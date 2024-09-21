@@ -1,0 +1,349 @@
+* {
+    box-sizing: border-box;
+    font-family: "Didact Gothic", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+:root {
+    --empty: rgba(32, 32, 32, 0.75);
+    --boxbg: linear-gradient(-45deg, #111, #2a2a2f 50%, #111);
+    --highlight: #23a7d5;
+    --green: #2dfa50;
+    --darkgreen: #1dda60;
+    --red: #fa502d;
+    --darkred: #da401d;
+    --yellow: #da8a11;
+    --grey: #777;
+    --darkbg: #161616;
+}
+
+button {
+    background-color: #111;
+    padding: 8px 16px;
+    box-shadow: none;
+    border: 1px solid #222233;
+    cursor: pointer;
+}
+
+button.icon-button {
+    width: 40px;
+    height: 40px;
+    padding: 5px;
+}
+
+button.icon-button img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+button:hover {
+    background-color: #171922;
+}
+
+button:disabled {
+    background-color: #333333;
+}
+
+body {
+    margin: 0px;
+    padding: 0px;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: linear-gradient(
+            rgba(0, 0, 0, 0.5),
+            rgba(0, 0, 0, 0.5)
+    ), url('../../public/images/background.jpeg') repeat;
+}
+
+p {
+    margin: 4px;
+}
+
+.page-wrap {
+    width: 100vw;
+    height: 100vh;
+}
+
+.page-wrap * {
+    color: #fff;
+}
+
+.page-wrap input {
+    color: #222233;
+}
+
+.hint-popup {
+    background: #111111;
+    color: #fff;
+    padding: 8px;
+}
+
+.hint-popup * {
+    color: #fff;
+}
+
+.hint-popup p {
+    margin: 5px;
+}
+
+.hint-popup p.hint {
+    font-style: italic;
+}
+
+.content-wrap {
+    height: calc(100vh - 80px);
+    display: flex;
+}
+
+.content-wrap .sidebar {
+    width: 280px;
+    height: calc(100% - 10px);
+    background: var(--boxbg);
+    overflow-x: visible;
+    margin: 5px;
+    border: 1px solid #333;
+    border-radius: 4px;
+}
+
+.content-wrap .sidebar .resource-item {
+    padding: 2px 5px;
+    margin: 0;
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    margin-bottom: 3px;
+    border-bottom: 1px solid #222233;
+}
+
+.sidebar .holder.monitored {
+    height: 27px;
+}
+
+.content-wrap .sidebar .resource-item.monitored {
+    width: 420px;
+    position: absolute;
+    z-index: 1;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+.content-wrap .sidebar .resource-item .appendix {
+    font-size: 13px;
+    width: 140px;
+    border-left: 1px solid #ffffff;
+    padding-left: 4px;
+}
+
+
+.content-wrap .sidebar .resource-item.affordable {
+    background: var(--darkgreen);
+}
+
+.content-wrap .sidebar .resource-item.unavailable {
+    background: var(--yellow);
+}
+
+.content-wrap .sidebar .resource-item.locked {
+    background: var(--darkred);
+}
+
+.content-wrap .sidebar .resource-item .resource-label {
+    width: 100px;
+}
+
+.content-wrap .sidebar .resource-item .resource-amount {
+    width: 100px;
+}
+
+.content-wrap .sidebar .resource-item .resource-balance {
+    width: 60px;
+}
+
+.content-wrap .content {
+    height: calc(100% - 10px);
+    flex: 1;
+    position: relative;
+    margin: 5px;
+}
+
+.footer {
+    height: 80px;
+    background: var(--boxbg);
+}
+
+.footer .mage-wrap {
+    height: 40px;
+    padding: 10px;
+}
+
+.footer .mage-wrap .level-up-wrap {
+    padding-left: 16px;
+    position: relative;
+}
+
+.flex-container {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.ingame-box {
+    border-radius: 4px;
+    border: 1px solid var(--grey);
+    padding: 12px;
+    background-color: var(--empty);
+}
+
+.card {
+    border-radius: 4px;
+    border: 1px solid var(--grey);
+    padding: 8px;
+    margin: 8px;
+    background: var(--darkbg);
+    transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0px 0px 12px rgba(200, 200, 255, 0.5);
+}
+
+.card.active {
+    border-color: var(--highlight);
+    background: var(--darkbg);
+    box-shadow: 0px 0px 12px var(--highlight);
+}
+
+.card.action {
+    width: 180px;
+}
+
+.bar-container .bar-outer {
+    height: 8px;
+    position: relative;
+    width: 100%;
+    border-radius: 4px;
+    border: 1px solid var(--grey);
+    background: var(--grey);
+}
+
+.bar-container .bar-outer .bar-inner {
+    background-color: var(--darkgreen);
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.2s linear;
+}
+
+.card.active .bar-container .bar-outer .bar-inner {
+    background-color: var(--highlight);
+    height: 100%;
+}
+
+ul.menu {
+    list-style: none;
+    margin: 0;
+    display: flex;
+}
+
+ul.menu li {
+    margin: 0;
+    padding: 8px 16px;
+    cursor: pointer;
+}
+
+ul.menu li.active span{
+    color: var(--highlight);
+}
+
+h4 {
+    font-size: 15px;
+    font-weight: bold;
+    margin: 8px 0px;
+}
+
+.detail-blade {
+    height: 100%;
+    width: 300px;
+    margin-left: 10px;
+    background: var(--darkbg);
+}
+
+.detail-blade .block {
+    padding-top: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #777777;
+}
+
+.effect-line {
+    border-bottom: 1px solid #333333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    padding: 4px;
+}
+
+.flashable {
+    position: relative;
+}
+
+.flashable.flash::after {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    width: calc(100% + 20px);
+    height: calc(100% + 20px);
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.5);
+    animation: pseudo-flash 1s forwards;
+}
+
+@keyframes pseudo-flash {
+    0% {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1.2);
+    }
+}
+
+
+
+.actions-wrap {
+    display: flex;
+    height: 100%;
+    width: 100%;
+}
+
+.actions-wrap .actions {
+    height: 100%;
+    flex: 1;
+}
+
+.card.action {
+    height: 120px;
+}
+
+.card.action .head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card.action .bottom .xp-text * {
+    font-size: 12px;
+}
+
+.card.action .xp-box,
+.detail-blade .xp-box {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+}
