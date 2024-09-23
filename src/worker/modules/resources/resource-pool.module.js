@@ -24,7 +24,7 @@ export class ResourcePoolModule extends GameModule {
             name: 'Coins',
             hasCap: true,
             tags: ['resource', 'coins', 'basic'],
-            defaultCap: 100,
+            defaultCap: 1000,
         })
 
     }

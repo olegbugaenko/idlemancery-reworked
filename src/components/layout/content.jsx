@@ -5,6 +5,7 @@ import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
 import {useAppContext} from "../../context/ui-context";
 import {Actions} from "../actions/actions.jsx";
+import {Shop} from "../shop/shop.jsx";
 
 export const Content = () => {
 
@@ -26,6 +27,10 @@ export const Content = () => {
 export const GetContent = ({ tab }) => {
     if(tab === 'actions') {
         return <Actions />
+    }
+
+    if(tab === 'shop') {
+        return <Shop />
     }
 
     return (<h3>Unknown tab</h3>)

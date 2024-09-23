@@ -27,4 +27,13 @@ export const registerAttributes = () => {
         saveBalanceTree: true,
         tags: ['attribute', 'mental']
     })
+
+    gameEffects.registerEffect('attribute_patience', {
+        name: 'Patience',
+        description: 'Patience impacts on your ability on focusing on routine tasks, increasing learning speed',
+        minValue: 1,
+        hasCap: false,
+        saveBalanceTree: true,
+        tags: ['attribute', 'mental']
+    })
 }

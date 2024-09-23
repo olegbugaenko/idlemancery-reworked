@@ -186,6 +186,7 @@ p {
 .flex-container {
     display: flex;
     justify-content: flex-start;
+    flex-wrap: wrap;
 }
 
 .ingame-box {
@@ -274,6 +275,19 @@ h4 {
     border-bottom: 1px solid #777777;
 }
 
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.tags-container .tag {
+    margin: 4px;
+    padding: 4px 8px;
+    border: 1px solid #777777;
+    border-radius: 12px;
+    font-size: 13px;
+}
+
 .effect-line {
     border-bottom: 1px solid #333333;
     display: flex;
@@ -281,6 +295,26 @@ h4 {
     align-items: center;
     font-size: 13px;
     padding: 4px;
+}
+
+.res-cost {
+    margin: 0;
+    padding: 4px;
+    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.res-cost.yellow * {
+    color: var(--yellow);
+}
+
+.res-cost.red * {
+    color: var(--red);
+}
+
+.res-cost .resource-name {
+    width: 75px;
 }
 
 .flashable {
@@ -316,15 +350,20 @@ h4 {
 
 
 
-.actions-wrap {
+.actions-wrap, .items-wrap {
     display: flex;
     height: 100%;
     width: 100%;
 }
 
-.actions-wrap .actions {
+.actions-wrap .actions,
+.items-wrap .items {
     height: 100%;
     flex: 1;
+}
+
+.actions-wrap .actions .list-wrap {
+    height: calc(100% - 80px);
 }
 
 .card.action {
@@ -341,9 +380,83 @@ h4 {
     font-size: 12px;
 }
 
+.action-lists-panel {
+    height: 50px;
+}
+
+.action-lists-panel .flex-container {
+    align-items: center;
+}
+
+.action-lists-panel .flex-container .panel-col {
+    margin-right: 10px;
+    position: relative;
+}
+
+.action-lists-panel .flex-container .panel-col .list-selector {
+    position: absolute;
+    bottom: 40px;
+    left: 0px;
+    padding: 12px;
+    border: 1px solid #777777;
+    border-radius: 4px;
+    background: #111111;
+}
+
+.action-lists-panel .flex-container .panel-col .list-selector .item {
+    padding: 4px 8px;
+    border-bottom: 1px solid #333333;
+}
+
+.list-editor .actions-list-wrap .action-row {
+    padding: 4px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+}
+
+.list-editor .actions-list-wrap .action-row input {
+    width: 50px;
+}
+
+.list-editor .actions-list-wrap .action-row .title {
+    width: 80px;
+}
+
+.list-editor .main-wrap .main-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+}
+
+.list-editor .buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+}
+
+
 .card.action .xp-box,
 .detail-blade .xp-box {
     display: flex;
     justify-content: space-between;
     font-size: 12px;
+}
+
+.card.item {
+    height: 80px;
+    width: 150px;
+}
+
+.card.item .head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card.item .hard-locked {
+    border: 1px solid var(--red);
 }

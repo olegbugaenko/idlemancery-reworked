@@ -58,7 +58,7 @@ export class MageModule extends GameModule {
                         },
                         'energy': {
                             A: 1,
-                            B: 5,
+                            B: 40 + 10*gameEffects.getEffectValue('attribute_strength'),
                             type: 1
                         }
                     }
@@ -72,7 +72,7 @@ export class MageModule extends GameModule {
                         }
                     }
                 }),
-                effectDeps: ['workersEfficiencyPerDragonLevel', 'mage_levelup_requirement', 'attribute_stamina']
+                effectDeps: ['workersEfficiencyPerDragonLevel', 'mage_levelup_requirement', 'attribute_stamina', 'attribute_strength']
             },
             get_cost: () => ({
                 'mage-xp': {

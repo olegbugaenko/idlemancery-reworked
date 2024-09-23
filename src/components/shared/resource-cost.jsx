@@ -4,7 +4,7 @@ import {TippyWrapper} from "./tippy-wrapper.jsx";
 
 export const ResourceCost = ({ affordabilities }) => {
 
-    const content = (<p className={`res-cost ${affordabilities.hardLocked ? 'red' : ''}`}>
+    const content = (<p className={`res-cost ${affordabilities.hardLocked ? 'red' : ''} ${!affordabilities.isAffordable ? 'yellow' : ''}`}>
         <span className={'resource-name'}>{affordabilities.name || affordabilities.id}</span>
         <span className={'resource-req'}>{formatValue(affordabilities.actual)} / {formatValue(affordabilities.requirement)}</span>
     </p>)

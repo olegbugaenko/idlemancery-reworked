@@ -1,6 +1,7 @@
 import {registerActionsStage1} from "./actions-db";
 import {GameModule} from "../../shared/game-module";
-import {gameEntity, gameResources} from "game-framework";
+import {gameEntity, gameResources, gameEffects} from "game-framework";
+import {ActionListsSubmodule} from "./action-lists.submodule";
 
 export class ActionsModule extends GameModule {
 
@@ -8,6 +9,8 @@ export class ActionsModule extends GameModule {
         super();
         this.activeAction = null;
         this.actions = {};
+        this.lists = new ActionListsSubmodule();
+
         this.eventHandler.registerHandler('run-action', (payload) => {
             this.setRunningAction(payload.id);
         })
@@ -25,6 +28,12 @@ export class ActionsModule extends GameModule {
 
         registerActionsStage1();
         this.actions = {};
+
+        gameEffects.registerEffect('learning_rate', {
+            name: 'Learning Rate',
+            defaultValue: 1.,
+            minValue: 1,
+        })
 
         gameEntity.registerGameEntity('runningAction', {
             name: 'Idling',
@@ -56,15 +65,20 @@ export class ActionsModule extends GameModule {
                 gameEntity.setEntityLevel(this.activeAction, this.actions[this.activeAction].level, true);
                 console.log('Leveled up: ', gameEntity.getLevel('runningAction'), gameEntity.getLevel(this.activeAction));
                 this.actions[this.activeAction].isLeveled = true;
+                if(gameEntity.isCapped(this.activeAction)) {
+                    this.setRunningAction(null);
+                }
                 this.sendActionsData();
             }
         }
+        this.lists.tick(game, delta)
     }
 
     save() {
         return {
             actions: this.actions,
             activeAction: this.activeAction,
+            actionLists: this.lists.save(),
         }
     }
 
@@ -79,8 +93,11 @@ export class ActionsModule extends GameModule {
                 this.actions[id].xp = saveObject.actions[id].xp;
             }
         }
-        if(saveObject.activeAction) {
+        if(saveObject?.activeAction) {
             this.setRunningAction(saveObject.activeAction);
+        }
+        if(saveObject?.actionLists) {
+            this.lists.load(saveObject.actionLists)
         }
         this.sendActionsData();
     }
@@ -102,7 +119,7 @@ export class ActionsModule extends GameModule {
             eff = entEff;
         }
 
-        return eff;
+        return eff * gameEffects.getEffectValue('attribute_patience') * gameEffects.getEffectValue('learning_rate');
     }
 
     setRunningAction(id) {
@@ -131,7 +148,7 @@ export class ActionsModule extends GameModule {
 
     getActionsData() {
         const entities = gameEntity.listEntitiesByTags(['action']);
-        const available = entities.filter(one => one.isUnlocked).map(entity => ({
+        const available = entities.filter(one => one.isUnlocked && !one.isCapped).map(entity => ({
             id: entity.id,
             name: entity.name,
             description: entity.description,
@@ -143,14 +160,17 @@ export class ActionsModule extends GameModule {
             maxXP: this.getActionXPMax(entity.id),
             isActive: this.activeAction === entity.id,
             xpRate: this.activeAction === entity.id ? this.getLearningRate('runningAction') : this.getLearningRate(entity.id, 1),
-            isLeveled: this.actions[entity.id]?.isLeveled
+            isLeveled: this.actions[entity.id]?.isLeveled,
+            tags: entity.tags
         }))
 
         const current = this.activeAction ? available.find(id => id === this.activeAction) : null;
 
         return {
             available,
-            current
+            current,
+            actionLists: this.lists.getLists(),
+            runningList: this.lists.runningList,
         }
     }
 
@@ -173,7 +193,8 @@ export class ActionsModule extends GameModule {
             maxXP: this.getActionXPMax(entity.id),
             isActive: this.activeAction === entity.id,
             xpRate: this.activeAction === entity.id ? this.getLearningRate('runningAction') : this.getLearningRate(entity.id, 1),
-            isLeveled: this.actions[entity.id]?.isLeveled
+            isLeveled: this.actions[entity.id]?.isLeveled,
+            tags: entity.tags
         };
 
         return entityData;

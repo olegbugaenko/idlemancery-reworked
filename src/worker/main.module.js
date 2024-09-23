@@ -4,6 +4,7 @@ import {MageModule} from "./modules/mage/mage.module";
 import {ResourcePoolModule} from "./modules/resources/resource-pool.module";
 import {ActionsModule} from "./modules/actions/actions.module";
 import {AttributesModule} from "./modules/attributes/attributes.module";
+import {ShopModule} from "./modules/items/shop.module";
 
 
 export class MainModule extends GameModule {
@@ -14,6 +15,7 @@ export class MainModule extends GameModule {
         gameCore.registerModule('mage', MageModule);
         gameCore.registerModule('resource-pool', ResourcePoolModule);
         gameCore.registerModule('actions', ActionsModule);
+        gameCore.registerModule('shop', ShopModule);
 
 
 
@@ -54,6 +56,7 @@ export class MainModule extends GameModule {
             }*/
             const unlocks = {
                 'actions': true,
+                'shop': gameCore.getModule('shop').isUnlocked,
             }
             this.eventHandler.sendData('unlocks', unlocks);
         })
