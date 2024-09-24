@@ -17,14 +17,24 @@ export class ResourcePoolModule extends GameModule {
         gameResources.registerResource('energy', {
             name: 'Energy',
             hasCap: true,
-            tags: ['resource', 'energy', 'basic'],
+            tags: ['resource', 'energy', 'basic', 'vital'],
             defaultCap: 0,
+        })
+        gameResources.registerResource('health', {
+            name: 'Health',
+            hasCap: true,
+            tags: ['resource', 'health', 'basic', 'vital'],
+            defaultCap: 0,
+            unlockCondition: () => {
+                // console.log('ACTLVL: ', )
+                return gameEntity.getLevel('action_pushup') > 1
+            }
         })
         gameResources.registerResource('coins', {
             name: 'Coins',
             hasCap: true,
             tags: ['resource', 'coins', 'basic'],
-            defaultCap: 1000,
+            defaultCap: 10,
         })
 
     }
@@ -52,6 +62,7 @@ export class ResourcePoolModule extends GameModule {
 
     getResourcesData() {
         const rs = gameResources.listResourcesByTags(['resource', 'population'], true);
+        // console.log('RS: ', rs);
         return rs.filter(one => one.isUnlocked).map(resource => ({
             ...resource,
             isNegative: resource.balance < 0,

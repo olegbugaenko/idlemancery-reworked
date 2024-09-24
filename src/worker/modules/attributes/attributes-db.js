@@ -19,6 +19,15 @@ export const registerAttributes = () => {
         tags: ['attribute', 'physical']
     })
 
+    gameEffects.registerEffect('attribute_vitality', {
+        name: 'Vitality',
+        description: 'Vitality improves your health',
+        minValue: 1,
+        hasCap: false,
+        saveBalanceTree: true,
+        tags: ['attribute', 'physical']
+    })
+
     gameEffects.registerEffect('attribute_charisma', {
         name: 'Charisma',
         description: 'Charisma improves your communication skills and interaction with other people',

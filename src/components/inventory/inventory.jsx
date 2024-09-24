@@ -7,12 +7,12 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import {EffectsSection} from "../shared/effects-section.jsx";
 import {ResourceCost} from "../shared/resource-cost.jsx";
 
-export const Shop = ({}) => {
+export const Inventory = ({}) => {
 
     const worker = useContext(WorkerContext);
 
     const { onMessage, sendData } = useWorkerClient(worker);
-    const [itemsData, setItemsData] = useState({
+    const [inventoryData, setItemsData] = useState({
         available: [],
         current: undefined
     });
@@ -20,22 +20,22 @@ export const Shop = ({}) => {
 
     useEffect(() => {
         const interval = setInterval(() => {
-            sendData('query-items-data', {});
+            sendData('query-inventory-data', {});
         }, 100);
         return () => {
             clearInterval(interval);
         }
     }, [])
 
-    onMessage('items-data', (items) => {
-        setItemsData(items);
+    onMessage('inventory-data', (inventory) => {
+        setItemsData(inventory);
     })
 
     const purchaseItem = (id) => {
-        sendData('purchase-item', { id })
+        sendData('consume-inventory', { id, amount: 1 })
     }
 
-    const setItemDetails = (id) => {
+    const setInventoryDetails = (id) => {
         if(!id) {
             setDetailOpened(null);
         } else {
@@ -44,16 +44,16 @@ export const Shop = ({}) => {
     }
 
     return (
-        <div className={'items-wrap'}>
-            <div className={'ingame-box items'}>
+        <div className={'inventory-wrap'}>
+            <div className={'ingame-box inventory'}>
                 <PerfectScrollbar>
                     <div className={'flex-container'}>
-                        {itemsData.available.map(item => <ItemCard key={item.id} {...item} onPurchase={purchaseItem} onShowDetails={setItemDetails}/>)}
+                        {inventoryData.available.map(item => <InventoryCard key={item.id} {...item} onPurchase={purchaseItem} onShowDetails={setInventoryDetails}/>)}
                     </div>
                 </PerfectScrollbar>
             </div>
             <div className={'item-detail ingame-box detail-blade'}>
-                {detailOpened ? (<ItemDetails itemId={detailOpened} />) : null}
+                {detailOpened ? (<InventoryDetails itemId={detailOpened} />) : null}
             </div>
         </div>
 
@@ -61,10 +61,10 @@ export const Shop = ({}) => {
 
 }
 
-export const ItemCard = ({ id, name, level, max, affordable, isLeveled, onClick, onPurchase, onShowDetails}) => {
+export const InventoryCard = ({ id, name, amount, onPurchase, onShowDetails}) => {
     const [isFlashActive, setFlashActive] = useState(false);
 
-    useEffect(() => {
+ /*   useEffect(() => {
 
         console.log('Leveled!', isLeveled)
         if(isLeveled) {
@@ -79,22 +79,17 @@ export const ItemCard = ({ id, name, level, max, affordable, isLeveled, onClick,
         // Cleanup the timer if the component unmounts or if someProp changes before the timer finishes
         return () => clearTimeout(timer);
 
-    }, [isLeveled]);
+    }, [isLeveled]);*/
 
-    return (<div className={`card item flashable ${isFlashActive ? 'flash' : ''} ${affordable.hardLocked ? 'hard-locked' : ''}  ${!affordable.isAffordable ? 'unavailable' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)}>
-        <div className={'head'}>
-            <p className={'title'}>{name}</p>
-            <span className={'level'}>{formatInt(level)}{max ? `/${formatInt(max)}` : ''}</span>
-        </div>
-        <div className={'bottom'}>
-            <div className={'buttons'}>
-                <button disabled={!affordable.isAffordable} onClick={() => onPurchase(id)}>Purchase</button>
-            </div>
+    return (<div className={`icon-card item flashable ${isFlashActive ? 'flash' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)} onClick={() => onPurchase(id)}>
+        <div className={'icon-content'}>
+            <img src={`icons/resources/${id}.png`} className={'resource'} />
+            <span className={'level'}>{formatInt(amount)}</span>
         </div>
     </div> )
 }
 
-export const ItemDetails = ({itemId}) => {
+export const InventoryDetails = ({itemId}) => {
 
     const worker = useContext(WorkerContext);
 
@@ -104,7 +99,7 @@ export const ItemDetails = ({itemId}) => {
 
     useEffect(() => {
         const interval = setInterval(() => {
-            sendData('query-item-details', { id: itemId });
+            sendData('query-inventory-details', { id: itemId });
         }, 100);
 
         return () => {
@@ -113,8 +108,8 @@ export const ItemDetails = ({itemId}) => {
     })
 
 
-    onMessage('item-details', (items) => {
-        setDetailOpened(items);
+    onMessage('inventory-details', (inventory) => {
+        setDetailOpened(inventory);
     })
 
     if(!itemId || !item) return null;
@@ -124,7 +119,7 @@ export const ItemDetails = ({itemId}) => {
         <PerfectScrollbar>
             <div className={'blade-inner'}>
                 <div className={'block'}>
-                    <h4>{item.name}</h4>
+                    <h4>{item.name} (x{formatInt(item.amount)})</h4>
                     <div className={'description'}>
                         {item.description}
                     </div>
@@ -135,15 +130,9 @@ export const ItemDetails = ({itemId}) => {
                     </div>
                 </div>
                 <div className={'block'}>
-                    <p>Cost:</p>
-                    <div className={'costs-wrap'}>
-                        {Object.values(item.affordable.affordabilities || {}).map(aff => <ResourceCost affordabilities={aff}/>)}
-                    </div>
-                </div>
-                <div className={'block'}>
-                    <p>Effects:</p>
+                    <p>Effects on usage:</p>
                     <div className={'effects'}>
-                        <EffectsSection effects={item.potentialEffects} />
+                        <EffectsSection effects={item.effects} />
                     </div>
                 </div>
             </div>

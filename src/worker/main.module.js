@@ -5,6 +5,7 @@ import {ResourcePoolModule} from "./modules/resources/resource-pool.module";
 import {ActionsModule} from "./modules/actions/actions.module";
 import {AttributesModule} from "./modules/attributes/attributes.module";
 import {ShopModule} from "./modules/items/shop.module";
+import {InventoryModule} from "./modules/inventory/inventory.module";
 
 
 export class MainModule extends GameModule {
@@ -16,6 +17,7 @@ export class MainModule extends GameModule {
         gameCore.registerModule('resource-pool', ResourcePoolModule);
         gameCore.registerModule('actions', ActionsModule);
         gameCore.registerModule('shop', ShopModule);
+        gameCore.registerModule('inventory', InventoryModule);
 
 
 
@@ -57,6 +59,7 @@ export class MainModule extends GameModule {
             const unlocks = {
                 'actions': true,
                 'shop': gameCore.getModule('shop').isUnlocked,
+                'inventory': gameEntity.getLevel('shop_item_backpack') > 0
             }
             this.eventHandler.sendData('unlocks', unlocks);
         })

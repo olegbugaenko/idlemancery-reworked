@@ -26,11 +26,29 @@ export class ActionsModule extends GameModule {
 
     initialize() {
 
+        gameEffects.registerEffect('begging_efficiency', {
+            name: 'Begging Efficiency',
+            defaultValue: 1.,
+            minValue: 1,
+        })
+
+        gameEffects.registerEffect('clean_stable_efficiency', {
+            name: 'Clean Stable Efficiency',
+            defaultValue: 1.,
+            minValue: 1,
+        })
+
         registerActionsStage1();
         this.actions = {};
 
         gameEffects.registerEffect('learning_rate', {
             name: 'Learning Rate',
+            defaultValue: 1.,
+            minValue: 1,
+        })
+
+        gameEffects.registerEffect('walking_learning_rate', {
+            name: 'Walking Learning Rate',
             defaultValue: 1.,
             minValue: 1,
         })
@@ -119,7 +137,13 @@ export class ActionsModule extends GameModule {
             eff = entEff;
         }
 
-        return eff * gameEffects.getEffectValue('attribute_patience') * gameEffects.getEffectValue('learning_rate');
+        let baseXPRate = 1.;
+
+        if(gameEntity.getEntity(id).getLearnRate) {
+            baseXPRate = gameEntity.getEntity(id).getLearnRate();
+        }
+
+        return baseXPRate * eff * gameEffects.getEffectValue('attribute_patience') * gameEffects.getEffectValue('learning_rate');
     }
 
     setRunningAction(id) {
@@ -128,6 +152,13 @@ export class ActionsModule extends GameModule {
             gameEntity.unsetEntity('runningAction');
 
             if(id) {
+                const isCapped = gameEntity.isCapped(id);
+
+                if(isCapped) {
+                    this.activeAction = null;
+                    return;
+                }
+
                 const rn = gameEntity.registerGameEntity('runningAction', {
                     copyFromId: id,
                     level: this.actions[id]?.level ?? 1,
@@ -155,7 +186,7 @@ export class ActionsModule extends GameModule {
             max: entity.getMaxLevel ? entity.getMaxLevel() : entity.maxLevel || 0,
             level: this.actions[entity.id]?.level || 1,
             affordable: gameEntity.getAffordable(entity.id),
-            potentialEffects: gameEntity.getEffects(entity.id, 0, this.actions[entity.id]?.level || 1, true),
+            potentialEffects: gameEntity.getEffects(entity.id, gameEntity.getAttribute(entity.id, 'isTraining') ? 1 : 0, this.actions[entity.id]?.level || 1, true),
             xp: this.actions[entity.id]?.xp || 0,
             maxXP: this.getActionXPMax(entity.id),
             isActive: this.activeAction === entity.id,
@@ -171,6 +202,7 @@ export class ActionsModule extends GameModule {
             current,
             actionLists: this.lists.getLists(),
             runningList: this.lists.runningList,
+            actionListsUnlocked: gameEntity.getLevel('shop_item_notebook') > 0
         }
     }
 
@@ -188,7 +220,7 @@ export class ActionsModule extends GameModule {
             max: entity.getMaxLevel ? entity.getMaxLevel() : entity.maxLevel || 0,
             level: this.actions[entity.id]?.level || 1,
             affordable: gameEntity.getAffordable(entity.id),
-            potentialEffects: gameEntity.getEffects(entity.id, 0, this.actions[entity.id]?.level || 1, true),
+            potentialEffects: gameEntity.getEffects(entity.id, gameEntity.getAttribute(entity.id, 'isTraining') ? 1 : 0, this.actions[entity.id]?.level || 1, true),
             xp: this.actions[entity.id]?.xp || 0,
             maxXP: this.getActionXPMax(entity.id),
             isActive: this.activeAction === entity.id,

@@ -58,7 +58,12 @@ export class MageModule extends GameModule {
                         },
                         'energy': {
                             A: 1,
-                            B: 40 + 10*gameEffects.getEffectValue('attribute_strength'),
+                            B: 9 + gameEffects.getEffectValue('attribute_strength'),
+                            type: 0
+                        },
+                        'health': {
+                            A: 1,
+                            B: 9 + gameEffects.getEffectValue('attribute_vitality'),
                             type: 1
                         }
                     }
@@ -67,12 +72,17 @@ export class MageModule extends GameModule {
                     resources: {
                         energy: {
                             A: 0,
-                            B: 0.01*gameEffects.getEffectValue('attribute_stamina'),
+                            B: 0.01 + 0.01*gameEffects.getEffectValue('attribute_stamina'),
+                            type: 0
+                        },
+                        health: {
+                            A: 0,
+                            B: 0.01,
                             type: 0
                         }
                     }
                 }),
-                effectDeps: ['workersEfficiencyPerDragonLevel', 'mage_levelup_requirement', 'attribute_stamina', 'attribute_strength']
+                effectDeps: ['workersEfficiencyPerDragonLevel', 'mage_levelup_requirement', 'attribute_stamina', 'attribute_strength', 'attribute_vitality']
             },
             get_cost: () => ({
                 'mage-xp': {

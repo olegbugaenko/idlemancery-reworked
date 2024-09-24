@@ -28,7 +28,7 @@ export class ShopModule extends GameModule {
     }
 
     tick(game, delta) {
-        if(!this.isUnlocked && gameResources.getResource('coins').amount > 100) {
+        if(!this.isUnlocked && gameResources.getResource('coins').amount >= 10) {
             this.isUnlocked = true;
         }
         this.leveledId = null;

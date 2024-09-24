@@ -53,6 +53,15 @@ export const Actions = ({}) => {
 
     })
 
+    onMessage('action-list-effects', (payload) => {
+        if(listData) {
+            setListData({
+                ...listData,
+                potentialEffects: payload,
+            })
+        }
+    })
+
     const activateAction = (id) => {
         sendData('run-action', { id })
     }
@@ -72,6 +81,7 @@ export const Actions = ({}) => {
             setEditingList(id);
         } else {
             console.log('Create new list. Setting listData')
+            setViewingList(null);
             setEditingList(null);
             setListData({ name: '', actions: []})
         }
@@ -91,9 +101,11 @@ export const Actions = ({}) => {
             newList.actions.push({
                 id,
                 name,
-                time: 2
+                time: 2,
+                isAvailable: true,
             })
             setListData(newList);
+            sendData('query-action-list-effects', { listData: newList });
         }
     }
 
@@ -102,6 +114,7 @@ export const Actions = ({}) => {
             const newList = listData;
             newList.actions = newList.actions.filter(a => a.id !== id);
             setListData(newList);
+            sendData('query-action-list-effects', { listData: newList });
         }
     }
 
@@ -110,6 +123,7 @@ export const Actions = ({}) => {
             const newList = listData;
             newList.actions = newList.actions.map(a => a.id !== id ? a : {...a, [key]: value});
             setListData(newList);
+            sendData('query-action-list-effects', { listData: newList });
         }
     }
 
@@ -119,6 +133,7 @@ export const Actions = ({}) => {
             const newList = listData;
             newList[key] = value;
             setListData(newList);
+            // sendData('query-action-list-effects', { id });
         }
     }
 
@@ -137,7 +152,7 @@ export const Actions = ({}) => {
                         </div>
                     </PerfectScrollbar>
                 </div>
-                <ActionListsPanel editListToDetails={editListToDetails} lists={actionsData.actionLists} viewListToDetails={viewListToDetails} runningList={actionsData.runningList}/>
+                {actionsData.actionListsUnlocked ? (<ActionListsPanel editListToDetails={editListToDetails} lists={actionsData.actionLists} viewListToDetails={viewListToDetails} runningList={actionsData.runningList}/>) : null}
             </div>
             <div className={'action-detail ingame-box detail-blade'}>
                 <DetailBlade
@@ -339,6 +354,10 @@ export const ActionDetailsComponent = React.memo(({...action}) => {
 
 export const ActionListsPanel = ({ runningList, editListToDetails, lists, viewListToDetails }) => {
 
+    const worker = useContext(WorkerContext);
+
+    const { onMessage, sendData } = useWorkerClient(worker);
+
     const [openedFor, setOpenedFor] = useState(null);
 
     useEffect(() => {
@@ -362,6 +381,7 @@ export const ActionListsPanel = ({ runningList, editListToDetails, lists, viewLi
     }
 
     const runList = (id) => {
+        sendData('run-list', { id })
         console.log('Selected list: ', id, '. Running TBD');
     }
 
@@ -370,7 +390,7 @@ export const ActionListsPanel = ({ runningList, editListToDetails, lists, viewLi
             <div className={'current-list panel-col'}>
                 Current list: {runningList ? runningList.name : 'None'}
                 <button onClick={() => setOpenedFor('change')}>Change</button>
-                <ActionListsPopup lists={lists} isOpened={openedFor === 'change'} setOpenedFor={setOpenedFor} onSelect={runList} onHover={viewListToDetails}/>
+                <ActionListsPopup lists={[{ id: null, name: 'None'}, ...(lists || [])]} isOpened={openedFor === 'change'} setOpenedFor={setOpenedFor} onSelect={runList} onHover={viewListToDetails}/>
             </div>
             <div className={'lists-editor panel-col'}>
                 <button onClick={() => editListToDetails()}>Create list</button>
@@ -421,7 +441,7 @@ export const ListEditor = ({ editListId, listData, onUpdateActionFromList, onDro
             </div>
         </div>
         <div className={'actions-list-wrap'}>
-            {editing.actions.map(action => (<div className={'action-row flex-container'}>
+            {editing.actions.map(action => (<div className={`action-row flex-container ${!action.isAvailable ? 'unavailable' : ''}`}>
                 <div className={'col title'}>
                     <span>{action.name}</span>
                 </div>
@@ -432,6 +452,10 @@ export const ListEditor = ({ editListId, listData, onUpdateActionFromList, onDro
                     <span className={'close'} onClick={() => onDropActionFromList(action.id)}>X</span>
                 </div>
             </div> ))}
+        </div>
+        <div className={'effects-wrap'}>
+            <p>Average Effects per second</p>
+            <EffectsSection effects={editing?.potentialEffects || []} maxDisplay={10}/>
         </div>
         <div className={'buttons'}>
             <button onClick={saveAndClose}>{listData.id ? 'Save' : 'Create'}</button>

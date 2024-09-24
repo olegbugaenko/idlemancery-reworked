@@ -28,7 +28,10 @@ export const registerActionsStage1 = () => {
                     }
                 }
             },
-            effectDeps: ['attribute_strength']
+            effectDeps: ['attribute_strength', 'walking_learning_rate']
+        },
+        getLearnRate: () => {
+            return gameEffects.getEffectValue('walking_learning_rate')
         },
         unlockCondition: () => {
             return true
@@ -65,7 +68,7 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'coins': {
-                        A: 0.005*(0.9 + 0.1*gameEffects.getEffectValue('attribute_charisma')),
+                        A: 0.005*(0.9 + 0.1*gameEffects.getEffectValue('attribute_charisma'))*gameEffects.getEffectValue('begging_efficiency'),
                         B: 0.045,
                         type: 0,
                     }
@@ -80,7 +83,7 @@ export const registerActionsStage1 = () => {
                     }
                 }
             }),
-            effectDeps: ['attribute_charisma']
+            effectDeps: ['attribute_charisma', 'begging_efficiency']
         },
         unlockCondition: () => {
             return gameEntity.getLevel('action_visit_city') > 1
@@ -101,8 +104,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'coins': {
-                        A: 0.01*(0.9 + 0.1*gameEffects.getEffectValue('attribute_strength')),
-                        B: 0.09,
+                        A: 0.02*(0.9 + 0.1*gameEffects.getEffectValue('attribute_strength'))*gameEffects.getEffectValue('clean_stable_efficiency'),
+                        B: 0.18,
                         type: 0,
                     }
                 }
@@ -113,13 +116,18 @@ export const registerActionsStage1 = () => {
                         A: 0.0,
                         B: (0.9 + 0.1*gameEffects.getEffectValue('attribute_strength')),
                         type: 0,
+                    },
+                    'health': {
+                        A: 0.0,
+                        B: (0.09 + 0.01*gameEffects.getEffectValue('attribute_strength')),
+                        type: 0,
                     }
                 }
             }),
             effectDeps: ['attribute_strength']
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('action_visit_city') > 1
+            return gameEntity.getLevel('action_pushup') > 1
         },
         attributes: {
             baseXPCost: 20,
@@ -135,11 +143,16 @@ export const registerActionsStage1 = () => {
         description: 'Pay some gold to rest in tavern',
         level: 1,
         resourceModifier: {
-            get_multiplier: () => ({
+            get_income: () => ({
                 resources: {
                     'energy': {
-                        A: 1,
-                        B: 1,
+                        A: 1.0,
+                        B: 0,
+                        type: 0,
+                    },
+                    'health': {
+                        A: 0.1,
+                        B: 0,
                         type: 0,
                     }
                 }
@@ -148,7 +161,7 @@ export const registerActionsStage1 = () => {
                 resources: {
                     'coins': {
                         A: 0.0,
-                        B: 0.5,
+                        B: 0.2,
                         type: 0,
                     }
                 }
@@ -198,6 +211,7 @@ export const registerActionsStage1 = () => {
         },
         attributes: {
             baseXPCost: 50,
+            isTraining: true,
         }
     })
 
@@ -215,6 +229,11 @@ export const registerActionsStage1 = () => {
                         A: 1,
                         B: 0,
                         type: 0,
+                    },
+                    'attribute_vitality': {
+                        A: 1,
+                        B: 0,
+                        type: 0,
                     }
                 }
             },
@@ -227,13 +246,54 @@ export const registerActionsStage1 = () => {
                     }
                 }
             },
-            effectDeps: []
+            effectDeps: [],
+            reourcesToReassert: ['health']
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('action_clean_stable') > 4
+            return gameEntity.getLevel('action_walk') > 14
         },
         attributes: {
             baseXPCost: 50,
+            isTraining: true,
+        }
+    })
+
+    gameEntity.registerGameEntity('action_read_motivation_book', {
+        tags: ["action", "training", "mental"],
+        name: 'Read book of Motivation',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Read book of motivation, containing some useful advices regarding self-development',
+        level: 1,
+        maxLevel: 10,
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'learning_rate': {
+                        A: 0.1,
+                        B: 0.9,
+                        type: 0,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'energy': {
+                        A: 0,
+                        B: 1,
+                        type: 0
+                    }
+                }
+            },
+            effectDeps: []
+        },
+        unlockCondition: () => {
+            // console.log('Beggar level: ', gameEntity.getLevel('action_beggar'));
+            return gameEntity.getLevel('shop_item_book_of_motivation') > 0
+        },
+        attributes: {
+            baseXPCost: 50,
+            isTraining: true,
         }
     })
 

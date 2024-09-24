@@ -105,7 +105,9 @@ export const AttributesBar = () => {
             console.log('res: ', res.breakDown);
 
             return (<div className={`holder ${aff ? 'monitored' : ''}`}><p className={`resource-item ${affClassData}`}>
-                <span className={'resource-label'}>{res.name}</span>
+                <TippyWrapper content={<div className={'hint-popup'}>{res.description}</div> }>
+                    <span className={'resource-label'}>{res.name}</span>
+                </TippyWrapper>
                 <TippyWrapper content={<div className={'hint-popup'}><BreakDown breakDown={res.breakDown}/></div> }>
                     <span className={'resource-balance'}>{formatValue(res.value || 0)}</span>
                 </TippyWrapper>

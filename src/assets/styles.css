@@ -205,6 +205,14 @@ p {
     transition: box-shadow 0.3s ease;
 }
 
+.card.unavailable {
+    border-color: var(--yellow);
+}
+
+.card.hard-locked {
+    border-color: var(--red);
+}
+
 .card:hover {
     box-shadow: 0px 0px 12px rgba(200, 200, 255, 0.5);
 }
@@ -240,6 +248,34 @@ p {
     height: 100%;
 }
 
+.icon-card {
+    border: 1px solid #777777;
+    border-radius: 4px;
+}
+
+.icon-card .icon-content {
+    width: 40px;
+    height: 40px;
+    position: relative;
+}
+
+.icon-card .icon-content img {
+    height: 100%;
+    object-fit: contain;
+}
+
+.icon-card .icon-content .level {
+    position: absolute;
+    padding: 3px;
+    background: #111111;
+    border: 1px solid #777777;
+    border-radius: 3px;
+    font-size: 12px;
+    top: -2px;
+    right: -2px;
+    line-height: 8px;
+}
+
 ul.menu {
     list-style: none;
     margin: 0;
@@ -250,6 +286,10 @@ ul.menu li {
     margin: 0;
     padding: 8px 16px;
     cursor: pointer;
+}
+
+ul.menu li:hover span {
+    text-shadow: 0 0 18px #ffffff;
 }
 
 ul.menu li.active span{
@@ -350,14 +390,15 @@ h4 {
 
 
 
-.actions-wrap, .items-wrap {
+.actions-wrap, .items-wrap, .inventory-wrap {
     display: flex;
     height: 100%;
     width: 100%;
 }
 
 .actions-wrap .actions,
-.items-wrap .items {
+.items-wrap .items,
+.inventory-wrap .inventory {
     height: 100%;
     flex: 1;
 }
@@ -416,6 +457,11 @@ h4 {
     font-size: 13px;
 }
 
+.list-editor .actions-list-wrap .action-row.unavailable * {
+    color: var(--grey);
+    font-style: italic;
+}
+
 .list-editor .actions-list-wrap .action-row input {
     width: 50px;
 }
@@ -446,15 +492,21 @@ h4 {
     font-size: 12px;
 }
 
+.detail-blade .effects-wrap {
+    padding: 4px;
+    margin: 8px 0;
+}
+
 .card.item {
     height: 80px;
-    width: 150px;
+    width: 180px;
 }
 
 .card.item .head {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    font-size: 14px;
 }
 
 .card.item .hard-locked {
