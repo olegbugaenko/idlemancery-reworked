@@ -9,6 +9,7 @@ export class ActionsModule extends GameModule {
         super();
         this.activeAction = null;
         this.actions = {};
+        this.selectedFilterId = 'all';
         this.lists = new ActionListsSubmodule();
 
         this.eventHandler.registerHandler('run-action', (payload) => {
@@ -16,15 +17,47 @@ export class ActionsModule extends GameModule {
         })
 
         this.eventHandler.registerHandler('query-actions-data', (payload) => {
-            this.sendActionsData()
+            this.sendActionsData(this.selectedFilterId)
         })
 
         this.eventHandler.registerHandler('query-action-details', (payload) => {
             this.sendActionDetails(payload.id)
         })
+
+        this.eventHandler.registerHandler('set-selected-actions-filter', ({filterId}) => {
+            this.selectedFilterId = filterId;
+        })
+
+        this.filters = [{
+            id: 'all',
+            name: 'All',
+            tags: [],
+            isDefault: true,
+        },{
+            id: 'jobs',
+            name: 'Jobs',
+            tags: ['job'],
+            isDefault: true,
+        },{
+            id: 'training',
+            name: 'Training',
+            tags: ['training'],
+            isDefault: true,
+        },{
+            id: 'gathering',
+            name: 'Gathering',
+            tags: ['gathering'],
+            isDefault: true,
+        }]
     }
 
     initialize() {
+
+        gameEffects.registerEffect('rest_efficiency', {
+            name: 'Rest Efficiency',
+            defaultValue: 1.,
+            minValue: 1,
+        })
 
         gameEffects.registerEffect('begging_efficiency', {
             name: 'Begging Efficiency',
@@ -34,6 +67,18 @@ export class ActionsModule extends GameModule {
 
         gameEffects.registerEffect('clean_stable_efficiency', {
             name: 'Clean Stable Efficiency',
+            defaultValue: 1.,
+            minValue: 1,
+        })
+
+        gameEffects.registerEffect('gathering_efficiency', {
+            name: 'Gathering Efficiency',
+            defaultValue: 1.,
+            minValue: 1,
+        })
+
+        gameEffects.registerEffect('read_books_efficiency', {
+            name: 'Read Books Efficiency',
             defaultValue: 1.,
             minValue: 1,
         })
@@ -86,7 +131,7 @@ export class ActionsModule extends GameModule {
                 if(gameEntity.isCapped(this.activeAction)) {
                     this.setRunningAction(null);
                 }
-                this.sendActionsData();
+                this.sendActionsData(this.selectedFilterId);
             }
         }
         this.lists.tick(game, delta)
@@ -97,6 +142,7 @@ export class ActionsModule extends GameModule {
             actions: this.actions,
             activeAction: this.activeAction,
             actionLists: this.lists.save(),
+            selectedFilterId: this.selectedFilterId
         }
     }
 
@@ -117,7 +163,8 @@ export class ActionsModule extends GameModule {
         if(saveObject?.actionLists) {
             this.lists.load(saveObject.actionLists)
         }
-        this.sendActionsData();
+        this.selectedFilterId = saveObject?.selectedFilterId || 'all';
+        this.sendActionsData(this.selectedFilterId);
     }
 
     setAction(actionId, amount, bForce = false) {
@@ -173,13 +220,32 @@ export class ActionsModule extends GameModule {
 
             this.activeAction = id;
 
-            this.sendActionsData()
+            this.sendActionsData(this.selectedFilterId)
         }
     }
 
-    getActionsData() {
-        const entities = gameEntity.listEntitiesByTags(['action']);
-        const available = entities.filter(one => one.isUnlocked && !one.isCapped).map(entity => ({
+    getActionsData(filterId) {
+        // const entities = gameEntity.listEntitiesByTags(['action']).filter(one => one.isUnlocked && !one.isCapped);
+        const perCats = this.filters.reduce((acc, filter) => {
+
+            acc[filter.id] = {
+                id: filter.id,
+                name: filter.name,
+                tags: filter.tags,
+                items: gameEntity.listEntitiesByTags(['action', ...filter.tags]).filter(one => one.isUnlocked && !one.isCapped),
+                isSelected: filterId === filter.id
+            }
+
+            return acc;
+        }, {})
+
+        if(!filterId) {
+            filterId = 'all';
+        }
+
+        const entities = perCats[filterId].items;
+
+        const available = entities.map(entity => ({
             id: entity.id,
             name: entity.name,
             description: entity.description,
@@ -202,7 +268,8 @@ export class ActionsModule extends GameModule {
             current,
             actionLists: this.lists.getLists(),
             runningList: this.lists.runningList,
-            actionListsUnlocked: gameEntity.getLevel('shop_item_notebook') > 0
+            actionListsUnlocked: gameEntity.getLevel('shop_item_notebook') > 0,
+            actionCategories: Object.values(perCats).filter(cat => cat.items.length > 0),
         }
     }
 
@@ -232,8 +299,8 @@ export class ActionsModule extends GameModule {
         return entityData;
     }
 
-    sendActionsData() {
-        const data = this.getActionsData();
+    sendActionsData(filterId) {
+        const data = this.getActionsData(filterId);
         this.eventHandler.sendData('actions-data', data);
     }
 

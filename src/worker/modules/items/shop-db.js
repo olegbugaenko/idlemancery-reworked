@@ -2,7 +2,48 @@ import { gameEntity, gameCore, gameEffects } from "game-framework"
 
 export const registerShopItemsStage1 = () => {
 
-    const charismaMod = (attr) => attr > 0 ? 1. / (1. + 0.1*Math.log10(attr)) : 1.;
+    const charismaMod = (attr) => attr > 0 ? 1. / (1. + 0.02*Math.log2(attr)) : 1.;
+
+    gameEntity.registerGameEntity('shop_item_hat', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Hat',
+        description: 'Purchase a hat to collect more coins from begging and have a bit more place to store them',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return true;
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'begging_efficiency': {
+                        A: 0.25,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+            rawCap: {
+                resources: {
+                    'coins': {
+                        A: 3,
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 2*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        }),
+    })
 
     gameEntity.registerGameEntity('shop_item_notebook', {
         tags: ["shop", "upgrade", "purchaseable"],
@@ -11,7 +52,7 @@ export const registerShopItemsStage1 = () => {
         level: 0,
         maxLevel: 1,
         unlockCondition: () => {
-            return true
+            return gameEntity.getLevel('shop_item_hat') > 0
         },
         attributes: {
             isCollectable: false,
@@ -19,7 +60,7 @@ export const registerShopItemsStage1 = () => {
         get_cost: () => ({
             'coins': {
                 A: 2,
-                B: 10*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 5*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 0
             }
         })
@@ -32,7 +73,7 @@ export const registerShopItemsStage1 = () => {
         level: 0,
         maxLevel: 9,
         unlockCondition: () => {
-            return true
+            return gameEntity.getLevel('shop_item_hat') > 0
         },
         attributes: {
             isCollectable: false,
@@ -41,7 +82,7 @@ export const registerShopItemsStage1 = () => {
             rawCap: {
                 resources: {
                     'coins': {
-                        A: 10,
+                        A: 5,
                         B: 0,
                         type: 0,
                     }
@@ -50,8 +91,8 @@ export const registerShopItemsStage1 = () => {
         },
         get_cost: () => ({
             'coins': {
-                A: 10*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
-                B: 10*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                A: 5*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 5*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 0
             }
         })
@@ -62,9 +103,9 @@ export const registerShopItemsStage1 = () => {
         name: 'Repair Slippers',
         description: 'Your slippers are old, but better than nothing. If you repair it, it could make you feel more comfortable and warm',
         level: 0,
-        maxLevel: 3,
+        maxLevel: 5,
         unlockCondition: () => {
-            return true
+            return gameEntity.getLevel('shop_item_hat') > 0
         },
         attributes: {
             isCollectable: false,
@@ -83,7 +124,7 @@ export const registerShopItemsStage1 = () => {
         get_cost: () => ({
             'coins': {
                 A: 1.5,
-                B: 10*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 5*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 1
             }
         })
@@ -104,7 +145,7 @@ export const registerShopItemsStage1 = () => {
         get_cost: () => ({
             'coins': {
                 A: 2,
-                B: 15*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 10*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 0
             }
         }),
@@ -136,7 +177,7 @@ export const registerShopItemsStage1 = () => {
         get_cost: () => ({
             'coins': {
                 A: 2,
-                B: 30*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 20*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 0
             }
         }),
@@ -168,7 +209,7 @@ export const registerShopItemsStage1 = () => {
         get_cost: () => ({
             'coins': {
                 A: 2,
-                B: 40*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 25*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 0
             }
         }),
@@ -200,7 +241,7 @@ export const registerShopItemsStage1 = () => {
         get_cost: () => ({
             'coins': {
                 A: 2,
-                B: 50*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 30*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 0
             }
         }),
@@ -221,7 +262,92 @@ export const registerShopItemsStage1 = () => {
         get_cost: () => ({
             'coins': {
                 A: 2,
-                B: 50*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 30*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_tent', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Tent',
+        description: 'Purchase your very first living property. Not really comfortable, but better than nothing',
+        level: 0,
+        maxLevel: 5,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_bag') > 4
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            income: {
+                resources: {
+                    'living_space': {
+                        A: 2,
+                        B: 3,
+                        type: 0,
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2.25,
+                B: 40*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_better_urns', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Better Urns',
+        description: 'Purchase better urns to increase their capacity',
+        level: 0,
+        maxLevel: 3,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_tent') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'urn_storage_bonus': {
+                        A: 0.5,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2.25,
+                B: 120*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_library_entrance', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Entrance To Library',
+        description: 'Invest some coins you have earned into your own development',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_tent') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 200*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 0
             }
         }),

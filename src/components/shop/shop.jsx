@@ -2,12 +2,58 @@ import React, {useContext, useEffect, useState} from "react";
 import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
 import {formatInt, formatValue} from "../../general/utils/strings";
-import {ProgressBar} from "../layout/progress-bar.jsx";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import {EffectsSection} from "../shared/effects-section.jsx";
 import {ResourceCost} from "../shared/resource-cost.jsx";
 
 export const Shop = ({}) => {
+    const [detailOpened, setDetailOpened] = useState(null)
+
+    const worker = useContext(WorkerContext);
+
+    const { onMessage, sendData } = useWorkerClient(worker);
+
+    const [ selectedTab, setSelectedTab ] = useState('upgrades');
+
+    const purchaseItem = (id) => {
+        sendData('purchase-item', { id })
+    }
+
+    const purchaseResource = (id) => {
+        sendData('purchase-resource', { id })
+    }
+
+    const setItemDetails = (id) => {
+        if(!id) {
+            setDetailOpened(null);
+        } else {
+            setDetailOpened(id);
+        }
+    }
+
+    return (
+        <div className={'items-wrap'}>
+            <div className={'items ingame-box'}>
+                <div className={'menu-wrap'}>
+                    <ul className={'menu'}>
+                        <li className={`${selectedTab === 'upgrades' ? 'active' : ''}`} onClick={() => {setSelectedTab('upgrades'); setDetailOpened(null);}}><span>Upgrades</span></li>
+                        <li className={`${selectedTab === 'items' ? 'active' : ''}`} onClick={() => {setSelectedTab('items');setDetailOpened(null);}}><span>Items</span></li>
+                    </ul>
+                </div>
+                {selectedTab === 'upgrades' ? (<ShopUpgrades setItemDetails={setItemDetails} purchaseItem={purchaseItem}/>) : null}
+                {selectedTab === 'items' ? (<ShopItems setItemDetails={setItemDetails} purchaseItem={purchaseResource}/>) : null}
+            </div>
+
+            <div className={'item-detail ingame-box detail-blade'}>
+                {detailOpened ? (<ItemDetails itemId={detailOpened} category={selectedTab}/>) : null}
+            </div>
+        </div>
+
+    )
+
+}
+
+export const ShopUpgrades = ({ setItemDetails, purchaseItem }) => {
 
     const worker = useContext(WorkerContext);
 
@@ -16,7 +62,6 @@ export const Shop = ({}) => {
         available: [],
         current: undefined
     });
-    const [detailOpened, setDetailOpened] = useState(null)
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -31,34 +76,45 @@ export const Shop = ({}) => {
         setItemsData(items);
     })
 
-    const purchaseItem = (id) => {
-        sendData('purchase-item', { id })
-    }
+    return (<div className={'items-cat'}>
+        <PerfectScrollbar>
+            <div className={'flex-container'}>
+                {itemsData.available.map(item => <ItemCard key={item.id} {...item} onPurchase={purchaseItem} onShowDetails={setItemDetails}/>)}
+            </div>
+        </PerfectScrollbar>
+    </div>)
+}
 
-    const setItemDetails = (id) => {
-        if(!id) {
-            setDetailOpened(null);
-        } else {
-            setDetailOpened(id);
+export const ShopItems = ({ setItemDetails, purchaseItem }) => {
+
+    const worker = useContext(WorkerContext);
+
+    const { onMessage, sendData } = useWorkerClient(worker);
+    const [itemsData, setItemsData] = useState({
+        available: [],
+        current: undefined
+    });
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            sendData('query-items-resources-data', {});
+        }, 100);
+        return () => {
+            clearInterval(interval);
         }
-    }
+    }, [])
 
-    return (
-        <div className={'items-wrap'}>
-            <div className={'ingame-box items'}>
-                <PerfectScrollbar>
-                    <div className={'flex-container'}>
-                        {itemsData.available.map(item => <ItemCard key={item.id} {...item} onPurchase={purchaseItem} onShowDetails={setItemDetails}/>)}
-                    </div>
-                </PerfectScrollbar>
+    onMessage('items-resources-data', (items) => {
+        setItemsData(items);
+    })
+
+    return (<div className={'items-cat'}>
+        <PerfectScrollbar>
+            <div className={'flex-container'}>
+                {itemsData.available.map(item => <ItemResourceCard key={item.id} {...item} onPurchase={purchaseItem} onShowDetails={setItemDetails}/>)}
             </div>
-            <div className={'item-detail ingame-box detail-blade'}>
-                {detailOpened ? (<ItemDetails itemId={detailOpened} />) : null}
-            </div>
-        </div>
-
-    )
-
+        </PerfectScrollbar>
+    </div>)
 }
 
 export const ItemCard = ({ id, name, level, max, affordable, isLeveled, onClick, onPurchase, onShowDetails}) => {
@@ -94,7 +150,34 @@ export const ItemCard = ({ id, name, level, max, affordable, isLeveled, onClick,
     </div> )
 }
 
-export const ItemDetails = ({itemId}) => {
+export const ItemResourceCard = ({ id, name, level, max, affordable, isLeveled, onClick, onPurchase, onShowDetails}) => {
+    const [isFlashActive, setFlashActive] = useState(false);
+
+    useEffect(() => {
+
+        console.log('Leveled!', isLeveled)
+        if(isLeveled) {
+            setFlashActive(true);
+        }
+
+        const timer = setTimeout(() => {
+            console.log('Clearing')
+            setFlashActive(false);
+        }, 1000); // Adjust the time as needed
+
+        // Cleanup the timer if the component unmounts or if someProp changes before the timer finishes
+        return () => clearTimeout(timer);
+
+    }, [isLeveled]);
+
+    return (<div className={`icon-card item flashable ${isFlashActive ? 'flash' : ''} ${affordable.hardLocked ? 'hard-locked' : ''}  ${!affordable.isAffordable ? 'unavailable' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)} onClick={() => onPurchase(id)}>
+        <div className={'icon-content'}>
+            <img src={`icons/resources/${id}.png`} className={'resource'} />
+        </div>
+    </div> )
+}
+
+export const ItemDetails = ({itemId, category}) => {
 
     const worker = useContext(WorkerContext);
 
@@ -103,13 +186,24 @@ export const ItemDetails = ({itemId}) => {
     const [item, setDetailOpened] = useState(null);
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            sendData('query-item-details', { id: itemId });
-        }, 100);
+        if(category === 'upgrades') {
+            const interval = setInterval(() => {
+                sendData('query-item-details', { id: itemId });
+            }, 100);
 
-        return () => {
-            clearInterval(interval);
+            return () => {
+                clearInterval(interval);
+            }
+        } else if(category === 'items'){
+            const interval = setInterval(() => {
+                sendData('query-item-resource-details', { id: itemId });
+            }, 100);
+
+            return () => {
+                clearInterval(interval);
+            }
         }
+
     })
 
 

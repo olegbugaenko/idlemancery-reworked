@@ -13,7 +13,13 @@ git push -u origin main
 2. [V] Show lists totals (resource balances and at least estimated attrinute growth)
 3. [V] Upgrades, increasing learning speed of specific jobs (therefore, every action entity should have in getLearningSpeedBonus function its own "learningSpeedBoost" depending on effects)
 4. [V] Add logic into lists to check if action is available and not capped, and loop over it if so to prevent freeze
-5. Inventory with setting to consume/sell objects
-6. Gather berries action
-7. New upgrade to invent new resource and attribute - intellect and knowledge.
-8. Knowledge should be used to invent new professions
+5. [V] Inventory with setting to consume/sell objects
+6. [V] Autoconsume options (with conditions over available resources/attributes)
+7. [V] Gather berries action
+8. [V] Filtering actions by tags
+9. [V] Section to purchase consumable items in shop
+10. New shop upgrades to boost energy gain
+11. Equipment
+12. Property with limited space for furniture and furniture choices
+13. New upgrade to invent new resource and attribute - intellect and knowledge.
+14. Knowledge should be used to invent new professions

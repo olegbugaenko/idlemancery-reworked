@@ -7,6 +7,7 @@ import {useAppContext} from "../../context/ui-context";
 import {Actions} from "../actions/actions.jsx";
 import {Shop} from "../shop/shop.jsx";
 import {Inventory} from "../inventory/inventory.jsx";
+import {Property} from "../property/index.jsx";
 
 export const Content = () => {
 
@@ -36,6 +37,10 @@ export const GetContent = ({ tab }) => {
 
     if(tab === 'inventory') {
         return <Inventory />
+    }
+
+    if(tab === 'property') {
+        return <Property />
     }
 
     return (<h3>Unknown tab</h3>)

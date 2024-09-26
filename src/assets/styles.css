@@ -73,6 +73,17 @@ p {
 
 .page-wrap input {
     color: #222233;
+    background: #ffffff;
+}
+
+.page-wrap select {
+    color: #222233;
+    background: #ffffff;
+}
+
+.page-wrap select * {
+    color: #222233;
+    background: #ffffff;
 }
 
 .hint-popup {
@@ -280,6 +291,7 @@ ul.menu {
     list-style: none;
     margin: 0;
     display: flex;
+    padding-left: 0;
 }
 
 ul.menu li {
@@ -371,6 +383,37 @@ h4 {
     border-radius: 5px;
     background-color: rgba(255, 255, 255, 0.5);
     animation: pseudo-flash 1s forwards;
+    z-index: 10;
+}
+
+
+
+.circular-progress {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.circular-progress .overlay {
+    position: absolute;
+    top: -20%;
+    left: -20%;
+    width: 140%;
+    height: 140%;
+    /* Use a conic-gradient to create the progress arc */
+    background: conic-gradient(
+            rgba(0, 0, 0, 0.5) calc(var(--angle) * 1deg),
+            transparent 0deg
+    );
+    transform: rotate(calc((360 - var(--angle)) * 1deg));
+    pointer-events: none; /* Allow clicks to pass through if necessary */
+}
+
+.circular-progress img,
+.circular-progress .content {
+    display: block;
 }
 
 @keyframes pseudo-flash {
@@ -404,7 +447,11 @@ h4 {
 }
 
 .actions-wrap .actions .list-wrap {
-    height: calc(100% - 80px);
+    height: calc(100% - 130px);
+}
+
+.actions-wrap .categories {
+    height: 50px;
 }
 
 .card.action {
@@ -511,4 +558,35 @@ h4 {
 
 .card.item .hard-locked {
     border: 1px solid var(--red);
+}
+
+.autoconsume-setting .rules .rule {
+    padding: 8px;
+    border: 1px solid #777777;
+    border-radius: 4px;
+    margin: 4px;
+}
+
+.autoconsume-setting .rules .rule .col {
+    margin: 4px;
+}
+
+.autoconsume-setting .rules .rule .col select,
+.autoconsume-setting .rules .rule .col input {
+    width: 200px;
+}
+
+.furniture-wrap .head {
+    padding: 8px;
+}
+
+.card.furniture {
+    width: 160px;
+}
+
+.card.furniture .head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0;
 }

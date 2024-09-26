@@ -10,6 +10,11 @@ export class ResourcePoolModule extends GameModule {
             const data = this.getResourcesData();
             this.eventHandler.sendData('resources-data', data);
         })
+
+        this.eventHandler.registerHandler('query-all-resources', () => {
+            const data = Object.values(gameResources.resources);
+            this.eventHandler.sendData('all-resources', data.map(one => ({ id: one.id, name: one.name, isCapped: one.isCapped })));
+        })
     }
 
     initialize() {
@@ -34,7 +39,16 @@ export class ResourcePoolModule extends GameModule {
             name: 'Coins',
             hasCap: true,
             tags: ['resource', 'coins', 'basic'],
+            defaultCap: 2,
+        })
+        gameResources.registerResource('knowledge', {
+            name: 'Knowledge',
+            hasCap: true,
+            tags: ['resource', 'basic', 'mental'],
             defaultCap: 10,
+            unlockCondition: () => {
+                return gameEntity.getLevel('shop_item_library_entrance') > 0
+            }
         })
 
     }

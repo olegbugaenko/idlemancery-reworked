@@ -41,10 +41,13 @@ export const Footer = () => {
                 {unlocks.shop ? (<li className={openedTab === 'shop' ? 'active' : ''}>
                     <span onClick={() => openTab('shop')}>Shop</span>
                 </li>) : <li className={'locked'}>
-                    <span>Locked (Reach 10 coins)</span>
+                    <span>Locked (Reach 2 coins)</span>
                 </li>}
                 {unlocks.inventory ? (<li className={openedTab === 'inventory' ? 'active' : ''}>
                     <span onClick={() => openTab('inventory')}>Inventory</span>
+                </li>) : null}
+                {unlocks.property ? (<li className={openedTab === 'property' ? 'active' : ''}>
+                    <span onClick={() => openTab('property')}>Property</span>
                 </li>) : null}
             </ul>
         </div>

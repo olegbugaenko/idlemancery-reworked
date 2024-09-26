@@ -13,7 +13,8 @@ export const Actions = ({}) => {
     const { onMessage, sendData } = useWorkerClient(worker);
     const [actionsData, setActionsData] = useState({
         available: [],
-        current: undefined
+        current: undefined,
+        actionCategories: []
     });
     const [detailOpened, setDetailOpened] = useState(null);
     const [editingList, setEditingList] = useState(null);
@@ -21,9 +22,11 @@ export const Actions = ({}) => {
     const [listData, setListData] = useState(null);
     const [viewedData, setViewedData] = useState(null);
 
+    // const [filterId, setFilterId] = useState('all');
+
     useEffect(() => {
         const interval = setInterval(() => {
-            sendData('query-actions-data', {});
+            sendData('query-actions-data', {  });
         }, 100);
         return () => {
             clearInterval(interval);
@@ -64,6 +67,10 @@ export const Actions = ({}) => {
 
     const activateAction = (id) => {
         sendData('run-action', { id })
+    }
+
+    const setActionsFilter = (filterId) => {
+        sendData('set-selected-actions-filter', { filterId })
     }
 
     const setActionDetails = (id) => {
@@ -145,6 +152,13 @@ export const Actions = ({}) => {
     return (
         <div className={'actions-wrap'}>
             <div className={'ingame-box actions'}>
+
+                <div className={'categories flex-container'}>
+                    <ul className={'menu'}>
+                        {actionsData.actionCategories.map(category => (<li className={`category ${category.isSelected ? 'active' : ''}`} onClick={() => setActionsFilter(category.id)}><span>{category.name}({category.items.length})</span></li> ))}
+                    </ul>
+
+                </div>
                 <div className={'list-wrap'}>
                     <PerfectScrollbar>
                         <div className={'flex-container'}>
@@ -152,6 +166,7 @@ export const Actions = ({}) => {
                         </div>
                     </PerfectScrollbar>
                 </div>
+
                 {actionsData.actionListsUnlocked ? (<ActionListsPanel editListToDetails={editListToDetails} lists={actionsData.actionLists} viewListToDetails={viewListToDetails} runningList={actionsData.runningList}/>) : null}
             </div>
             <div className={'action-detail ingame-box detail-blade'}>
@@ -187,6 +202,7 @@ export const DetailBlade = ({ actionId, viewListId, viewedData, editListId, list
             onDropActionFromList={onDropActionFromList}
             onUpdateListValue={onUpdateListValue}
             onCloseList={onCloseList}
+            isEditing={false}
         />)
     }
 
@@ -198,6 +214,7 @@ export const DetailBlade = ({ actionId, viewListId, viewedData, editListId, list
             onDropActionFromList={onDropActionFromList}
             onUpdateListValue={onUpdateListValue}
             onCloseList={onCloseList}
+            isEditing={true}
         />)
     }
 
@@ -411,7 +428,7 @@ export const ActionListsPopup = ({ lists, isOpened, setOpenedFor, onSelect, onHo
     </div> )
 }
 
-export const ListEditor = ({ editListId, listData, onUpdateActionFromList, onDropActionFromList, onUpdateListValue, onCloseList }) => {
+export const ListEditor = ({ editListId, listData, onUpdateActionFromList, onDropActionFromList, onUpdateListValue, onCloseList, isEditing }) => {
 
     const worker = useContext(WorkerContext);
 
@@ -437,7 +454,7 @@ export const ListEditor = ({ editListId, listData, onUpdateActionFromList, onDro
         <div className={'main-wrap'}>
             <div className={'main-row'}>
                 <span>Name</span>
-                <input type={'text'} value={editing.name} onChange={(e) => onUpdateListValue('name', e.target.value)}/>
+                {isEditing ? (<input type={'text'} value={editing.name} onChange={(e) => onUpdateListValue('name', e.target.value)}/>) : (<span>{editing.name}</span>)}
             </div>
         </div>
         <div className={'actions-list-wrap'}>
@@ -446,10 +463,14 @@ export const ListEditor = ({ editListId, listData, onUpdateActionFromList, onDro
                     <span>{action.name}</span>
                 </div>
                 <div className={'col amount'}>
-                    <input type={'number'} value={action.time} onChange={(e) => onUpdateActionFromList(action.id, 'time', +e.target.value)}/>
+                    {isEditing
+                        ? (<input type={'number'} value={action.time}
+                                  onChange={(e) => onUpdateActionFromList(action.id, 'time', +e.target.value)}/>)
+                        : (<span>{action.time} seconds</span>)
+                    }
                 </div>
                 <div className={'col delete'}>
-                    <span className={'close'} onClick={() => onDropActionFromList(action.id)}>X</span>
+                    {isEditing ? (<span className={'close'} onClick={() => onDropActionFromList(action.id)}>X</span>) : null}
                 </div>
             </div> ))}
         </div>
@@ -457,9 +478,9 @@ export const ListEditor = ({ editListId, listData, onUpdateActionFromList, onDro
             <p>Average Effects per second</p>
             <EffectsSection effects={editing?.potentialEffects || []} maxDisplay={10}/>
         </div>
-        <div className={'buttons'}>
+        {isEditing ? (<div className={'buttons'}>
             <button onClick={saveAndClose}>{listData.id ? 'Save' : 'Create'}</button>
             <button onClick={onCloseList}>Cancel</button>
-        </div>
+        </div>) : null}
     </div> )
 }

@@ -69,7 +69,7 @@ export const registerActionsStage1 = () => {
                 resources: {
                     'coins': {
                         A: 0.005*(0.9 + 0.1*gameEffects.getEffectValue('attribute_charisma'))*gameEffects.getEffectValue('begging_efficiency'),
-                        B: 0.045,
+                        B: 0.045*(0.9 + 0.1*gameEffects.getEffectValue('attribute_charisma'))*gameEffects.getEffectValue('begging_efficiency'),
                         type: 0,
                     }
                 }
@@ -104,8 +104,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'coins': {
-                        A: 0.02*(0.9 + 0.1*gameEffects.getEffectValue('attribute_strength'))*gameEffects.getEffectValue('clean_stable_efficiency'),
-                        B: 0.18,
+                        A: 0.03*(0.9 + 0.1*gameEffects.getEffectValue('attribute_strength'))*gameEffects.getEffectValue('clean_stable_efficiency'),
+                        B: 0.22*(0.9 + 0.1*gameEffects.getEffectValue('attribute_strength'))*gameEffects.getEffectValue('clean_stable_efficiency'),
                         type: 0,
                     }
                 }
@@ -119,7 +119,7 @@ export const registerActionsStage1 = () => {
                     },
                     'health': {
                         A: 0.0,
-                        B: (0.09 + 0.01*gameEffects.getEffectValue('attribute_strength')),
+                        B: 1.5*(0.09 + 0.01*gameEffects.getEffectValue('attribute_strength')),
                         type: 0,
                     }
                 }
@@ -127,7 +127,7 @@ export const registerActionsStage1 = () => {
             effectDeps: ['attribute_strength']
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('action_pushup') > 1
+            return gameEntity.getLevel('action_pushup') > 4
         },
         attributes: {
             baseXPCost: 20,
@@ -169,7 +169,39 @@ export const registerActionsStage1 = () => {
             effectDeps: ['attribute_strength']
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('action_visit_city') > 1
+            return gameEntity.getLevel('action_visit_city') > 1 && gameEntity.getLevel('shop_item_tent') < 1
+        },
+        attributes: {
+            baseXPCost: 1.e+10,
+        }
+    })
+
+    gameEntity.registerGameEntity('action_rest_home', {
+        tags: ["action", "rest", "physical"],
+        name: 'Rest at home',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Stay at your sweet home to heal and recover',
+        level: 1,
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'energy': {
+                        A: 1.0*gameEffects.getEffectValue('rest_efficiency'),
+                        B: 0,
+                        type: 0,
+                    },
+                    'health': {
+                        A: 0.1*gameEffects.getEffectValue('rest_efficiency'),
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['rest_efficiency']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('action_visit_city') > 1 && gameEntity.getLevel('shop_item_tent') >= 1
         },
         attributes: {
             baseXPCost: 1.e+10,
@@ -250,7 +282,7 @@ export const registerActionsStage1 = () => {
             reourcesToReassert: ['health']
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('action_walk') > 14
+            return gameEntity.getLevel('action_walk') > 19
         },
         attributes: {
             baseXPCost: 50,
@@ -280,7 +312,7 @@ export const registerActionsStage1 = () => {
                 resources: {
                     'energy': {
                         A: 0,
-                        B: 1,
+                        B: 0.4,
                         type: 0
                     }
                 }
@@ -294,6 +326,83 @@ export const registerActionsStage1 = () => {
         attributes: {
             baseXPCost: 50,
             isTraining: true,
+        }
+    })
+
+    gameEntity.registerGameEntity('action_gather_berries', {
+        tags: ["action", "gathering", "routine"],
+        name: 'Gather Berries',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Spend some time walking in nearby forest and collecting berries',
+        level: 1,
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'inventory_berry': {
+                        A: 0.001*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience'))*gameEffects.getEffectValue('gathering_efficiency'),
+                        B: 0.009*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience'))*gameEffects.getEffectValue('gathering_efficiency'),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0,
+                        B: (0.9 + 0.1*gameEffects.getEffectValue('attribute_patience')),
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['attribute_patience', 'gathering_efficiency']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0
+        },
+        attributes: {
+            baseXPCost: 50,
+        }
+    })
+
+    gameEntity.registerGameEntity('action_read_books', {
+        tags: ["action", "activity", "mental"],
+        name: 'Read Books',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Clean Stables to earn some gold',
+        level: 1,
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'knowledge': {
+                        A: 0.001*gameEffects.getEffectValue('read_books_efficiency'),
+                        B: 0.009*gameEffects.getEffectValue('read_books_efficiency'),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 1,
+                        type: 0,
+                    },
+                    'coins': {
+                        A: 0.0,
+                        B: 1.5,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['read_books_efficiency']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_library_entrance') > 0
+        },
+        attributes: {
+            baseXPCost: 50,
         }
     })
 
