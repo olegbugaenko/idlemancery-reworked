@@ -47,7 +47,7 @@ export class PropertyModule extends GameModule {
     }
 
     tick(game, delta) {
-        
+        this.leveledId = null;
     }
 
     save() {
@@ -94,7 +94,7 @@ export class PropertyModule extends GameModule {
     deleteFurniture(furnitureId) {
         if(!this.purchasedFurnitures[furnitureId]) return;
         this.purchasedFurnitures[furnitureId]--;
-        gameEntity.setLevel(furnitureId, this.purchasedFurnitures[furnitureId]);
+        gameEntity.setEntityLevel(furnitureId, this.purchasedFurnitures[furnitureId]);
         this.sendFurnituresData();
     }
 
@@ -102,7 +102,7 @@ export class PropertyModule extends GameModule {
         const entities = gameEntity.listEntitiesByTags(['furniture']);
         const spaceRes = gameResources.getResource('living_space');
         return {
-            available: entities.filter(one => one.isUnlocked && !one.isCapped).map(entity => ({
+            available: entities.filter(one => one.isUnlocked).map(entity => ({
                 id: entity.id,
                 name: entity.name,
                 description: entity.description,
@@ -110,7 +110,8 @@ export class PropertyModule extends GameModule {
                 level: this.purchasedFurnitures[entity.id] || 0,
                 affordable: gameEntity.getAffordable(entity.id),
                 potentialEffects: gameEntity.getEffects(entity.id, 1),
-                isLeveled: this.leveledId === entity.id
+                isLeveled: this.leveledId === entity.id,
+                isCapped: entity.isCapped,
             })),
             space: {
                 max: spaceRes.income * spaceRes.multiplier,

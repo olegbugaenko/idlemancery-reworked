@@ -19,6 +19,12 @@ export class ResourcePoolModule extends GameModule {
 
     initialize() {
 
+        gameEffects.registerEffect('coins_cap_bonus', {
+            name: 'Coins cap multiplier',
+            defaultValue: 1,
+            minValue: 1
+        })
+
         gameResources.registerResource('energy', {
             name: 'Energy',
             hasCap: true,

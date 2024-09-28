@@ -122,6 +122,50 @@ export const registerFurnitureStage1 = () => {
         get_cost: () => ({
             'coins': {
                 A: 2,
+                B: 40*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 2,
+                type: 0
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('furniture_table', {
+        tags: ["furniture", "upgrade", "purchaseable"],
+        name: 'Table',
+        description: 'Place some table where you can sit and put down notes or read books.',
+        level: 0,
+        maxLevel: 2,
+        unlockCondition: () => {
+            return true;
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'learning_rate': {
+                        A: 0.25,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }),
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 2,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            },
+            effectDeps: ['urn_storage_bonus']
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
                 B: 50*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 1
             },
@@ -138,7 +182,7 @@ export const registerFurnitureStage1 = () => {
         name: 'Small Book Case',
         description: 'Place some small wooden furniture to place books and notes.',
         level: 0,
-        maxLevel: 5,
+        maxLevel: 3,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_library_entrance');
         },
@@ -180,6 +224,99 @@ export const registerFurnitureStage1 = () => {
             'living_space': {
                 A: 0,
                 B: 1,
+                type: 0
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('furniture_lump', {
+        tags: ["furniture", "upgrade", "purchaseable"],
+        name: 'Oil Lamp',
+        description: 'Brighten your living space for more convenient reading, writing and learning',
+        level: 0,
+        maxLevel: 5,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_library_entrance') > 0 && gameEntity.getLevel('furniture_table') > 0;
+        },
+        resourceModifier: {
+            multiplier: {
+                resources: {
+                    'knowledge': {
+                        A: 0.1,
+                        B: 1,
+                        type: 0,
+                    }
+                },
+                effects: {
+                    'learning_rate': {
+                        A: 0.1,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 1,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 250*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 1,
+                type: 0
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('furniture_cot', {
+        tags: ["furniture", "upgrade", "purchaseable"],
+        name: 'Cot',
+        description: 'Old and smelly, but much better than your sleep bag',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_tent') > 3;
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'rest_efficiency': {
+                        A: 0.4,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 2,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 50*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 2,
                 type: 0
             }
         }),

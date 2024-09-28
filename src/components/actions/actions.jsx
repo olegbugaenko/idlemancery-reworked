@@ -1,10 +1,12 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, useEffect, useRef, useState} from "react";
 import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
 import {formatInt, formatValue} from "../../general/utils/strings";
 import {ProgressBar} from "../layout/progress-bar.jsx";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import {EffectsSection} from "../shared/effects-section.jsx";
+import {FlashOverlay} from "../layout/flash-overlay.jsx";
+import {useFlashOnLevelUp} from "../../general/hooks/flash";
 
 export const Actions = ({}) => {
 
@@ -149,6 +151,16 @@ export const Actions = ({}) => {
         setListData(null);
     }
 
+    const [overlayPositions, setOverlayPositions] = useState([]);
+
+    const handleFlash = (position) => {
+        console.log('Adding flash: ', position);
+        setOverlayPositions((prev) => [...prev, position]);
+        setTimeout(() => {
+            setOverlayPositions((prev) => prev.filter((p) => p !== position));
+        }, 1000);
+    };
+
     return (
         <div className={'actions-wrap'}>
             <div className={'ingame-box actions'}>
@@ -162,7 +174,10 @@ export const Actions = ({}) => {
                 <div className={'list-wrap'}>
                     <PerfectScrollbar>
                         <div className={'flex-container'}>
-                            {actionsData.available.map(action => <ActionCard key={action.id} {...action} onActivate={activateAction} onShowDetails={setActionDetails} onSelect={onSelectAction}/>)}
+                            {actionsData.available.map(action => <ActionCard key={action.id} {...action} onFlash={handleFlash} onActivate={activateAction} onShowDetails={setActionDetails} onSelect={onSelectAction}/>)}
+                            {overlayPositions.map((position, index) => (
+                                <FlashOverlay key={index} position={position} />
+                            ))}
                         </div>
                     </PerfectScrollbar>
                 </div>
@@ -221,27 +236,12 @@ export const DetailBlade = ({ actionId, viewListId, viewedData, editListId, list
     return null;
 }
 
-export const ActionCard = ({ id, name, level, max, xp, maxXP, xpRate, isActive, isLeveled, onSelect, onActivate, onShowDetails}) => {
-    const [isFlashActive, setFlashActive] = useState(false);
+export const ActionCard = ({ id, name, level, max, xp, maxXP, xpRate, isActive, isLeveled, onFlash, onSelect, onActivate, onShowDetails}) => {
+    const elementRef = useRef(null);
 
-    useEffect(() => {
+    useFlashOnLevelUp(isLeveled, onFlash, elementRef);
 
-        console.log('Leveled!', isLeveled)
-        if(isLeveled) {
-            setFlashActive(true);
-        }
-
-        const timer = setTimeout(() => {
-            console.log('Clearing')
-            setFlashActive(false);
-        }, 1000); // Adjust the time as needed
-
-        // Cleanup the timer if the component unmounts or if someProp changes before the timer finishes
-        return () => clearTimeout(timer);
-
-    }, [isLeveled]);
-
-    return (<div className={`card action ${isActive ? 'active' : ''} flashable ${isFlashActive ? 'flash' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)} onClick={() => onSelect({
+    return (<div ref={elementRef} className={`card action ${isActive ? 'active' : ''} flashable`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)} onClick={() => onSelect({
         id,
         name,
         level
@@ -328,7 +328,7 @@ export const ActionDetailsComponent = React.memo(({...action}) => {
             </div>
             <div className={'block'}>
                 <div className={'effects'}>
-                    <EffectsSection effects={action.potentialEffects} />
+                    <EffectsSection effects={action.potentialEffects} maxDisplay={10}/>
                 </div>
             </div>
         </div>

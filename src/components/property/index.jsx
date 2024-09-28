@@ -14,7 +14,7 @@ export const Property = ({}) => {
 
     const { onMessage, sendData } = useWorkerClient(worker);
 
-    const [ selectedTab, setSelectedTab ] = useState('upgrades');
+    const [ selectedTab, setSelectedTab ] = useState('furniture');
 
     const purchaseItem = (id) => {
         sendData('purchase-furniture', { id })

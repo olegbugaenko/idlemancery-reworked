@@ -1,5 +1,6 @@
 import {GameModule} from "../../shared/game-module";
 import { gameResources, gameEntity, gameEffects, gameCore } from 'game-framework';
+import {registerSkillsStage1} from "./skills-db";
 
 export class MageModule extends GameModule {
 
@@ -7,6 +8,7 @@ export class MageModule extends GameModule {
         super();
         this.mageLevel = 0;
         this.mageExp = 0;
+        this.skillUpgrades = {};
         /*
         this.eventHandler.registerHandler('feed-dragon', (data) => {
             this.feedDragon();
@@ -22,6 +24,26 @@ export class MageModule extends GameModule {
             this.eventHandler.sendData('mage-data', data);
         })
 
+        this.eventHandler.registerHandler('query-skills-data', () => {
+            const data = this.getSkillsData();
+            this.eventHandler.sendData('skills-data', data);
+        })
+
+        this.eventHandler.registerHandler('purchase-skill', ({ id }) => {
+            this.purchaseItem(id);
+        })
+
+    }
+
+    purchaseItem(itemId) {
+        const newEnt = gameEntity.levelUpEntity(itemId);
+        if(newEnt.success) {
+            this.skillUpgrades[itemId] = gameEntity.getLevel(itemId);
+            this.leveledId = itemId;
+            const data = this.getSkillsData();
+            this.eventHandler.sendData('skills-data', data);
+        }
+        return newEnt.success;
     }
 
     initialize() {
@@ -30,6 +52,14 @@ export class MageModule extends GameModule {
             hasCap: true,
             tags: ['mage', 'xp'],
             defaultCap: 0,
+        })
+
+        gameResources.registerResource('skill-points', {
+            name: 'Skill Points',
+            hasCap: true,
+            tags: ['mage', 'skill'],
+            defaultCap: 0,
+            isService: true,
         })
 
         gameEffects.registerEffect('mageLevel', {
@@ -44,6 +74,8 @@ export class MageModule extends GameModule {
             defaultValue: 1
         })
 
+        registerSkillsStage1();
+
         const entity = gameEntity.registerGameEntity('mage', {
             tags: ["mage", "general"],
             name: 'Mage',
@@ -52,8 +84,8 @@ export class MageModule extends GameModule {
                 get_rawCap: () => ({
                     resources: {
                         'mage-xp': {
-                            A: 1.2,
-                            B: 100*gameEffects.getEffectValue('mage_levelup_requirement'),
+                            A: 1.4,
+                            B: 200,
                             type: 1,
                         },
                         'energy': {
@@ -65,6 +97,11 @@ export class MageModule extends GameModule {
                             A: 1,
                             B: 9 + gameEffects.getEffectValue('attribute_vitality'),
                             type: 1
+                        },
+                        'knowledge': {
+                            A: 1,
+                            B: gameEffects.getEffectValue('attribute_memory'),
+                            type: 0
                         }
                     }
                 }),
@@ -77,17 +114,22 @@ export class MageModule extends GameModule {
                         },
                         health: {
                             A: 0,
-                            B: 0.01,
+                            B: 0.01*(0.5 + gameEffects.getEffectValue('attribute_recovery')),
                             type: 0
+                        },
+                        'skill-points': {
+                            A: 1,
+                            B: 0,
+                            type: 0,
                         }
                     }
                 }),
-                effectDeps: ['workersEfficiencyPerDragonLevel', 'mage_levelup_requirement', 'attribute_stamina', 'attribute_strength', 'attribute_vitality']
+                effectDeps: ['workersEfficiencyPerDragonLevel', 'mage_levelup_requirement', 'attribute_stamina', 'attribute_strength', 'attribute_vitality','attribute_recovery', 'attribute_memory']
             },
             get_cost: () => ({
                 'mage-xp': {
-                    A: 1.2,
-                    B: 100*gameEffects.getEffectValue('mage_levelup_requirement'),
+                    A: 1.4,
+                    B: 200,
                     type: 1,
                 }
             })
@@ -97,11 +139,16 @@ export class MageModule extends GameModule {
     }
 
     tick() {
+        this.leveledId = null;
+        this.isLeveledUp = false;
         const rs = gameResources.getResource('mage-xp');
         if(rs.amount >= rs.cap) {
             const rslt = gameEntity.levelUpEntity('mage');
             console.log('levelUp: ', rslt);
-            // gameResources.addResource('perks', 1);
+            gameResources.addResource('skill-points', 1);
+            this.isLeveledUp = true;
+            const data = this.getMageData();
+            this.eventHandler.sendData('mage-data', data);
         }
 
     }
@@ -109,6 +156,7 @@ export class MageModule extends GameModule {
     save() {
         return {
             mageLevel: gameEntity.getLevel('mage'),
+            skillUpgrades: this.skillUpgrades,
         }
     }
 
@@ -120,15 +168,55 @@ export class MageModule extends GameModule {
         this.mageLevel = obj?.mageLevel || 0;
         gameEntity.setEntityLevel('mage', this.mageLevel);
         console.log('[debugdrago] dragoEnt: ', gameEntity.getEntity('mage'));
+
+        for(const key in this.skillUpgrades) {
+            this.setSkill(key, 0, true);
+        }
+        this.skillUpgrades = {};
+        if(obj?.skillUpgrades) {
+            for(const id in obj.skillUpgrades) {
+                this.setSkill(id, obj.skillUpgrades[id], true);
+            }
+        }
+        // this.sen();
+    }
+
+    setSkill(skillId, amount, bForce = false) {
+        gameEntity.setEntityLevel(skillId, amount, bForce);
+        this.skillUpgrades[skillId] = gameEntity.getLevel(skillId);
     }
 
     getMageData() {
         const rs = gameResources.getResource('mage-xp');
+        const skills = gameResources.getResource('skill-points');
         return {
             mageLevel: gameEntity.getLevel('mage'),
             mageXP: rs.amount,
             mageMaxXP: rs.cap,
+            skillPoints: skills.amount,
             timeSpent: gameCore.globalTime,
+            isLeveledUp: this.isLeveledUp,
+        }
+    }
+
+    getSkillsData() {
+        const skills = gameEntity.listEntitiesByTags(['skill']);
+        const skillsRs = gameResources.getResource('skill-points');
+        return {
+            available: skills.filter(one => one.isUnlocked && !one.isCapped).map(entity => ({
+                id: entity.id,
+                name: entity.name,
+                description: entity.description,
+                max: gameEntity.getEntityMaxLevel(entity.id) || 0,
+                level: this.skillUpgrades[entity.id] || 0,
+                affordable: gameEntity.getAffordable(entity.id),
+                effects: gameEntity.getEffects(entity.id, 1),
+                isLeveled: this.leveledId === entity.id
+            })),
+            sp: {
+                total: skillsRs.amount,
+                max: skillsRs.cap,
+            }
         }
     }
 

@@ -13,7 +13,7 @@ export class ShopModule extends GameModule {
             this.purchaseItem(payload.id);
         })
         this.eventHandler.registerHandler('purchase-resource', (payload) => {
-            this.purchaseResource(payload.id);
+            this.purchaseResource(payload.id, payload.amount);
         })
         this.eventHandler.registerHandler('query-items-data', (payload) => {
             this.sendItemsData()
@@ -85,18 +85,25 @@ export class ShopModule extends GameModule {
         return newEnt.success;
     }
 
-    purchaseResource(itemId) {
+    purchaseResource(itemId, amount = 1) {
         const res = gameResources.getResource(itemId);
 
         const cost = res.get_cost();
 
         const aff = resourceCalculators.isAffordable(cost);
 
+        console.log('Affb: ', aff);
+        amount = Math.min(amount, aff.max);
+
         if(aff.isAffordable) {
             for(const key in cost) {
-                gameResources.addResource(key, -cost[key]);
+                gameResources.addResource(key, -cost[key]*amount);
             }
-            gameResources.addResource(itemId, 1);
+            gameResources.addResource(itemId, amount);
+
+            this.leveledId = itemId;
+
+            this.sendPurchaseableItemsData();
         }
     }
 
@@ -149,6 +156,7 @@ export class ShopModule extends GameModule {
             available: presentItems.map(resource => ({
                 ...resource,
                 affordable: resourceCalculators.isAffordable(resource.get_cost()),
+                isLeveled: this.leveledId === resource.id
             }))
         }
     }

@@ -1,8 +1,10 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, useEffect, useRef, useState} from "react";
 import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import {formatInt} from "../../general/utils/strings";
+import {FlashOverlay} from "../layout/flash-overlay.jsx";
+import {useFlashOnLevelUp} from "../../general/hooks/flash";
 
 export const FurnitureUpgrades = ({ setItemDetails, purchaseItem, deleteItem }) => {
 
@@ -30,6 +32,16 @@ export const FurnitureUpgrades = ({ setItemDetails, purchaseItem, deleteItem }) 
         setItemsData(furnitures);
     })
 
+    const [overlayPositions, setOverlayPositions] = useState([]);
+
+    const handleFlash = (position) => {
+        console.log('Adding flash: ', position);
+        setOverlayPositions((prev) => [...prev, position]);
+        setTimeout(() => {
+            setOverlayPositions((prev) => prev.filter((p) => p !== position));
+        }, 1000);
+    };
+
     return (<div className={'furniture-wrap'}>
         <div className={'head'}>
             <div className={'space-item'}>
@@ -40,41 +52,29 @@ export const FurnitureUpgrades = ({ setItemDetails, purchaseItem, deleteItem }) 
         <div className={'furnitures-cat'}>
             <PerfectScrollbar>
                 <div className={'flex-container'}>
-                    {furnituresData.available.map(furniture => <ItemCard key={furniture.id} {...furniture} onPurchase={purchaseItem} onShowDetails={setItemDetails} onDelete={deleteItem}/>)}
+                    {furnituresData.available.map(furniture => <ItemCard key={furniture.id} {...furniture} onFlash={handleFlash} onPurchase={purchaseItem} onShowDetails={setItemDetails} onDelete={deleteItem}/>)}
+                    {overlayPositions.map((position, index) => (
+                        <FlashOverlay key={index} position={position} />
+                    ))}
                 </div>
             </PerfectScrollbar>
         </div>
     </div>)
 }
 
-export const ItemCard = ({ id, name, level, max, affordable, isLeveled, onClick, onPurchase, onShowDetails, onDelete}) => {
-    const [isFlashActive, setFlashActive] = useState(false);
+export const ItemCard = ({ id, name, level, max, affordable, isLeveled, isCapped, onFlash, onPurchase, onShowDetails, onDelete}) => {
+    const elementRef = useRef(null);
 
-    useEffect(() => {
+    useFlashOnLevelUp(isLeveled, onFlash, elementRef);
 
-        console.log('Leveled!', isLeveled)
-        if(isLeveled) {
-            setFlashActive(true);
-        }
-
-        const timer = setTimeout(() => {
-            console.log('Clearing')
-            setFlashActive(false);
-        }, 1000); // Adjust the time as needed
-
-        // Cleanup the timer if the component unmounts or if someProp changes before the timer finishes
-        return () => clearTimeout(timer);
-
-    }, [isLeveled]);
-
-    return (<div className={`card furniture flashable ${isFlashActive ? 'flash' : ''} ${affordable.hardLocked ? 'hard-locked' : ''}  ${!affordable.isAffordable ? 'unavailable' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)}>
+    return (<div ref={elementRef} className={`card furniture flashable ${affordable.hardLocked ? 'hard-locked' : ''}  ${!affordable.isAffordable ? 'unavailable' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)}>
         <div className={'head'}>
             <p className={'title'}>{name}</p>
             <span className={'level'}>{formatInt(level)}{max ? `/${formatInt(max)}` : ''}</span>
         </div>
         <div className={'bottom'}>
             <div className={'buttons'}>
-                <button disabled={!affordable.isAffordable} onClick={() => onPurchase(id)}>Purchase</button>
+                <button disabled={!affordable.isAffordable || isCapped} onClick={() => onPurchase(id)}>Purchase</button>
                 <button disabled={level <= 0} onClick={() => onDelete(id)}>Remove</button>
             </div>
         </div>

@@ -289,7 +289,17 @@ export const registerShopItemsStage1 = () => {
                         type: 0,
                     }
                 }
-            }
+            },
+            get_capMult: () => ({
+                resources: {
+                    coins: {
+                        A: 0,
+                        B: gameEffects.getEffectValue('coins_cap_bonus'),
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['coins_cap_bonus']
         },
         get_cost: () => ({
             'coins': {
@@ -332,6 +342,7 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+
     gameEntity.registerGameEntity('shop_item_library_entrance', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Entrance To Library',
@@ -349,6 +360,215 @@ export const registerShopItemsStage1 = () => {
                 A: 2,
                 B: 200*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 0
+            }
+        }),
+    })
+
+
+    gameEntity.registerGameEntity('shop_item_anatomy_book', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Anatomy Book',
+        description: 'Purchase book that can improve your understanding of your body',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_library_entrance') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'knowledge': {
+                A: 2,
+                B: 5*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            },
+            'coins': {
+                A: 2,
+                B: 250*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_glasses', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Glasses',
+        description: 'Purchase glasses to read better and gather knowledge faster',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_library_entrance') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'read_books_efficiency': {
+                        A: 0.5,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 350*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_yoga_manual', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Yoga Manual',
+        description: 'Purchase yoga manual to train your patience and improve gathering and routine tasks performance',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_library_entrance') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2.25,
+                B: 400*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_vocabulary', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Vocabulary',
+        description: 'Most of books are written in old and obscure languages. Purchase vocabulary and start learning languages to make your book reading more efficient',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_library_entrance') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'knowledge': {
+                A: 2,
+                B: 10*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            },
+            'coins': {
+                A: 2,
+                B: 1000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_handbook', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Handbook',
+        description: 'Contains useful information regarding ancient civilizations languages.',
+        level: 0,
+        maxLevel: 4,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_vocabulary') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                resources: {
+                    'knowledge': {
+                        A: 0.25,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'knowledge': {
+                A: 1.5,
+                B: 20*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'coins': {
+                A: 1.5,
+                B: 1250*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+
+    gameEntity.registerGameEntity('shop_item_knife', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Knife',
+        description: 'Its barely a good weapon, but it can be used to cut things you found more efficiently',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('action_deeper_forest') > 1
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'gathering_efficiency': {
+                        A: 0.25,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 750*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_storeroom', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Storeroom',
+        description: 'Purchase bigger storeroom to store your goods',
+        level: 0,
+        maxLevel: 3,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_tent') > 4
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            income: {
+                resources: {
+                    'living_space': {
+                        A: 5,
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            },
+            effectDeps: ['coins_cap_bonus']
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2.25,
+                B: 1250*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
             }
         }),
     })

@@ -65,4 +65,41 @@ export const registerInventoryItems = () => {
         },
     })
 
+
+    gameResources.registerResource('inventory_fly_mushroom', {
+        name: 'Fly Mushroom',
+        hasCap: false,
+        tags: ['inventory', 'consumable'],
+        defaultCap: 0,
+        onUse: (amount) => {
+
+        },
+        getUsageCooldown: () => {
+            return 10;
+        },
+        usageGain: {
+            get_income: () => ({
+                resources: {
+                    knowledge: {
+                        A: 3,
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    health: {
+                        A: 5,
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            })
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0
+        },
+    })
+
 }

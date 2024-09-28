@@ -18,8 +18,9 @@ git push -u origin main
 7. [V] Gather berries action
 8. [V] Filtering actions by tags
 9. [V] Section to purchase consumable items in shop
-10. New shop upgrades to boost energy gain
-11. Equipment
-12. Property with limited space for furniture and furniture choices
-13. New upgrade to invent new resource and attribute - intellect and knowledge.
-14. Knowledge should be used to invent new professions
+10. [V]New shop upgrades to boost energy gain
+11. Make strength useful - increasing "Push-Up" to decent level (need to point it out) should unlock new action - "Train Regeneration" (increase HP regen)
+12. Equipment
+13. Property with limited space for furniture and furniture choices
+14. New upgrade to invent new resource and attribute - intellect and knowledge.
+15. Knowledge should be used to invent new professions

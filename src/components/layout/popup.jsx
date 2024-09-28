@@ -1,6 +1,7 @@
 import React, {useEffect} from "react";
 import { useAppContext } from '../../context/ui-context';
 import {PopupComponent} from "./popup-component.jsx";
+import {Skills} from "../mage/skills.jsx";
 
 export const Popup = () => {
 
@@ -20,10 +21,10 @@ export const Popup = () => {
         }
     }, [])
 
-    if(activePopup === 'perks') {
+    if(activePopup === 'skills') {
         return (
-            <PopupComponent>
-                Test
+            <PopupComponent title={'Skills'}>
+                <Skills />
             </PopupComponent>
         )
     }

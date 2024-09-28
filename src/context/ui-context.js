@@ -5,7 +5,7 @@ const AppContext = createContext();
 
 // Create a provider component
 export const AppProvider = ({ children }) => {
-    const [openedTab, setOpenedTab] = useState(null);
+    const [openedTab, setOpenedTab] = useState('actions');
     const [activePopup, setActivePopup] = useState(null);
     const [popupMeta, setPopupMeta] = useState({});
 

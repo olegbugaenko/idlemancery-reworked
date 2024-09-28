@@ -1,4 +1,4 @@
-import React, {useCallback, useContext, useEffect, useState} from "react";
+import React, {useCallback, useContext, useEffect, useRef, useState} from "react";
 import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
 import {formatInt, formatValue} from "../../general/utils/strings";
@@ -7,6 +7,8 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import {EffectsSection} from "../shared/effects-section.jsx";
 import {ResourceCost} from "../shared/resource-cost.jsx";
 import CircularProgress from "../shared/circular-progress.jsx";
+import {FlashOverlay} from "../layout/flash-overlay.jsx";
+import {useFlashOnLevelUp} from "../../general/hooks/flash";
 
 export const Inventory = ({}) => {
 
@@ -78,6 +80,7 @@ export const Inventory = ({}) => {
     const setInventoryDetailsView = useCallback((id) => {
         if(!id) {
             setViewedOpenedId(null);
+            setViewedData(null);
             return;
         }
         setViewedOpenedId(id)
@@ -120,12 +123,25 @@ export const Inventory = ({}) => {
         setViewedData(null);
     })
 
+    const [overlayPositions, setOverlayPositions] = useState([]);
+
+    const handleFlash = (position) => {
+        console.log('Adding flash: ', position);
+        setOverlayPositions((prev) => [...prev, position]);
+        setTimeout(() => {
+            setOverlayPositions((prev) => prev.filter((p) => p !== position));
+        }, 1000);
+    };
+
     return (
         <div className={'inventory-wrap'}>
             <div className={'ingame-box inventory'}>
                 <PerfectScrollbar>
                     <div className={'flex-container'}>
-                        {inventoryData.available.map(item => <InventoryCard key={item.id} {...item} onPurchase={purchaseItem} onShowDetails={setInventoryDetailsView} onEditConfig={setInventoryDetailsEdit}/>)}
+                        {inventoryData.available.map(item => <InventoryCard key={item.id} {...item} onPurchase={purchaseItem} onFlash={handleFlash} onShowDetails={setInventoryDetailsView} onEditConfig={setInventoryDetailsEdit}/>)}
+                        {overlayPositions.map((position, index) => (
+                            <FlashOverlay key={index} position={position} />
+                        ))}
                     </div>
                 </PerfectScrollbar>
             </div>
@@ -138,25 +154,10 @@ export const Inventory = ({}) => {
 
 }
 
-export const InventoryCard = React.memo(({ id, name, amount, isConsumed, cooldownProg, cooldown, onPurchase, onShowDetails, onEditConfig}) => {
-    const [isFlashActive, setFlashActive] = useState(false);
+export const InventoryCard = React.memo(({ id, name, amount, isConsumed, cooldownProg, cooldown, onFlash, onPurchase, onShowDetails, onEditConfig}) => {
+    const elementRef = useRef(null);
 
-    useEffect(() => {
-
-        console.log('isConsumed!', isConsumed)
-        if(isConsumed) {
-            setFlashActive(true);
-        }
-
-        const timer = setTimeout(() => {
-            console.log('Clearing')
-            setFlashActive(false);
-        }, 1000); // Adjust the time as needed
-
-        // Cleanup the timer if the component unmounts or if someProp changes before the timer finishes
-        return () => clearTimeout(timer);
-
-    }, [isConsumed]);
+    useFlashOnLevelUp(isConsumed, onFlash, elementRef);
 
     const handleClick = (e) => {
         if (e.button === 0) {
@@ -174,7 +175,7 @@ export const InventoryCard = React.memo(({ id, name, amount, isConsumed, cooldow
     // RERENDERING
     // console.log('Item: ', id, cooldownProg, cooldown);
 
-    return (<div className={`icon-card item flashable ${isFlashActive ? 'flash' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)} onClick={handleClick} onContextMenu={handleContextMenu}>
+    return (<div ref={elementRef} className={`icon-card item flashable`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)} onClick={handleClick} onContextMenu={handleContextMenu}>
         <div className={'icon-content'}>
             <CircularProgress progress={cooldownProg}>
                 <img src={`icons/resources/${id}.png`} className={'resource'} />

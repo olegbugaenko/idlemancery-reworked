@@ -12,7 +12,7 @@ import {Property} from "../property/index.jsx";
 export const Content = () => {
 
 
-    const { openedTab, setOpenedTab } = useAppContext();
+    const { openedTab, setOpenedTab } = useAppContext('actions');
 
     return (<div className={'content-wrap'}>
         <Sidebar />

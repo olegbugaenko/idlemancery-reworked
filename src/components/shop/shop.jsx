@@ -1,10 +1,13 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, useEffect, useRef, useState} from "react";
 import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
 import {formatInt, formatValue} from "../../general/utils/strings";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import {EffectsSection} from "../shared/effects-section.jsx";
 import {ResourceCost} from "../shared/resource-cost.jsx";
+import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
+import {FlashOverlay} from "../layout/flash-overlay.jsx";
+import {useFlashOnLevelUp} from "../../general/hooks/flash";
 
 export const Shop = ({}) => {
     const [detailOpened, setDetailOpened] = useState(null)
@@ -19,8 +22,8 @@ export const Shop = ({}) => {
         sendData('purchase-item', { id })
     }
 
-    const purchaseResource = (id) => {
-        sendData('purchase-resource', { id })
+    const purchaseResource = (id, amount) => {
+        sendData('purchase-resource', { id, amount })
     }
 
     const setItemDetails = (id) => {
@@ -63,6 +66,15 @@ export const ShopUpgrades = ({ setItemDetails, purchaseItem }) => {
         current: undefined
     });
 
+    const [overlayPositions, setOverlayPositions] = useState([]);
+
+    const handleFlash = (position) => {
+        setOverlayPositions((prev) => [...prev, position]);
+        setTimeout(() => {
+            setOverlayPositions((prev) => prev.filter((p) => p !== position));
+        }, 1000);
+    };
+
     useEffect(() => {
         const interval = setInterval(() => {
             sendData('query-items-data', {});
@@ -79,7 +91,10 @@ export const ShopUpgrades = ({ setItemDetails, purchaseItem }) => {
     return (<div className={'items-cat'}>
         <PerfectScrollbar>
             <div className={'flex-container'}>
-                {itemsData.available.map(item => <ItemCard key={item.id} {...item} onPurchase={purchaseItem} onShowDetails={setItemDetails}/>)}
+                {itemsData.available.map(item => <ItemCard onFlash={handleFlash} key={item.id} {...item} onPurchase={purchaseItem} onShowDetails={setItemDetails}/>)}
+                {overlayPositions.map((position, index) => (
+                    <FlashOverlay key={index} position={position} />
+                ))}
             </div>
         </PerfectScrollbar>
     </div>)
@@ -94,6 +109,16 @@ export const ShopItems = ({ setItemDetails, purchaseItem }) => {
         available: [],
         current: undefined
     });
+
+    const [overlayPositions, setOverlayPositions] = useState([]);
+
+    const handleFlash = (position) => {
+        console.log('Adding flash: ', position);
+        setOverlayPositions((prev) => [...prev, position]);
+        setTimeout(() => {
+            setOverlayPositions((prev) => prev.filter((p) => p !== position));
+        }, 1000);
+    };
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -111,33 +136,23 @@ export const ShopItems = ({ setItemDetails, purchaseItem }) => {
     return (<div className={'items-cat'}>
         <PerfectScrollbar>
             <div className={'flex-container'}>
-                {itemsData.available.map(item => <ItemResourceCard key={item.id} {...item} onPurchase={purchaseItem} onShowDetails={setItemDetails}/>)}
+                {itemsData.available.map(item => <ItemResourceCard onFlash={handleFlash} key={item.id} {...item} onPurchase={purchaseItem} onShowDetails={setItemDetails}/>)}
+                {overlayPositions.map((position, index) => (
+                    <FlashOverlay key={index} position={position} />
+                ))}
             </div>
         </PerfectScrollbar>
     </div>)
 }
 
-export const ItemCard = ({ id, name, level, max, affordable, isLeveled, onClick, onPurchase, onShowDetails}) => {
-    const [isFlashActive, setFlashActive] = useState(false);
+export const ItemCard = ({ id, name, level, max, affordable, isLeveled, onFlash, onPurchase, onShowDetails}) => {
 
-    useEffect(() => {
+    const elementRef = useRef(null);
 
-        console.log('Leveled!', isLeveled)
-        if(isLeveled) {
-            setFlashActive(true);
-        }
+    useFlashOnLevelUp(isLeveled, onFlash, elementRef);
 
-        const timer = setTimeout(() => {
-            console.log('Clearing')
-            setFlashActive(false);
-        }, 1000); // Adjust the time as needed
 
-        // Cleanup the timer if the component unmounts or if someProp changes before the timer finishes
-        return () => clearTimeout(timer);
-
-    }, [isLeveled]);
-
-    return (<div className={`card item flashable ${isFlashActive ? 'flash' : ''} ${affordable.hardLocked ? 'hard-locked' : ''}  ${!affordable.isAffordable ? 'unavailable' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)}>
+    return (<div ref={elementRef} className={`card item flashable ${affordable.hardLocked ? 'hard-locked' : ''}  ${!affordable.isAffordable ? 'unavailable' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)}>
         <div className={'head'}>
             <p className={'title'}>{name}</p>
             <span className={'level'}>{formatInt(level)}{max ? `/${formatInt(max)}` : ''}</span>
@@ -150,30 +165,23 @@ export const ItemCard = ({ id, name, level, max, affordable, isLeveled, onClick,
     </div> )
 }
 
-export const ItemResourceCard = ({ id, name, level, max, affordable, isLeveled, onClick, onPurchase, onShowDetails}) => {
-    const [isFlashActive, setFlashActive] = useState(false);
+export const ItemResourceCard = ({ id, name, level, max, affordable, isLeveled, onFlash, onPurchase, onShowDetails}) => {
 
-    useEffect(() => {
+    const elementRef = useRef(null);
 
-        console.log('Leveled!', isLeveled)
-        if(isLeveled) {
-            setFlashActive(true);
-        }
+    useFlashOnLevelUp(isLeveled, onFlash, elementRef);
 
-        const timer = setTimeout(() => {
-            console.log('Clearing')
-            setFlashActive(false);
-        }, 1000); // Adjust the time as needed
+    return (<div ref={elementRef} className={`icon-card item flashable ${affordable.hardLocked ? 'hard-locked' : ''}  ${!affordable.isAffordable ? 'unavailable' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)} onClick={(e) => onPurchase(id, e.shiftKey ? 1e9 : 1)}>
+        <TippyWrapper
+            content={<div className={'hint-popup'}>
+                <p>{name}</p>
+                <p>Press to buy. Hold Shift to by max</p>
+            </div>}>
+            <div className={'icon-content'}>
+                <img src={`icons/resources/${id}.png`} className={'resource'} />
+            </div>
+        </TippyWrapper>
 
-        // Cleanup the timer if the component unmounts or if someProp changes before the timer finishes
-        return () => clearTimeout(timer);
-
-    }, [isLeveled]);
-
-    return (<div className={`icon-card item flashable ${isFlashActive ? 'flash' : ''} ${affordable.hardLocked ? 'hard-locked' : ''}  ${!affordable.isAffordable ? 'unavailable' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)} onClick={() => onPurchase(id)}>
-        <div className={'icon-content'}>
-            <img src={`icons/resources/${id}.png`} className={'resource'} />
-        </div>
     </div> )
 }
 

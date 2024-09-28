@@ -187,6 +187,25 @@ p {
 .footer .mage-wrap {
     height: 40px;
     padding: 10px;
+    align-items: center;
+}
+
+.footer .mage-wrap .xp {
+    width: calc(100% - 200px);
+}
+
+.footer .mage-wrap .mage-xp-bar {
+    width: 100%;
+    padding: 4px 16px;
+}
+
+.footer .mage-wrap .mage-xp-bar .bar-outer {
+    background: #777777;
+    height: 10px;
+}
+
+.footer .mage-wrap .mage-xp-bar .bar-outer .bar-inner {
+    background: linear-gradient(to bottom, #caaa41 0%, #f2cc4e 50%, #caaa41 100%);
 }
 
 .footer .mage-wrap .level-up-wrap {
@@ -234,8 +253,27 @@ p {
     box-shadow: 0px 0px 12px var(--highlight);
 }
 
+.card .buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+}
+
+.card .buttons button {
+    font-size: 14px;
+    padding: 4px 8px;
+}
+
 .card.action {
     width: 180px;
+}
+
+.card.action .head p {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 0 1 100px;
 }
 
 .bar-container .bar-outer {
@@ -369,6 +407,7 @@ h4 {
     width: 75px;
 }
 
+/*
 .flashable {
     position: relative;
 }
@@ -385,7 +424,23 @@ h4 {
     animation: pseudo-flash 1s forwards;
     z-index: 10;
 }
+*/
 
+.flash-overlay {
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    width: calc(100% + 20px);
+    height: calc(100% + 20px);
+    /* Style your overlay */
+    background-color: rgba(255, 255, 255, 0.5);
+    animation: pseudo-flash 1s forwards;
+    z-index: 1000; /* Ensure it's above other elements */
+}
+
+.flash-overlay.powerful-splash {
+    animation: pseudo-flash-powerful 2s forwards;
+}
 
 
 .circular-progress {
@@ -423,11 +478,29 @@ h4 {
     }
     50% {
         opacity: 1;
-        transform: scale(1.1);
+        transform: scale(1.3);
     }
     100% {
         opacity: 0;
-        transform: scale(1.2);
+        transform: scale(1.5);
+    }
+}
+
+@keyframes pseudo-flash-powerful {
+    0% {
+        opacity: 0;
+        transform: scale(0.9);
+        box-shadow: none;
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.3);
+        box-shadow: 0 0 1000px rgba(255, 255, 255, 0.85);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1.5);
+        box-shadow: 0 0 1000px rgba(255, 255, 255, 0);
     }
 }
 
@@ -581,7 +654,7 @@ h4 {
 }
 
 .card.furniture {
-    width: 160px;
+    width: 200px;
 }
 
 .card.furniture .head {
@@ -589,4 +662,99 @@ h4 {
     justify-content: space-between;
     align-items: center;
     padding: 0;
+}
+
+.mage-wrap .level {
+    display: flex;
+    align-items: center;
+}
+
+.mage-wrap .skills-button {
+    border: 1px solid #111;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-left: 10px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.mage-wrap .skills-button:hover {
+    box-shadow: 0 0px 12px #ffffff;
+}
+
+.mage-wrap .skills-button img {
+    width: 100%;
+    height: 100%;
+    opacity: 50%;
+}
+
+.mage-wrap .skills-button span {
+    font-size: 18px;
+    font-weight: bold;
+    padding: 4px;
+    line-height: 18px;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+}
+
+.mage-wrap .skills-button.highlight {
+    color: var(--highlight);
+    cursor: pointer;
+    border-color: var(--highlight);
+    box-shadow: 0 0px 12px var(--highlight);
+}
+
+.mage-wrap .skills-button.highlight:hover {
+    background: #111111;
+}
+
+
+.popup-wrap {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background-color: rgba(0,0,0,0.5);
+    top: 0px;
+    left: 0px;
+}
+
+.popup-wrap .popup {
+    position: absolute;
+    width: calc(100% - 100px);
+    height: calc(100% - 100px);
+    left: 50px;
+    top: 50px;
+    background: var(--boxbg);
+    border: 1px solid #333;
+    padding: 16px;
+}
+
+.popup-content {
+    height: calc(100% - 60px);
+}
+
+.skills-wrap .skills-container {
+    height: calc(100% - 100px);
+}
+
+.skills-container .cards {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.popup-wrap .popup .popup-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.popup-wrap .popup .popup-heading h4 {
+    margin: 8px 0px;
 }

@@ -1,9 +1,9 @@
-import { gameEffects } from 'game-framework';
+import { gameEffects, gameEntity } from 'game-framework';
 
 export const registerAttributes = () => {
     gameEffects.registerEffect('attribute_strength', {
         name: 'Strength',
-        description: 'Strength impacts on physical activities efficiency and increase energy cap',
+        description: 'Strength impacts on physical activities efficiency and increase energy cap. Higher level unlocks more physical activities',
         minValue: 1,
         hasCap: false,
         saveBalanceTree: true,
@@ -30,7 +30,7 @@ export const registerAttributes = () => {
 
     gameEffects.registerEffect('attribute_charisma', {
         name: 'Charisma',
-        description: 'Charisma improves your communication skills and interaction with other people and decrease shop prices',
+        description: 'Charisma improves your communication skills and interaction with other people and decrease shop prices. Higher level unlocks more social activities',
         minValue: 1,
         hasCap: false,
         saveBalanceTree: true,
@@ -39,8 +39,34 @@ export const registerAttributes = () => {
 
     gameEffects.registerEffect('attribute_patience', {
         name: 'Patience',
-        description: 'Patience impacts on your ability on focusing on routine tasks and increasing learning speed',
+        description: 'Patience impacts on your ability on focusing on routine tasks and increasing learning speed. Higher level unlocks more gathering and routine activities',
         minValue: 1,
+        defaultValue: 1,
+        hasCap: false,
+        saveBalanceTree: true,
+        tags: ['attribute', 'mental']
+    })
+
+    gameEffects.registerEffect('attribute_recovery', {
+        name: 'Recovery',
+        description: 'Improves your health regeneration',
+        minValue: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_anatomy_book') > 0 || gameEntity.getLevel('action_endurance_training') > 0
+        },
+        hasCap: false,
+        saveBalanceTree: true,
+        tags: ['attribute', 'physical']
+    })
+
+    gameEffects.registerEffect('attribute_memory', {
+        name: 'Memory',
+        description: 'Improves your knowledge capacity',
+        minValue: 1,
+        defaultValue: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_library_entrance') > 0
+        },
         hasCap: false,
         saveBalanceTree: true,
         tags: ['attribute', 'mental']

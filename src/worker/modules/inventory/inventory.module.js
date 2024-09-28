@@ -119,11 +119,41 @@ export class InventoryModule extends GameModule {
         this.load({});
     }
 
+    getConsumeAffordable(resource, realCons) {
+        let result = {
+            isAffordable: true,
+            consume: {}
+        }
+        if(resource.usageGain) {
+            const effects = resourceApi.unpackEffects(resource.usageGain, realCons);
+            if(effects.length) {
+                const rsToRemove = effects.filter(eff => eff.scope === 'consumption' && eff.type === 'resources');
+
+                console.log('IIII: ', effects, rsToRemove, realCons);
+
+                rsToRemove.forEach(rs => {
+                    result.consume[rs.id] = rs.value;
+                    if(result.consume[rs.id] > gameResources.getResource(rs.id).amount) {
+                        result.isAffordable = false;
+                    }
+                })
+            }
+
+        }
+        return result;
+    }
+
     consumeItem(id, amount) {
         const resource = gameResources.getResource(id);
         const realCons = Math.min(amount, resource.amount);
         if(this.inventoryItems[id] && this.inventoryItems[id].cooldown > 0) return;
+        if(realCons < 1) return;
         if(resource.usageGain) {
+            const aff = this.getConsumeAffordable(resource, realCons);
+            if(!aff.isAffordable) {
+                return;
+            }
+
             const effects = resourceApi.unpackEffects(resource.usageGain, realCons);
             if(effects.length) {
                 const rsToAdd = effects.filter(eff => eff.scope === 'income' && eff.type === 'resources');
@@ -134,6 +164,11 @@ export class InventoryModule extends GameModule {
                     gameResources.addResource(rs.id, rs.value);
                 })
             }
+
+            for(const key in aff.consume) {
+                gameResources.addResource(key, -aff.consume[key]);
+            }
+
             if(!this.inventoryItems[id]) {
                 this.inventoryItems[id] = {};
             }

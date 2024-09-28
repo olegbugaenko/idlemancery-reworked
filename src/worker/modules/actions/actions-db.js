@@ -1,4 +1,4 @@
-import { gameEntity, gameCore, gameEffects } from "game-framework"
+import { gameEntity, gameCore, gameEffects, gameResources } from "game-framework"
 
 export const registerActionsStage1 = () => {
 
@@ -142,6 +142,9 @@ export const registerActionsStage1 = () => {
         allowedImpacts: ['effects'],
         description: 'Pay some gold to rest in tavern',
         level: 1,
+        getLearnRate: () => {
+            return 0;
+        },
         resourceModifier: {
             get_income: () => ({
                 resources: {
@@ -183,6 +186,9 @@ export const registerActionsStage1 = () => {
         allowedImpacts: ['effects'],
         description: 'Stay at your sweet home to heal and recover',
         level: 1,
+        getLearnRate: () => {
+            return 0;
+        },
         resourceModifier: {
             get_income: () => ({
                 resources: {
@@ -370,8 +376,11 @@ export const registerActionsStage1 = () => {
         name: 'Read Books',
         isAbstract: false,
         allowedImpacts: ['effects'],
-        description: 'Clean Stables to earn some gold',
+        description: 'Read books to find new information and increase your knowledge',
         level: 1,
+        getLearnRate: () => {
+            return gameEffects.getEffectValue('books_learning_rate')
+        },
         resourceModifier: {
             get_income: () => ({
                 resources: {
@@ -400,6 +409,279 @@ export const registerActionsStage1 = () => {
         },
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_library_entrance') > 0
+        },
+        attributes: {
+            baseXPCost: 50,
+        }
+    })
+
+
+    gameEntity.registerGameEntity('action_yoga_practices', {
+        tags: ["action", "training", "mental"],
+        name: 'Yoga Practice',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Practice yoga to train your patience and stamina',
+        level: 1,
+        resourceModifier: {
+            get_income: () => ({
+                effects: {
+                    'attribute_patience': {
+                        A: 1,
+                        B: -1,
+                        type: 0,
+                    },
+                    'attribute_stamina': {
+                        A: 0.5,
+                        B: -0.5,
+                        type: 0,
+                    }
+
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 2,
+                        type: 0,
+                    },
+                    'knowledge': {
+                        A: 0.0,
+                        B: 0.05,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['read_books_efficiency']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_yoga_manual') > 0
+        },
+        attributes: {
+            baseXPCost: 50,
+            displayPerLevel: 1,
+        }
+    })
+
+    gameEntity.registerGameEntity('action_home_errands', {
+        tags: ["action", "activity", "routine"],
+        name: 'Home Errands',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Clean your house, organize things to free more space for coins storage',
+        level: 1,
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'coins_cap_bonus': {
+                        A: 0.05,
+                        B: 1,
+                        type: 0,
+                    },
+
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 3,
+                        type: 0,
+                    }
+                }
+            }),
+        },
+        unlockCondition: () => {
+            return gameEffects.getEffectValue('attribute_patience') >= 5
+        },
+        attributes: {
+            baseXPCost: 50,
+        }
+    })
+
+
+    gameEntity.registerGameEntity('action_learn_anatomy', {
+        tags: ["action", "training", "mental"],
+        name: 'Learn Anatomy',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Lear anatomy to better understand your body and improve your health regeneration',
+        level: 1,
+        getLearnRate: () => {
+            return gameEffects.getEffectValue('books_learning_rate')
+        },
+        resourceModifier: {
+            get_income: () => ({
+                effects: {
+                    'attribute_recovery': {
+                        A: 0.2,
+                        B: -0.2,
+                        type: 0,
+                    },
+                    'attribute_stamina': {
+                        A: 3,
+                        B: -3,
+                        type: 0,
+                    }
+
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 1,
+                        type: 0,
+                    },
+                    'knowledge': {
+                        A: 0.0,
+                        B: 0.25,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['read_books_efficiency']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_anatomy_book') > 0
+        },
+        attributes: {
+            baseXPCost: 50,
+            displayPerLevel: 1,
+        }
+    })
+
+    gameEntity.registerGameEntity('action_learn_languages', {
+        tags: ["action", "training", "mental"],
+        name: 'Learn Languages',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Lear ancient languages to increase book reading related XP',
+        level: 1,
+        resourceModifier: {
+            get_income: () => ({
+                effects: {
+                    'books_learning_rate': {
+                        A: 0.1,
+                        B: -0.1,
+                        type: 0,
+                    },
+                    'attribute_memory': {
+                        A: 0.5,
+                        B: -0.5,
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 2,
+                        type: 0,
+                    },
+                    'knowledge': {
+                        A: 0.0,
+                        B: 0.25,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['read_books_efficiency']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_vocabulary') > 0
+        },
+        attributes: {
+            baseXPCost: 50,
+            displayPerLevel: 1,
+        }
+    })
+
+    gameEntity.registerGameEntity('action_endurance_training', {
+        tags: ["action", "training", "physical"],
+        name: 'Train Endurance',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Take some exercises in local gym to improve your body',
+        level: 1,
+        resourceModifier: {
+            get_income: () => ({
+                effects: {
+                    'attribute_recovery': {
+                        A: 0.5,
+                        B: -0.5,
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 2,
+                        type: 0,
+                    },
+                    'coins': {
+                        A: 0.0,
+                        B: 3,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['read_books_efficiency']
+        },
+        unlockCondition: () => {
+            return gameResources.getResource('health').cap >= 20
+        },
+        attributes: {
+            baseXPCost: 50,
+            displayPerLevel: 1,
+        }
+    })
+
+
+    gameEntity.registerGameEntity('action_deeper_forest', {
+        tags: ["action", "gathering", "routine"],
+        name: 'Walking in Forest',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'More dangerous activity, but searching for plants in less accessible places can pay off',
+        level: 1,
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'inventory_berry': {
+                        A: 0.004*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience'))*gameEffects.getEffectValue('gathering_efficiency'),
+                        B: 0.036*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience'))*gameEffects.getEffectValue('gathering_efficiency'),
+                        type: 0,
+                    },
+                    'inventory_fly_mushroom': {
+                        A: 0.001*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience'))*gameEffects.getEffectValue('gathering_efficiency'),
+                        B: 0.009*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience'))*gameEffects.getEffectValue('gathering_efficiency'),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 2*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience')),
+                        type: 0,
+                    },
+                    'health': {
+                        A: 0.0,
+                        B: 0.5*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience')),
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['attribute_patience', 'gathering_efficiency']
+        },
+        unlockCondition: () => {
+            return gameResources.getResource('health').cap >= 20
         },
         attributes: {
             baseXPCost: 50,

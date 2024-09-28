@@ -48,6 +48,11 @@ export class ActionsModule extends GameModule {
             name: 'Gathering',
             tags: ['gathering'],
             isDefault: true,
+        },{
+            id: 'other_activity',
+            name: 'Activities',
+            tags: ['activity'],
+            isDefault: true,
         }]
     }
 
@@ -79,6 +84,12 @@ export class ActionsModule extends GameModule {
 
         gameEffects.registerEffect('read_books_efficiency', {
             name: 'Read Books Efficiency',
+            defaultValue: 1.,
+            minValue: 1,
+        })
+
+        gameEffects.registerEffect('books_learning_rate', {
+            name: 'Read Books Learning Rate',
             defaultValue: 1.,
             minValue: 1,
         })
@@ -120,7 +131,9 @@ export class ActionsModule extends GameModule {
                     xp: 0
                 }
             }
-            this.actions[this.activeAction].xp += delta*this.getLearningRate('runningAction');
+            const dxp = delta*this.getLearningRate('runningAction');
+            this.actions[this.activeAction].xp += dxp;
+            gameResources.addResource('mage-xp', dxp);
             if(this.actions[this.activeAction].xp >= this.getActionXPMax(this.activeAction)) {
                 this.actions[this.activeAction].level++;
                 this.actions[this.activeAction].xp = 0;
@@ -190,7 +203,7 @@ export class ActionsModule extends GameModule {
             baseXPRate = gameEntity.getEntity(id).getLearnRate();
         }
 
-        return baseXPRate * eff * gameEffects.getEffectValue('attribute_patience') * gameEffects.getEffectValue('learning_rate');
+        return baseXPRate * eff * gameEffects.getEffectValue('learning_rate');
     }
 
     setRunningAction(id) {
@@ -287,7 +300,7 @@ export class ActionsModule extends GameModule {
             max: entity.getMaxLevel ? entity.getMaxLevel() : entity.maxLevel || 0,
             level: this.actions[entity.id]?.level || 1,
             affordable: gameEntity.getAffordable(entity.id),
-            potentialEffects: gameEntity.getEffects(entity.id, gameEntity.getAttribute(entity.id, 'isTraining') ? 1 : 0, this.actions[entity.id]?.level || 1, true),
+            potentialEffects: gameEntity.getEffects(entity.id, gameEntity.getAttribute(entity.id, 'displayPerLevel') ?? 0, this.actions[entity.id]?.level || 1, true),
             xp: this.actions[entity.id]?.xp || 0,
             maxXP: this.getActionXPMax(entity.id),
             isActive: this.activeAction === entity.id,
