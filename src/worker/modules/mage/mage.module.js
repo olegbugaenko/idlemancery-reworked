@@ -84,7 +84,7 @@ export class MageModule extends GameModule {
                 get_rawCap: () => ({
                     resources: {
                         'mage-xp': {
-                            A: 1.4,
+                            A: 1.3,
                             B: 200,
                             type: 1,
                         },
@@ -119,7 +119,7 @@ export class MageModule extends GameModule {
                         },
                         'skill-points': {
                             A: 1,
-                            B: 0,
+                            B: -1,
                             type: 0,
                         }
                     }
@@ -128,7 +128,7 @@ export class MageModule extends GameModule {
             },
             get_cost: () => ({
                 'mage-xp': {
-                    A: 1.4,
+                    A: 1.3,
                     B: 200,
                     type: 1,
                 }

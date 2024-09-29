@@ -198,7 +198,7 @@ export const registerSkillsStage1 = () => {
         level: 0,
         unlockCondition: () => {
             // console.log('ACTLVL: ', )
-            return gameEntity.getLevel('action_pushup') > 1
+            return gameEntity.getLevel('shop_item_library_entrance') >= 1
         },
         attributes: {
             isCollectable: false,

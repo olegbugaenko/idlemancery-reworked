@@ -51,6 +51,7 @@ export const registerAttributes = () => {
         name: 'Recovery',
         description: 'Improves your health regeneration',
         minValue: 1,
+        defaultValue: 1,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_anatomy_book') > 0 || gameEntity.getLevel('action_endurance_training') > 0
         },

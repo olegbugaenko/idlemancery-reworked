@@ -61,25 +61,24 @@ export const Footer = () => {
 
         <div className={'bottom'}>
             <ul className={'menu'}>
-                {unlocks.actions ? (<li className={openedTab === 'actions' ? 'active' : ''}>
-                    <span onClick={() => openTab('actions')}>Actions</span>
+                {unlocks.actions ? (<li className={openedTab === 'actions' ? 'active' : ''} onClick={() => openTab('actions')}>
+                    <span>Actions</span>
                 </li>) : null}
-                {unlocks.shop ? (<li className={openedTab === 'shop' ? 'active' : ''}>
-                    <span onClick={() => openTab('shop')}>Shop</span>
+                {unlocks.shop ? (<li className={openedTab === 'shop' ? 'active' : ''} onClick={() => openTab('shop')}>
+                    <span>Shop</span>
                 </li>) : <li className={'locked'}>
                     <span>Locked (Reach 2 coins)</span>
                 </li>}
-                {unlocks.inventory ? (<li className={openedTab === 'inventory' ? 'active' : ''}>
-                    <span onClick={() => openTab('inventory')}>Inventory</span>
+                {unlocks.inventory ? (<li className={openedTab === 'inventory' ? 'active' : ''} onClick={() => openTab('inventory')}>
+                    <span>Inventory</span>
                 </li>) : null}
-                {unlocks.property ? (<li className={openedTab === 'property' ? 'active' : ''}>
-                    <span onClick={() => openTab('property')}>Property</span>
+                {unlocks.property ? (<li className={openedTab === 'property' ? 'active' : ''} onClick={() => openTab('property')}>
+                    <span>Property</span>
                 </li>) : null}
             </ul>
         </div>
         {mageData ? (<div className={'mage-wrap flex-container'} ref={elementRef}>
             <div className={'level'}>
-                Mage: {formatInt(mageData.mageLevel)}
                 <span className={`skills-button ${mageData.skillPoints > 0 ? 'highlight' : ''}`} onClick={() => setActivePopup('skills')}>
                     <img src={'icons/ui/sp.png'}/>
                     <span>{mageData.skillPoints}</span>

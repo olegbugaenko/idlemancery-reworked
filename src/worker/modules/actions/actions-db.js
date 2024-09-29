@@ -681,7 +681,7 @@ export const registerActionsStage1 = () => {
             effectDeps: ['attribute_patience', 'gathering_efficiency']
         },
         unlockCondition: () => {
-            return gameResources.getResource('health').cap >= 20
+            return gameResources.getResource('health').cap >= 20 && gameEntity.getLevel('shop_item_backpack') > 0
         },
         attributes: {
             baseXPCost: 50,

@@ -77,6 +77,7 @@ export class ShopModule extends GameModule {
 
     purchaseItem(itemId) {
         const newEnt = gameEntity.levelUpEntity(itemId);
+        console.log('Purchase: ', newEnt)
         if(newEnt.success) {
             this.purchasedItems[itemId] = gameEntity.getLevel(itemId);
             this.leveledId = itemId;
