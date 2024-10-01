@@ -72,4 +72,17 @@ export const registerAttributes = () => {
         saveBalanceTree: true,
         tags: ['attribute', 'mental']
     })
+
+    gameEffects.registerEffect('attribute_magic_ability', {
+        name: 'Magic Ability',
+        description: 'Improves your mana regeneration',
+        minValue: 1,
+        defaultValue: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_spellbook') > 0
+        },
+        hasCap: false,
+        saveBalanceTree: true,
+        tags: ['attribute', 'magical']
+    })
 }

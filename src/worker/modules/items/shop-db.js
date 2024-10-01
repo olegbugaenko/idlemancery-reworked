@@ -508,6 +508,33 @@ export const registerShopItemsStage1 = () => {
     })
 
 
+    gameEntity.registerGameEntity('shop_item_spellbook', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Spellbook',
+        description: 'Contains some basic magic knowledge.',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_vocabulary') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'knowledge': {
+                A: 1.5,
+                B: 40*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'coins': {
+                A: 1.5,
+                B: 2500*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+
     gameEntity.registerGameEntity('shop_item_knife', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Knife',

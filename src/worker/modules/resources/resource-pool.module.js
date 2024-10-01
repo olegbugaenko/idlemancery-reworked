@@ -57,6 +57,16 @@ export class ResourcePoolModule extends GameModule {
             }
         })
 
+        gameResources.registerResource('mana', {
+            name: 'Mana',
+            hasCap: true,
+            tags: ['resource', 'magical', 'mental'],
+            defaultCap: 10,
+            unlockCondition: () => {
+                return gameEntity.getLevel('shop_item_spellbook') > 0
+            }
+        })
+
     }
 
     tick() {

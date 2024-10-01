@@ -117,6 +117,11 @@ export class MageModule extends GameModule {
                             B: 0.01*(0.5 + gameEffects.getEffectValue('attribute_recovery')),
                             type: 0
                         },
+                        mana: {
+                            A: 0,
+                            B: 0.01*(5 + gameEffects.getEffectValue('attribute_magic_ability')),
+                            type: 0
+                        },
                         'skill-points': {
                             A: 1,
                             B: -1,

@@ -300,6 +300,11 @@ p {
 .icon-card {
     border: 1px solid #777777;
     border-radius: 4px;
+    margin: 5px;
+}
+
+.icon-card.active {
+    box-shadow: 0 0 16px var(--highlight);
 }
 
 .icon-card .icon-content {
@@ -506,7 +511,7 @@ h4 {
 
 
 
-.actions-wrap, .items-wrap, .inventory-wrap {
+.actions-wrap, .items-wrap, .inventory-wrap, .spell-wrap {
     display: flex;
     height: 100%;
     width: 100%;
@@ -514,7 +519,8 @@ h4 {
 
 .actions-wrap .actions,
 .items-wrap .items,
-.inventory-wrap .inventory {
+.inventory-wrap .inventory,
+.spell-wrap .spell {
     height: 100%;
     flex: 1;
 }
@@ -757,4 +763,16 @@ h4 {
 
 .popup-wrap .popup .popup-heading h4 {
     margin: 8px 0px;
+}
+
+
+.icon-card.spell-card .icon-content {
+    width: 64px;
+    height: 64px;
+    position: relative;
+    cursor: pointer;
+}
+
+.icon-card.spell-card .icon-content:hover {
+    box-shadow: 0 0 12px #ffffff;
 }

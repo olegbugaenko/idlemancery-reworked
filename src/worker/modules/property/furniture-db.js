@@ -321,4 +321,92 @@ export const registerFurnitureStage1 = () => {
             }
         }),
     })
+
+    gameEntity.registerGameEntity('furniture_magic_orb', {
+        tags: ["furniture", "upgrade", "purchaseable"],
+        name: 'Magic Orb',
+        description: 'Place magic orb to improve mana regeneration',
+        level: 0,
+        maxLevel: 4,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_spellbook') > 0;
+        },
+        resourceModifier: {
+            multiplier: {
+                resources: {
+                    'mana': {
+                        A: 0.1,
+                        B: 1,
+                        type: 0,
+                    }
+                },
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 1,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 1250*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 1,
+                type: 0
+            }
+        }),
+    })
+
+
+    gameEntity.registerGameEntity('furniture_candle_holder', {
+        tags: ["furniture", "upgrade", "purchaseable"],
+        name: 'Candle Holder',
+        description: 'Place magic candle holder to further improve mana power',
+        level: 0,
+        maxLevel: 3,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_spellbook') > 0;
+        },
+        resourceModifier: {
+            multiplier: {
+                resources: {
+                    'mana': {
+                        A: 0.2,
+                        B: 1,
+                        type: 0,
+                    }
+                },
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 2,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 2500*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 2,
+                type: 0
+            }
+        }),
+    })
+
 }

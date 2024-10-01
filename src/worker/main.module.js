@@ -7,6 +7,7 @@ import {AttributesModule} from "./modules/attributes/attributes.module";
 import {ShopModule} from "./modules/items/shop.module";
 import {InventoryModule} from "./modules/inventory/inventory.module";
 import {PropertyModule} from "./modules/property/property.module";
+import {SpellModule} from "./modules/magic/spells.module";
 
 
 export class MainModule extends GameModule {
@@ -20,6 +21,7 @@ export class MainModule extends GameModule {
         gameCore.registerModule('property', PropertyModule);
         gameCore.registerModule('shop', ShopModule);
         gameCore.registerModule('inventory', InventoryModule);
+        gameCore.registerModule('magic', SpellModule);
 
 
 
@@ -62,7 +64,8 @@ export class MainModule extends GameModule {
                 'actions': true,
                 'shop': gameCore.getModule('shop').isUnlocked,
                 'inventory': gameEntity.getLevel('shop_item_backpack') > 0,
-                'property': gameEntity.getLevel('shop_item_tent') > 0
+                'property': gameEntity.getLevel('shop_item_tent') > 0,
+                'spellbook': gameEntity.getLevel('shop_item_spellbook') > 0
             }
             this.eventHandler.sendData('unlocks', unlocks);
         })
