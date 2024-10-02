@@ -74,7 +74,6 @@ export const Inventory = ({}) => {
     })
 
     const setInventoryDetailsEdit = useCallback(({id, name}) => {
-        console.log('setDet - setting details: ', id, isChanged);
         if(id) {
             if(detailOpenedId && isChanged) {
                 if(!confirm(`This will discard all your changes to ${detailOpenedId.name}. Are you sure`)) {
@@ -84,7 +83,6 @@ export const Inventory = ({}) => {
             setEditData(null);
             setViewedOpenedId(null);
             setDetailOpenedId({id, name});
-            console.log('setDet changed to false!')
             setChanged(false);
         }
     }, [isChanged, detailOpenedId])

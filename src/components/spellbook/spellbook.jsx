@@ -24,13 +24,21 @@ export const Spellbook = ({}) => {
     const [editData, setEditData] = useState(null);
     const [viewedData, setViewedData] = useState(null);
     const [resources, setResources] = useState([]);
+    const [isChanged, setChanged] = useState(false);
 
     useEffect(() => {
         const id = viewedOpenedId ?? detailOpenedId?.id;
         if(id !== null) {
+            if(!viewedOpenedId && isChanged) {
+                return;
+            }
             sendData('query-spell-details', { id });
         }
-    }, [viewedOpenedId, detailOpenedId])
+    }, [viewedOpenedId, detailOpenedId]);
+
+    useEffect(() => {
+        console.log('SpellChanged: ', isChanged)
+    }, [isChanged])
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -65,17 +73,21 @@ export const Spellbook = ({}) => {
         sendData('use-spell', { id, amount: 1 })
     })
 
+    console.log('RR: ', detailOpenedId, isChanged);
+
     const setSpellDetailsEdit = useCallback(({id, name}) => {
         if(id) {
-            if(detailOpenedId) {
+            console.log('Edit: ', id, detailOpenedId, isChanged);
+            if(detailOpenedId && isChanged) {
                 if(!confirm(`This will discard all your changes to ${detailOpenedId.name}. Are you sure`)) {
                     return;
                 }
             }
             setViewedOpenedId(null);
             setDetailOpenedId({id, name});
+            setChanged(false);
         }
-    })
+    }, [isChanged, detailOpenedId])
 
     const setSpellDetailsView = useCallback((id) => {
         if(!id) {
@@ -97,6 +109,16 @@ export const Spellbook = ({}) => {
                 value: 50,
             })
             setEditData(newEdit);
+            setChanged(true);
+        }
+    }, [editData])
+
+    const onDeleteAutoconsumeRule = useCallback((index) => {
+        if(editData) {
+            const newEdit = editData;
+            newEdit.autocast.rules.splice(index)
+            setEditData(newEdit);
+            setChanged(true);
         }
     }, [editData])
 
@@ -108,12 +130,14 @@ export const Spellbook = ({}) => {
                 [key]: value
             }
             setEditData(newEdit);
+            setChanged(true);
         }
     }, [editData])
 
     const onSave = useCallback(() => {
         console.log('saving: ', editData);
         sendData('save-spell-settings', editData);
+        setChanged(false);
     })
 
     const onCancel = useCallback(() => {
@@ -121,6 +145,7 @@ export const Spellbook = ({}) => {
         setDetailOpenedId(null);
         setEditData(null);
         setViewedData(null);
+        setChanged(false);
     })
 
     const [overlayPositions, setOverlayPositions] = useState([]);
@@ -138,7 +163,7 @@ export const Spellbook = ({}) => {
             <div className={'ingame-box spell'}>
                 <PerfectScrollbar>
                     <div className={'flex-container'}>
-                        {spellData.available.map(item => <SpellCard key={item.id} {...item} onPurchase={purchaseItem} onFlash={handleFlash} onShowDetails={setSpellDetailsView} onEditConfig={setSpellDetailsEdit}/>)}
+                        {spellData.available.map(item => <SpellCard isChanged={isChanged} key={item.id} {...item} onPurchase={purchaseItem} onFlash={handleFlash} onShowDetails={setSpellDetailsView} onEditConfig={setSpellDetailsEdit}/>)}
                         {overlayPositions.map((position, index) => (
                             <FlashOverlay key={index} position={position} />
                         ))}
@@ -146,7 +171,7 @@ export const Spellbook = ({}) => {
                 </PerfectScrollbar>
             </div>
             <div className={'item-detail ingame-box detail-blade'}>
-                {editData || viewedData ? (<SpellDetails editData={editData} viewedData={viewedData} resources={resources} onAddAutoconsumeRule={onAddAutoconsumeRule} onSetAutoconsumeRuleValue={onSetAutoconsumeRuleValue} onSave={onSave} onCancel={onCancel}/>) : null}
+                {editData || viewedData ? (<SpellDetails editData={editData} viewedData={viewedData} resources={resources} onAddAutoconsumeRule={onAddAutoconsumeRule} onSetAutoconsumeRuleValue={onSetAutoconsumeRuleValue} onDeleteAutoconsumeRule={onDeleteAutoconsumeRule} onSave={onSave} onCancel={onCancel}/>) : null}
             </div>
         </div>
 
@@ -154,7 +179,7 @@ export const Spellbook = ({}) => {
 
 }
 
-export const SpellCard = React.memo(({ id, name, isCasted, cooldownProg, isActive, cooldown, onFlash, onPurchase, onShowDetails, onEditConfig}) => {
+export const SpellCard = React.memo(({ id, isChanged, name, isCasted, cooldownProg, isActive, cooldown, onFlash, onPurchase, onShowDetails, onEditConfig}) => {
     const elementRef = useRef(null);
 
     useFlashOnLevelUp(isCasted, onFlash, elementRef);
@@ -198,11 +223,15 @@ export const SpellCard = React.memo(({ id, name, isCasted, cooldownProg, isActiv
     if(prevProps.isCasted !== currProps.isCasted) {
         return false;
     }
+
+    if(prevProps.isChanged !== currProps.isChanged) {
+        return false;
+    }
     // console.log('Rerender: ', prevProps, curr);
     return true;
 }))
 
-export const SpellDetails = ({editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onSave, onCancel}) => {
+export const SpellDetails = ({editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onSave, onCancel}) => {
 
     const item = viewedData ? viewedData : editData;
 
@@ -217,6 +246,10 @@ export const SpellDetails = ({editData, viewedData, resources, onAddAutoconsumeR
 
     const setAutoconsumeRuleValue = (index, key, value) => {
         onSetAutoconsumeRuleValue(index, key, value)
+    }
+
+    const deleteAutoconsumeRule = index => {
+        onDeleteAutoconsumeRule(index);
     }
 
 
@@ -281,6 +314,11 @@ export const SpellDetails = ({editData, viewedData, resources, onAddAutoconsumeR
                                         <input type={'number'}  onChange={e => setAutoconsumeRuleValue(index, 'value', e.target.value)} value={rule.value_type === 'percentage' ? Math.min(1, rule.value) : rule.value} max={rule.value_type === 'percentage' ? 1 : undefined}/>
                                         ) : (<span>{rule.value}</span>)}
                                 </div>
+                                {isEditing ? (<div className={'col delete-rule'}>
+                                    <span className={'close'} onClick={e => deleteAutoconsumeRule(index)}>
+                                        X
+                                    </span>
+                                </div> ) : null}
                             </div>
                         ))}
                     </div>

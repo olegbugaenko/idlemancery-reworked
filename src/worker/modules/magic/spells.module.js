@@ -62,11 +62,11 @@ export class SpellModule extends GameModule {
 
     checkMatchingRules(rules) {
         for(const rule of rules) {
-            console.log('RULE_CHECK: ', rule)
+            // console.log('RULE_CHECK: ', rule)
             if(!this.checkMatchingRule(rule)) {
                 return false;
             }
-            console.log('RULE Matched!');
+            // console.log('RULE Matched!');
         }
         return true;
     }
@@ -79,7 +79,7 @@ export class SpellModule extends GameModule {
             this.spells[itemId].isCasted = false;
 
             if(this.spells[itemId].duration > 0) {
-                console.log('SPELL: ', itemId, this.spells[itemId].duration);
+                // console.log('SPELL: ', itemId, this.spells[itemId].duration);
                 this.spells[itemId].duration -= delta;
                 if(gameEntity.entityExists(`active_${itemId}`)) {
                     gameEntity.setAttribute(`active_${itemId}`, 'current_duration', this.spells[itemId].duration);

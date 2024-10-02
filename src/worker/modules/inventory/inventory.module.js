@@ -69,11 +69,11 @@ export class InventoryModule extends GameModule {
 
     checkMatchingRules(rules) {
         for(const rule of rules) {
-            console.log('RULE_CHECK: ', rule)
+            // console.log('RULE_CHECK: ', rule)
             if(!this.checkMatchingRule(rule)) {
                 return false;
             }
-            console.log('RULE Matched!');
+            // console.log('RULE Matched!');
         }
         return true;
     }
