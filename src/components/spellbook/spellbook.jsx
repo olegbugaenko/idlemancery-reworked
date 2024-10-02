@@ -249,7 +249,7 @@ export const SpellDetails = ({editData, viewedData, resources, onAddAutoconsumeR
                 ): null}
                 <div className={'autoconsume-setting'}>
                     <div className={'rules-header flex-container'}>
-                        <p>Autoconsumption rules: </p>
+                        <p>Autospell rules: </p>
                         {isEditing ? (<button onClick={addAutoconsumeRule}>Add rule (AND)</button>) : null}
                     </div>
 

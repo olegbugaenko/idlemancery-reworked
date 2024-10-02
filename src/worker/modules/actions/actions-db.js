@@ -90,6 +90,7 @@ export const registerActionsStage1 = () => {
         },
         attributes: {
             baseXPCost: 20,
+            primaryAttribute: 'attribute_charisma'
         }
     })
 
@@ -131,6 +132,50 @@ export const registerActionsStage1 = () => {
         },
         attributes: {
             baseXPCost: 20,
+            primaryAttribute: 'attribute_strength'
+        }
+    })
+
+
+    gameEntity.registerGameEntity('action_patrol', {
+        tags: ["action", "job", "physical"],
+        name: 'Patrol',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Protect streets from hooligans and robbers. Its risky and hard job, but its well paid',
+        level: 1,
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'coins': {
+                        A: 0.1*(0.9 + 0.1*gameEffects.getEffectValue('attribute_strength'))*gameEffects.getEffectValue('clean_stable_efficiency'),
+                        B: 0.9*(0.9 + 0.1*gameEffects.getEffectValue('attribute_strength'))*gameEffects.getEffectValue('clean_stable_efficiency'),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 4*(0.9 + 0.1*gameEffects.getEffectValue('attribute_strength')),
+                        type: 0,
+                    },
+                    'health': {
+                        A: 0.0,
+                        B: 6*(0.09 + 0.01*gameEffects.getEffectValue('attribute_strength')),
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['attribute_strength']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('action_pushup') > 25
+        },
+        attributes: {
+            baseXPCost: 20,
+            primaryAttribute: 'attribute_strength'
         }
     })
 
@@ -368,6 +413,7 @@ export const registerActionsStage1 = () => {
         },
         attributes: {
             baseXPCost: 50,
+            primaryAttribute: 'attribute_patience'
         }
     })
 
@@ -690,6 +736,7 @@ export const registerActionsStage1 = () => {
         },
         attributes: {
             baseXPCost: 50,
+            primaryAttribute: 'attribute_patience'
         }
     })
 
@@ -742,6 +789,7 @@ export const registerActionsStage1 = () => {
         },
         attributes: {
             baseXPCost: 50,
+            primaryAttribute: 'attribute_patience'
         }
     })
 
@@ -785,7 +833,7 @@ export const registerActionsStage1 = () => {
             return gameEntity.getLevel('shop_item_meditation') > 0
         },
         attributes: {
-            baseXPCost: 10,
+            baseXPCost: 100,
         }
     })
 

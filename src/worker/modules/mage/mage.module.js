@@ -238,7 +238,7 @@ export class MageModule extends GameModule {
                 ...item,
                 originalId: item.originalId ?? item.copyFromId,
                 effects: gameEntity.getEffects(item.id),
-                duration: gameEntity.getAttribute(item.id, 'duration'),
+                duration: gameEntity.getAttribute(item.id, 'current_duration'),
                 durationProg: 1
             }))
         }

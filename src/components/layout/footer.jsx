@@ -78,6 +78,9 @@ export const Footer = () => {
                 {unlocks.spellbook ? (<li className={openedTab === 'spellbook' ? 'active' : ''} onClick={() => openTab('spellbook')}>
                     <span>Spellbook</span>
                 </li>) : null}
+                <li className={openedTab === 'settings' ? 'active' : ''} onClick={() => openTab('settings')}>
+                    <span>Settings</span>
+                </li>
             </ul>
         </div>
         {mageData ? (<div className={'mage-wrap flex-container'} ref={elementRef}>

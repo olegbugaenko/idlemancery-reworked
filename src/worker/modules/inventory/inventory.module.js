@@ -88,7 +88,7 @@ export class InventoryModule extends GameModule {
             if(this.inventoryItems[itemId].duration > 0) {
                 this.inventoryItems[itemId].duration -= delta;
                 if(gameEntity.entityExists(`active_${itemId}`)) {
-                    gameEntity.setAttribute(`active_${itemId}`, 'duration', this.inventoryItems[itemId].duration);
+                    gameEntity.setAttribute(`active_${itemId}`, 'current_duration', this.inventoryItems[itemId].duration);
                 }
             }
             if(this.inventoryItems[itemId].duration <= 0) {
@@ -283,7 +283,11 @@ export class InventoryModule extends GameModule {
 
     getItemsData() {
         const items = gameResources.listResourcesByTags(['inventory']);
-        const presentItems = items.filter(item => gameResources.getResource(item.id).amount >= 1);
+        const presentItems = items.filter(item =>
+            gameResources.getResource(item.id).amount >= 1
+            || this.inventoryItems[item.id]?.autoconsume?.rules?.length
+            || this.inventoryItems[item.id]?.autosell?.rules?.length
+        );
         if(presentItems.length <= 0) {
             gameResources.addResource('inventory_berry', 2);
         }

@@ -697,4 +697,37 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+
+    gameEntity.registerGameEntity('shop_item_better_stashes', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Better Stashes',
+        description: 'Purchase better stashes to increase coins capacity even more',
+        level: 0,
+        maxLevel: 5,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_storeroom') > 1
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'urn_storage_bonus': {
+                        A: 0.5,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2.25,
+                B: 3000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
 }

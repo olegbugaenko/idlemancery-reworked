@@ -7,6 +7,7 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import {EffectsSection} from "../shared/effects-section.jsx";
 import {FlashOverlay} from "../layout/flash-overlay.jsx";
 import {useFlashOnLevelUp} from "../../general/hooks/flash";
+import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
 
 export const Actions = ({}) => {
 
@@ -326,6 +327,12 @@ export const ActionDetailsComponent = React.memo(({...action}) => {
                     </div>
                 </div>
             </div>
+            {action.primaryAttribute ? (<div className={'block'}>
+
+                <p>Primary Attribute: {action.primaryAttribute.name} ({formatValue(action.primaryAttribute.value)})</p>
+                <p className={'hint'}>Primary attribute speeds up action, increasing both production and consumption</p>
+
+            </div> ) : null}
             <div className={'block'}>
                 <div className={'effects'}>
                     <EffectsSection effects={action.potentialEffects} maxDisplay={10}/>

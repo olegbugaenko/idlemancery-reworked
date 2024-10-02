@@ -80,7 +80,8 @@ p {
     color: #fff;
 }
 
-.page-wrap input {
+.page-wrap input,
+.page-wrap textarea {
     color: #222233;
     background: #ffffff;
 }
@@ -111,6 +112,11 @@ p {
 
 .hint-popup p.hint {
     font-style: italic;
+}
+
+p.hint {
+    font-style: italic;
+    font-size: 14px;
 }
 
 .content-wrap {
@@ -813,4 +819,33 @@ h4 {
 .sidebar .effects-list {
     position: absolute;
     bottom: 12px;
+}
+
+.custom-file-upload {
+    display: inline-block;
+    background-color: #111;
+    padding: 8px 16px;
+    box-shadow: none;
+    border: 1px solid #222233;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.custom-file-upload:hover {
+    background-color: #171922;
+}
+
+.settings-wrap .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.settings-wrap .row .col {
+    width: 300px;
+}
+
+.settings-wrap .row .col textarea {
+    width: 280px;
+    height: 120px;
 }

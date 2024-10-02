@@ -27,6 +27,6 @@ git push -u origin main
 
 0.0.1c
 1. [V] Autosell
-2. Show active effects
-3. UI refinement to items requiring attention
+2. [V] Show active effects
+3. [V] UI refinement to items requiring attention
 4. Settings (import/export)

@@ -79,9 +79,10 @@ export class SpellModule extends GameModule {
             this.spells[itemId].isCasted = false;
 
             if(this.spells[itemId].duration > 0) {
+                console.log('SPELL: ', itemId, this.spells[itemId].duration);
                 this.spells[itemId].duration -= delta;
                 if(gameEntity.entityExists(`active_${itemId}`)) {
-                    gameEntity.setAttribute(`active_${itemId}`, 'duration', this.spells[itemId].duration);
+                    gameEntity.setAttribute(`active_${itemId}`, 'current_duration', this.spells[itemId].duration);
                 }
             }
             if(this.spells[itemId].duration <= 0) {
@@ -226,13 +227,14 @@ export class SpellModule extends GameModule {
                 });
 
                 gameEntity.setEntityLevel(`active_${id}`, spell?.level ?? 1);
+                this.spells[id].duration = gameEntity.getAttribute(spell.id, 'duration');
             }
 
             if(!this.spells[id]) {
                 this.spells[id] = {};
             }
             this.spells[id].isCasted = true;
-            this.spells[id].duration = gameEntity.getAttribute(spell.id, 'duration');
+
         }
         this.sendSpellData();
     }

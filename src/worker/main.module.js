@@ -51,15 +51,6 @@ export class MainModule extends GameModule {
         })
 
         this.eventHandler.registerHandler('query-unlocks', () => {
-            /*const unlocks = {
-                population: gameEntity.getLevel('perk_dragon_cult') >= 1,
-                upgrades: gameEntity.getLevel('perk_dragon_knowledge') >= 1,
-                building: gameEntity.getLevel('upgrade_basic_construction') >= 1,
-                army: gameEntity.getLevel('upgrade_war') >= 1,
-                conquer: gameEntity.countEntitiesByTags(['soldier']) > 0,
-                supplies: gameEntity.getLevel('upgrade_pottery') >= 1 || gameEntity.getLevel('upgrade_clothes_making') >=1,
-                ascension: (gameEntity.getLevel('upgrade_ascension') >= 1) || (gameCore.getModule('ascension').numAscensions > 0)
-            }*/
             const unlocks = {
                 'actions': true,
                 'shop': gameCore.getModule('shop').isUnlocked,
@@ -68,6 +59,11 @@ export class MainModule extends GameModule {
                 'spellbook': gameEntity.getLevel('shop_item_spellbook') > 0
             }
             this.eventHandler.sendData('unlocks', unlocks);
+        })
+
+        this.eventHandler.registerHandler('get-save-string', ({ type }) => {
+            const saveObj = gameCore.save();
+            this.eventHandler.sendData('saved-string', { string: JSON.stringify(saveObj), type });
         })
 
         MainModule.instance = this;

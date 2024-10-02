@@ -306,7 +306,8 @@ export class ActionsModule extends GameModule {
             isActive: this.activeAction === entity.id,
             xpRate: this.activeAction === entity.id ? this.getLearningRate('runningAction') : this.getLearningRate(entity.id, 1),
             isLeveled: this.actions[entity.id]?.isLeveled,
-            tags: entity.tags
+            tags: entity.tags,
+            primaryAttribute: entity.attributes?.primaryAttribute ? gameEffects.getEffect(entity.attributes.primaryAttribute) : null
         };
 
         return entityData;
