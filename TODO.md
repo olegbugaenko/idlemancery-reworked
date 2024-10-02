@@ -26,6 +26,7 @@ git push -u origin main
 15. [V] Knowledge should be used to invent new professions
 
 0.0.1c
-1. Autosell
+1. [V] Autosell
 2. Show active effects
 3. UI refinement to items requiring attention
+4. Settings (import/export)

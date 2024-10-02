@@ -18,6 +18,15 @@
     --darkbg: #161616;
 }
 
+span.close {
+    cursor: pointer;
+}
+
+span.close:hover {
+    text-shadow: 0 0 6px var(--red);
+}
+
+
 button {
     background-color: #111;
     padding: 8px 16px;
@@ -644,16 +653,19 @@ h4 {
     border: 1px solid #777777;
     border-radius: 4px;
     margin: 4px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.rules .rule input,
+.rules .rule select {
+    width: 60px;
 }
 
 .autoconsume-setting .rules .rule .col {
     margin: 4px;
 }
 
-.autoconsume-setting .rules .rule .col select,
-.autoconsume-setting .rules .rule .col input {
-    width: 200px;
-}
 
 .furniture-wrap .head {
     padding: 8px;

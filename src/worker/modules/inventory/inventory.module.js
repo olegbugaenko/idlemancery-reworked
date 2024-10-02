@@ -2,6 +2,8 @@ import { gameEntity, gameResources, resourceApi } from "game-framework"
 import {GameModule} from "../../shared/game-module";
 import {registerInventoryItems} from "./inventory-items-db";
 
+const MAX_STOCK = 100;
+
 export class InventoryModule extends GameModule {
 
     constructor() {
@@ -12,6 +14,11 @@ export class InventoryModule extends GameModule {
         this.eventHandler.registerHandler('consume-inventory', (payload) => {
             this.consumeItem(payload.id, payload.amount);
         })
+
+        this.eventHandler.registerHandler('sell-inventory', (payload) => {
+            this.sellItem(payload.id, payload.amount);
+        })
+
         this.eventHandler.registerHandler('query-inventory-data', (payload) => {
             this.sendInventoryData()
         })
@@ -81,20 +88,31 @@ export class InventoryModule extends GameModule {
                 this.inventoryItems[itemId].cooldown -= delta;
             }
 
+            if(this.inventoryItems[itemId].stockCapacity < MAX_STOCK) {
+                this.inventoryItems[itemId].stockCapacity += delta;
+            }
+
 
             if(this.autoConsumeCD > 0) {
                 continue;
             }
-            if(!this.inventoryItems[itemId]?.autoconsume?.rules?.length) {
-                continue;
+            if(this.inventoryItems[itemId]?.autoconsume?.rules?.length) {
+                // check if matching rules
+                const isMatching = this.checkMatchingRules(this.inventoryItems[itemId]?.autoconsume?.rules);
+
+                // console.log('RULES MATCHED: ', isMatching);
+                if(isMatching) {
+                    this.consumeItem(itemId, 1);
+                }
             }
 
-            // check if matching rules
-            const isMatching = this.checkMatchingRules(this.inventoryItems[itemId]?.autoconsume?.rules);
+            if(this.inventoryItems[itemId]?.autosell?.rules?.length) {
+                const isMatching = this.checkMatchingRules(this.inventoryItems[itemId]?.autosell?.rules);
 
-            // console.log('RULES MATCHED: ', isMatching);
-            if(isMatching) {
-                this.consumeItem(itemId, 1);
+                console.log('RULES MATCHED: ', isMatching);
+                if(isMatching) {
+                    this.sellItem(itemId, 1);
+                }
             }
 
         }
@@ -112,6 +130,12 @@ export class InventoryModule extends GameModule {
 
     load(saveObject) {
         this.inventoryItems = saveObject?.inventory ?? {};
+
+        for(const key in this.inventoryItems) {
+            if(!('stockCapacity' in this.inventoryItems[key])) {
+                this.inventoryItems[key].stockCapacity = MAX_STOCK;
+            }
+        }
         this.sendInventoryData();
     }
 
@@ -170,7 +194,9 @@ export class InventoryModule extends GameModule {
             }
 
             if(!this.inventoryItems[id]) {
-                this.inventoryItems[id] = {};
+                this.inventoryItems[id] = {
+                    stockCapacity: MAX_STOCK
+                };
             }
             this.inventoryItems[id].isConsumed = true;
             this.inventoryItems[id].cooldown = resource.getUsageCooldown() ?? 0;
@@ -179,10 +205,33 @@ export class InventoryModule extends GameModule {
         this.sendInventoryData();
     }
 
+    sellItem(id, amount) {
+        const resource = gameResources.getResource(id);
+        const realCons = Math.min(amount, resource.amount, this.inventoryItems[id]?.stockCapacity || 10);
+        if(this.inventoryItems[id] && this.inventoryItems[id].stockCapacity <= 0) return;
+        if(realCons < 1) return;
+        if(resource.sellPrice) {
+
+
+            if(!this.inventoryItems[id]) {
+                this.inventoryItems[id] = {
+                    stockCapacity: MAX_STOCK
+                };
+            }
+            this.inventoryItems[id].stockCapacity -= realCons;
+            gameResources.addResource(id, -realCons);
+            gameResources.addResource('coins', realCons*resource.sellPrice);
+        }
+
+        this.sendInventoryData();
+    }
+
     saveSettings(payload) {
         if(payload.id) {
             this.inventoryItems[payload.id] = {
+                ...this.inventoryItems[payload.id],
                 autoconsume: payload.autoconsume,
+                autosell: payload.autosell,
             }
         }
     }
@@ -224,7 +273,11 @@ export class InventoryModule extends GameModule {
             effects,
             tags: resource.tags || [],
             autoconsume: this.inventoryItems[resource.id]?.autoconsume ?? { rules: [] },
-            isConsumed: this.inventoryItems[resource.id]?.isConsumed
+            autosell: this.inventoryItems[resource.id]?.autosell ?? { rules: [] },
+            isConsumed: this.inventoryItems[resource.id]?.isConsumed,
+            isSellable: !!resource.sellPrice,
+            sellPrice: resource.sellPrice,
+            maxSell: Math.min((this.inventoryItems[resource.id]?.stockCapacity ?? MAX_STOCK), Math.floor(resource.amount))
         }
     }
 

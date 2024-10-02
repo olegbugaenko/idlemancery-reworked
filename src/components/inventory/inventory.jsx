@@ -24,10 +24,14 @@ export const Inventory = ({}) => {
     const [editData, setEditData] = useState(null);
     const [viewedData, setViewedData] = useState(null);
     const [resources, setResources] = useState([]);
+    const [isChanged, setChanged] = useState(false);
 
     useEffect(() => {
         const id = viewedOpenedId ?? detailOpenedId?.id;
         if(id !== null) {
+            if(!viewedOpenedId && isChanged) {
+                return;
+            }
             sendData('query-inventory-details', { id });
         }
     }, [viewedOpenedId, detailOpenedId])
@@ -67,13 +71,15 @@ export const Inventory = ({}) => {
 
     const setInventoryDetailsEdit = useCallback(({id, name}) => {
         if(id) {
-            if(detailOpenedId) {
+            if(detailOpenedId && isChanged) {
                 if(!confirm(`This will discard all your changes to ${detailOpenedId.name}. Are you sure`)) {
                     return;
                 }
             }
+            setEditData(null);
             setViewedOpenedId(null);
             setDetailOpenedId({id, name});
+            setChanged(false);
         }
     })
 
@@ -97,6 +103,7 @@ export const Inventory = ({}) => {
                 value: 50,
             })
             setEditData(newEdit);
+            setChanged(true);
         }
     }, [editData])
 
@@ -108,12 +115,58 @@ export const Inventory = ({}) => {
                 [key]: value
             }
             setEditData(newEdit);
+            setChanged(true);
+        }
+    }, [editData])
+
+    const onDeleteAutoconsumeRule = useCallback((index) => {
+        if(editData) {
+            const newEdit = editData;
+            newEdit.autoconsume.rules.splice(index)
+            setEditData(newEdit);
+            setChanged(true);
+        }
+    }, [editData])
+
+    const onAddAutosellRule = useCallback(() => {
+        if(editData) {
+            const newEdit = editData;
+            newEdit.autosell.rules.push({
+                resource_id: (viewedData ?? editData).id,
+                condition: 'grt',
+                value_type: 'exact',
+                value: 5,
+            })
+            setEditData(newEdit);
+            setChanged(true);
+        }
+    }, [editData])
+
+    const onSetAutosellRuleValue = useCallback((index, key, value) => {
+        if(editData) {
+            const newEdit = editData;
+            newEdit.autosell.rules[index] = {
+                ...newEdit.autosell.rules[index],
+                [key]: value
+            }
+            setEditData(newEdit);
+            setChanged(true);
+        }
+    }, [editData])
+
+    const onDeleteAutosellRule = useCallback((index) => {
+        if(editData) {
+            const newEdit = editData;
+            newEdit.autosell.rules.splice(index, 1)
+            setEditData(newEdit);
+            setChanged(true);
         }
     }, [editData])
 
     const onSave = useCallback(() => {
         console.log('saving: ', editData);
         sendData('save-inventory-settings', editData);
+        setChanged(false);
     })
 
     const onCancel = useCallback(() => {
@@ -121,6 +174,11 @@ export const Inventory = ({}) => {
         setDetailOpenedId(null);
         setEditData(null);
         setViewedData(null);
+        setChanged(false);
+    })
+
+    const onSell = useCallback((id, amount) => {
+        sendData('sell-inventory', { id, amount });
     })
 
     const [overlayPositions, setOverlayPositions] = useState([]);
@@ -146,7 +204,20 @@ export const Inventory = ({}) => {
                 </PerfectScrollbar>
             </div>
             <div className={'item-detail ingame-box detail-blade'}>
-                {editData || viewedData ? (<InventoryDetails editData={editData} viewedData={viewedData} resources={resources} onAddAutoconsumeRule={onAddAutoconsumeRule} onSetAutoconsumeRuleValue={onSetAutoconsumeRuleValue} onSave={onSave} onCancel={onCancel}/>) : null}
+                {editData || viewedData ? (<InventoryDetails
+                    editData={editData}
+                    viewedData={viewedData}
+                    resources={resources}
+                    onAddAutoconsumeRule={onAddAutoconsumeRule}
+                    onSetAutoconsumeRuleValue={onSetAutoconsumeRuleValue}
+                    onDeleteAutoconsumeRule={onDeleteAutoconsumeRule}
+                    onAddAutosellRule={onAddAutosellRule}
+                    onSetAutosellRuleValue={onSetAutosellRuleValue}
+                    onDeleteAutosellRule={onDeleteAutosellRule}
+                    onSave={onSave}
+                    onCancel={onCancel}
+                    onSell={onSell}
+                />) : null}
             </div>
         </div>
 
@@ -203,7 +274,7 @@ export const InventoryCard = React.memo(({ id, name, amount, isConsumed, cooldow
     return true;
 }))
 
-export const InventoryDetails = ({editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onSave, onCancel}) => {
+export const InventoryDetails = ({editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onAddAutosellRule, onSetAutosellRuleValue, onDeleteAutosellRule, onSave, onCancel, onSell}) => {
 
     const item = viewedData ? viewedData : editData;
 
@@ -218,6 +289,22 @@ export const InventoryDetails = ({editData, viewedData, resources, onAddAutocons
 
     const setAutoconsumeRuleValue = (index, key, value) => {
         onSetAutoconsumeRuleValue(index, key, value)
+    }
+
+    const deleteAutoconsumeRule = () => {
+        onDeleteAutoconsumeRule()
+    }
+
+    const addAutosellRule = () => {
+        onAddAutosellRule()
+    }
+
+    const setAutosellRuleValue = (index, key, value) => {
+        onSetAutosellRuleValue(index, key, value)
+    }
+
+    const deleteAutosellRule = () => {
+        onDeleteAutosellRule()
     }
 
 
@@ -243,7 +330,7 @@ export const InventoryDetails = ({editData, viewedData, resources, onAddAutocons
                 </div>
                 <div className={'autoconsume-setting'}>
                     <div className={'rules-header flex-container'}>
-                        <p>Autoconsumption rules: </p>
+                        <p>Autoconsumption rules: {item.autoconsume?.rules?.length ? null : 'None'}</p>
                         {isEditing ? (<button onClick={addAutoconsumeRule}>Add rule (AND)</button>) : null}
                     </div>
 
@@ -275,10 +362,55 @@ export const InventoryDetails = ({editData, viewedData, resources, onAddAutocons
                                         <input type={'number'}  onChange={e => setAutoconsumeRuleValue(index, 'value', e.target.value)} value={rule.value_type === 'percentage' ? Math.min(1, rule.value) : rule.value} max={rule.value_type === 'percentage' ? 1 : undefined}/>
                                         ) : (<span>{rule.value}</span>)}
                                 </div>
+                                {isEditing ? (<div className={'col delete-rule'}>
+                                    <span className={'close'} onClick={e => deleteAutoconsumeRule(index)}>
+                                        X
+                                    </span>
+                                </div> ) : null}
                             </div>
                         ))}
                     </div>
                 </div>
+
+                {item.isSellable ? (<div className={'autoconsume-setting'}>
+                    <div className={'rules-header flex-container'}>
+                        <p>Autosell rules: {item.autosell?.rules?.length ? null : 'None'}</p>
+                        {isEditing ? (<button onClick={addAutosellRule}>Add rule (AND)</button>) : null}
+                    </div>
+
+                    <div className={'rules'}>
+                        {item.autosell?.rules?.map((rule, index) => (
+                            <div className={'rule row add-row'}>
+                                <div className={'col subject'}>
+                                    <span>{resources.find(r => r.id === rule.resource_id)?.name || 'Invalid'}</span>
+                                </div>
+                                <div className={'col condition'}>
+                                    <span>{rule.condition}</span>
+                                </div>
+                                <div className={'col value'}>
+                                    {isEditing ? (
+                                        <input type={'number'}
+                                               onChange={e => setAutosellRuleValue(index, 'value', e.target.value)}
+                                               value={rule.value}
+                                        />
+                                    ) : (<span>{rule.value}</span>)}
+                                </div>
+                                {isEditing ? (<div className={'col delete-rule'}>
+                                    <span className={'close'} onClick={e => deleteAutosellRule(index)}>
+                                        X
+                                    </span>
+                                </div> ) : null}
+                            </div>
+                        ))}
+                    </div>
+                </div>) : null}
+
+                {item.isSellable ? (<div className={'block sell-block'}>
+                    <p>Sell price: {formatValue(item.sellPrice)}</p>
+                    <button disabled={item.maxSell < 1} onClick={() => onSell(item.id, 1)}>Sell</button>
+                    <button disabled={item.maxSell < 1} onClick={() => onSell(item.id, item.maxSell)}>Sell max (x{formatInt(item.maxSell)})</button>
+                </div> ) : null}
+
                 {isEditing ? (<div className={'buttons flex-container'}>
                     <button onClick={onSave}>Save</button>
                     <button onClick={onCancel}>Cancel</button>

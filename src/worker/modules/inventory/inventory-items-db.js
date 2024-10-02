@@ -33,6 +33,7 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0
         },
+        sellPrice: 0.5
     })
 
     gameResources.registerResource('inventory_bread', {
@@ -63,6 +64,7 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0
         },
+        sellPrice: 0.5
     })
 
 
@@ -100,6 +102,7 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0
         },
+        sellPrice: 2,
     })
 
 }
