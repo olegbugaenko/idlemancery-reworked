@@ -3,6 +3,7 @@ import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
 import {formatValue, secondsToString} from "../../general/utils/strings";
 import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
+import {ActiveEffects} from "../shared/active-effects.jsx";
 
 export const Sidebar = () => {
 
@@ -19,6 +20,9 @@ export const Sidebar = () => {
         </ul>
         <div className={'main-bar'}>
             {activePanel === 'resources' ? <ResourcesBar /> : <AttributesBar />}
+        </div>
+        <div className={'effects-list'}>
+            <ActiveEffects />
         </div>
     </div> )
 

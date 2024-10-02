@@ -1,7 +1,7 @@
 import React, {useCallback, useContext, useEffect, useRef, useState} from "react";
 import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
-import {formatInt, formatValue} from "../../general/utils/strings";
+import {formatInt, formatValue, secondsToString} from "../../general/utils/strings";
 import {ProgressBar} from "../layout/progress-bar.jsx";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import {EffectsSection} from "../shared/effects-section.jsx";
@@ -65,11 +65,16 @@ export const Inventory = ({}) => {
         setItemsData(inventory);
     })
 
+    useEffect(() => {
+        console.log('setDet isChanged set to ', isChanged);
+    }, [isChanged])
+
     const purchaseItem = useCallback((id) => {
         sendData('consume-inventory', { id, amount: 1 })
     })
 
     const setInventoryDetailsEdit = useCallback(({id, name}) => {
+        console.log('setDet - setting details: ', id, isChanged);
         if(id) {
             if(detailOpenedId && isChanged) {
                 if(!confirm(`This will discard all your changes to ${detailOpenedId.name}. Are you sure`)) {
@@ -79,9 +84,10 @@ export const Inventory = ({}) => {
             setEditData(null);
             setViewedOpenedId(null);
             setDetailOpenedId({id, name});
+            console.log('setDet changed to false!')
             setChanged(false);
         }
-    })
+    }, [isChanged, detailOpenedId])
 
     const setInventoryDetailsView = useCallback((id) => {
         if(!id) {
@@ -164,8 +170,9 @@ export const Inventory = ({}) => {
     }, [editData])
 
     const onSave = useCallback(() => {
-        console.log('saving: ', editData);
+        // console.log('saving: ', editData);
         sendData('save-inventory-settings', editData);
+        console.log('setDet changed to false onSave!')
         setChanged(false);
     })
 
@@ -175,6 +182,7 @@ export const Inventory = ({}) => {
         setEditData(null);
         setViewedData(null);
         setChanged(false);
+        console.log('setDet changed to false onCancel!')
     })
 
     const onSell = useCallback((id, amount) => {
@@ -196,7 +204,7 @@ export const Inventory = ({}) => {
             <div className={'ingame-box inventory'}>
                 <PerfectScrollbar>
                     <div className={'flex-container'}>
-                        {inventoryData.available.map(item => <InventoryCard key={item.id} {...item} onPurchase={purchaseItem} onFlash={handleFlash} onShowDetails={setInventoryDetailsView} onEditConfig={setInventoryDetailsEdit}/>)}
+                        {inventoryData.available.map(item => <InventoryCard key={item.id} isChanged={isChanged} {...item} onPurchase={purchaseItem} onFlash={handleFlash} onShowDetails={setInventoryDetailsView} onEditConfig={setInventoryDetailsEdit}/>)}
                         {overlayPositions.map((position, index) => (
                             <FlashOverlay key={index} position={position} />
                         ))}
@@ -225,7 +233,7 @@ export const Inventory = ({}) => {
 
 }
 
-export const InventoryCard = React.memo(({ id, name, amount, isConsumed, cooldownProg, cooldown, onFlash, onPurchase, onShowDetails, onEditConfig}) => {
+export const InventoryCard = React.memo(({ isChanged, id, name, amount, isConsumed, cooldownProg, cooldown, onFlash, onPurchase, onShowDetails, onEditConfig}) => {
     const elementRef = useRef(null);
 
     useFlashOnLevelUp(isConsumed, onFlash, elementRef);
@@ -268,6 +276,10 @@ export const InventoryCard = React.memo(({ id, name, amount, isConsumed, cooldow
     }
 
     if(prevProps.isConsumed !== currProps.isConsumed) {
+        return false;
+    }
+
+    if(prevProps.isChanged !== currProps.isChanged) {
         return false;
     }
     // console.log('Rerender: ', prevProps, curr);
@@ -328,6 +340,13 @@ export const InventoryDetails = ({editData, viewedData, resources, onAddAutocons
                         <EffectsSection effects={item.effects} />
                     </div>
                 </div>
+                {item.duration ? (<div className={'block'}>
+                    <p>Effects lasting: {secondsToString(item.duration)}</p>
+                    <div className={'effects'}>
+                        <EffectsSection effects={item.potentialEffects} />
+                    </div>
+                </div>) : null}
+                {item.consumptionCooldown ? (<p>Consumption Cooldown: {secondsToString(item.consumptionCooldown)}</p>) : null}
                 <div className={'autoconsume-setting'}>
                     <div className={'rules-header flex-container'}>
                         <p>Autoconsumption rules: {item.autoconsume?.rules?.length ? null : 'None'}</p>

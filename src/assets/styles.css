@@ -126,6 +126,7 @@ p {
     margin: 5px;
     border: 1px solid #333;
     border-radius: 4px;
+    position: relative;
 }
 
 .content-wrap .sidebar .resource-item {
@@ -666,6 +667,10 @@ h4 {
     margin: 4px;
 }
 
+.rules-header.flex-container {
+    align-items: center;
+    margin-top: 8px;
+}
 
 .furniture-wrap .head {
     padding: 8px;
@@ -722,11 +727,23 @@ h4 {
     text-align: center;
 }
 
+@keyframes flashShadow {
+    0% {
+        box-shadow: 0 0 12px var(--highlight);
+    }
+    50% {
+        box-shadow: 0 0 12px rgba(255, 255, 255, 0);
+    }
+    100% {
+        box-shadow: 0 0 12px var(--highlight);
+    }
+}
+
 .mage-wrap .skills-button.highlight {
     color: var(--highlight);
     cursor: pointer;
     border-color: var(--highlight);
-    box-shadow: 0 0px 12px var(--highlight);
+    animation: flashShadow 1s infinite;
 }
 
 .mage-wrap .skills-button.highlight:hover {
@@ -787,4 +804,13 @@ h4 {
 
 .icon-card.spell-card .icon-content:hover {
     box-shadow: 0 0 12px #ffffff;
+}
+
+.active-effects-wrap {
+    display: flex;
+}
+
+.sidebar .effects-list {
+    position: absolute;
+    bottom: 12px;
 }

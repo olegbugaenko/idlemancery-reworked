@@ -60,7 +60,7 @@ export const registerFurnitureStage1 = () => {
             multiplier: {
                 effects: {
                     'gathering_efficiency': {
-                        A: 0.5,
+                        A: 0.25,
                         B: 1,
                         type: 0,
                     }

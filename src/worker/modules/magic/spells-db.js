@@ -94,4 +94,46 @@ export const initSpellsDB1 = () => {
         },
     })
 
+    gameEntity.registerGameEntity('spell_magic_recovery', {
+        name: 'Less Magic Recovery',
+        description: 'Improve your learning capabilities using magic',
+        hasCap: false,
+        tags: ['spell', 'magic', 'restoration', 'restoration_magic'],
+        defaultCap: 0,
+        isAbstract: true,
+        level: 1,
+        onUse: (amount) => {
+
+        },
+        getUsageCooldown: () => {
+            return 10;
+        },
+        usageGain: {
+            get_consumption: () => ({
+                resources: {
+                    mana: {
+                        A: 8,
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            }),
+            get_income: () => ({
+                resources: {
+                    health: {
+                        A: 10,
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            })
+        },
+        attributes: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_less_restoration') > 0
+        },
+    })
+
 }

@@ -33,6 +33,10 @@ export class MageModule extends GameModule {
             this.purchaseItem(id);
         })
 
+        this.eventHandler.registerHandler('query-active-effects', () => {
+            this.sendActiveEffectsData();
+        })
+
     }
 
     purchaseItem(itemId) {
@@ -129,7 +133,7 @@ export class MageModule extends GameModule {
                         }
                     }
                 }),
-                effectDeps: ['workersEfficiencyPerDragonLevel', 'mage_levelup_requirement', 'attribute_stamina', 'attribute_strength', 'attribute_vitality','attribute_recovery', 'attribute_memory']
+                effectDeps: ['workersEfficiencyPerDragonLevel', 'mage_levelup_requirement', 'attribute_stamina', 'attribute_strength', 'attribute_vitality','attribute_recovery', 'attribute_memory', 'attribute_magic_ability']
             },
             get_cost: () => ({
                 'mage-xp': {
@@ -223,6 +227,27 @@ export class MageModule extends GameModule {
                 max: skillsRs.cap,
             }
         }
+    }
+
+    getActiveEffectsData() {
+        const items = gameEntity.listEntitiesByTags(['active_effect']);
+        // const presentSpells = items.filter(item => item.isUnlocked);
+
+        return {
+            list: items.map(item => ({
+                ...item,
+                originalId: item.originalId ?? item.copyFromId,
+                effects: gameEntity.getEffects(item.id),
+                duration: gameEntity.getAttribute(item.id, 'duration'),
+                durationProg: 1
+            }))
+        }
+    }
+
+    sendActiveEffectsData() {
+        const activeEffectsData = this.getActiveEffectsData();
+
+        this.eventHandler.sendData('active-effects', activeEffectsData);
     }
 
 }

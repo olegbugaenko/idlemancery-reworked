@@ -16,7 +16,7 @@ export const PopupComponent = ({ children, onClose, title }) => {
         <div className={'popup'}>
             <div className={'popup-heading'}>
                 <h4>{title}</h4>
-                <span onClick={onClosePopup}>X</span>
+                <span onClick={onClosePopup} className={'close'}>X</span>
             </div>
             <div className={'popup-content'}>
                 {children}

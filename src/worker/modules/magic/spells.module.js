@@ -80,7 +80,13 @@ export class SpellModule extends GameModule {
 
             if(this.spells[itemId].duration > 0) {
                 this.spells[itemId].duration -= delta;
-                if(this.spells[itemId].duration <= 0) {
+                if(gameEntity.entityExists(`active_${itemId}`)) {
+                    gameEntity.setAttribute(`active_${itemId}`, 'duration', this.spells[itemId].duration);
+                }
+            }
+            if(this.spells[itemId].duration <= 0) {
+                this.spells[itemId].duration = 0;
+                if(gameEntity.entityExists(`active_${itemId}`)) {
                     gameEntity.unsetEntity(`active_${itemId}`);
                     this.spells[itemId].cooldown = gameEntity.getEntity(itemId).getUsageCooldown() ?? 0;
                 }
@@ -136,7 +142,8 @@ export class SpellModule extends GameModule {
                     gameEntity.registerGameEntity(`active_${id}`, {
                         copyFromId: id,
                         isAbstract: false,
-                        tags: ['active_spell'],
+                        tags: ['active_spell', 'active_effect'],
+                        scope: 'spells',
                         level: saveObject.spells[id].level,
                     });
                 }
@@ -214,7 +221,8 @@ export class SpellModule extends GameModule {
                     copyFromId: id,
                     isAbstract: false,
                     level: spell.level,
-                    tags: ['active_spell'],
+                    tags: ['active_spell', 'active_effect'],
+                    scope: 'spells'
                 });
 
                 gameEntity.setEntityLevel(`active_${id}`, spell?.level ?? 1);

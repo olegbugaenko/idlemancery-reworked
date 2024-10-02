@@ -567,6 +567,49 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+    gameEntity.registerGameEntity('shop_item_herbs_handbook_1', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Herbs Handbook I',
+        description: 'Learn new herbs and their effects',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_knife') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 3000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_herbs_handbook_2', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Herbs Handbook II',
+        description: 'Learn more sophisticated herbs and their effects',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_herbs_handbook_1') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 12000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        }),
+    })
+
+
     gameEntity.registerGameEntity('shop_item_storeroom', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Storeroom',
@@ -599,4 +642,59 @@ export const registerShopItemsStage1 = () => {
             }
         }),
     })
+
+
+    gameEntity.registerGameEntity('shop_item_meditation', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Meditation Book',
+        description: 'Learn how to meditate to increase your magic abilities.',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_spellbook') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'knowledge': {
+                A: 1.5,
+                B: 60*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'coins': {
+                A: 1.5,
+                B: 5000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+
+    gameEntity.registerGameEntity('shop_item_less_restoration', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Lesser Restoration',
+        description: 'Learn some basic restoration spells.',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_meditation') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'knowledge': {
+                A: 1.5,
+                B: 90*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'coins': {
+                A: 1.5,
+                B: 8000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
 }

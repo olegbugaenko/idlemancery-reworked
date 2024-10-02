@@ -661,6 +661,11 @@ export const registerActionsStage1 = () => {
                         A: 0.001*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience'))*gameEffects.getEffectValue('gathering_efficiency'),
                         B: 0.009*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience'))*gameEffects.getEffectValue('gathering_efficiency'),
                         type: 0,
+                    },
+                    'inventory_aloe_vera': {
+                        A: 0.0002*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience'))*gameEffects.getEffectValue('gathering_efficiency'),
+                        B: 0.0018*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience'))*gameEffects.getEffectValue('gathering_efficiency'),
+                        type: 0,
                     }
                 }
             }),
@@ -685,6 +690,102 @@ export const registerActionsStage1 = () => {
         },
         attributes: {
             baseXPCost: 50,
+        }
+    })
+
+    gameEntity.registerGameEntity('action_magic_garden', {
+        tags: ["action", "gathering", "routine"],
+        name: 'Searching in Magic Garden',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Magic garden is told to be planted by some wizard. The wizard was murdered, but his garden keeps growing, providing variety of precious herbs',
+        level: 1,
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'inventory_aloe_vera': {
+                        A: 0.001*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience'))*gameEffects.getEffectValue('gathering_efficiency'),
+                        B: 0.009*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience'))*gameEffects.getEffectValue('gathering_efficiency'),
+                        type: 0,
+                    },
+                    'inventory_ginseng': {
+                        A: 0.001*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience'))*gameEffects.getEffectValue('gathering_efficiency'),
+                        B: 0.009*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience'))*gameEffects.getEffectValue('gathering_efficiency'),
+                        type: 0,
+                    },
+                    'inventory_nightshade': {
+                        A: 0.0002*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience'))*gameEffects.getEffectValue('gathering_efficiency'),
+                        B: 0.0018*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience'))*gameEffects.getEffectValue('gathering_efficiency'),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 4*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience')),
+                        type: 0,
+                    },
+                    'health': {
+                        A: 0.0,
+                        B: 2*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience')),
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['attribute_patience', 'gathering_efficiency']
+        },
+        unlockCondition: () => {
+            return gameResources.getResource('health').cap >= 25 && gameEntity.getLevel('shop_item_backpack') > 0
+                && gameEntity.getLevel('shop_item_herbs_handbook_1') > 0
+        },
+        attributes: {
+            baseXPCost: 50,
+        }
+    })
+
+    gameEntity.registerGameEntity('action_meditate', {
+        tags: ["action", "training", "magical"],
+        name: 'Meditate',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Perform some walking exercises to improve your stamina',
+        level: 1,
+        resourceModifier: {
+            income: {
+                effects: {
+                    'attribute_magic_ability': {
+                        A: 1,
+                        B: 0,
+                        type: 0,
+                    },
+                    'attribute_patience': {
+                        A: 0.5,
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'energy': {
+                        A: 0,
+                        B: 10.00,
+                        type: 0
+                    }
+                }
+            },
+            effectDeps: []
+        },
+        getLearnRate: () => {
+            return 1
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_meditation') > 0
+        },
+        attributes: {
+            baseXPCost: 10,
         }
     })
 

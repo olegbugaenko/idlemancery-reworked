@@ -84,6 +84,21 @@ export class InventoryModule extends GameModule {
         // trigger autoconsume
         for(const itemId in this.inventoryItems) {
             this.inventoryItems[itemId].isConsumed = false;
+
+            if(this.inventoryItems[itemId].duration > 0) {
+                this.inventoryItems[itemId].duration -= delta;
+                if(gameEntity.entityExists(`active_${itemId}`)) {
+                    gameEntity.setAttribute(`active_${itemId}`, 'duration', this.inventoryItems[itemId].duration);
+                }
+            }
+            if(this.inventoryItems[itemId].duration <= 0) {
+                this.inventoryItems[itemId].duration = 0;
+                if(gameEntity.entityExists(`active_${itemId}`)) {
+                    gameEntity.unsetEntity(`active_${itemId}`);
+                    this.inventoryItems[itemId].cooldown = gameResources.getResource(itemId).getUsageCooldown() ?? 0;
+                }
+            }
+
             if(this.inventoryItems[itemId].cooldown > 0) {
                 this.inventoryItems[itemId].cooldown -= delta;
             }
@@ -135,6 +150,17 @@ export class InventoryModule extends GameModule {
             if(!('stockCapacity' in this.inventoryItems[key])) {
                 this.inventoryItems[key].stockCapacity = MAX_STOCK;
             }
+            if(this.inventoryItems[key].duration && this.inventoryItems[key].duration > 0) {
+                gameEntity.registerGameEntity(`active_${id}`, {
+                    originalId: key,
+                    name: gameResources.getResource(key).name,
+                    isAbstract: false,
+                    tags: ['active_consumable', 'active_effect'],
+                    scope: 'resources',
+                    level: 1,
+                    resourceModifier: gameResources.getResource(key).resourceModifier ?? undefined
+                });
+            }
         }
         this.sendInventoryData();
     }
@@ -170,7 +196,7 @@ export class InventoryModule extends GameModule {
     consumeItem(id, amount) {
         const resource = gameResources.getResource(id);
         const realCons = Math.min(amount, resource.amount);
-        if(this.inventoryItems[id] && this.inventoryItems[id].cooldown > 0) return;
+        if(this.inventoryItems[id] && (this.inventoryItems[id].cooldown > 0 || this.inventoryItems[id].duration > 0)) return;
         if(realCons < 1) return;
         if(resource.usageGain) {
             const aff = this.getConsumeAffordable(resource, realCons);
@@ -199,7 +225,26 @@ export class InventoryModule extends GameModule {
                 };
             }
             this.inventoryItems[id].isConsumed = true;
-            this.inventoryItems[id].cooldown = resource.getUsageCooldown() ?? 0;
+            if(resource.attributes?.duration && resource.resourceModifier) {
+                // has active effect
+
+                gameEntity.registerGameEntity(`active_${id}`, {
+                    originalId: id,
+                    name: resource.name,
+                    isAbstract: false,
+                    level: 1,
+                    tags: ['active_consumable', 'active_effect'],
+                    scope: 'resources',
+                    resourceModifier: resource.resourceModifier ?? undefined
+                });
+
+                gameEntity.setEntityLevel(`active_${id}`, 1);
+
+                this.inventoryItems[id].duration = resource.attributes.duration;
+
+            } else {
+                this.inventoryItems[id].cooldown = resource.getUsageCooldown() ?? 0;
+            }
         }
         gameResources.addResource(id, -realCons);
         this.sendInventoryData();
@@ -238,7 +283,7 @@ export class InventoryModule extends GameModule {
 
     getItemsData() {
         const items = gameResources.listResourcesByTags(['inventory']);
-        const presentItems = items.filter(item => gameResources.getResource(item.id).amount > 0);
+        const presentItems = items.filter(item => gameResources.getResource(item.id).amount >= 1);
         if(presentItems.length <= 0) {
             gameResources.addResource('inventory_berry', 2);
         }
@@ -277,7 +322,10 @@ export class InventoryModule extends GameModule {
             isConsumed: this.inventoryItems[resource.id]?.isConsumed,
             isSellable: !!resource.sellPrice,
             sellPrice: resource.sellPrice,
-            maxSell: Math.min((this.inventoryItems[resource.id]?.stockCapacity ?? MAX_STOCK), Math.floor(resource.amount))
+            maxSell: Math.min((this.inventoryItems[resource.id]?.stockCapacity ?? MAX_STOCK), Math.floor(resource.amount)),
+            duration: resource.attributes?.duration || 0,
+            potentialEffects: resource.resourceModifier ? resourceApi.unpackEffects(resource.resourceModifier, 1) : [],
+            consumptionCooldown: resource.getUsageCooldown ? resource.getUsageCooldown() : 0
         }
     }
 
