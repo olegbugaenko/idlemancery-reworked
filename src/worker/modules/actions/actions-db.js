@@ -303,7 +303,7 @@ export const registerActionsStage1 = () => {
         name: 'Push Up',
         isAbstract: false,
         allowedImpacts: ['effects'],
-        description: 'Perform some simple physical exercises to become stronger',
+        description: 'Perform some simple physical exercises to become stronger and unlock better physical jobs options',
         level: 1,
         resourceModifier: {
             income: {

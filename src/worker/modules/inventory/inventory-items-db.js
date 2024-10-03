@@ -4,6 +4,8 @@ export const registerInventoryItems = () => {
 
     const charismaMod = (attr) => attr > 0 ? 1. / (1. + 0.02*Math.log2(attr)) : 1.;
 
+    const metabolismMod = (attr) => attr > 1 ? 1. / (Math.pow(attr, 0.25)) : 1.;
+
 
     gameResources.registerResource('inventory_berry', {
         name: 'Berry',
@@ -14,7 +16,7 @@ export const registerInventoryItems = () => {
 
         },
         getUsageCooldown: () => {
-            return 5;
+            return 5*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
         },
         usageGain: {
             get_income: () => ({
@@ -27,8 +29,8 @@ export const registerInventoryItems = () => {
                 }
             })
         },
-        get_cost: () => ({
-            coins: 5*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+        get_cost: (amount = 1) => ({
+            coins: amount*5*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
         }),
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0
@@ -45,7 +47,7 @@ export const registerInventoryItems = () => {
 
         },
         getUsageCooldown: () => {
-            return 10;
+            return 10*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
         },
         usageGain: {
             get_income: () => ({
@@ -58,8 +60,8 @@ export const registerInventoryItems = () => {
                 }
             })
         },
-        get_cost: () => ({
-            coins: 5*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+        get_cost: (amount = 1) => ({
+            coins: amount*5*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
         }),
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0
@@ -77,7 +79,7 @@ export const registerInventoryItems = () => {
 
         },
         getUsageCooldown: () => {
-            return 10;
+            return 10*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
         },
         usageGain: {
             get_income: () => ({
@@ -115,7 +117,7 @@ export const registerInventoryItems = () => {
 
         },
         getUsageCooldown: () => {
-            return 20;
+            return 20*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
         },
         usageGain: {
             get_income: () => ({
@@ -145,7 +147,7 @@ export const registerInventoryItems = () => {
 
         },
         getUsageCooldown: () => {
-            return 30;
+            return 30*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
         },
         attributes: {
             duration: 20,
@@ -189,7 +191,7 @@ export const registerInventoryItems = () => {
 
         },
         getUsageCooldown: () => {
-            return 30;
+            return 30*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
         },
         attributes: {
             duration: 20,

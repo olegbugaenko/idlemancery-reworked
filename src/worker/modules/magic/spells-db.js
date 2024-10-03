@@ -96,7 +96,7 @@ export const initSpellsDB1 = () => {
 
     gameEntity.registerGameEntity('spell_magic_recovery', {
         name: 'Less Magic Recovery',
-        description: 'Improve your learning capabilities using magic',
+        description: 'Heal yourself using magic',
         hasCap: false,
         tags: ['spell', 'magic', 'restoration', 'restoration_magic'],
         defaultCap: 0,
@@ -121,7 +121,7 @@ export const initSpellsDB1 = () => {
             get_income: () => ({
                 resources: {
                     health: {
-                        A: 10,
+                        A: 10*gameEffects.getEffectValue('restoration_spells_efficiency'),
                         B: 0,
                         type: 0,
                     }
@@ -130,6 +130,65 @@ export const initSpellsDB1 = () => {
         },
         attributes: {
 
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_less_restoration') > 0
+        },
+    })
+
+
+    gameEntity.registerGameEntity('spell_small_regeneration', {
+        name: 'Less Magic Regeneration',
+        description: 'Enchant your body for faster recovery',
+        hasCap: false,
+        tags: ['spell', 'magic', 'restoration', 'restoration_magic'],
+        defaultCap: 0,
+        isAbstract: true,
+        level: 1,
+        onUse: (amount) => {
+
+        },
+        getUsageCooldown: () => {
+            return 10;
+        },
+        resourceModifier: {
+            income: {
+                resources: {
+                    health: {
+                        A: 0.5*gameEffects.getEffectValue('restoration_spells_efficiency'),
+                        B: 1*gameEffects.getEffectValue('restoration_spells_efficiency'),
+                        type: 0,
+                    },
+                    energy: {
+                        A: 1*gameEffects.getEffectValue('restoration_spells_efficiency'),
+                        B: 2*gameEffects.getEffectValue('restoration_spells_efficiency'),
+                        type: 0,
+                    }
+                },
+            },
+            consumption: {
+                resources: {
+                    mana: {
+                        A: 0,
+                        B: 2,
+                        type: 0,
+                    }
+                }
+            }
+        },
+        usageGain: {
+            get_consumption: () => ({
+                resources: {
+                    mana: {
+                        A: 5,
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            })
+        },
+        attributes: {
+            duration: 10,
         },
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_less_restoration') > 0

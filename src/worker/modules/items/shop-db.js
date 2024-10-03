@@ -603,7 +603,7 @@ export const registerShopItemsStage1 = () => {
         get_cost: () => ({
             'coins': {
                 A: 2,
-                B: 12000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 40000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 0
             }
         }),
@@ -729,5 +729,40 @@ export const registerShopItemsStage1 = () => {
             }
         }),
     })
+
+
+    gameEntity.registerGameEntity('shop_item_land', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Purchase land',
+        description: 'Purchase some land for even more place',
+        level: 0,
+        maxLevel: 10,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_storeroom') > 2
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            income: {
+                resources: {
+                    'living_space': {
+                        A: 5,
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            },
+            effectDeps: ['coins_cap_bonus']
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1.25,
+                B: 20000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
 
 }

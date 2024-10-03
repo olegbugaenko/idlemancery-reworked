@@ -1,4 +1,4 @@
-import { gameEntity, gameResources, resourceApi, resourceCalculators } from "game-framework"
+import { gameEntity, gameResources, resourceApi, resourceCalculators, gameEffects } from "game-framework"
 import {GameModule} from "../../shared/game-module";
 import {initSpellsDB1} from "./spells-db";
 
@@ -26,6 +26,12 @@ export class SpellModule extends GameModule {
     }
 
     initialize() {
+
+        gameEffects.registerEffect('restoration_spells_efficiency', {
+            name: 'Restoration Magic Efficiency',
+            defaultValue: 1,
+            minValue: 1,
+        })
 
         initSpellsDB1();
 
@@ -192,7 +198,7 @@ export class SpellModule extends GameModule {
             return;
         }
 
-        if(this.spells[id].cooldown > 0) {
+        if((this.spells[id]?.cooldown || 0) > 0) {
             return;
         }
         

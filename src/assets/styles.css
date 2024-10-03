@@ -114,6 +114,10 @@ p {
     font-style: italic;
 }
 
+.effects-popup.hint-popup {
+    width: 280px;
+}
+
 p.hint {
     font-style: italic;
     font-size: 14px;
@@ -235,6 +239,10 @@ p.hint {
     flex-wrap: wrap;
 }
 
+.flex-container.buttons {
+    justify-content: space-between;
+}
+
 .ingame-box {
     border-radius: 4px;
     border: 1px solid var(--grey);
@@ -321,6 +329,10 @@ p.hint {
 
 .icon-card.active {
     box-shadow: 0 0 16px var(--highlight);
+}
+
+.icon-card.selected {
+    box-shadow: 0 0 8px#ffffff;
 }
 
 .icon-card .icon-content {
@@ -546,7 +558,8 @@ h4 {
 }
 
 .actions-wrap .categories {
-    height: 50px;
+    height: 40px;
+    border-bottom: 1px solid #777777;
 }
 
 .card.action {
@@ -848,4 +861,38 @@ h4 {
 .settings-wrap .row .col textarea {
     width: 280px;
     height: 120px;
+}
+
+.text-desc {
+    font-size: 13px;
+}
+
+.items-cat .heading.flex-container {
+    align-items: center;
+    height: 40px;
+    padding: 8px 12px;
+}
+
+.items-cat .heading.flex-container ul.menu li {
+    padding: 4px;
+}
+
+.items-cat .items-holder {
+    height: calc(100% - 60px);
+}
+
+.items-wrap .items-cat {
+    height: calc(100% - 40px);
+}
+
+.items .menu-wrap {
+    border-bottom: 1px solid #777777;
+}
+
+.effects-table .nextVal.green {
+    color: var(--green);
+}
+
+.effects-table .nextVal.red {
+    color: var(--red);
 }

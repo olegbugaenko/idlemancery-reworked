@@ -11,13 +11,13 @@ export const ResourceComparison = ({ effects1, effects2 }) => {
         if(!prevValue) {
             prevValue = {
                 ...nextValue,
-                value: 0
+                value: (nextValue.scope === 'multiplier' || nextValue.scope === 'capMult') ? 1 : 0
             }
         }
         if(!nextValue) {
             nextValue = {
                 ...prevValue,
-                value: 0
+                value: (prevValue.scope === 'multiplier' || prevValue.scope === 'capMult') ? 1 : 0
             }
         }
 

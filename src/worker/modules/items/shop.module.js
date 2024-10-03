@@ -1,4 +1,4 @@
-import { gameEntity, gameResources, resourceCalculators, resourceApi } from "game-framework"
+import { gameEntity, gameResources, resourceCalculators, resourceApi, gameEffects } from "game-framework"
 import {GameModule} from "../../shared/game-module";
 import {registerShopItemsStage1} from "./shop-db";
 
@@ -9,6 +9,10 @@ export class ShopModule extends GameModule {
         this.purchasedItems = {};
         this.isUnlocked = false;
         this.leveledId = null;
+        this.purchaseMultiplier = 1;
+        this.eventHandler.registerHandler('set-purchase-multiplier', (payload) => {
+            this.setPurchaseMultiplier(payload.amount);
+        })
         this.eventHandler.registerHandler('purchase-item', (payload) => {
             this.purchaseItem(payload.id);
         })
@@ -34,6 +38,18 @@ export class ShopModule extends GameModule {
 
     initialize() {
 
+        gameEffects.registerEffect('shop_max_stock', {
+            name: 'Shop Max Stock',
+            defaultValue: 100,
+            minValue: 100
+        })
+
+        gameEffects.registerEffect('shop_stock_renew_rate', {
+            name: 'Stock Renew Rate',
+            defaultValue: 1,
+            minValue: 1
+        })
+
         registerShopItemsStage1();
 
     }
@@ -49,6 +65,7 @@ export class ShopModule extends GameModule {
         return {
             items: this.purchasedItems,
             isUnlocked: this.isUnlocked,
+            purchaseMultiplier: this.purchaseMultiplier,
         }
     }
 
@@ -63,6 +80,7 @@ export class ShopModule extends GameModule {
             }
         }
         this.isUnlocked = saveObject?.isUnlocked || false;
+        this.purchaseMultiplier = saveObject?.purchaseMultiplier || 1;
         this.sendItemsData();
     }
 
@@ -73,6 +91,12 @@ export class ShopModule extends GameModule {
     setItem(itemId, amount, bForce = false) {
         gameEntity.setEntityLevel(itemId, amount, bForce);
         this.purchasedItems[itemId] = gameEntity.getLevel(itemId);
+    }
+
+    setPurchaseMultiplier(amount) {
+        this.purchaseMultiplier = Math.max(1, amount);
+        console.log('Set to: ', this.purchaseMultiplier);
+        this.sendPurchaseableItemsData();
     }
 
     purchaseItem(itemId) {
@@ -120,7 +144,8 @@ export class ShopModule extends GameModule {
                 affordable: gameEntity.getAffordable(entity.id),
                 potentialEffects: gameEntity.getEffects(entity.id, 1),
                 isLeveled: this.leveledId === entity.id
-            }))
+            })),
+            purchaseMultiplier: this.purchaseMultiplier,
         }
     }
 
@@ -140,7 +165,9 @@ export class ShopModule extends GameModule {
             level: this.purchasedItems[entity.id] || 0,
             affordable: gameEntity.getAffordable(entity.id),
             potentialEffects: gameEntity.getEffects(entity.id, 1),
-            tags: entity.tags
+            currentEffects: gameEntity.getEffects(entity.id),
+            tags: entity.tags,
+            purchaseMultiplier: 1,
         }
     }
 
@@ -153,12 +180,18 @@ export class ShopModule extends GameModule {
         const items = gameResources.listResourcesByTags(['inventory']);
         // console.log('items: ', items);
         const presentItems = items.filter(item => item.isUnlocked && item.get_cost);
+
         return {
-            available: presentItems.map(resource => ({
+            available: presentItems.map(resource => {
+                const affordable = resourceCalculators.isAffordable(resource.get_cost());
+                return {
                 ...resource,
-                affordable: resourceCalculators.isAffordable(resource.get_cost()),
-                isLeveled: this.leveledId === resource.id
-            }))
+                    affordable,
+                    isLeveled: this.leveledId === resource.id,
+                    purchaseMultiplier: Math.min(this.purchaseMultiplier, affordable.max)
+                }
+            }),
+            purchaseMultiplier: this.purchaseMultiplier,
         }
     }
 
@@ -170,15 +203,19 @@ export class ShopModule extends GameModule {
     getPurchaseableItemDetails(id) {
         if(!id) return null;
         const entity = gameResources.getResource(id);
+        const affordable = resourceCalculators.isAffordable(entity.get_cost());
+        const potPurchase = Math.min(this.purchaseMultiplier, affordable.max);
+
         return {
             id: entity.id,
             name: entity.name,
             description: entity.description,
             max: entity.max,
             level: this.purchasedItems[entity.id] || 0,
-            affordable: resourceCalculators.isAffordable(entity.get_cost()),
+            affordable: resourceCalculators.isAffordable(entity.get_cost(potPurchase)),
             potentialEffects: resourceApi.unpackEffects(entity.usageGain, 1),
-            tags: entity.tags
+            tags: entity.tags,
+            purchaseMultiplier: potPurchase,
         }
     }
 

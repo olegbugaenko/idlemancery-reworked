@@ -34,7 +34,7 @@ export const ActiveEffectItem = ({ id, originalId, scope, name, description, eff
 
     return (<div className={`icon-card effect flashable`}>
         <TippyWrapper
-            content={<div className={'hint-popup'}>
+            content={<div className={'hint-popup effects-popup'}>
                 <div className={'blade-inner'}>
                     <div className={'block'}>
                         <h4>{name} ({formatInt(level)})</h4>

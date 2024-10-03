@@ -137,6 +137,7 @@ export class PropertyModule extends GameModule {
             level: this.purchasedFurnitures[entity.id] || 0,
             affordable: gameEntity.getAffordable(entity.id),
             potentialEffects: gameEntity.getEffects(entity.id, 1),
+            currentEffects: gameEntity.getEffects(entity.id),
             tags: entity.tags
         }
     }

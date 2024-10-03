@@ -1,8 +1,7 @@
-import { gameEntity, gameResources, resourceApi } from "game-framework"
+import { gameEntity, gameResources, resourceApi, gameEffects } from "game-framework"
 import {GameModule} from "../../shared/game-module";
 import {registerInventoryItems} from "./inventory-items-db";
 
-const MAX_STOCK = 100;
 
 export class InventoryModule extends GameModule {
 
@@ -27,12 +26,22 @@ export class InventoryModule extends GameModule {
             this.sendItemDetails(payload.id)
         })
 
+        this.eventHandler.registerHandler('query-sell-details', (payload) => {
+            this.sendSellDetails(payload.id)
+        })
+
         this.eventHandler.registerHandler('save-inventory-settings', payload => {
             this.saveSettings(payload)
         })
     }
 
     initialize() {
+
+        gameEffects.registerEffect('metabolism_rate', {
+            name: 'Consumable Cooldown Reduction',
+            defaultValue: 1,
+            minValue: 1
+        })
 
         registerInventoryItems();
 
@@ -103,8 +112,8 @@ export class InventoryModule extends GameModule {
                 this.inventoryItems[itemId].cooldown -= delta;
             }
 
-            if(this.inventoryItems[itemId].stockCapacity < MAX_STOCK) {
-                this.inventoryItems[itemId].stockCapacity += delta;
+            if(this.inventoryItems[itemId].stockCapacity < gameEffects.getEffectValue('shop_max_stock')) {
+                this.inventoryItems[itemId].stockCapacity += delta*gameEffects.getEffectValue('shop_stock_renew_rate');
             }
 
 
@@ -148,7 +157,7 @@ export class InventoryModule extends GameModule {
 
         for(const key in this.inventoryItems) {
             if(!('stockCapacity' in this.inventoryItems[key])) {
-                this.inventoryItems[key].stockCapacity = MAX_STOCK;
+                this.inventoryItems[key].stockCapacity = gameEffects.getEffectValue('shop_max_stock');
             }
             if(this.inventoryItems[key].duration && this.inventoryItems[key].duration > 0) {
                 gameEntity.registerGameEntity(`active_${id}`, {
@@ -221,7 +230,7 @@ export class InventoryModule extends GameModule {
 
             if(!this.inventoryItems[id]) {
                 this.inventoryItems[id] = {
-                    stockCapacity: MAX_STOCK
+                    stockCapacity: gameEffects.getEffectValue('shop_max_stock')
                 };
             }
             this.inventoryItems[id].isConsumed = true;
@@ -260,7 +269,7 @@ export class InventoryModule extends GameModule {
 
             if(!this.inventoryItems[id]) {
                 this.inventoryItems[id] = {
-                    stockCapacity: MAX_STOCK
+                    stockCapacity: gameEffects.getEffectValue('shop_max_stock')
                 };
             }
             this.inventoryItems[id].stockCapacity -= realCons;
@@ -326,7 +335,7 @@ export class InventoryModule extends GameModule {
             isConsumed: this.inventoryItems[resource.id]?.isConsumed,
             isSellable: !!resource.sellPrice,
             sellPrice: resource.sellPrice,
-            maxSell: Math.min((this.inventoryItems[resource.id]?.stockCapacity ?? MAX_STOCK), Math.floor(resource.amount)),
+            maxSell: Math.min((this.inventoryItems[resource.id]?.stockCapacity ?? gameEffects.getEffectValue('shop_max_stock')), Math.floor(resource.amount)),
             duration: resource.attributes?.duration || 0,
             potentialEffects: resource.resourceModifier ? resourceApi.unpackEffects(resource.resourceModifier, 1) : [],
             consumptionCooldown: resource.getUsageCooldown ? resource.getUsageCooldown() : 0
@@ -336,6 +345,20 @@ export class InventoryModule extends GameModule {
     sendItemDetails(id) {
         const data = this.getItemDetails(id);
         this.eventHandler.sendData('inventory-details', data);
+    }
+
+    sendSellDetails(id) {
+        if(!id) return null;
+        const resource =  gameResources.getResource(id);
+
+        const data = {
+            id,
+            isSellable: !!resource.sellPrice,
+            sellPrice: resource.sellPrice,
+            maxSell: Math.min((this.inventoryItems[resource.id]?.stockCapacity ?? gameEffects.getEffectValue('shop_max_stock')), Math.floor(resource.amount)),
+        }
+
+        this.eventHandler.sendData('sell-details', data);
     }
 
 }

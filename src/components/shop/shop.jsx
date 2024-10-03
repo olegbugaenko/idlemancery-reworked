@@ -8,6 +8,7 @@ import {ResourceCost} from "../shared/resource-cost.jsx";
 import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
 import {FlashOverlay} from "../layout/flash-overlay.jsx";
 import {useFlashOnLevelUp} from "../../general/hooks/flash";
+import {ResourceComparison} from "../shared/resource-comparison.jsx";
 
 export const Shop = ({}) => {
     const [detailOpened, setDetailOpened] = useState(null)
@@ -107,7 +108,8 @@ export const ShopItems = ({ setItemDetails, purchaseItem }) => {
     const { onMessage, sendData } = useWorkerClient(worker);
     const [itemsData, setItemsData] = useState({
         available: [],
-        current: undefined
+        current: undefined,
+        purchaseMultiplier: 1,
     });
 
     const [overlayPositions, setOverlayPositions] = useState([]);
@@ -129,19 +131,48 @@ export const ShopItems = ({ setItemDetails, purchaseItem }) => {
         }
     }, [])
 
+    const setPurchaseMultiplier = (amount) => {
+        sendData('set-purchase-multiplier', { amount })
+    }
+
     onMessage('items-resources-data', (items) => {
         setItemsData(items);
     })
 
     return (<div className={'items-cat'}>
-        <PerfectScrollbar>
-            <div className={'flex-container'}>
-                {itemsData.available.map(item => <ItemResourceCard onFlash={handleFlash} key={item.id} {...item} onPurchase={purchaseItem} onShowDetails={setItemDetails}/>)}
-                {overlayPositions.map((position, index) => (
-                    <FlashOverlay key={index} position={position} />
-                ))}
-            </div>
-        </PerfectScrollbar>
+        <div className={'heading flex-container'}>
+            <p>Purchase X: </p>
+            <ul className={'menu'}>
+                <li className={`${itemsData.purchaseMultiplier === 1 ? 'active' : ''}`} onClick={() => setPurchaseMultiplier(1)}>
+                    <span>1</span>
+                </li>
+                <li className={`${itemsData.purchaseMultiplier === 5 ? 'active' : ''}`} onClick={() => setPurchaseMultiplier(5)}>
+                    <span>5</span>
+                </li>
+                <li className={`${itemsData.purchaseMultiplier === 10 ? 'active' : ''}`} onClick={() => setPurchaseMultiplier(10)}>
+                    <span>10</span>
+                </li>
+                <li className={`${itemsData.purchaseMultiplier === 25 ? 'active' : ''}`} onClick={() => setPurchaseMultiplier(25)}>
+                    <span>25</span>
+                </li>
+                <li className={`${itemsData.purchaseMultiplier === 100 ? 'active' : ''}`} onClick={() => setPurchaseMultiplier(100)}>
+                    <span>100</span>
+                </li>
+                <li className={`${itemsData.purchaseMultiplier > 1000 ? 'active' : ''}`} onClick={() => setPurchaseMultiplier(1e+8)}>
+                    <span>Max</span>
+                </li>
+            </ul>
+        </div>
+        <div className={'items-holder'}>
+            <PerfectScrollbar>
+                <div className={'flex-container'}>
+                    {itemsData.available.map(item => <ItemResourceCard onFlash={handleFlash} key={item.id} {...item} onPurchase={purchaseItem} onShowDetails={setItemDetails}/>)}
+                    {overlayPositions.map((position, index) => (
+                        <FlashOverlay key={index} position={position} />
+                    ))}
+                </div>
+            </PerfectScrollbar>
+        </div>
     </div>)
 }
 
@@ -165,17 +196,17 @@ export const ItemCard = ({ id, name, level, max, affordable, isLeveled, onFlash,
     </div> )
 }
 
-export const ItemResourceCard = ({ id, name, level, max, affordable, isLeveled, onFlash, onPurchase, onShowDetails}) => {
+export const ItemResourceCard = ({ id, name, purchaseMultiplier, level, max, affordable, isLeveled, onFlash, onPurchase, onShowDetails}) => {
 
     const elementRef = useRef(null);
 
     useFlashOnLevelUp(isLeveled, onFlash, elementRef);
 
-    return (<div ref={elementRef} className={`icon-card item flashable ${affordable.hardLocked ? 'hard-locked' : ''}  ${!affordable.isAffordable ? 'unavailable' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)} onClick={(e) => onPurchase(id, e.shiftKey ? 1e9 : 1)}>
+    return (<div ref={elementRef} className={`icon-card item flashable ${affordable.hardLocked ? 'hard-locked' : ''}  ${!affordable.isAffordable ? 'unavailable' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)} onClick={(e) => onPurchase(id, e.shiftKey ? 1e9 : purchaseMultiplier)}>
         <TippyWrapper
             content={<div className={'hint-popup'}>
                 <p>{name}</p>
-                <p>Press to buy. Hold Shift to by max</p>
+                <p>Press to buy x{formatInt(purchaseMultiplier)}. Hold Shift to by max</p>
             </div>}>
             <div className={'icon-content'}>
                 <img src={`icons/resources/${id}.png`} className={'resource'} />
@@ -237,7 +268,7 @@ export const ItemDetails = ({itemId, category}) => {
                     </div>
                 </div>
                 <div className={'block'}>
-                    <p>Cost:</p>
+                    <p>Cost: (x{formatInt(item.purchaseMultiplier)})</p>
                     <div className={'costs-wrap'}>
                         {Object.values(item.affordable.affordabilities || {}).map(aff => <ResourceCost affordabilities={aff}/>)}
                     </div>
@@ -245,7 +276,10 @@ export const ItemDetails = ({itemId, category}) => {
                 <div className={'block'}>
                     <p>Effects:</p>
                     <div className={'effects'}>
-                        <EffectsSection effects={item.potentialEffects} />
+                        {item.currentEffects ?
+                            (<ResourceComparison effects1={item.currentEffects} effects2={item.potentialEffects} /> )
+                            : (<EffectsSection effects={item.potentialEffects} />)
+                        }
                     </div>
                 </div>
             </div>

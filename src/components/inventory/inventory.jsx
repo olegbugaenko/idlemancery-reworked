@@ -9,6 +9,7 @@ import {ResourceCost} from "../shared/resource-cost.jsx";
 import CircularProgress from "../shared/circular-progress.jsx";
 import {FlashOverlay} from "../layout/flash-overlay.jsx";
 import {useFlashOnLevelUp} from "../../general/hooks/flash";
+import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
 
 export const Inventory = ({}) => {
 
@@ -65,9 +66,32 @@ export const Inventory = ({}) => {
         setItemsData(inventory);
     })
 
+    // Handle sell-details messages
+    onMessage("sell-details", (payload) => {
+        if (editData && payload.id === editData.id) {
+            setEditData((prevData) => ({
+                ...prevData,
+                isSellable: payload.isSellable,
+                maxSell: payload.maxSell,
+            }));
+        }
+    });
+
+    // Set up interval to query sell details
     useEffect(() => {
-        console.log('setDet isChanged set to ', isChanged);
-    }, [isChanged])
+        let interval = null;
+        if (detailOpenedId && editData && editData.isSellable) {
+            interval = setInterval(() => {
+                sendData("query-sell-details", { id: detailOpenedId.id });
+            }, 500);
+        }
+
+        return () => {
+            if (interval) {
+                clearInterval(interval);
+            }
+        };
+    }, [detailOpenedId, editData]);
 
     const purchaseItem = useCallback((id) => {
         sendData('consume-inventory', { id, amount: 1 })
@@ -202,7 +226,16 @@ export const Inventory = ({}) => {
             <div className={'ingame-box inventory'}>
                 <PerfectScrollbar>
                     <div className={'flex-container'}>
-                        {inventoryData.available.map(item => <InventoryCard key={item.id} isChanged={isChanged} {...item} onPurchase={purchaseItem} onFlash={handleFlash} onShowDetails={setInventoryDetailsView} onEditConfig={setInventoryDetailsEdit}/>)}
+                        {inventoryData.available.map(item => <InventoryCard
+                            key={item.id}
+                            isSelected={item.id === detailOpenedId?.id}
+                            isChanged={isChanged}
+                            {...item}
+                            onPurchase={purchaseItem}
+                            onFlash={handleFlash}
+                            onShowDetails={setInventoryDetailsView}
+                            onEditConfig={setInventoryDetailsEdit}
+                        />)}
                         {overlayPositions.map((position, index) => (
                             <FlashOverlay key={index} position={position} />
                         ))}
@@ -211,6 +244,7 @@ export const Inventory = ({}) => {
             </div>
             <div className={'item-detail ingame-box detail-blade'}>
                 {editData || viewedData ? (<InventoryDetails
+                    isChanged={isChanged}
                     editData={editData}
                     viewedData={viewedData}
                     resources={resources}
@@ -231,7 +265,7 @@ export const Inventory = ({}) => {
 
 }
 
-export const InventoryCard = React.memo(({ isChanged, id, name, amount, isConsumed, cooldownProg, cooldown, onFlash, onPurchase, onShowDetails, onEditConfig}) => {
+export const InventoryCard = React.memo(({ isChanged, isSelected, id, name, amount, isConsumed, cooldownProg, cooldown, onFlash, onPurchase, onShowDetails, onEditConfig}) => {
     const elementRef = useRef(null);
 
     useFlashOnLevelUp(isConsumed, onFlash, elementRef);
@@ -252,13 +286,19 @@ export const InventoryCard = React.memo(({ isChanged, id, name, amount, isConsum
     // RERENDERING
     // console.log('Item: ', id, cooldownProg, cooldown);
 
-    return (<div ref={elementRef} className={`icon-card item flashable`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)} onClick={handleClick} onContextMenu={handleContextMenu}>
-        <div className={'icon-content'}>
-            <CircularProgress progress={cooldownProg}>
-                <img src={`icons/resources/${id}.png`} className={'resource'} />
-            </CircularProgress>
-            <span className={'level'}>{formatInt(amount)}</span>
-        </div>
+    return (<div ref={elementRef} className={`icon-card item flashable ${isSelected ? 'selected' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)} onClick={handleClick} onContextMenu={handleContextMenu}>
+        <TippyWrapper content={<div className={'hint-popup'}>
+            <p>Left click to select</p>
+            <p>Right click to consume</p>
+        </div> }>
+            <div className={'icon-content'}>
+                <CircularProgress progress={cooldownProg}>
+                    <img src={`icons/resources/${id}.png`} className={'resource'} />
+                </CircularProgress>
+                <span className={'level'}>{formatInt(amount)}</span>
+            </div>
+        </TippyWrapper>
+
     </div> )
 }, ((prevProps, currProps) => {
     if(prevProps.id !== currProps.id) {
@@ -280,11 +320,15 @@ export const InventoryCard = React.memo(({ isChanged, id, name, amount, isConsum
     if(prevProps.isChanged !== currProps.isChanged) {
         return false;
     }
+
+    if(prevProps.isSelected !== currProps.isSelected) {
+        return false;
+    }
     // console.log('Rerender: ', prevProps, curr);
     return true;
 }))
 
-export const InventoryDetails = ({editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onAddAutosellRule, onSetAutosellRuleValue, onDeleteAutosellRule, onSave, onCancel, onSell}) => {
+export const InventoryDetails = ({isChanged, editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onAddAutosellRule, onSetAutosellRuleValue, onDeleteAutosellRule, onSave, onCancel, onSell}) => {
 
     const item = viewedData ? viewedData : editData;
 
@@ -344,8 +388,12 @@ export const InventoryDetails = ({editData, viewedData, resources, onAddAutocons
                         <EffectsSection effects={item.potentialEffects} />
                     </div>
                 </div>) : null}
-                {item.consumptionCooldown ? (<p>Consumption Cooldown: {secondsToString(item.consumptionCooldown)}</p>) : null}
-                <div className={'autoconsume-setting'}>
+                {item.consumptionCooldown ? (
+                <div className={'block'}>
+                    <p>Consumption Cooldown: {secondsToString(item.consumptionCooldown)}</p>
+                </div>
+                ) : null}
+                <div className={'autoconsume-setting block'}>
                     <div className={'rules-header flex-container'}>
                         <p>Autoconsumption rules: {item.autoconsume?.rules?.length ? null : 'None'}</p>
                         {isEditing ? (<button onClick={addAutoconsumeRule}>Add rule (AND)</button>) : null}
@@ -376,7 +424,13 @@ export const InventoryDetails = ({editData, viewedData, resources, onAddAutocons
                                 </div>
                                 <div className={'col value'}>
                                     {isEditing ? (
-                                        <input type={'number'}  onChange={e => setAutoconsumeRuleValue(index, 'value', e.target.value)} value={rule.value_type === 'percentage' ? Math.min(1, rule.value) : rule.value} max={rule.value_type === 'percentage' ? 1 : undefined}/>
+                                        <input
+                                            type={'number'}
+                                            onChange={e => setAutoconsumeRuleValue(index, 'value', e.target.value)}
+                                            value={rule.value_type === 'percentage' ? Math.min(1, Math.max(0, rule.value)) : Math.max(0, rule.value)}
+                                            max={rule.value_type === 'percentage' ? 1 : undefined}
+                                            step={rule.value_type === 'percentage' ? 0.05 : 1}
+                                        />
                                         ) : (<span>{rule.value}</span>)}
                                 </div>
                                 {isEditing ? (<div className={'col delete-rule'}>
@@ -389,7 +443,7 @@ export const InventoryDetails = ({editData, viewedData, resources, onAddAutocons
                     </div>
                 </div>
 
-                {item.isSellable ? (<div className={'autoconsume-setting'}>
+                {item.isSellable ? (<div className={'autoconsume-setting block'}>
                     <div className={'rules-header flex-container'}>
                         <p>Autosell rules: {item.autosell?.rules?.length ? null : 'None'}</p>
                         {isEditing ? (<button onClick={addAutosellRule}>Add rule (AND)</button>) : null}
@@ -408,7 +462,7 @@ export const InventoryDetails = ({editData, viewedData, resources, onAddAutocons
                                     {isEditing ? (
                                         <input type={'number'}
                                                onChange={e => setAutosellRuleValue(index, 'value', e.target.value)}
-                                               value={rule.value}
+                                               value={Math.max(1, rule.value)}
                                         />
                                     ) : (<span>{rule.value}</span>)}
                                 </div>
@@ -423,14 +477,16 @@ export const InventoryDetails = ({editData, viewedData, resources, onAddAutocons
                 </div>) : null}
 
                 {item.isSellable ? (<div className={'block sell-block'}>
-                    <p>Sell price: {formatValue(item.sellPrice)}</p>
-                    <button disabled={item.maxSell < 1} onClick={() => onSell(item.id, 1)}>Sell</button>
-                    <button disabled={item.maxSell < 1} onClick={() => onSell(item.id, item.maxSell)}>Sell max (x{formatInt(item.maxSell)})</button>
+                    <p className={'text-desc'}>Sell price: {formatValue(item.sellPrice)}</p>
+                    <div className={'buttons flex-container'}>
+                        <button disabled={item.maxSell < 1} onClick={() => onSell(item.id, 1)}>Sell</button>
+                        <button disabled={item.maxSell < 1} onClick={() => onSell(item.id, item.maxSell)}>Sell max (x{formatInt(item.maxSell)})</button>
+                    </div>
                 </div> ) : null}
 
                 {isEditing ? (<div className={'buttons flex-container'}>
-                    <button onClick={onSave}>Save</button>
-                    <button onClick={onCancel}>Cancel</button>
+                    <button disabled={!isChanged} onClick={onSave}>Save</button>
+                    <button disabled={!isChanged} onClick={onCancel}>Cancel</button>
                 </div>) : null}
             </div>
         </PerfectScrollbar>

@@ -237,7 +237,7 @@ export class MageModule extends GameModule {
             list: items.map(item => ({
                 ...item,
                 originalId: item.originalId ?? item.copyFromId,
-                effects: gameEntity.getEffects(item.id),
+                effects: gameEntity.getEffects(item.id, item.level, 0, false, 1, item.modifier.efficiency),
                 duration: gameEntity.getAttribute(item.id, 'current_duration'),
                 durationProg: 1
             }))

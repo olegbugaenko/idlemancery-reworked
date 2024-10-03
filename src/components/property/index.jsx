@@ -6,6 +6,7 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import {EffectsSection} from "../shared/effects-section.jsx";
 import {ResourceCost} from "../shared/resource-cost.jsx";
 import {FurnitureUpgrades} from "./furniture.jsx";
+import {ResourceComparison} from "../shared/resource-comparison.jsx";
 
 export const Property = ({}) => {
     const [detailOpened, setDetailOpened] = useState(null)
@@ -105,7 +106,10 @@ export const ItemDetails = ({itemId, category}) => {
                 <div className={'block'}>
                     <p>Effects:</p>
                     <div className={'effects'}>
-                        <EffectsSection effects={item.potentialEffects} />
+                        {item.currentEffects ?
+                            (<ResourceComparison effects1={item.currentEffects} effects2={item.potentialEffects} /> )
+                            : (<EffectsSection effects={item.potentialEffects} />)
+                        }
                     </div>
                 </div>
             </div>

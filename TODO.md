@@ -29,4 +29,11 @@ git push -u origin main
 1. [V] Autosell
 2. [V] Show active effects
 3. [V] UI refinement to items requiring attention
-4. Settings (import/export)
+4. [V] Settings (import/export)
+
+0.0.1d
+1. Conjuration magic - selling raw materials for now
+2. Auto-purchase options
+3. [V] Add sell multiplier options
+4. New furniture for improving physical exercises, reading books and other stuff
+5. [V] Add validation on inputs

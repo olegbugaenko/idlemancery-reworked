@@ -171,7 +171,7 @@ export const Spellbook = ({}) => {
                 </PerfectScrollbar>
             </div>
             <div className={'item-detail ingame-box detail-blade'}>
-                {editData || viewedData ? (<SpellDetails editData={editData} viewedData={viewedData} resources={resources} onAddAutoconsumeRule={onAddAutoconsumeRule} onSetAutoconsumeRuleValue={onSetAutoconsumeRuleValue} onDeleteAutoconsumeRule={onDeleteAutoconsumeRule} onSave={onSave} onCancel={onCancel}/>) : null}
+                {editData || viewedData ? (<SpellDetails isChanged={isChanged} editData={editData} viewedData={viewedData} resources={resources} onAddAutoconsumeRule={onAddAutoconsumeRule} onSetAutoconsumeRuleValue={onSetAutoconsumeRuleValue} onDeleteAutoconsumeRule={onDeleteAutoconsumeRule} onSave={onSave} onCancel={onCancel}/>) : null}
             </div>
         </div>
 
@@ -231,7 +231,7 @@ export const SpellCard = React.memo(({ id, isChanged, name, isCasted, cooldownPr
     return true;
 }))
 
-export const SpellDetails = ({editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onSave, onCancel}) => {
+export const SpellDetails = ({isChanged, editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onSave, onCancel}) => {
 
     const item = viewedData ? viewedData : editData;
 
@@ -324,8 +324,8 @@ export const SpellDetails = ({editData, viewedData, resources, onAddAutoconsumeR
                     </div>
                 </div>
                 {isEditing ? (<div className={'buttons flex-container'}>
-                    <button onClick={onSave}>Save</button>
-                    <button onClick={onCancel}>Cancel</button>
+                    <button disabled={!isChanged} onClick={onSave}>Save</button>
+                    <button disabled={!isChanged} onClick={onCancel}>Cancel</button>
                 </div>) : null}
             </div>
         </PerfectScrollbar>
