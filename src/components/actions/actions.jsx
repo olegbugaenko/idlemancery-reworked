@@ -348,6 +348,7 @@ export const ActionDetailsComponent = React.memo(({...action}) => {
 
             </div> ) : null}
             <div className={'block'}>
+                {action?.currentEffects ? (<p>Level-up Effects</p>) : (<p>Action Effects</p>)}
                 <div className={'effects'}>
                     {action?.currentEffects ?
                         (<ResourceComparison effects1={action?.currentEffects} effects2={action?.potentialEffects} /> )
