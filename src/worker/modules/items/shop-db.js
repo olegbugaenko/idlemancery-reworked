@@ -288,7 +288,7 @@ export const registerShopItemsStage1 = () => {
             multiplier: {
                 resources: {
                     'coins': {
-                        A: 0.25,
+                        A: 0.1,
                         B: 1,
                         type: 0,
                     }
