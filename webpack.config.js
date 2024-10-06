@@ -49,6 +49,11 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: './src/index.html',
         }),
+        new CopyWebpackPlugin({
+            patterns: [
+                { from: 'public', to: '.' } // Копіюємо вміст папки 'public' до кореня 'dist'
+            ],
+        }),
     ],
     devServer: {
         static: {
