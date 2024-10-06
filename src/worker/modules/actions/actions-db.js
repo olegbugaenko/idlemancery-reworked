@@ -394,8 +394,8 @@ export const registerActionsStage1 = () => {
             multiplier: {
                 effects: {
                     'coins_earned_bonus': {
-                        A: 0.25,
-                        B: 0.75,
+                        A: 0.125,
+                        B: 0.875,
                         type: 0,
                     }
                 }
@@ -413,7 +413,7 @@ export const registerActionsStage1 = () => {
         },
         unlockCondition: () => {
             // console.log('Beggar level: ', gameEntity.getLevel('action_beggar'));
-            return gameEntity.getLevel('shop_item_book_of_motivation') > 0
+            return gameEntity.getLevel('shop_item_book_of_math') > 0
         },
         attributes: {
             baseXPCost: 50,
