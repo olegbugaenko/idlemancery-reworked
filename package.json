@@ -33,6 +33,7 @@
     "react-beautiful-dnd": "^13.1.1",
     "react-dom": "^18.3.1",
     "react-perfect-scrollbar": "^1.5.8",
-    "react-tippy": "^1.4.0"
+    "react-tippy": "^1.4.0",
+    "game-framework": "git+https://github.com/olegbugaenko/game-framework.git"
   }
 }

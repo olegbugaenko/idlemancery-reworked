@@ -220,11 +220,12 @@ export class MageModule extends GameModule {
                 level: this.skillUpgrades[entity.id] || 0,
                 affordable: gameEntity.getAffordable(entity.id),
                 effects: gameEntity.getEffects(entity.id, 1),
+                currentEffects: gameEntity.getEffects(entity.id, 0),
                 isLeveled: this.leveledId === entity.id
             })),
             sp: {
                 total: skillsRs.amount,
-                max: skillsRs.cap,
+                max: skillsRs.income,
             }
         }
     }

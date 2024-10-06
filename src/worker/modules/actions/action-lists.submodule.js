@@ -1,5 +1,5 @@
 import {GameModule} from "../../shared/game-module";
-import {gameEntity} from "game-framework";
+import {gameEntity, gameResources, gameCore} from "game-framework";
 
 export class ActionListsSubmodule extends GameModule {
 
@@ -86,10 +86,10 @@ export class ActionListsSubmodule extends GameModule {
             }
 
             let action = listToRun.actions[this.runningList.actionIndex];
-            let isAvailable = gameEntity.isEntityUnlocked(action.id) && !gameEntity.isCapped(action.id);
+            let isAvailable = action?.id && gameEntity.isEntityUnlocked(action.id) && !gameEntity.isCapped(action.id);
 
             // Check if action timer exceeded or action is not available
-            if (this.runningList.actionTimer > action.time || !isAvailable) {
+            if (!action || this.runningList.actionTimer > action.time || !isAvailable) {
                 this.runningList.actionTimer = 0;
 
                 // Initialize loop control variables
@@ -164,13 +164,24 @@ export class ActionListsSubmodule extends GameModule {
             if(!isAvailable) {
                 return;
             }
-            const effects = gameEntity.getEffects(action.id, 0, gameEntity.getLevel(action.id), true, action.time / totalTime);
+            const effects = gameEntity.getEffects(action.id, 0, gameEntity.getAttribute(action.id, 'isTraining') ? 1 : gameEntity.getLevel(action.id), true, action.time / totalTime);
+
+            let learnRateFactor = gameCore.getModule('actions').getLearningRate(action.id) / gameCore.getModule('actions').getActionXPMax(action.id);
+
             effects.forEach(effToAdd => {
                 const foundId = totalEffects.findIndex(a => a.id === effToAdd.id
                     && (a.scope === effToAdd.scope
                         || (['income', 'consumption'].includes(a.scope) && ['income', 'consumption'].includes(effToAdd.scope))
                     )
                 );
+                if(effToAdd.scope === 'income' && effToAdd.type === 'resources') {
+                    effToAdd.value *= gameResources.getResource(effToAdd.id).multiplier;
+                }
+
+                if(effToAdd.scope === 'income' && effToAdd.type === 'effects') {
+                    effToAdd.value *= learnRateFactor;
+                }
+
                 if(foundId < 0) {
                     totalEffects.push(effToAdd);
                 } else {

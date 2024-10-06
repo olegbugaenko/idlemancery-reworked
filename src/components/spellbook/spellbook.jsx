@@ -311,7 +311,13 @@ export const SpellDetails = ({isChanged, editData, viewedData, resources, onAddA
                                 </div>
                                 <div className={'col value'}>
                                     {isEditing ? (
-                                        <input type={'number'}  onChange={e => setAutoconsumeRuleValue(index, 'value', e.target.value)} value={rule.value_type === 'percentage' ? Math.min(1, rule.value) : rule.value} max={rule.value_type === 'percentage' ? 1 : undefined}/>
+                                        <input
+                                            type={'number'}
+                                            onChange={e => setAutoconsumeRuleValue(index, 'value', e.target.value)}
+                                            value={rule.value_type === 'percentage' ? Math.min(1, Math.max(0, rule.value)) : Math.max(0, rule.value)}
+                                            max={rule.value_type === 'percentage' ? 1 : undefined}
+                                            step={rule.value_type === 'percentage' ? 0.05 : 1}
+                                        />
                                         ) : (<span>{rule.value}</span>)}
                                 </div>
                                 {isEditing ? (<div className={'col delete-rule'}>

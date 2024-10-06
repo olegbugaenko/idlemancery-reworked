@@ -11,6 +11,7 @@ export class ActionsModule extends GameModule {
         this.actions = {};
         this.selectedFilterId = 'all';
         this.lists = new ActionListsSubmodule();
+        this.focus = null;
 
         this.eventHandler.registerHandler('run-action', (payload) => {
             this.setRunningAction(payload.id);
@@ -94,6 +95,18 @@ export class ActionsModule extends GameModule {
             minValue: 1,
         })
 
+        gameEffects.registerEffect('max_focus_time', {
+            name: 'Max focus time',
+            defaultValue: 300.,
+            minValue: 300,
+        })
+
+        gameEffects.registerEffect('coins_earned_bonus', {
+            name: 'Coins Earning Bonus',
+            defaultValue: 1.,
+            minValue: 1,
+        })
+
         registerActionsStage1();
         this.actions = {};
 
@@ -131,6 +144,13 @@ export class ActionsModule extends GameModule {
                     xp: 0
                 }
             }
+            if(!this.focus) {
+                this.focus = {
+                    time: 0,
+                }
+            }
+            this.focus.time += delta;
+            this.focus.bonus = this.getFocusBonus();
             const dxp = delta*this.getLearningRate('runningAction');
             this.actions[this.activeAction].xp += dxp;
             gameResources.addResource('mage-xp', dxp);
@@ -155,7 +175,8 @@ export class ActionsModule extends GameModule {
             actions: this.actions,
             activeAction: this.activeAction,
             actionLists: this.lists.save(),
-            selectedFilterId: this.selectedFilterId
+            selectedFilterId: this.selectedFilterId,
+            focus: this.focus,
         }
     }
 
@@ -177,6 +198,7 @@ export class ActionsModule extends GameModule {
             this.lists.load(saveObject.actionLists)
         }
         this.selectedFilterId = saveObject?.selectedFilterId || 'all';
+        this.focus = saveObject?.focus;
         this.sendActionsData(this.selectedFilterId);
     }
 
@@ -191,8 +213,17 @@ export class ActionsModule extends GameModule {
         this.actions[actionId].level = amount;
     }
 
+    getFocusBonus() {
+        return 1 + Math.min(gameEffects.getEffectValue('max_focus_time'), Math.max(0, this.focus.time - 15))*0.1 / 60;
+    }
+
     getLearningRate(id, eff) {
         const entEff = gameEntity.getEntityEfficiency(id);
+        let focusBonus = 1.;
+        if(id === 'runningAction') {
+            // console.log('EffMult: ', id, eff, entEff);
+            focusBonus = this.focus?.bonus ?? 1.;
+        }
         if(eff == null) {
             eff = entEff;
         }
@@ -203,13 +234,14 @@ export class ActionsModule extends GameModule {
             baseXPRate = gameEntity.getEntity(id).getLearnRate();
         }
 
-        return baseXPRate * eff * gameEffects.getEffectValue('learning_rate');
+        return baseXPRate * eff * gameEffects.getEffectValue('learning_rate')*focusBonus;
     }
 
     setRunningAction(id) {
         console.log('Running: ', id)
         if(id !== this.activeAction) {
             gameEntity.unsetEntity('runningAction');
+            this.focus = null;
 
             if(id) {
                 const isCapped = gameEntity.isCapped(id);
@@ -271,7 +303,14 @@ export class ActionsModule extends GameModule {
             isActive: this.activeAction === entity.id,
             xpRate: this.activeAction === entity.id ? this.getLearningRate('runningAction') : this.getLearningRate(entity.id, 1),
             isLeveled: this.actions[entity.id]?.isLeveled,
-            tags: entity.tags
+            tags: entity.tags,
+            focused: this.activeAction === entity.id && this.focus?.bonus > 1 ? {
+                isFocused: true,
+                focusTime: this.focus.time,
+                focusBonus: this.focus.bonus,
+                isCapped: this.focus.time >= gameEffects.getEffectValue('max_focus_time'),
+                cap: gameEffects.getEffectValue('max_focus_time'),
+            } : null,
         }))
 
         const current = this.activeAction ? available.find(id => id === this.activeAction) : null;

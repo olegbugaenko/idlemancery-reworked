@@ -896,3 +896,21 @@ h4 {
 .effects-table .nextVal.red {
     color: var(--red);
 }
+
+.focused-icon {
+    width: 24px;
+    height: 24px;
+    box-shadow: 0 0 12px #ffffff;
+    border-radius: 50%;
+}
+
+.focused-icon img{
+    width: 24px;
+    object-fit: contain;
+    border-radius: 50%;
+    filter: contrast(150%);
+}
+
+.about-block {
+    height: 100%;
+}

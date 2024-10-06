@@ -8,6 +8,7 @@ import {formatInt} from "../../general/utils/strings";
 import {EffectsSection} from "../shared/effects-section.jsx";
 import {ResourceCost} from "../shared/resource-cost.jsx";
 import {FlashOverlay} from "../layout/flash-overlay.jsx";
+import {ResourceComparison} from "../shared/resource-comparison.jsx";
 
 export const Skills = () => {
 
@@ -72,7 +73,7 @@ export const Skills = () => {
     </div> )
 }
 
-export const ItemSkillCard = ({ id, name, description, level, max, effects, affordable, isLeveled, onFlash, onPurchase, onShowDetails}) => {
+export const ItemSkillCard = ({ id, name, description, level, max, effects, currentEffects, affordable, isLeveled, onFlash, onPurchase, onShowDetails}) => {
 
     const elementRef = useRef(null);
 
@@ -80,7 +81,7 @@ export const ItemSkillCard = ({ id, name, description, level, max, effects, affo
 
     return (<div ref={elementRef} className={`icon-card item flashable ${!affordable.isAffordable ? 'unavailable' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)} onClick={(e) => onPurchase(id, e.shiftKey ? 1e9 : 1)}>
         <TippyWrapper
-            content={<div className={'hint-popup'}>
+            content={<div className={'hint-popup effects-popup'}>
                 <div className={'blade-inner'}>
                     <div className={'block'}>
                         <h4>{name} ({formatInt(level)})</h4>
@@ -91,7 +92,10 @@ export const ItemSkillCard = ({ id, name, description, level, max, effects, affo
                     <div className={'block'}>
                         <p>Effects:</p>
                         <div className={'effects'}>
-                            <EffectsSection effects={effects} maxDisplay={10} />
+                            {currentEffects ?
+                                (<ResourceComparison effects1={currentEffects} effects2={effects} /> )
+                                : (<EffectsSection effects={effects} />)
+                            }
                         </div>
                     </div>
                     <div className={'block'}>

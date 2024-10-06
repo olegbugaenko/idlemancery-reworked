@@ -38,6 +38,7 @@ export const registerActionsStage1 = () => {
         },
         attributes: {
             baseXPCost: 10,
+            isTraining: true,
         }
     })
 
@@ -68,8 +69,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'coins': {
-                        A: 0.005*(0.9 + 0.1*gameEffects.getEffectValue('attribute_charisma'))*gameEffects.getEffectValue('begging_efficiency'),
-                        B: 0.045*(0.9 + 0.1*gameEffects.getEffectValue('attribute_charisma'))*gameEffects.getEffectValue('begging_efficiency'),
+                        A: 0.005*(0.9 + 0.1*gameEffects.getEffectValue('attribute_charisma'))*gameEffects.getEffectValue('begging_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
+                        B: 0.045*(0.9 + 0.1*gameEffects.getEffectValue('attribute_charisma'))*gameEffects.getEffectValue('begging_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
                         type: 0,
                     }
                 }
@@ -83,7 +84,7 @@ export const registerActionsStage1 = () => {
                     }
                 }
             }),
-            effectDeps: ['attribute_charisma', 'begging_efficiency']
+            effectDeps: ['attribute_charisma', 'begging_efficiency', 'coins_earned_bonus']
         },
         unlockCondition: () => {
             return gameEntity.getLevel('action_visit_city') > 1
@@ -105,8 +106,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'coins': {
-                        A: 0.03*(0.9 + 0.1*gameEffects.getEffectValue('attribute_strength'))*gameEffects.getEffectValue('clean_stable_efficiency'),
-                        B: 0.22*(0.9 + 0.1*gameEffects.getEffectValue('attribute_strength'))*gameEffects.getEffectValue('clean_stable_efficiency'),
+                        A: 0.03*(0.9 + 0.1*gameEffects.getEffectValue('attribute_strength'))*gameEffects.getEffectValue('clean_stable_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
+                        B: 0.22*(0.9 + 0.1*gameEffects.getEffectValue('attribute_strength'))*gameEffects.getEffectValue('clean_stable_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
                         type: 0,
                     }
                 }
@@ -125,7 +126,7 @@ export const registerActionsStage1 = () => {
                     }
                 }
             }),
-            effectDeps: ['attribute_strength']
+            effectDeps: ['attribute_strength', 'coins_earned_bonus', 'clean_stable_efficiency']
         },
         unlockCondition: () => {
             return gameEntity.getLevel('action_pushup') > 4
@@ -148,8 +149,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'coins': {
-                        A: 0.1*(0.9 + 0.1*gameEffects.getEffectValue('attribute_strength'))*gameEffects.getEffectValue('clean_stable_efficiency'),
-                        B: 0.9*(0.9 + 0.1*gameEffects.getEffectValue('attribute_strength'))*gameEffects.getEffectValue('clean_stable_efficiency'),
+                        A: 0.1*(0.9 + 0.1*gameEffects.getEffectValue('attribute_strength'))*gameEffects.getEffectValue('coins_earned_bonus'),
+                        B: 0.9*(0.9 + 0.1*gameEffects.getEffectValue('attribute_strength'))*gameEffects.getEffectValue('coins_earned_bonus'),
                         type: 0,
                     }
                 }
@@ -168,7 +169,7 @@ export const registerActionsStage1 = () => {
                     }
                 }
             }),
-            effectDeps: ['attribute_strength']
+            effectDeps: ['attribute_strength', 'coins_earned_bonus']
         },
         unlockCondition: () => {
             return gameEntity.getLevel('action_pushup') > 25
@@ -348,13 +349,13 @@ export const registerActionsStage1 = () => {
         allowedImpacts: ['effects'],
         description: 'Read book of motivation, containing some useful advices regarding self-development',
         level: 1,
-        maxLevel: 10,
+        maxLevel: 5,
         resourceModifier: {
             multiplier: {
                 effects: {
                     'learning_rate': {
-                        A: 0.1,
-                        B: 0.9,
+                        A: 0.25,
+                        B: 0.75,
                         type: 0,
                     }
                 }
@@ -364,6 +365,46 @@ export const registerActionsStage1 = () => {
                     'energy': {
                         A: 0,
                         B: 0.4,
+                        type: 0
+                    }
+                }
+            },
+            effectDeps: []
+        },
+        unlockCondition: () => {
+            // console.log('Beggar level: ', gameEntity.getLevel('action_beggar'));
+            return gameEntity.getLevel('shop_item_book_of_motivation') > 0
+        },
+        attributes: {
+            baseXPCost: 50,
+            isTraining: true,
+        }
+    })
+
+
+    gameEntity.registerGameEntity('action_read_math_book', {
+        tags: ["action", "training", "mental"],
+        name: 'Train Math',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Train you brain to calculate coins better. Increase coins income',
+        level: 1,
+        maxLevel: 5,
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'coins_earned_bonus': {
+                        A: 0.25,
+                        B: 0.75,
+                        type: 0,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'energy': {
+                        A: 0,
+                        B: 0.8,
                         type: 0
                     }
                 }
@@ -467,7 +508,7 @@ export const registerActionsStage1 = () => {
         name: 'Yoga Practice',
         isAbstract: false,
         allowedImpacts: ['effects'],
-        description: 'Practice yoga to train your patience and stamina',
+        description: 'Practice yoga to train your patience and stamina. Unlocks new activities requiring more patience.',
         level: 1,
         resourceModifier: {
             get_income: () => ({
@@ -507,6 +548,7 @@ export const registerActionsStage1 = () => {
         attributes: {
             baseXPCost: 50,
             displayPerLevel: 1,
+            isTraining: true,
         }
     })
 
@@ -543,6 +585,7 @@ export const registerActionsStage1 = () => {
         },
         attributes: {
             baseXPCost: 50,
+            isTraining: true,
         }
     })
 
@@ -595,6 +638,7 @@ export const registerActionsStage1 = () => {
         attributes: {
             baseXPCost: 50,
             displayPerLevel: 1,
+            isTraining: true,
         }
     })
 
@@ -642,6 +686,7 @@ export const registerActionsStage1 = () => {
         attributes: {
             baseXPCost: 50,
             displayPerLevel: 1,
+            isTraining: true,
         }
     })
 
@@ -669,21 +714,17 @@ export const registerActionsStage1 = () => {
                         B: 2,
                         type: 0,
                     },
-                    'coins': {
-                        A: 0.0,
-                        B: 3,
-                        type: 0,
-                    }
                 }
             }),
             effectDeps: ['read_books_efficiency']
         },
         unlockCondition: () => {
-            return gameResources.getResource('health').cap >= 20
+            return gameEffects.getEffectValue('attribute_strength') >= 5
         },
         attributes: {
             baseXPCost: 50,
             displayPerLevel: 1,
+            isTraining: true,
         }
     })
 

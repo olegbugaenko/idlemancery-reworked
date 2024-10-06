@@ -2,7 +2,7 @@ import React, {useState, useContext, useEffect, useRef} from "react";
 import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
 import { useAppContext } from '../../context/ui-context';
-import {formatInt} from "../../general/utils/strings";
+import {formatInt, secondsToString} from "../../general/utils/strings";
 import {ProgressBar} from "./progress-bar.jsx";
 import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
 import {useFlashOnLevelUp} from "../../general/hooks/flash";
@@ -81,6 +81,9 @@ export const Footer = () => {
                 <li className={openedTab === 'settings' ? 'active' : ''} onClick={() => openTab('settings')}>
                     <span>Settings</span>
                 </li>
+                <li className={openedTab === 'about' ? 'active' : ''} onClick={() => openTab('about')}>
+                    <span>v0.0.1 (First Prototype)</span>
+                </li>
             </ul>
         </div>
         {mageData ? (<div className={'mage-wrap flex-container'} ref={elementRef}>
@@ -98,6 +101,9 @@ export const Footer = () => {
                     <ProgressBar className={'mage-xp-bar'} percentage={mageData.mageXP / mageData.mageMaxXP} />
                 </div>
             </TippyWrapper>
+            <div className={'time-spent'}>
+                {secondsToString(mageData.timeSpent)}
+            </div>
         </div>) : null}
         {overlayPositions.map((position, index) => (
             <FlashOverlay key={index} position={position} className={'powerful-splash'}/>

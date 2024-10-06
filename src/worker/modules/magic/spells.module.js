@@ -248,6 +248,7 @@ export class SpellModule extends GameModule {
     saveSettings(payload) {
         if(payload.id) {
             this.spells[payload.id] = {
+                ...this.spells[payload.id],
                 autocast: payload.autocast,
             }
         }

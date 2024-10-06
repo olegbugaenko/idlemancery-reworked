@@ -33,7 +33,8 @@ git push -u origin main
 
 0.0.1d
 1. Conjuration magic - selling raw materials for now
-2. Auto-purchase options
-3. [V] Add sell multiplier options
-4. New furniture for improving physical exercises, reading books and other stuff
-5. [V] Add validation on inputs
+2. [V] Focus - new resource, improving efficiency over time when not changing activity
+3. Auto-purchase options
+4. [V] Add sell multiplier options
+5. New furniture for improving physical exercises, reading books and other stuff
+6. [V] Add validation on inputs

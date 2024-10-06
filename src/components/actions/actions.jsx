@@ -1,7 +1,7 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
 import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
-import {formatInt, formatValue} from "../../general/utils/strings";
+import {formatInt, formatValue, secondsToString} from "../../general/utils/strings";
 import {ProgressBar} from "../layout/progress-bar.jsx";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import {EffectsSection} from "../shared/effects-section.jsx";
@@ -237,7 +237,7 @@ export const DetailBlade = ({ actionId, viewListId, viewedData, editListId, list
     return null;
 }
 
-export const ActionCard = ({ id, name, level, max, xp, maxXP, xpRate, isActive, isLeveled, onFlash, onSelect, onActivate, onShowDetails}) => {
+export const ActionCard = ({ id, name, level, max, xp, maxXP, xpRate, isActive, isLeveled, focused, onFlash, onSelect, onActivate, onShowDetails}) => {
     const elementRef = useRef(null);
 
     useFlashOnLevelUp(isLeveled, onFlash, elementRef);
@@ -262,6 +262,19 @@ export const ActionCard = ({ id, name, level, max, xp, maxXP, xpRate, isActive, 
             </div>
             <div className={'buttons'}>
                 {isActive ? <button onClick={() => onActivate()}>Stop</button> : <button onClick={() => onActivate(id)}>Start</button> }
+                {focused && focused.isFocused ? (
+                    <TippyWrapper content={<div className={'hint-popup'}>
+                        {!focused.isCapped
+                            ? (<p>You are running this action for {secondsToString(focused.focusTime)}</p>)
+                            : (<p>Your focus is capped at {secondsToString(focused.cap)}</p>)
+                        }
+                        <p>Focus providing x{formatValue(focused.focusBonus)} to your learning speed</p>
+                    </div> }>
+                        <div className={'icon-content focused-icon'}>
+                            <img src={"icons/interface/focused.png"}/>
+                        </div>
+                    </TippyWrapper>
+                ) : null}
             </div>
         </div>
     </div> )

@@ -29,7 +29,7 @@ export const registerShopItemsStage1 = () => {
             rawCap: {
                 resources: {
                     'coins': {
-                        A: 3,
+                        A: 8,
                         B: 0,
                         type: 0,
                     }
@@ -71,7 +71,7 @@ export const registerShopItemsStage1 = () => {
         name: 'Bag',
         description: 'Purchase a bag to store more coins',
         level: 0,
-        maxLevel: 9,
+        maxLevel: 4,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_hat') > 0
         },
@@ -82,7 +82,7 @@ export const registerShopItemsStage1 = () => {
             rawCap: {
                 resources: {
                     'coins': {
-                        A: 5,
+                        A: 10,
                         B: 0,
                         type: 0,
                     }
@@ -91,7 +91,7 @@ export const registerShopItemsStage1 = () => {
         },
         get_cost: () => ({
             'coins': {
-                A: 5*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                A: 10*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 B: 5*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 0
             }
@@ -183,6 +183,29 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+
+    gameEntity.registerGameEntity('shop_item_book_of_math', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Book of Math',
+        description: 'Allows you doing some primitive math exercises to train your brain in calculating coins',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_book_of_motivation') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 30*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        }),
+    })
+
+
     gameEntity.registerGameEntity('shop_item_panpipe', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Panpipe',
@@ -247,6 +270,42 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+
+
+    gameEntity.registerGameEntity('shop_item_better_tools', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Tools',
+        description: 'Purchase better tools, improve your performance at any job. Increase coins income',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_shovel') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                resources: {
+                    'coins': {
+                        A: 0.25,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 125*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        }),
+    })
+
+
+
     gameEntity.registerGameEntity('shop_item_backpack', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Backpack',
@@ -254,7 +313,7 @@ export const registerShopItemsStage1 = () => {
         level: 0,
         maxLevel: 1,
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_bag') > 3
+            return gameEntity.getLevel('shop_item_bag') > 1
         },
         attributes: {
             isCollectable: false,
@@ -275,7 +334,7 @@ export const registerShopItemsStage1 = () => {
         level: 0,
         maxLevel: 5,
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_bag') > 4
+            return gameEntity.getLevel('shop_item_bag') > 2
         },
         attributes: {
             isCollectable: false,

@@ -10,6 +10,7 @@ import {Inventory} from "../inventory/inventory.jsx";
 import {Property} from "../property/index.jsx";
 import {Spellbook} from "../spellbook/spellbook.jsx";
 import {Settings} from "../settings/index.jsx";
+import {About} from "../about/index.jsx";
 
 export const Content = () => {
 
@@ -51,6 +52,10 @@ export const GetContent = ({ tab }) => {
 
     if(tab === 'settings') {
         return <Settings />
+    }
+
+    if(tab === 'about') {
+        return <About />
     }
 
     return (<h3>Unknown tab</h3>)
