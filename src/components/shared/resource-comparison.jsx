@@ -24,6 +24,8 @@ export const ResourceComparison = ({ effects1, effects2 }) => {
         const prevMapped = mapEffect(prevValue);
         const nextMapped = mapEffect(nextValue);
 
+        console.log('Mapping: ', key, prevMapped, nextMapped, effects1, effects2);
+
         return {
             title: prevMapped.title || nextMapped.title,
             prevValue: prevMapped.value,
@@ -32,6 +34,8 @@ export const ResourceComparison = ({ effects1, effects2 }) => {
             isWorse: nextMapped.direction*prevValue.value > nextMapped.direction*nextValue.value
         }
     })
+
+
 
 
 

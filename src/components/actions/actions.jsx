@@ -348,14 +348,19 @@ export const ActionDetailsComponent = React.memo(({...action}) => {
 
             </div> ) : null}
             <div className={'block'}>
-                {action?.currentEffects ? (<p>Level-up Effects</p>) : (<p>Action Effects</p>)}
+                <p>Action Effects</p>
                 <div className={'effects'}>
-                    {action?.currentEffects ?
-                        (<ResourceComparison effects1={action?.currentEffects} effects2={action?.potentialEffects} /> )
-                        : (<EffectsSection effects={action?.potentialEffects} maxDisplay={10}/>)
-                    }
+                    <EffectsSection effects={action?.actionEffect} maxDisplay={10}/>
                 </div>
             </div>
+            {action.isTraining ? (
+                <div className={'block'}>
+                    <p>Action LevelUp bonuses</p>
+                    <div className={'effects'}>
+                        <ResourceComparison effects1={action?.currentEffects} effects2={action?.potentialEffects} />
+                    </div>
+                </div>
+            ) : null}
         </div>
     </PerfectScrollbar>)
 }, (prevProps, currentProps) => {

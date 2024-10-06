@@ -325,6 +325,16 @@ export class ActionsModule extends GameModule {
         }
     }
 
+    packEffects(effects, filter = (item) => true) {
+        const result = effects.filter(filter).reduce((acc, item) => {
+            acc[item.key] = item;
+
+            return acc;
+        }, {})
+
+        return result;
+    }
+
     getActionData(id) {
         if(!id) {
             return null;
@@ -339,7 +349,15 @@ export class ActionsModule extends GameModule {
             max: entity.getMaxLevel ? entity.getMaxLevel() : entity.maxLevel || 0,
             level: this.actions[entity.id]?.level || 1,
             affordable: gameEntity.getAffordable(entity.id),
-            potentialEffects: gameEntity.getEffects(entity.id, gameEntity.getAttribute(entity.id, 'isTraining') ? 1 : 0, this.actions[entity.id]?.level || 1, true),
+            actionEffect: gameEntity.getEffects(entity.id, 0, this.actions[entity.id]?.level || 1, true).filter(eff => eff.type === 'resources'),
+            potentialEffects: this.packEffects(
+                gameEntity.getEffects(entity.id, 1, this.actions[entity.id]?.level || 1, true),
+                item => item.type === 'effects'
+            ),
+            currentEffects: this.packEffects(
+                gameEntity.getEffects(entity.id, 0, this.actions[entity.id]?.level || 1, true),
+                item => item.type === 'effects'
+            ),
             xp: this.actions[entity.id]?.xp || 0,
             maxXP: this.getActionXPMax(entity.id),
             isActive: this.activeAction === entity.id,
@@ -347,10 +365,8 @@ export class ActionsModule extends GameModule {
             isLeveled: this.actions[entity.id]?.isLeveled,
             tags: entity.tags,
             primaryAttribute: entity.attributes?.primaryAttribute ? gameEffects.getEffect(entity.attributes.primaryAttribute) : null,
-            currentEffects: gameEntity.getAttribute(entity.id, 'isTraining') ? gameEntity.getEffects(entity.id, 0, this.actions[entity.id]?.level || 1, true) : null,
+            isTraining: gameEntity.getAttribute(entity.id, 'isTraining')
         };
-
-        console.log('data: ', entityData);
 
         return entityData;
     }
