@@ -278,7 +278,7 @@ export const ItemDetails = ({itemId, category}) => {
                     <div className={'effects'}>
                         {item.currentEffects ?
                             (<ResourceComparison effects1={item.currentEffects} effects2={item.potentialEffects} /> )
-                            : (<EffectsSection effects={item.potentialEffects} />)
+                            : (<EffectsSection effects={item.potentialEffects} maxDisplay={10}/>)
                         }
                     </div>
                 </div>

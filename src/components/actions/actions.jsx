@@ -8,6 +8,7 @@ import {EffectsSection} from "../shared/effects-section.jsx";
 import {FlashOverlay} from "../layout/flash-overlay.jsx";
 import {useFlashOnLevelUp} from "../../general/hooks/flash";
 import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
+import {ResourceComparison} from "../shared/resource-comparison.jsx";
 
 export const Actions = ({}) => {
 
@@ -348,7 +349,10 @@ export const ActionDetailsComponent = React.memo(({...action}) => {
             </div> ) : null}
             <div className={'block'}>
                 <div className={'effects'}>
-                    <EffectsSection effects={action.potentialEffects} maxDisplay={10}/>
+                    {action?.currentEffects ?
+                        (<ResourceComparison effects1={action?.currentEffects} effects2={action?.potentialEffects} /> )
+                        : (<EffectsSection effects={action?.potentialEffects} maxDisplay={10}/>)
+                    }
                 </div>
             </div>
         </div>

@@ -339,15 +339,18 @@ export class ActionsModule extends GameModule {
             max: entity.getMaxLevel ? entity.getMaxLevel() : entity.maxLevel || 0,
             level: this.actions[entity.id]?.level || 1,
             affordable: gameEntity.getAffordable(entity.id),
-            potentialEffects: gameEntity.getEffects(entity.id, gameEntity.getAttribute(entity.id, 'displayPerLevel') ?? 0, this.actions[entity.id]?.level || 1, true),
+            potentialEffects: gameEntity.getEffects(entity.id, gameEntity.getAttribute(entity.id, 'isTraining') ? 1 : 0, this.actions[entity.id]?.level || 1, true),
             xp: this.actions[entity.id]?.xp || 0,
             maxXP: this.getActionXPMax(entity.id),
             isActive: this.activeAction === entity.id,
             xpRate: this.activeAction === entity.id ? this.getLearningRate('runningAction') : this.getLearningRate(entity.id, 1),
             isLeveled: this.actions[entity.id]?.isLeveled,
             tags: entity.tags,
-            primaryAttribute: entity.attributes?.primaryAttribute ? gameEffects.getEffect(entity.attributes.primaryAttribute) : null
+            primaryAttribute: entity.attributes?.primaryAttribute ? gameEffects.getEffect(entity.attributes.primaryAttribute) : null,
+            currentEffects: gameEntity.getAttribute(entity.id, 'isTraining') ? gameEntity.getEffects(entity.id, 0, this.actions[entity.id]?.level || 1, true) : null,
         };
+
+        console.log('data: ', entityData);
 
         return entityData;
     }
