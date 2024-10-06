@@ -64,7 +64,9 @@ export const Actions = ({}) => {
         if(listData) {
             setListData({
                 ...listData,
-                potentialEffects: payload,
+                potentialEffects: payload.potentialEffects,
+                resourcesEffects: payload.resourcesEffects,
+                effectEffects: payload.effectEffects
             })
         }
     })
@@ -505,8 +507,12 @@ export const ListEditor = ({ editListId, listData, onUpdateActionFromList, onDro
             </div> ))}
         </div>
         <div className={'effects-wrap'}>
+            {editing?.resourcesEffects?.length ? (<div className={'block'}>
+            <p>Average Resources per second</p>
+            <EffectsSection effects={editing?.resourcesEffects || []} maxDisplay={10}/></div>) : null}
+            {editing?.effectEffects?.length ? (<div className={'block'}>
             <p>Average Effects per second</p>
-            <EffectsSection effects={editing?.potentialEffects || []} maxDisplay={10}/>
+            <EffectsSection effects={editing?.effectEffects || []} maxDisplay={10}/></div>) : null}
         </div>
         {isEditing ? (<div className={'buttons'}>
             <button onClick={saveAndClose}>{listData.id ? 'Save' : 'Create'}</button>

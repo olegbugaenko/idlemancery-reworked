@@ -327,7 +327,7 @@ export class ActionsModule extends GameModule {
 
     packEffects(effects, filter = (item) => true) {
         const result = effects.filter(filter).reduce((acc, item) => {
-            acc[item.key] = item;
+            acc[item.id] = item;
 
             return acc;
         }, {})

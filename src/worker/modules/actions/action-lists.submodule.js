@@ -29,7 +29,11 @@ export class ActionListsSubmodule extends GameModule {
         this.eventHandler.registerHandler('query-action-list-effects', ({ id, listData }) => {
             const data = this.getListEffects(id, listData);
             // console.log('queried data: ', id, listData, data)
-            this.eventHandler.sendData('action-list-effects', data);
+            this.eventHandler.sendData('action-list-effects', {
+                potentialEffects: data,
+                resourcesEffects: data.filter(one => one.type === 'resources'),
+                effectEffects: data.filter(one => one.type === 'effects')
+            });
         })
     }
 
@@ -142,6 +146,9 @@ export class ActionListsSubmodule extends GameModule {
 
         data.potentialEffects = this.getListEffects(id);
 
+        data.resourcesEffects = data.potentialEffects.filter(one => one.type === 'resources');
+        data.effectEffects = data.potentialEffects.filter(one => one.type === 'effects');
+
         this.eventHandler.sendData('action-list-data', data);
     }
 
@@ -164,7 +171,7 @@ export class ActionListsSubmodule extends GameModule {
             if(!isAvailable) {
                 return;
             }
-            const effects = gameEntity.getEffects(action.id, 0, gameEntity.getAttribute(action.id, 'isTraining') ? 1 : gameEntity.getLevel(action.id), true, action.time / totalTime);
+            const effects = gameEntity.getEffects(action.id, gameEntity.getAttribute(action.id, 'isTraining') ? 1 : 0, gameEntity.getAttribute(action.id, 'isTraining') ? 1 : gameEntity.getLevel(action.id), true, action.time / totalTime);
 
             let learnRateFactor = gameCore.getModule('actions').getLearningRate(action.id) / gameCore.getModule('actions').getActionXPMax(action.id);
 
@@ -176,6 +183,11 @@ export class ActionListsSubmodule extends GameModule {
                 );
                 if(effToAdd.scope === 'income' && effToAdd.type === 'resources') {
                     effToAdd.value *= gameResources.getResource(effToAdd.id).multiplier;
+                }
+
+                if(effToAdd.scope === 'multiplier' && effToAdd.type === 'effects') {
+                    // we actually adding multiplier
+                    effToAdd.value *= learnRateFactor;
                 }
 
                 if(effToAdd.scope === 'income' && effToAdd.type === 'effects') {
