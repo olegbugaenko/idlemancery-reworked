@@ -38,3 +38,12 @@ git push -u origin main
 4. [V] Add sell multiplier options
 5. New furniture for improving physical exercises, reading books and other stuff
 6. [V] Add validation on inputs
+7. Fix bug - resource income breakdown doesn't take into account efficiency of action
+
+
+List fixes:
+clicking "start" should set current action and stop list, maybe add "restart LISTNAME" button
+add buttons for few last lists, without need to press "change"
+add edit button for current list (without "select&edit")
+change action's button to "add to list" when editing action
+maybe add placeholder "drag actions here to add to list" and implement dragging

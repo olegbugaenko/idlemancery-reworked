@@ -610,6 +610,7 @@ h4 {
     align-items: center;
     justify-content: space-between;
     font-size: 13px;
+    border-bottom: 1px solid #777777;
 }
 
 .list-editor .actions-list-wrap .action-row.unavailable * {

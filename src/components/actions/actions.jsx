@@ -72,7 +72,7 @@ export const Actions = ({}) => {
     })
 
     const activateAction = (id) => {
-        sendData('run-action', { id })
+        sendData('run-action', { id, isForce: true })
     }
 
     const setActionsFilter = (filterId) => {
@@ -178,7 +178,7 @@ export const Actions = ({}) => {
                 <div className={'list-wrap'}>
                     <PerfectScrollbar>
                         <div className={'flex-container'}>
-                            {actionsData.available.map(action => <ActionCard key={action.id} {...action} onFlash={handleFlash} onActivate={activateAction} onShowDetails={setActionDetails} onSelect={onSelectAction}/>)}
+                            {actionsData.available.map(action => <ActionCard key={action.id} {...action} isEditingList={!!editingList} onFlash={handleFlash} onActivate={activateAction} onShowDetails={setActionDetails} onSelect={onSelectAction}/>)}
                             {overlayPositions.map((position, index) => (
                                 <FlashOverlay key={index} position={position} />
                             ))}
@@ -507,9 +507,9 @@ export const ListEditor = ({ editListId, listData, onUpdateActionFromList, onDro
             </div> ))}
         </div>
         <div className={'effects-wrap'}>
-            {editing?.resourcesEffects?.length ? (<div className={'block'}>
+            {Object.keys(editing?.resourcesEffects || {}).length ? (<div className={'block'}>
             <p>Average Resources per second</p>
-            <EffectsSection effects={editing?.resourcesEffects || []} maxDisplay={10}/></div>) : null}
+            <ResourceComparison effects1={editing?.prevEffects} effects2={editing?.resourcesEffects} maxDisplay={10}/></div>) : null}
             {editing?.effectEffects?.length ? (<div className={'block'}>
             <p>Average Effects per second</p>
             <EffectsSection effects={editing?.effectEffects || []} maxDisplay={10}/></div>) : null}

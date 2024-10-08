@@ -1,5 +1,5 @@
 import {GameModule} from "../../shared/game-module";
-import {gameEntity, gameResources, gameCore} from "game-framework";
+import {gameEntity, gameResources, gameCore, resourceCalculators} from "game-framework";
 
 export class ActionListsSubmodule extends GameModule {
 
@@ -28,10 +28,33 @@ export class ActionListsSubmodule extends GameModule {
 
         this.eventHandler.registerHandler('query-action-list-effects', ({ id, listData }) => {
             const data = this.getListEffects(id, listData);
-            // console.log('queried data: ', id, listData, data)
+
+            const prevEffects = [];
+            const resourcesEffects = this.packEffects(data.filter(one => one.type === 'resources').map(effect => {
+                const prev = resourceCalculators.assertResource(effect.id, false, ['running']);
+                prevEffects.push({
+                    ...effect,
+                    value: prev.balance
+                });
+
+                if(effect.scope !== 'income' && effect.scope !== 'consumption') return effect;
+
+                const newVal = (effect.scope === 'income' ? effect.value : -effect.value) + prev.balance;
+
+                return {
+                    ...effect,
+                    value: newVal,
+                    scope: effect.scope === 'consumption' ? 'income' : effect.scope
+                }
+            }));
+
+            console.log('SendingData: ', JSON.stringify(data.prevEffects), JSON.stringify(data.resourcesEffects));
+
+
             this.eventHandler.sendData('action-list-effects', {
                 potentialEffects: data,
-                resourcesEffects: data.filter(one => one.type === 'resources'),
+                resourcesEffects,
+                prevEffects: this.packEffects(prevEffects),
                 effectEffects: data.filter(one => one.type === 'effects')
             });
         })
@@ -135,6 +158,16 @@ export class ActionListsSubmodule extends GameModule {
 
     }
 
+    packEffects(effects, filter = (item) => true) {
+        const result = effects.filter(filter).reduce((acc, item) => {
+            acc[item.id] = item;
+
+            return acc;
+        }, {})
+
+        return result;
+    }
+
     sendListData(id) {
         const data = this.actionsLists[id];
 
@@ -146,8 +179,34 @@ export class ActionListsSubmodule extends GameModule {
 
         data.potentialEffects = this.getListEffects(id);
 
-        data.resourcesEffects = data.potentialEffects.filter(one => one.type === 'resources');
+        const resourcesEffects = data.potentialEffects.filter(one => one.type === 'resources');
         data.effectEffects = data.potentialEffects.filter(one => one.type === 'effects');
+
+        const prevEffects = [];
+        data.resourcesEffects = this.packEffects(resourcesEffects.map(effect => {
+            const prev = resourceCalculators.assertResource(effect.id, false, ['running']);
+
+            if(effect.scope !== 'income' && effect.scope !== 'consumption') return effect;
+
+            const pScope = prev.balance >= 0 ? 'income' : 'consumption';
+            prevEffects.push({
+                ...effect,
+                scope: pScope,
+                value: prev.balance
+            });
+
+            const newVal = (effect.scope === 'income' ? effect.value : -effect.value) + prev.balance;
+
+            return {
+                ...effect,
+                value: Math.abs(newVal),
+                scope: effect.scope === 'consumption' ? 'income' : effect.scope
+            }
+        }));
+
+        data.prevEffects = this.packEffects(prevEffects);
+
+        console.log('SendingData: ', JSON.stringify(data.prevEffects), JSON.stringify(data.resourcesEffects));
 
         this.eventHandler.sendData('action-list-data', data);
     }

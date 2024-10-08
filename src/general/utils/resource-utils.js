@@ -12,7 +12,12 @@ export const mapEffect = (effect) => {
         value = `-${value}`;
         direction = -1;
     } else {
-        value = `+${value}`;
+        if(effect.value > 0) {
+            value = `+${value}`;
+        } else {
+            value = `${value}`;
+        }
+
     }
 
     if(effect.scope === 'rawCap' || effect.scope === 'capMult') {

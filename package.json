@@ -25,11 +25,11 @@
     "webpack": "^5.92.1",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^5.0.4",
+    "game-framework": "git+https://github.com/olegbugaenko/game-framework.git#main",
     "worker-loader": "^3.0.8"
   },
   "dependencies": {
     "@tippyjs/react": "^4.2.6",
-    "game-framework": "git+https://github.com/olegbugaenko/game-framework.git",
     "react": "^18.3.1",
     "react-beautiful-dnd": "^13.1.1",
     "react-dom": "^18.3.1",

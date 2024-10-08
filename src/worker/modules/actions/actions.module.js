@@ -14,6 +14,9 @@ export class ActionsModule extends GameModule {
         this.focus = null;
 
         this.eventHandler.registerHandler('run-action', (payload) => {
+            if(payload.isForce) {
+                this.lists.stopList();
+            }
             this.setRunningAction(payload.id);
         })
 
