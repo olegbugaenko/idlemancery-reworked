@@ -28,8 +28,8 @@ export const ResourceComparison = ({ effects1, effects2 }) => {
             title: prevMapped.title || nextMapped.title,
             prevValue: prevMapped.value,
             nextValue: nextMapped.value,
-            isImprovement: nextMapped.direction*prevValue.value < nextMapped.direction*nextValue.value,
-            isWorse: nextMapped.direction*prevValue.value > nextMapped.direction*nextValue.value
+            isImprovement: prevMapped.direction*prevValue.value < nextMapped.direction*nextValue.value,
+            isWorse: prevMapped.direction*prevValue.value > nextMapped.direction*nextValue.value
         }
     })
 

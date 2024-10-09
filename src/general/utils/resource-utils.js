@@ -27,6 +27,7 @@ export const mapEffect = (effect) => {
     return {
         title,
         value,
-        direction
+        direction,
+        originalValue: effect.value,
     }
 }

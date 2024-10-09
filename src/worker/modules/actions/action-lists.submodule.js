@@ -32,19 +32,35 @@ export class ActionListsSubmodule extends GameModule {
             const prevEffects = [];
             const resourcesEffects = this.packEffects(data.filter(one => one.type === 'resources').map(effect => {
                 const prev = resourceCalculators.assertResource(effect.id, false, ['running']);
-                prevEffects.push({
-                    ...effect,
-                    value: prev.balance
-                });
 
                 if(effect.scope !== 'income' && effect.scope !== 'consumption') return effect;
 
+                const pScope = effect.scope === 'consumption' ? 'income' : effect.scope;
+
+                const nPrv = {
+                    ...effect,
+                    scope: pScope,
+                    value: prev.balance
+                };
+
+                if(nPrv.value < 0) {
+                    nPrv.value = Math.abs(nPrv.value);
+                    nPrv.scope = 'consumption';
+                }
+
+                console.log('Prv: ', prev, effect, nPrv);
+
+
+                prevEffects.push(nPrv);
+
                 const newVal = (effect.scope === 'income' ? effect.value : -effect.value) + prev.balance;
+
+                const nScope = newVal > 0 ? 'income' : 'consumption';
 
                 return {
                     ...effect,
-                    value: newVal,
-                    scope: effect.scope === 'consumption' ? 'income' : effect.scope
+                    value: Math.abs(newVal),
+                    scope: nScope
                 }
             }));
 
@@ -188,19 +204,32 @@ export class ActionListsSubmodule extends GameModule {
 
             if(effect.scope !== 'income' && effect.scope !== 'consumption') return effect;
 
-            const pScope = prev.balance >= 0 ? 'income' : 'consumption';
-            prevEffects.push({
+            const pScope = effect.scope === 'consumption' ? 'income' : effect.scope;
+
+            const nPrv = {
                 ...effect,
                 scope: pScope,
                 value: prev.balance
-            });
+            };
+
+            if(nPrv.value < 0) {
+                nPrv.value = Math.abs(nPrv.value);
+                nPrv.scope = 'consumption';
+            }
+
+            console.log('Prv2: ', prev, effect, nPrv);
+
+
+            prevEffects.push(nPrv);
 
             const newVal = (effect.scope === 'income' ? effect.value : -effect.value) + prev.balance;
+
+            const nScope = newVal > 0 ? 'income' : 'consumption';
 
             return {
                 ...effect,
                 value: Math.abs(newVal),
-                scope: effect.scope === 'consumption' ? 'income' : effect.scope
+                scope: nScope
             }
         }));
 

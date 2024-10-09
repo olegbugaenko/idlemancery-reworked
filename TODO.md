@@ -42,8 +42,8 @@ git push -u origin main
 
 
 List fixes:
-clicking "start" should set current action and stop list, maybe add "restart LISTNAME" button
+[V] clicking "start" should set current action and stop list, maybe add "restart LISTNAME" button
 add buttons for few last lists, without need to press "change"
 add edit button for current list (without "select&edit")
 change action's button to "add to list" when editing action
-maybe add placeholder "drag actions here to add to list" and implement dragging
+[V] maybe add placeholder "drag actions here to add to list" and implement dragging

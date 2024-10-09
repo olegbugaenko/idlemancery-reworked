@@ -9,6 +9,7 @@ import {FlashOverlay} from "../layout/flash-overlay.jsx";
 import {useFlashOnLevelUp} from "../../general/hooks/flash";
 import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
 import {ResourceComparison} from "../shared/resource-comparison.jsx";
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 export const Actions = ({}) => {
 
@@ -66,7 +67,8 @@ export const Actions = ({}) => {
                 ...listData,
                 potentialEffects: payload.potentialEffects,
                 resourcesEffects: payload.resourcesEffects,
-                effectEffects: payload.effectEffects
+                effectEffects: payload.effectEffects,
+                prevEffects: payload.prevEffects
             })
         }
     })
@@ -165,49 +167,109 @@ export const Actions = ({}) => {
         }, 1000);
     };
 
+    const onDragEnd = (result) => {
+        const { source, destination, draggableId } = result;
+
+        if (!destination) return;
+
+        const sourceDroppableId = source.droppableId;
+        const destinationDroppableId = destination.droppableId;
+
+        // Розбираємо draggableId
+        const [type, actionId, actionIndex] = draggableId.split('-');
+
+        if (sourceDroppableId === 'available-actions' && destinationDroppableId === 'action-list-editor') {
+            const action = actionsData.available.find(a => a.id.toString() === actionId);
+            if (action) {
+                const newListData = { ...listData };
+                newListData.actions = Array.from(newListData.actions);
+                newListData.actions.splice(destination.index, 0, {
+                    id: action.id,
+                    name: action.name,
+                    time: 2,
+                    isAvailable: true,
+                });
+                setListData(newListData);
+                sendData('query-action-list-effects', { listData: newListData });
+            }
+        } else if (
+            sourceDroppableId === 'action-list-editor' &&
+            destinationDroppableId === 'action-list-editor'
+        ) {
+            const newActions = Array.from(listData.actions);
+            const [movedAction] = newActions.splice(source.index, 1);
+            newActions.splice(destination.index, 0, movedAction);
+
+            const newListData = { ...listData, actions: newActions };
+            setListData(newListData);
+            sendData('query-action-list-effects', { listData: newListData });
+        }
+    };
+
     return (
-        <div className={'actions-wrap'}>
-            <div className={'ingame-box actions'}>
+        <DragDropContext onDragEnd={onDragEnd}>
+            <div className={'actions-wrap'}>
+                <div className={'ingame-box actions'}>
 
-                <div className={'categories flex-container'}>
-                    <ul className={'menu'}>
-                        {actionsData.actionCategories.map(category => (<li className={`category ${category.isSelected ? 'active' : ''}`} onClick={() => setActionsFilter(category.id)}><span>{category.name}({category.items.length})</span></li> ))}
-                    </ul>
+                    <div className={'categories flex-container'}>
+                        <ul className={'menu'}>
+                            {actionsData.actionCategories.map(category => (<li className={`category ${category.isSelected ? 'active' : ''}`} onClick={() => setActionsFilter(category.id)}><span>{category.name}({category.items.length})</span></li> ))}
+                        </ul>
 
+                    </div>
+                    <div className={'list-wrap'}>
+                        <PerfectScrollbar>
+                            <div>
+                                <Droppable droppableId="available-actions" isDropDisabled={true}>
+                                    {(provided) => (
+                                        <div ref={provided.innerRef} {...provided.droppableProps} className="flex-container">
+                                            {actionsData.available.map((action, index) => <ActionCard isEditingList={!!listData} index={index} key={action.id} {...action} onFlash={handleFlash} onActivate={activateAction} onShowDetails={setActionDetails} onSelect={onSelectAction}/>)}
+                                            {provided.placeholder}
+                                        </div>
+                                    )}
+                                </Droppable>
+                                {overlayPositions.map((position, index) => (
+                                        <FlashOverlay key={index} position={position} />
+                                ))}
+                            </div>
+                        </PerfectScrollbar>
+                    </div>
+
+                    {actionsData.actionListsUnlocked ? (<ActionListsPanel editListToDetails={editListToDetails} lists={actionsData.actionLists} viewListToDetails={viewListToDetails} runningList={actionsData.runningList}/>) : null}
                 </div>
-                <div className={'list-wrap'}>
-                    <PerfectScrollbar>
-                        <div className={'flex-container'}>
-                            {actionsData.available.map(action => <ActionCard key={action.id} {...action} isEditingList={!!editingList} onFlash={handleFlash} onActivate={activateAction} onShowDetails={setActionDetails} onSelect={onSelectAction}/>)}
-                            {overlayPositions.map((position, index) => (
-                                <FlashOverlay key={index} position={position} />
-                            ))}
-                        </div>
-                    </PerfectScrollbar>
+                <div className={'action-detail ingame-box detail-blade'}>
+                    <DetailBlade
+                        actionId={detailOpened}
+                        editListId={editingList}
+                        listData={listData}
+                        viewListId={viewingList}
+                        onUpdateActionFromList={onUpdateActionFromList}
+                        onDropActionFromList={onDropActionFromList}
+                        onUpdateListValue={onUpdateListValue}
+                        onCloseList={onCloseList}
+                        viewedData={viewedData}
+                    />
                 </div>
-
-                {actionsData.actionListsUnlocked ? (<ActionListsPanel editListToDetails={editListToDetails} lists={actionsData.actionLists} viewListToDetails={viewListToDetails} runningList={actionsData.runningList}/>) : null}
             </div>
-            <div className={'action-detail ingame-box detail-blade'}>
-                <DetailBlade
-                    actionId={detailOpened}
-                    editListId={editingList}
-                    listData={listData}
-                    viewListId={viewingList}
-                    onUpdateActionFromList={onUpdateActionFromList}
-                    onDropActionFromList={onDropActionFromList}
-                    onUpdateListValue={onUpdateListValue}
-                    onCloseList={onCloseList}
-                    viewedData={viewedData}
-                />
-            </div>
-        </div>
+        </DragDropContext>
 
     )
 
 }
 
 export const DetailBlade = ({ actionId, viewListId, viewedData, editListId, listData, onUpdateActionFromList, onDropActionFromList, onUpdateListValue, onCloseList }) => {
+
+    if(listData) {
+        return (<ListEditor
+            listData={listData}
+            editListId={editListId}
+            onUpdateActionFromList={onUpdateActionFromList}
+            onDropActionFromList={onDropActionFromList}
+            onUpdateListValue={onUpdateListValue}
+            onCloseList={onCloseList}
+            isEditing={true}
+        />)
+    }
 
     if(actionId) {
         return (<ActionDetails actionId={actionId} />)
@@ -240,47 +302,80 @@ export const DetailBlade = ({ actionId, viewListId, viewedData, editListId, list
     return null;
 }
 
-export const ActionCard = ({ id, name, level, max, xp, maxXP, xpRate, isActive, isLeveled, focused, onFlash, onSelect, onActivate, onShowDetails}) => {
+export const ActionCard = ({ id, isEditingList, index, name, level, max, xp, maxXP, xpRate, isActive, isLeveled, focused, isTraining, actionEffect, currentEffects, potentialEffects, onFlash, onSelect, onActivate, onShowDetails, ...props}) => {
     const elementRef = useRef(null);
 
     useFlashOnLevelUp(isLeveled, onFlash, elementRef);
 
-    return (<div ref={elementRef} className={`card action ${isActive ? 'active' : ''} flashable`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)} onClick={() => onSelect({
-        id,
-        name,
-        level
-    })}>
-        <div className={'head'}>
-            <p className={'title'}>{name}</p>
-            <span className={'level'}>{formatInt(level)}{max ? `/${formatInt(max)}` : ''}</span>
-        </div>
-        <div className={'bottom'}>
-            <div className={'xp-box'}>
-                <span className={'xp-text'}>XP: {formatInt(xp)}/{formatInt(maxXP)}</span>
-                <span className={'xp-income'}>+{formatValue(xpRate)}</span>
-            </div>
-
-            <div>
-                <ProgressBar className={'action-progress'} percentage={xp/maxXP}></ProgressBar>
-            </div>
-            <div className={'buttons'}>
-                {isActive ? <button onClick={() => onActivate()}>Stop</button> : <button onClick={() => onActivate(id)}>Start</button> }
-                {focused && focused.isFocused ? (
-                    <TippyWrapper content={<div className={'hint-popup'}>
-                        {!focused.isCapped
-                            ? (<p>You are running this action for {secondsToString(focused.focusTime)}</p>)
-                            : (<p>Your focus is capped at {secondsToString(focused.cap)}</p>)
-                        }
-                        <p>Focus providing x{formatValue(focused.focusBonus)} to your learning speed</p>
-                    </div> }>
-                        <div className={'icon-content focused-icon'}>
-                            <img src={"icons/interface/focused.png"}/>
+    const comp = (
+        <Draggable key={`available-${id}`} draggableId={`available-${id}`} index={index} isDragDisabled={!isEditingList}>
+            {(provided) => (
+                <div
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                    className={`card action ${isActive ? 'active' : ''} flashable`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)} onClick={() => onSelect({
+                    id,
+                    name,
+                    level
+                })}>
+                    <div className={'head'}>
+                        <p className={'title'}>{name}</p>
+                        <span className={'level'}>{formatInt(level)}{max ? `/${formatInt(max)}` : ''}</span>
+                    </div>
+                    <div className={'bottom'}>
+                        <div className={'xp-box'}>
+                            <span className={'xp-text'}>XP: {formatInt(xp)}/{formatInt(maxXP)}</span>
+                            <span className={'xp-income'}>+{formatValue(xpRate)}</span>
                         </div>
-                    </TippyWrapper>
-                ) : null}
+
+                        <div>
+                            <ProgressBar className={'action-progress'} percentage={xp/maxXP}></ProgressBar>
+                        </div>
+                        <div className={'buttons'}>
+                            {isActive ? <button onClick={() => onActivate()}>Stop</button> : <button onClick={() => onActivate(id)}>Start</button> }
+                            {focused && focused.isFocused ? (
+                                <TippyWrapper content={<div className={'hint-popup'}>
+                                    {!focused.isCapped
+                                        ? (<p>You are running this action for {secondsToString(focused.focusTime)}</p>)
+                                        : (<p>Your focus is capped at {secondsToString(focused.cap)}</p>)
+                                    }
+                                    <p>Focus providing x{formatValue(focused.focusBonus)} to your learning speed</p>
+                                </div> }>
+                                    <div className={'icon-content focused-icon'}>
+                                        <img src={"icons/interface/focused.png"}/>
+                                    </div>
+                                </TippyWrapper>
+                            ) : null}
+                        </div>
+                    </div>
+                </div>
+                )}
+        </Draggable>
+    );
+
+    if(!isEditingList) return comp;
+
+    return (<TippyWrapper content={<div className={'hint-popup effects-popup'}>
+        <div className={'block'}>
+            <p>Action Effects</p>
+            <div className={'effects'}>
+                <EffectsSection effects={actionEffect} maxDisplay={10}/>
             </div>
         </div>
-    </div> )
+        {isTraining ? (
+            <div className={'block'}>
+                <p>Action LevelUp bonuses</p>
+                <div className={'effects'}>
+                    <ResourceComparison effects1={currentEffects} effects2={potentialEffects} />
+                </div>
+            </div>
+        ) : null}
+    </div> }>
+        <div>
+            {comp}
+        </div>
+    </TippyWrapper>)
 }
 
 export const ActionDetails = ({actionId}) => {
@@ -469,10 +564,6 @@ export const ListEditor = ({ editListId, listData, onUpdateActionFromList, onDro
     const [editing, setEditing] = useState({ actions: [] })
 
     useEffect(() => {
-        console.log('Sending request to retain list details: ', editListId);
-    }, [editListId]);
-
-    useEffect(() => {
         setEditing(listData);
     }, [listData])
 
@@ -489,23 +580,38 @@ export const ListEditor = ({ editListId, listData, onUpdateActionFromList, onDro
                 {isEditing ? (<input type={'text'} value={editing.name} onChange={(e) => onUpdateListValue('name', e.target.value)}/>) : (<span>{editing.name}</span>)}
             </div>
         </div>
-        <div className={'actions-list-wrap'}>
-            {editing.actions.map(action => (<div className={`action-row flex-container ${!action.isAvailable ? 'unavailable' : ''}`}>
-                <div className={'col title'}>
-                    <span>{action.name}</span>
+        <Droppable droppableId="action-list-editor">
+            {(provided) => (
+                <div ref={provided.innerRef} {...provided.droppableProps} className="actions-list-wrap">
+                    {editing.actions.length ? editing.actions.map((action, index) => (
+                        <Draggable key={`list-${action.id}-${index}`} draggableId={`list-${action.id}-${index}`} index={index}>
+                            {(provided) => (
+                                <div className={`action-row flex-container ${!action.isAvailable ? 'unavailable' : ''}`}
+                                     ref={provided.innerRef}
+                                     {...provided.draggableProps}
+                                     {...provided.dragHandleProps}
+                                >
+                                    <div className={'col title'}>
+                                        <span>{action.name}</span>
+                                    </div>
+                                    <div className={'col amount'}>
+                                        {isEditing
+                                            ? (<input type={'number'} value={action.time}
+                                                      onChange={(e) => onUpdateActionFromList(action.id, 'time', +e.target.value)}/>)
+                                            : (<span>{action.time} seconds</span>)
+                                        }
+                                    </div>
+                                    <div className={'col delete'}>
+                                        {isEditing ? (<span className={'close'} onClick={() => onDropActionFromList(action.id)}>X</span>) : null}
+                                    </div>
+                                </div>
+                            )}
+                        </Draggable>
+                    )) : <p className={'hint'}>Click on actions or drag & drop them to add</p>}
+                    {provided.placeholder}
                 </div>
-                <div className={'col amount'}>
-                    {isEditing
-                        ? (<input type={'number'} value={action.time}
-                                  onChange={(e) => onUpdateActionFromList(action.id, 'time', +e.target.value)}/>)
-                        : (<span>{action.time} seconds</span>)
-                    }
-                </div>
-                <div className={'col delete'}>
-                    {isEditing ? (<span className={'close'} onClick={() => onDropActionFromList(action.id)}>X</span>) : null}
-                </div>
-            </div> ))}
-        </div>
+            )}
+        </Droppable>
         <div className={'effects-wrap'}>
             {Object.keys(editing?.resourcesEffects || {}).length ? (<div className={'block'}>
             <p>Average Resources per second</p>

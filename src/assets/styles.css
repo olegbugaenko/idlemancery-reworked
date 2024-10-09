@@ -116,6 +116,8 @@ p {
 
 .effects-popup.hint-popup {
     width: 280px;
+    border: 1px solid #777777;
+    box-shadow: 0 0 12px #ffffff;
 }
 
 p.hint {
