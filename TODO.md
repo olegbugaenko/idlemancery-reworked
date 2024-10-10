@@ -50,8 +50,9 @@ List fixes:
 [V] add apply button to apply list changes and keep editor open
 [X] created list shoud contain current action
 [X] per second data at list may switch to per minute/per hour/per run on click
-Fix percentage display = 100% should be 100, and not 1.
+[V] Fix percentage display = 100% should be 100, and not 1.
 Make resources dropdowns allow search
 Add auto-trigger rules for list (with priority setup)
 Add auto-purchase
 Create separate "Automations" tab under settings
+Make Popups closed by clicking outside
