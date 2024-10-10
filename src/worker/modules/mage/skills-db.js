@@ -284,7 +284,7 @@ export const registerSkillsStage1 = () => {
     gameEntity.registerGameEntity('skill_highbrow', {
         tags: ["skill", "upgrade", "purchaseable"],
         name: 'Highbrow',
-        description: 'Increase your HP regen',
+        description: 'Increase your knowledge capacity and regeneration',
         level: 0,
         unlockCondition: () => {
             // console.log('ACTLVL: ', )

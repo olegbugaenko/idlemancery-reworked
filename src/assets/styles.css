@@ -348,6 +348,30 @@ p.hint {
     object-fit: contain;
 }
 
+.interface-icon {
+    width: 32px;
+    height: 32px;
+    position: relative;
+    border-radius: 5px;
+    border: 1px solid #ffffff;
+    overflow: hidden;
+}
+
+.interface-icon.small {
+    width: 24px;
+    height: 24px;
+}
+
+.interface-icon img {
+    height: 100%;
+    object-fit: contain;
+}
+
+.interface-icon:hover {
+    box-shadow: 0 0 8px #ffffff;
+    cursor: pointer;
+}
+
 .icon-card .icon-content .level {
     position: absolute;
     padding: 3px;
@@ -591,6 +615,16 @@ h4 {
     position: relative;
 }
 
+.action-lists-panel .flex-container .panel-col.current-list {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.action-lists-panel .flex-container .panel-col.current-list  * {
+    margin-right: 8px;
+}
+
 .action-lists-panel .flex-container .panel-col .list-selector {
     position: absolute;
     bottom: 40px;
@@ -639,7 +673,6 @@ h4 {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px;
 }
 
 
@@ -916,4 +949,19 @@ h4 {
 
 .about-block {
     height: 100%;
+}
+
+.lists-editor .list-selector {
+    width: 260px;
+}
+
+.lists-editor .list-selector .list-item-row {
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+}
+
+.lists-editor .list-selector .list-item-row .list-name {
+    width: 160px;
+    display: block;
 }

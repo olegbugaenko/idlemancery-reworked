@@ -19,7 +19,8 @@ export const Actions = ({}) => {
     const [actionsData, setActionsData] = useState({
         available: [],
         current: undefined,
-        actionCategories: []
+        actionCategories: [],
+        actionLists: []
     });
     const [detailOpened, setDetailOpened] = useState(null);
     const [editingList, setEditingList] = useState(null);
@@ -51,10 +52,14 @@ export const Actions = ({}) => {
     })
 
     onMessage('action-list-data', (payload) => {
-        console.log(`currViewing: ${viewingList}, edit: ${editingList}`);
+        console.log(`currViewing: ${viewingList}, edit: ${editingList}`, payload);
         if(viewingList) {
             setViewedData(payload);
-        } else if(editingList) {
+        } else if(editingList || payload.bForceOpen) {
+            if(payload.bForceOpen && !editingList) {
+                setEditingList(payload.id);
+                console.log('Set Editing to: ', payload);
+            }
             setListData(payload);
             setViewedData(null);
         }
@@ -506,6 +511,7 @@ export const ActionListsPanel = ({ runningList, editListToDetails, lists, viewLi
 
     useEffect(() => {
         const setOp = () => {
+            console.log('setOpToNull ')
             setOpenedFor(null);
         }
         if(openedFor) {
@@ -532,26 +538,48 @@ export const ActionListsPanel = ({ runningList, editListToDetails, lists, viewLi
     return (<div className={'action-lists-panel'}>
         <div className={'flex-container'}>
             <div className={'current-list panel-col'}>
-                Current list: {runningList ? runningList.name : 'None'}
-                <button onClick={() => setOpenedFor('change')}>Change</button>
-                <ActionListsPopup lists={[{ id: null, name: 'None'}, ...(lists || [])]} isOpened={openedFor === 'change'} setOpenedFor={setOpenedFor} onSelect={runList} onHover={viewListToDetails}/>
+                Current list: {runningList ? (<div className={'flex-container'}>
+                    <span>{runningList.name}</span>
+                    <div className={'icon-content stop-icon interface-icon'} onClick={() => runList(null)}>
+                        <img src={"icons/interface/pause.png"}/>
+                    </div>
+                    <div className={'icon-content edit-icon interface-icon'} onClick={() => editList(runningList.id)}>
+                        <img src={"icons/interface/edit-icon.png"}/>
+                    </div>
+                </div>) : 'None'}
             </div>
             <div className={'lists-editor panel-col'}>
-                <button onClick={() => editListToDetails()}>Create list</button>
+                <button onClick={() => editListToDetails()}>Create New</button>
             </div>
             <div className={'lists-editor panel-col'}>
-                <button onClick={() => setOpenedFor('edit')}>Select & Edit</button>
-                <ActionListsPopup lists={lists} isOpened={openedFor === 'edit'} setOpenedFor={setOpenedFor} onSelect={editList} onHover={viewListToDetails}/>
+                <button onClick={(e) => { e.stopPropagation(); setOpenedFor('edit')}}>Pick list</button>
+                <ActionListsPopup lists={lists} isOpened={openedFor === 'edit'} setOpenedFor={setOpenedFor} onSelect={editList} onRun={runList} onHover={viewListToDetails}/>
             </div>
         </div>
     </div>)
 }
 
-export const ActionListsPopup = ({ lists, isOpened, setOpenedFor, onSelect, onHover }) => {
+export const ActionListsPopup = ({ lists, isOpened, setOpenedFor, onSelect, onHover, onRun }) => {
+
     if(!isOpened) return null;
 
     return (<div className={'list-selector'}>
-        {lists.map(list => (<div className={'item'} onClick={() => onSelect(list.id)} onMouseEnter={() => onHover(list.id)} onMouseLeave={() => onHover(null)}>{list.name}</div> ))}
+        {lists.map(list => (<div className={'item'} onMouseEnter={() => onHover(list.id)} onMouseLeave={() => onHover(null)}>
+            <div className={'list-item-row flex-container'}>
+                <span className={'list-name'}>{list.name}</span>
+                <TippyWrapper content={<div className={'hint-popup'}>Run List</div> }>
+                    <div className={'icon-content run-icon interface-icon small'} onClick={() => onRun(list.id)}>
+                        <img src={"icons/interface/run.png"}/>
+                    </div>
+                </TippyWrapper>
+                <TippyWrapper content={<div className={'hint-popup'}>Edit List</div> }>
+                    <div className={'icon-content edit-icon interface-icon small'} onClick={() => onSelect(list.id)}>
+                        <img src={"icons/interface/edit-icon.png"}/>
+                    </div>
+                </TippyWrapper>
+            </div>
+
+        </div> ))}
     </div> )
 }
 
@@ -567,10 +595,15 @@ export const ListEditor = ({ editListId, listData, onUpdateActionFromList, onDro
         setEditing(listData);
     }, [listData])
 
-    const saveAndClose = () => {
+    const saveAndClose = (isClose) => {
         console.log('Saving: ', editing);
+        if(!isClose) {
+            editing.isReopenEdit = true;
+        }
         sendData('save-action-list', editing);
-        onCloseList();
+        if(isClose) {
+            onCloseList();
+        }
     }
 
     return (<div className={'list-editor'}>
@@ -621,7 +654,8 @@ export const ListEditor = ({ editListId, listData, onUpdateActionFromList, onDro
             <EffectsSection effects={editing?.effectEffects || []} maxDisplay={10}/></div>) : null}
         </div>
         {isEditing ? (<div className={'buttons'}>
-            <button onClick={saveAndClose}>{listData.id ? 'Save' : 'Create'}</button>
+            <button onClick={() => saveAndClose(false)}>{listData.id ? 'Save' : 'Create'}</button>
+            <button onClick={() => saveAndClose(true)}>{listData.id ? 'Save & Close' : 'Create & Close'}</button>
             <button onClick={onCloseList}>Cancel</button>
         </div>) : null}
     </div> )

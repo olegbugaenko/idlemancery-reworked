@@ -98,11 +98,21 @@ export class ActionListsSubmodule extends GameModule {
 
         const list = {...payload};
 
+        delete list['isReopenEdit'];
+
+        const isReopenEdit = payload.isReopenEdit
+
         if(!list.id) {
             list.id = `${Math.random()*1000000}`
         }
 
         this.actionsLists[list.id] = list;
+
+        console.log('isReopenEdit: ', isReopenEdit, list);
+
+        if(isReopenEdit) {
+            this.sendListData(list.id, true);
+        }
     }
 
     getLists() {
@@ -184,7 +194,7 @@ export class ActionListsSubmodule extends GameModule {
         return result;
     }
 
-    sendListData(id) {
+    sendListData(id, bForceOpen = false) {
         const data = this.actionsLists[id];
 
         data.actions = data.actions.map(a => ({
@@ -235,7 +245,9 @@ export class ActionListsSubmodule extends GameModule {
 
         data.prevEffects = this.packEffects(prevEffects);
 
-        console.log('SendingData: ', JSON.stringify(data.prevEffects), JSON.stringify(data.resourcesEffects));
+        data.bForceOpen = bForceOpen;
+
+        // console.log('SendingData: ', JSON.stringify(data.prevEffects), JSON.stringify(data.resourcesEffects));
 
         this.eventHandler.sendData('action-list-data', data);
     }

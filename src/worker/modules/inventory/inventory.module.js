@@ -57,7 +57,7 @@ export class InventoryModule extends GameModule {
         if(rule.value_type === 'percentage') {
             if(!resource.cap) return false;
 
-            compare = resource.amount / resource.cap;
+            compare = 100 * resource.amount / resource.cap;
         }
 
         switch (rule.condition) {

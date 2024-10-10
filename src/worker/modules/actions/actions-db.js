@@ -1,8 +1,36 @@
-import { gameEntity, gameCore, gameEffects, gameResources } from "game-framework"
+import {gameEntity, gameCore, gameEffects, gameResources, resourceModifiers} from "game-framework"
+
+const getPrimaryBonus = (attributeId) => {
+    return 1 + 0.1*gameEffects.getEffectValue(attributeId);
+}
+
+const registerGameAction = (id, options) => {
+    
+    const primaryAttribute = options.attributes.primaryAttribute;
+    
+    if(!primaryAttribute || !options.resourceModifier) {
+        return registerGameAction(id, options);
+    }
+    
+    if(!options.resourceModifier.effectDeps) {
+        options.resourceModifier.effectDeps = []
+    }
+
+    if(!options.resourceModifier.effectDeps.includes(primaryAttribute)) {
+        options.resourceModifier.effectDeps.push(primaryAttribute);
+    }
+    
+    options.getPrimaryEffect = () => getPrimaryBonus(primaryAttribute);
+
+    options.getCustomAmplifier = () => 1*options.getPrimaryEffect();
+    
+    return registerGameAction(id, options);
+    
+}
 
 export const registerActionsStage1 = () => {
 
-    gameEntity.registerGameEntity('action_walk', {
+    registerGameAction('action_walk', {
         tags: ["action", "training", "physical"],
         name: 'Walking',
         isAbstract: false,
@@ -28,7 +56,7 @@ export const registerActionsStage1 = () => {
                     }
                 }
             },
-            effectDeps: ['attribute_strength', 'walking_learning_rate']
+            effectDeps: ['walking_learning_rate']
         },
         getLearnRate: () => {
             return gameEffects.getEffectValue('walking_learning_rate')
@@ -42,7 +70,7 @@ export const registerActionsStage1 = () => {
         }
     })
 
-    gameEntity.registerGameEntity('action_visit_city', {
+    registerGameAction('action_visit_city', {
         tags: ["action", "training", "physical"],
         name: 'Visit City',
         isAbstract: false,
@@ -58,7 +86,7 @@ export const registerActionsStage1 = () => {
         }
     })
 
-    gameEntity.registerGameEntity('action_beggar', {
+    registerGameAction('action_beggar', {
         tags: ["action", "job", "physical"],
         name: 'Beggar',
         isAbstract: false,
@@ -95,7 +123,7 @@ export const registerActionsStage1 = () => {
         }
     })
 
-    gameEntity.registerGameEntity('action_clean_stable', {
+    registerGameAction('action_clean_stable', {
         tags: ["action", "job", "physical"],
         name: 'Clean Stable',
         isAbstract: false,
@@ -138,7 +166,7 @@ export const registerActionsStage1 = () => {
     })
 
 
-    gameEntity.registerGameEntity('action_patrol', {
+    registerGameAction('action_patrol', {
         tags: ["action", "job", "physical"],
         name: 'Patrol',
         isAbstract: false,
@@ -181,7 +209,7 @@ export const registerActionsStage1 = () => {
     })
 
 
-    gameEntity.registerGameEntity('action_rest', {
+    registerGameAction('action_rest', {
         tags: ["action", "rest", "physical"],
         name: 'Rest in Tavern',
         isAbstract: false,
@@ -225,7 +253,7 @@ export const registerActionsStage1 = () => {
         }
     })
 
-    gameEntity.registerGameEntity('action_rest_home', {
+    registerGameAction('action_rest_home', {
         tags: ["action", "rest", "physical"],
         name: 'Rest at home',
         isAbstract: false,
@@ -261,7 +289,7 @@ export const registerActionsStage1 = () => {
     })
 
 
-    gameEntity.registerGameEntity('action_gossip', {
+    registerGameAction('action_gossip', {
         tags: ["action", "training", "mental"],
         name: 'Gossip',
         isAbstract: false,
@@ -299,7 +327,7 @@ export const registerActionsStage1 = () => {
         }
     })
 
-    gameEntity.registerGameEntity('action_pushup', {
+    registerGameAction('action_pushup', {
         tags: ["action", "training", "physical"],
         name: 'Push Up',
         isAbstract: false,
@@ -342,7 +370,7 @@ export const registerActionsStage1 = () => {
         }
     })
 
-    gameEntity.registerGameEntity('action_read_motivation_book', {
+    registerGameAction('action_read_motivation_book', {
         tags: ["action", "training", "mental"],
         name: 'Read book of Motivation',
         isAbstract: false,
@@ -382,7 +410,7 @@ export const registerActionsStage1 = () => {
     })
 
 
-    gameEntity.registerGameEntity('action_read_math_book', {
+    registerGameAction('action_read_math_book', {
         tags: ["action", "training", "mental"],
         name: 'Train Math',
         isAbstract: false,
@@ -421,7 +449,7 @@ export const registerActionsStage1 = () => {
         }
     })
 
-    gameEntity.registerGameEntity('action_gather_berries', {
+    registerGameAction('action_gather_berries', {
         tags: ["action", "gathering", "routine"],
         name: 'Gather Berries',
         isAbstract: false,
@@ -458,7 +486,7 @@ export const registerActionsStage1 = () => {
         }
     })
 
-    gameEntity.registerGameEntity('action_read_books', {
+    registerGameAction('action_read_books', {
         tags: ["action", "activity", "mental"],
         name: 'Read Books',
         isAbstract: false,
@@ -503,7 +531,7 @@ export const registerActionsStage1 = () => {
     })
 
 
-    gameEntity.registerGameEntity('action_yoga_practices', {
+    registerGameAction('action_yoga_practices', {
         tags: ["action", "training", "mental"],
         name: 'Yoga Practice',
         isAbstract: false,
@@ -552,7 +580,7 @@ export const registerActionsStage1 = () => {
         }
     })
 
-    gameEntity.registerGameEntity('action_home_errands', {
+    registerGameAction('action_home_errands', {
         tags: ["action", "activity", "routine"],
         name: 'Home Errands',
         isAbstract: false,
@@ -590,7 +618,7 @@ export const registerActionsStage1 = () => {
     })
 
 
-    gameEntity.registerGameEntity('action_learn_anatomy', {
+    registerGameAction('action_learn_anatomy', {
         tags: ["action", "training", "mental"],
         name: 'Learn Anatomy',
         isAbstract: false,
@@ -642,7 +670,7 @@ export const registerActionsStage1 = () => {
         }
     })
 
-    gameEntity.registerGameEntity('action_learn_languages', {
+    registerGameAction('action_learn_languages', {
         tags: ["action", "training", "mental"],
         name: 'Learn Languages',
         isAbstract: false,
@@ -690,7 +718,7 @@ export const registerActionsStage1 = () => {
         }
     })
 
-    gameEntity.registerGameEntity('action_endurance_training', {
+    registerGameAction('action_endurance_training', {
         tags: ["action", "training", "physical"],
         name: 'Train Endurance',
         isAbstract: false,
@@ -729,7 +757,7 @@ export const registerActionsStage1 = () => {
     })
 
 
-    gameEntity.registerGameEntity('action_deeper_forest', {
+    registerGameAction('action_deeper_forest', {
         tags: ["action", "gathering", "routine"],
         name: 'Walking in Forest',
         isAbstract: false,
@@ -781,7 +809,7 @@ export const registerActionsStage1 = () => {
         }
     })
 
-    gameEntity.registerGameEntity('action_magic_garden', {
+    registerGameAction('action_magic_garden', {
         tags: ["action", "gathering", "routine"],
         name: 'Searching in Magic Garden',
         isAbstract: false,
@@ -834,7 +862,7 @@ export const registerActionsStage1 = () => {
         }
     })
 
-    gameEntity.registerGameEntity('action_meditate', {
+    registerGameAction('action_meditate', {
         tags: ["action", "training", "magical"],
         name: 'Meditate',
         isAbstract: false,

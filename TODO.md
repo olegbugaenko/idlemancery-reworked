@@ -43,7 +43,15 @@ git push -u origin main
 
 List fixes:
 [V] clicking "start" should set current action and stop list, maybe add "restart LISTNAME" button
-add buttons for few last lists, without need to press "change"
-add edit button for current list (without "select&edit")
-change action's button to "add to list" when editing action
+[X] add buttons for few last lists, without need to press "change"
+[V] add edit button for current list (without "select&edit")
+[X] change action's button to "add to list" when editing action
 [V] maybe add placeholder "drag actions here to add to list" and implement dragging
+[V] add apply button to apply list changes and keep editor open
+[X] created list shoud contain current action
+[X] per second data at list may switch to per minute/per hour/per run on click
+Fix percentage display = 100% should be 100, and not 1.
+Make resources dropdowns allow search
+Add auto-trigger rules for list (with priority setup)
+Add auto-purchase
+Create separate "Automations" tab under settings

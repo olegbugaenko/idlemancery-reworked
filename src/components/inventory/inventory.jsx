@@ -428,8 +428,8 @@ export const InventoryDetails = ({isChanged, editData, viewedData, resources, on
                                             type={'number'}
                                             onChange={e => setAutoconsumeRuleValue(index, 'value', e.target.value)}
                                             value={rule.value_type === 'percentage' ? Math.min(1, Math.max(0, rule.value)) : Math.max(0, rule.value)}
-                                            max={rule.value_type === 'percentage' ? 1 : undefined}
-                                            step={rule.value_type === 'percentage' ? 0.05 : 1}
+                                            max={rule.value_type === 'percentage' ? 100 : undefined}
+                                            step={rule.value_type === 'percentage' ? 5 : 1}
                                         />
                                         ) : (<span>{rule.value}</span>)}
                                 </div>
