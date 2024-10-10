@@ -1,7 +1,7 @@
 import {gameEntity, gameCore, gameEffects, gameResources, resourceModifiers} from "game-framework"
 
 const getPrimaryBonus = (attributeId) => {
-    return 1 + 0.1*gameEffects.getEffectValue(attributeId);
+    return 0.98 + 0.02*gameEffects.getEffectValue(attributeId);
 }
 
 const registerGameAction = (id, options) => {
@@ -9,7 +9,7 @@ const registerGameAction = (id, options) => {
     const primaryAttribute = options.attributes.primaryAttribute;
     
     if(!primaryAttribute || !options.resourceModifier) {
-        return registerGameAction(id, options);
+        return gameEntity.registerGameEntity(id, options);
     }
     
     if(!options.resourceModifier.effectDeps) {
@@ -22,9 +22,9 @@ const registerGameAction = (id, options) => {
     
     options.getPrimaryEffect = () => getPrimaryBonus(primaryAttribute);
 
-    options.getCustomAmplifier = () => 1*options.getPrimaryEffect();
+    options.resourceModifier.getCustomAmplifier = () => 1*options.getPrimaryEffect();
     
-    return registerGameAction(id, options);
+    return gameEntity.registerGameEntity(id, options);
     
 }
 
@@ -97,8 +97,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'coins': {
-                        A: 0.01*(0.9 + 0.1*gameEffects.getEffectValue('attribute_charisma'))*gameEffects.getEffectValue('begging_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
-                        B: 0.09*(0.9 + 0.1*gameEffects.getEffectValue('attribute_charisma'))*gameEffects.getEffectValue('begging_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
+                        A: 0.01*gameEffects.getEffectValue('begging_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
+                        B: 0.09*gameEffects.getEffectValue('begging_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
                         type: 0,
                     }
                 }
@@ -107,12 +107,12 @@ export const registerActionsStage1 = () => {
                 resources: {
                     'energy': {
                         A: 0,
-                        B: 0.2*(0.9 + 0.1*gameEffects.getEffectValue('attribute_charisma')),
+                        B: 0.2,
                         type: 0,
                     }
                 }
             }),
-            effectDeps: ['attribute_charisma', 'begging_efficiency', 'coins_earned_bonus']
+            effectDeps: ['begging_efficiency', 'coins_earned_bonus']
         },
         unlockCondition: () => {
             return gameEntity.getLevel('action_visit_city') > 1
@@ -134,8 +134,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'coins': {
-                        A: 0.03*(0.9 + 0.1*gameEffects.getEffectValue('attribute_strength'))*gameEffects.getEffectValue('clean_stable_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
-                        B: 0.3*(0.9 + 0.1*gameEffects.getEffectValue('attribute_strength'))*gameEffects.getEffectValue('clean_stable_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
+                        A: 0.03*gameEffects.getEffectValue('clean_stable_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
+                        B: 0.3*gameEffects.getEffectValue('clean_stable_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
                         type: 0,
                     }
                 }
@@ -144,17 +144,17 @@ export const registerActionsStage1 = () => {
                 resources: {
                     'energy': {
                         A: 0.0,
-                        B: (0.9 + 0.1*gameEffects.getEffectValue('attribute_strength')),
+                        B: 1,
                         type: 0,
                     },
                     'health': {
                         A: 0.0,
-                        B: 1.5*(0.09 + 0.01*gameEffects.getEffectValue('attribute_strength')),
+                        B: 1.5,
                         type: 0,
                     }
                 }
             }),
-            effectDeps: ['attribute_strength', 'coins_earned_bonus', 'clean_stable_efficiency']
+            effectDeps: ['coins_earned_bonus', 'clean_stable_efficiency']
         },
         unlockCondition: () => {
             return gameEntity.getLevel('action_pushup') > 4
@@ -177,8 +177,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'coins': {
-                        A: 0.1*(0.9 + 0.1*gameEffects.getEffectValue('attribute_strength'))*gameEffects.getEffectValue('coins_earned_bonus'),
-                        B: 0.9*(0.9 + 0.1*gameEffects.getEffectValue('attribute_strength'))*gameEffects.getEffectValue('coins_earned_bonus'),
+                        A: 0.1*gameEffects.getEffectValue('coins_earned_bonus'),
+                        B: 0.9*gameEffects.getEffectValue('coins_earned_bonus'),
                         type: 0,
                     }
                 }
@@ -187,17 +187,17 @@ export const registerActionsStage1 = () => {
                 resources: {
                     'energy': {
                         A: 0.0,
-                        B: 4*(0.9 + 0.1*gameEffects.getEffectValue('attribute_strength')),
+                        B: 4,
                         type: 0,
                     },
                     'health': {
                         A: 0.0,
-                        B: 6*(0.09 + 0.01*gameEffects.getEffectValue('attribute_strength')),
+                        B: 6,
                         type: 0,
                     }
                 }
             }),
-            effectDeps: ['attribute_strength', 'coins_earned_bonus']
+            effectDeps: ['coins_earned_bonus']
         },
         unlockCondition: () => {
             return gameEntity.getLevel('action_pushup') > 25
@@ -243,7 +243,7 @@ export const registerActionsStage1 = () => {
                     }
                 }
             }),
-            effectDeps: ['attribute_strength']
+            effectDeps: []
         },
         unlockCondition: () => {
             return gameEntity.getLevel('action_visit_city') > 1 && gameEntity.getLevel('shop_item_tent') < 1
@@ -460,8 +460,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'inventory_berry': {
-                        A: 0.001*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience'))*gameEffects.getEffectValue('gathering_efficiency'),
-                        B: 0.009*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience'))*gameEffects.getEffectValue('gathering_efficiency'),
+                        A: 0.001*gameEffects.getEffectValue('gathering_efficiency'),
+                        B: 0.009*gameEffects.getEffectValue('gathering_efficiency'),
                         type: 0,
                     }
                 }
@@ -470,12 +470,12 @@ export const registerActionsStage1 = () => {
                 resources: {
                     'energy': {
                         A: 0,
-                        B: (0.9 + 0.1*gameEffects.getEffectValue('attribute_patience')),
+                        B: 1,
                         type: 0,
                     }
                 }
             }),
-            effectDeps: ['attribute_patience', 'gathering_efficiency']
+            effectDeps: ['gathering_efficiency']
         },
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0
@@ -768,18 +768,18 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'inventory_berry': {
-                        A: 0.004*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience'))*gameEffects.getEffectValue('gathering_efficiency'),
-                        B: 0.036*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience'))*gameEffects.getEffectValue('gathering_efficiency'),
+                        A: 0.004*gameEffects.getEffectValue('gathering_efficiency'),
+                        B: 0.036*gameEffects.getEffectValue('gathering_efficiency'),
                         type: 0,
                     },
                     'inventory_fly_mushroom': {
-                        A: 0.001*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience'))*gameEffects.getEffectValue('gathering_efficiency'),
-                        B: 0.009*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience'))*gameEffects.getEffectValue('gathering_efficiency'),
+                        A: 0.001*gameEffects.getEffectValue('gathering_efficiency'),
+                        B: 0.009*gameEffects.getEffectValue('gathering_efficiency'),
                         type: 0,
                     },
                     'inventory_aloe_vera': {
-                        A: 0.0002*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience'))*gameEffects.getEffectValue('gathering_efficiency'),
-                        B: 0.0018*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience'))*gameEffects.getEffectValue('gathering_efficiency'),
+                        A: 0.0002*gameEffects.getEffectValue('gathering_efficiency'),
+                        B: 0.0018*gameEffects.getEffectValue('gathering_efficiency'),
                         type: 0,
                     }
                 }
@@ -788,17 +788,17 @@ export const registerActionsStage1 = () => {
                 resources: {
                     'energy': {
                         A: 0.0,
-                        B: 2*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience')),
+                        B: 2,
                         type: 0,
                     },
                     'health': {
                         A: 0.0,
-                        B: 0.5*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience')),
+                        B: 0.5,
                         type: 0,
                     }
                 }
             }),
-            effectDeps: ['attribute_patience', 'gathering_efficiency']
+            effectDeps: ['gathering_efficiency']
         },
         unlockCondition: () => {
             return gameResources.getResource('health').cap >= 20 && gameEntity.getLevel('shop_item_backpack') > 0
@@ -820,18 +820,18 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'inventory_aloe_vera': {
-                        A: 0.001*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience'))*gameEffects.getEffectValue('gathering_efficiency'),
-                        B: 0.009*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience'))*gameEffects.getEffectValue('gathering_efficiency'),
+                        A: 0.001*gameEffects.getEffectValue('gathering_efficiency'),
+                        B: 0.009*gameEffects.getEffectValue('gathering_efficiency'),
                         type: 0,
                     },
                     'inventory_ginseng': {
-                        A: 0.001*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience'))*gameEffects.getEffectValue('gathering_efficiency'),
-                        B: 0.009*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience'))*gameEffects.getEffectValue('gathering_efficiency'),
+                        A: 0.001*gameEffects.getEffectValue('gathering_efficiency'),
+                        B: 0.009*gameEffects.getEffectValue('gathering_efficiency'),
                         type: 0,
                     },
                     'inventory_nightshade': {
-                        A: 0.0002*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience'))*gameEffects.getEffectValue('gathering_efficiency'),
-                        B: 0.0018*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience'))*gameEffects.getEffectValue('gathering_efficiency'),
+                        A: 0.0002*gameEffects.getEffectValue('gathering_efficiency'),
+                        B: 0.0018*gameEffects.getEffectValue('gathering_efficiency'),
                         type: 0,
                     }
                 }
@@ -840,17 +840,17 @@ export const registerActionsStage1 = () => {
                 resources: {
                     'energy': {
                         A: 0.0,
-                        B: 4*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience')),
+                        B: 4,
                         type: 0,
                     },
                     'health': {
                         A: 0.0,
-                        B: 2*(0.9 + 0.1*gameEffects.getEffectValue('attribute_patience')),
+                        B: 2,
                         type: 0,
                     }
                 }
             }),
-            effectDeps: ['attribute_patience', 'gathering_efficiency']
+            effectDeps: ['gathering_efficiency']
         },
         unlockCondition: () => {
             return gameResources.getResource('health').cap >= 25 && gameEntity.getLevel('shop_item_backpack') > 0

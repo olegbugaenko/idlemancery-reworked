@@ -445,7 +445,7 @@ export const ActionDetailsComponent = React.memo(({...action}) => {
             </div>
             {action.primaryAttribute ? (<div className={'block'}>
 
-                <p>Primary Attribute: {action.primaryAttribute.name} ({formatValue(action.primaryAttribute.value)})</p>
+                <p>Primary Attribute: {action.primaryAttribute.name} ({formatValue(action.primaryAttribute.value)}), providing {formatValue(100*action.primaryAttributeEffect)}% intensity</p>
                 <p className={'hint'}>Primary attribute speeds up action, increasing both production and consumption</p>
 
             </div> ) : null}

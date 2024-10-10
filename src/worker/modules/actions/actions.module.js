@@ -237,6 +237,10 @@ export class ActionsModule extends GameModule {
             baseXPRate = gameEntity.getEntity(id).getLearnRate();
         }
 
+        if(gameEntity.getEntity(id).getPrimaryEffect) {
+            baseXPRate *= gameEntity.getEntity(id).getPrimaryEffect();
+        }
+
         return baseXPRate * eff * gameEffects.getEffectValue('learning_rate')*focusBonus;
     }
 
@@ -378,6 +382,7 @@ export class ActionsModule extends GameModule {
             isLeveled: this.actions[entity.id]?.isLeveled,
             tags: entity.tags,
             primaryAttribute: entity.attributes?.primaryAttribute ? gameEffects.getEffect(entity.attributes.primaryAttribute) : null,
+            primaryAttributeEffect: entity.attributes?.primaryAttribute ? entity.getPrimaryEffect() : 1,
             isTraining: gameEntity.getAttribute(entity.id, 'isTraining')
         };
 
