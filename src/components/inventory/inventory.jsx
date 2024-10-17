@@ -2,14 +2,14 @@ import React, {useCallback, useContext, useEffect, useRef, useState} from "react
 import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
 import {formatInt, formatValue, secondsToString} from "../../general/utils/strings";
-import {ProgressBar} from "../layout/progress-bar.jsx";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import {EffectsSection} from "../shared/effects-section.jsx";
-import {ResourceCost} from "../shared/resource-cost.jsx";
 import CircularProgress from "../shared/circular-progress.jsx";
 import {FlashOverlay} from "../layout/flash-overlay.jsx";
 import {useFlashOnLevelUp} from "../../general/hooks/flash";
 import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
+import RulesList from "../shared/rules-list.jsx";
+import {cloneDeep} from "lodash";
 
 export const Inventory = ({}) => {
 
@@ -123,7 +123,7 @@ export const Inventory = ({}) => {
 
     const onAddAutoconsumeRule = useCallback(() => {
         if(editData) {
-            const newEdit = editData;
+            const newEdit = cloneDeep(editData);;
             newEdit.autoconsume.rules.push({
                 resource_id: resources[0].id,
                 condition: 'less_or_eq',
@@ -137,7 +137,7 @@ export const Inventory = ({}) => {
 
     const onSetAutoconsumeRuleValue = useCallback((index, key, value) => {
         if(editData) {
-            const newEdit = editData;
+            const newEdit = cloneDeep(editData);
             newEdit.autoconsume.rules[index] = {
                 ...newEdit.autoconsume.rules[index],
                 [key]: value
@@ -149,7 +149,7 @@ export const Inventory = ({}) => {
 
     const onDeleteAutoconsumeRule = useCallback((index) => {
         if(editData) {
-            const newEdit = editData;
+            const newEdit = cloneDeep(editData);;
             newEdit.autoconsume.rules.splice(index)
             setEditData(newEdit);
             setChanged(true);
@@ -158,7 +158,7 @@ export const Inventory = ({}) => {
 
     const onAddAutosellRule = useCallback(() => {
         if(editData) {
-            const newEdit = editData;
+            const newEdit = cloneDeep(editData);;
             newEdit.autosell.rules.push({
                 resource_id: (viewedData ?? editData).id,
                 condition: 'grt',
@@ -172,7 +172,7 @@ export const Inventory = ({}) => {
 
     const onSetAutosellRuleValue = useCallback((index, key, value) => {
         if(editData) {
-            const newEdit = editData;
+            const newEdit = cloneDeep(editData);;
             newEdit.autosell.rules[index] = {
                 ...newEdit.autosell.rules[index],
                 [key]: value
@@ -184,7 +184,7 @@ export const Inventory = ({}) => {
 
     const onDeleteAutosellRule = useCallback((index) => {
         if(editData) {
-            const newEdit = editData;
+            const newEdit = cloneDeep(editData);
             newEdit.autosell.rules.splice(index, 1)
             setEditData(newEdit);
             setChanged(true);
@@ -328,7 +328,7 @@ export const InventoryCard = React.memo(({ isChanged, isSelected, id, name, amou
     return true;
 }))
 
-export const InventoryDetails = ({isChanged, editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onAddAutosellRule, onSetAutosellRuleValue, onDeleteAutosellRule, onSave, onCancel, onSell}) => {
+export const InventoryDetails = React.memo(({isChanged, editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onAddAutosellRule, onSetAutosellRuleValue, onDeleteAutosellRule, onSave, onCancel, onSell}) => {
 
     const item = viewedData ? viewedData : editData;
 
@@ -399,48 +399,13 @@ export const InventoryDetails = ({isChanged, editData, viewedData, resources, on
                         {isEditing ? (<button onClick={addAutoconsumeRule}>Add rule (AND)</button>) : null}
                     </div>
 
-                    <div className={'rules'}>
-                        {item.autoconsume?.rules?.map((rule, index) => (
-                            <div className={'rule row add-row'}>
-                                <div className={'col subject'}>
-                                    {isEditing ? (<select name={'resource_id'} onChange={e => setAutoconsumeRuleValue(index, 'resource_id', e.target.value)}>
-                                        {resources.map(r => (<option id={r.id} value={r.id} selected={rule.resource_id === r.id}>{r.name}</option>))}
-                                    </select>) : <span>{resources.find(r => r.id === rule.resource_id)?.name || 'Invalid'}</span>}
-                                </div>
-                                <div className={'col condition'}>
-                                    {isEditing ? (<select name={'condition'} onChange={e => setAutoconsumeRuleValue(index, 'condition', e.target.value)}>
-                                        <option id={'less'} value={'less'} selected={rule.condition === 'less'}>Less</option>
-                                        <option id={'less_or_eq'} value={'less_or_eq'} selected={rule.condition === 'less_or_eq'}>Less or Equal</option>
-                                        <option id={'eq'} value={'eq'} selected={rule.condition === 'eq'}>Equal</option>
-                                        <option id={'grt_or_eq'} value={'grt_or_eq'} selected={rule.condition === 'grt_or_eq'}>Greater or Equal</option>
-                                        <option id={'grt'} value={'grt'} selected={rule.condition === 'grt'}>Greater</option>
-                                    </select>) : (<span>{rule.condition}</span>)}
-                                </div>
-                                <div className={'col value_type'}>
-                                    {isEditing ? (<select name={'value_type'} onChange={e => setAutoconsumeRuleValue(index, 'value_type', e.target.value)}>
-                                        <option id={'exact'} value={'exact'} selected={rule.value_type === 'exact'}>Exact</option>
-                                        <option id={'percentage'} value={'percentage'} selected={rule.value_type === 'percentage'}>Percentage</option>
-                                    </select>) : (<span>{rule.value_type}</span>)}
-                                </div>
-                                <div className={'col value'}>
-                                    {isEditing ? (
-                                        <input
-                                            type={'number'}
-                                            onChange={e => setAutoconsumeRuleValue(index, 'value', e.target.value)}
-                                            value={rule.value_type === 'percentage' ? Math.min(100, Math.max(0, rule.value)) : Math.max(0, rule.value)}
-                                            max={rule.value_type === 'percentage' ? 100 : undefined}
-                                            step={rule.value_type === 'percentage' ? 5 : 1}
-                                        />
-                                        ) : (<span>{rule.value}</span>)}
-                                </div>
-                                {isEditing ? (<div className={'col delete-rule'}>
-                                    <span className={'close'} onClick={e => deleteAutoconsumeRule(index)}>
-                                        X
-                                    </span>
-                                </div> ) : null}
-                            </div>
-                        ))}
-                    </div>
+                    <RulesList
+                        isEditing={isEditing}
+                        rules={item.autoconsume?.rules || []}
+                        resources={resources}
+                        deleteRule={deleteAutoconsumeRule}
+                        setRuleValue={setAutoconsumeRuleValue}
+                    />
                 </div>
 
                 {item.isSellable ? (<div className={'autoconsume-setting block'}>
@@ -449,31 +414,13 @@ export const InventoryDetails = ({isChanged, editData, viewedData, resources, on
                         {isEditing ? (<button onClick={addAutosellRule}>Add rule (AND)</button>) : null}
                     </div>
 
-                    <div className={'rules'}>
-                        {item.autosell?.rules?.map((rule, index) => (
-                            <div className={'rule row add-row'}>
-                                <div className={'col subject'}>
-                                    <span>{resources.find(r => r.id === rule.resource_id)?.name || 'Invalid'}</span>
-                                </div>
-                                <div className={'col condition'}>
-                                    <span>{rule.condition}</span>
-                                </div>
-                                <div className={'col value'}>
-                                    {isEditing ? (
-                                        <input type={'number'}
-                                               onChange={e => setAutosellRuleValue(index, 'value', e.target.value)}
-                                               value={Math.max(1, rule.value)}
-                                        />
-                                    ) : (<span>{rule.value}</span>)}
-                                </div>
-                                {isEditing ? (<div className={'col delete-rule'}>
-                                    <span className={'close'} onClick={e => deleteAutosellRule(index)}>
-                                        X
-                                    </span>
-                                </div> ) : null}
-                            </div>
-                        ))}
-                    </div>
+                    <RulesList
+                        isEditing={isEditing}
+                        rules={item.autosell?.rules || []}
+                        resources={resources}
+                        deleteRule={deleteAutosellRule}
+                        setRuleValue={setAutosellRuleValue}
+                    />
                 </div>) : null}
 
                 {item.isSellable ? (<div className={'block sell-block'}>
@@ -491,4 +438,21 @@ export const InventoryDetails = ({isChanged, editData, viewedData, resources, on
             </div>
         </PerfectScrollbar>
     )
-}
+}, (prevProps, currentProps) => {
+
+    if(prevProps.isChanged !== currentProps.isChanged) {
+        //console.log('isChanged: ', prevProps.isChanged, currentProps.isChanged)
+        return false;
+    }
+
+    if(prevProps.editData !== currentProps.editData) {
+        return false;
+    }
+
+    if(prevProps.viewedData !== currentProps.viewedData) {
+        //console.log('viewedChng: ', prevProps.viewedData, currentProps.viewedData)
+        return false;
+    }
+
+    return true;
+})

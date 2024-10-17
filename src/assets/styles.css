@@ -704,7 +704,8 @@ h4 {
     border: 1px solid var(--red);
 }
 
-.autoconsume-setting .rules .rule {
+.autoconsume-setting .rules .rule,
+.automated-wrap .rules .rule{
     padding: 8px;
     border: 1px solid #777777;
     border-radius: 4px;
@@ -727,12 +728,20 @@ h4 {
     margin-top: 8px;
 }
 
+.furniture-wrap {
+    height: calc(100% - 40px);
+}
+
 .furniture-wrap .head {
     padding: 8px;
 }
 
 .card.furniture {
     width: 200px;
+}
+
+.furniture-wrap .furnitures-cat {
+    height: calc(100% - 40px);
 }
 
 .card.furniture .head {
@@ -884,17 +893,21 @@ h4 {
     background-color: #171922;
 }
 
-.settings-wrap .row {
+.inner-settings-wrap {
+    height: calc(100% - 40px);
+}
+
+.save-settings-wrap .row {
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 
-.settings-wrap .row .col {
+.save-settings-wrap .row .col {
     width: 300px;
 }
 
-.settings-wrap .row .col textarea {
+.save-settings-wrap .row .col textarea {
     width: 280px;
     height: 120px;
 }
@@ -964,4 +977,86 @@ h4 {
 .lists-editor .list-selector .list-item-row .list-name {
     width: 160px;
     display: block;
+}
+
+.automated-list .automated-wrap {
+    display: flex;
+    justify-content: space-between;
+}
+
+.automated-wrap .col.title {
+    padding-top: 30px;
+    width: 160px;
+}
+
+.automated-wrap .col.priority {
+    padding-top: 30px;
+    width: 120px;
+}
+
+.automated-wrap .col.auto-actions-wrap {
+    padding-top: 30px;
+    width: 200px;
+}
+
+.automated-wrap.editing .col.title {
+    padding-top: 50px;
+}
+
+.automated-wrap.editing .col.priority {
+    padding-top: 50px;
+}
+
+.automated-wrap.editing .col.auto-actions-wrap {
+    padding-top: 50px;
+}
+
+.automated-wrap .col.rules-wrap {
+    width: 400px;
+}
+
+.automated-wrap .col.priority input{
+    width: 80px;
+}
+
+.automated-wrap .col.rules-wrap .rule.row {
+    justify-content: space-between;
+}
+
+.automations-box.closed .automated-list {
+    display: none;
+}
+
+.automations-box .automation-panel-title {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.automations-box {
+    background: rgba(0,0,0,0.5);
+    margin: 8px;
+    padding: 8px;
+    border: 1px solid #777777;
+    border-radius: 8px;
+}
+
+.automations-box.opened .automated-list {
+    border-top: 1px solid #777777;
+}
+
+.automations-box.opened .automated-list .automated-wrap {
+    padding: 4px;
+    border-bottom: 1px solid #777777;
+}
+
+.automations-box.closed .arrow-down {
+    display: block;
+    transform: rotate(-90deg);
+}
+
+.automations-box .arrow-down {
+    padding: 4px;
+    font-size: 24px;
 }

@@ -1,6 +1,7 @@
 import { gameEntity, gameResources, resourceApi, resourceCalculators, gameEffects } from "game-framework"
 import {GameModule} from "../../shared/game-module";
 import {initSpellsDB1} from "./spells-db";
+import {checkMatchingRules} from "../../shared/utils/rule-utils";
 
 export class SpellModule extends GameModule {
 
@@ -37,46 +38,6 @@ export class SpellModule extends GameModule {
 
     }
 
-    checkMatchingRule(rule) {
-        const resource = gameResources.getResource(rule.resource_id);
-
-        if(!resource) return false;
-
-        let compare = resource.amount;
-
-        if(rule.value_type === 'percentage') {
-            if(!resource.cap) return false;
-
-            compare = 100 * resource.amount / resource.cap;
-        }
-
-        switch (rule.condition) {
-            case 'less':
-                return compare < rule.value;
-            case 'less_or_eq':
-                return  compare <= rule.value;
-            case 'eq':
-                return compare == rule.value;
-            case 'grt_or_eq':
-                return compare >= rule.value;
-            case 'grt':
-                return compare > rule.value;
-        }
-
-        return false;
-    }
-
-    checkMatchingRules(rules) {
-        for(const rule of rules) {
-            // console.log('RULE_CHECK: ', rule)
-            if(!this.checkMatchingRule(rule)) {
-                return false;
-            }
-            // console.log('RULE Matched!');
-        }
-        return true;
-    }
-
     tick(game, delta) {
         this.autoConsumeCD -= delta;
 
@@ -111,7 +72,7 @@ export class SpellModule extends GameModule {
             }
 
             // check if matching rules
-            const isMatching = this.checkMatchingRules(this.spells[itemId]?.autocast?.rules);
+            const isMatching = checkMatchingRules(this.spells[itemId]?.autocast?.rules);
 
             // console.log('RULES MATCHED: ', isMatching);
             if(isMatching) {

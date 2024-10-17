@@ -1,6 +1,7 @@
 import { gameEntity, gameResources, resourceApi, gameEffects } from "game-framework"
 import {GameModule} from "../../shared/game-module";
 import {registerInventoryItems} from "./inventory-items-db";
+import {checkMatchingRules} from "../../shared/utils/rule-utils";
 
 
 export class InventoryModule extends GameModule {
@@ -19,7 +20,7 @@ export class InventoryModule extends GameModule {
         })
 
         this.eventHandler.registerHandler('query-inventory-data', (payload) => {
-            this.sendInventoryData()
+            this.sendInventoryData(payload);
         })
 
         this.eventHandler.registerHandler('query-inventory-details', (payload) => {
@@ -45,46 +46,6 @@ export class InventoryModule extends GameModule {
 
         registerInventoryItems();
 
-    }
-
-    checkMatchingRule(rule) {
-        const resource = gameResources.getResource(rule.resource_id);
-
-        if(!resource) return false;
-
-        let compare = resource.amount;
-
-        if(rule.value_type === 'percentage') {
-            if(!resource.cap) return false;
-
-            compare = 100 * resource.amount / resource.cap;
-        }
-
-        switch (rule.condition) {
-            case 'less':
-                return compare < rule.value;
-            case 'less_or_eq':
-                return  compare <= rule.value;
-            case 'eq':
-                return compare == rule.value;
-            case 'grt_or_eq':
-                return compare >= rule.value;
-            case 'grt':
-                return compare > rule.value;
-        }
-
-        return false;
-    }
-
-    checkMatchingRules(rules) {
-        for(const rule of rules) {
-            // console.log('RULE_CHECK: ', rule)
-            if(!this.checkMatchingRule(rule)) {
-                return false;
-            }
-            // console.log('RULE Matched!');
-        }
-        return true;
     }
 
     tick(game, delta) {
@@ -122,7 +83,7 @@ export class InventoryModule extends GameModule {
             }
             if(this.inventoryItems[itemId]?.autoconsume?.rules?.length) {
                 // check if matching rules
-                const isMatching = this.checkMatchingRules(this.inventoryItems[itemId]?.autoconsume?.rules);
+                const isMatching = checkMatchingRules(this.inventoryItems[itemId]?.autoconsume?.rules);
 
                 // console.log('RULES MATCHED: ', isMatching);
                 if(isMatching) {
@@ -131,9 +92,8 @@ export class InventoryModule extends GameModule {
             }
 
             if(this.inventoryItems[itemId]?.autosell?.rules?.length) {
-                const isMatching = this.checkMatchingRules(this.inventoryItems[itemId]?.autosell?.rules);
+                const isMatching = checkMatchingRules(this.inventoryItems[itemId]?.autosell?.rules);
 
-                console.log('RULES MATCHED: ', isMatching);
                 if(isMatching) {
                     this.sellItem(itemId, 1);
                 }
@@ -290,29 +250,45 @@ export class InventoryModule extends GameModule {
         }
     }
 
-    getItemsData() {
+    getItemsData(pl) {
         const items = gameResources.listResourcesByTags(['inventory']);
-        const presentItems = items.filter(item =>
+        let presentItems = items.filter(item =>
             gameResources.getResource(item.id).amount >= 1
             || this.inventoryItems[item.id]?.autoconsume?.rules?.length
             || this.inventoryItems[item.id]?.autosell?.rules?.length
         );
-        if(presentItems.length <= 0) {
-            gameResources.addResource('inventory_berry', 2);
+        if(pl?.filterAutomatedSell) {
+            presentItems = presentItems.filter(p => this.inventoryItems[p.id].autosell?.rules?.length)
         }
+        if(pl?.filterAutomatedConsume) {
+            presentItems = presentItems.filter(p => this.inventoryItems[p.id].autoconsume?.rules?.length)
+        }
+        if(pl?.includeAutomations) {
+            presentItems = presentItems.map(item => ({
+                ...item,
+                autoconsume: this.inventoryItems[item.id]?.autoconsume ?? { rules: [] },
+                autosell: this.inventoryItems[item.id]?.autosell ?? { rules: [] },
+            }))
+        }
+
         return {
             available: presentItems.map(resource => ({
                 ...resource,
                 isConsumed: this.inventoryItems[resource.id]?.isConsumed,
                 cooldown: this.inventoryItems[resource.id]?.cooldown ?? 0,
-                cooldownProg: resource.getUsageCooldown ? (resource.getUsageCooldown() - (this.inventoryItems[resource.id]?.cooldown ?? 0)) / resource.getUsageCooldown() : 1
-            }))
+                cooldownProg: resource.getUsageCooldown ? (resource.getUsageCooldown() - (this.inventoryItems[resource.id]?.cooldown ?? 0)) / resource.getUsageCooldown() : 1,
+            })),
+            payload: pl,
         }
     }
 
-    sendInventoryData() {
-        const data = this.getItemsData();
-        this.eventHandler.sendData('inventory-data', data);
+    sendInventoryData(pl) {
+        const data = this.getItemsData(pl);
+        let label = 'inventory-data';
+        if(pl?.prefix) {
+            label = `${label}-${pl.prefix}`;
+        }
+        this.eventHandler.sendData(label, data);
     }
 
     getItemDetails(id) {

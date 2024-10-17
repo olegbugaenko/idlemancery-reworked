@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useRef, useState} from "react";
+import React, {useCallback, useContext, useEffect, useRef, useState} from "react";
 import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
 import {formatInt, formatValue, secondsToString} from "../../general/utils/strings";
@@ -10,6 +10,8 @@ import {useFlashOnLevelUp} from "../../general/hooks/flash";
 import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
 import {ResourceComparison} from "../shared/resource-comparison.jsx";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import RulesList from "../shared/rules-list.jsx";
+import {cloneDeep} from "lodash";
 
 export const Actions = ({}) => {
 
@@ -20,13 +22,15 @@ export const Actions = ({}) => {
         available: [],
         current: undefined,
         actionCategories: [],
-        actionLists: []
+        actionLists: [],
+        automationEnabled: false
     });
     const [detailOpened, setDetailOpened] = useState(null);
     const [editingList, setEditingList] = useState(null);
     const [viewingList, setViewingList] = useState(null);
     const [listData, setListData] = useState(null);
     const [viewedData, setViewedData] = useState(null);
+    const [resources, setResources] = useState(null);
 
     // const [filterId, setFilterId] = useState('all');
 
@@ -34,6 +38,8 @@ export const Actions = ({}) => {
         const interval = setInterval(() => {
             sendData('query-actions-data', {  });
         }, 100);
+        sendData('query-all-resources', {});
+
         return () => {
             clearInterval(interval);
         }
@@ -46,6 +52,9 @@ export const Actions = ({}) => {
         }
     }, [editingList, viewingList])
 
+    onMessage('all-resources', (payload) => {
+        setResources(payload);
+    })
 
     onMessage('actions-data', (actions) => {
         setActionsData(actions);
@@ -124,7 +133,7 @@ export const Actions = ({}) => {
                 time: 2,
                 isAvailable: true,
             })
-            setListData(newList);
+            setListData({...newList});
             sendData('query-action-list-effects', { listData: newList });
         }
     }
@@ -133,7 +142,7 @@ export const Actions = ({}) => {
         if(listData) {
             const newList = listData;
             newList.actions = newList.actions.filter(a => a.id !== id);
-            setListData(newList);
+            setListData({...newList});
             sendData('query-action-list-effects', { listData: newList });
         }
     }
@@ -142,7 +151,7 @@ export const Actions = ({}) => {
         if(listData) {
             const newList = listData;
             newList.actions = newList.actions.map(a => a.id !== id ? a : {...a, [key]: value});
-            setListData(newList);
+            setListData({...newList});
             sendData('query-action-list-effects', { listData: newList });
         }
     }
@@ -152,7 +161,7 @@ export const Actions = ({}) => {
         if(listData) {
             const newList = listData;
             newList[key] = value;
-            setListData(newList);
+            setListData({...newList});
             // sendData('query-action-list-effects', { id });
         }
     }
@@ -211,6 +220,76 @@ export const Actions = ({}) => {
         }
     };
 
+    const setAutotriggerPriority = useCallback((priority) => {
+        if(listData) {
+            const newList = cloneDeep(listData);
+            if(!newList.autotrigger) {
+                newList.autotrigger = {};
+            }
+            if(!newList.autotrigger.rules) {
+                newList.autotrigger.rules = [];
+            }
+            newList.autotrigger.priority = priority;
+            setListData({...newList});
+        }
+    }, [listData]);
+
+
+    const onAddAutotriggerRule = useCallback(() => {
+
+        if(listData) {
+            const newList = cloneDeep(listData);
+            if(!newList.autotrigger) {
+                newList.autotrigger = {};
+            }
+            if(!newList.autotrigger.rules) {
+                newList.autotrigger.rules = [];
+            }
+            newList.autotrigger.rules.push({
+                resource_id: resources[0].id,
+                condition: 'less_or_eq',
+                value_type: 'percentage',
+                value: 50,
+            });
+            setListData({...newList});
+        }
+    }, [listData])
+
+    const onSetAutotriggerRuleValue = useCallback((index, key, value) => {
+        if(listData) {
+            const newList = cloneDeep(listData);
+            if(!newList.autotrigger) {
+                newList.autotrigger = {};
+            }
+            if(!newList.autotrigger.rules) {
+                newList.autotrigger.rules = [];
+            }
+            newList.autotrigger.rules[index] ={
+                ...newList.autotrigger.rules[index],
+                [key]: value
+            };
+            setListData({...newList});
+        }
+    }, [listData])
+
+    const onDeleteAutotriggerRule = useCallback((index) => {
+        if(listData) {
+            const newList = cloneDeep(listData);
+            if(!newList.autotrigger) {
+                newList.autotrigger = {};
+            }
+            if(!newList.autotrigger.rules) {
+                newList.autotrigger.rules = [];
+            }
+            newList.autotrigger.rules.splice(index);
+            setListData({...newList});
+        }
+    }, [listData])
+
+    const toggleAutomation = useCallback(() => {
+        sendData('set-automation-enabled', { flag: !actionsData.automationEnabled })
+    })
+
     return (
         <DragDropContext onDragEnd={onDragEnd}>
             <div className={'actions-wrap'}>
@@ -240,7 +319,7 @@ export const Actions = ({}) => {
                         </PerfectScrollbar>
                     </div>
 
-                    {actionsData.actionListsUnlocked ? (<ActionListsPanel editListToDetails={editListToDetails} lists={actionsData.actionLists} viewListToDetails={viewListToDetails} runningList={actionsData.runningList}/>) : null}
+                    {actionsData.actionListsUnlocked ? (<ActionListsPanel editListToDetails={editListToDetails} lists={actionsData.actionLists} viewListToDetails={viewListToDetails} runningList={actionsData.runningList} automationEnabled={actionsData.automationEnabled} toggleAutomation={toggleAutomation}/>) : null}
                 </div>
                 <div className={'action-detail ingame-box detail-blade'}>
                     <DetailBlade
@@ -253,6 +332,11 @@ export const Actions = ({}) => {
                         onUpdateListValue={onUpdateListValue}
                         onCloseList={onCloseList}
                         viewedData={viewedData}
+                        onAddAutotriggerRule={onAddAutotriggerRule}
+                        onSetAutotriggerRuleValue={onSetAutotriggerRuleValue}
+                        onDeleteAutotriggerRule={onDeleteAutotriggerRule}
+                        setAutotriggerPriority={setAutotriggerPriority}
+                        resources={resources}
                     />
                 </div>
             </div>
@@ -262,7 +346,22 @@ export const Actions = ({}) => {
 
 }
 
-export const DetailBlade = ({ actionId, viewListId, viewedData, editListId, listData, onUpdateActionFromList, onDropActionFromList, onUpdateListValue, onCloseList }) => {
+export const DetailBlade = ({
+    actionId,
+    viewListId,
+    viewedData,
+    editListId,
+    listData,
+    onUpdateActionFromList,
+    onDropActionFromList,
+    onUpdateListValue,
+    onCloseList,
+    onAddAutotriggerRule,
+    onSetAutotriggerRuleValue,
+    onDeleteAutotriggerRule,
+    setAutotriggerPriority,
+    resources
+}) => {
 
     if(listData) {
         return (<ListEditor
@@ -273,6 +372,11 @@ export const DetailBlade = ({ actionId, viewListId, viewedData, editListId, list
             onUpdateListValue={onUpdateListValue}
             onCloseList={onCloseList}
             isEditing={true}
+            onAddAutotriggerRule={onAddAutotriggerRule}
+            onSetAutotriggerRuleValue={onSetAutotriggerRuleValue}
+            onDeleteAutotriggerRule={onDeleteAutotriggerRule}
+            setAutotriggerPriority={setAutotriggerPriority}
+            resources={resources}
         />)
     }
 
@@ -289,6 +393,11 @@ export const DetailBlade = ({ actionId, viewListId, viewedData, editListId, list
             onUpdateListValue={onUpdateListValue}
             onCloseList={onCloseList}
             isEditing={false}
+            onAddAutotriggerRule={onAddAutotriggerRule}
+            onSetAutotriggerRuleValue={onSetAutotriggerRuleValue}
+            onDeleteAutotriggerRule={onDeleteAutotriggerRule}
+            setAutotriggerPriority={setAutotriggerPriority}
+            resources={resources}
         />)
     }
 
@@ -301,6 +410,11 @@ export const DetailBlade = ({ actionId, viewListId, viewedData, editListId, list
             onUpdateListValue={onUpdateListValue}
             onCloseList={onCloseList}
             isEditing={true}
+            onAddAutotriggerRule={onAddAutotriggerRule}
+            onSetAutotriggerRuleValue={onSetAutotriggerRuleValue}
+            onDeleteAutotriggerRule={onDeleteAutotriggerRule}
+            setAutotriggerPriority={setAutotriggerPriority}
+            resources={resources}
         />)
     }
 
@@ -501,7 +615,7 @@ export const ActionDetailsComponent = React.memo(({...action}) => {
     return true;
 })
 
-export const ActionListsPanel = ({ runningList, editListToDetails, lists, viewListToDetails }) => {
+export const ActionListsPanel = ({ runningList, editListToDetails, lists, viewListToDetails, automationEnabled, toggleAutomation }) => {
 
     const worker = useContext(WorkerContext);
 
@@ -555,6 +669,12 @@ export const ActionListsPanel = ({ runningList, editListToDetails, lists, viewLi
                 <button onClick={(e) => { e.stopPropagation(); setOpenedFor('edit')}}>Pick list</button>
                 <ActionListsPopup lists={lists} isOpened={openedFor === 'edit'} setOpenedFor={setOpenedFor} onSelect={editList} onRun={runList} onHover={viewListToDetails}/>
             </div>
+            <div className={'automation-enabled panel-col'}>
+                <label>
+                    <input type={'checkbox'} checked={automationEnabled} onChange={toggleAutomation}/>
+                    Lists automation enabled
+                </label>
+            </div>
         </div>
     </div>)
 }
@@ -583,7 +703,20 @@ export const ActionListsPopup = ({ lists, isOpened, setOpenedFor, onSelect, onHo
     </div> )
 }
 
-export const ListEditor = ({ editListId, listData, onUpdateActionFromList, onDropActionFromList, onUpdateListValue, onCloseList, isEditing }) => {
+export const ListEditor = React.memo(({
+   editListId,
+   listData,
+   onUpdateActionFromList,
+   onDropActionFromList,
+   onUpdateListValue,
+   onCloseList,
+   isEditing,
+   onAddAutotriggerRule,
+   onSetAutotriggerRuleValue,
+   onDeleteAutotriggerRule,
+   setAutotriggerPriority,
+   resources
+}) => {
 
     const worker = useContext(WorkerContext);
 
@@ -604,6 +737,18 @@ export const ListEditor = ({ editListId, listData, onUpdateActionFromList, onDro
         if(isClose) {
             onCloseList();
         }
+    }
+
+    const addAutotriggerRule = () => {
+        onAddAutotriggerRule()
+    }
+
+    const setAutotriggerRuleValue = (index, key, value) => {
+        onSetAutotriggerRuleValue(index, key, value)
+    }
+
+    const deleteAutotriggerRule = index => {
+        onDeleteAutotriggerRule(index);
     }
 
     return (<div className={'list-editor'}>
@@ -653,10 +798,36 @@ export const ListEditor = ({ editListId, listData, onUpdateActionFromList, onDro
             <p>Average Effects per second</p>
             <EffectsSection effects={editing?.effectEffects || []} maxDisplay={10}/></div>) : null}
         </div>
+        <div className={'autotrigger-settings autoconsume-setting block'}>
+            <div className={'rules-header flex-container'}>
+                <p>Autotrigger rules: {editing?.autotrigger?.rules?.length ? null : 'None'}</p>
+                {isEditing ? (<button onClick={addAutotriggerRule}>Add rule (AND)</button>) : null}
+            </div>
+            <div className={'priority-line flex-container'}>
+                <p>Priority: </p>
+                <input type={'number'} value={editing.autotrigger?.priority || 0} onChange={e => setAutotriggerPriority(+(e.target.value || 0))}/>
+            </div>
+            <RulesList
+                isEditing={isEditing}
+                rules={editing.autotrigger?.rules || []}
+                resources={resources}
+                deleteRule={deleteAutotriggerRule}
+                setRuleValue={setAutotriggerRuleValue}
+            />
+        </div>
         {isEditing ? (<div className={'buttons'}>
             <button onClick={() => saveAndClose(false)}>{listData.id ? 'Save' : 'Create'}</button>
             <button onClick={() => saveAndClose(true)}>{listData.id ? 'Save & Close' : 'Create & Close'}</button>
             <button onClick={onCloseList}>Cancel</button>
         </div>) : null}
     </div> )
-}
+}, ((prevProps, currentProps) => {
+
+    if(prevProps.isEditing !== currentProps.isEditing) return false;
+
+    if(prevProps.listData !== currentProps.listData) return false;
+
+    // if(prevProps.editListId !== currentProps.editListId) return false;
+
+    return true;
+}))

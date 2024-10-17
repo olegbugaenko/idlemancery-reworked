@@ -51,8 +51,10 @@ List fixes:
 [X] created list shoud contain current action
 [X] per second data at list may switch to per minute/per hour/per run on click
 [V] Fix percentage display = 100% should be 100, and not 1.
-Make resources dropdowns allow search
-Add auto-trigger rules for list (with priority setup)
-Add auto-purchase
-Create separate "Automations" tab under settings
+[V] Make resources dropdowns allow search
+[V] Add auto-trigger rules for list (with priority setup)
+[V] Review component re-renders
+[X] Add auto-purchase
+[V/-] Create separate "Automations" tab under settings (Add spells and test)
 Make Popups closed by clicking outside
+Show ETA's on learning/resource availability

@@ -1,5 +1,6 @@
 import {GameModule} from "../../shared/game-module";
 import {gameEntity, gameResources, gameCore, resourceCalculators} from "game-framework";
+import {checkMatchingRules} from "../../shared/utils/rule-utils";
 
 export class ActionListsSubmodule extends GameModule {
 
@@ -10,12 +11,23 @@ export class ActionListsSubmodule extends GameModule {
 
         this.runningList = null;
 
+        this.listsAutotrigger = [];
+
+        this.autotriggerCD = 0;
+
+        this.automationEnabled = false;
+
         this.eventHandler.registerHandler('save-action-list', (payload) => {
             this.saveActionList(payload);
         })
 
         this.eventHandler.registerHandler('load-action-list', ({ id }) => {
             this.sendListData(id);
+        })
+
+        this.eventHandler.registerHandler('query-actions-lists', (pl) => {
+            const lists = this.getLists(pl);
+            this.eventHandler.sendData('actions-lists', lists);
         })
 
         this.eventHandler.registerHandler('run-list', ({ id }) => {
@@ -25,6 +37,11 @@ export class ActionListsSubmodule extends GameModule {
         this.eventHandler.registerHandler('stop-list', ({ id }) => {
             this.stopList(id);
         })
+
+        this.eventHandler.registerHandler('set-automation-enabled', ({ flag }) => {
+            this.automationEnabled = !!flag;
+        })
+
 
         this.eventHandler.registerHandler('query-action-list-effects', ({ id, listData }) => {
             const data = this.getListEffects(id, listData);
@@ -47,9 +64,6 @@ export class ActionListsSubmodule extends GameModule {
                     nPrv.value = Math.abs(nPrv.value);
                     nPrv.scope = 'consumption';
                 }
-
-                console.log('Prv: ', prev, effect, nPrv);
-
 
                 prevEffects.push(nPrv);
 
@@ -113,25 +127,66 @@ export class ActionListsSubmodule extends GameModule {
         if(isReopenEdit) {
             this.sendListData(list.id, true);
         }
+
+        this.regenerateListsPriorityMap()
     }
 
-    getLists() {
-        return Object.values(this.actionsLists);
+    regenerateListsPriorityMap() {
+        const listsBeingAutotrigger = Object.values(this.actionsLists).filter(one => !!one.autotrigger?.rules?.length);
+
+        this.listsAutotrigger = listsBeingAutotrigger.map(one => ({
+            id: one.id,
+            priority: one.autotrigger.priority ?? 0,
+        })).sort((a, b) => a.priority - b.priority);
+    }
+
+    getLists(pl) {
+        let ls = Object.values(this.actionsLists);
+
+        if(pl?.filterAutomated) {
+            ls = ls.filter(one => one.autotrigger?.rules?.length);
+        }
+        return ls;
     }
 
     save() {
         return {
             list: this.actionsLists,
             runningList: this.runningList,
+            automationEnabled: this.automationEnabled,
         }
     }
 
     load(obj) {
         this.actionsLists = obj?.list ?? []
         this.runningList = obj?.runningList ?? null;
+        this.automationEnabled = obj?.automationEnabled;
+        this.regenerateListsPriorityMap();
+    }
+
+    getAutotriggerList() {
+        for(const list of this.listsAutotrigger) {
+            if(checkMatchingRules(this.actionsLists[list.id]?.autotrigger?.rules)) {
+                return list.id;
+            }
+        }
+        return null;
     }
 
     tick(game, delta) {
+        // Here we checking autotrigger
+        if(this.automationEnabled && this.listsAutotrigger.length && this.autotriggerCD <= 0) {
+            this.autotriggerCD = 2;
+            const autotrigger = this.getAutotriggerList();
+
+            if(autotrigger && this.runningList !== autotrigger) {
+                console.log('Run list autotrigger: ', autotrigger, this.listsAutotrigger);
+                this.runList(autotrigger);
+            }
+        }
+
+        this.autotriggerCD -= delta;
+
         if (this.runningList) {
             const listToRun = this.actionsLists[this.runningList.id];
             if (!listToRun) {
@@ -157,7 +212,7 @@ export class ActionListsSubmodule extends GameModule {
                     }
 
                     action = listToRun.actions[this.runningList.actionIndex];
-                    isAvailable = gameEntity.isEntityUnlocked(action.id) && !gameEntity.isCapped(action.id);
+                    isAvailable = action && gameEntity.isEntityUnlocked(action.id) && !gameEntity.isCapped(action.id);
                     loops++;
                 } while (!isAvailable && loops < maxLoops);
 
@@ -197,7 +252,7 @@ export class ActionListsSubmodule extends GameModule {
     sendListData(id, bForceOpen = false) {
         const data = this.actionsLists[id];
 
-        data.actions = data.actions.map(a => ({
+        data.actions = (data.actions || []).map(a => ({
             ...a,
             isAvailable: gameEntity.isEntityUnlocked(a.id) && !gameEntity.isCapped(a.id)
         }))

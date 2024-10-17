@@ -339,6 +339,7 @@ export class ActionsModule extends GameModule {
             runningList: this.lists.runningList,
             actionListsUnlocked: gameEntity.getLevel('shop_item_notebook') > 0,
             actionCategories: Object.values(perCats).filter(cat => cat.items.length > 0),
+            automationEnabled: this.lists.automationEnabled,
         }
     }
 
