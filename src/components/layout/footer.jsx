@@ -104,6 +104,9 @@ export const Footer = () => {
             <div className={'time-spent'}>
                 {secondsToString(mageData.timeSpent)}
             </div>
+            <div className={'unlocks'}>
+                <span className={'unlock'} onClick={() => setActivePopup('unlocks')}>View Unlocks</span>
+            </div>
         </div>) : null}
         {overlayPositions.map((position, index) => (
             <FlashOverlay key={index} position={position} className={'powerful-splash'}/>

@@ -47,6 +47,25 @@ const customStyles = {
     }),
 };
 
+const mapRuleCond = cond => {
+    if(cond === 'less') {
+        return '<';
+    }
+    if(cond === 'less_or_eq') {
+        return '<=';
+    }
+    if(cond === 'eq') {
+        return '=';
+    }
+    if(cond === 'grt_or_eq') {
+        return '>=';
+    }
+    if(cond === 'grt') {
+        return '>';
+    }
+    return cond;
+}
+
 
 const RulesList = React.memo(({ rules, isEditing, resources, setRuleValue, deleteRule }) => {
 
@@ -99,7 +118,7 @@ const RulesList = React.memo(({ rules, isEditing, resources, setRuleValue, delet
                             <option value="grt">Greater</option>
                         </select>
                     ) : (
-                        <span>{rule.condition}</span>
+                        <span>{mapRuleCond(rule.condition)}</span>
                     )}
                 </div>
                 <div className="col value_type">

@@ -53,6 +53,7 @@ export class MainModule extends GameModule {
         this.eventHandler.registerHandler('query-unlocks', () => {
             const unlocks = {
                 'actions': true,
+                'actionLists': gameEntity.getLevel('shop_item_notebook') > 0,
                 'shop': gameCore.getModule('shop').isUnlocked,
                 'inventory': gameEntity.getLevel('shop_item_backpack') > 0,
                 'property': gameEntity.getLevel('shop_item_tent') > 0,

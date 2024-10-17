@@ -1,5 +1,5 @@
 import {GameModule} from "../../shared/game-module";
-import {gameEffects} from "game-framework";
+import {gameEffects, gameEntity} from "game-framework";
 import {registerAttributes} from "./attributes-db";
 
 export class AttributesModule extends GameModule {
@@ -10,6 +10,10 @@ export class AttributesModule extends GameModule {
 
         this.eventHandler.registerHandler('query-attributes-data', (payload) => {
             this.sendAttributesData()
+        })
+
+        this.eventHandler.registerHandler('query-attributes-unlocks', (payload) => {
+            this.sendAttributesUnlocks()
         })
     }
 
@@ -32,6 +36,12 @@ export class AttributesModule extends GameModule {
 
     }
 
+    getAttributesUnlocks() {
+        const items = gameEffects.listEffectsByTags(['attribute'])
+            .filter(one => one.isUnlocked && one.nextUnlock);
+        return items;
+    }
+
 
     getAttributesData() {
         const effects = gameEffects.listEffectsByTags(['attribute']);
@@ -42,6 +52,11 @@ export class AttributesModule extends GameModule {
         return {
             list,
         }
+    }
+
+    sendAttributesUnlocks() {
+        const data = this.getAttributesUnlocks();
+        this.eventHandler.sendData('attributes-unlocks', data);
     }
 
     sendAttributesData() {

@@ -213,7 +213,7 @@ p.hint {
 }
 
 .footer .mage-wrap .xp {
-    width: calc(100% - 200px);
+    width: calc(100% - 280px);
 }
 
 .footer .mage-wrap .mage-xp-bar {
@@ -233,6 +233,15 @@ p.hint {
 .footer .mage-wrap .level-up-wrap {
     padding-left: 16px;
     position: relative;
+}
+
+.footer .mage-wrap .unlocks {
+    margin-left: 12px;
+    cursor: pointer;
+}
+
+.footer .mage-wrap .unlocks .unlock:hover {
+    color: var(--highlight);
 }
 
 .flex-container {
@@ -619,6 +628,8 @@ h4 {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    width: 300px;
+    margin-right: 12px;
 }
 
 .action-lists-panel .flex-container .panel-col.current-list  * {
@@ -965,13 +976,17 @@ h4 {
 }
 
 .lists-editor .list-selector {
-    width: 260px;
+    width: 320px;
 }
 
 .lists-editor .list-selector .list-item-row {
     align-items: center;
     justify-content: space-between;
     flex-wrap: nowrap;
+}
+
+.lists-editor .list-selector .list-item-row .icon-content {
+    margin: 2px 4px;
 }
 
 .lists-editor .list-selector .list-item-row .list-name {
@@ -1059,4 +1074,26 @@ h4 {
 .automations-box .arrow-down {
     padding: 4px;
     font-size: 24px;
+}
+
+.unlocks-map {
+    height: 100%;
+}
+
+.unlocks-inner h5 {
+    font-size: 16px;
+    margin: 8px;
+}
+
+.unlocks-inner .flex-container {
+    justify-content: space-between;
+    display: flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-bottom: 1px solid #777777;
+}
+
+.unlocks-inner .flex-container p {
+    font-size: 14px;
+    margin: 0;
 }

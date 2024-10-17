@@ -540,6 +540,9 @@ export const ActionDetailsComponent = React.memo(({...action}) => {
                     {action.description}
                 </div>
             </div>
+            {action.nextUnlock ? (<div className={'unlock block'}>
+                <p className={'hint'}>Next unlock at level {formatInt(action.nextUnlock.level)}</p>
+            </div> ) : null}
             <div className={'block'}>
                 <div className={'tags-container'}>
                     {action.tags.map(tag => (<div className={'tag'}>{tag}</div> ))}
@@ -645,8 +648,12 @@ export const ActionListsPanel = ({ runningList, editListToDetails, lists, viewLi
     }
 
     const runList = (id) => {
-        sendData('run-list', { id })
-        console.log('Selected list: ', id, '. Running TBD');
+        sendData('run-list', { id });
+    }
+
+    const onDelete = (id) => {
+        sendData('delete-action-list', { id });
+        setOpenedFor('edit');
     }
 
     return (<div className={'action-lists-panel'}>
@@ -667,7 +674,7 @@ export const ActionListsPanel = ({ runningList, editListToDetails, lists, viewLi
             </div>
             <div className={'lists-editor panel-col'}>
                 <button onClick={(e) => { e.stopPropagation(); setOpenedFor('edit')}}>Pick list</button>
-                <ActionListsPopup lists={lists} isOpened={openedFor === 'edit'} setOpenedFor={setOpenedFor} onSelect={editList} onRun={runList} onHover={viewListToDetails}/>
+                <ActionListsPopup lists={lists} isOpened={openedFor === 'edit'} setOpenedFor={setOpenedFor} onSelect={editList} onRun={runList} onHover={viewListToDetails} onDelete={onDelete}/>
             </div>
             <div className={'automation-enabled panel-col'}>
                 <label>
@@ -679,7 +686,7 @@ export const ActionListsPanel = ({ runningList, editListToDetails, lists, viewLi
     </div>)
 }
 
-export const ActionListsPopup = ({ lists, isOpened, setOpenedFor, onSelect, onHover, onRun }) => {
+export const ActionListsPopup = ({ lists, isOpened, setOpenedFor, onSelect, onHover, onRun, onDelete }) => {
 
     if(!isOpened) return null;
 
@@ -695,6 +702,11 @@ export const ActionListsPopup = ({ lists, isOpened, setOpenedFor, onSelect, onHo
                 <TippyWrapper content={<div className={'hint-popup'}>Edit List</div> }>
                     <div className={'icon-content edit-icon interface-icon small'} onClick={() => onSelect(list.id)}>
                         <img src={"icons/interface/edit-icon.png"}/>
+                    </div>
+                </TippyWrapper>
+                <TippyWrapper content={<div className={'hint-popup'}>Delete List</div> }>
+                    <div className={'icon-content edit-icon interface-icon small'} onClick={() => onDelete(list.id)}>
+                        <img src={"icons/interface/delete.png"}/>
                     </div>
                 </TippyWrapper>
             </div>
@@ -750,6 +762,8 @@ export const ListEditor = React.memo(({
     const deleteAutotriggerRule = index => {
         onDeleteAutotriggerRule(index);
     }
+
+    if(!editing) return ;
 
     return (<div className={'list-editor'}>
         <div className={'main-wrap'}>
@@ -816,8 +830,8 @@ export const ListEditor = React.memo(({
             />
         </div>
         {isEditing ? (<div className={'buttons'}>
-            <button onClick={() => saveAndClose(false)}>{listData.id ? 'Save' : 'Create'}</button>
-            <button onClick={() => saveAndClose(true)}>{listData.id ? 'Save & Close' : 'Create & Close'}</button>
+            <button onClick={() => saveAndClose(false)}>{listData?.id ? 'Save' : 'Create'}</button>
+            <button onClick={() => saveAndClose(true)}>{listData?.id ? 'Save & Close' : 'Create & Close'}</button>
             <button onClick={onCloseList}>Cancel</button>
         </div>) : null}
     </div> )

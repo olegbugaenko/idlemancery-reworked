@@ -14,7 +14,7 @@ export class SpellModule extends GameModule {
             this.useSpell(payload.id, payload.amount);
         })
         this.eventHandler.registerHandler('query-spell-data', (payload) => {
-            this.sendSpellData()
+            this.sendSpellData(payload)
         })
 
         this.eventHandler.registerHandler('query-spell-details', (payload) => {
@@ -215,9 +215,20 @@ export class SpellModule extends GameModule {
         }
     }
 
-    getSpellsData() {
+    getSpellsData(payload) {
         const items = gameEntity.listEntitiesByTags(['spell']);
-        const presentSpells = items.filter(item => item.isUnlocked);
+        let presentSpells = items.filter(item => item.isUnlocked);
+
+        if(payload?.filterAutomated) {
+            presentSpells = presentSpells.filter(one => this.spells[one.id]?.autocast?.rules?.length)
+        }
+
+        if(payload?.includeAutomations) {
+            presentSpells = presentSpells.map(spell => ({
+                ...spell,
+                autocast: this.spells[spell.id]?.autocast,
+            }))
+        }
         
         return {
             available: presentSpells.map(spell => ({
@@ -231,9 +242,13 @@ export class SpellModule extends GameModule {
         }
     }
 
-    sendSpellData() {
-        const data = this.getSpellsData();
-        this.eventHandler.sendData('spell-data', data);
+    sendSpellData(payload) {
+        const data = this.getSpellsData(payload);
+        let label = 'spell-data';
+        if(payload?.prefix) {
+            label = `${label}-${payload.prefix}`;
+        }
+        this.eventHandler.sendData(label, data);
     }
 
     getSpellDetails(id) {

@@ -21,6 +21,10 @@ export class ActionListsSubmodule extends GameModule {
             this.saveActionList(payload);
         })
 
+        this.eventHandler.registerHandler('delete-action-list', ({id}) => {
+            this.deleteActionList(id);
+        })
+
         this.eventHandler.registerHandler('load-action-list', ({ id }) => {
             this.sendListData(id);
         })
@@ -122,13 +126,17 @@ export class ActionListsSubmodule extends GameModule {
 
         this.actionsLists[list.id] = list;
 
-        console.log('isReopenEdit: ', isReopenEdit, list);
-
         if(isReopenEdit) {
             this.sendListData(list.id, true);
         }
 
         this.regenerateListsPriorityMap()
+    }
+
+    deleteActionList(id) {
+        delete this.actionsLists[id];
+
+        this.regenerateListsPriorityMap();
     }
 
     regenerateListsPriorityMap() {
@@ -176,11 +184,11 @@ export class ActionListsSubmodule extends GameModule {
     tick(game, delta) {
         // Here we checking autotrigger
         if(this.automationEnabled && this.listsAutotrigger.length && this.autotriggerCD <= 0) {
-            this.autotriggerCD = 2;
+            this.autotriggerCD = 10;
             const autotrigger = this.getAutotriggerList();
 
-            if(autotrigger && this.runningList !== autotrigger) {
-                console.log('Run list autotrigger: ', autotrigger, this.listsAutotrigger);
+            if(autotrigger && this.runningList?.id !== autotrigger) {
+                console.log('Run list autotrigger: ', autotrigger, this.runningList?.id, this.listsAutotrigger);
                 this.runList(autotrigger);
             }
         }

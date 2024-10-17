@@ -55,6 +55,7 @@ List fixes:
 [V] Add auto-trigger rules for list (with priority setup)
 [V] Review component re-renders
 [X] Add auto-purchase
-[V/-] Create separate "Automations" tab under settings (Add spells and test)
-Make Popups closed by clicking outside
+[V] Create separate "Automations" tab under settings (Add spells and test)
+[V] Make Popups closed by clicking outside
+Make lists doing all included actions simultaneously, while sharing focus
 Show ETA's on learning/resource availability

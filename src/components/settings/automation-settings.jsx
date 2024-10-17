@@ -13,8 +13,11 @@ export const AutomationsSettings = () => {
 
     const [resources, setResources] = useState(null);
 
+    const [unlocks, setUnlocksData] = useState({});
+
     useEffect(() => {
         sendData('query-all-resources', {});
+        sendData('query-unlocks', {});
 
     }, [])
 
@@ -22,11 +25,23 @@ export const AutomationsSettings = () => {
         setResources(payload);
     })
 
+    onMessage('unlocks', (unlocks) => {
+        setUnlocksData(unlocks);
+    })
+
+    if(!unlocks.actionLists && !unlocks.inventory && !unlocks.spellbook) {
+        return (<div className={'inner-settings-wrap automations-wrap'}>
+            <h4>You haven't unlocked any automations yet :=(</h4>
+            <p>Don't worry, you'll unlock them pretty soon</p>
+        </div>)
+    }
+
     return (<div className={'inner-settings-wrap automations-wrap'}>
         <PerfectScrollbar>
-            <ActionsAutomations resources={resources}/>
-            <SellAutomations resources={resources} />
-            <ConsumeAutomations resources={resources} />
+            {unlocks.actionLists ? (<ActionsAutomations resources={resources}/>) : null}
+            {unlocks.inventory ? (<SellAutomations resources={resources}/>) : null}
+            {unlocks.inventory ? (<ConsumeAutomations resources={resources} />) : null}
+            {unlocks.spellbook ? (<SpellAutomations resources={resources} />) : null}
         </PerfectScrollbar>
     </div> )
 }
@@ -212,6 +227,68 @@ export const AutomatedSell = ({ auto, resources, onSaveSell }) => {
         id={auto.id}
         name={auto.name}
         rules={auto.autosell.rules}
+        resources={resources}
+        isPriorityShown={false}
+        onSave={onSave}
+    />
+
+}
+
+
+export const SpellAutomations = ({ resources }) => {
+
+    const worker = useContext(WorkerContext);
+    const { onMessage, sendData } = useWorkerClient(worker);
+    const [automations, setAutomations] = useState([]);
+    const [isOpened, setOpened] = useState(false);
+
+    useEffect(() => {
+        sendData('query-spell-data', { filterAutomated: true, includeAutomations: true, prefix: 'autocast' })
+    }, []);
+
+    onMessage('spell-data-autocast', (data) => {
+        console.log('SPELLS: ', data);
+
+        setAutomations(data.available);
+
+    })
+
+    const onSaveSpell = useCallback((id, saveData) => {
+        const prev = automations.find(a => a.id === id);
+        const toSave = {
+            ...prev,
+            autocast: {
+                rules: saveData.rules,
+            }
+        }
+        console.log('Saving spell: ', toSave);
+        sendData('save-spell-settings', toSave);
+    })
+
+    if(!automations || !automations.length || !resources) return;
+
+    return (<div className={`automations-box ${isOpened ? 'opened' : 'closed'}`}>
+        <div className={'automation-panel-title'} onClick={() => setOpened(!isOpened)}>
+            <h4>Spell Automations</h4>
+            <span className={'arrow-down'}>&#8681;</span>
+        </div>
+        <div className={'automated-list'}>
+            {automations.map(auto => (<AutomatedSpell auto={auto} resources={resources} onSaveSpell={onSaveSpell}/>))}
+        </div>
+    </div> )
+
+}
+
+export const AutomatedSpell = ({ auto, resources, onSaveSpell }) => {
+
+    const onSave = useCallback((id, data) => {
+        onSaveSpell(id, data);
+    })
+
+    return <AutomatedItem
+        id={auto.id}
+        name={auto.name}
+        rules={auto.autocast.rules}
         resources={resources}
         isPriorityShown={false}
         onSave={onSave}

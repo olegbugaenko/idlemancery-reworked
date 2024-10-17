@@ -322,6 +322,49 @@ export const registerFurnitureStage1 = () => {
         }),
     })
 
+    gameEntity.registerGameEntity('furniture_workout_bench', {
+        tags: ["furniture", "upgrade", "purchaseable"],
+        name: 'Workout Bench',
+        description: 'Provide some elementary inventory to improve physical training efficiency, like Training Endurance',
+        level: 0,
+        maxLevel: 4,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_tent') > 3;
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'physical_training_learn_speed': {
+                        A: 0.25,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 1,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 150*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 2,
+                type: 0
+            }
+        }),
+    })
+
     gameEntity.registerGameEntity('furniture_magic_orb', {
         tags: ["furniture", "upgrade", "purchaseable"],
         name: 'Magic Orb',

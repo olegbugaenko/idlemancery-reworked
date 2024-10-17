@@ -2,6 +2,7 @@ import React, {useEffect} from "react";
 import { useAppContext } from '../../context/ui-context';
 import {PopupComponent} from "./popup-component.jsx";
 import {Skills} from "../mage/skills.jsx";
+import {UnlocksList} from "../mage/unlocks.jsx";
 
 export const Popup = () => {
 
@@ -25,6 +26,14 @@ export const Popup = () => {
         return (
             <PopupComponent title={'Skills'}>
                 <Skills />
+            </PopupComponent>
+        )
+    }
+
+    if(activePopup === 'unlocks') {
+        return (
+            <PopupComponent title={'Upcoming Unlocks Requirements'}>
+                <UnlocksList />
             </PopupComponent>
         )
     }

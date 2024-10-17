@@ -9,6 +9,8 @@ import {ResourceCost} from "../shared/resource-cost.jsx";
 import CircularProgress from "../shared/circular-progress.jsx";
 import {FlashOverlay} from "../layout/flash-overlay.jsx";
 import {useFlashOnLevelUp} from "../../general/hooks/flash";
+import RulesList from "../shared/rules-list.jsx";
+import {cloneDeep} from "lodash";
 
 export const Spellbook = ({}) => {
 
@@ -73,8 +75,6 @@ export const Spellbook = ({}) => {
         sendData('use-spell', { id, amount: 1 })
     })
 
-    console.log('RR: ', detailOpenedId, isChanged);
-
     const setSpellDetailsEdit = useCallback(({id, name}) => {
         if(id) {
             console.log('Edit: ', id, detailOpenedId, isChanged);
@@ -101,7 +101,7 @@ export const Spellbook = ({}) => {
 
     const onAddAutoconsumeRule = useCallback(() => {
         if(editData) {
-            const newEdit = editData;
+            const newEdit = cloneDeep(editData);
             newEdit.autocast.rules.push({
                 resource_id: resources[0].id,
                 condition: 'less_or_eq',
@@ -115,7 +115,7 @@ export const Spellbook = ({}) => {
 
     const onDeleteAutoconsumeRule = useCallback((index) => {
         if(editData) {
-            const newEdit = editData;
+            const newEdit = cloneDeep(editData);
             newEdit.autocast.rules.splice(index)
             setEditData(newEdit);
             setChanged(true);
@@ -124,7 +124,7 @@ export const Spellbook = ({}) => {
 
     const onSetAutoconsumeRuleValue = useCallback((index, key, value) => {
         if(editData) {
-            const newEdit = editData;
+            const newEdit = cloneDeep(editData);
             newEdit.autocast.rules[index] = {
                 ...newEdit.autocast.rules[index],
                 [key]: value
@@ -231,7 +231,7 @@ export const SpellCard = React.memo(({ id, isChanged, name, isCasted, cooldownPr
     return true;
 }))
 
-export const SpellDetails = ({isChanged, editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onSave, onCancel}) => {
+export const SpellDetails = React.memo(({isChanged, editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onSave, onCancel}) => {
 
     const item = viewedData ? viewedData : editData;
 
@@ -286,48 +286,14 @@ export const SpellDetails = ({isChanged, editData, viewedData, resources, onAddA
                         {isEditing ? (<button onClick={addAutoconsumeRule}>Add rule (AND)</button>) : null}
                     </div>
 
-                    <div className={'rules'}>
-                        {item.autocast?.rules?.map((rule, index) => (
-                            <div className={'rule row add-row'}>
-                                <div className={'col subject'}>
-                                    {isEditing ? (<select name={'resource_id'} onChange={e => setAutoconsumeRuleValue(index, 'resource_id', e.target.value)}>
-                                        {resources.map(r => (<option id={r.id} value={r.id} selected={rule.resource_id === r.id}>{r.name}</option>))}
-                                    </select>) : <span>{resources.find(r => r.id === rule.resource_id)?.name || 'Invalid'}</span>}
-                                </div>
-                                <div className={'col condition'}>
-                                    {isEditing ? (<select name={'condition'} onChange={e => setAutoconsumeRuleValue(index, 'condition', e.target.value)}>
-                                        <option id={'less'} value={'less'} selected={rule.condition === 'less'}>Less</option>
-                                        <option id={'less_or_eq'} value={'less_or_eq'} selected={rule.condition === 'less_or_eq'}>Less or Equal</option>
-                                        <option id={'eq'} value={'eq'} selected={rule.condition === 'eq'}>Equal</option>
-                                        <option id={'grt_or_eq'} value={'grt_or_eq'} selected={rule.condition === 'grt_or_eq'}>Greater or Equal</option>
-                                        <option id={'grt'} value={'grt'} selected={rule.condition === 'grt'}>Greater</option>
-                                    </select>) : (<span>{rule.condition}</span>)}
-                                </div>
-                                <div className={'col value_type'}>
-                                    {isEditing ? (<select name={'value_type'} onChange={e => setAutoconsumeRuleValue(index, 'value_type', e.target.value)}>
-                                        <option id={'exact'} value={'exact'} selected={rule.value_type === 'exact'}>Exact</option>
-                                        <option id={'percentage'} value={'percentage'} selected={rule.value_type === 'percentage'}>Percentage</option>
-                                    </select>) : (<span>{rule.value_type}</span>)}
-                                </div>
-                                <div className={'col value'}>
-                                    {isEditing ? (
-                                        <input
-                                            type={'number'}
-                                            onChange={e => setAutoconsumeRuleValue(index, 'value', e.target.value)}
-                                            value={rule.value_type === 'percentage' ? Math.min(100, Math.max(0, rule.value)) : Math.max(0, rule.value)}
-                                            max={rule.value_type === 'percentage' ? 1 : undefined}
-                                            step={rule.value_type === 'percentage' ? 5 : 1}
-                                        />
-                                        ) : (<span>{rule.value}</span>)}
-                                </div>
-                                {isEditing ? (<div className={'col delete-rule'}>
-                                    <span className={'close'} onClick={e => deleteAutoconsumeRule(index)}>
-                                        X
-                                    </span>
-                                </div> ) : null}
-                            </div>
-                        ))}
-                    </div>
+                    <RulesList
+                        isEditing={isEditing}
+                        rules={item.autocast?.rules || []}
+                        resources={resources}
+                        deleteRule={deleteAutoconsumeRule}
+                        setRuleValue={setAutoconsumeRuleValue}
+                    />
+
                 </div>
                 {isEditing ? (<div className={'buttons flex-container'}>
                     <button disabled={!isChanged} onClick={onSave}>Save</button>
@@ -336,4 +302,21 @@ export const SpellDetails = ({isChanged, editData, viewedData, resources, onAddA
             </div>
         </PerfectScrollbar>
     )
-}
+}, (prevProps, currentProps) => {
+
+    if(prevProps.isChanged !== currentProps.isChanged) {
+        //console.log('isChanged: ', prevProps.isChanged, currentProps.isChanged)
+        return false;
+    }
+
+    if(prevProps.editData !== currentProps.editData) {
+        return false;
+    }
+
+    if(prevProps.viewedData !== currentProps.viewedData) {
+        //console.log('viewedChng: ', prevProps.viewedData, currentProps.viewedData)
+        return false;
+    }
+
+    return true;
+});

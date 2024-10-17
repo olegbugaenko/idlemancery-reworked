@@ -24,6 +24,10 @@ export class ActionsModule extends GameModule {
             this.sendActionsData(this.selectedFilterId)
         })
 
+        this.eventHandler.registerHandler('query-actions-unlocks', () => {
+            this.sendActionsUnlocks()
+        })
+
         this.eventHandler.registerHandler('query-action-details', (payload) => {
             this.sendActionDetails(payload.id)
         })
@@ -110,6 +114,12 @@ export class ActionsModule extends GameModule {
             minValue: 1,
         })
 
+        gameEffects.registerEffect('physical_training_learn_speed', {
+            name: 'Physical Training Learning',
+            defaultValue: 1.,
+            minValue: 1,
+        })
+
         registerActionsStage1();
         this.actions = {};
 
@@ -129,6 +139,7 @@ export class ActionsModule extends GameModule {
             name: 'Idling',
             level: 0,
         })
+
     }
 
     getActionXPMax(id) {
@@ -276,6 +287,15 @@ export class ActionsModule extends GameModule {
         }
     }
 
+    getActionsUnlocks() {
+        const items = gameEntity
+            .listEntitiesByTags(['action'])
+            .filter(one => one.isUnlocked && !one.isCapped && one.nextUnlock);
+
+        console.log('Items: ', items);
+        return items;
+    }
+
     getActionsData(filterId) {
         // const entities = gameEntity.listEntitiesByTags(['action']).filter(one => one.isUnlocked && !one.isCapped);
         const perCats = this.filters.reduce((acc, filter) => {
@@ -384,7 +404,8 @@ export class ActionsModule extends GameModule {
             tags: entity.tags,
             primaryAttribute: entity.attributes?.primaryAttribute ? gameEffects.getEffect(entity.attributes.primaryAttribute) : null,
             primaryAttributeEffect: entity.attributes?.primaryAttribute ? entity.getPrimaryEffect() : 1,
-            isTraining: gameEntity.getAttribute(entity.id, 'isTraining')
+            isTraining: gameEntity.getAttribute(entity.id, 'isTraining'),
+            nextUnlock: entity.nextUnlock,
         };
 
         return entityData;
@@ -398,6 +419,11 @@ export class ActionsModule extends GameModule {
     sendActionDetails(id) {
         const data = this.getActionData(id);
         this.eventHandler.sendData('action-details', data);
+    }
+
+    sendActionsUnlocks() {
+        const data = this.getActionsUnlocks();
+        this.eventHandler.sendData('actions-unlocks', data);
     }
 
 }

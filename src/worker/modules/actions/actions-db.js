@@ -78,9 +78,11 @@ export const registerActionsStage1 = () => {
         description: 'Visit city to find new jobs and opportunities',
         level: 1,
         maxLevel: 2,
-        unlockCondition: () => {
-            return gameEntity.getLevel('action_walk') > 1
-        },
+        unlockedBy: [{
+            type: 'entity',
+            id: 'action_walk',
+            level: 2,
+        }],
         attributes: {
             baseXPCost: 10,
         }
@@ -114,9 +116,50 @@ export const registerActionsStage1 = () => {
             }),
             effectDeps: ['begging_efficiency', 'coins_earned_bonus']
         },
-        unlockCondition: () => {
-            return gameEntity.getLevel('action_visit_city') > 1
+        unlockedBy: [{
+            type: 'entity',
+            id: 'action_visit_city',
+            level: 2,
+        }],
+        attributes: {
+            baseXPCost: 20,
+            primaryAttribute: 'attribute_charisma'
+        }
+    })
+
+    registerGameAction('action_street_musician', {
+        tags: ["action", "job", "politician"],
+        name: 'Street Musician',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Strange over city streets hoping for someones help',
+        level: 1,
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'coins': {
+                        A: 0.025*gameEffects.getEffectValue('coins_earned_bonus'),
+                        B: 0.225*gameEffects.getEffectValue('coins_earned_bonus'),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0,
+                        B: 1.0,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['begging_efficiency', 'coins_earned_bonus']
         },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_charisma',
+            level: 10,
+        }],
         attributes: {
             baseXPCost: 20,
             primaryAttribute: 'attribute_charisma'
@@ -134,8 +177,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'coins': {
-                        A: 0.03*gameEffects.getEffectValue('clean_stable_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
-                        B: 0.3*gameEffects.getEffectValue('clean_stable_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
+                        A: 0.04*gameEffects.getEffectValue('clean_stable_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
+                        B: 0.4*gameEffects.getEffectValue('clean_stable_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
                         type: 0,
                     }
                 }
@@ -149,16 +192,18 @@ export const registerActionsStage1 = () => {
                     },
                     'health': {
                         A: 0.0,
-                        B: 1.5,
+                        B: 0.75,
                         type: 0,
                     }
                 }
             }),
             effectDeps: ['coins_earned_bonus', 'clean_stable_efficiency']
         },
-        unlockCondition: () => {
-            return gameEntity.getLevel('action_pushup') > 4
-        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 5,
+        }],
         attributes: {
             baseXPCost: 20,
             primaryAttribute: 'attribute_strength'
@@ -199,9 +244,11 @@ export const registerActionsStage1 = () => {
             }),
             effectDeps: ['coins_earned_bonus']
         },
-        unlockCondition: () => {
-            return gameEntity.getLevel('action_pushup') > 25
-        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 50,
+        }],
         attributes: {
             baseXPCost: 20,
             primaryAttribute: 'attribute_strength'
@@ -245,8 +292,13 @@ export const registerActionsStage1 = () => {
             }),
             effectDeps: []
         },
+        unlockedBy: [{
+            type: 'entity',
+            id: 'action_visit_city',
+            level: 2,
+        }],
         unlockCondition: () => {
-            return gameEntity.getLevel('action_visit_city') > 1 && gameEntity.getLevel('shop_item_tent') < 1
+            return gameEntity.getLevel('shop_item_tent') < 1
         },
         attributes: {
             baseXPCost: 1.e+10,
@@ -280,9 +332,15 @@ export const registerActionsStage1 = () => {
             }),
             effectDeps: ['rest_efficiency']
         },
-        unlockCondition: () => {
-            return gameEntity.getLevel('action_visit_city') > 1 && gameEntity.getLevel('shop_item_tent') >= 1
-        },
+        unlockedBy: [{
+            type: 'entity',
+            id: 'action_visit_city',
+            level: 2,
+        },{
+            type: 'entity',
+            id: 'shop_item_tent',
+            level: 1,
+        }],
         attributes: {
             baseXPCost: 1.e+10,
         }
@@ -317,10 +375,11 @@ export const registerActionsStage1 = () => {
             },
             effectDeps: []
         },
-        unlockCondition: () => {
-            // console.log('Beggar level: ', gameEntity.getLevel('action_beggar'));
-            return gameEntity.getLevel('action_beggar') > 4
-        },
+        unlockedBy: [{
+            type: 'entity',
+            id: 'action_beggar',
+            level: 5,
+        }],
         attributes: {
             baseXPCost: 50,
             isTraining: true,
@@ -361,6 +420,11 @@ export const registerActionsStage1 = () => {
             effectDeps: [],
             reourcesToReassert: ['health']
         },
+        unlockedBy: [{
+            type: 'entity',
+            id: 'action_walk',
+            level: 20,
+        }],
         unlockCondition: () => {
             return gameEntity.getLevel('action_walk') > 19
         },
@@ -608,9 +672,11 @@ export const registerActionsStage1 = () => {
                 }
             }),
         },
-        unlockCondition: () => {
-            return gameEffects.getEffectValue('attribute_patience') >= 5
-        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 5,
+        }],
         attributes: {
             baseXPCost: 50,
             isTraining: true,
@@ -725,6 +791,9 @@ export const registerActionsStage1 = () => {
         allowedImpacts: ['effects'],
         description: 'Take some exercises in local gym to improve your body',
         level: 1,
+        getLearnRate: () => {
+            return gameEffects.getEffectValue('physical_training_learn_speed')
+        },
         resourceModifier: {
             get_income: () => ({
                 effects: {
@@ -746,9 +815,11 @@ export const registerActionsStage1 = () => {
             }),
             effectDeps: ['read_books_efficiency']
         },
-        unlockCondition: () => {
-            return gameEffects.getEffectValue('attribute_strength') >= 5
-        },
+        unlockedBy: [{
+            type: 'entity',
+            id: 'action_pushup',
+            level: 5,
+        }],
         attributes: {
             baseXPCost: 50,
             displayPerLevel: 1,
@@ -800,8 +871,13 @@ export const registerActionsStage1 = () => {
             }),
             effectDeps: ['gathering_efficiency']
         },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 20,
+        }],
         unlockCondition: () => {
-            return gameResources.getResource('health').cap >= 20 && gameEntity.getLevel('shop_item_backpack') > 0
+            return gameEntity.getLevel('shop_item_backpack') > 0
         },
         attributes: {
             baseXPCost: 50,
@@ -852,8 +928,13 @@ export const registerActionsStage1 = () => {
             }),
             effectDeps: ['gathering_efficiency']
         },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 25,
+        }],
         unlockCondition: () => {
-            return gameResources.getResource('health').cap >= 25 && gameEntity.getLevel('shop_item_backpack') > 0
+            return gameEntity.getLevel('shop_item_backpack') > 0
                 && gameEntity.getLevel('shop_item_herbs_handbook_1') > 0
         },
         attributes: {
