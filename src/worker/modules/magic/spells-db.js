@@ -20,18 +20,18 @@ export const initSpellsDB1 = () => {
             get_income: () => ({
                 resources: {
                     knowledge: {
-                        A: 5,
-                        B: 0,
-                        type: 0,
+                        A: 1.2,
+                        B: 5,
+                        type: 1,
                     }
                 }
             }),
             get_consumption: () => ({
                 resources: {
                     mana: {
-                        A: 5,
-                        B: 0,
-                        type: 0,
+                        A: 1.5,
+                        B: 3,
+                        type: 1,
                     }
                 }
             })
@@ -39,6 +39,9 @@ export const initSpellsDB1 = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_spellbook') > 0
         },
+        attributes: {
+            xpOnCast: 20,
+        }
     })
 
     gameEntity.registerGameEntity('spell_focus', {
@@ -59,18 +62,18 @@ export const initSpellsDB1 = () => {
             multiplier: {
                 effects: {
                     learning_rate: {
-                        A: 0.5,
-                        B: 1,
-                        type: 0,
+                        A: 1.2,
+                        B: 1.25,
+                        type: 1,
                     }
                 }
             },
             consumption: {
                 resources: {
                     mana: {
-                        A: 0,
+                        A: 1.5,
                         B: 1,
-                        type: 0,
+                        type: 1,
                     }
                 }
             }
@@ -79,15 +82,16 @@ export const initSpellsDB1 = () => {
             get_consumption: () => ({
                 resources: {
                     mana: {
-                        A: 3,
-                        B: 0,
-                        type: 0,
+                        A: 1.5,
+                        B: 2,
+                        type: 1,
                     }
                 }
             })
         },
         attributes: {
             duration: 10,
+            xpOnCast: 20,
         },
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_spellbook') > 0
@@ -112,24 +116,24 @@ export const initSpellsDB1 = () => {
             get_consumption: () => ({
                 resources: {
                     mana: {
-                        A: 8,
-                        B: 0,
-                        type: 0,
+                        A: 1.5,
+                        B: 4,
+                        type: 1,
                     }
                 }
             }),
             get_income: () => ({
                 resources: {
                     health: {
-                        A: 10*gameEffects.getEffectValue('restoration_spells_efficiency'),
-                        B: 0,
-                        type: 0,
+                        A: 1.2,
+                        B: 10*gameEffects.getEffectValue('restoration_spells_efficiency'),
+                        type: 1,
                     }
                 }
             })
         },
         attributes: {
-
+            xpOnCast: 20,
         },
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_less_restoration') > 0
@@ -155,23 +159,23 @@ export const initSpellsDB1 = () => {
             get_income: () => ({
                 resources: {
                     health: {
-                        A: 0.5*gameEffects.getEffectValue('restoration_spells_efficiency'),
+                        A: 1.2,
                         B: 1.0*gameEffects.getEffectValue('restoration_spells_efficiency'),
-                        type: 0,
+                        type: 1,
                     },
                     energy: {
-                        A: 1*gameEffects.getEffectValue('restoration_spells_efficiency'),
+                        A: 1.2,
                         B: 2*gameEffects.getEffectValue('restoration_spells_efficiency'),
-                        type: 0,
+                        type: 1,
                     }
                 },
             }),
             consumption: {
                 resources: {
                     mana: {
-                        A: 0,
+                        A: 1.5,
                         B: 2,
-                        type: 0,
+                        type: 1,
                     }
                 }
             },
@@ -181,15 +185,16 @@ export const initSpellsDB1 = () => {
             get_consumption: () => ({
                 resources: {
                     mana: {
-                        A: 5,
-                        B: 0,
-                        type: 0,
+                        A: 1.5,
+                        B: 5/1.5,
+                        type: 1,
                     }
                 }
             })
         },
         attributes: {
             duration: 10,
+            xpOnCast: 20,
         },
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_less_restoration') > 0
@@ -214,7 +219,7 @@ export const initSpellsDB1 = () => {
             get_multiplier: () =>({
                 effects: {
                     coins_earned_bonus: {
-                        A: 0.1*gameEffects.getEffectValue('illusion_spells_efficiency'),
+                        A: 0.2*gameEffects.getEffectValue('illusion_spells_efficiency'),
                         B: 1.0 + 0.4*gameEffects.getEffectValue('illusion_spells_efficiency'),
                         type: 0,
                     }
@@ -223,9 +228,9 @@ export const initSpellsDB1 = () => {
             consumption: {
                 resources: {
                     mana: {
-                        A: 0.5,
-                        B: 0.5,
-                        type: 0,
+                        A: 1.5,
+                        B: 1,
+                        type: 1,
                     }
                 }
             },
@@ -235,15 +240,16 @@ export const initSpellsDB1 = () => {
             get_consumption: () => ({
                 resources: {
                     mana: {
-                        A: 3,
-                        B: 0,
-                        type: 0,
+                        A: 1.5,
+                        B: 4,
+                        type: 1,
                     }
                 }
             })
         },
         attributes: {
             duration: 20,
+            xpOnCast: 50,
         },
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_less_illusion') > 0
@@ -278,9 +284,9 @@ export const initSpellsDB1 = () => {
             consumption: {
                 resources: {
                     mana: {
-                        A: 0.5,
-                        B: 0.5,
-                        type: 0,
+                        A: 1.5,
+                        B: 1.0/1.5,
+                        type: 1,
                     }
                 }
             },
@@ -290,15 +296,16 @@ export const initSpellsDB1 = () => {
             get_consumption: () => ({
                 resources: {
                     mana: {
-                        A: 5,
-                        B: 0,
-                        type: 0,
+                        A: 1.5,
+                        B: 5./1.5,
+                        type: 1,
                     }
                 }
             })
         },
         attributes: {
             duration: 20,
+            xpOnCast: 50,
         },
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_less_illusion') > 0

@@ -787,6 +787,31 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+    gameEntity.registerGameEntity('shop_item_spellcraft', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Spellcraft',
+        description: 'Learn how to improve your spells by analyzing your mistakes and earning experience. Spells now can be leveled',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_meditation') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'knowledge': {
+                A: 1.5,
+                B: 120*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'coins': {
+                A: 1.5,
+                B: 15000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
 
     gameEntity.registerGameEntity('shop_item_better_stashes', {
         tags: ["shop", "upgrade", "purchaseable"],

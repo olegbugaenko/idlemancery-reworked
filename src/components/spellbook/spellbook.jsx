@@ -67,6 +67,18 @@ export const Spellbook = ({}) => {
 
     })
 
+    onMessage('spell-level-effects', (payload) => {
+        if(editData) {
+            setEditData({
+                ...editData,
+                effects: payload.effects,
+                potentialEffects: payload.potentialEffects,
+                affordable: payload.affordable,
+                xpRate: payload.xpRate,
+            });
+        }
+    })
+
     onMessage('spell-data', (spell) => {
         setItemsData(spell);
     })
@@ -98,6 +110,16 @@ export const Spellbook = ({}) => {
         setViewedOpenedId(id)
 
     })
+
+    const onChangeLevel = useCallback((level) => {
+        if(editData) {
+            const newEdit = cloneDeep(editData);
+            newEdit.actualLevel = level;
+            setEditData(newEdit);
+            setChanged(true);
+            sendData('get-spell-level-effects', { id: editData.id, level })
+        }
+    }, [editData])
 
     const onAddAutoconsumeRule = useCallback(() => {
         if(editData) {
@@ -171,7 +193,7 @@ export const Spellbook = ({}) => {
                 </PerfectScrollbar>
             </div>
             <div className={'item-detail ingame-box detail-blade'}>
-                {editData || viewedData ? (<SpellDetails isChanged={isChanged} editData={editData} viewedData={viewedData} resources={resources} onAddAutoconsumeRule={onAddAutoconsumeRule} onSetAutoconsumeRuleValue={onSetAutoconsumeRuleValue} onDeleteAutoconsumeRule={onDeleteAutoconsumeRule} onSave={onSave} onCancel={onCancel}/>) : null}
+                {editData || viewedData ? (<SpellDetails isChanged={isChanged} editData={editData} viewedData={viewedData} resources={resources} onAddAutoconsumeRule={onAddAutoconsumeRule} onSetAutoconsumeRuleValue={onSetAutoconsumeRuleValue} onDeleteAutoconsumeRule={onDeleteAutoconsumeRule} onChangeLevel={onChangeLevel} onSave={onSave} onCancel={onCancel}/>) : null}
             </div>
         </div>
 
@@ -231,7 +253,7 @@ export const SpellCard = React.memo(({ id, isChanged, name, isCasted, cooldownPr
     return true;
 }))
 
-export const SpellDetails = React.memo(({isChanged, editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onSave, onCancel}) => {
+export const SpellDetails = React.memo(({isChanged, editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onChangeLevel, onSave, onCancel}) => {
 
     const item = viewedData ? viewedData : editData;
 
@@ -267,6 +289,23 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
                         {item.tags.map(tag => (<div className={'tag'}>{tag}</div> ))}
                     </div>
                 </div>
+                {item.isSpellLevelingAvailable ? (<div className={'block'}>
+                    <div className={'bottom'}>
+                        <div className={'xp-box'}>
+                            <span className={'xp-text'}>XP: {formatInt(item.xp)}/{formatInt(item.maxXP)}</span>
+                            <span className={'xp-income'}>+{formatValue(item.xpRate)} / Cast</span>
+                        </div>
+                        <div>
+                            <ProgressBar className={'action-progress'} percentage={item.xp/item.maxXP}></ProgressBar>
+                        </div>
+                    </div>
+                    <div className={'set-level'}>
+                        <span>Set level to </span>
+                        <input type={'number'} value={item.actualLevel} min={1} max={item.maxLevel} onChange={e => onChangeLevel(+e.target.value)}/>
+                        <span>of {item.maxLevel}</span>
+                    </div>
+                    <p className={'hint'}>Increasing level will increase spells cost and consumption but also increase their output</p>
+                </div> ) : null}
                 <div className={'block'}>
                     <p>Effects on usage:</p>
                     <div className={'effects'}>

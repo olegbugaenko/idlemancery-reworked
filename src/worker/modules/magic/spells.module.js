@@ -24,6 +24,11 @@ export class SpellModule extends GameModule {
         this.eventHandler.registerHandler('save-spell-settings', payload => {
             this.saveSettings(payload)
         })
+
+        this.eventHandler.registerHandler('get-spell-level-effects', payload => {
+            const effects = this.querySpellEffects(payload.id, payload.level);
+            this.eventHandler.sendData('spell-level-effects', effects);
+        })
     }
 
     initialize() {
@@ -42,6 +47,26 @@ export class SpellModule extends GameModule {
 
         initSpellsDB1();
 
+    }
+
+    isSpellLevelingAvailable() {
+        return gameEntity.getLevel('shop_item_spellcraft') > 0;
+    }
+
+    getMaxXP(id, level) {
+        if(!level) {
+            level = this.spells[id]?.level || 1;
+        }
+        return 100*Math.pow(3, level)
+    }
+
+    getXPPerCast(id, level) {
+        if(!level) {
+            level = this.spells[id]?.actualLevel || 1;
+        }
+        const sp = gameEntity.getAttribute(id, 'xpOnCast', 0);
+
+        return sp*Math.pow(1.4, level);
     }
 
     tick(game, delta) {
@@ -110,7 +135,11 @@ export class SpellModule extends GameModule {
                 if(!this.spells[id].level) {
                     this.spells[id].level = 1;
                 }
-                this.setSpell(id, saveObject.spells[id].level || 1, true);
+                if(!this.spells[id].actualLevel) {
+                    this.spells[id].actualLevel = 1;
+                    this.spells[id].xp = 0;
+                }
+                this.setSpell(id, saveObject.spells[id].actualLevel || 1, true);
                 this.spells[id].duration = saveObject.spells[id].duration;
                 if(this.spells[id].duration && this.spells[id].duration > 0) {
                     gameEntity.registerGameEntity(`active_${id}`, {
@@ -118,7 +147,7 @@ export class SpellModule extends GameModule {
                         isAbstract: false,
                         tags: ['active_spell', 'active_effect'],
                         scope: 'spells',
-                        level: saveObject.spells[id].level,
+                        level: saveObject.spells[id].actualLevel,
                     });
                 }
             }
@@ -132,17 +161,24 @@ export class SpellModule extends GameModule {
     }
 
     setSpell(spellId, amount, bForce = false) {
+        if(amount < 1) amount = 1;
+        if(amount > this.spells[spellId].level) {
+            amount = this.spells[spellId].level;
+        }
         gameEntity.setEntityLevel(spellId, amount, bForce);
-        this.spells[spellId].level = gameEntity.getLevel(spellId);
+        this.spells[spellId].actualLevel = gameEntity.getLevel(spellId);
     }
 
-    getConsumeAffordable(entity) {
+    getConsumeAffordable(entity, level) {
         let result = {
             isAffordable: true,
             consume: {}
         }
+        if(!level) {
+            level = entity.level;
+        }
         if(entity.usageGain) {
-            const effects = resourceApi.unpackEffects(entity.usageGain, entity.level);
+            const effects = resourceApi.unpackEffects(entity.usageGain, level);
             if(effects.length) {
                 const rsToRemove = effects.filter(eff => eff.scope === 'consumption' && eff.type === 'resources');
                 
@@ -167,6 +203,20 @@ export class SpellModule extends GameModule {
 
         if((this.spells[id]?.cooldown || 0) > 0) {
             return;
+        }
+
+
+
+        if(this.isSpellLevelingAvailable()) {
+
+            const dXP = this.getXPPerCast(id);
+
+            this.spells[id].xp += dXP;
+            if(this.spells[id].xp >= this.getMaxXP(id)) {
+                this.spells[id].xp = 0;
+                // level-up spell
+                this.spells[id].level++;
+            }
         }
         
         if(spell.usageGain) {
@@ -214,6 +264,11 @@ export class SpellModule extends GameModule {
 
     saveSettings(payload) {
         if(payload.id) {
+            // check if level was changed
+            if(payload.actualLevel && payload.actualLevel !== this.spells[payload.id].actualLevel) {
+                this.setSpell(payload.id, payload.actualLevel, true);
+            }
+
             this.spells[payload.id] = {
                 ...this.spells[payload.id],
                 autocast: payload.autocast,
@@ -244,7 +299,8 @@ export class SpellModule extends GameModule {
                 isCasted: this.spells[spell.id]?.isCasted,
                 cooldown: this.spells[spell.id]?.cooldown ?? 0,
                 cooldownProg: spell.getUsageCooldown ? (spell.getUsageCooldown() - (this.spells[spell.id]?.cooldown ?? 0)) / spell.getUsageCooldown() : 1
-            }))
+            })),
+            isSpellLevelingAvailable: this.isSpellLevelingAvailable(),
         }
     }
 
@@ -257,13 +313,29 @@ export class SpellModule extends GameModule {
         this.eventHandler.sendData(label, data);
     }
 
+    querySpellEffects(id, level) {
+        const spell =  gameEntity.getEntity(id);
+        let effects = [];
+        if(spell.usageGain) {
+            effects = resourceApi.unpackEffects(spell.usageGain, level)
+        }
+
+        return {
+            effects,
+            potentialEffects: gameEntity.getEffects(id, 0, level, true),
+            affordable: resourceCalculators.isAffordable(this.getConsumeAffordable(spell, level).consume),
+            xpRate: this.getXPPerCast(id, level)
+        }
+    }
+
     getSpellDetails(id) {
         if(!id) return null;
         const spell =  gameEntity.getEntity(id);
         let effects = [];
         if(spell.usageGain) {
-            effects = resourceApi.unpackEffects(spell.usageGain, 1)
+            effects = resourceApi.unpackEffects(spell.usageGain, spell.level)
         }
+
         return {
             id: spell.id,
             name: spell.name,
@@ -277,7 +349,13 @@ export class SpellModule extends GameModule {
             affordable: resourceCalculators.isAffordable(this.getConsumeAffordable(spell).consume),
             tags: spell.tags || [],
             autocast: this.spells[id]?.autocast ?? { rules: [] },
-            isCasted: this.spells[id]?.isCasted
+            isCasted: this.spells[id]?.isCasted,
+            maxLevel: this.spells[id]?.level || 1,
+            maxXP: this.getMaxXP(id),
+            xp: this.spells[id]?.xp || 0,
+            xpRate: this.getXPPerCast(id),
+            actualLevel: spell.level,
+            isSpellLevelingAvailable: this.isSpellLevelingAvailable(),
         }
     }
 
