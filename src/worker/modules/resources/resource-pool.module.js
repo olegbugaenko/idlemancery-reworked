@@ -11,9 +11,13 @@ export class ResourcePoolModule extends GameModule {
             this.eventHandler.sendData('resources-data', data);
         })
 
-        this.eventHandler.registerHandler('query-all-resources', () => {
+        this.eventHandler.registerHandler('query-all-resources', (payload) => {
             const data = Object.values(gameResources.resources);
-            this.eventHandler.sendData('all-resources', data.map(one => ({ id: one.id, name: one.name, isCapped: one.isCapped, isUnlocked: one.unlockCondition ? one.unlockCondition() : true })));
+            let label = 'all-resources';
+            if(payload?.prefix) {
+                label = `${label}-${payload?.prefix}`
+            }
+            this.eventHandler.sendData(label, data.map(one => ({ id: one.id, name: one.name, isCapped: one.isCapped, isUnlocked: one.unlockCondition ? one.unlockCondition() : true })));
         })
     }
 

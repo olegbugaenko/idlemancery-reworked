@@ -129,7 +129,7 @@ const mapCompareType = {
 };
 
 const RulesList = React.memo(
-    ({ rules, isEditing, setRuleValue, deleteRule }) => {
+    ({ prefix = 'default', rules, isEditing, setRuleValue, deleteRule }) => {
         const worker = useContext(WorkerContext);
 
         const { onMessage, sendData } = useWorkerClient(worker);
@@ -138,21 +138,22 @@ const RulesList = React.memo(
         const [tags, setTags] = useState([]);
 
         useEffect(() => {
-            sendData('query-all-resources', {});
-            sendData('query-all-actions', {});
-            sendData('query-all-action-tags', {});
-
+            sendData('query-all-resources', { prefix });
+            sendData('query-all-actions', { prefix });
+            sendData('query-all-action-tags', { prefix });
+            console.log('Sent queries...');
         }, [])
 
-        onMessage('all-resources', (payload) => {
+        onMessage(`all-resources-${prefix}`, (payload) => {
             setResources(payload);
+            console.log('RecRes: ', payload);
         })
 
-        onMessage('all-actions', (payload) => {
+        onMessage(`all-actions-${prefix}`, (payload) => {
             setActions(payload);
         })
 
-        onMessage('all-action-tags', (payload) => {
+        onMessage(`all-action-tags-${prefix}`, (payload) => {
             setTags(payload);
         })
 
@@ -210,6 +211,8 @@ const RulesList = React.memo(
                                 value: item.id,
                                 label: item.name,
                             }));
+
+                        console.log('SubObj: ', subjectOptions, subjectArray, resources, actions, tags);
 
                         subjectValue = subjectOptions.find(
                             (option) =>

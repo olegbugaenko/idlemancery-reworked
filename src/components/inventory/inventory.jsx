@@ -400,6 +400,7 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
                     </div>
 
                     <RulesList
+                        prefix={'autoconsume'}
                         isEditing={isEditing}
                         rules={item.autoconsume?.rules || []}
                         resources={resources}
@@ -415,6 +416,7 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
                     </div>
 
                     <RulesList
+                        prefix={'autosell'}
                         isEditing={isEditing}
                         rules={item.autosell?.rules || []}
                         resources={resources}

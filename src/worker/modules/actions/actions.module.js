@@ -2,6 +2,7 @@ import {registerActionsStage1} from "./actions-db";
 import {GameModule} from "../../shared/game-module";
 import {gameEntity, gameResources, gameEffects, resourceCalculators} from "game-framework";
 import {ActionListsSubmodule} from "./action-lists.submodule";
+import {prefix} from "react-beautiful-dnd/src/view/data-attributes";
 
 export class ActionsModule extends GameModule {
 
@@ -25,12 +26,12 @@ export class ActionsModule extends GameModule {
             this.sendActionsData(this.selectedFilterId)
         })
 
-        this.eventHandler.registerHandler('query-all-actions', () => {
-            this.sendAllActions()
+        this.eventHandler.registerHandler('query-all-actions', (payload) => {
+            this.sendAllActions(payload)
         })
 
-        this.eventHandler.registerHandler('query-all-action-tags', () => {
-            this.sendAllActionTags()
+        this.eventHandler.registerHandler('query-all-action-tags', (payload) => {
+            this.sendAllActionTags(payload)
         })
 
         this.eventHandler.registerHandler('query-actions-unlocks', () => {
@@ -526,9 +527,13 @@ export class ActionsModule extends GameModule {
         }))
     }
 
-    sendAllActions() {
+    sendAllActions(payload) {
         const data = this.getAllActions();
-        this.eventHandler.sendData('all-actions', data);
+        let label = 'all-actions';
+        if(payload?.prefix) {
+            label = `${label}-${payload?.prefix}`
+        }
+        this.eventHandler.sendData(label, data);
     }
 
     getAllActionTags() {
@@ -550,9 +555,13 @@ export class ActionsModule extends GameModule {
 
     }
 
-    sendAllActionTags() {
+    sendAllActionTags(payload) {
         const data = this.getAllActionTags();
-        this.eventHandler.sendData('all-action-tags', data);
+        let label = 'all-action-tags';
+        if(payload?.prefix) {
+            label = `${label}-${payload?.prefix}`
+        }
+        this.eventHandler.sendData(label, data);
     }
 
     sendActionsData(filterId, options = {}) {

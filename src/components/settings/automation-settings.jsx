@@ -402,6 +402,7 @@ export const AutomatedItem = ({
         <div className={'col rules-wrap'}>
             <p>Rules {isEditing ? (<button onClick={addRule}>Add Rule</button>) : null}</p>
             <RulesList
+                prefix={`automation-${id}`}
                 rules={editedValues.rules}
                 isEditing={isEditing}
                 resources={resources}
