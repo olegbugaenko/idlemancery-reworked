@@ -197,6 +197,16 @@ export class SpellModule extends GameModule {
     useSpell(id) {
         const spell = gameEntity.getEntity(id);
 
+        if(!this.spells[id]) {
+            this.spells[id] = {
+                duration: 0,
+                cooldown: 0,
+                level: 1,
+                actualLevel: 1,
+                xp: 0
+            }
+        }
+
         if((this.spells[id]?.duration || 0) > 0) {
             return;
         }
@@ -270,7 +280,7 @@ export class SpellModule extends GameModule {
             }
 
             this.spells[payload.id] = {
-                ...this.spells[payload.id],
+                ...(this.spells[payload.id] || {}),
                 autocast: payload.autocast,
             }
         }

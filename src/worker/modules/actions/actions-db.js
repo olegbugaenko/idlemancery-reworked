@@ -59,7 +59,7 @@ export const registerActionsStage1 = () => {
             effectDeps: ['walking_learning_rate']
         },
         getLearnRate: () => {
-            return gameEffects.getEffectValue('walking_learning_rate')
+            return gameEffects.getEffectValue('walking_learning_rate')*gameEffects.getEffectValue('physical_training_learn_speed');
         },
         unlockCondition: () => {
             return true
@@ -425,6 +425,9 @@ export const registerActionsStage1 = () => {
             id: 'action_walk',
             level: 20,
         }],
+        getLearnRate: () => {
+            return gameEffects.getEffectValue('physical_training_learn_speed')
+        },
         unlockCondition: () => {
             return gameEntity.getLevel('action_walk') > 19
         },
