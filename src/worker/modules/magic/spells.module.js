@@ -275,6 +275,15 @@ export class SpellModule extends GameModule {
     saveSettings(payload) {
         if(payload.id) {
             // check if level was changed
+            if(!this.spells[payload.id]) {
+                this.spells[payload.id] = {
+                    duration: 0,
+                    cooldown: 0,
+                    level: 1,
+                    actualLevel: 1,
+                    xp: 0
+                }
+            }
             if(payload.actualLevel && payload.actualLevel !== this.spells[payload.id].actualLevel) {
                 this.setSpell(payload.id, payload.actualLevel, true);
             }

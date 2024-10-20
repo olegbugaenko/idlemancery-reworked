@@ -29,5 +29,10 @@ export const About = () => {
             <p>Spells can be leveled-up after purchasing corresponding shop upgrade</p>
             <p>Performance fixes</p>
         </div>
+        <h3>Idle Awakening v0.0.2a</h3>
+        <div className={'features'}>
+            <p>Fixed bug with training workbench effects</p>
+            <p>Fixed bug when newly added spells settings where not saving</p>
+        </div>
     </div>)
 }
