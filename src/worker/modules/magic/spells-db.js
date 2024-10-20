@@ -62,9 +62,9 @@ export const initSpellsDB1 = () => {
             multiplier: {
                 effects: {
                     learning_rate: {
-                        A: 1.2,
-                        B: 1.25,
-                        type: 1,
+                        A: 0.1,
+                        B: 1.4,
+                        type: 0,
                     }
                 }
             },
