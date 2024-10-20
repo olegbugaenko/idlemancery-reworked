@@ -50,7 +50,7 @@ export class ActionListsSubmodule extends GameModule {
 
 
         this.eventHandler.registerHandler('query-action-list-effects', ({ id, listData }) => {
-            const data = this.getListEffects(id, listData);
+            const data = this.getListEffects(null, listData);
 
             const prevEffects = [];
             const resourcesEffects = this.packEffects(data.filter(one => one.type === 'resources').map(effect => {
@@ -84,7 +84,7 @@ export class ActionListsSubmodule extends GameModule {
                 }
             }));
 
-            console.log('SendingData: ', JSON.stringify(data.prevEffects), JSON.stringify(data.resourcesEffects));
+            console.log('SendingData: ', JSON.stringify(data.prevEffects), JSON.stringify(data.resourcesEffects), data, id);
 
 
             this.eventHandler.sendData('action-list-effects', {

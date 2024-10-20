@@ -600,6 +600,11 @@ export const registerShopItemsStage1 = () => {
         description: 'Its barely a good weapon, but it can be used to cut things you found more efficiently',
         level: 0,
         maxLevel: 1,
+        unlockedBy: [{
+            type: 'entity',
+            id: 'action_deeper_forest',
+            level: 2,
+        }],
         unlockCondition: () => {
             return gameEntity.getLevel('action_deeper_forest') > 1
         },
@@ -734,6 +739,32 @@ export const registerShopItemsStage1 = () => {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Lesser Restoration',
         description: 'Learn some basic restoration spells.',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_meditation') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'knowledge': {
+                A: 1.5,
+                B: 90*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'coins': {
+                A: 1.5,
+                B: 8000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_less_illusion', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Lesser Illusion',
+        description: 'Learn some basic illusion spells.',
         level: 0,
         maxLevel: 1,
         unlockCondition: () => {

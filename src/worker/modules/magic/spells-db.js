@@ -152,11 +152,11 @@ export const initSpellsDB1 = () => {
             return 10;
         },
         resourceModifier: {
-            income: {
+            get_income: () => ({
                 resources: {
                     health: {
                         A: 0.5*gameEffects.getEffectValue('restoration_spells_efficiency'),
-                        B: 1*gameEffects.getEffectValue('restoration_spells_efficiency'),
+                        B: 1.0*gameEffects.getEffectValue('restoration_spells_efficiency'),
                         type: 0,
                     },
                     energy: {
@@ -165,7 +165,7 @@ export const initSpellsDB1 = () => {
                         type: 0,
                     }
                 },
-            },
+            }),
             consumption: {
                 resources: {
                     mana: {
@@ -174,7 +174,8 @@ export const initSpellsDB1 = () => {
                         type: 0,
                     }
                 }
-            }
+            },
+            effectDeps: ['restoration_spells_efficiency']
         },
         usageGain: {
             get_consumption: () => ({
@@ -192,6 +193,115 @@ export const initSpellsDB1 = () => {
         },
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_less_restoration') > 0
+        },
+    })
+
+    gameEntity.registerGameEntity('spell_perfection_illusion', {
+        name: 'Perfection Illusion',
+        description: 'Use magic to create illusion that you are perfect worker. Increases coins income from jobs',
+        hasCap: false,
+        tags: ['spell', 'magic', 'mental', 'illusion_magic'],
+        defaultCap: 0,
+        isAbstract: true,
+        level: 1,
+        onUse: (amount) => {
+
+        },
+        getUsageCooldown: () => {
+            return 30;
+        },
+        resourceModifier: {
+            get_multiplier: () =>({
+                effects: {
+                    coins_earned_bonus: {
+                        A: 0.1*gameEffects.getEffectValue('illusion_spells_efficiency'),
+                        B: 1.0 + 0.4*gameEffects.getEffectValue('illusion_spells_efficiency'),
+                        type: 0,
+                    }
+                }
+            }),
+            consumption: {
+                resources: {
+                    mana: {
+                        A: 0.5,
+                        B: 0.5,
+                        type: 0,
+                    }
+                }
+            },
+            effectDeps: ['illusion_spells_efficiency']
+        },
+        usageGain: {
+            get_consumption: () => ({
+                resources: {
+                    mana: {
+                        A: 3,
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            })
+        },
+        attributes: {
+            duration: 20,
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_less_illusion') > 0
+        },
+    })
+
+
+    gameEntity.registerGameEntity('spell_dancing_fairy', {
+        name: 'Dancing Fairy',
+        description: 'Summon illusion of dancing fairy, inspiring you while performing routine actions. Improves learning rate for all routine tasks',
+        hasCap: false,
+        tags: ['spell', 'magic', 'mental', 'illusion_magic'],
+        defaultCap: 0,
+        isAbstract: true,
+        level: 1,
+        onUse: (amount) => {
+
+        },
+        getUsageCooldown: () => {
+            return 30;
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    routine_learning_speed: {
+                        A: 0.2*gameEffects.getEffectValue('illusion_spells_efficiency'),
+                        B: 1.0 + 0.8*gameEffects.getEffectValue('illusion_spells_efficiency'),
+                        type: 0,
+                    }
+                }
+            }),
+            consumption: {
+                resources: {
+                    mana: {
+                        A: 0.5,
+                        B: 0.5,
+                        type: 0,
+                    }
+                }
+            },
+            effectDeps: ['illusion_spells_efficiency']
+        },
+        usageGain: {
+            get_consumption: () => ({
+                resources: {
+                    mana: {
+                        A: 5,
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            })
+        },
+        attributes: {
+            duration: 20,
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_less_illusion') > 0
         },
     })
 

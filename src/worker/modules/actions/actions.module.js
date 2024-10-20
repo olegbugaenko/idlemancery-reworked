@@ -25,6 +25,14 @@ export class ActionsModule extends GameModule {
             this.sendActionsData(this.selectedFilterId)
         })
 
+        this.eventHandler.registerHandler('query-all-actions', () => {
+            this.sendAllActions()
+        })
+
+        this.eventHandler.registerHandler('query-all-action-tags', () => {
+            this.sendAllActionTags()
+        })
+
         this.eventHandler.registerHandler('query-actions-unlocks', () => {
             this.sendActionsUnlocks()
         })
@@ -129,6 +137,12 @@ export class ActionsModule extends GameModule {
             name: 'Physical Training Learning',
             defaultValue: 1.,
             minValue: 1,
+        })
+
+        gameEffects.registerEffect('routine_learning_speed', {
+            name: 'Routine Learning',
+            defaultValue: 1.,
+            minValue: 1.
         })
 
         registerActionsStage1();
@@ -305,6 +319,18 @@ export class ActionsModule extends GameModule {
 
     isRunningAction(id) {
         return this.activeActions && this.activeActions.find(one => one.id === id || one.originalId === id);
+    }
+
+
+    isRunningActionWithTag(id) {
+        if(!this.activeActions) return false;
+
+        for(const running of this.activeActions) {
+            const ent = gameEntity.getEntity(running.originalId);
+            if(ent.tags.includes(id)) return true;
+        }
+
+        return false;
     }
 
     stopRunningActions() {
@@ -491,6 +517,42 @@ export class ActionsModule extends GameModule {
         };
 
         return entityData;
+    }
+
+    getAllActions() {
+        return gameEntity.listEntitiesByTags(['action']).map(one => ({
+            ...one,
+            isUnlocked: one.isUnlocked && !one.isCapped
+        }))
+    }
+
+    sendAllActions() {
+        const data = this.getAllActions();
+        this.eventHandler.sendData('all-actions', data);
+    }
+
+    getAllActionTags() {
+        const allActions = gameEntity.listEntitiesByTags(['action']);
+
+        const tagsByUnlocks = {};
+
+        allActions.forEach(a => {
+            a.tags.forEach(tag => {
+                tagsByUnlocks[tag] = {
+                    id: tag,
+                    name: tag,
+                    isUnlocked: tagsByUnlocks[tag]?.isUnlocked || (a.isUnlocked && !a.isCapped)
+                }
+            })
+        })
+
+        return Object.values(tagsByUnlocks);
+
+    }
+
+    sendAllActionTags() {
+        const data = this.getAllActionTags();
+        this.eventHandler.sendData('all-action-tags', data);
     }
 
     sendActionsData(filterId, options = {}) {

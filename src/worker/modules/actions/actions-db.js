@@ -520,6 +520,9 @@ export const registerActionsStage1 = () => {
         allowedImpacts: ['effects'],
         description: 'Spend some time walking in nearby forest and collecting berries',
         level: 1,
+        getLearnRate: () => {
+            return gameEffects.getEffectValue('routine_learning_speed')
+        },
         resourceModifier: {
             get_income: () => ({
                 resources: {
@@ -651,6 +654,9 @@ export const registerActionsStage1 = () => {
         allowedImpacts: ['effects'],
         description: 'Clean your house, organize things to free more space for coins storage',
         level: 1,
+        getLearnRate: () => {
+            return gameEffects.getEffectValue('routine_learning_speed')
+        },
         resourceModifier: {
             get_multiplier: () => ({
                 effects: {
@@ -836,6 +842,9 @@ export const registerActionsStage1 = () => {
         allowedImpacts: ['effects'],
         description: 'More dangerous activity, but searching for plants in less accessible places can pay off',
         level: 1,
+        getLearnRate: () => {
+            return gameEffects.getEffectValue('routine_learning_speed')
+        },
         resourceModifier: {
             get_income: () => ({
                 resources: {
@@ -893,6 +902,9 @@ export const registerActionsStage1 = () => {
         allowedImpacts: ['effects'],
         description: 'Magic garden is told to be planted by some wizard. The wizard was murdered, but his garden keeps growing, providing variety of precious herbs',
         level: 1,
+        getLearnRate: () => {
+            return gameEffects.getEffectValue('routine_learning_speed')
+        },
         resourceModifier: {
             get_income: () => ({
                 resources: {
@@ -945,7 +957,7 @@ export const registerActionsStage1 = () => {
     })
 
     registerGameAction('action_meditate', {
-        tags: ["action", "training", "magical"],
+        tags: ["action", "training", "magical", "routine"],
         name: 'Meditate',
         isAbstract: false,
         allowedImpacts: ['effects'],
@@ -983,7 +995,7 @@ export const registerActionsStage1 = () => {
             effectDeps: []
         },
         getLearnRate: () => {
-            return 1
+            return gameEffects.getEffectValue('routine_learning_speed')
         },
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_meditation') > 0

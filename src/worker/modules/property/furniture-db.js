@@ -510,7 +510,51 @@ export const registerFurnitureStage1 = () => {
             multiplier: {
                 effects: {
                     'restoration_spells_efficiency': {
-                        A: 0.5,
+                        A: 0.25,
+                        B: 1,
+                        type: 0,
+                    }
+                },
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 3,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1.5,
+                B: 10000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 3,
+                type: 0
+            }
+        }),
+    })
+
+
+    gameEntity.registerGameEntity('furniture_illusion_magic_circle', {
+        tags: ["furniture", "upgrade", "purchaseable"],
+        name: 'Illusion Magic Circle',
+        description: 'Improves your restoration magic efficiency',
+        level: 0,
+        maxLevel: 3,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_less_illusion') > 0;
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'illusion_spells_efficiency': {
+                        A: 0.25,
                         B: 1,
                         type: 0,
                     }

@@ -34,6 +34,12 @@ export class SpellModule extends GameModule {
             minValue: 1,
         })
 
+        gameEffects.registerEffect('illusion_spells_efficiency', {
+            name: 'Illusion Magic Efficiency',
+            defaultValue: 1,
+            minValue: 1,
+        })
+
         initSpellsDB1();
 
     }
