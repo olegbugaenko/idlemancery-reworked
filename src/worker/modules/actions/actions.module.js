@@ -290,7 +290,7 @@ export class ActionsModule extends GameModule {
     }
 
     getFocusBonus(time) {
-        return 1 + Math.min(gameEffects.getEffectValue('max_focus_time'), Math.max(0, time - 15))*0.1 / 60;
+        return 1 + Math.min(gameEffects.getEffectValue('max_focus_time'), Math.max(0, time - 15))*0.1*5 / 285;
     }
 
     getLearningRate(id, eff) {
