@@ -2,7 +2,6 @@ import {registerActionsStage1} from "./actions-db";
 import {GameModule} from "../../shared/game-module";
 import {gameEntity, gameResources, gameEffects, resourceCalculators} from "game-framework";
 import {ActionListsSubmodule} from "./action-lists.submodule";
-import {prefix} from "react-beautiful-dnd/src/view/data-attributes";
 
 export class ActionsModule extends GameModule {
 
