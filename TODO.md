@@ -57,5 +57,8 @@ List fixes:
 [X] Add auto-purchase
 [V] Create separate "Automations" tab under settings (Add spells and test)
 [V] Make Popups closed by clicking outside
-Make lists doing all included actions simultaneously, while sharing focus
-Show ETA's on learning/resource availability
+[V] Make lists doing all included actions simultaneously, while sharing focus
+a) Deal with changes to efforts when something becomes unavailable while running
+b) Deal with focuses
+[V] Show ETA's on learning/resource availability
+[V] Add possibility to hide actions

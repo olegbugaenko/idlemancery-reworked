@@ -22,7 +22,7 @@ const registerGameAction = (id, options) => {
     
     options.getPrimaryEffect = () => getPrimaryBonus(primaryAttribute);
 
-    options.resourceModifier.getCustomAmplifier = () => 1*options.getPrimaryEffect();
+    options.resourceModifier.getCustomAmplifier = () => (options.attributes.isTraining ? 1 : 1*options.getPrimaryEffect());
     
     return gameEntity.registerGameEntity(id, options);
     
@@ -138,8 +138,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'coins': {
-                        A: 0.025*gameEffects.getEffectValue('coins_earned_bonus'),
-                        B: 0.225*gameEffects.getEffectValue('coins_earned_bonus'),
+                        A: 0.04*gameEffects.getEffectValue('coins_earned_bonus'),
+                        B: 0.36*gameEffects.getEffectValue('coins_earned_bonus'),
                         type: 0,
                     }
                 }
@@ -177,8 +177,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'coins': {
-                        A: 0.04*gameEffects.getEffectValue('clean_stable_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
-                        B: 0.4*gameEffects.getEffectValue('clean_stable_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
+                        A: 0.06*gameEffects.getEffectValue('clean_stable_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
+                        B: 0.54*gameEffects.getEffectValue('clean_stable_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
                         type: 0,
                     }
                 }
@@ -192,7 +192,7 @@ export const registerActionsStage1 = () => {
                     },
                     'health': {
                         A: 0.0,
-                        B: 0.75,
+                        B: 0.5,
                         type: 0,
                     }
                 }
@@ -680,6 +680,7 @@ export const registerActionsStage1 = () => {
         attributes: {
             baseXPCost: 50,
             isTraining: true,
+            primaryAttribute: 'attribute_patience'
         }
     })
 
@@ -948,7 +949,7 @@ export const registerActionsStage1 = () => {
         name: 'Meditate',
         isAbstract: false,
         allowedImpacts: ['effects'],
-        description: 'Perform some walking exercises to improve your stamina',
+        description: 'Use meditative practices to improve your mental abilities',
         level: 1,
         resourceModifier: {
             income: {
@@ -969,7 +970,12 @@ export const registerActionsStage1 = () => {
                 resources: {
                     'energy': {
                         A: 0,
-                        B: 10.00,
+                        B: 5.00,
+                        type: 0
+                    },
+                    'knowledge': {
+                        A: 0,
+                        B: 1.00,
                         type: 0
                     }
                 }

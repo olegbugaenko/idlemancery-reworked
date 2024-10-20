@@ -290,6 +290,14 @@ export const Actions = ({}) => {
         sendData('set-automation-enabled', { flag: !actionsData.automationEnabled })
     })
 
+    const toggleShowHidden = useCallback(() => {
+        sendData('toggle-show-hidden', !actionsData.showHidden)
+    })
+
+    const toggleHiddenAction = useCallback((id, flag) => {
+        sendData('toggle-hidden-action', { id, flag });
+    })
+
     return (
         <DragDropContext onDragEnd={onDragEnd}>
             <div className={'actions-wrap'}>
@@ -299,7 +307,12 @@ export const Actions = ({}) => {
                         <ul className={'menu'}>
                             {actionsData.actionCategories.map(category => (<li className={`category ${category.isSelected ? 'active' : ''}`} onClick={() => setActionsFilter(category.id)}><span>{category.name}({category.items.length})</span></li> ))}
                         </ul>
-
+                        <div className={'additional-filters'}>
+                            <label>
+                                <input type={"checkbox"} checked={actionsData.showHidden} onChange={toggleShowHidden}/>
+                                Show hidden
+                            </label>
+                        </div>
                     </div>
                     <div className={'list-wrap'}>
                         <PerfectScrollbar>
@@ -307,7 +320,7 @@ export const Actions = ({}) => {
                                 <Droppable droppableId="available-actions" isDropDisabled={true}>
                                     {(provided) => (
                                         <div ref={provided.innerRef} {...provided.droppableProps} className="flex-container">
-                                            {actionsData.available.map((action, index) => <ActionCard isEditingList={!!listData} index={index} key={action.id} {...action} onFlash={handleFlash} onActivate={activateAction} onShowDetails={setActionDetails} onSelect={onSelectAction}/>)}
+                                            {actionsData.available.map((action, index) => <ActionCard isEditingList={!!listData} index={index} key={action.id} {...action} onFlash={handleFlash} onActivate={activateAction} onShowDetails={setActionDetails} onSelect={onSelectAction} toggleHiddenAction={toggleHiddenAction}/>)}
                                             {provided.placeholder}
                                         </div>
                                     )}
@@ -421,7 +434,7 @@ export const DetailBlade = ({
     return null;
 }
 
-export const ActionCard = ({ id, isEditingList, index, name, level, max, xp, maxXP, xpRate, isActive, isLeveled, focused, isTraining, actionEffect, currentEffects, potentialEffects, onFlash, onSelect, onActivate, onShowDetails, ...props}) => {
+export const ActionCard = ({ id, isEditingList, index, name, level, max, xp, maxXP, xpRate, isActive, isLeveled, focused, isTraining, actionEffect, currentEffects, potentialEffects, isHidden, onFlash, onSelect, onActivate, onShowDetails, toggleHiddenAction, ...props}) => {
     const elementRef = useRef(null);
 
     useFlashOnLevelUp(isLeveled, onFlash, elementRef);
@@ -452,7 +465,12 @@ export const ActionCard = ({ id, isEditingList, index, name, level, max, xp, max
                             <ProgressBar className={'action-progress'} percentage={xp/maxXP}></ProgressBar>
                         </div>
                         <div className={'buttons'}>
-                            {isActive ? <button onClick={() => onActivate()}>Stop</button> : <button onClick={() => onActivate(id)}>Start</button> }
+                            <div className={'buttons-inner-wrap'}>
+                                {isActive ? <button onClick={() => onActivate()}>Stop</button> : <button onClick={() => onActivate(id)}>Start</button> }
+                                <button onClick={() => toggleHiddenAction(id, !isHidden)}>
+                                    {isHidden ? "Show" : "Hide"}
+                                </button>
+                            </div>
                             {focused && focused.isFocused ? (
                                 <TippyWrapper content={<div className={'hint-popup'}>
                                     {!focused.isCapped

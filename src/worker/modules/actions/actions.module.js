@@ -1,17 +1,18 @@
 import {registerActionsStage1} from "./actions-db";
 import {GameModule} from "../../shared/game-module";
-import {gameEntity, gameResources, gameEffects} from "game-framework";
+import {gameEntity, gameResources, gameEffects, resourceCalculators} from "game-framework";
 import {ActionListsSubmodule} from "./action-lists.submodule";
 
 export class ActionsModule extends GameModule {
 
     constructor() {
         super();
-        this.activeAction = null;
+        this.activeActions = [];
         this.actions = {};
         this.selectedFilterId = 'all';
         this.lists = new ActionListsSubmodule();
         this.focus = null;
+        this.showHidden = false;
 
         this.eventHandler.registerHandler('run-action', (payload) => {
             if(payload.isForce) {
@@ -30,6 +31,16 @@ export class ActionsModule extends GameModule {
 
         this.eventHandler.registerHandler('query-action-details', (payload) => {
             this.sendActionDetails(payload.id)
+        })
+
+        this.eventHandler.registerHandler('toggle-hidden-action', (payload) => {
+            this.setActionHidden(payload.id, payload.flag);
+            this.sendActionsData(this.selectedFilterId)
+        })
+
+        this.eventHandler.registerHandler('toggle-show-hidden', (payload) => {
+            this.showHidden = payload;
+            this.sendActionsData(this.selectedFilterId)
         })
 
         this.eventHandler.registerHandler('set-selected-actions-filter', ({filterId}) => {
@@ -147,39 +158,69 @@ export class ActionsModule extends GameModule {
         return gameEntity.getAttribute(id, 'baseXPCost', 50)*Math.pow(1.01, lvl-1)*(0.8 + 0.2*lvl);
     }
 
+    reassertRunningEfforts(bForce) {
+        const totalEffort = this.activeActions.reduce((acc, act) => acc += act.effort, 0);
+        if((Math.abs(1.0 - totalEffort) > 1.e-8) || bForce) {
+            const mult = 1./totalEffort;
+            this.activeActions.forEach((act, index) => {
+                this.activeActions[index].effort *= mult;
+                gameEntity.getEntity(act.id).modifier.effectFactor = this.activeActions[index].effort;
+                resourceCalculators.regenerateModifier(gameEntity.getEntity(act.id).modifier.id);
+            })
+        }
+    }
+
+    setActionHidden(id, flag) {
+        if(!this.actions[id]) {
+            this.actions[id] = {};
+        }
+        this.actions[id].isHidden = flag;
+    }
+
     tick(game, delta) {
         for(let key in this.actions) {
             this.actions[key].isLeveled = false;
         }
-        if(this.activeAction) {
-            if(!this.actions[this.activeAction]) {
-                this.actions[this.activeAction] = {
-                    level: 1,
-                    xp: 0
+        if(this.activeActions) {
+            this.activeActions.forEach(act => {
+                if(!this.actions[act.originalId]) {
+                    this.actions[act.originalId] = {
+                        level: 1,
+                        xp: 0,
+                        focus: {
+                            time: 0,
+                        }
+                    }
                 }
-            }
-            if(!this.focus) {
-                this.focus = {
-                    time: 0,
+                if(!this.actions[act.originalId].focus) {
+                    this.actions[act.originalId].focus = {
+                        time: 0,
+                    }
                 }
-            }
-            this.focus.time += delta;
-            this.focus.bonus = this.getFocusBonus();
-            const dxp = delta*this.getLearningRate('runningAction');
-            this.actions[this.activeAction].xp += dxp;
-            gameResources.addResource('mage-xp', dxp);
-            if(this.actions[this.activeAction].xp >= this.getActionXPMax(this.activeAction)) {
-                this.actions[this.activeAction].level++;
-                this.actions[this.activeAction].xp = 0;
-                gameEntity.setEntityLevel('runningAction', this.actions[this.activeAction].level, true);
-                gameEntity.setEntityLevel(this.activeAction, this.actions[this.activeAction].level, true);
-                console.log('Leveled up: ', gameEntity.getLevel('runningAction'), gameEntity.getLevel(this.activeAction));
-                this.actions[this.activeAction].isLeveled = true;
-                if(gameEntity.isCapped(this.activeAction)) {
-                    this.setRunningAction(null);
+
+                if(this.actions[act.originalId].focus.time < this.getFocusCapTime(act.originalId)) {
+                    this.actions[act.originalId].focus.time += delta*act.effort;
                 }
-                this.sendActionsData(this.selectedFilterId);
-            }
+
+                this.actions[act.originalId].focus.bonus = this.getFocusBonus(this.actions[act.originalId].focus.time);
+                const dxp = delta*this.getLearningRate(act.id)*act.effort;
+                this.actions[act.originalId].xp += dxp;
+                gameResources.addResource('mage-xp', dxp);
+                if(this.actions[act.originalId].xp >= this.getActionXPMax(act.originalId)) {
+                    this.actions[act.originalId].level++;
+                    this.actions[act.originalId].xp = 0;
+                    gameEntity.setEntityLevel(act.originalId, this.actions[act.originalId].level, true);
+                    gameEntity.setEntityLevel(act.id, this.actions[act.originalId].level, true);
+                    console.log('Leveled up: ', gameEntity.getLevel(act.id), gameEntity.getLevel(act.originalId));
+                    this.actions[act.originalId].isLeveled = true;
+                    if(gameEntity.isCapped(act.originalId)) {
+                        this.dropRunningAction(act.originalId);
+                        this.reassertRunningEfforts();
+                    }
+                    this.sendActionsData(this.selectedFilterId);
+                }
+            })
+
         }
         this.lists.tick(game, delta)
     }
@@ -187,7 +228,7 @@ export class ActionsModule extends GameModule {
     save() {
         return {
             actions: this.actions,
-            activeAction: this.activeAction,
+            activeActions: this.activeActions,
             actionLists: this.lists.save(),
             selectedFilterId: this.selectedFilterId,
             focus: this.focus,
@@ -205,8 +246,11 @@ export class ActionsModule extends GameModule {
                 this.actions[id].xp = saveObject.actions[id].xp;
             }
         }
-        if(saveObject?.activeAction) {
-            this.setRunningAction(saveObject.activeAction);
+        if(saveObject?.activeActions) {
+            this.stopRunningActions();
+            saveObject?.activeActions.forEach(a => {
+                this.addRunningAction(a.originalId, a.effort);
+            })
         }
         if(saveObject?.actionLists) {
             this.lists.load(saveObject.actionLists)
@@ -227,16 +271,20 @@ export class ActionsModule extends GameModule {
         this.actions[actionId].level = amount;
     }
 
-    getFocusBonus() {
-        return 1 + Math.min(gameEffects.getEffectValue('max_focus_time'), Math.max(0, this.focus.time - 15))*0.1 / 60;
+    getFocusCapTime(id) {
+        return 15 + (gameEffects.getEffectValue('max_focus_time') - 15)*(this.isRunningAction(id)?.effort || 0);
+    }
+
+    getFocusBonus(time) {
+        return 1 + Math.min(gameEffects.getEffectValue('max_focus_time'), Math.max(0, time - 15))*0.1 / 60;
     }
 
     getLearningRate(id, eff) {
         const entEff = gameEntity.getEntityEfficiency(id);
         let focusBonus = 1.;
-        if(id === 'runningAction') {
+        if(this.isRunningAction(id)) {
             // console.log('EffMult: ', id, eff, entEff);
-            focusBonus = this.focus?.bonus ?? 1.;
+            focusBonus = this.actions[gameEntity.getEntity(id).copyFromId]?.focus?.bonus || 1.;
         }
         if(eff == null) {
             eff = entEff;
@@ -255,36 +303,68 @@ export class ActionsModule extends GameModule {
         return baseXPRate * eff * gameEffects.getEffectValue('learning_rate')*focusBonus;
     }
 
+    isRunningAction(id) {
+        return this.activeActions && this.activeActions.find(one => one.id === id || one.originalId === id);
+    }
+
+    stopRunningActions() {
+        for(const act of this.activeActions) {
+            this.actions[act.originalId].focus = null;
+        }
+        this.activeActions = [];
+        const runningEntities = gameEntity.listEntitiesByTags(['runningActions']);
+        runningEntities.forEach(e => {
+            gameEntity.unsetEntity(e.id);
+        })
+    }
+
+    addRunningAction(id, effort) {
+        if(!id) {
+            return;
+        }
+
+        const isCapped = gameEntity.isCapped(id);
+
+        if(isCapped) {
+            return;
+        }
+
+        const rn = gameEntity.registerGameEntity(`runningAction_${id}`, {
+            copyFromId: id,
+            level: this.actions[id]?.level ?? 1,
+            allowedImpacts: ['resources'],
+            tags: ['running','runningActions'],
+            effectFactor: effort,
+        })
+
+        gameEntity.setEntityLevel(`runningAction_${id}`, this.actions[id]?.level ?? 1);
+
+        this.activeActions.push({
+            id: `runningAction_${id}`,
+            originalId: id,
+            effort
+        })
+
+        console.log('CLL: ', this.activeActions, rn);
+    }
+
+    dropRunningAction(id) {
+        if(!this.isRunningAction(id)) return;
+        const index = this.activeActions.findIndex(one => one.originalId === id);
+        if(index < 0) {
+            throw new Error(`Woops! Can't find action by originalId ${id}`)
+        }
+        if(this.actions[id]?.focus) {
+            this.actions[id].focus = null;
+        }
+        this.activeActions.splice(index, 1);
+        gameEntity.unsetEntity(`runningAction_${id}`);
+    }
+
     setRunningAction(id) {
         console.log('Running: ', id)
-        if(id !== this.activeAction) {
-            gameEntity.unsetEntity('runningAction');
-            this.focus = null;
-
-            if(id) {
-                const isCapped = gameEntity.isCapped(id);
-
-                if(isCapped) {
-                    this.activeAction = null;
-                    return;
-                }
-
-                const rn = gameEntity.registerGameEntity('runningAction', {
-                    copyFromId: id,
-                    level: this.actions[id]?.level ?? 1,
-                    allowedImpacts: ['resources'],
-                    tags: ['running'],
-                })
-
-                gameEntity.setEntityLevel('runningAction', this.actions[id]?.level ?? 1);
-
-                console.log('Rnn: ', rn, gameResources.resources);
-            }
-
-            this.activeAction = id;
-
-            this.sendActionsData(this.selectedFilterId)
-        }
+        this.stopRunningActions();
+        this.addRunningAction(id, 1);
     }
 
     getActionsUnlocks() {
@@ -292,11 +372,10 @@ export class ActionsModule extends GameModule {
             .listEntitiesByTags(['action'])
             .filter(one => one.isUnlocked && !one.isCapped && one.nextUnlock);
 
-        console.log('Items: ', items);
         return items;
     }
 
-    getActionsData(filterId) {
+    getActionsData(filterId, options) {
         // const entities = gameEntity.listEntitiesByTags(['action']).filter(one => one.isUnlocked && !one.isCapped);
         const perCats = this.filters.reduce((acc, filter) => {
 
@@ -304,7 +383,8 @@ export class ActionsModule extends GameModule {
                 id: filter.id,
                 name: filter.name,
                 tags: filter.tags,
-                items: gameEntity.listEntitiesByTags(['action', ...filter.tags]).filter(one => one.isUnlocked && !one.isCapped),
+                items: gameEntity.listEntitiesByTags(['action', ...filter.tags])
+                    .filter(one => one.isUnlocked && !one.isCapped && (options?.showHidden || this.showHidden || !this.actions?.[one.id]?.isHidden)),
                 isSelected: filterId === filter.id
             }
 
@@ -327,16 +407,16 @@ export class ActionsModule extends GameModule {
             // potentialEffects: gameEntity.getEffects(entity.id, gameEntity.getAttribute(entity.id, 'isTraining') ? 1 : 0, this.actions[entity.id]?.level || 1, true),
             xp: this.actions[entity.id]?.xp || 0,
             maxXP: this.getActionXPMax(entity.id),
-            isActive: this.activeAction === entity.id,
-            xpRate: this.activeAction === entity.id ? this.getLearningRate('runningAction') : this.getLearningRate(entity.id, 1),
+            isActive: this.isRunningAction(entity.id),
+            xpRate: this.isRunningAction(entity.id) ? this.getLearningRate(`runningAction_${entity.id}`)*this.isRunningAction(entity.id).effort : this.getLearningRate(entity.id, 1),
             isLeveled: this.actions[entity.id]?.isLeveled,
             tags: entity.tags,
-            focused: this.activeAction === entity.id && this.focus?.bonus > 1 ? {
+            focused: this.isRunningAction(entity.id) && this.actions[entity.id]?.focus?.bonus > 1 ? {
                 isFocused: true,
-                focusTime: this.focus.time,
-                focusBonus: this.focus.bonus,
-                isCapped: this.focus.time >= gameEffects.getEffectValue('max_focus_time'),
-                cap: gameEffects.getEffectValue('max_focus_time'),
+                focusTime: this.actions[entity.id].focus.time,
+                focusBonus: this.actions[entity.id].focus.bonus,
+                isCapped: this.actions[entity.id].focus.time >= this.getFocusCapTime(entity.id),
+                cap: gameEffects.getEffectValue('max_focus_time')*this.isRunningAction(entity.id).effort,
             } : null,
             actionEffect: gameEntity.getEffects(entity.id, 0, this.actions[entity.id]?.level || 1, true).filter(eff => eff.type === 'resources'),
             potentialEffects: this.packEffects(
@@ -347,14 +427,16 @@ export class ActionsModule extends GameModule {
                 gameEntity.getEffects(entity.id, 0, this.actions[entity.id]?.level || 1, true),
                 item => item.type === 'effects'
             ),
-            isTraining: gameEntity.getAttribute(entity.id, 'isTraining')
+            isTraining: gameEntity.getAttribute(entity.id, 'isTraining'),
+            isHidden: this.actions?.[entity.id]?.isHidden
         }))
 
-        const current = this.activeAction ? available.find(id => id === this.activeAction) : null;
+        const current = this.activeActions ? available.filter(one => this.activeActions.some(act => act.originalId === one.id)) : null;
 
         return {
             available,
             current,
+            showHidden: this.showHidden,
             actionLists: this.lists.getLists(),
             runningList: this.lists.runningList,
             actionListsUnlocked: gameEntity.getLevel('shop_item_notebook') > 0,
@@ -398,8 +480,8 @@ export class ActionsModule extends GameModule {
             ),
             xp: this.actions[entity.id]?.xp || 0,
             maxXP: this.getActionXPMax(entity.id),
-            isActive: this.activeAction === entity.id,
-            xpRate: this.activeAction === entity.id ? this.getLearningRate('runningAction') : this.getLearningRate(entity.id, 1),
+            isActive: this.isRunningAction(entity.id),
+            xpRate: this.isRunningAction(entity.id) ? this.getLearningRate(`runningAction_${entity.id}`)*this.isRunningAction(entity.id).effort : this.getLearningRate(entity.id, 1),
             isLeveled: this.actions[entity.id]?.isLeveled,
             tags: entity.tags,
             primaryAttribute: entity.attributes?.primaryAttribute ? gameEffects.getEffect(entity.attributes.primaryAttribute) : null,
@@ -411,8 +493,8 @@ export class ActionsModule extends GameModule {
         return entityData;
     }
 
-    sendActionsData(filterId) {
-        const data = this.getActionsData(filterId);
+    sendActionsData(filterId, options = {}) {
+        const data = this.getActionsData(filterId, options);
         this.eventHandler.sendData('actions-data', data);
     }
 

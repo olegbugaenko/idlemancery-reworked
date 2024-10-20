@@ -15,10 +15,24 @@ export const PopupComponent = ({ children, onClose, title }) => {
     }, [onClose, setActivePopup]);
 
     const handleClickOutside = useCallback((event) => {
-        if (popupRef.current && !popupRef.current.contains(event.target)) {
-            onClosePopup();
+        if (popupRef.current) {
+            const rect = popupRef.current.getBoundingClientRect();
+            const x = event.clientX;
+            const y = event.clientY;
+
+            if (
+                x >= rect.left &&
+                x <= rect.right &&
+                y >= rect.top &&
+                y <= rect.bottom
+            ) {
+                return;
+            } else {
+                onClosePopup();
+            }
         }
     }, [onClosePopup]);
+
 
     useEffect(() => {
         document.addEventListener('mousedown', handleClickOutside);

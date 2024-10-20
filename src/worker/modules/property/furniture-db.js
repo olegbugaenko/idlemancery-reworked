@@ -329,7 +329,7 @@ export const registerFurnitureStage1 = () => {
         level: 0,
         maxLevel: 4,
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_tent') > 3;
+            return gameEntity.getLevel('shop_item_tent') > 3 && gameEntity.getLevel('action_pushup') > 4;
         },
         resourceModifier: {
             multiplier: {

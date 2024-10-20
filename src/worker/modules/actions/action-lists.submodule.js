@@ -17,6 +17,8 @@ export class ActionListsSubmodule extends GameModule {
 
         this.automationEnabled = false;
 
+        this.combineLists = true;
+
         this.eventHandler.registerHandler('save-action-list', (payload) => {
             this.saveActionList(payload);
         })
@@ -105,10 +107,16 @@ export class ActionListsSubmodule extends GameModule {
             actionIndex: 0,
             actionTimer: 0,
         };
+
+        if(this.combineLists) {
+            // register entity as custom action
+            this.runCombinedList(id);
+        }
     }
 
     stopList() {
         this.runningList = null;
+        gameCore.getModule('actions').stopRunningActions();
     }
 
     saveActionList(payload) {
@@ -130,7 +138,29 @@ export class ActionListsSubmodule extends GameModule {
             this.sendListData(list.id, true);
         }
 
-        this.regenerateListsPriorityMap()
+        this.regenerateListsPriorityMap();
+
+        if(this.runningList?.id && (this.runningList?.id === payload.id)) {
+            const listToRun = this.actionsLists[this.runningList.id];
+
+            let newTotalTime = 0.;
+
+            listToRun.actions.forEach(a => {
+                const isAvailable = gameEntity.isEntityUnlocked(a.id) && !gameEntity.isCapped(a.id);
+                if(isAvailable) {
+                    newTotalTime += a.time;
+                }
+            })
+
+            gameCore.getModule('actions').activeActions = gameCore.getModule('actions').activeActions.map(active => {
+                return {
+                    ...active,
+                    effort: (listToRun.actions.find(o => o.id === active.originalId)?.time || 0) / newTotalTime
+                }
+            })
+            console.log('Reassert list onSave: ', newTotalTime, gameCore.getModule('actions').activeActions);
+            gameCore.getModule('actions').reassertRunningEfforts(true);
+        }
     }
 
     deleteActionList(id) {
@@ -142,7 +172,13 @@ export class ActionListsSubmodule extends GameModule {
     regenerateListsPriorityMap() {
         const listsBeingAutotrigger = Object.values(this.actionsLists).filter(one => !!one.autotrigger?.rules?.length);
 
-        this.listsAutotrigger = listsBeingAutotrigger.map(one => ({
+        const listsBeingAutotriggerAvailable = listsBeingAutotrigger.filter(lst => {
+           if(lst.actions && lst.actions.find(one => gameEntity.isEntityUnlocked(one.id)
+               && !gameEntity.isCapped(one.id))) return true;
+
+           return false;
+        });
+        this.listsAutotrigger = listsBeingAutotriggerAvailable.map(one => ({
             id: one.id,
             priority: one.autotrigger.priority ?? 0,
         })).sort((a, b) => a.priority - b.priority);
@@ -195,7 +231,7 @@ export class ActionListsSubmodule extends GameModule {
 
         this.autotriggerCD -= delta;
 
-        if (this.runningList) {
+        if (this.runningList && !this.combineLists) {
             const listToRun = this.actionsLists[this.runningList.id];
             if (!listToRun) {
                 throw new Error('Invalid list to run');
@@ -229,7 +265,7 @@ export class ActionListsSubmodule extends GameModule {
                     console.log('No available actions in the list.');
                     // Handle this case as needed, e.g., stop the running list
                     this.stopList();
-                    game.getModule('actions').setRunningAction(null);
+                    gameCore.getModule('actions').setRunningAction(null);
                     return; // Exit the function early
                 } else {
                     console.log('Toggled to:', this.runningList, action.id, delta);
@@ -237,12 +273,55 @@ export class ActionListsSubmodule extends GameModule {
             }
 
             // Set the active action if it's not already active
-            if (game.getModule('actions').activeAction !== action.id) {
-                game.getModule('actions').setRunningAction(action.id);
+            if (gameCore.getModule('actions').activeAction !== action.id) {
+                gameCore.getModule('actions').setRunningAction(action.id);
             }
 
             // Increment the action timer
             this.runningList.actionTimer += delta;
+        }
+
+        if (this.runningList && this.combineLists) {
+            // include available notpresent
+            const listToRun = this.actionsLists[this.runningList.id];
+            if (!listToRun) {
+                throw new Error('Invalid list to run');
+            }
+
+            const totalTime = listToRun.actions.reduce((acc, item) => acc += item.time, 0)
+            let needReassert = false;
+            let newTotalTime = 0.;
+            listToRun.actions.forEach(a => {
+                const isAvailable = gameEntity.isEntityUnlocked(a.id) && !gameEntity.isCapped(a.id);
+                if(isAvailable) {
+                    newTotalTime += a.time;
+                }
+                if(!isAvailable && gameCore.getModule('actions').isRunningAction(a.id)) {
+                    gameCore.getModule('actions').dropRunningAction(a.id);
+                    needReassert = true;
+                }
+                if(!gameCore.getModule('actions').isRunningAction(a.id) && isAvailable) {
+                    gameCore.getModule('actions').addRunningAction(a.id, a.time / totalTime);
+                    needReassert = true;
+                }
+            })
+            const activeActions = gameCore.getModule('actions').activeActions;
+            activeActions.forEach(active => {
+                if(!listToRun.actions.find(o => o.id === active.originalId)) {
+                    gameCore.getModule('actions').dropRunningAction(active.originalId);
+                    needReassert = true;
+                }
+            })
+            if(needReassert) {
+                gameCore.getModule('actions').activeActions = gameCore.getModule('actions').activeActions.map(active => {
+                    return {
+                        ...active,
+                        effort: (listToRun.actions.find(o => o.id === active.originalId)?.time || 0) / newTotalTime
+                    }
+                })
+                console.log('Reassert list: ', needReassert, newTotalTime, totalTime, gameCore.getModule('actions').activeActions);
+                gameCore.getModule('actions').reassertRunningEfforts();
+            }
         }
 
     }
@@ -255,6 +334,33 @@ export class ActionListsSubmodule extends GameModule {
         }, {})
 
         return result;
+    }
+
+    runCombinedList(id) {
+        const data = this.actionsLists[id];
+
+        const actionsAvailable = (data.actions || []).map(a => ({
+            ...a,
+            isAvailable: gameEntity.isEntityUnlocked(a.id) && !gameEntity.isCapped(a.id)
+        }));
+
+        const totalTime = actionsAvailable
+            .filter(action => gameEntity.isEntityUnlocked(action.id) && !gameEntity.isCapped(action.id))
+            .reduce((acc, item) => acc += item.time, 0);
+
+        const actionsFractions = actionsAvailable.map(action => ({
+            ...action,
+            effortFraction: action.time / totalTime
+        }));
+
+        // now registering entities for every action
+        gameCore.getModule('actions').stopRunningActions();
+        actionsFractions.forEach(actionToRun => {
+            gameCore.getModule('actions').addRunningAction(
+                actionToRun.id,
+                actionToRun.effortFraction
+            )
+        })
     }
 
     sendListData(id, bForceOpen = false) {

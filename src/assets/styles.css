@@ -475,6 +475,15 @@ h4 {
     width: 75px;
 }
 
+.res-cost .resource-eta {
+    font-size: 13px;
+    width: 60px;
+}
+
+.res-cost .resource-req {
+    width: 100px;
+}
+
 /*
 .flashable {
     position: relative;
@@ -595,6 +604,9 @@ h4 {
 .actions-wrap .categories {
     height: 40px;
     border-bottom: 1px solid #777777;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .card.action {
