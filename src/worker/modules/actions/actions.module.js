@@ -258,6 +258,7 @@ export class ActionsModule extends GameModule {
             for(const id in saveObject.actions) {
                 this.setAction(id, saveObject.actions[id].level, true);
                 this.actions[id].xp = saveObject.actions[id].xp;
+                this.actions[id].focus = saveObject.actions[id].focus;
             }
         }
         if(saveObject?.activeActions) {
@@ -286,7 +287,7 @@ export class ActionsModule extends GameModule {
     }
 
     getFocusCapTime(id) {
-        return 15 + (gameEffects.getEffectValue('max_focus_time') - 15)*(this.isRunningAction(id)?.effort || 0);
+        return 15 + (gameEffects.getEffectValue('max_focus_time') - 15)*(Math.pow(this.isRunningAction(id)?.effort, 0.25) ?? 0);
     }
 
     getFocusBonus(time) {
@@ -335,7 +336,9 @@ export class ActionsModule extends GameModule {
 
     stopRunningActions() {
         for(const act of this.activeActions) {
-            this.actions[act.originalId].focus = null;
+            if(this.actions[act.originalId]) {
+                this.actions[act.originalId].focus = null;
+            }
         }
         this.activeActions = [];
         const runningEntities = gameEntity.listEntitiesByTags(['runningActions']);
@@ -468,6 +471,7 @@ export class ActionsModule extends GameModule {
             actionListsUnlocked: gameEntity.getLevel('shop_item_notebook') > 0,
             actionCategories: Object.values(perCats).filter(cat => cat.items.length > 0),
             automationEnabled: this.lists.automationEnabled,
+            autotriggerIntervalSetting: this.lists.autotriggerIntervalSetting,
         }
     }
 

@@ -19,6 +19,8 @@ export class ActionListsSubmodule extends GameModule {
 
         this.combineLists = true;
 
+        this.autotriggerIntervalSetting = 10;
+
         this.eventHandler.registerHandler('save-action-list', (payload) => {
             this.saveActionList(payload);
         })
@@ -46,6 +48,10 @@ export class ActionListsSubmodule extends GameModule {
 
         this.eventHandler.registerHandler('set-automation-enabled', ({ flag }) => {
             this.automationEnabled = !!flag;
+        })
+
+        this.eventHandler.registerHandler('set-autotrigger-interval', ({ interval }) => {
+            this.autotriggerIntervalSetting = interval;
         })
 
 
@@ -198,6 +204,7 @@ export class ActionListsSubmodule extends GameModule {
             list: this.actionsLists,
             runningList: this.runningList,
             automationEnabled: this.automationEnabled,
+            autotriggerIntervalSetting: this.autotriggerIntervalSetting,
         }
     }
 
@@ -205,6 +212,7 @@ export class ActionListsSubmodule extends GameModule {
         this.actionsLists = obj?.list ?? []
         this.runningList = obj?.runningList ?? null;
         this.automationEnabled = obj?.automationEnabled;
+        this.autotriggerIntervalSetting = obj?.autotriggerIntervalSetting || 10;
         this.regenerateListsPriorityMap();
     }
 
@@ -220,7 +228,7 @@ export class ActionListsSubmodule extends GameModule {
     tick(game, delta) {
         // Here we checking autotrigger
         if(this.automationEnabled && this.listsAutotrigger.length && this.autotriggerCD <= 0) {
-            this.autotriggerCD = 10;
+            this.autotriggerCD = this.autotriggerIntervalSetting || 10;
             const autotrigger = this.getAutotriggerList();
 
             if(autotrigger && this.runningList?.id !== autotrigger) {

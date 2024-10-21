@@ -290,6 +290,10 @@ export const Actions = ({}) => {
         sendData('set-automation-enabled', { flag: !actionsData.automationEnabled })
     })
 
+    const changeAutomationInterval = useCallback((interval) => {
+        sendData('set-autotrigger-interval', { interval })
+    })
+
     const toggleShowHidden = useCallback(() => {
         sendData('toggle-show-hidden', !actionsData.showHidden)
     })
@@ -332,7 +336,7 @@ export const Actions = ({}) => {
                         </PerfectScrollbar>
                     </div>
 
-                    {actionsData.actionListsUnlocked ? (<ActionListsPanel editListToDetails={editListToDetails} lists={actionsData.actionLists} viewListToDetails={viewListToDetails} runningList={actionsData.runningList} automationEnabled={actionsData.automationEnabled} toggleAutomation={toggleAutomation}/>) : null}
+                    {actionsData.actionListsUnlocked ? (<ActionListsPanel editListToDetails={editListToDetails} lists={actionsData.actionLists} viewListToDetails={viewListToDetails} runningList={actionsData.runningList} automationEnabled={actionsData.automationEnabled} toggleAutomation={toggleAutomation} autotriggerIntervalSetting={actionsData.autotriggerIntervalSetting} changeAutomationInterval={changeAutomationInterval}/>) : null}
                 </div>
                 <div className={'action-detail ingame-box detail-blade'}>
                     <DetailBlade
@@ -636,7 +640,7 @@ export const ActionDetailsComponent = React.memo(({...action}) => {
     return true;
 })
 
-export const ActionListsPanel = ({ runningList, editListToDetails, lists, viewListToDetails, automationEnabled, toggleAutomation }) => {
+export const ActionListsPanel = ({ runningList, editListToDetails, lists, viewListToDetails, automationEnabled, toggleAutomation, autotriggerIntervalSetting, changeAutomationInterval }) => {
 
     const worker = useContext(WorkerContext);
 
@@ -698,6 +702,20 @@ export const ActionListsPanel = ({ runningList, editListToDetails, lists, viewLi
                 <label>
                     <input type={'checkbox'} checked={automationEnabled} onChange={toggleAutomation}/>
                     Lists automation enabled
+                </label>
+            </div>
+            <div className={'panel-col automation-interval'}>
+                <label>
+                    Switch lists interval:
+                    <select onChange={e => changeAutomationInterval(+e.target.value)}>
+                        <option value={10} selected={autotriggerIntervalSetting === 10}>10 seconds</option>
+                        <option value={30} selected={autotriggerIntervalSetting === 30}>30 seconds</option>
+                        <option value={60} selected={autotriggerIntervalSetting === 60}>1 minute</option>
+                        <option value={300} selected={autotriggerIntervalSetting === 300}>5 minutes</option>
+                        <option value={900} selected={autotriggerIntervalSetting === 900}>15 minutes</option>
+                        <option value={1800} selected={autotriggerIntervalSetting === 1800}>30 minutes</option>
+                        <option value={3600} selected={autotriggerIntervalSetting === 3600}>1 hour</option>
+                    </select>
                 </label>
             </div>
         </div>
