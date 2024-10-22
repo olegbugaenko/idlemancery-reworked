@@ -83,7 +83,7 @@ export class InventoryModule extends GameModule {
             }
             if(this.inventoryItems[itemId]?.autoconsume?.rules?.length) {
                 // check if matching rules
-                const isMatching = checkMatchingRules(this.inventoryItems[itemId]?.autoconsume?.rules);
+                const isMatching = checkMatchingRules(this.inventoryItems[itemId]?.autoconsume?.rules, this.inventoryItems[itemId]?.autoconsume?.pattern);
 
                 // console.log('RULES MATCHED: ', isMatching);
                 if(isMatching) {
@@ -92,7 +92,7 @@ export class InventoryModule extends GameModule {
             }
 
             if(this.inventoryItems[itemId]?.autosell?.rules?.length) {
-                const isMatching = checkMatchingRules(this.inventoryItems[itemId]?.autosell?.rules);
+                const isMatching = checkMatchingRules(this.inventoryItems[itemId]?.autosell?.rules, this.inventoryItems[itemId]?.autosell?.pattern);
 
                 if(isMatching) {
                     this.sellItem(itemId, 1);
@@ -258,10 +258,10 @@ export class InventoryModule extends GameModule {
             || this.inventoryItems[item.id]?.autosell?.rules?.length
         );
         if(pl?.filterAutomatedSell) {
-            presentItems = presentItems.filter(p => this.inventoryItems[p.id].autosell?.rules?.length)
+            presentItems = presentItems.filter(p => this.inventoryItems[p.id]?.autosell?.rules?.length)
         }
         if(pl?.filterAutomatedConsume) {
-            presentItems = presentItems.filter(p => this.inventoryItems[p.id].autoconsume?.rules?.length)
+            presentItems = presentItems.filter(p => this.inventoryItems[p.id]?.autoconsume?.rules?.length)
         }
         if(pl?.includeAutomations) {
             presentItems = presentItems.map(item => ({

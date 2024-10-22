@@ -6,6 +6,16 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+                <h3>Idle Awakening v0.0.2c</h3>
+                <div className={'features'}>
+                    <p>Fixed bug when some actions consumptions, like Home Errands didn't taken into account primary attribute</p>
+                    <p>Fixed bug action list details could overflow page</p>
+                    <p>Fixed bug when inventory page crashed sometimes</p>
+                    <p>Fixed bug when settings page crashed when trying to edit autosell rules</p>
+                    <p>Fixed bug when meditation action effect was not displaying</p>
+                    <p>Added rule conditions field to put more complex logic</p>
+                    <p>Added action level rule conditions</p>
+                </div>
                 <h3>Idle Awakening v0.0.2b</h3>
                 <div className={'features'}>
                     <p>Fixed bug when spells effects where not displayed sometimes</p>

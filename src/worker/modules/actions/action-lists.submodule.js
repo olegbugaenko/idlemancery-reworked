@@ -218,7 +218,7 @@ export class ActionListsSubmodule extends GameModule {
 
     getAutotriggerList() {
         for(const list of this.listsAutotrigger) {
-            if(checkMatchingRules(this.actionsLists[list.id]?.autotrigger?.rules)) {
+            if(checkMatchingRules(this.actionsLists[list.id]?.autotrigger?.rules, this.actionsLists[list.id]?.autotrigger?.pattern)) {
                 return list.id;
             }
         }

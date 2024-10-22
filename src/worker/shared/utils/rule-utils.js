@@ -1,4 +1,4 @@
-import {gameResources, gameCore} from "game-framework";
+import {gameResources, gameCore, gameEntity} from "game-framework";
 
 export const checkMatchingResourceRule = (rule, key) => {
     const resource = gameResources.getResource(rule.resource_id);
@@ -56,6 +56,29 @@ export const checkMatchingActionTagRule = (rule) => {
     return false;
 }
 
+export const checkMatchingActionLevelRule = (rule, key) => {
+    const action = gameEntity.getEntity(rule.action_id);
+
+    if(!action) return false;
+
+    let compare = action.level;
+
+    switch (rule.condition) {
+        case 'less':
+            return compare < rule.value;
+        case 'less_or_eq':
+            return  compare <= rule.value;
+        case 'eq':
+            return compare == rule.value;
+        case 'grt_or_eq':
+            return compare >= rule.value;
+        case 'grt':
+            return compare > rule.value;
+    }
+
+    return false;
+}
+
 
 export const checkMatchingRule = (rule) => {
     if(rule.compare_type === 'resource_amount') {
@@ -70,15 +93,30 @@ export const checkMatchingRule = (rule) => {
     if(rule.compare_type === 'running_action_tag') {
         return checkMatchingActionTagRule(rule);
     }
+    if(rule.compare_type === 'action_level') {
+        return checkMatchingActionLevelRule(rule);
+    }
 }
 
-export const checkMatchingRules = (rules) => {
-    for(const rule of rules) {
-        // console.log('RULE_CHECK: ', rule)
-        if(!checkMatchingRule(rule)) {
-            return false;
-        }
-        // console.log('RULE Matched!');
+export const checkMatchingRules = (rules, conditionStr = null) => {
+    const ruleResults = rules.map(rule => checkMatchingRule(rule));
+
+    if (!conditionStr) {
+        return ruleResults.every(result => result === true);
     }
-    return true;
-}
+
+    let conditionExpression = conditionStr;
+
+    ruleResults.forEach((result, index) => {
+        conditionExpression = conditionExpression.replace(new RegExp(`\\b${index + 1}\\b`, 'g'), result);
+    });
+
+    conditionExpression = conditionExpression.replace(/\bAND\b/g, '&&').replace(/\bOR\b/g, '||').replace(/\bNOT\b/g, '!');
+
+    try {
+        return eval(conditionExpression);  // Виконуємо вираз
+    } catch (error) {
+        console.error("Invalid condition string", error);
+        return false;
+    }
+};

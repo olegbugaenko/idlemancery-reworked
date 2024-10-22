@@ -61,7 +61,7 @@ export const Actions = ({}) => {
     })
 
     onMessage('action-list-data', (payload) => {
-        console.log(`currViewing: ${viewingList}, edit: ${editingList}`, payload);
+        // console.log(`currViewing: ${viewingList}, edit: ${editingList}`, payload);
         if(viewingList) {
             setViewedData(payload);
         } else if(editingList || payload.bForceOpen) {
@@ -234,6 +234,20 @@ export const Actions = ({}) => {
         }
     }, [listData]);
 
+    const onSetAutotriggerPattern = useCallback(pattern => {
+        if(listData) {
+            const newList = cloneDeep(listData);
+            if(!newList.autotrigger) {
+                newList.autotrigger = {};
+            }
+            if(!newList.autotrigger.rules) {
+                newList.autotrigger.rules = [];
+            }
+            newList.autotrigger.pattern = pattern;
+            setListData({...newList});
+        }
+    }, [listData]);
+
 
     const onAddAutotriggerRule = useCallback(() => {
 
@@ -353,6 +367,7 @@ export const Actions = ({}) => {
                         onSetAutotriggerRuleValue={onSetAutotriggerRuleValue}
                         onDeleteAutotriggerRule={onDeleteAutotriggerRule}
                         setAutotriggerPriority={setAutotriggerPriority}
+                        onSetAutotriggerPattern={onSetAutotriggerPattern}
                         resources={resources}
                     />
                 </div>
@@ -377,6 +392,7 @@ export const DetailBlade = ({
     onSetAutotriggerRuleValue,
     onDeleteAutotriggerRule,
     setAutotriggerPriority,
+    onSetAutotriggerPattern,
     resources
 }) => {
 
@@ -393,6 +409,7 @@ export const DetailBlade = ({
             onSetAutotriggerRuleValue={onSetAutotriggerRuleValue}
             onDeleteAutotriggerRule={onDeleteAutotriggerRule}
             setAutotriggerPriority={setAutotriggerPriority}
+            onSetAutotriggerPattern={onSetAutotriggerPattern}
             resources={resources}
         />)
     }
@@ -607,31 +624,31 @@ export const ActionDetailsComponent = React.memo(({...action}) => {
 }, (prevProps, currentProps) => {
     if(!prevProps && !currentProps) return true;
     if(!prevProps || !currentProps) {
-        console.log('One of prp null or undefined. Re-render: ', prevProps, currentProps);
+        //console.log('One of prp null or undefined. Re-render: ', prevProps, currentProps);
         return false;
     }
     if(prevProps.level !== currentProps.level) {
-        console.log('Level mismatch. Re-render: ', prevProps, currentProps);
+        //console.log('Level mismatch. Re-render: ', prevProps, currentProps);
         return false;
     }
     if(prevProps.xp !== currentProps.xp) {
-        console.log('XP mismatch. Re-render: ', prevProps, currentProps);
+        //console.log('XP mismatch. Re-render: ', prevProps, currentProps);
         return false;
     }
     if(prevProps.id !== currentProps.id) {
-        console.log('id mismatch. Re-render: ', prevProps, currentProps);
+        //console.log('id mismatch. Re-render: ', prevProps, currentProps);
         return false;
     }
 
     if(currentProps.potentialEffects.length) {
         for(let i = 0; i < currentProps.potentialEffects.length; i++) {
             if(!prevProps.potentialEffects[i]) {
-                console.log('potEff mismatch length. Re-render: ', prevProps, currentProps);
+                //console.log('potEff mismatch length. Re-render: ', prevProps, currentProps);
                 return false;
             }
 
             if(prevProps.potentialEffects[i].value !== currentProps.potentialEffects[i].value) {
-                console.log('One of prp of potEff mismatched: '+i+'. Re-render: ', prevProps, currentProps);
+               // console.log('One of prp of potEff mismatched: '+i+'. Re-render: ', prevProps, currentProps);
                 return false;
             }
         }
@@ -763,6 +780,7 @@ export const ListEditor = React.memo(({
    onSetAutotriggerRuleValue,
    onDeleteAutotriggerRule,
    setAutotriggerPriority,
+   onSetAutotriggerPattern,
    resources
 }) => {
 
@@ -799,9 +817,13 @@ export const ListEditor = React.memo(({
         onDeleteAutotriggerRule(index);
     }
 
+    const setAutotriggerPattern = (pattern) => {
+        onSetAutotriggerPattern(pattern)
+    }
+
     if(!editing) return ;
 
-    return (<div className={'list-editor'}>
+    return (<PerfectScrollbar><div className={'list-editor'}>
         <div className={'main-wrap'}>
             <div className={'main-row'}>
                 <span>Name</span>
@@ -863,6 +885,8 @@ export const ListEditor = React.memo(({
                 resources={resources}
                 deleteRule={deleteAutotriggerRule}
                 setRuleValue={setAutotriggerRuleValue}
+                setPattern={setAutotriggerPattern}
+                pattern={editing.autotrigger?.pattern || ''}
             />
         </div>
         {isEditing ? (<div className={'buttons'}>
@@ -870,7 +894,7 @@ export const ListEditor = React.memo(({
             <button onClick={() => saveAndClose(true)}>{listData?.id ? 'Save & Close' : 'Create & Close'}</button>
             <button onClick={onCloseList}>Cancel</button>
         </div>) : null}
-    </div> )
+    </div></PerfectScrollbar> )
 }, ((prevProps, currentProps) => {
 
     if(prevProps.isEditing !== currentProps.isEditing) return false;

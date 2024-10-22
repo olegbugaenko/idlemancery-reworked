@@ -22,7 +22,13 @@ const registerGameAction = (id, options) => {
     
     options.getPrimaryEffect = () => getPrimaryBonus(primaryAttribute);
 
-    options.resourceModifier.getCustomAmplifier = () => (options.attributes.isTraining ? 1 : 1*options.getPrimaryEffect());
+    if(options.attributes.isTraining) {
+        options.resourceModifier.customAmplifierApplyTypes = ['resources']
+    } else {
+        options.resourceModifier.customAmplifierApplyTypes = ['effects', 'resources']
+    }
+
+    options.resourceModifier.getCustomAmplifier = () => options.getPrimaryEffect();
     
     return gameEntity.registerGameEntity(id, options);
     
@@ -975,7 +981,7 @@ export const registerActionsStage1 = () => {
                         type: 0,
                     },
                     'attribute_patience': {
-                        A: 0.5,
+                        A: 0.25,
                         B: 0,
                         type: 0,
                     }
@@ -1005,6 +1011,7 @@ export const registerActionsStage1 = () => {
         },
         attributes: {
             baseXPCost: 100,
+            isTraining: true,
         }
     })
 

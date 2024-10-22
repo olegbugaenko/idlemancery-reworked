@@ -103,7 +103,7 @@ export class SpellModule extends GameModule {
             }
 
             // check if matching rules
-            const isMatching = checkMatchingRules(this.spells[itemId]?.autocast?.rules);
+            const isMatching = checkMatchingRules(this.spells[itemId]?.autocast?.rules, this.spells[itemId]?.autocast?.pattern);
 
             // console.log('RULES MATCHED: ', isMatching);
             if(isMatching) {

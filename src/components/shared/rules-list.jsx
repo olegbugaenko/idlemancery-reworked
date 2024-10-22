@@ -3,6 +3,7 @@ import Select from 'react-select';
 import { isEqual } from 'lodash';
 import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
+import {TippyWrapper} from "./tippy-wrapper.jsx";
 
 const customStyles = {
     control: (provided, state) => ({
@@ -126,10 +127,24 @@ const mapCompareType = {
         ],
         isHideValue: true,
     },
+    'action_level': {
+        label: 'Action Level',
+        subject: 'action_id',
+        availableConditions: [
+            'less',
+            'less_or_eq',
+            'eq',
+            'grt_or_eq',
+            'grt',
+        ],
+        availableValueTypes: [
+            'exact'
+        ],
+    }
 };
 
 const RulesList = React.memo(
-    ({ prefix = 'default', rules, isEditing, setRuleValue, deleteRule }) => {
+    ({ prefix = 'default', rules, isEditing, setRuleValue, deleteRule, pattern, setPattern }) => {
         const worker = useContext(WorkerContext);
 
         const { onMessage, sendData } = useWorkerClient(worker);
@@ -211,8 +226,6 @@ const RulesList = React.memo(
                                 value: item.id,
                                 label: item.name,
                             }));
-
-                        console.log('SubObj: ', subjectOptions, subjectArray, resources, actions, tags);
 
                         subjectValue = subjectOptions.find(
                             (option) =>
@@ -383,11 +396,29 @@ const RulesList = React.memo(
                         </div>
                     );
                 })}
+                <TippyWrapper content={<div className={'hint-popup'}>
+                    <p>You can set more complex matching conditions, like (1 AND 2) OR 3, where numbers are numbers of your rules</p>
+                </div> }>
+                    <div className={'pattern-wrap flex-container'}>
+                        <span className={'pattern-label'}>Rules Condition: </span>
+                        {isEditing ? (<input
+                            value={pattern}
+                            placeholder={Array.from({ length: rules.length }).map((a, i) => i+1).join(' AND ')}
+                            onChange={(e) => setPattern(e.target.value?.toUpperCase())}
+                        />) : (<span>
+                        {pattern || Array.from({ length: rules.length }).map((a, i) => i+1).join(' AND ')}
+                    </span>)}
+                    </div>
+                </TippyWrapper>
+
             </div>
         );
     },
     (prev, curr) => {
         if (!isEqual(prev.rules, curr.rules)) {
+            return false;
+        }
+        if(prev.pattern !== curr.pattern) {
             return false;
         }
         if (prev.isEditing !== curr.isEditing) return false;

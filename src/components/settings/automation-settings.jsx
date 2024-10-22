@@ -72,6 +72,7 @@ export const ActionsAutomations = ({ resources }) => {
             autotrigger: {
                 priority: saveData.priority,
                 rules: saveData.rules,
+                pattern: saveData.pattern
             }
         }
         console.log('Saving data: ', toSave);
@@ -99,9 +100,11 @@ export const AutomatedAction = ({ auto, resources, onSaveAction }) => {
     })
 
     return <AutomatedItem
+        scope={'autotrigger'}
         id={auto.id}
         name={auto.name}
         rules={auto.autotrigger.rules}
+        pattern={auto.autotrigger.pattern}
         resources={resources}
         isPriorityShown={true}
         priority={auto.autotrigger.priority}
@@ -134,6 +137,7 @@ export const ConsumeAutomations = ({ resources }) => {
             ...prev,
             autoconsume: {
                 rules: saveData.rules,
+                pattern: saveData.pattern
             }
         }
         console.log('Saving consume: ', toSave);
@@ -161,9 +165,11 @@ export const AutomatedConsumption = ({ auto, resources, onSaveConsume }) => {
     })
 
     return <AutomatedItem
+        scope={'autoconsume'}
         id={auto.id}
         name={auto.name}
         rules={auto.autoconsume.rules}
+        pattern={auto.autoconsume.pattern}
         resources={resources}
         isPriorityShown={false}
         onSave={onSave}
@@ -224,9 +230,11 @@ export const AutomatedSell = ({ auto, resources, onSaveSell }) => {
     })
 
     return <AutomatedItem
+        scope={'autosell'}
         id={auto.id}
         name={auto.name}
         rules={auto.autosell.rules}
+        pattern={auto.autosell.pattern}
         resources={resources}
         isPriorityShown={false}
         onSave={onSave}
@@ -259,6 +267,7 @@ export const SpellAutomations = ({ resources }) => {
             ...prev,
             autocast: {
                 rules: saveData.rules,
+                pattern: saveData.pattern
             }
         }
         console.log('Saving spell: ', toSave);
@@ -286,9 +295,11 @@ export const AutomatedSpell = ({ auto, resources, onSaveSpell }) => {
     })
 
     return <AutomatedItem
+        scope={'autocast'}
         id={auto.id}
         name={auto.name}
         rules={auto.autocast.rules}
+        pattern={auto.autocast.pattern}
         resources={resources}
         isPriorityShown={false}
         onSave={onSave}
@@ -298,11 +309,13 @@ export const AutomatedSpell = ({ auto, resources, onSaveSpell }) => {
 
 
 export const AutomatedItem = ({
+    scope,
     id,
     name,
     priority,
     isPriorityShown,
     rules,
+    pattern,
     resources,
     onSave
 }) => {
@@ -314,6 +327,7 @@ export const AutomatedItem = ({
     useEffect(() => {
         setEditedValues({
             priority,
+            pattern,
             rules: rules ?? []
         })
     }, [rules, priority])
@@ -325,6 +339,18 @@ export const AutomatedItem = ({
                 newValues.rules = [];
             }
             newValues.priority = priority;
+            setEditedValues({...newValues});
+            setChanged(true);
+        }
+    }, [editedValues, isEditing]);
+
+    const setPattern = useCallback((pattern) => {
+        if(isEditing && editedValues) {
+            const newValues = cloneDeep(editedValues);
+            if(!newValues.rules) {
+                newValues.rules = [];
+            }
+            newValues.pattern = pattern;
             setEditedValues({...newValues});
             setChanged(true);
         }
@@ -402,12 +428,14 @@ export const AutomatedItem = ({
         <div className={'col rules-wrap'}>
             <p>Rules {isEditing ? (<button onClick={addRule}>Add Rule</button>) : null}</p>
             <RulesList
-                prefix={`automation-${id}`}
+                prefix={`${scope}-automation-${id}`}
                 rules={editedValues.rules}
+                pattern={editedValues.pattern}
                 isEditing={isEditing}
                 resources={resources}
                 setRuleValue={setRuleValue}
                 deleteRule={deleteRule}
+                setPattern={setPattern}
             />
         </div>
         <div className={'col auto-actions-wrap'}>

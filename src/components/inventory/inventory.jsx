@@ -121,6 +121,21 @@ export const Inventory = ({}) => {
 
     })
 
+    const onSetAutoconsumePattern = useCallback(pattern => {
+        if(editData) {
+            const newEdit = cloneDeep(editData);
+            if(!newEdit.autoconsume) {
+                newEdit.autoconsume = {};
+            }
+            if(!newEdit.autoconsume.rules) {
+                newEdit.autoconsume.rules = [];
+            }
+            newEdit.autoconsume.pattern = pattern;
+            setEditData({...newEdit});
+            setChanged(true);
+        }
+    }, [editData]);
+
     const onAddAutoconsumeRule = useCallback(() => {
         if(editData) {
             const newEdit = cloneDeep(editData);;
@@ -155,6 +170,21 @@ export const Inventory = ({}) => {
             setChanged(true);
         }
     }, [editData])
+
+    const onSetAutosellPattern = useCallback(pattern => {
+        if(editData) {
+            const newEdit = cloneDeep(editData);
+            if(!newEdit.autosell) {
+                newEdit.autosell = {};
+            }
+            if(!newEdit.autosell.rules) {
+                newEdit.autosell.rules = [];
+            }
+            newEdit.autosell.pattern = pattern;
+            setEditData({...newEdit});
+            setChanged(true);
+        }
+    }, [editData]);
 
     const onAddAutosellRule = useCallback(() => {
         if(editData) {
@@ -254,6 +284,8 @@ export const Inventory = ({}) => {
                     onAddAutosellRule={onAddAutosellRule}
                     onSetAutosellRuleValue={onSetAutosellRuleValue}
                     onDeleteAutosellRule={onDeleteAutosellRule}
+                    onSetAutoconsumePattern={onSetAutoconsumePattern}
+                    onSetAutosellPattern={onSetAutosellPattern}
                     onSave={onSave}
                     onCancel={onCancel}
                     onSell={onSell}
@@ -328,7 +360,7 @@ export const InventoryCard = React.memo(({ isChanged, isSelected, id, name, amou
     return true;
 }))
 
-export const InventoryDetails = React.memo(({isChanged, editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onAddAutosellRule, onSetAutosellRuleValue, onDeleteAutosellRule, onSave, onCancel, onSell}) => {
+export const InventoryDetails = React.memo(({isChanged, editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onAddAutosellRule, onSetAutosellRuleValue, onDeleteAutosellRule, onSave, onCancel, onSell, onSetAutosellPattern, onSetAutoconsumePattern}) => {
 
     const item = viewedData ? viewedData : editData;
 
@@ -336,6 +368,10 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
 
 
     if(!item) return null;
+
+    const setAutoconsumePattern = (pattern) => {
+      onSetAutoconsumePattern(pattern)
+    }
 
     const addAutoconsumeRule = () => {
         onAddAutoconsumeRule()
@@ -347,6 +383,10 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
 
     const deleteAutoconsumeRule = () => {
         onDeleteAutoconsumeRule()
+    }
+
+    const setAutosellPattern = (pattern) => {
+        onSetAutosellPattern(pattern)
     }
 
     const addAutosellRule = () => {
@@ -404,8 +444,10 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
                         isEditing={isEditing}
                         rules={item.autoconsume?.rules || []}
                         resources={resources}
+                        pattern={item.autoconsume?.pattern}
                         deleteRule={deleteAutoconsumeRule}
                         setRuleValue={setAutoconsumeRuleValue}
+                        setPattern={setAutoconsumePattern}
                     />
                 </div>
 
@@ -419,9 +461,11 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
                         prefix={'autosell'}
                         isEditing={isEditing}
                         rules={item.autosell?.rules || []}
+                        pattern={item.autosell?.pattern}
                         resources={resources}
                         deleteRule={deleteAutosellRule}
                         setRuleValue={setAutosellRuleValue}
+                        setPattern={setAutosellPattern}
                     />
                 </div>) : null}
 

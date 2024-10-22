@@ -121,6 +121,21 @@ export const Spellbook = ({}) => {
         }
     }, [editData])
 
+    const onSetAutocastPattern = useCallback(pattern => {
+        if(editData) {
+            const newEdit = cloneDeep(editData);
+            if(!newEdit.autocast) {
+                newEdit.autocast = {};
+            }
+            if(!newEdit.autocast.rules) {
+                newEdit.autocast.rules = [];
+            }
+            newEdit.autocast.pattern = pattern;
+            setEditData({...newEdit});
+            setChanged(true);
+        }
+    }, [editData]);
+
     const onAddAutoconsumeRule = useCallback(() => {
         if(editData) {
             const newEdit = cloneDeep(editData);
@@ -193,7 +208,7 @@ export const Spellbook = ({}) => {
                 </PerfectScrollbar>
             </div>
             <div className={'item-detail ingame-box detail-blade'}>
-                {editData || viewedData ? (<SpellDetails isChanged={isChanged} editData={editData} viewedData={viewedData} resources={resources} onAddAutoconsumeRule={onAddAutoconsumeRule} onSetAutoconsumeRuleValue={onSetAutoconsumeRuleValue} onDeleteAutoconsumeRule={onDeleteAutoconsumeRule} onChangeLevel={onChangeLevel} onSave={onSave} onCancel={onCancel}/>) : null}
+                {editData || viewedData ? (<SpellDetails isChanged={isChanged} editData={editData} viewedData={viewedData} resources={resources} onAddAutoconsumeRule={onAddAutoconsumeRule} onSetAutoconsumeRuleValue={onSetAutoconsumeRuleValue} onDeleteAutoconsumeRule={onDeleteAutoconsumeRule} onSetAutocastPattern={onSetAutocastPattern} onChangeLevel={onChangeLevel} onSave={onSave} onCancel={onCancel}/>) : null}
             </div>
         </div>
 
@@ -253,7 +268,7 @@ export const SpellCard = React.memo(({ id, isChanged, name, isCasted, cooldownPr
     return true;
 }))
 
-export const SpellDetails = React.memo(({isChanged, editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onChangeLevel, onSave, onCancel}) => {
+export const SpellDetails = React.memo(({isChanged, editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onSetAutocastPattern, onChangeLevel, onSave, onCancel}) => {
 
     const item = viewedData ? viewedData : editData;
 
@@ -272,6 +287,10 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
 
     const deleteAutoconsumeRule = index => {
         onDeleteAutoconsumeRule(index);
+    }
+
+    const setAutocastPattern = pattern => {
+        onSetAutocastPattern(pattern);
     }
 
 
@@ -329,8 +348,10 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
                         isEditing={isEditing}
                         rules={item.autocast?.rules || []}
                         resources={resources}
+                        pattern={item.autocast?.pattern}
                         deleteRule={deleteAutoconsumeRule}
                         setRuleValue={setAutoconsumeRuleValue}
+                        setPattern={setAutocastPattern}
                     />
 
                 </div>
