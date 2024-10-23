@@ -262,6 +262,12 @@ const RulesList = React.memo(
                             }))
                             : [];
 
+                    if(selectedCompareType && selectedCompareType.availableValueTypes) {
+                        if(!selectedCompareType.availableValueTypes.includes(rule.value_type)) {
+                            setRuleValue(index, 'value_type', selectedCompareType.availableValueTypes[0])
+                        }
+                    }
+
                     const isHideValue = selectedCompareType
                         ? selectedCompareType.isHideValue
                         : false;
@@ -384,8 +390,6 @@ const RulesList = React.memo(
                                     )}
                                 </div>
                             )}
-
-                            {/* Кнопка для видалення правила */}
                             {isEditing && (
                                 <div className="col delete-rule">
                   <span className="close" onClick={() => deleteRule(index)}>

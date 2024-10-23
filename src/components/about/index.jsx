@@ -6,6 +6,11 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+                <h3>Idle Awakening v0.0.2d</h3>
+                <div className={'features'}>
+                    <p>Fixed bug when filter by level value input had unnecessary restrictions</p>
+                    <p>Fixed bug some UI elements where hidden by scroll-bar</p>
+                </div>
                 <h3>Idle Awakening v0.0.2c</h3>
                 <div className={'features'}>
                     <p>Fixed bug when some actions consumptions, like Home Errands didn't taken into account primary attribute</p>

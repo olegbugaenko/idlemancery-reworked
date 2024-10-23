@@ -422,7 +422,7 @@ h4 {
 
 .detail-blade {
     height: 100%;
-    width: 300px;
+    width: 320px;
     margin-left: 10px;
     background: var(--darkbg);
 }
@@ -1122,4 +1122,8 @@ h4 {
 
 .pattern-wrap.flex-container input {
     width: 120px;
+}
+
+.list-editor {
+    padding-right: 12px;
 }
