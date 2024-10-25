@@ -6,7 +6,7 @@ import {formatInt} from "../../general/utils/strings";
 import {FlashOverlay} from "../layout/flash-overlay.jsx";
 import {useFlashOnLevelUp} from "../../general/hooks/flash";
 
-export const FurnitureUpgrades = ({ setItemDetails, purchaseItem, deleteItem }) => {
+export const AccessoryUpgrades = ({ setItemDetails, purchaseItem }) => {
 
     const worker = useContext(WorkerContext);
 
@@ -21,7 +21,7 @@ export const FurnitureUpgrades = ({ setItemDetails, purchaseItem, deleteItem }) 
 
     useEffect(() => {
         const interval = setInterval(() => {
-            sendData('query-furnitures-data', { filterId: 'furniture' });
+            sendData('query-furnitures-data', { filterId: 'accessory' });
         }, 100);
         return () => {
             clearInterval(interval);
@@ -43,16 +43,10 @@ export const FurnitureUpgrades = ({ setItemDetails, purchaseItem, deleteItem }) 
     };
 
     return (<div className={'furniture-wrap'}>
-        <div className={'head'}>
-            <div className={'space-item'}>
-                <span>Space:</span>
-                <span>{formatInt(furnituresData.space.total)}/{formatInt(furnituresData.space.max)}</span>
-            </div>
-        </div>
         <div className={'furnitures-cat'}>
             <PerfectScrollbar>
                 <div className={'flex-container'}>
-                    {furnituresData.available.map(furniture => <ItemCard key={furniture.id} {...furniture} onFlash={handleFlash} onPurchase={purchaseItem} onShowDetails={setItemDetails} onDelete={deleteItem}/>)}
+                    {furnituresData.available.map(furniture => <ItemCard key={furniture.id} {...furniture} onFlash={handleFlash} onPurchase={purchaseItem} onShowDetails={setItemDetails} />)}
                     {overlayPositions.map((position, index) => (
                         <FlashOverlay key={index} position={position} />
                     ))}
@@ -75,7 +69,7 @@ export const ItemCard = ({ id, name, level, max, affordable, isLeveled, isCapped
         <div className={'bottom'}>
             <div className={'buttons'}>
                 <button disabled={!affordable.isAffordable || isCapped} onClick={() => onPurchase(id)}>Purchase</button>
-                <button disabled={level <= 0} onClick={() => onDelete(id)}>Remove</button>
+                {/*<button disabled={level <= 0} onClick={() => onDelete(id)}>Remove</button>*/}
             </div>
         </div>
     </div> )

@@ -62,3 +62,18 @@ a) Deal with changes to efforts when something becomes unavailable while running
 b) Deal with focuses
 [V] Show ETA's on learning/resource availability
 [V] Add possibility to hide actions
+
+v0.3
+[V] Implement "Materials" tab in inventory
+[V] Add lumberjack job, gathering wood
+[V] Implement module and page for materials crafting
+[V] Implement module and page for making accessories
+Add Conjuration magic and 2 resources: water and wood
+Add shop items: book of herbalism and woodworking manual
+Implement alchemy
+
+---
+Troubles: missing something providing energy very bad. It can be fixed with alchemy, however.
+So, tomorrow:
+1. Implement alchemy
+2. Test it on save files of other players

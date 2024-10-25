@@ -6,6 +6,10 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+                <h3>Idle Awakening v0.0.3</h3>
+                <div className={'features'}>
+
+                </div>
                 <h3>Idle Awakening v0.0.2d</h3>
                 <div className={'features'}>
                     <p>Fixed bug when filter by level value input had unnecessary restrictions</p>

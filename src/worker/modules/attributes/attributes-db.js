@@ -85,4 +85,17 @@ export const registerAttributes = () => {
         saveBalanceTree: true,
         tags: ['attribute', 'magical']
     })
+
+    gameEffects.registerEffect('attribute_magic_capability', {
+        name: 'Magic Capabilty',
+        description: 'Improves your mana capacity',
+        minValue: 1,
+        defaultValue: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_magic_training') > 0
+        },
+        hasCap: false,
+        saveBalanceTree: true,
+        tags: ['attribute', 'magical']
+    })
 }

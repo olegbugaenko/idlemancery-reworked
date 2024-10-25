@@ -106,6 +106,11 @@ export class MageModule extends GameModule {
                             A: 1,
                             B: gameEffects.getEffectValue('attribute_memory'),
                             type: 0
+                        },
+                        mana: {
+                            A: 0,
+                            B: 0.5*(gameEffects.getEffectValue('attribute_magic_capability')-1),
+                            type: 0
                         }
                     }
                 }),
@@ -133,7 +138,7 @@ export class MageModule extends GameModule {
                         }
                     }
                 }),
-                effectDeps: ['workersEfficiencyPerDragonLevel', 'mage_levelup_requirement', 'attribute_stamina', 'attribute_strength', 'attribute_vitality','attribute_recovery', 'attribute_memory', 'attribute_magic_ability']
+                effectDeps: ['workersEfficiencyPerDragonLevel', 'mage_levelup_requirement', 'attribute_stamina', 'attribute_strength', 'attribute_vitality','attribute_recovery', 'attribute_memory', 'attribute_magic_ability', 'attribute_magic_capability']
             },
             get_cost: () => ({
                 'mage-xp': {

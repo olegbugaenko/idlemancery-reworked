@@ -225,4 +225,48 @@ export const registerInventoryItems = () => {
         sellPrice: 20,
     })
 
+
+    gameResources.registerResource('inventory_wood', {
+        name: 'Wood',
+        hasCap: false,
+        tags: ['inventory', 'material'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        attributes: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0
+        },
+        sellPrice: 50,
+        get_cost: (amount = 1) => ({
+            coins: amount*500*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+        }),
+    })
+
+
+    gameResources.registerResource('inventory_refined_wood', {
+        name: 'Refined Wood',
+        hasCap: false,
+        tags: ['inventory', 'material', 'craftable'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        attributes: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0
+        },
+        sellPrice: 150,
+        get_cost: (amount = 1) => ({
+            coins: amount*500*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+        }),
+    })
+
 }

@@ -1,8 +1,6 @@
 import React, {useContext, useEffect, useState} from "react";
 import {Sidebar} from "./sidebar.jsx";
 import {Popup} from "./popup.jsx";
-import WorkerContext from "../../context/worker-context";
-import {useWorkerClient} from "../../general/client";
 import {useAppContext} from "../../context/ui-context";
 import {Actions} from "../actions/actions.jsx";
 import {Shop} from "../shop/shop.jsx";
@@ -11,6 +9,7 @@ import {Property} from "../property/index.jsx";
 import {Spellbook} from "../spellbook/spellbook.jsx";
 import {Settings} from "../settings/index.jsx";
 import {About} from "../about/index.jsx";
+import {Workshop} from "../workshop/index.jsx";
 
 export const Content = () => {
 
@@ -44,6 +43,10 @@ export const GetContent = ({ tab }) => {
 
     if(tab === 'property') {
         return <Property />
+    }
+
+    if(tab === 'workshop') {
+        return <Workshop />
     }
 
     if(tab === 'spellbook') {

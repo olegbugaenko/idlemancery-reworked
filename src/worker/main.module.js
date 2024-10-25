@@ -8,6 +8,8 @@ import {ShopModule} from "./modules/items/shop.module";
 import {InventoryModule} from "./modules/inventory/inventory.module";
 import {PropertyModule} from "./modules/property/property.module";
 import {SpellModule} from "./modules/magic/spells.module";
+import {CraftingModule} from "./modules/workshop/crafting.module";
+import {prefix} from "react-beautiful-dnd/src/view/data-attributes";
 
 
 export class MainModule extends GameModule {
@@ -22,6 +24,7 @@ export class MainModule extends GameModule {
         gameCore.registerModule('shop', ShopModule);
         gameCore.registerModule('inventory', InventoryModule);
         gameCore.registerModule('magic', SpellModule);
+        gameCore.registerModule('crafting', CraftingModule);
 
 
 
@@ -50,16 +53,22 @@ export class MainModule extends GameModule {
             })
         })
 
-        this.eventHandler.registerHandler('query-unlocks', () => {
+        this.eventHandler.registerHandler('query-unlocks', (payload) => {
             const unlocks = {
                 'actions': true,
                 'actionLists': gameEntity.getLevel('shop_item_notebook') > 0,
                 'shop': gameCore.getModule('shop').isUnlocked,
                 'inventory': gameEntity.getLevel('shop_item_backpack') > 0,
                 'property': gameEntity.getLevel('shop_item_tent') > 0,
-                'spellbook': gameEntity.getLevel('shop_item_spellbook') > 0
+                'spellbook': gameEntity.getLevel('shop_item_spellbook') > 0,
+                'crafting': gameEntity.getLevel('shop_item_crafting_courses') > 0,
+                'workshop': gameEntity.getLevel('shop_item_crafting_courses') > 0 // here alchemy reqs should be added
             }
-            this.eventHandler.sendData('unlocks', unlocks);
+            let label = 'unlocks';
+            if(payload?.prefix) {
+                label = `${label}-${payload?.prefix}`;
+            }
+            this.eventHandler.sendData(label, unlocks);
         })
 
         this.eventHandler.registerHandler('get-save-string', ({ type }) => {

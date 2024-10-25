@@ -10,6 +10,7 @@ import {useFlashOnLevelUp} from "../../general/hooks/flash";
 import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
 import RulesList from "../shared/rules-list.jsx";
 import {cloneDeep} from "lodash";
+import {BreakDown} from "../layout/sidebar.jsx";
 
 export const Inventory = ({}) => {
 
@@ -18,7 +19,8 @@ export const Inventory = ({}) => {
     const { onMessage, sendData } = useWorkerClient(worker);
     const [inventoryData, setItemsData] = useState({
         available: [],
-        current: undefined
+        current: undefined,
+        itemCategories: [],
     });
     const [detailOpenedId, setDetailOpenedId] = useState(null); // here should be object containing id and rules
     const [viewedOpenedId, setViewedOpenedId] = useState(null);
@@ -251,26 +253,38 @@ export const Inventory = ({}) => {
         }, 1000);
     };
 
+
+    const setItemsFilter = (filterId) => {
+        sendData('set-selected-inventory-filter', { filterId })
+    }
+
     return (
         <div className={'inventory-wrap'}>
             <div className={'ingame-box inventory'}>
-                <PerfectScrollbar>
-                    <div className={'flex-container'}>
-                        {inventoryData.available.map(item => <InventoryCard
-                            key={item.id}
-                            isSelected={item.id === detailOpenedId?.id}
-                            isChanged={isChanged}
-                            {...item}
-                            onPurchase={purchaseItem}
-                            onFlash={handleFlash}
-                            onShowDetails={setInventoryDetailsView}
-                            onEditConfig={setInventoryDetailsEdit}
-                        />)}
-                        {overlayPositions.map((position, index) => (
-                            <FlashOverlay key={index} position={position} />
-                        ))}
-                    </div>
-                </PerfectScrollbar>
+                <div className={'categories flex-container'}>
+                    <ul className={'menu'}>
+                        {inventoryData.itemCategories.map(category => (<li className={`category ${category.isSelected ? 'active' : ''}`} onClick={() => setItemsFilter(category.id)}><span>{category.name}({category.items.length})</span></li> ))}
+                    </ul>
+                </div>
+                <div className={'inventory-items-wrap'}>
+                    <PerfectScrollbar>
+                        <div className={'flex-container'}>
+                            {inventoryData.available.map(item => <InventoryCard
+                                key={item.id}
+                                isSelected={item.id === detailOpenedId?.id}
+                                isChanged={isChanged}
+                                {...item}
+                                onPurchase={purchaseItem}
+                                onFlash={handleFlash}
+                                onShowDetails={setInventoryDetailsView}
+                                onEditConfig={setInventoryDetailsEdit}
+                            />)}
+                            {overlayPositions.map((position, index) => (
+                                <FlashOverlay key={index} position={position} />
+                            ))}
+                        </div>
+                    </PerfectScrollbar>
+                </div>
             </div>
             <div className={'item-detail ingame-box detail-blade'}>
                 {editData || viewedData ? (<InventoryDetails
@@ -297,7 +311,7 @@ export const Inventory = ({}) => {
 
 }
 
-export const InventoryCard = React.memo(({ isChanged, isSelected, id, name, amount, isConsumed, cooldownProg, cooldown, onFlash, onPurchase, onShowDetails, onEditConfig}) => {
+export const InventoryCard = React.memo(({ isChanged, isConsumable, isSelected, id, name, amount, balance, breakDown, isConsumed, cooldownProg, cooldown, onFlash, onPurchase, onShowDetails, onEditConfig}) => {
     const elementRef = useRef(null);
 
     useFlashOnLevelUp(isConsumed, onFlash, elementRef);
@@ -320,8 +334,10 @@ export const InventoryCard = React.memo(({ isChanged, isSelected, id, name, amou
 
     return (<div ref={elementRef} className={`icon-card item flashable ${isSelected ? 'selected' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)} onClick={handleClick} onContextMenu={handleContextMenu}>
         <TippyWrapper content={<div className={'hint-popup'}>
+            {breakDown ? (<BreakDown breakDown={breakDown}/>) : null}
+            <p>Balance: {formatValue(balance)}</p>
             <p>Left click to select</p>
-            <p>Right click to consume</p>
+            {isConsumable ? (<p>Right click to consume</p>) : null}
         </div> }>
             <div className={'icon-content'}>
                 <CircularProgress progress={cooldownProg}>

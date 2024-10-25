@@ -228,8 +228,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'coins': {
-                        A: 0.1*gameEffects.getEffectValue('coins_earned_bonus'),
-                        B: 0.9*gameEffects.getEffectValue('coins_earned_bonus'),
+                        A: 0.2*gameEffects.getEffectValue('coins_earned_bonus'),
+                        B: 1.8*gameEffects.getEffectValue('coins_earned_bonus'),
                         type: 0,
                     }
                 }
@@ -243,7 +243,7 @@ export const registerActionsStage1 = () => {
                     },
                     'health': {
                         A: 0.0,
-                        B: 6,
+                        B: 3,
                         type: 0,
                     }
                 }
@@ -257,6 +257,50 @@ export const registerActionsStage1 = () => {
         }],
         attributes: {
             baseXPCost: 20,
+            primaryAttribute: 'attribute_strength'
+        }
+    })
+
+    registerGameAction('action_woodcutter', {
+        tags: ["action", "activity", "physical"],
+        name: 'Woodcutting',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Spend some time working hard to get some wood',
+        level: 1,
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'inventory_wood': {
+                        A: 0.002,
+                        B: 0.008,
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 8,
+                        type: 0,
+                    },
+                    'health': {
+                        A: 0.0,
+                        B: 4,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: []
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 100,
+        }],
+        attributes: {
+            baseXPCost: 500,
             primaryAttribute: 'attribute_strength'
         }
     })
@@ -563,7 +607,7 @@ export const registerActionsStage1 = () => {
     })
 
     registerGameAction('action_read_books', {
-        tags: ["action", "activity", "mental"],
+        tags: ["action", "activity", "mental", "book"],
         name: 'Read Books',
         isAbstract: false,
         allowedImpacts: ['effects'],
@@ -701,7 +745,7 @@ export const registerActionsStage1 = () => {
 
 
     registerGameAction('action_learn_anatomy', {
-        tags: ["action", "training", "mental"],
+        tags: ["action", "training", "mental", "book"],
         name: 'Learn Anatomy',
         isAbstract: false,
         allowedImpacts: ['effects'],
@@ -966,7 +1010,7 @@ export const registerActionsStage1 = () => {
     })
 
     registerGameAction('action_meditate', {
-        tags: ["action", "training", "magical", "routine"],
+        tags: ["action", "training", "magical", "spiritual"],
         name: 'Meditate',
         isAbstract: false,
         allowedImpacts: ['effects'],
@@ -1004,7 +1048,7 @@ export const registerActionsStage1 = () => {
             effectDeps: []
         },
         getLearnRate: () => {
-            return gameEffects.getEffectValue('routine_learning_speed')
+            return gameEffects.getEffectValue('spiritual_learning_rate')
         },
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_meditation') > 0
@@ -1015,4 +1059,187 @@ export const registerActionsStage1 = () => {
         }
     })
 
+
+    registerGameAction('action_magic_training', {
+        tags: ["action", "training", "magical", "spiritual"],
+        name: 'Magic Training',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Improve your magic capability using practices of ancient monks',
+        level: 1,
+        resourceModifier: {
+            income: {
+                effects: {
+                    'attribute_magic_capability': {
+                        A: 1,
+                        B: 0,
+                        type: 0,
+                    },
+                }
+            },
+            consumption: {
+                resources: {
+                    'energy': {
+                        A: 0,
+                        B: 5.00,
+                        type: 0
+                    },
+                    'knowledge': {
+                        A: 0,
+                        B: 1.00,
+                        type: 0
+                    }
+                }
+            },
+            effectDeps: []
+        },
+        getLearnRate: () => {
+            return gameEffects.getEffectValue('spiritual_learning_rate')
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_magic_training') > 0
+        },
+        attributes: {
+            baseXPCost: 200,
+            isTraining: true,
+        }
+    })
+
+
+    registerGameAction('action_spiritual_alignment', {
+        tags: ["action", "activity", "mental"],
+        name: 'Spiritual Alignment',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Spend some time trying to hear the magic inside you. Improve your feeling of yourself',
+        level: 1,
+        getLearnRate: () => {
+            return 1.
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'spiritual_learning_rate': {
+                        A: 0.05,
+                        B: 0.95,
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 5,
+                        type: 0,
+                    },
+                    'knowledge': {
+                        A: 0,
+                        B: 2.5,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: []
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_spiritualism') > 0
+        },
+        attributes: {
+            baseXPCost: 200,
+            isTraining: true
+        }
+    })
+
+
+    registerGameAction('action_craft', {
+        tags: ["action", "activity", "physical", "crafting"],
+        name: 'Craft',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Dedicate your time and efforts to crafting',
+        level: 1,
+        getLearnRate: () => {
+            return 2
+        },
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'crafting_ability': {
+                        A: 0.001,
+                        B: 0.009,
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 5,
+                        type: 0,
+                    },
+                    'health': {
+                        A: 0.0,
+                        B: 1.5,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: []
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0
+        },
+        attributes: {
+            baseXPCost: 100,
+            primaryAttribute: 'attribute_strength'
+        }
+    })
+
+
+    registerGameAction('action_alchemy', {
+        tags: ["action", "activity", "physical", "crafting"],
+        name: 'Alchemy',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Spent some time brewing potions',
+        level: 1,
+        getLearnRate: () => {
+            return 2
+        },
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'alchemy_ability': {
+                        A: 0.001,
+                        B: 0.009,
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 5,
+                        type: 0,
+                    },
+                    'health': {
+                        A: 0.0,
+                        B: 1.5,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: []
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_alchemy_courses') > 0
+        },
+        attributes: {
+            baseXPCost: 100,
+            primaryAttribute: 'attribute_patience'
+        }
+    })
 }

@@ -2,6 +2,7 @@ import {registerActionsStage1} from "./actions-db";
 import {GameModule} from "../../shared/game-module";
 import {gameEntity, gameResources, gameEffects, resourceCalculators} from "game-framework";
 import {ActionListsSubmodule} from "./action-lists.submodule";
+import {calculateTimeToLevelUp} from "../../shared/utils/math";
 
 export class ActionsModule extends GameModule {
 
@@ -117,6 +118,12 @@ export class ActionsModule extends GameModule {
 
         gameEffects.registerEffect('books_learning_rate', {
             name: 'Read Books Learning Rate',
+            defaultValue: 1.,
+            minValue: 1,
+        })
+
+        gameEffects.registerEffect('spiritual_learning_rate', {
+            name: 'Spiritual Learning Rate',
             defaultValue: 1.,
             minValue: 1,
         })
@@ -399,7 +406,11 @@ export class ActionsModule extends GameModule {
     getActionsUnlocks() {
         const items = gameEntity
             .listEntitiesByTags(['action'])
-            .filter(one => one.isUnlocked && !one.isCapped && one.nextUnlock);
+            .filter(one => one.isUnlocked && !one.isCapped && one.nextUnlock)
+            .map(one => ({
+                ...one,
+                eta: calculateTimeToLevelUp(gameEntity.getAttribute(one.id, 'baseXPCost'), 0.2, one.level, one.nextUnlock.level)
+            }));
 
         return items;
     }
@@ -521,6 +532,20 @@ export class ActionsModule extends GameModule {
         };
 
         return entityData;
+    }
+
+    getEffectFromRunningAction(id) {
+        const runningActions = gameEntity.listEntitiesByTags(['runningActions']);
+        const results = [];
+        runningActions.forEach(entity => {
+            const effts = gameEntity.getEffects(entity.id);
+            console.log('Queried effects: ', effts);
+            const suitable = effts.filter(u => u.type === 'effects' && u.id === id);
+            // now that we have suitable action added - need to understand it inputs (effort, xpRate and so on...)
+
+            results.push(suitable);
+        })
+        return results;
     }
 
     getAllActions() {

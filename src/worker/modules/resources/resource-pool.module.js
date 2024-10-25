@@ -71,6 +71,34 @@ export class ResourcePoolModule extends GameModule {
             }
         })
 
+
+
+
+
+        gameResources.registerResource('crafting_ability', {
+            tags: ['crafting', 'secondary'],
+            name: 'Crafting Effort',
+            isService: true,
+        })
+
+        gameResources.registerResource('crafting_slots', {
+            tags: ['crafting', 'secondary'],
+            name: 'Crafting Slots',
+            isService: true,
+        })
+
+        gameResources.registerResource('alchemy_ability', {
+            tags: ['alchemy', 'secondary'],
+            name: 'Alchemy Effort',
+            isService: true,
+        })
+
+        gameResources.registerResource('alchemy_slots', {
+            tags: ['alchemy', 'secondary'],
+            name: 'Alchemy Slots',
+            isService: true,
+        })
+
     }
 
     tick() {

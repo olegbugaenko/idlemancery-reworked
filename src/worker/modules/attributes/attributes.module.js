@@ -1,5 +1,5 @@
 import {GameModule} from "../../shared/game-module";
-import {gameEffects, gameEntity} from "game-framework";
+import {gameCore, gameEffects, gameEntity} from "game-framework";
 import {registerAttributes} from "./attributes-db";
 
 export class AttributesModule extends GameModule {
@@ -38,7 +38,17 @@ export class AttributesModule extends GameModule {
 
     getAttributesUnlocks() {
         const items = gameEffects.listEffectsByTags(['attribute'])
-            .filter(one => one.isUnlocked && one.nextUnlock);
+            .filter(one => one.isUnlocked && one.nextUnlock)
+            .map(one => {
+                // Here we should somehow get current increment of attribute
+                // first of all we should get current income from list
+                const effects = gameCore.getModule('actions').getEffectFromRunningAction(one.id);
+                console.log('Effects: ', effects);
+                return {
+                    ...one,
+                    // eta: calculateTimeToLevelUp(gameEntity.getAttribute(one.id, 'baseXPCost'), 0.2, one.level, one.nextUnlock.level)
+                }
+            });
         return items;
     }
 

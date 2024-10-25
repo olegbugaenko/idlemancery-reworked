@@ -813,6 +813,60 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+
+    gameEntity.registerGameEntity('shop_item_magic_training', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Magic Training Book',
+        description: 'Reveal the secrets of magic flowing through your body by learning new practices of training your magic capability',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_spellcraft') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'knowledge': {
+                A: 1.5,
+                B: 160*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'coins': {
+                A: 1.5,
+                B: 60000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+
+    gameEntity.registerGameEntity('shop_item_spiritualism', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Spiritualism Book',
+        description: 'Unlocks way to improve your spiritual activities by consuming magic knowledge',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_spellcraft') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'knowledge': {
+                A: 1.5,
+                B: 180*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'coins': {
+                A: 1.5,
+                B: 110000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
     gameEntity.registerGameEntity('shop_item_better_stashes', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Better Stashes',
@@ -851,7 +905,6 @@ export const registerShopItemsStage1 = () => {
         name: 'Purchase land',
         description: 'Purchase some land for even more place',
         level: 0,
-        maxLevel: 10,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_storeroom') > 2
         },
@@ -879,5 +932,83 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+
+    gameEntity.registerGameEntity('shop_item_crafting_courses', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Crafting Courses',
+        description: 'Unlocks crafting and materials processing',
+        level: 0,
+        maxLevel: 1,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 100,
+        }],
+        unlockCondition: () => {
+            return gameEffects.getEffectValue('attribute_strength') >= 100
+            //||  gameEntity.getLevel('shop_item_conjuration_magic') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            income: {
+                resources: {
+                    'crafting_slots': {
+                        A: 1,
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2.25,
+                B: 140000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+
+
+    gameEntity.registerGameEntity('shop_item_alchemy_courses', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Alchemy Courses',
+        description: 'Learn how to create useful potions from your herbs and other ingredients',
+        level: 0,
+        maxLevel: 1,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 100,
+        }],
+        unlockCondition: () => {
+            return gameEffects.getEffectValue('attribute_patience') >= 100
+            //||  gameEntity.getLevel('shop_item_conjuration_magic') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            income: {
+                resources: {
+                    'alchemy_slots': {
+                        A: 1,
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2.25,
+                B: 140000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
 
 }

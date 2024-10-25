@@ -1,6 +1,7 @@
 import { gameEntity, gameResources, resourceCalculators, resourceApi, gameEffects } from "game-framework"
 import {GameModule} from "../../shared/game-module";
 import {registerFurnitureStage1} from "./furniture-db";
+import {registerAccessoriesStage1} from "./accessories-db";
 
 export class PropertyModule extends GameModule {
 
@@ -10,15 +11,15 @@ export class PropertyModule extends GameModule {
         this.isUnlocked = false;
         this.leveledId = null;
         this.eventHandler.registerHandler('purchase-furniture', (payload) => {
-            this.purchaseFurniture(payload.id);
+            this.purchaseFurniture(payload.id, payload.filterId);
         })
 
         this.eventHandler.registerHandler('delete-furniture', (payload) => {
-            this.deleteFurniture(payload.id);
+            this.deleteFurniture(payload.id, payload.filterId);
         })
         
         this.eventHandler.registerHandler('query-furnitures-data', (payload) => {
-            this.sendFurnituresData()
+            this.sendFurnituresData(payload)
         })
 
         this.eventHandler.registerHandler('query-furniture-details', (payload) => {
@@ -43,6 +44,7 @@ export class PropertyModule extends GameModule {
         })
 
         registerFurnitureStage1();
+        registerAccessoriesStage1();
 
     }
 
@@ -67,7 +69,7 @@ export class PropertyModule extends GameModule {
             }
         }
         this.isUnlocked = saveObject?.isUnlocked || false;
-        this.sendFurnituresData();
+        this.sendFurnituresData({ filterId: 'furniture' });
     }
 
     reset() {
@@ -79,28 +81,33 @@ export class PropertyModule extends GameModule {
         this.purchasedFurnitures[furnitureId] = gameEntity.getLevel(furnitureId);
     }
 
-    purchaseFurniture(furnitureId) {
+    purchaseFurniture(furnitureId, filterId) {
         const newEnt = gameEntity.levelUpEntity(furnitureId);
         console.log('newEntFurn: ', newEnt);
         if(newEnt.success) {
             this.purchasedFurnitures[furnitureId] = gameEntity.getLevel(furnitureId);
             this.leveledId = furnitureId;
             console.log('newEntFurnNEW: ', this.purchasedFurnitures)
-            this.sendFurnituresData();
+            this.sendFurnituresData({ filterId });
         }
         return newEnt.success;
     }
 
-    deleteFurniture(furnitureId) {
+    deleteFurniture(furnitureId, filterId) {
         if(!this.purchasedFurnitures[furnitureId]) return;
         this.purchasedFurnitures[furnitureId]--;
         gameEntity.setEntityLevel(furnitureId, this.purchasedFurnitures[furnitureId]);
-        this.sendFurnituresData();
+        this.sendFurnituresData({ filterId });
     }
 
-    getFurnituresData() {
-        const entities = gameEntity.listEntitiesByTags(['furniture']);
+    getFurnituresData(payload) {
+        if(!payload.filterId) {
+            throw new Error('filter is required here');
+        }
+        // console.log('PL: ', payload);
+        const entities = gameEntity.listEntitiesByTags([payload.filterId]);
         const spaceRes = gameResources.getResource('living_space');
+
         return {
             available: entities.filter(one => one.isUnlocked).map(entity => ({
                 id: entity.id,
@@ -121,14 +128,15 @@ export class PropertyModule extends GameModule {
         }
     }
 
-    sendFurnituresData() {
-        const data = this.getFurnituresData();
+    sendFurnituresData(payload) {
+        const data = this.getFurnituresData(payload);
         this.eventHandler.sendData('furnitures-data', data);
     }
 
     getFurnitureDetails(id) {
         if(!id) return null;
         const entity = gameEntity.getEntity(id);
+        console.log('QueryDet: ', id, entity);
         return {
             id: entity.id,
             name: entity.name,

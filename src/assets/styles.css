@@ -597,6 +597,10 @@ h4 {
     flex: 1;
 }
 
+.inventory-wrap .inventory .inventory-items-wrap {
+    height: calc(100% - 40px);
+}
+
 .actions-wrap .actions .list-wrap {
     height: calc(100% - 130px);
 }
@@ -1126,4 +1130,30 @@ h4 {
 
 .list-editor {
     padding-right: 12px;
+}
+
+.crafting-wrap {
+    height: calc(100% - 40px);
+}
+
+.crafting-wrap .head {
+    padding: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.crafting-wrap .head .space-item span {
+    margin-right: 12px;
+}
+
+.crafting-wrap .craftables-cat {
+    height: calc(100% - 40px);
+}
+
+.card.craftable .head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0;
 }

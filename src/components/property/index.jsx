@@ -7,6 +7,7 @@ import {EffectsSection} from "../shared/effects-section.jsx";
 import {ResourceCost} from "../shared/resource-cost.jsx";
 import {FurnitureUpgrades} from "./furniture.jsx";
 import {ResourceComparison} from "../shared/resource-comparison.jsx";
+import {AccessoryUpgrades} from "./accessories.jsx";
 
 export const Property = ({}) => {
     const [detailOpened, setDetailOpened] = useState(null)
@@ -15,14 +16,31 @@ export const Property = ({}) => {
 
     const { onMessage, sendData } = useWorkerClient(worker);
 
+    const [unlocks, setUnlocksData] = useState({});
+
     const [ selectedTab, setSelectedTab ] = useState('furniture');
 
+    useEffect(() => {
+        sendData('query-unlocks', { prefix: 'property' });
+        const interval = setInterval(() => {
+            sendData('query-unlocks', { prefix: 'property' });
+        }, 1000);
+        return () => {
+            clearInterval(interval);
+        }
+    }, [])
+
+    onMessage('unlocks-property', (unlocks) => {
+        setUnlocksData(unlocks);
+    })
+
+
     const purchaseItem = (id) => {
-        sendData('purchase-furniture', { id })
+        sendData('purchase-furniture', { id, filterId: selectedTab })
     }
 
     const deleteItem = (id) => {
-        sendData('delete-furniture', { id })
+        sendData('delete-furniture', { id, filterId: selectedTab })
     }
 
     const setItemDetails = (id) => {
@@ -38,10 +56,16 @@ export const Property = ({}) => {
             <div className={'items ingame-box'}>
                 <div className={'menu-wrap'}>
                     <ul className={'menu'}>
-                        <li className={`${selectedTab === 'furniture' ? 'active' : ''}`} onClick={() => {setSelectedTab('furniture'); setDetailOpened(null);}}><span>Furniture</span></li>
+                        <li className={`${selectedTab === 'furniture' ? 'active' : ''}`} onClick={() => {setSelectedTab('furniture'); setDetailOpened(null);}}>
+                            <span>Furniture</span>
+                        </li>
+                        {unlocks.crafting ? (<li className={`${selectedTab === 'accessory' ? 'active' : ''}`} onClick={() => {setSelectedTab('accessory'); setDetailOpened(null);}}>
+                            <span>Accessories</span>
+                        </li>) : null}
                     </ul>
                 </div>
                 {selectedTab === 'furniture' ? (<FurnitureUpgrades setItemDetails={setItemDetails} purchaseItem={purchaseItem} deleteItem={deleteItem}/>) : null}
+                {selectedTab === 'accessory' ? (<AccessoryUpgrades setItemDetails={setItemDetails} purchaseItem={purchaseItem} deleteItem={deleteItem}/>) : null}
             </div>
 
             <div className={'item-detail ingame-box detail-blade'}>
@@ -63,7 +87,7 @@ export const ItemDetails = ({itemId, category}) => {
     const [item, setDetailOpened] = useState(null);
 
     useEffect(() => {
-        if(category === 'furniture') {
+        if(category === 'furniture' || category === 'accessory') {
             const interval = setInterval(() => {
                 sendData('query-furniture-details', { id: itemId });
             }, 100);

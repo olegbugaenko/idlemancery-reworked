@@ -83,11 +83,13 @@ export class SpellModule extends GameModule {
                     gameEntity.setAttribute(`active_${itemId}`, 'current_duration', this.spells[itemId].duration);
                 }
             }
-            if(this.spells[itemId].duration <= 0) {
+            if(this.spells[itemId].duration <= 0 && this.spells[itemId].isRunning) {
                 this.spells[itemId].duration = 0;
+                this.spells[itemId].isRunning = false;
+                this.spells[itemId].cooldown = gameEntity.getEntity(itemId).getUsageCooldown() ?? 0;
+                console.log('Set cooldown of '+itemId, this.spells[itemId].cooldown);
                 if(gameEntity.entityExists(`active_${itemId}`)) {
                     gameEntity.unsetEntity(`active_${itemId}`);
-                    this.spells[itemId].cooldown = gameEntity.getEntity(itemId).getUsageCooldown() ?? 0;
                 }
             }
 
@@ -106,7 +108,7 @@ export class SpellModule extends GameModule {
             const isMatching = checkMatchingRules(this.spells[itemId]?.autocast?.rules, this.spells[itemId]?.autocast?.pattern);
 
             // console.log('RULES MATCHED: ', isMatching);
-            if(isMatching) {
+            if(isMatching && (this.spells[itemId]?.cooldown || 0) <= 0) {
                 this.useSpell(itemId, 1);
             }
 
@@ -142,6 +144,7 @@ export class SpellModule extends GameModule {
                 this.setSpell(id, saveObject.spells[id].actualLevel || 1, true);
                 this.spells[id].duration = saveObject.spells[id].duration;
                 if(this.spells[id].duration && this.spells[id].duration > 0) {
+                    this.spells[id].isRunning = true;
                     gameEntity.registerGameEntity(`active_${id}`, {
                         copyFromId: id,
                         isAbstract: false,
@@ -215,7 +218,8 @@ export class SpellModule extends GameModule {
             return;
         }
 
-
+        this.spells[id].isRunning = true;
+        this.spells[id].duration = 0;
 
         if(this.isSpellLevelingAvailable()) {
 

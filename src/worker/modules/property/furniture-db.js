@@ -502,7 +502,7 @@ export const registerFurnitureStage1 = () => {
         name: 'Restoration Magic Circle',
         description: 'Improves your restoration magic efficiency',
         level: 0,
-        maxLevel: 3,
+        maxLevel: 5,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_less_restoration') > 0;
         },
@@ -546,7 +546,7 @@ export const registerFurnitureStage1 = () => {
         name: 'Illusion Magic Circle',
         description: 'Improves your restoration magic efficiency',
         level: 0,
-        maxLevel: 3,
+        maxLevel: 5,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_less_illusion') > 0;
         },
@@ -579,6 +579,135 @@ export const registerFurnitureStage1 = () => {
             'living_space': {
                 A: 0,
                 B: 3,
+                type: 0
+            }
+        }),
+    })
+
+
+    gameEntity.registerGameEntity('furniture_crafting_table', {
+        tags: ["furniture", "upgrade", "purchaseable"],
+        name: 'Crafting Table',
+        description: 'Provides additional space for crafting, revealing new crafting slot',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0;
+        },
+        resourceModifier: {
+            income: {
+                resources: {
+                    'crafting_slots': {
+                        A: 1,
+                        B: 0,
+                        type: 0,
+                    }
+                },
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 2,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1.5,
+                B: 80000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 2,
+                type: 0
+            }
+        }),
+    })
+
+
+    gameEntity.registerGameEntity('furniture_masters_table', {
+        tags: ["furniture", "upgrade", "purchaseable"],
+        name: 'Master’s Table',
+        description: 'Specialized "master’s table" with enhanced tools that boosts crafting efficiency',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0;
+        },
+        resourceModifier: {
+            multiplier: {
+                resources: {
+                    'crafting_ability': {
+                        A: 0.1,
+                        B: 1,
+                        type: 0,
+                    }
+                },
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 2,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1.5,
+                B: 80000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 2,
+                type: 0
+            }
+        }),
+    })
+
+
+    gameEntity.registerGameEntity('furniture_masters_table', {
+        tags: ["furniture", "upgrade", "purchaseable"],
+        name: 'Master’s Table',
+        description: 'Specialized "master’s table" with enhanced tools that boosts crafting efficiency',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0;
+        },
+        resourceModifier: {
+            multiplier: {
+                resources: {
+                    'crafting_ability': {
+                        A: 0.1,
+                        B: 1,
+                        type: 0,
+                    }
+                },
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 2,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1.5,
+                B: 80000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 2,
                 type: 0
             }
         }),

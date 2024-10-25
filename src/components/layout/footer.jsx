@@ -75,6 +75,9 @@ export const Footer = () => {
                 {unlocks.property ? (<li className={openedTab === 'property' ? 'active' : ''} onClick={() => openTab('property')}>
                     <span>Property</span>
                 </li>) : null}
+                {unlocks.workshop ? (<li className={openedTab === 'workshop' ? 'active' : ''} onClick={() => openTab('workshop')}>
+                    <span>Workshop</span>
+                </li>) : null}
                 {unlocks.spellbook ? (<li className={openedTab === 'spellbook' ? 'active' : ''} onClick={() => openTab('spellbook')}>
                     <span>Spellbook</span>
                 </li>) : null}
@@ -82,7 +85,7 @@ export const Footer = () => {
                     <span>Settings</span>
                 </li>
                 <li className={openedTab === 'about' ? 'active' : ''} onClick={() => openTab('about')}>
-                    <span>v0.0.2d</span>
+                    <span>v0.0.3</span>
                 </li>
             </ul>
         </div>

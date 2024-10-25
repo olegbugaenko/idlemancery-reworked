@@ -11,6 +11,26 @@ export class InventoryModule extends GameModule {
         this.inventoryItems = {};
         this.isUnlocked = false;
         this.autoConsumeCD = 2;
+
+        this.selectedFilterId = 'all';
+
+        this.filters = [{
+            id: 'all',
+            name: 'All',
+            tags: [],
+            isDefault: true,
+        },{
+            id: 'consumable',
+            name: 'Consumable',
+            tags: ['consumable'],
+            isDefault: true,
+        },{
+            id: 'materials',
+            name: 'Materials',
+            tags: ['material'],
+            isDefault: false,
+        }]
+
         this.eventHandler.registerHandler('consume-inventory', (payload) => {
             this.consumeItem(payload.id, payload.amount);
         })
@@ -20,7 +40,7 @@ export class InventoryModule extends GameModule {
         })
 
         this.eventHandler.registerHandler('query-inventory-data', (payload) => {
-            this.sendInventoryData(payload);
+            this.sendInventoryData(this.selectedFilterId, payload);
         })
 
         this.eventHandler.registerHandler('query-inventory-details', (payload) => {
@@ -33,6 +53,10 @@ export class InventoryModule extends GameModule {
 
         this.eventHandler.registerHandler('save-inventory-settings', payload => {
             this.saveSettings(payload)
+        })
+
+        this.eventHandler.registerHandler('set-selected-inventory-filter', ({filterId}) => {
+            this.selectedFilterId = filterId;
         })
     }
 
@@ -109,11 +133,13 @@ export class InventoryModule extends GameModule {
     save() {
         return {
             inventory: this.inventoryItems,
+            selectedFilterId: this.selectedFilterId
         }
     }
 
     load(saveObject) {
         this.inventoryItems = saveObject?.inventory ?? {};
+        this.selectedFilterId = saveObject?.selectedFilterId || 'all';
 
         for(const key in this.inventoryItems) {
             if(!('stockCapacity' in this.inventoryItems[key])) {
@@ -131,7 +157,7 @@ export class InventoryModule extends GameModule {
                 });
             }
         }
-        this.sendInventoryData();
+        this.sendInventoryData(this.selectedFilterId);
     }
 
     reset() {
@@ -216,7 +242,7 @@ export class InventoryModule extends GameModule {
             }
         }
         gameResources.addResource(id, -realCons);
-        this.sendInventoryData();
+        this.sendInventoryData(this.selectedFilterId);
     }
 
     sellItem(id, amount) {
@@ -237,7 +263,7 @@ export class InventoryModule extends GameModule {
             gameResources.addResource('coins', realCons*resource.sellPrice);
         }
 
-        this.sendInventoryData();
+        this.sendInventoryData(this.selectedFilterId);
     }
 
     saveSettings(payload) {
@@ -250,9 +276,30 @@ export class InventoryModule extends GameModule {
         }
     }
 
-    getItemsData(pl) {
-        const items = gameResources.listResourcesByTags(['inventory']);
-        let presentItems = items.filter(item =>
+    getItemsData(filterId, pl) {
+        const perCats = this.filters.reduce((acc, filter) => {
+
+            acc[filter.id] = {
+                id: filter.id,
+                name: filter.name,
+                tags: filter.tags,
+                items: gameResources.listResourcesByTags(['inventory', ...filter.tags])
+                    .filter(one => one.isUnlocked && !one.isCapped && (gameResources.getResource(one.id).amount >= 1
+                        || this.inventoryItems[one.id]?.autoconsume?.rules?.length
+                        || this.inventoryItems[one.id]?.autosell?.rules?.length)),
+                isSelected: filterId === filter.id
+            }
+
+            return acc;
+        }, {})
+
+        if(!filterId) {
+            filterId = 'all';
+        }
+
+        const entities = perCats[filterId].items;
+
+        let presentItems = entities.filter(item =>
             gameResources.getResource(item.id).amount >= 1
             || this.inventoryItems[item.id]?.autoconsume?.rules?.length
             || this.inventoryItems[item.id]?.autosell?.rules?.length
@@ -274,16 +321,18 @@ export class InventoryModule extends GameModule {
         return {
             available: presentItems.map(resource => ({
                 ...resource,
+                isConsumable: resource.tags.includes('consumable'),
                 isConsumed: this.inventoryItems[resource.id]?.isConsumed,
                 cooldown: this.inventoryItems[resource.id]?.cooldown ?? 0,
                 cooldownProg: resource.getUsageCooldown ? (resource.getUsageCooldown() - (this.inventoryItems[resource.id]?.cooldown ?? 0)) / resource.getUsageCooldown() : 1,
             })),
+            itemCategories: Object.values(perCats).filter(cat => cat.items.length > 0),
             payload: pl,
         }
     }
 
-    sendInventoryData(pl) {
-        const data = this.getItemsData(pl);
+    sendInventoryData(filter, pl) {
+        const data = this.getItemsData(filter, pl);
         let label = 'inventory-data';
         if(pl?.prefix) {
             label = `${label}-${pl.prefix}`;
