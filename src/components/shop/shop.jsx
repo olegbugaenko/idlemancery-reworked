@@ -273,15 +273,15 @@ export const ItemDetails = ({itemId, category}) => {
                         {Object.values(item.affordable.affordabilities || {}).map(aff => <ResourceCost affordabilities={aff}/>)}
                     </div>
                 </div>
-                <div className={'block'}>
+                {(item.potentialEffects?.length || item.currentEffects) ? (<div className={'block'}>
                     <p>Effects:</p>
                     <div className={'effects'}>
                         {item.currentEffects ?
-                            (<ResourceComparison effects1={item.currentEffects} effects2={item.potentialEffects} /> )
+                            (<ResourceComparison effects1={item.currentEffects} effects2={item.potentialEffects}/>)
                             : (<EffectsSection effects={item.potentialEffects} maxDisplay={10}/>)
                         }
                     </div>
-                </div>
+                </div>) : null}
             </div>
         </PerfectScrollbar>
     )

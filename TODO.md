@@ -70,7 +70,13 @@ v0.3
 [V] Implement module and page for making accessories
 Add Conjuration magic and 2 resources: water and wood
 Add shop items: book of herbalism and woodworking manual
-Implement alchemy
+[V] Implement alchemy
+[V] Something to boost physical learning rates (action or whatever)
+[V] Add new recipes for herbs (increasing health, increasing XP gain)
+[QA] Add stonecutting and refine stone into the rubies or sapfires. 
+Make actions lists list searchable and scrollable
+Add caps breakdowns
+Implement new accessories based on stone refining
 
 ---
 Troubles: missing something providing energy very bad. It can be fixed with alchemy, however.

@@ -432,12 +432,12 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
                         {item.tags.map(tag => (<div className={'tag'}>{tag}</div> ))}
                     </div>
                 </div>
-                <div className={'block'}>
+                {item?.effects?.length ? (<div className={'block'}>
                     <p>Effects on usage:</p>
                     <div className={'effects'}>
-                        <EffectsSection effects={item.effects} />
+                        <EffectsSection effects={item.effects}/>
                     </div>
-                </div>
+                </div>) : null}
                 {item.duration ? (<div className={'block'}>
                     <p>Effects lasting: {secondsToString(item.duration)}</p>
                     <div className={'effects'}>

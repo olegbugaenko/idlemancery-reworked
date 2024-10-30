@@ -481,7 +481,7 @@ h4 {
 }
 
 .res-cost .resource-req {
-    width: 100px;
+    width: 120px;
 }
 
 /*
@@ -502,6 +502,13 @@ h4 {
     z-index: 10;
 }
 */
+
+.block .stats-block p {
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
 .flash-overlay {
     position: absolute;
@@ -1151,9 +1158,27 @@ h4 {
     height: calc(100% - 40px);
 }
 
+.card.craftable {
+    width: 300px;
+}
+
+
 .card.craftable .head {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0;
+}
+
+.breakdowns .breakdown-section {
+    font-size: 15px;
+}
+
+.breakdowns .breakdown-section .breakdown-section-sub {
+    padding-left: 20px;
+    font-size: 14px;
+}
+
+span.highlighted-span {
+    color: var(--highlight);
 }

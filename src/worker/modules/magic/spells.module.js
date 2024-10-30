@@ -45,6 +45,12 @@ export class SpellModule extends GameModule {
             minValue: 1,
         })
 
+        gameEffects.registerEffect('spell_xp_rate', {
+            name: 'Spell XP Gain',
+            defaultValue: 1,
+            minValue: 1,
+        })
+
         initSpellsDB1();
 
     }
@@ -66,7 +72,7 @@ export class SpellModule extends GameModule {
         }
         const sp = gameEntity.getAttribute(id, 'xpOnCast', 0);
 
-        return sp*Math.pow(1.4, level);
+        return sp*Math.pow(1.4, level)*gameEffects.getEffectValue('spell_xp_rate')*Math.pow(1.025, gameEffects.getEffectValue('attribute_spell_reading'));
     }
 
     tick(game, delta) {

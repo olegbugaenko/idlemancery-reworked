@@ -14,7 +14,7 @@ export const registerAccessoriesStage1 = () => {
             capMult: {
                 resources: {
                     'coins': {
-                        A: 0.02,
+                        A: 0.1,
                         B: 1,
                         type: 0,
                     }
@@ -77,7 +77,7 @@ export const registerAccessoriesStage1 = () => {
             capMult: {
                 resources: {
                     'knowledge': {
-                        A: 0.02,
+                        A: 0.1,
                         B: 1,
                         type: 0,
                     }
@@ -88,6 +88,41 @@ export const registerAccessoriesStage1 = () => {
             'inventory_refined_wood': {
                 A: 1.1,
                 B: 1,
+                type: 1
+            }
+        }),
+    })
+
+
+
+    gameEntity.registerGameEntity('accessory_aromatic_carpet', {
+        tags: ["accessory", "upgrade", "purchaseable"],
+        name: 'Aromatic Carpet',
+        description: 'Craft aromatic carpet that inspires you and boosts your energy recovery',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0;
+        },
+        resourceModifier: {
+            multiplier: {
+                resources: {
+                    'energy': {
+                        A: 0.02,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+        },
+        get_cost: () => ({
+            'inventory_herbal_fibers': {
+                A: 1.1,
+                B: 2,
+                type: 1
+            },
+            'mana': {
+                A: 1.1,
+                B: 3,
                 type: 1
             }
         }),

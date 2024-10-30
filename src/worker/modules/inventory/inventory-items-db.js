@@ -261,12 +261,223 @@ export const registerInventoryItems = () => {
 
         },
         unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0
+        },
+        sellPrice: 450,
+        get_cost: (amount = 1) => ({
+            coins: amount*25000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+        }),
+    })
+
+
+    gameResources.registerResource('inventory_herbal_fibers', {
+        name: 'Herbal Fibers',
+        hasCap: false,
+        tags: ['inventory', 'material', 'craftable'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        attributes: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0
+        },
+        sellPrice: 625,
+        get_cost: (amount = 1) => ({
+            coins: amount*30000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+        }),
+    })
+
+
+    gameResources.registerResource('inventory_stone', {
+        name: 'Stone',
+        hasCap: false,
+        tags: ['inventory', 'material'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        attributes: {
+
+        },
+        unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0
         },
-        sellPrice: 150,
+        sellPrice: 125,
         get_cost: (amount = 1) => ({
-            coins: amount*500*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+            coins: amount*1250*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
         }),
+    })
+
+
+    gameResources.registerResource('inventory_ruby', {
+        name: 'Ruby',
+        hasCap: false,
+        tags: ['inventory', 'material', 'craftable'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        attributes: {
+
+        },
+        unlockedBy: [{
+            type: 'entity',
+            id: 'action_quarrying',
+            level: 2,
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0
+        },
+        sellPrice: 12000,
+        get_cost: (amount = 1) => ({
+            coins: amount*800000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+        }),
+    })
+
+
+    gameResources.registerResource('inventory_sapphire', {
+        name: 'Sapphire',
+        hasCap: false,
+        tags: ['inventory', 'material', 'craftable'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        attributes: {
+
+        },
+        unlockedBy: [{
+            type: 'entity',
+            id: 'action_quarrying',
+            level: 2,
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0
+        },
+        sellPrice: 16000,
+        get_cost: (amount = 1) => ({
+            coins: amount*1000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+        }),
+    })
+
+
+    gameResources.registerResource('inventory_small_endurance_flask', {
+        name: 'Small Endurance Flask',
+        hasCap: false,
+        tags: ['inventory', 'consumable'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        getUsageCooldown: () => {
+            return 10*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+        },
+        attributes: {
+            duration: 5,
+        },
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    energy: {
+                        A: 0,
+                        B: 5,
+                        type: 0,
+                    }
+                }
+            })
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0
+        },
+        sellPrice: 225,
+    })
+
+
+    gameResources.registerResource('inventory_healing_potion', {
+        name: 'Small Healing Potion',
+        hasCap: false,
+        tags: ['inventory', 'consumable'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        getUsageCooldown: () => {
+            return 10*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+        },
+        attributes: {
+            duration: 5,
+        },
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    health: {
+                        A: 0,
+                        B: 5,
+                        type: 0,
+                    }
+                }
+            })
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0
+        },
+        sellPrice: 425,
+    })
+
+
+    gameResources.registerResource('inventory_experience_potion', {
+        name: 'Small Experience Potion',
+        hasCap: false,
+        tags: ['inventory', 'consumable'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        getUsageCooldown: () => {
+            return 10*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+        },
+        attributes: {
+            duration: 20,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    learning_rate: {
+                        A: 1,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    health: {
+                        A: 10,
+                        B: 0,
+                        type: 0
+                    },
+                    mana: {
+                        A: 5,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0
+        },
+        sellPrice: 1500,
     })
 
 }

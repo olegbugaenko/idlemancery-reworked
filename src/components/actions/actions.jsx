@@ -12,6 +12,7 @@ import {ResourceComparison} from "../shared/resource-comparison.jsx";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import RulesList from "../shared/rules-list.jsx";
 import {cloneDeep} from "lodash";
+import {ActionXPBreakdown} from "./action-xp-breakdown.jsx";
 
 export const Actions = ({}) => {
 
@@ -460,6 +461,8 @@ export const ActionCard = ({ id, isEditingList, index, name, level, max, xp, max
 
     useFlashOnLevelUp(isLeveled, onFlash, elementRef);
 
+    const [isXpVisible, setIsXpVisible] = useState(false);
+
     const comp = (
         <Draggable key={`available-${id}`} draggableId={`available-${id}`} index={index} isDragDisabled={!isEditingList}>
             {(provided) => (
@@ -479,7 +482,14 @@ export const ActionCard = ({ id, isEditingList, index, name, level, max, xp, max
                     <div className={'bottom'}>
                         <div className={'xp-box'}>
                             <span className={'xp-text'}>XP: {formatInt(xp)}/{formatInt(maxXP)}</span>
-                            <span className={'xp-income'}>+{formatValue(xpRate)}</span>
+                            <TippyWrapper
+                                lazy={true}
+                                content={isXpVisible ? <ActionXPBreakdown id={id} /> : null}
+                                onShow={() => setIsXpVisible(true)}
+                                onHide={() => setIsXpVisible(false)}
+                            >
+                                <span className={'xp-income highlighted-span'}>+{formatValue(xpRate)}</span>
+                            </TippyWrapper>
                         </div>
 
                         <div>
@@ -619,6 +629,13 @@ export const ActionDetailsComponent = React.memo(({...action}) => {
                     </div>
                 </div>
             ) : null}
+            <div className={'block'}>
+                <p>Action Statistics</p>
+                <div className={'stats-block'}>
+                    <p><span>Time spent:</span> <span>{secondsToString(action.timeInvested)}</span></p>
+                    <p><span>XP earned:</span> <span>{formatValue(action.xpEarned)}</span></p>
+                </div>
+            </div>
         </div>
     </PerfectScrollbar>)
 }, (prevProps, currentProps) => {
@@ -636,6 +653,10 @@ export const ActionDetailsComponent = React.memo(({...action}) => {
         return false;
     }
     if(prevProps.id !== currentProps.id) {
+        //console.log('id mismatch. Re-render: ', prevProps, currentProps);
+        return false;
+    }
+    if(prevProps.timeInvested !== currentProps.timeInvested) {
         //console.log('id mismatch. Re-render: ', prevProps, currentProps);
         return false;
     }

@@ -6,6 +6,7 @@ import {EffectsSection} from "../shared/effects-section.jsx";
 import {formatInt, formatValue} from "../../general/utils/strings";
 import {Crafting} from "./crafting.jsx";
 import {ResourceCost} from "../shared/resource-cost.jsx";
+import {Alchemy} from "./alchemy.jsx";
 
 export const Workshop = () => {
 
@@ -22,14 +23,14 @@ export const Workshop = () => {
 
     useEffect(() => {
         const interval = setInterval(() => {
-            sendData('query-unlocks', {});
+            sendData('query-unlocks', { prefix: 'workshop' });
         }, 100);
         return () => {
             clearInterval(interval);
         }
     }, [])
 
-    onMessage('unlocks', (unlocks) => {
+    onMessage('unlocks-workshop', (unlocks) => {
         setUnlocksData(unlocks);
     })
 
@@ -54,6 +55,7 @@ export const Workshop = () => {
                 </ul>
             </div>
             {selectedTab === 'crafting' ? (<Crafting filterId={selectedTab} setItemDetails={setItemDetails} setItemLevel={setItemLevel} />) : null}
+            {selectedTab === 'alchemy' ? (<Alchemy filterId={selectedTab} setItemDetails={setItemDetails} setItemLevel={setItemLevel} />) : null}
         </div>
 
         <div className={'item-detail ingame-box detail-blade'}>
@@ -73,6 +75,7 @@ export const ItemDetails = ({itemId, category}) => {
     const [item, setDetailOpened] = useState(null);
 
     useEffect(() => {
+        console.log('Details: ', itemId, category);
         if(category === 'crafting' || category === 'alchemy') {
             const interval = setInterval(() => {
                 sendData('query-crafting-details', { id: itemId });
@@ -87,6 +90,7 @@ export const ItemDetails = ({itemId, category}) => {
 
 
     onMessage('crafting-details', (items) => {
+        console.log('DETS: ', items);
         setDetailOpened(items);
     })
 

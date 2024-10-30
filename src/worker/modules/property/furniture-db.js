@@ -322,6 +322,49 @@ export const registerFurnitureStage1 = () => {
         }),
     })
 
+    gameEntity.registerGameEntity('furniture_yoga_carpet', {
+        tags: ["furniture", "upgrade", "purchaseable"],
+        name: 'Yoga Carpet',
+        description: 'Use it for your daily yoga practices, increasing yoga XP rate',
+        level: 0,
+        maxLevel: 6,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_yoga_manual') > 0;
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'yoga_learn_speed': {
+                        A: 0.25,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 1,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 150*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 1,
+                type: 0
+            }
+        }),
+    })
+
     gameEntity.registerGameEntity('furniture_workout_bench', {
         tags: ["furniture", "upgrade", "purchaseable"],
         name: 'Workout Bench',
@@ -359,7 +402,56 @@ export const registerFurnitureStage1 = () => {
             },
             'living_space': {
                 A: 0,
-                B: 2,
+                B: 1,
+                type: 0
+            }
+        }),
+    })
+
+
+    gameEntity.registerGameEntity('furniture_gym', {
+        tags: ["furniture", "upgrade", "purchaseable"],
+        name: 'Personal Gym',
+        description: 'Provide better inventory to improve physical training efficiency',
+        level: 0,
+        maxLevel: 10,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 225,
+        }],
+        unlockCondition: () => {
+            return true;
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'physical_training_learn_speed': {
+                        A: 0.2,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 3,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 100000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 3,
                 type: 0
             }
         }),
@@ -502,7 +594,7 @@ export const registerFurnitureStage1 = () => {
         name: 'Restoration Magic Circle',
         description: 'Improves your restoration magic efficiency',
         level: 0,
-        maxLevel: 5,
+        maxLevel: 4,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_less_restoration') > 0;
         },
@@ -546,7 +638,7 @@ export const registerFurnitureStage1 = () => {
         name: 'Illusion Magic Circle',
         description: 'Improves your restoration magic efficiency',
         level: 0,
-        maxLevel: 5,
+        maxLevel: 4,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_less_illusion') > 0;
         },
@@ -574,6 +666,103 @@ export const registerFurnitureStage1 = () => {
             'coins': {
                 A: 1.5,
                 B: 10000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 3,
+                type: 0
+            }
+        }),
+    })
+
+
+    gameEntity.registerGameEntity('furniture_spirit_crystal', {
+        tags: ["furniture", "upgrade", "purchaseable"],
+        name: 'Spirit Crystal',
+        description: 'Magic spirit captured into crystal provides significant amplifier to your magical capabilities',
+        level: 0,
+        maxLevel: 5,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_spiritualism') > 0;
+        },
+        resourceModifier: {
+            capMult: {
+                resources: {
+                    'mana': {
+                        A: 0.2,
+                        B: 1,
+                        type: 0,
+                    }
+                },
+            },
+            multiplier: {
+                resources: {
+                    'mana': {
+                        A: 0.1,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 3,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 100000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 3,
+                type: 0
+            }
+        }),
+    })
+
+
+    gameEntity.registerGameEntity('furniture_spell_analyzer', {
+        tags: ["furniture", "upgrade", "purchaseable"],
+        name: 'Spell Analyzer',
+        description: 'Device that capturing acoustic and energetic waves from your spells, and provide you waves histogram for further analysis and learning',
+        level: 0,
+        maxLevel: 5,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_spiritualism') > 0;
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'spell_xp_rate': {
+                        A: 0.25,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 3,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 100000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 1
             },
             'living_space': {
@@ -627,7 +816,6 @@ export const registerFurnitureStage1 = () => {
         }),
     })
 
-
     gameEntity.registerGameEntity('furniture_masters_table', {
         tags: ["furniture", "upgrade", "purchaseable"],
         name: 'Master’s Table',
@@ -671,18 +859,60 @@ export const registerFurnitureStage1 = () => {
     })
 
 
-    gameEntity.registerGameEntity('furniture_masters_table', {
+    gameEntity.registerGameEntity('furniture_cauldron', {
         tags: ["furniture", "upgrade", "purchaseable"],
-        name: 'Master’s Table',
-        description: 'Specialized "master’s table" with enhanced tools that boosts crafting efficiency',
+        name: 'Cauldron',
+        description: 'Provides additional space for alchemy, revealing new alchemy slot',
         level: 0,
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_crafting_courses') > 0;
+            return gameEntity.getLevel('shop_item_alchemy_courses') > 0;
+        },
+        resourceModifier: {
+            income: {
+                resources: {
+                    'alchemy_slots': {
+                        A: 1,
+                        B: 0,
+                        type: 0,
+                    }
+                },
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 2,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1.5,
+                B: 80000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 2,
+                type: 0
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('furniture_chemistry_lab_equipment', {
+        tags: ["furniture", "upgrade", "purchaseable"],
+        name: 'Chemistry Lab',
+        description: 'Place some additional equipment to improve your ability of studying chemical reactions between ingredients',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_alchemy_courses') > 0;
         },
         resourceModifier: {
             multiplier: {
                 resources: {
-                    'crafting_ability': {
+                    'alchemy_ability': {
                         A: 0.1,
                         B: 1,
                         type: 0,
@@ -712,5 +942,49 @@ export const registerFurnitureStage1 = () => {
             }
         }),
     })
+
+
+    gameEntity.registerGameEntity('furniture_drying_rack', {
+        tags: ["furniture", "upgrade", "purchaseable"],
+        name: 'Herbalist\'s Drying Rack\n',
+        description: 'This rustic wooden rack is woven with strands of enchanted twine, used by skilled herbalists to preserve the potency of rare plants. Hanging bunches of herbs and roots sway gently, their fragrance filling the room and infusing the air with traces of ancient magic. With this rack, even common plants yield their highest quality, providing you a greater chance to find potent herbs in the wild.',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_alchemy_courses') > 0;
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'gathering_efficiency': {
+                        A: 0.1,
+                        B: 1,
+                        type: 0,
+                    }
+                },
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 2,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1.5,
+                B: 120000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 2,
+                type: 0
+            }
+        }),
+    })
+
 
 }

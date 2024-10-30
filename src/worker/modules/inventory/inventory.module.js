@@ -2,6 +2,7 @@ import { gameEntity, gameResources, resourceApi, gameEffects } from "game-framew
 import {GameModule} from "../../shared/game-module";
 import {registerInventoryItems} from "./inventory-items-db";
 import {checkMatchingRules} from "../../shared/utils/rule-utils";
+import {SMALL_NUMBER} from "game-framework/src/utils/consts";
 
 
 export class InventoryModule extends GameModule {
@@ -193,13 +194,13 @@ export class InventoryModule extends GameModule {
         const realCons = Math.min(amount, resource.amount);
         if(this.inventoryItems[id] && (this.inventoryItems[id].cooldown > 0 || this.inventoryItems[id].duration > 0)) return;
         if(realCons < 1) return;
-        if(resource.usageGain) {
+        if(resource.usageGain || resource.resourceModifier) {
             const aff = this.getConsumeAffordable(resource, realCons);
             if(!aff.isAffordable) {
                 return;
             }
 
-            const effects = resourceApi.unpackEffects(resource.usageGain, realCons);
+            const effects = resourceApi.unpackEffects(resource.usageGain || {}, realCons);
             if(effects.length) {
                 const rsToAdd = effects.filter(eff => eff.scope === 'income' && eff.type === 'resources');
 
@@ -285,6 +286,7 @@ export class InventoryModule extends GameModule {
                 tags: filter.tags,
                 items: gameResources.listResourcesByTags(['inventory', ...filter.tags])
                     .filter(one => one.isUnlocked && !one.isCapped && (gameResources.getResource(one.id).amount >= 1
+                        || Math.abs(gameResources.getResource(one.id).income) >= SMALL_NUMBER
                         || this.inventoryItems[one.id]?.autoconsume?.rules?.length
                         || this.inventoryItems[one.id]?.autosell?.rules?.length)),
                 isSelected: filterId === filter.id
@@ -299,11 +301,8 @@ export class InventoryModule extends GameModule {
 
         const entities = perCats[filterId].items;
 
-        let presentItems = entities.filter(item =>
-            gameResources.getResource(item.id).amount >= 1
-            || this.inventoryItems[item.id]?.autoconsume?.rules?.length
-            || this.inventoryItems[item.id]?.autosell?.rules?.length
-        );
+        let presentItems = entities;
+
         if(pl?.filterAutomatedSell) {
             presentItems = presentItems.filter(p => this.inventoryItems[p.id]?.autosell?.rules?.length)
         }

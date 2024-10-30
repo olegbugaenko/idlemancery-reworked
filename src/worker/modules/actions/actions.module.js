@@ -3,6 +3,7 @@ import {GameModule} from "../../shared/game-module";
 import {gameEntity, gameResources, gameEffects, resourceCalculators} from "game-framework";
 import {ActionListsSubmodule} from "./action-lists.submodule";
 import {calculateTimeToLevelUp} from "../../shared/utils/math";
+import {SMALL_NUMBER} from "game-framework/src/utils/consts";
 
 export class ActionsModule extends GameModule {
 
@@ -54,6 +55,15 @@ export class ActionsModule extends GameModule {
 
         this.eventHandler.registerHandler('set-selected-actions-filter', ({filterId}) => {
             this.selectedFilterId = filterId;
+        })
+
+        this.eventHandler.registerHandler('query-action-xp-breakdown', (payload) => {
+            let eff = undefined;
+            if(this.isRunningAction(payload.id)) {
+                eff = gameEntity.getEntityEfficiency(`runningAction_${payload.id}`);
+            }
+            const breakdowns = this.getLearningRate(payload.id, eff, true);
+            this.eventHandler.sendData(`action-xp-breakdown-${payload.id}`, breakdowns);
         })
 
         this.filters = [{
@@ -120,12 +130,14 @@ export class ActionsModule extends GameModule {
             name: 'Read Books Learning Rate',
             defaultValue: 1.,
             minValue: 1,
+            saveBalanceTree: true,
         })
 
         gameEffects.registerEffect('spiritual_learning_rate', {
             name: 'Spiritual Learning Rate',
             defaultValue: 1.,
             minValue: 1,
+            saveBalanceTree: true,
         })
 
         gameEffects.registerEffect('max_focus_time', {
@@ -144,12 +156,21 @@ export class ActionsModule extends GameModule {
             name: 'Physical Training Learning',
             defaultValue: 1.,
             minValue: 1,
+            saveBalanceTree: true,
         })
 
         gameEffects.registerEffect('routine_learning_speed', {
             name: 'Routine Learning',
             defaultValue: 1.,
-            minValue: 1.
+            minValue: 1.,
+            saveBalanceTree: true,
+        })
+
+        gameEffects.registerEffect('yoga_learn_speed', {
+            name: 'Yoga Learning Rate',
+            defaultValue: 1.,
+            minValue: 1.,
+            saveBalanceTree: true,
         })
 
         registerActionsStage1();
@@ -159,12 +180,14 @@ export class ActionsModule extends GameModule {
             name: 'Learning Rate',
             defaultValue: 1.,
             minValue: 1,
+            saveBalanceTree: true,
         })
 
         gameEffects.registerEffect('walking_learning_rate', {
             name: 'Walking Learning Rate',
             defaultValue: 1.,
             minValue: 1,
+            saveBalanceTree: true,
         })
 
         gameEntity.registerGameEntity('runningAction', {
@@ -223,9 +246,12 @@ export class ActionsModule extends GameModule {
                     this.actions[act.originalId].focus.time += delta*act.effort;
                 }
 
+                this.actions[act.originalId].timeInvested = (this.actions[act.originalId].timeInvested || 0) + delta*act.effort;
+
                 this.actions[act.originalId].focus.bonus = this.getFocusBonus(this.actions[act.originalId].focus.time);
                 const dxp = delta*this.getLearningRate(act.id)*act.effort;
                 this.actions[act.originalId].xp += dxp;
+                this.actions[act.originalId].xpEarned = (this.actions[act.originalId].xpEarned || 0) + dxp;
                 gameResources.addResource('mage-xp', dxp);
                 if(this.actions[act.originalId].xp >= this.getActionXPMax(act.originalId)) {
                     this.actions[act.originalId].level++;
@@ -266,6 +292,8 @@ export class ActionsModule extends GameModule {
                 this.setAction(id, saveObject.actions[id].level, true);
                 this.actions[id].xp = saveObject.actions[id].xp;
                 this.actions[id].focus = saveObject.actions[id].focus;
+                this.actions[id].timeInvested = saveObject.actions[id].timeInvested || 0;
+                this.actions[id].xpEarned = saveObject.actions[id].xpEarned || 0;
             }
         }
         if(saveObject?.activeActions) {
@@ -301,12 +329,20 @@ export class ActionsModule extends GameModule {
         return 1 + Math.min(gameEffects.getEffectValue('max_focus_time'), Math.max(0, time - 15))*0.1*5 / 285;
     }
 
-    getLearningRate(id, eff) {
+    getLearningRate(id, eff, bGetBreakdowns = false) {
         const entEff = gameEntity.getEntityEfficiency(id);
         let focusBonus = 1.;
+        let breakDowns = {};
         if(this.isRunningAction(id)) {
-            // console.log('EffMult: ', id, eff, entEff);
+            // console.log('EffMult: ', id, eff, entEff, eff == null);
             focusBonus = this.actions[gameEntity.getEntity(id).copyFromId]?.focus?.bonus || 1.;
+            if(Math.abs(1 - focusBonus) > SMALL_NUMBER) {
+                breakDowns['focus'] = {
+                    title: 'Focus',
+                    value: focusBonus,
+                }
+            }
+
         }
         if(eff == null) {
             eff = entEff;
@@ -316,13 +352,55 @@ export class ActionsModule extends GameModule {
 
         if(gameEntity.getEntity(id).getLearnRate) {
             baseXPRate = gameEntity.getEntity(id).getLearnRate();
+            // we should list breakdowns here
+            if(gameEntity.getEntity(id).learningEffects?.length) {
+                for(const effect of gameEntity.getEntity(id).learningEffects) {
+                    baseXPRate *= gameEffects.getEffectValue(effect);
+                    breakDowns[effect] = {
+                        title: gameEffects.getEffect(effect).name,
+                        value: gameEffects.getEffectValue(effect),
+                        breakDown: gameEffects.getEffect(effect).breakDown
+                    }
+                }
+            }
         }
 
         if(gameEntity.getEntity(id).getPrimaryEffect) {
+            const primaryEffect = gameEntity.getEntity(id).getPrimaryEffect();
             baseXPRate *= gameEntity.getEntity(id).getPrimaryEffect();
+            const pAtt = gameEntity.getEntity(id).attributes?.primaryAttribute;
+            breakDowns['primaryAttribute'] = {
+                title: `Primary Attribute: ${pAtt ? gameEffects.getEffect(pAtt).name : ''}`,
+                value: primaryEffect
+            }
         }
 
-        return baseXPRate * eff * gameEffects.getEffectValue('learning_rate')*focusBonus;
+        breakDowns['learning_rate'] = {
+            title: gameEffects.getEffect('learning_rate').name,
+            value: gameEffects.getEffectValue('learning_rate'),
+            breakDown: gameEffects.getEffect('learning_rate').breakDown
+        };
+
+        if(Math.abs(1 - eff) > SMALL_NUMBER) {
+            breakDowns['effort'] = {
+                title: 'Action Effort',
+                value: eff,
+            };
+        }
+        if(bGetBreakdowns) {
+            console.log('EffMult: ', id, eff, entEff, eff == null, breakDowns['effort']);
+        }
+
+        const total = baseXPRate * eff * gameEffects.getEffectValue('learning_rate')*focusBonus;
+
+        if(bGetBreakdowns) {
+            return {
+                breakDowns,
+                total
+            }
+        }
+
+        return total;
     }
 
     isRunningAction(id) {
@@ -529,6 +607,8 @@ export class ActionsModule extends GameModule {
             primaryAttributeEffect: entity.attributes?.primaryAttribute ? entity.getPrimaryEffect() : 1,
             isTraining: gameEntity.getAttribute(entity.id, 'isTraining'),
             nextUnlock: entity.nextUnlock,
+            timeInvested: this.actions[entity.id]?.timeInvested || 0,
+            xpEarned: this.actions[entity.id]?.xpEarned || 0,
         };
 
         return entityData;

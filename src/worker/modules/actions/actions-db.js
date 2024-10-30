@@ -65,8 +65,9 @@ export const registerActionsStage1 = () => {
             effectDeps: ['walking_learning_rate']
         },
         getLearnRate: () => {
-            return gameEffects.getEffectValue('walking_learning_rate')*gameEffects.getEffectValue('physical_training_learn_speed');
+            return 1.;
         },
+        learningEffects: ['walking_learning_rate', 'physical_training_learn_speed'],
         unlockCondition: () => {
             return true
         },
@@ -198,7 +199,7 @@ export const registerActionsStage1 = () => {
                     },
                     'health': {
                         A: 0.0,
-                        B: 0.5,
+                        B: 0.4,
                         type: 0,
                     }
                 }
@@ -243,7 +244,7 @@ export const registerActionsStage1 = () => {
                     },
                     'health': {
                         A: 0.0,
-                        B: 3,
+                        B: 2,
                         type: 0,
                     }
                 }
@@ -287,7 +288,7 @@ export const registerActionsStage1 = () => {
                     },
                     'health': {
                         A: 0.0,
-                        B: 4,
+                        B: 3,
                         type: 0,
                     }
                 }
@@ -298,6 +299,51 @@ export const registerActionsStage1 = () => {
             type: 'effect',
             id: 'attribute_strength',
             level: 100,
+        }],
+        attributes: {
+            baseXPCost: 500,
+            primaryAttribute: 'attribute_strength'
+        }
+    })
+
+
+    registerGameAction('action_quarrying', {
+        tags: ["action", "activity", "physical"],
+        name: 'Quarrying',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Work hard in quarry trying to find some rocks containing precious minerals',
+        level: 1,
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'inventory_stone': {
+                        A: 0.001,
+                        B: 0.004,
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 12,
+                        type: 0,
+                    },
+                    'health': {
+                        A: 0.0,
+                        B: 5,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: []
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 300,
         }],
         attributes: {
             baseXPCost: 500,
@@ -476,8 +522,9 @@ export const registerActionsStage1 = () => {
             level: 20,
         }],
         getLearnRate: () => {
-            return gameEffects.getEffectValue('physical_training_learn_speed')
+            return 1.
         },
+        learningEffects: ['physical_training_learn_speed'],
         unlockCondition: () => {
             return gameEntity.getLevel('action_walk') > 19
         },
@@ -574,8 +621,9 @@ export const registerActionsStage1 = () => {
         description: 'Spend some time walking in nearby forest and collecting berries',
         level: 1,
         getLearnRate: () => {
-            return gameEffects.getEffectValue('routine_learning_speed')
+            return 1.
         },
+        learningEffects: ['routine_learning_speed'],
         resourceModifier: {
             get_income: () => ({
                 resources: {
@@ -614,8 +662,9 @@ export const registerActionsStage1 = () => {
         description: 'Read books to find new information and increase your knowledge',
         level: 1,
         getLearnRate: () => {
-            return gameEffects.getEffectValue('books_learning_rate')
+            return 1
         },
+        learningEffects: ['books_learning_rate'],
         resourceModifier: {
             get_income: () => ({
                 resources: {
@@ -636,6 +685,52 @@ export const registerActionsStage1 = () => {
                     'coins': {
                         A: 0.0,
                         B: 1.5,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['read_books_efficiency']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_library_entrance') > 0
+        },
+        attributes: {
+            baseXPCost: 50,
+        }
+    })
+
+
+    registerGameAction('action_read_mages_handbook', {
+        tags: ["action", "activity", "spiritual", "book"],
+        name: 'Read Appretience Handbook',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Read magic book, providing you precious information about increasing your magic potential. Unfortunately, text inside encrypted with runes that you have to de-crypt using spells.',
+        level: 1,
+        getLearnRate: () => {
+            return 1
+        },
+        learningEffects: ['books_learning_rate'],
+        resourceModifier: {
+            income: {
+                effects: {
+                    'attribute_spell_reading': {
+                        A: 1,
+                        B: -1,
+                        type: 0,
+                    }
+                }
+            },
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0,
+                        B: 30.0,
+                        type: 0,
+                    },
+                    'mana': {
+                        A: 0.0,
+                        B: 10,
                         type: 0,
                     }
                 }
@@ -690,6 +785,8 @@ export const registerActionsStage1 = () => {
             }),
             effectDeps: ['read_books_efficiency']
         },
+        getLearnRate: () => 1.,
+        learningEffects: ['yoga_learn_speed'],
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_yoga_manual') > 0
         },
@@ -708,8 +805,9 @@ export const registerActionsStage1 = () => {
         description: 'Clean your house, organize things to free more space for coins storage',
         level: 1,
         getLearnRate: () => {
-            return gameEffects.getEffectValue('routine_learning_speed')
+            return 1.
         },
+        learningEffects: ['routine_learning_speed'],
         resourceModifier: {
             get_multiplier: () => ({
                 effects: {
@@ -744,6 +842,51 @@ export const registerActionsStage1 = () => {
     })
 
 
+    registerGameAction('action_dig_vaults', {
+        tags: ["action", "activity", "routine"],
+        name: 'Dig Vaults',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Dig underground vaults to store your coins. Its energy consuming action, but can pay off',
+        level: 1,
+        getLearnRate: () => {
+            return 2.
+        },
+        learningEffects: ['routine_learning_speed'],
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'coins_cap_bonus': {
+                        A: 0.025,
+                        B: 1,
+                        type: 0,
+                    },
+
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 20,
+                        type: 0,
+                    }
+                }
+            }),
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 225,
+        }],
+        attributes: {
+            baseXPCost: 500,
+            isTraining: true,
+            primaryAttribute: 'attribute_patience'
+        }
+    })
+
+
     registerGameAction('action_learn_anatomy', {
         tags: ["action", "training", "mental", "book"],
         name: 'Learn Anatomy',
@@ -752,8 +895,9 @@ export const registerActionsStage1 = () => {
         description: 'Lear anatomy to better understand your body and improve your health regeneration',
         level: 1,
         getLearnRate: () => {
-            return gameEffects.getEffectValue('books_learning_rate')
+            return 1.
         },
+        learningEffects: ['books_learning_rate'],
         resourceModifier: {
             get_income: () => ({
                 effects: {
@@ -852,8 +996,9 @@ export const registerActionsStage1 = () => {
         description: 'Take some exercises in local gym to improve your body',
         level: 1,
         getLearnRate: () => {
-            return gameEffects.getEffectValue('physical_training_learn_speed')
+            return 1.
         },
+        learningEffects: ['physical_training_learn_speed'],
         resourceModifier: {
             get_income: () => ({
                 effects: {
@@ -887,6 +1032,98 @@ export const registerActionsStage1 = () => {
         }
     })
 
+    registerGameAction('action_stamina_training', {
+        tags: ["action", "training", "physical"],
+        name: 'Train Stamina',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Better endurance unlocked harder but much more efficient way to train your stamina',
+        level: 1,
+        getLearnRate: () => {
+            return 1
+        },
+        learningEffects: ['physical_training_learn_speed'],
+        resourceModifier: {
+            get_income: () => ({
+                effects: {
+                    'attribute_stamina': {
+                        A: 8,
+                        B: -8,
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 10,
+                        type: 0,
+                    },
+                    'health': {
+                        A: 0.0,
+                        B: 10,
+                        type: 0,
+                    },
+                }
+            }),
+            effectDeps: ['physical_training_learn_speed']
+        },
+        unlockedBy: [{
+            type: 'entity',
+            id: 'action_endurance_training',
+            level: 200,
+        }],
+        attributes: {
+            baseXPCost: 500,
+            displayPerLevel: 1,
+            isTraining: true,
+        }
+    })
+
+    registerGameAction('action_cardio_training', {
+        tags: ["action", "training", "physical"],
+        name: 'Cardio Training',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Finally, you feel the power in your hands. But still, you feel like you need to train more',
+        level: 1,
+        getLearnRate: () => {
+            return 1.
+        },
+        learningEffects: ['physical_training_learn_speed'],
+        resourceModifier: {
+            get_income: () => ({
+                effects: {
+                    'attribute_recovery': {
+                        A: 3,
+                        B: -3,
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 20,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['physical_training_learn_speed']
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 200,
+        }],
+        attributes: {
+            baseXPCost: 500,
+            displayPerLevel: 1,
+            isTraining: true,
+        }
+    })
 
     registerGameAction('action_deeper_forest', {
         tags: ["action", "gathering", "routine"],
@@ -896,8 +1133,9 @@ export const registerActionsStage1 = () => {
         description: 'More dangerous activity, but searching for plants in less accessible places can pay off',
         level: 1,
         getLearnRate: () => {
-            return gameEffects.getEffectValue('routine_learning_speed')
+            return 1.
         },
+        learningEffects: ['routine_learning_speed'],
         resourceModifier: {
             get_income: () => ({
                 resources: {
@@ -956,8 +1194,9 @@ export const registerActionsStage1 = () => {
         description: 'Magic garden is told to be planted by some wizard. The wizard was murdered, but his garden keeps growing, providing variety of precious herbs',
         level: 1,
         getLearnRate: () => {
-            return gameEffects.getEffectValue('routine_learning_speed')
+            return 1
         },
+        learningEffects: ['routine_learning_speed'],
         resourceModifier: {
             get_income: () => ({
                 resources: {
@@ -1048,8 +1287,9 @@ export const registerActionsStage1 = () => {
             effectDeps: []
         },
         getLearnRate: () => {
-            return gameEffects.getEffectValue('spiritual_learning_rate')
+            return 1
         },
+        learningEffects: ['spiritual_learning_rate'],
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_meditation') > 0
         },
@@ -1094,8 +1334,9 @@ export const registerActionsStage1 = () => {
             effectDeps: []
         },
         getLearnRate: () => {
-            return gameEffects.getEffectValue('spiritual_learning_rate')
+            return 1
         },
+        learningEffects: ['spiritual_learning_rate'],
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_magic_training') > 0
         },
@@ -1199,7 +1440,7 @@ export const registerActionsStage1 = () => {
 
 
     registerGameAction('action_alchemy', {
-        tags: ["action", "activity", "physical", "crafting"],
+        tags: ["action", "activity", "routine", "crafting"],
         name: 'Alchemy',
         isAbstract: false,
         allowedImpacts: ['effects'],

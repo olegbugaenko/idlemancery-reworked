@@ -136,7 +136,6 @@ export class PropertyModule extends GameModule {
     getFurnitureDetails(id) {
         if(!id) return null;
         const entity = gameEntity.getEntity(id);
-        console.log('QueryDet: ', id, entity);
         return {
             id: entity.id,
             name: entity.name,

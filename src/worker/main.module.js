@@ -44,7 +44,7 @@ export class MainModule extends GameModule {
         })
 
         this.eventHandler.registerHandler('start-ticking', () => {
-            const cheat = 1;
+            const cheat = 4;
             console.log('gameCore', GameCore.instance);
             gameCore.startTicking(100, 0.1*cheat, () => {
                 if(gameCore.numTicks % 100 === 0) {
@@ -62,7 +62,8 @@ export class MainModule extends GameModule {
                 'property': gameEntity.getLevel('shop_item_tent') > 0,
                 'spellbook': gameEntity.getLevel('shop_item_spellbook') > 0,
                 'crafting': gameEntity.getLevel('shop_item_crafting_courses') > 0,
-                'workshop': gameEntity.getLevel('shop_item_crafting_courses') > 0 // here alchemy reqs should be added
+                'alchemy': gameEntity.getLevel('shop_item_alchemy_courses') > 0,
+                'workshop': gameEntity.getLevel('shop_item_crafting_courses') > 0 || gameEntity.getLevel('shop_item_alchemy_courses') > 0
             }
             let label = 'unlocks';
             if(payload?.prefix) {

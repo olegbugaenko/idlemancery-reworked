@@ -42,7 +42,12 @@ export class CraftingModule extends GameModule {
     }
 
     tick() {
-
+        /*if(gameEntity.entityExists('activeCrafting_craft_herbal_fibers')) {
+            console.log('DT: ',
+                gameEntity.getEntity('activeCrafting_craft_herbal_fibers'),
+                gameResources.getResource('inventory_ginseng')
+            )
+        }*/
     }
 
     save() {
@@ -107,21 +112,24 @@ export class CraftingModule extends GameModule {
 
         const entities = gameEntity.listEntitiesByTags(['recipe', ...filter.tags]).filter(one => one.isUnlocked);
 
+        const rrs = filterId === 'crafting' ? gameResources.getResource('crafting_slots') : gameResources.getResource('alchemy_slots')
+        const efrs = filterId === 'crafting' ? gameResources.getResource('crafting_ability') : gameResources.getResource('alchemy_ability')
+
         const available = entities.map(recipe => ({
             ...recipe,
             level: this.craftingSlots[recipe.id]?.level || 0,
-            maxLevel: gameResources.getResource('crafting_slots').amount + (this.craftingSlots[recipe.id]?.level || 0)
+            maxLevel: rrs.amount + (this.craftingSlots[recipe.id]?.level || 0)
         }));
 
         const slots = {
-            max: gameResources.getResource('crafting_slots').income,
-            total: gameResources.getResource('crafting_slots').amount
+            max: rrs.income,
+            total: rrs.amount
         }
 
         return {
             available,
             slots,
-            efforts: gameResources.getResource('crafting_ability')
+            efforts: efrs
         }
     }
 

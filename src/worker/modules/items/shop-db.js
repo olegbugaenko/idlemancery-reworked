@@ -844,7 +844,7 @@ export const registerShopItemsStage1 = () => {
     gameEntity.registerGameEntity('shop_item_spiritualism', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Spiritualism Book',
-        description: 'Unlocks way to improve your spiritual activities by consuming magic knowledge',
+        description: 'Unlocks way to improve your spiritual activities by consuming magic knowledge. Also, unlocks new furniture',
         level: 0,
         maxLevel: 1,
         unlockCondition: () => {
@@ -866,6 +866,39 @@ export const registerShopItemsStage1 = () => {
             }
         }),
     })
+
+
+    gameEntity.registerGameEntity('shop_item_mages_handbook', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Mages Handbook',
+        description: 'Finally, your knowledge is sufficient to read the title of the book. It appears to contain secrets of ancient magic. Although, you’re not entirely sure you’ll be able to read its contents… Still, your hand reaches for the shelf to take it.',
+        level: 0,
+        maxLevel: 1,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_magic_ability',
+            level: 120
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_spiritualism') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'knowledge': {
+                A: 1.5,
+                B: 500*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'coins': {
+                A: 1.5,
+                B: 2000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
 
     gameEntity.registerGameEntity('shop_item_better_stashes', {
         tags: ["shop", "upgrade", "purchaseable"],
@@ -925,7 +958,7 @@ export const registerShopItemsStage1 = () => {
         },
         get_cost: () => ({
             'coins': {
-                A: 1.25,
+                A: 1.3,
                 B: 20000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 1
             }
@@ -945,7 +978,7 @@ export const registerShopItemsStage1 = () => {
             level: 100,
         }],
         unlockCondition: () => {
-            return gameEffects.getEffectValue('attribute_strength') >= 100
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEffects.getEffectValue('attribute_strength') >= 100
             //||  gameEntity.getLevel('shop_item_conjuration_magic') > 0
         },
         attributes: {
@@ -985,7 +1018,7 @@ export const registerShopItemsStage1 = () => {
             level: 100,
         }],
         unlockCondition: () => {
-            return gameEffects.getEffectValue('attribute_patience') >= 100
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEffects.getEffectValue('attribute_patience') >= 100
             //||  gameEntity.getLevel('shop_item_conjuration_magic') > 0
         },
         attributes: {

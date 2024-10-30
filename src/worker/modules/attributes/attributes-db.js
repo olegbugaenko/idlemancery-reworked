@@ -98,4 +98,18 @@ export const registerAttributes = () => {
         saveBalanceTree: true,
         tags: ['attribute', 'magical']
     })
+
+
+    gameEffects.registerEffect('attribute_spell_reading', {
+        name: 'Spell Reading ',
+        description: 'Improves your spell learning rate',
+        minValue: 1,
+        defaultValue: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_mages_handbook') > 0
+        },
+        hasCap: false,
+        saveBalanceTree: true,
+        tags: ['attribute', 'magical']
+    })
 }
