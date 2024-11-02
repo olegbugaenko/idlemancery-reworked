@@ -76,7 +76,10 @@ Add shop items: book of herbalism and woodworking manual
 [QA] Add stonecutting and refine stone into the rubies or sapfires. 
 Make actions lists list searchable and scrollable
 Add caps breakdowns
-Implement new accessories based on stone refining
+[V] Implement new accessories based on stone refining
+[V] Add new job based on strength
+Add new options (actions) for boosting mana regen and caps (New actions)
+
 
 ---
 Troubles: missing something providing energy very bad. It can be fixed with alchemy, however.

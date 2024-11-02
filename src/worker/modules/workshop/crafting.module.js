@@ -169,6 +169,7 @@ export class CraftingModule extends GameModule {
 
     sendCraftingDetails(payload) {
         const data = this.getCraftingDetails(payload);
+        // console.log('Send crafting: crafting-details', data);
         this.eventHandler.sendData(`crafting-details`, data)
     }
 

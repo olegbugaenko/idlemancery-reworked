@@ -262,8 +262,54 @@ export const registerActionsStage1 = () => {
         }
     })
 
+
+
+    registerGameAction('action_builder', {
+        tags: ["action", "job", "physical"],
+        name: 'Builder',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Work as builder. Its hard job, but well paid',
+        level: 1,
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'coins': {
+                        A: 1*gameEffects.getEffectValue('coins_earned_bonus'),
+                        B: 9*gameEffects.getEffectValue('coins_earned_bonus'),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 12,
+                        type: 0,
+                    },
+                    'health': {
+                        A: 0.0,
+                        B: 6,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['coins_earned_bonus']
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 350,
+        }],
+        attributes: {
+            baseXPCost: 20,
+            primaryAttribute: 'attribute_strength'
+        }
+    })
+
     registerGameAction('action_woodcutter', {
-        tags: ["action", "activity", "physical"],
+        tags: ["action", "activity", "physical", "manual-labor"],
         name: 'Woodcutting',
         isAbstract: false,
         allowedImpacts: ['effects'],
@@ -273,8 +319,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'inventory_wood': {
-                        A: 0.002,
-                        B: 0.008,
+                        A: 0.002*gameEffects.getEffectValue('manual_labor_efficiency'),
+                        B: 0.008*gameEffects.getEffectValue('manual_labor_efficiency'),
                         type: 0,
                     }
                 }
@@ -293,7 +339,7 @@ export const registerActionsStage1 = () => {
                     }
                 }
             }),
-            effectDeps: []
+            effectDeps: ['manual_labor_efficiency']
         },
         unlockedBy: [{
             type: 'effect',
@@ -308,7 +354,7 @@ export const registerActionsStage1 = () => {
 
 
     registerGameAction('action_quarrying', {
-        tags: ["action", "activity", "physical"],
+        tags: ["action", "activity", "physical", "manual-labor"],
         name: 'Quarrying',
         isAbstract: false,
         allowedImpacts: ['effects'],
@@ -318,8 +364,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'inventory_stone': {
-                        A: 0.001,
-                        B: 0.004,
+                        A: 0.001*gameEffects.getEffectValue('manual_labor_efficiency'),
+                        B: 0.004*gameEffects.getEffectValue('manual_labor_efficiency'),
                         type: 0,
                     }
                 }
@@ -338,7 +384,7 @@ export const registerActionsStage1 = () => {
                     }
                 }
             }),
-            effectDeps: []
+            effectDeps: ['manual_labor_efficiency']
         },
         unlockedBy: [{
             type: 'effect',
@@ -742,6 +788,7 @@ export const registerActionsStage1 = () => {
         },
         attributes: {
             baseXPCost: 50,
+            isTraining: true,
         }
     })
 
@@ -1483,4 +1530,63 @@ export const registerActionsStage1 = () => {
             primaryAttribute: 'attribute_patience'
         }
     })
+
+
+    registerGameAction('action_meditative_insight', {
+        tags: ["action", "training", "magical", "spiritual"],
+        name: 'Meditative Insight',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Engage in a deep meditative practice with the Metaphysics Book, sharpening memory and enhancing mana regeneration by channeling profound knowledge and magical focus.',
+        level: 1,
+        resourceModifier: {
+            income: {
+                effects: {
+                    'attribute_magic_ability': {
+                        A: 2,
+                        B: 0,
+                        type: 0,
+                    },
+                    'attribute_memory': {
+                        A: 4,
+                        B: 0,
+                        type: 0,
+                    },
+                }
+            },
+            consumption: {
+                resources: {
+                    'energy': {
+                        A: 0,
+                        B: 25.00,
+                        type: 0
+                    },
+                    'knowledge': {
+                        A: 0,
+                        B: 10.00,
+                        type: 0
+                    },
+                    'mana': {
+                        A: 0,
+                        B: 5.00,
+                        type: 0
+                    }
+                }
+            },
+            effectDeps: []
+        },
+        getLearnRate: () => {
+            return 2
+        },
+        learningEffects: ['spiritual_learning_rate'],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_metaphysics_handbook') > 0
+        },
+        attributes: {
+            baseXPCost: 1000,
+            isTraining: true,
+        }
+    })
+
+
 }

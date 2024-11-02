@@ -99,6 +99,12 @@ export class ResourcePoolModule extends GameModule {
             isService: true,
         })
 
+        gameResources.registerResource('plantation_slots', {
+            tags: ['alchemy', 'secondary'],
+            name: 'Plantation Slots',
+            isService: true,
+        })
+
     }
 
     tick() {

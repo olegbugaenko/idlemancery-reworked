@@ -91,6 +91,61 @@ export const registerCraftingRecipes = () => {
     })
 
 
+    registerCraftingRecipe('craft_paper', {
+        tags: ["recipe", "crafting", "material", "physical"],
+        name: 'Craft Paper',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Refine wood and use it for your needs, or just sell it',
+        level: 1,
+        resourceModifier: {
+            income: {
+                resources: {
+                    'inventory_paper': {
+                        A: 0.1,
+                        B: 1.2,
+                        type: 1,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'inventory_wood': {
+                        A: 1.5,
+                        B: 1,
+                        type: 1
+                    },
+                    'crafting_ability': {
+                        A: 1.5,
+                        B: 1,
+                        type: 1,
+                    },
+                    'crafting_slots': {
+                        A: 1,
+                        B: 0,
+                        type: 0,
+                        ignoreEfficiency: true,
+                    },
+                }
+            },
+            effectDeps: ['walking_learning_rate']
+        },
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_paper')
+        },
+        attributes: {
+            baseXPCost: 10,
+        },
+        get_cost: () => ({
+            'crafting_slots': {
+                A: 1,
+                B: 0,
+                type: 0
+            }
+        }),
+    })
+
+
     registerCraftingRecipe('craft_herbal_fibers', {
         tags: ["recipe", "crafting", "material", "physical"],
         name: 'Craft Herbal Fibers',
@@ -133,10 +188,120 @@ export const registerCraftingRecipes = () => {
                     },
                 }
             },
-            effectDeps: ['walking_learning_rate']
+            effectDeps: []
         },
         unlockCondition: () => {
             return true
+        },
+        attributes: {
+            baseXPCost: 10,
+        },
+        get_cost: () => ({
+            'crafting_slots': {
+                A: 1,
+                B: 0,
+                type: 0
+            }
+        }),
+    })
+
+
+    registerCraftingRecipe('craft_ruby', {
+        tags: ["recipe", "crafting", "material", "physical"],
+        name: 'Refine Ruby',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Refine your stones to obtain trace amounts of rubies',
+        level: 1,
+        resourceModifier: {
+            income: {
+                resources: {
+                    'inventory_ruby': {
+                        A: 0.05,
+                        B: 1.2,
+                        type: 1,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'inventory_stone': {
+                        A: 1.5,
+                        B: 1,
+                        type: 1
+                    },
+                    'crafting_ability': {
+                        A: 1.5,
+                        B: 1,
+                        type: 1,
+                    },
+                    'crafting_slots': {
+                        A: 1,
+                        B: 0,
+                        type: 0,
+                        ignoreEfficiency: true,
+                    },
+                }
+            },
+            effectDeps: []
+        },
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_stone')
+        },
+        attributes: {
+            baseXPCost: 10,
+        },
+        get_cost: () => ({
+            'crafting_slots': {
+                A: 1,
+                B: 0,
+                type: 0
+            }
+        }),
+    })
+
+
+    registerCraftingRecipe('craft_sapphire', {
+        tags: ["recipe", "crafting", "material", "physical"],
+        name: 'Refine Sapphire',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Refine your stones to obtain trace amounts of sapphires',
+        level: 1,
+        resourceModifier: {
+            income: {
+                resources: {
+                    'inventory_sapphire': {
+                        A: 0.05,
+                        B: 1.2,
+                        type: 1,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'inventory_stone': {
+                        A: 1.5,
+                        B: 1,
+                        type: 1
+                    },
+                    'crafting_ability': {
+                        A: 1.5,
+                        B: 1,
+                        type: 1,
+                    },
+                    'crafting_slots': {
+                        A: 1,
+                        B: 0,
+                        type: 0,
+                        ignoreEfficiency: true,
+                    },
+                }
+            },
+            effectDeps: []
+        },
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_stone')
         },
         attributes: {
             baseXPCost: 10,

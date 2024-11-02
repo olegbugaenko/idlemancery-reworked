@@ -94,7 +94,6 @@ export const registerAccessoriesStage1 = () => {
     })
 
 
-
     gameEntity.registerGameEntity('accessory_aromatic_carpet', {
         tags: ["accessory", "upgrade", "purchaseable"],
         name: 'Aromatic Carpet',
@@ -123,6 +122,201 @@ export const registerAccessoriesStage1 = () => {
             'mana': {
                 A: 1.1,
                 B: 3,
+                type: 1
+            }
+        }),
+    })
+
+
+
+    gameEntity.registerGameEntity('accessory_scroll_of_wisdom', {
+        tags: ["accessory", "upgrade", "purchaseable"],
+        name: 'Scroll of Wisdom',
+        description: 'A scroll inscribed with glowing runes that impart knowledge to the reader. It continuously generates insight, aiding the bearer in gradually increasing their understanding and intelligence over time.',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_paper_working') > 0;
+        },
+        resourceModifier: {
+            income: {
+                resources: {
+                    'knowledge': {
+                        A: 0.005,
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            },
+        },
+        get_cost: () => ({
+            'inventory_paper': {
+                A: 1.1,
+                B: 2,
+                type: 1
+            },
+            'mana': {
+                A: 1.1,
+                B: 2,
+                type: 1
+            }
+        }),
+    })
+
+
+    gameEntity.registerGameEntity('accessory_scroll_of_restoration', {
+        tags: ["accessory", "upgrade", "purchaseable"],
+        name: 'Charm of Restoration Magic',
+        description: 'A delicately folded paper charm shaped like a bird, imbued with restorative magic',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_paper_working') > 0;
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'restoration_spells_efficiency': {
+                        A: 0.025,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+        },
+        get_cost: () => ({
+            'inventory_paper': {
+                A: 1.1,
+                B: 2,
+                type: 1
+            },
+            'knowledge': {
+                A: 1.1,
+                B: 2,
+                type: 1
+            },
+            'inventory_aloe_vera': {
+                A: 1.1,
+                B: 20,
+                type: 1
+            }
+        }),
+    })
+
+
+    gameEntity.registerGameEntity('accessory_ruby_pendant', {
+        tags: ["accessory", "upgrade", "purchaseable"],
+        name: 'Ruby Pendant',
+        description: 'Create ruby pendant that empowers your physical learning rate',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.isEntityUnlocked('action_quarrying');
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'physical_training_learn_speed': {
+                        A: 0.04,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+        },
+        get_cost: () => ({
+            'inventory_ruby': {
+                A: 1.1,
+                B: 1,
+                type: 1
+            }
+        }),
+    })
+
+
+    gameEntity.registerGameEntity('accessory_vitality_talisman', {
+        tags: ["accessory", "upgrade", "purchaseable"],
+        name: 'Vitality Talisman',
+        description: 'Increase your HP and energy caps',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.isEntityUnlocked('action_quarrying');
+        },
+        resourceModifier: {
+            capMult: {
+                resources: {
+                    'energy': {
+                        A: 0.05,
+                        B: 1,
+                        type: 0,
+                    },
+                    'health': {
+                        A: 0.05,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+        },
+        get_cost: () => ({
+            'inventory_ruby': {
+                A: 1.1,
+                B: 1,
+                type: 1
+            }
+        }),
+    })
+
+
+    gameEntity.registerGameEntity('accessory_sapphire_ring', {
+        tags: ["accessory", "upgrade", "purchaseable"],
+        name: 'Sapphire Ring',
+        description: 'Increase your spell XP gain',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.isEntityUnlocked('action_quarrying');
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'spell_xp_rate': {
+                        A: 0.1,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+        },
+        get_cost: () => ({
+            'inventory_sapphire': {
+                A: 1.1,
+                B: 1,
+                type: 1
+            }
+        }),
+    })
+
+
+    gameEntity.registerGameEntity('accessory_sapphire_pendant', {
+        tags: ["accessory", "upgrade", "purchaseable"],
+        name: 'Sapphire Pendant',
+        description: 'Increase your mana cap',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.isEntityUnlocked('action_quarrying');
+        },
+        resourceModifier: {
+            capMult: {
+                resources: {
+                    'mana': {
+                        A: 0.05,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+        },
+        get_cost: () => ({
+            'inventory_sapphire': {
+                A: 1.1,
+                B: 1,
                 type: 1
             }
         }),

@@ -987,4 +987,182 @@ export const registerFurnitureStage1 = () => {
     })
 
 
+
+    gameEntity.registerGameEntity('furniture_herbs_plantation', {
+        tags: ["furniture", "upgrade", "purchaseable"],
+        name: 'Herbs Plantation',
+        description: 'Devote some space for platations to grow your very own herbs and plants',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_herbalists_handbook') > 0;
+        },
+        resourceModifier: {
+            income: {
+                resources: {
+                    'plantation_slots': {
+                        A: 1,
+                        B: 0,
+                        type: 0,
+                    }
+                },
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 3,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1.5,
+                B: 1000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 3,
+                type: 0
+            }
+        }),
+    })
+
+
+
+
+    gameEntity.registerGameEntity('furniture_well', {
+        tags: ["furniture", "upgrade", "purchaseable"],
+        name: 'Well',
+        description: 'Dig well to make watering process more efficient, increasing plants growth rate',
+        level: 0,
+        maxLevel: 4,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_herbalists_handbook') > 0;
+        },
+        resourceModifier: {
+            income: {
+                effects: {
+                    'plantations_efficiency': {
+                        A: 0.25,
+                        B: 1,
+                        type: 0,
+                    }
+                },
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 2,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1.5,
+                B: 1000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 2,
+                type: 0
+            }
+        }),
+    })
+
+
+
+    gameEntity.registerGameEntity('furniture_tools_workshop', {
+        tags: ["furniture", "upgrade", "purchaseable"],
+        name: 'Tools Workshop',
+        description: 'Provides you with some place and instruments to repair your tools, increasing your manual-labor actions efficiency',
+        level: 0,
+        maxLevel: 6,
+        unlockCondition: () => {
+            return gameEntity.isEntityUnlocked('action_woodcutter') > 0;
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'manual_labor_efficiency': {
+                        A: 0.25,
+                        B: 1,
+                        type: 0,
+                    }
+                },
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 3,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1.5,
+                B: 600000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 3,
+                type: 0
+            }
+        }),
+    })
+
+
+    gameEntity.registerGameEntity('furniture_fertilizing_station', {
+        tags: ["furniture", "upgrade", "purchaseable"],
+        name: 'Fertilizing Station',
+        description: 'Purchase some basic tools for analyzing soil on your plantations and further increase your plantations efficiency',
+        level: 0,
+        maxLevel: 4,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_soil_manual') > 0;
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'plantations_efficiency': {
+                        A: 0.25,
+                        B: 1,
+                        type: 0,
+                    }
+                },
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 2,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1.5,
+                B: 1500000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 2,
+                type: 0
+            }
+        }),
+    })
+
 }

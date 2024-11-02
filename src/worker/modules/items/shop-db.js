@@ -870,7 +870,7 @@ export const registerShopItemsStage1 = () => {
 
     gameEntity.registerGameEntity('shop_item_mages_handbook', {
         tags: ["shop", "upgrade", "purchaseable"],
-        name: 'Mages Handbook',
+        name: 'Apprentice Handbook',
         description: 'Finally, your knowledge is sufficient to read the title of the book. It appears to contain secrets of ancient magic. Although, you’re not entirely sure you’ll be able to read its contents… Still, your hand reaches for the shelf to take it.',
         level: 0,
         maxLevel: 1,
@@ -894,6 +894,76 @@ export const registerShopItemsStage1 = () => {
             'coins': {
                 A: 1.5,
                 B: 2000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+
+    gameEntity.registerGameEntity('shop_item_herbalists_handbook', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Herbalists Handbook',
+        description: 'Learn how to gather seeds and plant different kind of flora near your home. Now you\'ll be able to purchase new furniture for it!',
+        level: 0,
+        maxLevel: 1,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 250
+        }],
+        unlockCondition: () => {
+            return true
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'knowledge': {
+                A: 1.5,
+                B: 500*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'coins': {
+                A: 1.5,
+                B: 2000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+
+    gameEntity.registerGameEntity('shop_item_soil_manual', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Soil Types Handbook',
+        description: 'Learn more about soil types that might be suitable for your plants. Increase plantations efficiency and unlock new furniture',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_herbalists_handbook') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    plantations_efficiency: {
+                        A: 0.25,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'knowledge': {
+                A: 1.5,
+                B: 800*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'coins': {
+                A: 1.5,
+                B: 8000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 1
             }
         }),
@@ -1039,6 +1109,61 @@ export const registerShopItemsStage1 = () => {
             'coins': {
                 A: 2.25,
                 B: 140000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+
+    gameEntity.registerGameEntity('shop_item_paper_working', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Paper Working',
+        description: 'Unlocks new resource',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_crafting_courses') > 0
+            //||  gameEntity.getLevel('shop_item_conjuration_magic') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2.25,
+                B: 6000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+
+    gameEntity.registerGameEntity('shop_item_metaphysics_handbook', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Metaphysics Book',
+        description: 'Learn new ways of boosting your mental stats using improved meditative practices',
+        level: 0,
+        maxLevel: 1,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_magic_ability',
+            level: 275
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_mages_handbook') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'knowledge': {
+                A: 1.5,
+                B: 1300*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'coins': {
+                A: 1.5,
+                B: 11000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 1
             }
         }),

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
-import {formatValue, secondsToString} from "../../general/utils/strings";
+import {formatInt, formatValue, secondsToString} from "../../general/utils/strings";
 import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
 import {ActiveEffects} from "../shared/active-effects.jsx";
 
@@ -60,7 +60,7 @@ export const ResourcesBar = () => {
 
             return (<div className={`holder ${aff ? 'monitored' : ''}`}><p className={`resource-item ${affClassData}`}>
                 <span className={'resource-label'}>{res.name}</span>
-                <TippyWrapper content={<div className={'hint-popup'}>{res.eta >= 0 ? `${secondsToString(res.eta)} to full` : `${secondsToString(-res.eta)} to empty`}</div> }>
+                <TippyWrapper content={<div className={'hint-popup'}><BreakDown breakDown={res.storageBreakdown}/>{res.eta >= 0 ? `${secondsToString(res.eta)} to full` : `${secondsToString(-res.eta)} to empty`}</div> }>
                     <span className={'resource-amount'}>{formatValue(res.amount || 0)}{res.hasCap ? `/${formatValue(res.cap || 0)}` : ''}</span>
                 </TippyWrapper>
                 <TippyWrapper content={<div className={'hint-popup'}><BreakDown breakDown={res.breakDown}/></div> }>
@@ -106,10 +106,15 @@ export const AttributesBar = () => {
                 affClassData = ` monitored ${aff.isAffordable ? 'affordable' : (aff.hardLocked ? 'locked' : 'unavailable')}`
             }
 
-            console.log('res: ', res.breakDown);
+            // console.log('res: ', res.breakDown);
 
             return (<div className={`holder ${aff ? 'monitored' : ''}`}><p className={`resource-item ${affClassData}`}>
-                <TippyWrapper content={<div className={'hint-popup'}>{res.description}</div> }>
+                <TippyWrapper content={<div className={'hint-popup'}>
+                    {res.description}
+                    {res.nextUnlock ? (<div className={'unlock block'}>
+                        <p className={'hint'}>Next unlock at level {formatInt(res.nextUnlock.level)}</p>
+                    </div> ) : null}
+                </div> }>
                     <span className={'resource-label'}>{res.name}</span>
                 </TippyWrapper>
                 <TippyWrapper content={<div className={'hint-popup'}><BreakDown breakDown={res.breakDown}/></div> }>

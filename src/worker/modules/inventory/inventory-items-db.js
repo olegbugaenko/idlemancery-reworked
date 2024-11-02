@@ -270,6 +270,28 @@ export const registerInventoryItems = () => {
     })
 
 
+    gameResources.registerResource('inventory_paper', {
+        name: 'Paper',
+        hasCap: false,
+        tags: ['inventory', 'material', 'craftable'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        attributes: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_paper_working') > 0
+        },
+        sellPrice: 900,
+        get_cost: (amount = 1) => ({
+            coins: amount*50000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+        }),
+    })
+
+
     gameResources.registerResource('inventory_herbal_fibers', {
         name: 'Herbal Fibers',
         hasCap: false,
@@ -304,8 +326,13 @@ export const registerInventoryItems = () => {
         attributes: {
 
         },
+        unlockedBy: {
+            type: 'entity',
+            id: 'action_quarrying',
+            level: 1,
+        },
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_backpack') > 0
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.isEntityUnlocked('action_quarrying')
         },
         sellPrice: 125,
         get_cost: (amount = 1) => ({

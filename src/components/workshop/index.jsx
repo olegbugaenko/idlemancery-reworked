@@ -7,6 +7,8 @@ import {formatInt, formatValue} from "../../general/utils/strings";
 import {Crafting} from "./crafting.jsx";
 import {ResourceCost} from "../shared/resource-cost.jsx";
 import {Alchemy} from "./alchemy.jsx";
+import {Plantations} from "./plantations.jsx";
+import {ResourceComparison} from "../shared/resource-comparison.jsx";
 
 export const Workshop = () => {
 
@@ -52,10 +54,12 @@ export const Workshop = () => {
                 <ul className={'menu'}>
                     {unlocks.crafting ? (<li className={`${selectedTab === 'crafting' ? 'active' : ''}`} onClick={() => {setSelectedTab('crafting'); setDetailOpened(null);}}><span>Crafting</span></li>) : null}
                     {unlocks.alchemy ? (<li className={`${selectedTab === 'alchemy' ? 'active' : ''}`} onClick={() => {setSelectedTab('alchemy'); setDetailOpened(null);}}><span>Alchemy</span></li>) : null}
+                    {unlocks.plantation ? (<li className={`${selectedTab === 'plantation' ? 'active' : ''}`} onClick={() => {setSelectedTab('plantation'); setDetailOpened(null);}}><span>Plantations</span></li>) : null}
                 </ul>
             </div>
             {selectedTab === 'crafting' ? (<Crafting filterId={selectedTab} setItemDetails={setItemDetails} setItemLevel={setItemLevel} />) : null}
             {selectedTab === 'alchemy' ? (<Alchemy filterId={selectedTab} setItemDetails={setItemDetails} setItemLevel={setItemLevel} />) : null}
+            {selectedTab === 'plantation' ? (<Plantations setItemDetails={setItemDetails} />) : null}
         </div>
 
         <div className={'item-detail ingame-box detail-blade'}>
@@ -79,18 +83,32 @@ export const ItemDetails = ({itemId, category}) => {
         if(category === 'crafting' || category === 'alchemy') {
             const interval = setInterval(() => {
                 sendData('query-crafting-details', { id: itemId });
-            }, 100);
+            }, 200);
+
+            return () => {
+                clearInterval(interval);
+            }
+        }
+        if(category === 'plantation') {
+            const interval = setInterval(() => {
+                sendData('query-plantation-details', { id: itemId });
+            }, 200);
 
             return () => {
                 clearInterval(interval);
             }
         }
 
-    })
+    }, [])
 
 
     onMessage('crafting-details', (items) => {
-        console.log('DETS: ', items);
+        console.log('CraftDetails: ', items)
+        setDetailOpened(items);
+    })
+
+    onMessage('plantation-details', (items) => {
+        console.log('PlantDetails: ', items)
         setDetailOpened(items);
     })
 
@@ -118,7 +136,10 @@ export const ItemDetails = ({itemId, category}) => {
                 <div className={'block'}>
                     <p>Effects:</p>
                     <div className={'effects'}>
-                        <EffectsSection effects={item.effects} maxDisplay={10}/>
+                        {item.currentEffects ?
+                            (<ResourceComparison effects1={item.currentEffects} effects2={item.potentialEffects}/>)
+                            : (<EffectsSection effects={item.effects} maxDisplay={10}/>)
+                        }
                     </div>
                 </div>
             </div>

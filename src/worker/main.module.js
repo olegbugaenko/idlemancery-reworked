@@ -1,5 +1,5 @@
 import {GameModule} from "./shared/game-module";
-import { gameCore, GameCore, gameEntity } from 'game-framework';
+import {gameCore, GameCore, gameEntity, gameResources} from 'game-framework';
 import {MageModule} from "./modules/mage/mage.module";
 import {ResourcePoolModule} from "./modules/resources/resource-pool.module";
 import {ActionsModule} from "./modules/actions/actions.module";
@@ -10,6 +10,7 @@ import {PropertyModule} from "./modules/property/property.module";
 import {SpellModule} from "./modules/magic/spells.module";
 import {CraftingModule} from "./modules/workshop/crafting.module";
 import {prefix} from "react-beautiful-dnd/src/view/data-attributes";
+import {PlantationsModule} from "./modules/workshop/plantations.module";
 
 
 export class MainModule extends GameModule {
@@ -25,6 +26,7 @@ export class MainModule extends GameModule {
         gameCore.registerModule('inventory', InventoryModule);
         gameCore.registerModule('magic', SpellModule);
         gameCore.registerModule('crafting', CraftingModule);
+        gameCore.registerModule('plantations', PlantationsModule);
 
 
 
@@ -63,7 +65,8 @@ export class MainModule extends GameModule {
                 'spellbook': gameEntity.getLevel('shop_item_spellbook') > 0,
                 'crafting': gameEntity.getLevel('shop_item_crafting_courses') > 0,
                 'alchemy': gameEntity.getLevel('shop_item_alchemy_courses') > 0,
-                'workshop': gameEntity.getLevel('shop_item_crafting_courses') > 0 || gameEntity.getLevel('shop_item_alchemy_courses') > 0
+                'workshop': gameEntity.getLevel('shop_item_crafting_courses') > 0 || gameEntity.getLevel('shop_item_alchemy_courses') > 0 || gameResources.getResource('plantation_slots').income > 0,
+                'plantation': gameResources.getResource('plantation_slots').income > 0,
             }
             let label = 'unlocks';
             if(payload?.prefix) {

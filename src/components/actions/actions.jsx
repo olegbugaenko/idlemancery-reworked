@@ -636,6 +636,14 @@ export const ActionDetailsComponent = React.memo(({...action}) => {
                     <p><span>XP earned:</span> <span>{formatValue(action.xpEarned)}</span></p>
                 </div>
             </div>
+            <div className={'block'}>
+                <p>Learn ETA's</p>
+                <div className={'stats-block'}>
+                    {Object.entries(action.etas).map(([level, eta]) => (
+                        <p><span>Level {formatInt(level)}: </span> <span>{secondsToString(eta)}</span></p>
+                    ))}
+                </div>
+            </div>
         </div>
     </PerfectScrollbar>)
 }, (prevProps, currentProps) => {

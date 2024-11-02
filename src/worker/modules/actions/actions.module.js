@@ -173,6 +173,12 @@ export class ActionsModule extends GameModule {
             saveBalanceTree: true,
         })
 
+        gameEffects.registerEffect('manual_labor_efficiency', {
+            name: 'Manual Labor Efficiency',
+            defaultValue: 1.,
+            minValue: 1.,
+        })
+
         registerActionsStage1();
         this.actions = {};
 
@@ -493,6 +499,52 @@ export class ActionsModule extends GameModule {
         return items;
     }
 
+    calculateAnalyticalETA(currentLevel, targetLevel, baseCost, xpRate, cxp) {
+        const ln = Math.log;
+        const a = baseCost;
+        const logFactor = ln(1.01);
+
+        function integralAtLevel(x) {
+            const term1 = Math.pow(1.01, x) / logFactor;
+            const term2 = (0.2 * x * Math.pow(1.01, x)) / logFactor;
+            const term3 = 0.2 * Math.pow(1.01, x) / (logFactor * logFactor);
+            return a * (term1 + term2 - term3);
+        }
+
+        // Calculate the integral difference for levels U and L
+        const totalXP = integralAtLevel(targetLevel) - integralAtLevel(currentLevel);
+        const eta = (totalXP - cxp) / xpRate;
+
+        return eta;
+    }
+
+    findNextKeypoints(currentLevel) {
+        let keypoints = [];
+        [25, 50, 100].forEach(divisor => {
+            let nextKeypoint = Math.ceil(currentLevel / divisor) * divisor;
+            if (nextKeypoint === currentLevel) {
+                nextKeypoint += divisor;
+            }
+            if(keypoints.includes(nextKeypoint)) {
+                nextKeypoint += divisor;
+            }
+            keypoints.push(nextKeypoint);
+        });
+        return [...new Set(keypoints)].sort((a, b) => a - b);
+    }
+
+    getEtas(id) {
+        const entity = gameEntity.getEntity(id);
+        const xpRate = this.isRunningAction(entity.id) ? this.getLearningRate(`runningAction_${entity.id}`)*this.isRunningAction(entity.id).effort : this.getLearningRate(entity.id, 1);
+        const keypoints = this.findNextKeypoints(entity.level);
+        const etaResults = {};
+        keypoints.forEach(keypoint => {
+            const eta = this.calculateAnalyticalETA(entity.level, keypoint, entity.attributes.baseXPCost, xpRate, this.actions[id]?.xp);
+            etaResults[keypoint] = eta;
+        });
+        return etaResults;
+    }
+
     getActionsData(filterId, options) {
         // const entities = gameEntity.listEntitiesByTags(['action']).filter(one => one.isUnlocked && !one.isCapped);
         const perCats = this.filters.reduce((acc, filter) => {
@@ -609,6 +661,7 @@ export class ActionsModule extends GameModule {
             nextUnlock: entity.nextUnlock,
             timeInvested: this.actions[entity.id]?.timeInvested || 0,
             xpEarned: this.actions[entity.id]?.xpEarned || 0,
+            etas: this.getEtas(entity.id)
         };
 
         return entityData;
