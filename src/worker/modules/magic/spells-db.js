@@ -312,4 +312,118 @@ export const initSpellsDB1 = () => {
         },
     })
 
+
+
+    gameEntity.registerGameEntity('spell_friendliness_mask', {
+        name: 'Mask of Friendliness',
+        description: 'Cast a spell on your face to appear more friendly to others',
+        hasCap: false,
+        tags: ['spell', 'magic', 'mental', 'illusion_magic'],
+        defaultCap: 0,
+        isAbstract: true,
+        level: 1,
+        onUse: (amount) => {
+
+        },
+        getUsageCooldown: () => {
+            return 30;
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    social_training_learning_rate: {
+                        A: 0.2*gameEffects.getEffectValue('illusion_spells_efficiency'),
+                        B: 1.0 + 0.8*gameEffects.getEffectValue('illusion_spells_efficiency'),
+                        type: 0,
+                    }
+                }
+            }),
+            consumption: {
+                resources: {
+                    mana: {
+                        A: 1.5,
+                        B: 10.0/1.5,
+                        type: 1,
+                    }
+                }
+            },
+            effectDeps: ['illusion_spells_efficiency']
+        },
+        usageGain: {
+            get_consumption: () => ({
+                resources: {
+                    mana: {
+                        A: 1.5,
+                        B: 25./1.5,
+                        type: 1,
+                    }
+                }
+            })
+        },
+        attributes: {
+            duration: 20,
+            xpOnCast: 50,
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_minor_illusion') > 0
+        },
+    })
+
+
+
+    gameEntity.registerGameEntity('spell_illusory_hammer', {
+        name: 'Illusory Hammer',
+        description: 'Create an duplicated hammer. Of course, its just an imagination, but still it chops wood nice.',
+        hasCap: false,
+        tags: ['spell', 'magic', 'mental', 'illusion_magic'],
+        defaultCap: 0,
+        isAbstract: true,
+        level: 1,
+        onUse: (amount) => {
+
+        },
+        getUsageCooldown: () => {
+            return 30;
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    crafting_efficiency: {
+                        A: 0.05*gameEffects.getEffectValue('illusion_spells_efficiency'),
+                        B: 1.0 + 0.2*gameEffects.getEffectValue('illusion_spells_efficiency'),
+                        type: 0,
+                    }
+                }
+            }),
+            consumption: {
+                resources: {
+                    mana: {
+                        A: 1.5,
+                        B: 25.0/1.5,
+                        type: 1,
+                    }
+                }
+            },
+            effectDeps: ['illusion_spells_efficiency']
+        },
+        usageGain: {
+            get_consumption: () => ({
+                resources: {
+                    mana: {
+                        A: 1.5,
+                        B: 80./1.5,
+                        type: 1,
+                    }
+                }
+            })
+        },
+        attributes: {
+            duration: 20,
+            xpOnCast: 50,
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_minor_illusion') > 0
+        },
+    })
+
 }

@@ -72,7 +72,7 @@ export const registerActionsStage1 = () => {
             return true
         },
         attributes: {
-            baseXPCost: 10,
+            baseXPCost: 5,
             isTraining: true,
         }
     })
@@ -129,7 +129,7 @@ export const registerActionsStage1 = () => {
             level: 2,
         }],
         attributes: {
-            baseXPCost: 20,
+            baseXPCost: 10,
             primaryAttribute: 'attribute_charisma'
         }
     })
@@ -145,8 +145,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'coins': {
-                        A: 0.04*gameEffects.getEffectValue('coins_earned_bonus'),
-                        B: 0.36*gameEffects.getEffectValue('coins_earned_bonus'),
+                        A: 0.05*gameEffects.getEffectValue('coins_earned_bonus'),
+                        B: 0.45*gameEffects.getEffectValue('coins_earned_bonus'),
                         type: 0,
                     }
                 }
@@ -184,8 +184,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'coins': {
-                        A: 0.06*gameEffects.getEffectValue('clean_stable_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
-                        B: 0.54*gameEffects.getEffectValue('clean_stable_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
+                        A: 0.08*gameEffects.getEffectValue('clean_stable_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
+                        B: 0.72*gameEffects.getEffectValue('clean_stable_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
                         type: 0,
                     }
                 }
@@ -229,8 +229,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'coins': {
-                        A: 0.2*gameEffects.getEffectValue('coins_earned_bonus'),
-                        B: 1.8*gameEffects.getEffectValue('coins_earned_bonus'),
+                        A: 0.25*gameEffects.getEffectValue('coins_earned_bonus'),
+                        B: 2.25*gameEffects.getEffectValue('coins_earned_bonus'),
                         type: 0,
                     }
                 }
@@ -490,12 +490,16 @@ export const registerActionsStage1 = () => {
 
 
     registerGameAction('action_gossip', {
-        tags: ["action", "training", "mental"],
+        tags: ["action", "training", "mental", "social"],
         name: 'Gossip',
         isAbstract: false,
         allowedImpacts: ['effects'],
         description: 'Spend some time communicating with people about news and other things. Improves your charisma',
         level: 1,
+        getLearnRate: () => {
+            return 1;
+        },
+        learningEffects: ['mental_training_learning_rate', 'social_training_learning_rate'],
         resourceModifier: {
             income: {
                 effects: {
@@ -523,10 +527,205 @@ export const registerActionsStage1 = () => {
             level: 5,
         }],
         attributes: {
-            baseXPCost: 50,
+            baseXPCost: 25,
             isTraining: true,
         }
     })
+
+
+    registerGameAction('action_knowledge_exchange', {
+        tags: ["action", "training", "mental", "social"],
+        name: 'Knowledge Exchange',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Engage in a mutual exchange of ideas with others, sharing insights and gaining valuable knowledge. Slightly increases your learning speed.',
+        level: 1,
+        getLearnRate: () => {
+            return 1.
+        },
+        learningEffects: ['mental_training_learning_rate', 'social_training_learning_rate'],
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'learning_rate': {
+                        A: 0.01,
+                        B: 0.99,
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 10,
+                        type: 0,
+                    },
+                    'knowledge': {
+                        A: 0.0,
+                        B: 5,
+                        type: 0,
+                    },
+                }
+            }),
+            effectDeps: []
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_charisma',
+            level: 75,
+        }],
+        unlockCondition: () => {
+            return true
+        },
+        attributes: {
+            baseXPCost: 200,
+            isTraining: true
+        }
+    })
+
+    registerGameAction('action_train_bargaining', {
+        tags: ["action", "training", "mental", "social"],
+        name: 'Train Bargaining',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Spent time walking through local market and talking to local merchants.',
+        level: 1,
+        getLearnRate: () => {
+            return 2.
+        },
+        learningEffects: ['mental_training_learning_rate', 'social_training_learning_rate'],
+        resourceModifier: {
+            get_income: () => ({
+                effects: {
+                    'attribute_bargaining': {
+                        A: 0.5,
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 50,
+                        type: 0,
+                    },
+                }
+            }),
+            effectDeps: []
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_charisma',
+            level: 200,
+        }],
+        unlockCondition: () => {
+            return true
+        },
+        attributes: {
+            baseXPCost: 5000,
+            isTraining: true
+        }
+    })
+
+
+
+    registerGameAction('action_public_engagement', {
+        tags: ["action", "mental", "social"],
+        name: 'Public Engagement',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Engage with the public through speeches, events, and social interactions to inspire others and strengthen your influence. This action enhances the effectiveness of all social actions, making your efforts more impactful.',
+        level: 1,
+        getLearnRate: () => {
+            return 4.
+        },
+        learningEffects: ['social_training_learning_rate'],
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'social_training_learning_rate': {
+                        A: 0.05,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 100,
+                        type: 0,
+                    },
+                }
+            }),
+            effectDeps: []
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_charisma',
+            level: 300,
+        }],
+        unlockCondition: () => {
+            return true
+        },
+        attributes: {
+            baseXPCost: 1000,
+            isTraining: true
+        }
+    })
+
+
+    registerGameAction('action_academic_discussions', {
+        tags: ["action", "mental", "training"],
+        name: 'Academic Discussions',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Participate in thought-provoking academic discussions and debates to broaden your knowledge and understanding.',
+        level: 1,
+        getLearnRate: () => {
+            return 1.
+        },
+        learningEffects: ['mental_training_learning_rate'],
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'learning_rate': {
+                        A: 0.02,
+                        B: 0.98,
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 50,
+                        type: 0,
+                    },
+                }
+            }),
+            effectDeps: []
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_charisma',
+            level: 400,
+        }],
+        unlockCondition: () => {
+            return true
+        },
+        attributes: {
+            baseXPCost: 5000,
+            isTraining: true,
+            primaryAttribute: 'attribute_charisma'
+        }
+    })
+
 
     registerGameAction('action_pushup', {
         tags: ["action", "training", "physical"],
@@ -575,7 +774,7 @@ export const registerActionsStage1 = () => {
             return gameEntity.getLevel('action_walk') > 19
         },
         attributes: {
-            baseXPCost: 50,
+            baseXPCost: 25,
             isTraining: true,
         }
     })
@@ -715,8 +914,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'knowledge': {
-                        A: 0.001*gameEffects.getEffectValue('read_books_efficiency'),
-                        B: 0.009*gameEffects.getEffectValue('read_books_efficiency'),
+                        A: 0.0015*gameEffects.getEffectValue('read_books_efficiency'),
+                        B: 0.0135*gameEffects.getEffectValue('read_books_efficiency'),
                         type: 0,
                     }
                 }
@@ -784,7 +983,7 @@ export const registerActionsStage1 = () => {
             effectDeps: ['read_books_efficiency']
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_library_entrance') > 0
+            return gameEntity.getLevel('shop_item_mages_handbook') > 0
         },
         attributes: {
             baseXPCost: 50,
@@ -833,7 +1032,7 @@ export const registerActionsStage1 = () => {
             effectDeps: ['read_books_efficiency']
         },
         getLearnRate: () => 1.,
-        learningEffects: ['yoga_learn_speed'],
+        learningEffects: ['yoga_learn_speed', 'mental_training_learning_rate'],
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_yoga_manual') > 0
         },
@@ -994,6 +1193,8 @@ export const registerActionsStage1 = () => {
         allowedImpacts: ['effects'],
         description: 'Lear ancient languages to increase book reading related XP',
         level: 1,
+        getLearnRate: () => 1,
+        learningEffects: ['mental_training_learning_rate'],
         resourceModifier: {
             get_income: () => ({
                 effects: {
@@ -1307,12 +1508,12 @@ export const registerActionsStage1 = () => {
                 effects: {
                     'attribute_magic_ability': {
                         A: 1,
-                        B: 0,
+                        B: -1,
                         type: 0,
                     },
                     'attribute_patience': {
                         A: 0.25,
-                        B: 0,
+                        B: -0.25,
                         type: 0,
                     }
                 }
@@ -1395,7 +1596,7 @@ export const registerActionsStage1 = () => {
 
 
     registerGameAction('action_spiritual_alignment', {
-        tags: ["action", "activity", "mental"],
+        tags: ["action", "training", "mental"],
         name: 'Spiritual Alignment',
         isAbstract: false,
         allowedImpacts: ['effects'],
@@ -1404,6 +1605,7 @@ export const registerActionsStage1 = () => {
         getLearnRate: () => {
             return 1.
         },
+        learningEffects: ['mental_training_learning_rate'],
         resourceModifier: {
             get_multiplier: () => ({
                 effects: {
@@ -1544,12 +1746,12 @@ export const registerActionsStage1 = () => {
                 effects: {
                     'attribute_magic_ability': {
                         A: 2,
-                        B: 0,
+                        B: -2,
                         type: 0,
                     },
                     'attribute_memory': {
                         A: 4,
-                        B: 0,
+                        B: -4,
                         type: 0,
                     },
                 }
@@ -1579,6 +1781,124 @@ export const registerActionsStage1 = () => {
             return 2
         },
         learningEffects: ['spiritual_learning_rate'],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_metaphysics_handbook') > 0
+        },
+        attributes: {
+            baseXPCost: 1000,
+            isTraining: true,
+        }
+    })
+
+
+    registerGameAction('action_nail_standing', {
+        tags: ["action", "training", "mental"],
+        name: 'Nail Standing',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Upon reaching 350 points in the Patience attribute, you unlock the ancient art of Nail Standing. This practice demands immense concentration and endurance as you stand on a board embedded with nails. Through this rigorous discipline, you strengthen both mind and body, enhancing your efficiency in routine tasks.',
+        level: 1,
+        getLearnRate: () => {
+            return 5.
+        },
+        learningEffects: ['mental_training_learning_rate'],
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'routine_learning_speed': {
+                        A: 0.05,
+                        B: 0.95,
+                        type: 0,
+                    }
+                }
+            }),
+            get_income: () => ({
+                effects: {
+                    'attribute_recovery': {
+                        A: 2,
+                        B: -2,
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 200,
+                        type: 0,
+                    },
+                    'health': {
+                        A: 0,
+                        B: 25,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: []
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 350,
+        }],
+        unlockCondition: () => {
+            return true
+        },
+        attributes: {
+            baseXPCost: 20000,
+            isTraining: true
+        }
+    })
+
+
+    registerGameAction('action_magic_analyzes', {
+        tags: ["action", "training", "magical", "spiritual"],
+        name: 'Magic Analysis',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Finally you achieved that point where your brain allows you to understand the nature of magic. Analyze magic, mana and how its used by spells. Its hard and exhausting task, but totally worth it',
+        level: 1,
+        resourceModifier: {
+            income: {
+                effects: {
+                    'attribute_magic_capability': {
+                        A: 10,
+                        B: 0,
+                        type: 0,
+                    },
+                }
+            },
+            consumption: {
+                resources: {
+                    'energy': {
+                        A: 0,
+                        B: 225.00,
+                        type: 0
+                    },
+                    'knowledge': {
+                        A: 0,
+                        B: 50.00,
+                        type: 0
+                    },
+                    'mana': {
+                        A: 0,
+                        B: 25.00,
+                        type: 0
+                    }
+                }
+            },
+            effectDeps: []
+        },
+        getLearnRate: () => {
+            return 2
+        },
+        learningEffects: ['spiritual_learning_rate'],
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_magic_ability',
+            level: 500,
+        }],
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_metaphysics_handbook') > 0
         },

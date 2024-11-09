@@ -7,8 +7,9 @@ export const registerPlant = (id, inventoryResource, incomeBase, costBase, optio
         isAbstract: false,
         description: options.description,
         level: 0,
+        icon_id: inventoryResource,
         resourceModifier: {
-            income: {
+            get_income: () => ({
                 resources: {
                     [inventoryResource]: {
                         A: incomeBase*gameEffects.getEffectValue('plantations_efficiency'),
@@ -16,7 +17,7 @@ export const registerPlant = (id, inventoryResource, incomeBase, costBase, optio
                         type: 0,
                     }
                 }
-            },
+            }),
             consumption: {
                 resources: {
                     plantation_slots: {
@@ -26,7 +27,7 @@ export const registerPlant = (id, inventoryResource, incomeBase, costBase, optio
                     }
                 }
             },
-            effectDeps: ['walking_learning_rate']
+            effectDeps: ['plantations_efficiency']
         },
         unlockCondition: () => {
             return gameResources.isResourceUnlocked(inventoryResource)

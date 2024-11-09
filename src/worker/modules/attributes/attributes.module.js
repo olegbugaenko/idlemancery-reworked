@@ -37,13 +37,14 @@ export class AttributesModule extends GameModule {
     }
 
     getAttributesUnlocks() {
+        console.log('Attrs: ', gameEffects.listEffectsByTags(['attribute']));
         const items = gameEffects.listEffectsByTags(['attribute'])
             .filter(one => one.isUnlocked && one.nextUnlock)
             .map(one => {
                 // Here we should somehow get current increment of attribute
                 // first of all we should get current income from list
                 const effects = gameCore.getModule('actions').getEffectFromRunningAction(one.id);
-                console.log('Effects: ', effects);
+                console.log('Effects: ', one);
                 return {
                     ...one,
                     // eta: calculateTimeToLevelUp(gameEntity.getAttribute(one.id, 'baseXPCost'), 0.2, one.level, one.nextUnlock.level)

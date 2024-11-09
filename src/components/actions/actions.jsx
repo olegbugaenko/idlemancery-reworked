@@ -1,4 +1,4 @@
-import React, {useCallback, useContext, useEffect, useRef, useState} from "react";
+import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
 import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
 import {formatInt, formatValue, secondsToString} from "../../general/utils/strings";
@@ -470,7 +470,7 @@ export const ActionCard = ({ id, isEditingList, index, name, level, max, xp, max
                     ref={provided.innerRef}
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
-                    className={`card action ${isActive ? 'active' : ''} flashable`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)} onClick={() => onSelect({
+                    className={`card action ${isActive ? 'active' : ''} flashable`} onMouseEnter={() => onShowDetails(id)} onMouseOver={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)} onClick={() => onSelect({
                     id,
                     name,
                     level
@@ -565,10 +565,11 @@ export const ActionDetails = ({actionId}) => {
         return () => {
             clearInterval(intervalLoc);
         }
-    }, [])
+    }, [actionId])
 
 
     onMessage('action-details', (actions) => {
+        console.log('received-details: ', actions, actionId);
         setDetailOpened(actions);
     })
 
@@ -772,28 +773,51 @@ export const ActionListsPopup = ({ lists, isOpened, setOpenedFor, onSelect, onHo
 
     if(!isOpened) return null;
 
-    return (<div className={'list-selector'}>
-        {lists.map(list => (<div className={'item'} onMouseEnter={() => onHover(list.id)} onMouseLeave={() => onHover(null)}>
-            <div className={'list-item-row flex-container'}>
-                <span className={'list-name'}>{list.name}</span>
-                <TippyWrapper content={<div className={'hint-popup'}>Run List</div> }>
-                    <div className={'icon-content run-icon interface-icon small'} onClick={() => onRun(list.id)}>
-                        <img src={"icons/interface/run.png"}/>
-                    </div>
-                </TippyWrapper>
-                <TippyWrapper content={<div className={'hint-popup'}>Edit List</div> }>
-                    <div className={'icon-content edit-icon interface-icon small'} onClick={() => onSelect(list.id)}>
-                        <img src={"icons/interface/edit-icon.png"}/>
-                    </div>
-                </TippyWrapper>
-                <TippyWrapper content={<div className={'hint-popup'}>Delete List</div> }>
-                    <div className={'icon-content edit-icon interface-icon small'} onClick={() => onDelete(list.id)}>
-                        <img src={"icons/interface/delete.png"}/>
-                    </div>
-                </TippyWrapper>
-            </div>
+    const [search, setSearch] = useState('')
 
-        </div> ))}
+    const listsDisplayed = useMemo(() => {
+        if(!search) return lists;
+        return lists.filter(l => l.name.includes(search));
+    }, [lists, search])
+
+    return (<div className={'list-selector'}>
+        <div className={'list-selector-inner'}>
+            <div clallName={'search-wrap'}>
+                <input
+                    type={'text'}
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    onClick={(e) => e.stopPropagation()}
+                />
+            </div>
+            <div className={'lists-wrap'}>
+                <PerfectScrollbar>
+                    <div className={'list-inner'}>
+                        {listsDisplayed.map(list => (<div className={'item'} onMouseEnter={() => onHover(list.id)} onMouseLeave={() => onHover(null)}>
+                            <div className={'list-item-row flex-container'}>
+                                <span className={'list-name'}>{list.name}</span>
+                                <TippyWrapper content={<div className={'hint-popup'}>Run List</div> }>
+                                    <div className={'icon-content run-icon interface-icon small'} onClick={() => onRun(list.id)}>
+                                        <img src={"icons/interface/run.png"}/>
+                                    </div>
+                                </TippyWrapper>
+                                <TippyWrapper content={<div className={'hint-popup'}>Edit List</div> }>
+                                    <div className={'icon-content edit-icon interface-icon small'} onClick={() => onSelect(list.id)}>
+                                        <img src={"icons/interface/edit-icon.png"}/>
+                                    </div>
+                                </TippyWrapper>
+                                <TippyWrapper content={<div className={'hint-popup'}>Delete List</div> }>
+                                    <div className={'icon-content edit-icon interface-icon small'} onClick={() => onDelete(list.id)}>
+                                        <img src={"icons/interface/delete.png"}/>
+                                    </div>
+                                </TippyWrapper>
+                            </div>
+
+                        </div> ))}
+                    </div>
+                </PerfectScrollbar>
+            </div>
+        </div>
     </div> )
 }
 

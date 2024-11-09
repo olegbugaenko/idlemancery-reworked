@@ -243,7 +243,7 @@ export const ItemDetails = ({itemId, category}) => {
             }
         }
 
-    })
+    }, [itemId])
 
 
     onMessage('item-details', (items) => {

@@ -73,13 +73,16 @@ Add shop items: book of herbalism and woodworking manual
 [V] Implement alchemy
 [V] Something to boost physical learning rates (action or whatever)
 [V] Add new recipes for herbs (increasing health, increasing XP gain)
-[QA] Add stonecutting and refine stone into the rubies or sapfires. 
-Make actions lists list searchable and scrollable
-Add caps breakdowns
+[V] Add stonecutting and refine stone into the rubies or sapfires. 
+[V] Make actions lists list searchable and scrollable
+[V] Add caps breakdowns
 [V] Implement new accessories based on stone refining
 [V] Add new job based on strength
-Add new options (actions) for boosting mana regen and caps (New actions)
-
+[V] Add new options (actions) for boosting mana regen and caps (New actions)
+[V] Add some new crafting materials that required for relics providing boost to Mental Training Rate
+Add shop upgrade, that would provide bonus to crafting slots
+Pushup 400 should unlock something to improve crafting output
+Add advanced illusion magic, improving crafting efficiency and social XP rate
 
 ---
 Troubles: missing something providing energy very bad. It can be fixed with alchemy, however.

@@ -99,7 +99,7 @@ export const ItemDetails = ({itemId, category}) => {
             }
         }
 
-    }, [])
+    }, [itemId])
 
 
     onMessage('crafting-details', (items) => {

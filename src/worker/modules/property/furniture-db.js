@@ -828,7 +828,7 @@ export const registerFurnitureStage1 = () => {
             multiplier: {
                 resources: {
                     'crafting_ability': {
-                        A: 0.1,
+                        A: 0.2,
                         B: 1,
                         type: 0,
                     }
@@ -913,7 +913,7 @@ export const registerFurnitureStage1 = () => {
             multiplier: {
                 resources: {
                     'alchemy_ability': {
-                        A: 0.1,
+                        A: 0.2,
                         B: 1,
                         type: 0,
                     }

@@ -133,10 +133,10 @@ export const BreakDown = ({ breakDown }) => {
     if(!breakDown) return null;
 
     return (<div className={'breakdown'}>
-        {breakDown.income.length ? (<div className={'box'}>
+        {breakDown.income?.length ? (<div className={'box'}>
             <span className={'sub-title'}>Income</span>
             <div className={'box-inner'}>
-                {breakDown.income.map(one => {
+                {breakDown.income.filter(one => Math.abs(one.value) > 1.e-8).map(one => {
                     return (<p className={'line'}>
                         <span className={'name'}>{one.name}: </span>
                         <span className={'value'}>+{formatValue(one.value, 3)}</span>
@@ -144,10 +144,10 @@ export const BreakDown = ({ breakDown }) => {
                 })}
             </div>
         </div>) : null}
-        {breakDown.multiplier.length ? (<div className={'box'}>
+        {breakDown.multiplier?.length ? (<div className={'box'}>
             <span className={'sub-title'}>Multiplier</span>
             <div className={'box-inner'}>
-                {breakDown.multiplier.map(one => {
+                {breakDown.multiplier.filter(one => Math.abs(one.value) - 1 > 1.e-8).map(one => {
                     return (<p className={'line'}>
                         <span className={'name'}>{one.name}: </span>
                         <span className={'value'}>X{formatValue(one.value, 3)}</span>
@@ -155,10 +155,10 @@ export const BreakDown = ({ breakDown }) => {
                 })}
             </div>
         </div>) : null}
-        {breakDown.consumption.length ? (<div className={'box'}>
+        {breakDown.consumption?.length ? (<div className={'box'}>
             <span className={'sub-title'}>Consumption</span>
             <div className={'box-inner'}>
-                {breakDown.consumption.map(one => {
+                {breakDown.consumption.filter(one => Math.abs(one.value) > 1.e-8).map(one => {
                     return (<p className={'line'}>
                         <span className={'name'}>{one.name}: </span>
                         <span className={'value'}>-{formatValue(one.value, 3)}</span>

@@ -140,6 +140,20 @@ export class ActionsModule extends GameModule {
             saveBalanceTree: true,
         })
 
+        gameEffects.registerEffect('mental_training_learning_rate', {
+            name: 'Mental Training Rate',
+            defaultValue: 1.,
+            minValue: 1,
+            saveBalanceTree: true,
+        })
+
+        gameEffects.registerEffect('social_training_learning_rate', {
+            name: 'Social Training Rate',
+            defaultValue: 1.,
+            minValue: 1,
+            saveBalanceTree: true,
+        })
+
         gameEffects.registerEffect('max_focus_time', {
             name: 'Max focus time',
             defaultValue: 300.,
@@ -175,6 +189,12 @@ export class ActionsModule extends GameModule {
 
         gameEffects.registerEffect('manual_labor_efficiency', {
             name: 'Manual Labor Efficiency',
+            defaultValue: 1.,
+            minValue: 1.,
+        })
+
+        gameEffects.registerEffect('crafting_efficiency', {
+            name: 'Crafting Efficiency',
             defaultValue: 1.,
             minValue: 1.,
         })
@@ -255,7 +275,8 @@ export class ActionsModule extends GameModule {
                 this.actions[act.originalId].timeInvested = (this.actions[act.originalId].timeInvested || 0) + delta*act.effort;
 
                 this.actions[act.originalId].focus.bonus = this.getFocusBonus(this.actions[act.originalId].focus.time);
-                const dxp = delta*this.getLearningRate(act.id)*act.effort;
+                const dxp = delta*this.getLearningRate(act.id);
+                // console.log('------------: ', act.id, dxp, delta, this.getLearningRate(act.id, undefined, true));
                 this.actions[act.originalId].xp += dxp;
                 this.actions[act.originalId].xpEarned = (this.actions[act.originalId].xpEarned || 0) + dxp;
                 gameResources.addResource('mage-xp', dxp);
@@ -338,15 +359,24 @@ export class ActionsModule extends GameModule {
     getLearningRate(id, eff, bGetBreakdowns = false) {
         const entEff = gameEntity.getEntityEfficiency(id);
         let focusBonus = 1.;
+        let effortMult = 1.;
         let breakDowns = {};
-        if(this.isRunningAction(id)) {
+        const isRunning = this.isRunningAction(id);
+        if(isRunning) {
             // console.log('EffMult: ', id, eff, entEff, eff == null);
-            focusBonus = this.actions[gameEntity.getEntity(id).copyFromId]?.focus?.bonus || 1.;
+            focusBonus = this.actions[gameEntity.getEntity(id).copyFromId]?.focus?.bonus || this.actions[id]?.focus?.bonus || 1.;
             if(Math.abs(1 - focusBonus) > SMALL_NUMBER) {
                 breakDowns['focus'] = {
                     title: 'Focus',
                     value: focusBonus,
                 }
+            }
+            if(Math.abs(1 - isRunning.effort) > SMALL_NUMBER) {
+                breakDowns['effort'] = {
+                    title: 'Effort',
+                    value: isRunning.effort,
+                }
+                effortMult = isRunning.effort;
             }
 
         }
@@ -358,22 +388,31 @@ export class ActionsModule extends GameModule {
 
         if(gameEntity.getEntity(id).getLearnRate) {
             baseXPRate = gameEntity.getEntity(id).getLearnRate();
+
+            breakDowns['base'] = {
+                title: 'Base',
+                value: baseXPRate,
+            }
             // we should list breakdowns here
             if(gameEntity.getEntity(id).learningEffects?.length) {
                 for(const effect of gameEntity.getEntity(id).learningEffects) {
                     baseXPRate *= gameEffects.getEffectValue(effect);
-                    breakDowns[effect] = {
-                        title: gameEffects.getEffect(effect).name,
-                        value: gameEffects.getEffectValue(effect),
-                        breakDown: gameEffects.getEffect(effect).breakDown
+                    if(Math.abs(1 - gameEffects.getEffectValue(effect)) > SMALL_NUMBER) {
+                        breakDowns[effect] = {
+                            title: gameEffects.getEffect(effect).name,
+                            value: gameEffects.getEffectValue(effect),
+                            breakDown: gameEffects.getEffect(effect).breakDown
+                        }
                     }
                 }
             }
         }
 
+        let primaryEffect = 1.;
+
         if(gameEntity.getEntity(id).getPrimaryEffect) {
-            const primaryEffect = gameEntity.getEntity(id).getPrimaryEffect();
-            baseXPRate *= gameEntity.getEntity(id).getPrimaryEffect();
+            primaryEffect = gameEntity.getEntity(id).getPrimaryEffect();
+            // baseXPRate *= gameEntity.getEntity(id).getPrimaryEffect();
             const pAtt = gameEntity.getEntity(id).attributes?.primaryAttribute;
             breakDowns['primaryAttribute'] = {
                 title: `Primary Attribute: ${pAtt ? gameEffects.getEffect(pAtt).name : ''}`,
@@ -388,16 +427,17 @@ export class ActionsModule extends GameModule {
         };
 
         if(Math.abs(1 - eff) > SMALL_NUMBER) {
-            breakDowns['effort'] = {
-                title: 'Action Effort',
+            breakDowns['efficiency'] = {
+                title: 'Action Efficiency',
                 value: eff,
             };
         }
-        if(bGetBreakdowns) {
-            console.log('EffMult: ', id, eff, entEff, eff == null, breakDowns['effort']);
-        }
 
-        const total = baseXPRate * eff * gameEffects.getEffectValue('learning_rate')*focusBonus;
+        const total = baseXPRate * primaryEffect * eff * gameEffects.getEffectValue('learning_rate')*focusBonus*effortMult;
+
+        if(bGetBreakdowns) {
+            console.log('EffMult: ', id, baseXPRate, primaryEffect, eff, gameEffects.getEffectValue('learning_rate'), focusBonus, effortMult, total);
+        }
 
         if(bGetBreakdowns) {
             return {
@@ -499,7 +539,10 @@ export class ActionsModule extends GameModule {
         return items;
     }
 
-    calculateAnalyticalETA(currentLevel, targetLevel, baseCost, xpRate, cxp) {
+    calculateAnalyticalETA(currentLevel, targetLevel, baseCost, xpRate = 0, cxp = 0) {
+        if(!currentLevel) {
+            currentLevel = 1;
+        }
         const ln = Math.log;
         const a = baseCost;
         const logFactor = ln(1.01);
@@ -535,7 +578,7 @@ export class ActionsModule extends GameModule {
 
     getEtas(id) {
         const entity = gameEntity.getEntity(id);
-        const xpRate = this.isRunningAction(entity.id) ? this.getLearningRate(`runningAction_${entity.id}`)*this.isRunningAction(entity.id).effort : this.getLearningRate(entity.id, 1);
+        const xpRate = this.isRunningAction(entity.id) ? this.getLearningRate(`runningAction_${entity.id}`) : this.getLearningRate(entity.id, 1);
         const keypoints = this.findNextKeypoints(entity.level);
         const etaResults = {};
         keypoints.forEach(keypoint => {
@@ -578,7 +621,7 @@ export class ActionsModule extends GameModule {
             xp: this.actions[entity.id]?.xp || 0,
             maxXP: this.getActionXPMax(entity.id),
             isActive: this.isRunningAction(entity.id),
-            xpRate: this.isRunningAction(entity.id) ? this.getLearningRate(`runningAction_${entity.id}`)*this.isRunningAction(entity.id).effort : this.getLearningRate(entity.id, 1),
+            xpRate: this.isRunningAction(entity.id) ? this.getLearningRate(`runningAction_${entity.id}`) : this.getLearningRate(entity.id, 1),
             isLeveled: this.actions[entity.id]?.isLeveled,
             tags: entity.tags,
             focused: this.isRunningAction(entity.id) && this.actions[entity.id]?.focus?.bonus > 1 ? {

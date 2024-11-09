@@ -16,7 +16,8 @@ export const registerAccessoriesStage1 = () => {
                     'coins': {
                         A: 0.1,
                         B: 1,
-                        type: 0,
+                        C: 1.01,
+                        type: 3,
                     }
                 }
             },
@@ -45,7 +46,8 @@ export const registerAccessoriesStage1 = () => {
                     'health': {
                         A: 0.02,
                         B: 1,
-                        type: 0,
+                        C: 1.01,
+                        type: 3,
                     }
                 }
             },
@@ -79,7 +81,8 @@ export const registerAccessoriesStage1 = () => {
                     'knowledge': {
                         A: 0.1,
                         B: 1,
-                        type: 0,
+                        C: 1.01,
+                        type: 3,
                     }
                 }
             },
@@ -108,7 +111,8 @@ export const registerAccessoriesStage1 = () => {
                     'energy': {
                         A: 0.02,
                         B: 1,
-                        type: 0,
+                        C: 1.01,
+                        type: 3,
                     }
                 }
             },
@@ -143,7 +147,8 @@ export const registerAccessoriesStage1 = () => {
                     'knowledge': {
                         A: 0.005,
                         B: 0,
-                        type: 0,
+                        C: 1.01,
+                        type: 3,
                     }
                 }
             },
@@ -177,7 +182,8 @@ export const registerAccessoriesStage1 = () => {
                     'restoration_spells_efficiency': {
                         A: 0.025,
                         B: 1,
-                        type: 0,
+                        C: 1.01,
+                        type: 3,
                     }
                 }
             },
@@ -202,6 +208,86 @@ export const registerAccessoriesStage1 = () => {
     })
 
 
+    gameEntity.registerGameEntity('accessory_tome_of_mentalist', {
+        tags: ["accessory", "upgrade", "purchaseable"],
+        name: 'Mentalist\'s Tome',
+        description: 'Magic book containing a lot of mental power',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_paper_enhance') > 0;
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'mental_training_learning_rate': {
+                        A: 0.04,
+                        B: 1,
+                        C: 1.01,
+                        type: 3,
+                    }
+                }
+            },
+        },
+        get_cost: () => ({
+            'inventory_enchanted_paper': {
+                A: 1.1,
+                B: 2,
+                type: 1
+            },
+            'knowledge': {
+                A: 1.1,
+                B: 2,
+                type: 1
+            },
+            'inventory_herbal_fibers': {
+                A: 1.1,
+                B: 20,
+                type: 1
+            }
+        }),
+    })
+
+
+    gameEntity.registerGameEntity('accessory_tome_of_occultism', {
+        tags: ["accessory", "upgrade", "purchaseable"],
+        name: 'Occultist\'s Tome',
+        description: 'Small glowing tome. You feel inspiration every time you touch it',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_paper_enhance') > 0;
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'spiritual_learning_rate': {
+                        A: 0.04,
+                        B: 1,
+                        C: 1.01,
+                        type: 3,
+                    }
+                }
+            },
+        },
+        get_cost: () => ({
+            'inventory_enchanted_paper': {
+                A: 1.1,
+                B: 2,
+                type: 1
+            },
+            'knowledge': {
+                A: 1.1,
+                B: 2,
+                type: 1
+            },
+            'inventory_herbal_fibers': {
+                A: 1.1,
+                B: 20,
+                type: 1
+            }
+        }),
+    })
+
+
     gameEntity.registerGameEntity('accessory_ruby_pendant', {
         tags: ["accessory", "upgrade", "purchaseable"],
         name: 'Ruby Pendant',
@@ -216,7 +302,8 @@ export const registerAccessoriesStage1 = () => {
                     'physical_training_learn_speed': {
                         A: 0.04,
                         B: 1,
-                        type: 0,
+                        C: 1.01,
+                        type: 3,
                     }
                 }
             },
@@ -245,12 +332,14 @@ export const registerAccessoriesStage1 = () => {
                     'energy': {
                         A: 0.05,
                         B: 1,
-                        type: 0,
+                        C: 1.01,
+                        type: 3,
                     },
                     'health': {
                         A: 0.05,
                         B: 1,
-                        type: 0,
+                        C: 0.01,
+                        type: 3,
                     }
                 }
             },
@@ -279,7 +368,8 @@ export const registerAccessoriesStage1 = () => {
                     'spell_xp_rate': {
                         A: 0.1,
                         B: 1,
-                        type: 0,
+                        C: 1.01,
+                        type: 3,
                     }
                 }
             },
@@ -308,7 +398,8 @@ export const registerAccessoriesStage1 = () => {
                     'mana': {
                         A: 0.05,
                         B: 1,
-                        type: 0,
+                        C: 1.01,
+                        type: 3,
                     }
                 }
             },

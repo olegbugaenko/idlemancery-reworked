@@ -520,6 +520,7 @@ h4 {
     background-color: rgba(255, 255, 255, 0.5);
     animation: pseudo-flash 1s forwards;
     z-index: 1000; /* Ensure it's above other elements */
+    pointer-events: none;
 }
 
 .flash-overlay.powerful-splash {
@@ -998,8 +999,16 @@ h4 {
     height: 100%;
 }
 
-.lists-editor .list-selector {
+.lists-editor .list-selector .list-selector-inner {
     width: 320px;
+    overflow: hidden;
+    position: relative;
+}
+
+.lists-editor .list-selector .lists-wrap {
+    height: 300px;
+    overflow-y: hidden;
+    position: relative;
 }
 
 .lists-editor .list-selector .list-item-row {
@@ -1181,4 +1190,22 @@ h4 {
 
 span.highlighted-span {
     color: var(--highlight);
+}
+
+.two-side-card .left {
+    padding: 12px;
+}
+
+.two-side-card .right {
+    flex: 1;
+}
+
+.two-side-card .right .label {
+    font-size: 14px;
+}
+
+.two-side-card .left img{
+    height: 48px;
+    border: 1px solid #777;
+    border-radius: 2px;
 }

@@ -14,6 +14,10 @@ export class PlantationsModule extends GameModule {
             this.purchaseItem(payload.id);
         })
 
+        this.eventHandler.registerHandler('remove-plantation', (payload) => {
+            this.removeItem(payload.id);
+        })
+
         this.eventHandler.registerHandler('query-plantation-data', (payload) => {
             this.sendItemsData()
         })
@@ -71,13 +75,16 @@ export class PlantationsModule extends GameModule {
 
     purchaseItem(itemId) {
         const newEnt = gameEntity.levelUpEntity(itemId);
-        console.log('Plant: ', newEnt)
         if(newEnt.success) {
             this.purchasedItems[itemId] = gameEntity.getLevel(itemId);
             this.leveledId = itemId;
             this.sendItemsData();
         }
         return newEnt.success;
+    }
+
+    removeItem(itemId) {
+        this.setItem(itemId, 0, true);
     }
 
     getItemsData() {
@@ -93,6 +100,7 @@ export class PlantationsModule extends GameModule {
         return {
             available: entities.filter(one => one.isUnlocked && !one.isCapped).map(entity => ({
                 id: entity.id,
+                icon_id: entity.icon_id,
                 name: entity.name,
                 description: entity.description,
                 max: gameEntity.getEntityMaxLevel(entity.id),

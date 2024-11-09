@@ -52,7 +52,7 @@ export class MainModule extends GameModule {
                 if(gameCore.numTicks % 100 === 0) {
                     this.save();
                 }
-            })
+            }, false)
         })
 
         this.eventHandler.registerHandler('query-unlocks', (payload) => {

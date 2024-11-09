@@ -37,6 +37,16 @@ export const registerAttributes = () => {
         tags: ['attribute', 'mental']
     })
 
+
+    gameEffects.registerEffect('attribute_bargaining', {
+        name: 'Bargaining',
+        description: 'Bargaining attribute slightly increase your coins income from all sources',
+        minValue: 1,
+        hasCap: false,
+        saveBalanceTree: true,
+        tags: ['attribute', 'mental']
+    })
+
     gameEffects.registerEffect('attribute_patience', {
         name: 'Patience',
         description: 'Patience impacts on your ability on focusing on routine tasks and increasing learning speed. Higher level unlocks more gathering and routine activities',

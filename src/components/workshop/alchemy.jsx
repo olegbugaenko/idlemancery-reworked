@@ -60,16 +60,24 @@ export const Alchemy = ({ setItemDetails, setItemLevel, filterId }) => {
     </div>)
 }
 
-export const ItemCard = ({ id, name, level, maxLevel, onSetLevel, onShowDetails}) => {
+export const ItemCard = ({ id, icon_id, name, level, maxLevel, onSetLevel, onShowDetails}) => {
 
     return (<div className={`card craftable`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)}>
-        <div className={'head'}>
-            <p className={'title'}>{name}</p>
-            <span className={'level'}>{formatInt(level)}{maxLevel ? `/${formatInt(maxLevel)}` : ''}</span>
-        </div>
-        <div className={'bottom'}>
-            <div className={'buttons'}>
-                <input type={'number'} min={0} max={maxLevel} value={level} onChange={e => onSetLevel(id, Math.round(+e.target.value))}/>
+        <div className={'flex-container two-side-card'}>
+            <div className={'left'}>
+                <img src={`icons/resources/${icon_id}.png`} className={'resource big'}/>
+            </div>
+            <div className={'right'}>
+                <div className={'head'}>
+                    <p className={'title'}>{name}</p>
+                    <span className={'level'}>{formatInt(level)}{maxLevel ? `/${formatInt(maxLevel)}` : ''}</span>
+                </div>
+                <div className={'bottom'}>
+                    <div className={'buttons'}>
+                        <span className={'label'}>Set Effort:</span>
+                        <input type={'number'} min={0} max={maxLevel} value={level} onChange={e => onSetLevel(id, Math.round(+e.target.value))}/>
+                    </div>
+                </div>
             </div>
         </div>
     </div> )

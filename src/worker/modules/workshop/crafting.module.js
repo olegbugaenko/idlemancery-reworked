@@ -117,6 +117,7 @@ export class CraftingModule extends GameModule {
 
         const available = entities.map(recipe => ({
             ...recipe,
+            icon_id: recipe.resourceId,
             level: this.craftingSlots[recipe.id]?.level || 0,
             maxLevel: rrs.amount + (this.craftingSlots[recipe.id]?.level || 0)
         }));

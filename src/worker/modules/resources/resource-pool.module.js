@@ -130,7 +130,7 @@ export class ResourcePoolModule extends GameModule {
 
     getResourcesData() {
         const rs = gameResources.listResourcesByTags(['resource', 'population'], true);
-        // console.log('RS: ', rs);
+        // console.log('RS: ', JSON.stringify(rs));
         return rs.filter(one => one.isUnlocked).map(resource => ({
             ...resource,
             isNegative: resource.balance < 0,

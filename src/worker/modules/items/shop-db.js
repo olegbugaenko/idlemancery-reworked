@@ -103,7 +103,7 @@ export const registerShopItemsStage1 = () => {
         name: 'Repair Slippers',
         description: 'Your slippers are old, but better than nothing. If you repair it, it could make you feel more comfortable and warm',
         level: 0,
-        maxLevel: 5,
+        maxLevel: 6,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_hat') > 0
         },
@@ -114,7 +114,7 @@ export const registerShopItemsStage1 = () => {
             multiplier: {
                 effects: {
                     'walking_learning_rate': {
-                        A: 0.2,
+                        A: 0.25,
                         B: 1,
                         type: 0,
                     }
@@ -123,7 +123,7 @@ export const registerShopItemsStage1 = () => {
         },
         get_cost: () => ({
             'coins': {
-                A: 1.5,
+                A: 1.4,
                 B: 5*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 1
             }
@@ -655,11 +655,12 @@ export const registerShopItemsStage1 = () => {
     gameEntity.registerGameEntity('shop_item_herbs_handbook_2', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Herbs Handbook II',
-        description: 'Learn more sophisticated herbs and their effects',
+        description: 'Learn more sophisticated herbs and their effects when combining them together',
         level: 0,
         maxLevel: 1,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_herbs_handbook_1') > 0
+                && gameEntity.getLevel('shop_item_alchemy_courses') > 0
         },
         attributes: {
             isCollectable: false,
@@ -667,7 +668,7 @@ export const registerShopItemsStage1 = () => {
         get_cost: () => ({
             'coins': {
                 A: 2,
-                B: 40000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 4000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 0
             }
         }),
@@ -1005,7 +1006,7 @@ export const registerShopItemsStage1 = () => {
 
     gameEntity.registerGameEntity('shop_item_land', {
         tags: ["shop", "upgrade", "purchaseable"],
-        name: 'Purchase land',
+        name: 'Purchase Land',
         description: 'Purchase some land for even more place',
         level: 0,
         unlockCondition: () => {
@@ -1029,7 +1030,7 @@ export const registerShopItemsStage1 = () => {
         get_cost: () => ({
             'coins': {
                 A: 1.3,
-                B: 20000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 15000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 1
             }
         }),
@@ -1168,5 +1169,56 @@ export const registerShopItemsStage1 = () => {
             }
         }),
     })
+
+
+    gameEntity.registerGameEntity('shop_item_paper_enhance', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Paper Enhancement',
+        description: 'Learn new ways of doing cool stuff from your papers',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_paper_working') > 0
+            //||  gameEntity.getLevel('shop_item_conjuration_magic') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2.25,
+                B: 30000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+
+    gameEntity.registerGameEntity('shop_item_minor_illusion', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Minor Illusion',
+        description: 'Learn some better illusion spells.',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_less_illusion') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'knowledge': {
+                A: 1.5,
+                B: 9000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'coins': {
+                A: 1.5,
+                B: 40000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
 
 }

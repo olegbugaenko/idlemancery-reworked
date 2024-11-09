@@ -43,16 +43,17 @@ export const registerCraftingRecipes = () => {
         allowedImpacts: ['effects'],
         description: 'Refine wood and use it for your needs, or just sell it',
         level: 1,
+        resourceId: 'inventory_refined_wood',
         resourceModifier: {
-            income: {
+            get_income: () => ({
                 resources: {
                     'inventory_refined_wood': {
-                        A: 0.2,
-                        B: 1.2,
+                        A: 1.3,
+                        B: 0.2*gameEffects.getEffectValue('crafting_efficiency'),
                         type: 1,
                     }
                 }
-            },
+            }),
             consumption: {
                 resources: {
                     'inventory_wood': {
@@ -73,7 +74,7 @@ export const registerCraftingRecipes = () => {
                     },
                 }
             },
-            effectDeps: ['walking_learning_rate']
+            effectDeps: ['crafting_efficiency']
         },
         unlockCondition: () => {
             return true
@@ -98,16 +99,17 @@ export const registerCraftingRecipes = () => {
         allowedImpacts: ['effects'],
         description: 'Refine wood and use it for your needs, or just sell it',
         level: 1,
+        resourceId: 'inventory_paper',
         resourceModifier: {
-            income: {
+            get_income: () => ({
                 resources: {
                     'inventory_paper': {
-                        A: 0.1,
-                        B: 1.2,
+                        A: 1.3,
+                        B: 0.1*gameEffects.getEffectValue('crafting_efficiency'),
                         type: 1,
                     }
                 }
-            },
+            }),
             consumption: {
                 resources: {
                     'inventory_wood': {
@@ -128,10 +130,71 @@ export const registerCraftingRecipes = () => {
                     },
                 }
             },
-            effectDeps: ['walking_learning_rate']
+            effectDeps: ['crafting_efficiency']
         },
         unlockCondition: () => {
             return gameResources.isResourceUnlocked('inventory_paper')
+        },
+        attributes: {
+            baseXPCost: 10,
+        },
+        get_cost: () => ({
+            'crafting_slots': {
+                A: 1,
+                B: 0,
+                type: 0
+            }
+        }),
+    })
+
+
+    registerCraftingRecipe('craft_enchanted_paper', {
+        tags: ["recipe", "crafting", "material", "physical"],
+        name: 'Enchant Paper',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Craft Enchanted magical paper scrolls',
+        level: 1,
+        resourceId: 'inventory_enchanted_paper',
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'inventory_enchanted_paper': {
+                        A: 1.3,
+                        B: 0.1*gameEffects.getEffectValue('crafting_efficiency'),
+                        type: 1,
+                    }
+                }
+            }),
+            consumption: {
+                resources: {
+                    'inventory_paper': {
+                        A: 1.5,
+                        B: 1,
+                        type: 1
+                    },
+                    mana: {
+                        A: 1.5,
+                        B: 40,
+                        type: 1,
+                    },
+                    'crafting_ability': {
+                        A: 1.5,
+                        B: 2,
+                        type: 1,
+                    },
+                    'crafting_slots': {
+                        A: 1,
+                        B: 0,
+                        type: 0,
+                        ignoreEfficiency: true,
+                    },
+                }
+            },
+            effectDeps: ['crafting_efficiency']
+        },
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_enchanted_paper')
         },
         attributes: {
             baseXPCost: 10,
@@ -153,16 +216,17 @@ export const registerCraftingRecipes = () => {
         allowedImpacts: ['effects'],
         description: 'Dry and weave your herbs in fibers for further usage',
         level: 1,
+        resourceId: 'inventory_herbal_fibers',
         resourceModifier: {
-            income: {
+            get_income: () => ({
                 resources: {
                     'inventory_herbal_fibers': {
-                        A: 0.2,
-                        B: 1.2,
+                        A: 1.3,
+                        B: 0.2*gameEffects.getEffectValue('crafting_efficiency'),
                         type: 1,
                     }
                 }
-            },
+            }),
             consumption: {
                 resources: {
                     'inventory_ginseng': {
@@ -188,7 +252,7 @@ export const registerCraftingRecipes = () => {
                     },
                 }
             },
-            effectDeps: []
+            effectDeps: ['crafting_efficiency']
         },
         unlockCondition: () => {
             return true
@@ -213,16 +277,17 @@ export const registerCraftingRecipes = () => {
         allowedImpacts: ['effects'],
         description: 'Refine your stones to obtain trace amounts of rubies',
         level: 1,
+        resourceId: 'inventory_ruby',
         resourceModifier: {
-            income: {
+            get_income: () => ({
                 resources: {
                     'inventory_ruby': {
-                        A: 0.05,
-                        B: 1.2,
+                        A: 1.3,
+                        B: 0.05*gameEffects.getEffectValue('crafting_efficiency'),
                         type: 1,
                     }
                 }
-            },
+            }),
             consumption: {
                 resources: {
                     'inventory_stone': {
@@ -243,7 +308,7 @@ export const registerCraftingRecipes = () => {
                     },
                 }
             },
-            effectDeps: []
+            effectDeps: ['crafting_efficiency']
         },
         unlockCondition: () => {
             return gameResources.isResourceUnlocked('inventory_stone')
@@ -268,16 +333,17 @@ export const registerCraftingRecipes = () => {
         allowedImpacts: ['effects'],
         description: 'Refine your stones to obtain trace amounts of sapphires',
         level: 1,
+        resourceId: 'inventory_sapphire',
         resourceModifier: {
-            income: {
+            get_income: () => ({
                 resources: {
                     'inventory_sapphire': {
-                        A: 0.05,
-                        B: 1.2,
+                        A: 1.3,
+                        B: 0.05*gameEffects.getEffectValue('crafting_efficiency'),
                         type: 1,
                     }
                 }
-            },
+            }),
             consumption: {
                 resources: {
                     'inventory_stone': {
@@ -298,7 +364,7 @@ export const registerCraftingRecipes = () => {
                     },
                 }
             },
-            effectDeps: []
+            effectDeps: ['crafting_efficiency']
         },
         unlockCondition: () => {
             return gameResources.isResourceUnlocked('inventory_stone')
@@ -325,12 +391,13 @@ export const registerCraftingRecipes = () => {
         allowedImpacts: ['effects'],
         description: 'Use your herbs to create more efficient substance to boost your energy',
         level: 1,
+        resourceId: 'inventory_small_endurance_flask',
         resourceModifier: {
             income: {
                 resources: {
                     'inventory_small_endurance_flask': {
-                        A: 1,
-                        B: 1.2,
+                        A: 1.3,
+                        B: 1,
                         type: 1,
                     }
                 }
@@ -385,12 +452,13 @@ export const registerCraftingRecipes = () => {
         allowedImpacts: ['effects'],
         description: 'Use healing herbs concentrate to save yourself from falling deceased',
         level: 1,
+        resourceId: 'inventory_healing_potion',
         resourceModifier: {
             income: {
                 resources: {
                     'inventory_healing_potion': {
-                        A: 1,
-                        B: 1.2,
+                        A: 1.3,
+                        B: 1,
                         type: 1,
                     }
                 }
@@ -446,12 +514,13 @@ export const registerCraftingRecipes = () => {
         allowedImpacts: ['effects'],
         description: 'Use experimental and dangerous herbs at your risk in searching for better understanding of human and mages being',
         level: 1,
+        resourceId: 'inventory_experience_potion',
         resourceModifier: {
             income: {
                 resources: {
                     'inventory_experience_potion': {
-                        A: 0.1,
-                        B: 1.2,
+                        A: 1.3,
+                        B: 0.1,
                         type: 1,
                     }
                 }

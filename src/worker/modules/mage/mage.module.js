@@ -138,7 +138,16 @@ export class MageModule extends GameModule {
                         }
                     }
                 }),
-                effectDeps: ['workersEfficiencyPerDragonLevel', 'mage_levelup_requirement', 'attribute_stamina', 'attribute_strength', 'attribute_vitality','attribute_recovery', 'attribute_memory', 'attribute_magic_ability', 'attribute_magic_capability']
+                get_multiplier: () => ({
+                    resources: {
+                        coins: {
+                            A: 0,
+                            B: 0.99 + 0.01*gameEffects.getEffectValue('attribute_bargaining'),
+                            type: 0,
+                        }
+                    }
+                }),
+                effectDeps: ['workersEfficiencyPerDragonLevel', 'mage_levelup_requirement', 'attribute_stamina', 'attribute_strength', 'attribute_vitality','attribute_recovery', 'attribute_memory', 'attribute_magic_ability', 'attribute_magic_capability', 'attribute_bargaining']
             },
             get_cost: () => ({
                 'mage-xp': {

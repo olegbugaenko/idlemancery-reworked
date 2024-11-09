@@ -241,9 +241,9 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0
         },
-        sellPrice: 50,
+        sellPrice: 300,
         get_cost: (amount = 1) => ({
-            coins: amount*500*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+            coins: amount*5000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
         }),
     })
 
@@ -263,9 +263,9 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_crafting_courses') > 0
         },
-        sellPrice: 450,
+        sellPrice: 1600,
         get_cost: (amount = 1) => ({
-            coins: amount*25000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+            coins: amount*50000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
         }),
     })
 
@@ -285,9 +285,31 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_paper_working') > 0
         },
-        sellPrice: 900,
+        sellPrice: 3200,
         get_cost: (amount = 1) => ({
-            coins: amount*50000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+            coins: amount*125000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+        }),
+    })
+
+
+    gameResources.registerResource('inventory_enchanted_paper', {
+        name: 'Enchanted Paper',
+        hasCap: false,
+        tags: ['inventory', 'material', 'craftable'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        attributes: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_paper_enhance') > 0
+        },
+        sellPrice: 320000,
+        get_cost: (amount = 1) => ({
+            coins: amount*6400000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
         }),
     })
 
@@ -307,9 +329,9 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_crafting_courses') > 0
         },
-        sellPrice: 625,
+        sellPrice: 2000,
         get_cost: (amount = 1) => ({
-            coins: amount*30000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+            coins: amount*75000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
         }),
     })
 
@@ -334,9 +356,9 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.isEntityUnlocked('action_quarrying')
         },
-        sellPrice: 125,
+        sellPrice: 625,
         get_cost: (amount = 1) => ({
-            coins: amount*1250*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+            coins: amount*12500*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
         }),
     })
 

@@ -10,7 +10,7 @@ export const checkMatchingResourceRule = (rule, key) => {
     if(rule.value_type === 'percentage') {
         if(!resource.cap) return false;
 
-        compare = 100 * resource.amount / resource.cap;
+        compare = 100 * resource[key] / resource.cap;
     }
 
     switch (rule.condition) {
