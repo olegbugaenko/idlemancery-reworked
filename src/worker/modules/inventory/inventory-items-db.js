@@ -529,4 +529,37 @@ export const registerInventoryItems = () => {
         sellPrice: 1500,
     })
 
+
+    gameResources.registerResource('inventory_amnesia_potion', {
+        name: 'Amnesia Potion',
+        hasCap: false,
+        tags: ['inventory', 'consumable'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+            gameCore.getModule('mage').resetPerks()
+        },
+        getUsageCooldown: () => {
+            return 3600*24;
+        },
+        attributes: {
+            duration: 24*3600,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    learning_rate: {
+                        A: -0.25,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0
+        },
+        sellPrice: 15000,
+    })
+
 }

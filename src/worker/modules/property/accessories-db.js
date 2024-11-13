@@ -220,7 +220,7 @@ export const registerAccessoriesStage1 = () => {
             multiplier: {
                 effects: {
                     'mental_training_learning_rate': {
-                        A: 0.04,
+                        A: 0.025,
                         B: 1,
                         C: 1.01,
                         type: 3,
@@ -260,7 +260,7 @@ export const registerAccessoriesStage1 = () => {
             multiplier: {
                 effects: {
                     'spiritual_learning_rate': {
-                        A: 0.04,
+                        A: 0.025,
                         B: 1,
                         C: 1.01,
                         type: 3,

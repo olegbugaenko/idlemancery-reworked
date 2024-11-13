@@ -326,6 +326,9 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
                     <p className={'hint'}>Increasing level will increase spells cost and consumption but also increase their output</p>
                 </div> ) : null}
                 <div className={'block'}>
+                    <p>Cooldown: {formatValue(item.cooldown)} seconds</p>
+                </div>
+                <div className={'block'}>
                     <p>Effects on usage:</p>
                     <div className={'effects'}>
                         <EffectsSection effects={item.effects} />

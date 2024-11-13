@@ -147,7 +147,7 @@ export const BreakDown = ({ breakDown }) => {
         {breakDown.multiplier?.length ? (<div className={'box'}>
             <span className={'sub-title'}>Multiplier</span>
             <div className={'box-inner'}>
-                {breakDown.multiplier.filter(one => Math.abs(one.value) - 1 > 1.e-8).map(one => {
+                {breakDown.multiplier.filter(one => Math.abs(one.value - 1) > 1.e-8).map(one => {
                     return (<p className={'line'}>
                         <span className={'name'}>{one.name}: </span>
                         <span className={'value'}>X{formatValue(one.value, 3)}</span>

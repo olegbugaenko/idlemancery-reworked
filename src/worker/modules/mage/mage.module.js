@@ -209,6 +209,13 @@ export class MageModule extends GameModule {
         this.skillUpgrades[skillId] = gameEntity.getLevel(skillId);
     }
 
+    resetPerks() {
+        console.log('resetPerks');
+        for(const id in this.skillUpgrades) {
+            this.setSkill(id, 0, true);
+        }
+    }
+
     getMageData() {
         const rs = gameResources.getResource('mage-xp');
         const skills = gameResources.getResource('skill-points');

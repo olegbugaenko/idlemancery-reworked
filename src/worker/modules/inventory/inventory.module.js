@@ -139,6 +139,16 @@ export class InventoryModule extends GameModule {
     }
 
     load(saveObject) {
+
+        for(const key in this.inventoryItems) {
+            if(this.inventoryItems[key].duration && this.inventoryItems[key].duration > 0) {
+                // we should unset existing
+                if(gameEntity.entityExists(`active_${key}`)) {
+                    gameEntity.unsetEntity(`active_${key}`);
+                }
+            }
+        }
+
         this.inventoryItems = saveObject?.inventory ?? {};
         this.selectedFilterId = saveObject?.selectedFilterId || 'all';
 
@@ -147,7 +157,7 @@ export class InventoryModule extends GameModule {
                 this.inventoryItems[key].stockCapacity = gameEffects.getEffectValue('shop_max_stock');
             }
             if(this.inventoryItems[key].duration && this.inventoryItems[key].duration > 0) {
-                gameEntity.registerGameEntity(`active_${id}`, {
+                gameEntity.registerGameEntity(`active_${key}`, {
                     originalId: key,
                     name: gameResources.getResource(key).name,
                     isAbstract: false,
@@ -156,6 +166,8 @@ export class InventoryModule extends GameModule {
                     level: 1,
                     resourceModifier: gameResources.getResource(key).resourceModifier ?? undefined
                 });
+
+                gameEntity.setEntityLevel(`active_${key}`, 1);
             }
         }
         this.sendInventoryData(this.selectedFilterId);
@@ -241,6 +253,9 @@ export class InventoryModule extends GameModule {
             } else {
                 this.inventoryItems[id].cooldown = resource.getUsageCooldown() ?? 0;
             }
+        }
+        if(resource.onUse) {
+            resource.onUse(realCons);
         }
         gameResources.addResource(id, -realCons);
         this.sendInventoryData(this.selectedFilterId);

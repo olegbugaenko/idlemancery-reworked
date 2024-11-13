@@ -567,4 +567,65 @@ export const registerCraftingRecipes = () => {
         }),
     })
 
+
+    registerCraftingRecipe('craft_amnesia_potion', {
+        tags: ["recipe", "crafting", "alchemy", "physical"],
+        name: 'Amnesia Potion',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Forget your previously learned skills, feel yourself refreshed. Of course, it will have consequences',
+        level: 1,
+        resourceId: 'inventory_amnesia_potion',
+        resourceModifier: {
+            income: {
+                resources: {
+                    'inventory_amnesia_potion': {
+                        A: 1.3,
+                        B: 0.1,
+                        type: 1,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'inventory_nightshade': {
+                        A: 1.5,
+                        B: 100,
+                        type: 1
+                    },
+                    'inventory_fly_mushroom': {
+                        A: 1.5,
+                        B: 1000,
+                        type: 1
+                    },
+                    'alchemy_ability': {
+                        A: 1.5,
+                        B: 2./1.5,
+                        type: 1,
+                    },
+                    'alchemy_slots': {
+                        A: 1,
+                        B: 0,
+                        type: 0,
+                        ignoreEfficiency: true,
+                    },
+                }
+            },
+            effectDeps: []
+        },
+        unlockCondition: () => {
+            return true
+        },
+        attributes: {
+            baseXPCost: 10,
+        },
+        get_cost: () => ({
+            'alchemy_slots': {
+                A: 1,
+                B: 0,
+                type: 0
+            }
+        }),
+    })
+
 }

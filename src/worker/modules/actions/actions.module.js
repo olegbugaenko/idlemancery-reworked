@@ -495,6 +495,7 @@ export class ActionsModule extends GameModule {
             allowedImpacts: ['resources'],
             tags: ['running','runningActions'],
             effectFactor: effort,
+            unlockedBy: undefined,
         })
 
         gameEntity.setEntityLevel(`runningAction_${id}`, this.actions[id]?.level ?? 1);

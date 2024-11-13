@@ -385,6 +385,7 @@ export class SpellModule extends GameModule {
             xpRate: this.getXPPerCast(id),
             actualLevel: spell.level,
             isSpellLevelingAvailable: this.isSpellLevelingAvailable(),
+            cooldown: spell.getUsageCooldown(),
         }
     }
 

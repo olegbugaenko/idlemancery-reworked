@@ -1,6 +1,7 @@
 import {GameModule} from "../../shared/game-module";
 import {gameCore, gameEffects, gameEntity} from "game-framework";
 import {registerAttributes} from "./attributes-db";
+import {gameUnlocks} from "game-framework/src/utils/unlocks";
 
 export class AttributesModule extends GameModule {
 
@@ -37,7 +38,7 @@ export class AttributesModule extends GameModule {
     }
 
     getAttributesUnlocks() {
-        console.log('Attrs: ', gameEffects.listEffectsByTags(['attribute']));
+        console.log('Attrs: ', gameEffects.listEffectsByTags(['attribute']), gameUnlocks.unlockMapping);
         const items = gameEffects.listEffectsByTags(['attribute'])
             .filter(one => one.isUnlocked && one.nextUnlock)
             .map(one => {
