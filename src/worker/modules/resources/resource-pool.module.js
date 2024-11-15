@@ -105,6 +105,19 @@ export class ResourcePoolModule extends GameModule {
             isService: true,
         })
 
+
+
+
+        gameResources.registerResource('rare_herbs_loot', {
+            tags: ['gathering', 'secondary'],
+            name: 'Rare Herbs',
+            isService: true,
+            isPercentage: true,
+            unlockCondition: () => {
+                return gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
+            }
+        })
+
     }
 
     tick() {

@@ -1,7 +1,11 @@
 import {formatValue} from "./strings";
 
 export const mapEffect = (effect) => {
-    let value = formatValue(effect.value || 0, 3);
+    let rVal = effect.isPercentage ? (effect.value || 0) * 100 : (effect.value || 0);
+    let value = formatValue(rVal, 3);
+    if(effect.isPercentage) {
+        value += '%';
+    }
     let title = effect.name;
 
     let direction = 1;
@@ -12,7 +16,7 @@ export const mapEffect = (effect) => {
         value = `-${value}`;
         direction = -1;
     } else {
-        if(effect.value > 0) {
+        if(effect.value > 0 && !effect.isPercentage) {
             value = `+${value}`;
         } else {
             value = `${value}`;

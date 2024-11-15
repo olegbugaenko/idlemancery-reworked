@@ -655,7 +655,7 @@ export const registerShopItemsStage1 = () => {
     gameEntity.registerGameEntity('shop_item_herbs_handbook_2', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Herbs Handbook II',
-        description: 'Learn more sophisticated herbs and their effects when combining them together',
+        description: 'Learn more sophisticated and rare herbs',
         level: 0,
         maxLevel: 1,
         unlockCondition: () => {
@@ -668,7 +668,7 @@ export const registerShopItemsStage1 = () => {
         get_cost: () => ({
             'coins': {
                 A: 2,
-                B: 4000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 400000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 0
             }
         }),

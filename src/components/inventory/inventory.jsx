@@ -11,6 +11,7 @@ import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
 import RulesList from "../shared/rules-list.jsx";
 import {cloneDeep} from "lodash";
 import {BreakDown} from "../layout/sidebar.jsx";
+import {ResourceComparison} from "../shared/resource-comparison.jsx";
 
 export const Inventory = ({}) => {
 
@@ -96,7 +97,8 @@ export const Inventory = ({}) => {
     }, [detailOpenedId, editData]);
 
     const purchaseItem = useCallback((id) => {
-        sendData('consume-inventory', { id, amount: 1 })
+        sendData('consume-inventory', { id, amount: 1, sendDetails: true });
+        // sendData('query-inventory-details', { id, amount: 1 })
     })
 
     const setInventoryDetailsEdit = useCallback(({id, name}) => {
@@ -311,7 +313,7 @@ export const Inventory = ({}) => {
 
 }
 
-export const InventoryCard = React.memo(({ isChanged, isConsumable, isSelected, id, name, amount, balance, breakDown, isConsumed, cooldownProg, cooldown, onFlash, onPurchase, onShowDetails, onEditConfig}) => {
+export const InventoryCard = React.memo(({ isChanged, isConsumable, isRare, isSelected, id, name, amount, balance, breakDown, isConsumed, cooldownProg, cooldown, onFlash, onPurchase, onShowDetails, onEditConfig}) => {
     const elementRef = useRef(null);
 
     useFlashOnLevelUp(isConsumed, onFlash, elementRef);
@@ -332,7 +334,7 @@ export const InventoryCard = React.memo(({ isChanged, isConsumable, isSelected, 
     // RERENDERING
     // console.log('Item: ', id, cooldownProg, cooldown);
 
-    return (<div ref={elementRef} className={`icon-card item flashable ${isSelected ? 'selected' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)} onClick={handleClick} onContextMenu={handleContextMenu}>
+    return (<div ref={elementRef} className={`icon-card item flashable ${isSelected ? 'selected' : ''} ${isRare ? 'bluish' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)} onClick={handleClick} onContextMenu={handleContextMenu}>
         <TippyWrapper content={<div className={'hint-popup'}>
             {breakDown ? (<BreakDown breakDown={breakDown}/>) : null}
             <p>Balance: {formatValue(balance)}</p>
@@ -438,6 +440,12 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
                         <EffectsSection effects={item.effects}/>
                     </div>
                 </div>) : null}
+                {item.potentialPermanentEffects ? (<div className={'block'}>
+                    <p>Permanent Effects:</p>
+                    <div className={'effects'}>
+                        <ResourceComparison effects1={item.permanentEffects} effects2={item.potentialPermanentEffects}/>
+                    </div>
+                </div>) : null}
                 {item.duration ? (<div className={'block'}>
                     <p>Effects lasting: {secondsToString(item.duration)}</p>
                     <div className={'effects'}>
@@ -447,6 +455,7 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
                 {item.consumptionCooldown ? (
                 <div className={'block'}>
                     <p>Consumption Cooldown: {secondsToString(item.consumptionCooldown)}</p>
+                    <p>Consumed amount: {formatInt(item.numConsumed)}</p>
                 </div>
                 ) : null}
                 <div className={'autoconsume-setting block'}>

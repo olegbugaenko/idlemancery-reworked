@@ -1,6 +1,7 @@
 import {GameModule} from "../../shared/game-module";
 import { gameResources, gameEntity, gameEffects, gameCore } from 'game-framework';
 import {registerSkillsStage1} from "./skills-db";
+import {registerPermanentBonuses} from "./permanent-bonuses-db";
 
 export class MageModule extends GameModule {
 
@@ -79,6 +80,8 @@ export class MageModule extends GameModule {
         })
 
         registerSkillsStage1();
+
+        registerPermanentBonuses();
 
         const entity = gameEntity.registerGameEntity('mage', {
             tags: ["mage", "general"],
@@ -180,6 +183,7 @@ export class MageModule extends GameModule {
         return {
             mageLevel: gameEntity.getLevel('mage'),
             skillUpgrades: this.skillUpgrades,
+            permanentBonuses: gameEntity.listEntitiesByTags(['bonus', 'permanent']).map(one => ({ id: one.id, level: one.level }))
         }
     }
 
@@ -190,7 +194,6 @@ export class MageModule extends GameModule {
     load(obj) {
         this.mageLevel = obj?.mageLevel || 0;
         gameEntity.setEntityLevel('mage', this.mageLevel);
-        console.log('[debugdrago] dragoEnt: ', gameEntity.getEntity('mage'));
 
         for(const key in this.skillUpgrades) {
             this.setSkill(key, 0, true);
@@ -200,6 +203,11 @@ export class MageModule extends GameModule {
             for(const id in obj.skillUpgrades) {
                 this.setSkill(id, obj.skillUpgrades[id], true);
             }
+        }
+        if(obj?.permanentBonuses) {
+            obj.permanentBonuses.forEach(({ id, level }) => {
+                gameEntity.setEntityLevel(id, level, true);
+            })
         }
         // this.sen();
     }

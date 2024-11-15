@@ -1401,6 +1401,11 @@ export const registerActionsStage1 = () => {
                         A: 0.0002*gameEffects.getEffectValue('gathering_efficiency'),
                         B: 0.0018*gameEffects.getEffectValue('gathering_efficiency'),
                         type: 0,
+                    },
+                    'rare_herbs_loot': {
+                        A: 0,
+                        B: 0.0002*gameEffects.getEffectValue('gathering_efficiency'),
+                        type: 0
                     }
                 }
             }),
@@ -1430,7 +1435,11 @@ export const registerActionsStage1 = () => {
         },
         attributes: {
             baseXPCost: 50,
-            primaryAttribute: 'attribute_patience'
+            primaryAttribute: 'attribute_patience',
+            possibleRareHerbs: {
+                'inventory_rare_titanleaf': 1,
+                'inventory_rare_heartroot': 1
+            }
         }
     })
 
@@ -1462,6 +1471,11 @@ export const registerActionsStage1 = () => {
                         A: 0.0002*gameEffects.getEffectValue('gathering_efficiency'),
                         B: 0.0018*gameEffects.getEffectValue('gathering_efficiency'),
                         type: 0,
+                    },
+                    'rare_herbs_loot': {
+                        A: 0,
+                        B: 0.0003*gameEffects.getEffectValue('gathering_efficiency'),
+                        type: 0
                     }
                 }
             }),
@@ -1492,7 +1506,83 @@ export const registerActionsStage1 = () => {
         },
         attributes: {
             baseXPCost: 50,
-            primaryAttribute: 'attribute_patience'
+            primaryAttribute: 'attribute_patience',
+            possibleRareHerbs: {
+                'inventory_rare_titanleaf': 1,
+                'inventory_rare_heartroot': 1,
+                'inventory_rare_energloom': 0.5,
+                'inventory_rare_lifebloom': 0.5,
+            }
+        }
+    })
+
+
+    registerGameAction('action_magic_backyard', {
+        tags: ["action", "gathering", "routine"],
+        name: 'Searching in Mages Backyard',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'There is abandoned mages hut at the edge of settlement. It is told to be very dangerous, but having a lot of unique plants',
+        level: 1,
+        getLearnRate: () => {
+            return 1
+        },
+        learningEffects: ['routine_learning_speed'],
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'inventory_fly_mushroom': {
+                        A: 0.001*gameEffects.getEffectValue('gathering_efficiency'),
+                        B: 0.009*gameEffects.getEffectValue('gathering_efficiency'),
+                        type: 0,
+                    },
+                    'inventory_ginseng': {
+                        A: 0.001*gameEffects.getEffectValue('gathering_efficiency'),
+                        B: 0.009*gameEffects.getEffectValue('gathering_efficiency'),
+                        type: 0,
+                    },
+                    'inventory_nightshade': {
+                        A: 0.0002*gameEffects.getEffectValue('gathering_efficiency'),
+                        B: 0.0018*gameEffects.getEffectValue('gathering_efficiency'),
+                        type: 0,
+                    },
+                    'rare_herbs_loot': {
+                        A: 0,
+                        B: 0.0005*gameEffects.getEffectValue('gathering_efficiency'),
+                        type: 0
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 20,
+                        type: 0,
+                    },
+                    'health': {
+                        A: 0.0,
+                        B: 10,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['gathering_efficiency']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0
+                && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
+        },
+        attributes: {
+            baseXPCost: 500,
+            primaryAttribute: 'attribute_patience',
+            possibleRareHerbs: {
+                'inventory_rare_titanleaf': 1,
+                'inventory_rare_heartroot': 1,
+                'inventory_rare_azureblossom': 0.5,
+                'inventory_rare_mindspire': 0.5,
+                'inventory_rare_mindroot': 0.5,
+            }
         }
     })
 

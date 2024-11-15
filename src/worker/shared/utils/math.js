@@ -20,3 +20,20 @@ export function calculateTimeToLevelUp(A, B, N, M, factor, dxp) {
 
     return totalTime;
 }
+
+export function weightedRandomChoice(probMap) {
+    // Calculate total weight
+    const totalWeight = Object.values(probMap).reduce((sum, weight) => sum + weight, 0);
+
+    // Generate a random number in the range of totalWeight
+    const randVal = Math.random() * totalWeight;
+
+    // Traverse through the items, accumulating the weight
+    let cumulativeWeight = 0;
+    for (const [key, weight] of Object.entries(probMap)) {
+        cumulativeWeight += weight;
+        if (randVal < cumulativeWeight) {
+            return key;
+        }
+    }
+}

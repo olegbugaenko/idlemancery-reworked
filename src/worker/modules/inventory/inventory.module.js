@@ -3,6 +3,7 @@ import {GameModule} from "../../shared/game-module";
 import {registerInventoryItems} from "./inventory-items-db";
 import {checkMatchingRules} from "../../shared/utils/rule-utils";
 import {SMALL_NUMBER} from "game-framework/src/utils/consts";
+import {packEffects} from "../../shared/utils/objects";
 
 
 export class InventoryModule extends GameModule {
@@ -34,6 +35,10 @@ export class InventoryModule extends GameModule {
 
         this.eventHandler.registerHandler('consume-inventory', (payload) => {
             this.consumeItem(payload.id, payload.amount);
+            if(payload.sendDetails) {
+                this.sendItemDetails(payload.id);
+            }
+
         })
 
         this.eventHandler.registerHandler('sell-inventory', (payload) => {
@@ -257,6 +262,7 @@ export class InventoryModule extends GameModule {
         if(resource.onUse) {
             resource.onUse(realCons);
         }
+        this.inventoryItems[id].numConsumed = (this.inventoryItems[id].numConsumed || 0) + realCons;
         gameResources.addResource(id, -realCons);
         this.sendInventoryData(this.selectedFilterId);
     }
@@ -335,6 +341,7 @@ export class InventoryModule extends GameModule {
         return {
             available: presentItems.map(resource => ({
                 ...resource,
+                isRare: resource.attributes?.isRare,
                 isConsumable: resource.tags.includes('consumable'),
                 isConsumed: this.inventoryItems[resource.id]?.isConsumed,
                 cooldown: this.inventoryItems[resource.id]?.cooldown ?? 0,
@@ -361,6 +368,19 @@ export class InventoryModule extends GameModule {
         if(resource.usageGain) {
             effects = resourceApi.unpackEffects(resource.usageGain, 1)
         }
+
+        // const currentEffects = resource.attributes?.entityEffect ? gameEntity.getEffects(resource.attributes?.entityEffect) : null;
+        // let potentialEffects = resource.resourceModifier ? resourceApi.unpackEffects(resource.resourceModifier, 1) : [];
+
+        let permanentEffects;
+        let potentialPermanentEffects;
+
+        if(resource.attributes?.entityEffect) {
+            permanentEffects = packEffects(gameEntity.getEffects(resource.attributes?.entityEffect));
+            potentialPermanentEffects = packEffects(gameEntity.getEffects(resource.attributes?.entityEffect, 1));
+        }
+
+        console.log('EEFF: ', resource.attributes?.entityEffect, permanentEffects, potentialPermanentEffects);
         return {
             id: resource.id,
             name: resource.name,
@@ -377,7 +397,10 @@ export class InventoryModule extends GameModule {
             maxSell: Math.min((this.inventoryItems[resource.id]?.stockCapacity ?? gameEffects.getEffectValue('shop_max_stock')), Math.floor(resource.amount)),
             duration: resource.attributes?.duration || 0,
             potentialEffects: resource.resourceModifier ? resourceApi.unpackEffects(resource.resourceModifier, 1) : [],
-            consumptionCooldown: resource.getUsageCooldown ? resource.getUsageCooldown() : 0
+            consumptionCooldown: resource.getUsageCooldown ? resource.getUsageCooldown() : 0,
+            permanentEffects,
+            potentialPermanentEffects,
+            numConsumed: this.inventoryItems[resource.id]?.numConsumed || 0
         }
     }
 

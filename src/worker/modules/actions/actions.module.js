@@ -2,7 +2,7 @@ import {registerActionsStage1} from "./actions-db";
 import {GameModule} from "../../shared/game-module";
 import {gameEntity, gameResources, gameEffects, resourceCalculators} from "game-framework";
 import {ActionListsSubmodule} from "./action-lists.submodule";
-import {calculateTimeToLevelUp} from "../../shared/utils/math";
+import {calculateTimeToLevelUp, weightedRandomChoice} from "../../shared/utils/math";
 import {SMALL_NUMBER} from "game-framework/src/utils/consts";
 
 export class ActionsModule extends GameModule {
@@ -251,6 +251,11 @@ export class ActionsModule extends GameModule {
         for(let key in this.actions) {
             this.actions[key].isLeveled = false;
         }
+        let rareEvents = {
+            herbDrops: {},
+            oreDrops: {}
+        };
+
         if(this.activeActions) {
             this.activeActions.forEach(act => {
                 if(!this.actions[act.originalId]) {
@@ -279,6 +284,17 @@ export class ActionsModule extends GameModule {
                 // console.log('------------: ', act.id, dxp, delta, this.getLearningRate(act.id, undefined, true));
                 this.actions[act.originalId].xp += dxp;
                 this.actions[act.originalId].xpEarned = (this.actions[act.originalId].xpEarned || 0) + dxp;
+
+                const herbDrops = gameEntity.getAttribute(act.originalId, 'possibleRareHerbs', null);
+
+                if(herbDrops) {
+                    if(!rareEvents['herbDrops']) {
+                        rareEvents['herbDrops'] = {}
+                    }
+                    for(const key in herbDrops) {
+                        rareEvents['herbDrops'][key] = (rareEvents['herbDrops'][key] || 0) + herbDrops[key];
+                    }
+                }
                 gameResources.addResource('mage-xp', dxp);
                 if(this.actions[act.originalId].xp >= this.getActionXPMax(act.originalId)) {
                     this.actions[act.originalId].level++;
@@ -294,6 +310,18 @@ export class ActionsModule extends GameModule {
                     this.sendActionsData(this.selectedFilterId);
                 }
             })
+
+        }
+        // check for rare loot
+        if(gameResources.getResource('rare_herbs_loot').balance > 0) {
+            const chanceMult = delta * gameResources.getResource('rare_herbs_loot').balance;
+            console.log('Handling chances for rare loots: ', gameResources.getResource('rare_herbs_loot'), chanceMult);
+            if(Math.random() < chanceMult) {
+                const id = weightedRandomChoice(rareEvents['herbDrops']);
+                console.log('Add: ', id, rareEvents['herbDrops']);
+
+                gameResources.addResource(id, 1);
+            }
 
         }
         this.lists.tick(game, delta)

@@ -562,4 +562,274 @@ export const registerInventoryItems = () => {
         sellPrice: 15000,
     })
 
+    // Rare
+
+
+    gameResources.registerResource('inventory_rare_titanleaf', {
+        name: 'Titanleaf',
+        hasCap: false,
+        tags: ['inventory', 'consumable', 'rare'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+            gameEntity.levelUpEntity('rare_titanleaf_effect')
+        },
+        getUsageCooldown: () => {
+            return 0.1*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+        },
+        attributes: {
+            baseChanceMult: 1,
+            entityEffect: 'rare_titanleaf_effect',
+            isRare: true,
+        },
+        usageGain: {
+
+        },
+        resourceModifier: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
+        },
+        sellPrice: 15000,
+    })
+
+
+    gameResources.registerResource('inventory_rare_heartroot', {
+        name: 'Heartroot',
+        hasCap: false,
+        tags: ['inventory', 'consumable', 'rare'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+            gameEntity.levelUpEntity('rare_heartroot_effect')
+        },
+        getUsageCooldown: () => {
+            return 0.1*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+        },
+        attributes: {
+            baseChanceMult: 1,
+            entityEffect: 'rare_heartroot_effect',
+            isRare: true,
+        },
+        usageGain: {
+
+        },
+        resourceModifier: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
+        },
+        sellPrice: 15000,
+    })
+
+
+    gameResources.registerResource('inventory_rare_energloom', {
+        name: 'Energloom',
+        hasCap: false,
+        tags: ['inventory', 'consumable', 'rare'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+            gameEntity.levelUpEntity('rare_energloom_effect')
+        },
+        getUsageCooldown: () => {
+            return 0.1*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+        },
+        attributes: {
+            baseChanceMult: 1,
+            entityEffect: 'rare_energloom_effect',
+            isRare: true,
+        },
+        usageGain: {
+
+        },
+        resourceModifier: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
+        },
+        sellPrice: 15000,
+    })
+
+
+    gameResources.registerResource('inventory_rare_lifebloom', {
+        name: 'Lifebloom',
+        hasCap: false,
+        tags: ['inventory', 'consumable', 'rare'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+            gameEntity.levelUpEntity('rare_lifebloom_effect')
+        },
+        getUsageCooldown: () => {
+            return 0.1*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+        },
+        attributes: {
+            baseChanceMult: 1,
+            entityEffect: 'rare_lifebloom_effect',
+            isRare: true,
+        },
+        usageGain: {
+
+        },
+        resourceModifier: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
+        },
+        sellPrice: 15000,
+    })
+
+
+    gameResources.registerResource('inventory_rare_stillfern', {
+        name: 'Stillfern',
+        hasCap: false,
+        tags: ['inventory', 'consumable', 'rare'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+            gameEntity.levelUpEntity('rare_stillfern_effect')
+        },
+        getUsageCooldown: () => {
+            return 0.1*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+        },
+        attributes: {
+            baseChanceMult: 1,
+            entityEffect: 'rare_stillfern_effect',
+            isRare: true,
+        },
+        usageGain: {
+
+        },
+        resourceModifier: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
+        },
+        sellPrice: 15000,
+    })
+
+    gameResources.registerResource('inventory_rare_mindroot', {
+        name: 'Mindroot',
+        hasCap: false,
+        tags: ['inventory', 'consumable', 'rare'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+            gameEntity.levelUpEntity('rare_mindroot_effect')
+        },
+        getUsageCooldown: () => {
+            return 0.1*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+        },
+        attributes: {
+            baseChanceMult: 1,
+            entityEffect: 'rare_mindroot_effect',
+            isRare: true,
+        },
+        usageGain: {
+
+        },
+        resourceModifier: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
+        },
+        sellPrice: 15000,
+    })
+
+    gameResources.registerResource('inventory_rare_azureblossom', {
+        name: 'Azureblossom',
+        hasCap: false,
+        tags: ['inventory', 'consumable', 'rare'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+            gameEntity.levelUpEntity('rare_azureblossom_effect')
+        },
+        getUsageCooldown: () => {
+            return 0.1*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+        },
+        attributes: {
+            baseChanceMult: 1,
+            entityEffect: 'rare_azureblossom_effect',
+            isRare: true,
+        },
+        usageGain: {
+
+        },
+        resourceModifier: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
+        },
+        sellPrice: 15000,
+    })
+
+
+    gameResources.registerResource('inventory_rare_ironvine', {
+        name: 'Ironvine',
+        hasCap: false,
+        tags: ['inventory', 'consumable', 'rare'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+            gameEntity.levelUpEntity('rare_ironvine_effect')
+        },
+        getUsageCooldown: () => {
+            return 0.1*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+        },
+        attributes: {
+            baseChanceMult: 1,
+            entityEffect: 'rare_ironvine_effect',
+            isRare: true,
+        },
+        usageGain: {
+
+        },
+        resourceModifier: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
+        },
+        sellPrice: 15000,
+    })
+
+
+    gameResources.registerResource('inventory_rare_mindspire', {
+        name: 'Mindspire',
+        hasCap: false,
+        tags: ['inventory', 'consumable', 'rare'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+            gameEntity.levelUpEntity('rare_mindspire_effect')
+        },
+        getUsageCooldown: () => {
+            return 0.1*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+        },
+        attributes: {
+            baseChanceMult: 1,
+            entityEffect: 'rare_mindspire_effect',
+            isRare: true,
+        },
+        usageGain: {
+
+        },
+        resourceModifier: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
+        },
+        sellPrice: 15000,
+    })
+
 }

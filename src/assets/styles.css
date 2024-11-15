@@ -338,6 +338,10 @@ p.hint {
     margin: 5px;
 }
 
+.icon-card.bluish {
+    border: 1px solid var(--highlight);
+}
+
 .icon-card.active {
     box-shadow: 0 0 16px var(--highlight);
 }
