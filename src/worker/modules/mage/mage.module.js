@@ -10,6 +10,11 @@ export class MageModule extends GameModule {
         this.mageLevel = 0;
         this.mageExp = 0;
         this.skillUpgrades = {};
+        this.bankedTime = {
+            current: 0,
+            max: 3600*4*1000,
+            speedUpFactor: 1,
+        };
         /*
         this.eventHandler.registerHandler('feed-dragon', (data) => {
             this.feedDragon();
@@ -34,8 +39,17 @@ export class MageModule extends GameModule {
             this.purchaseItem(id);
         })
 
+        this.eventHandler.registerHandler('toggle-speedup', () => {
+            this.bankedTime.speedUpFactor = 5 - this.bankedTime.speedUpFactor;
+        })
+
         this.eventHandler.registerHandler('query-active-effects', () => {
             this.sendActiveEffectsData();
+        })
+
+        this.eventHandler.registerHandler('query-statistics', () => {
+            const data = this.getStatistics();
+            this.eventHandler.sendData('statistics', data);
         })
 
     }
@@ -164,7 +178,39 @@ export class MageModule extends GameModule {
 
     }
 
-    tick() {
+    topValues(data) {
+        return (data || []).sort((a, b) => b.value - a.value)
+            .slice(0, 10);
+    }
+
+    getStatistics() {
+        const result = {};
+        result.totalTimePlayed = gameCore.globalTime;
+        result.mageLevel = this.mageLevel;
+        result.actionsUnlocked = gameEntity.listEntitiesByTags(['action']).filter(one => gameEntity.isEntityUnlocked(one.id)).length;
+        result.actionTimes = this.topValues(Object.entries(gameCore.getModule('actions').actions).map(([id, action]) => {
+            return {
+                name: gameEntity.getEntity(id).name,
+                value: action.timeInvested
+            }
+        }))
+        result.actionXP = this.topValues(Object.entries(gameCore.getModule('actions').actions).map(([id, action]) => {
+            return {
+                name: gameEntity.getEntity(id).name,
+                value: action.xpEarned
+            }
+        }))
+        result.spellsCasted = this.topValues(Object.entries(gameCore.getModule('magic').spells).map(([id, spell]) => {
+            return {
+                name: gameEntity.getEntity(id).name,
+                value: spell.numCasted
+            }
+        }))
+        console.log('RS: ', result);
+        return result;
+    }
+
+    tick(game, dT) {
         this.leveledId = null;
         this.isLeveledUp = false;
         const rs = gameResources.getResource('mage-xp');
@@ -177,13 +223,31 @@ export class MageModule extends GameModule {
             this.eventHandler.sendData('mage-data', data);
         }
 
+        console.log('B_TICK: ', this.bankedTime)
+        if(!this.bankedTime.current) {
+            this.bankedTime.current = 0;
+        }
+
+        if(this.bankedTime?.speedUpFactor > 1) {
+            this.bankedTime.current -= dT*(this.bankedTime?.speedUpFactor - 1)*1000;
+            if(this.bankedTime?.current <= 0) {
+                this.bankedTime.current = 0;
+                this.bankedTime.speedUpFactor = 1;
+            }
+        }
+        console.log('A_TICK: ', this.bankedTime);
+
     }
 
     save() {
         return {
             mageLevel: gameEntity.getLevel('mage'),
             skillUpgrades: this.skillUpgrades,
-            permanentBonuses: gameEntity.listEntitiesByTags(['bonus', 'permanent']).map(one => ({ id: one.id, level: one.level }))
+            permanentBonuses: gameEntity.listEntitiesByTags(['bonus', 'permanent']).map(one => ({ id: one.id, level: one.level })),
+            bankedTime: {
+                ...this.bankedTime,
+                lastSave: Date.now()
+            }
         }
     }
 
@@ -209,7 +273,14 @@ export class MageModule extends GameModule {
                 gameEntity.setEntityLevel(id, level, true);
             })
         }
-        // this.sen();
+        if(obj?.bankedTime) {
+            this.bankedTime = obj?.bankedTime;
+            if(Date.now() > this.bankedTime.lastSave + 60000) {
+                const delta = Date.now() - (this.bankedTime.lastSave + 60000);
+                this.bankedTime.current = Math.min(this.bankedTime.max, this.bankedTime.current + delta);
+            }
+            console.log('loadedBankedTime: ', this.bankedTime, Date.now(), Date.now() - (this.bankedTime.lastSave + 60000))
+        }
     }
 
     setSkill(skillId, amount, bForce = false) {
@@ -234,6 +305,7 @@ export class MageModule extends GameModule {
             skillPoints: skills.amount,
             timeSpent: gameCore.globalTime,
             isLeveledUp: this.isLeveledUp,
+            bankedTime: this.bankedTime,
         }
     }
 

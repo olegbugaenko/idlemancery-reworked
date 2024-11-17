@@ -213,7 +213,7 @@ p.hint {
 }
 
 .footer .mage-wrap .xp {
-    width: calc(100% - 280px);
+    width: calc(100% - 330px);
 }
 
 .footer .mage-wrap .mage-xp-bar {
@@ -236,8 +236,11 @@ p.hint {
 }
 
 .footer .mage-wrap .unlocks {
+    display: flex;
+}
+
+.footer .mage-wrap .unlocks .icon-content {
     margin-left: 12px;
-    cursor: pointer;
 }
 
 .footer .mage-wrap .unlocks .unlock:hover {
@@ -1212,4 +1215,47 @@ span.highlighted-span {
     height: 48px;
     border: 1px solid #777;
     border-radius: 2px;
+}
+
+.footer-add-info {
+    font-size: 14px;
+    margin: 0 4px;
+}
+
+.footer-add-info .banked-toggle {
+    cursor: pointer;
+    margin: 0 4px;
+}
+
+.footer-add-info .banked-toggle:hover {
+    color: var(--highlight);
+}
+
+.footer-add-info .banked-toggle.activated {
+    color: var(--highlight);
+}
+
+.footer-add-info .banked-toggle.disabled {
+    color: var(--grey);
+}
+
+.popup-content .statistics {
+    height: 100%;
+}
+
+.popup-content .statistics .flex-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.popup-content .statistics .flex-row .stat-title {
+    width: 200px;
+}
+
+.popup-content .statistics .flex-row .stat-value {
+    width: calc(100% - 240px)
+}
+
+.recharts-wrapper tspan {
+    font-size: 13px;
 }

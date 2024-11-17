@@ -80,12 +80,17 @@ Add shop items: book of herbalism and woodworking manual
 [V] Add new job based on strength
 [V] Add new options (actions) for boosting mana regen and caps (New actions)
 [V] Add some new crafting materials that required for relics providing boost to Mental Training Rate
-Add shop upgrade, that would provide bonus to crafting slots
-Pushup 400 should unlock something to improve crafting output
-Add advanced illusion magic, improving crafting efficiency and social XP rate
+[V] Add shop upgrade, that would provide bonus to crafting slots
+[V] Pushup 400 should unlock something to improve crafting output
+[V] Add advanced illusion magic, improving crafting efficiency and social XP rate
 
 ---
 Troubles: missing something providing energy very bad. It can be fixed with alchemy, however.
 So, tomorrow:
 1. Implement alchemy
 2. Test it on save files of other players
+
+Pre-release 0.0.3
+1. Configurable consumption amounts
+2. Offline progress
+3. Statistics

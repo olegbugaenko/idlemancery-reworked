@@ -4,6 +4,17 @@ const getPrimaryBonus = (attributeId) => {
     return 0.98 + 0.02*gameEffects.getEffectValue(attributeId);
 }
 
+const getChanceBased = (effect, softCap, hardCap) => {
+    if(effect < softCap) {
+        return effect;
+    }
+    let rs = softCap + (effect - softCap)*Math.pow(softCap/effect, 0.5);
+    if(rs < hardCap) {
+        return rs;
+    }
+    return hardCap;
+}
+
 const registerGameAction = (id, options) => {
     
     const primaryAttribute = options.attributes.primaryAttribute;
@@ -647,7 +658,7 @@ export const registerActionsStage1 = () => {
             get_multiplier: () => ({
                 effects: {
                     'social_training_learning_rate': {
-                        A: 0.05,
+                        A: 0.02,
                         B: 1,
                         type: 0,
                     }
@@ -704,7 +715,12 @@ export const registerActionsStage1 = () => {
                 resources: {
                     'energy': {
                         A: 0.0,
-                        B: 50,
+                        B: 80,
+                        type: 0,
+                    },
+                    'knowledge': {
+                        A: 0.0,
+                        B: 25,
                         type: 0,
                     },
                 }
@@ -1404,7 +1420,7 @@ export const registerActionsStage1 = () => {
                     },
                     'rare_herbs_loot': {
                         A: 0,
-                        B: 0.0002*gameEffects.getEffectValue('gathering_efficiency'),
+                        B: 0.0004*getChanceBased(gameEffects.getEffectValue('gathering_efficiency'), 1.5, 10),
                         type: 0
                     }
                 }
@@ -1474,7 +1490,7 @@ export const registerActionsStage1 = () => {
                     },
                     'rare_herbs_loot': {
                         A: 0,
-                        B: 0.0003*gameEffects.getEffectValue('gathering_efficiency'),
+                        B: 0.0004*getChanceBased(gameEffects.getEffectValue('gathering_efficiency'), 1.5, 10),
                         type: 0
                     }
                 }
@@ -1548,7 +1564,7 @@ export const registerActionsStage1 = () => {
                     },
                     'rare_herbs_loot': {
                         A: 0,
-                        B: 0.0005*gameEffects.getEffectValue('gathering_efficiency'),
+                        B: 0.0004*getChanceBased(gameEffects.getEffectValue('gathering_efficiency'), 1.5, 10),
                         type: 0
                     }
                 }

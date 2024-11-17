@@ -39,6 +39,10 @@ export const Footer = () => {
         setMageData(mage);
     })
 
+    const toggleSpeedUp = () => {
+        sendData('toggle-speedup', {});
+    }
+
     const openTab = (id) => {
         setOpenedTab(id);
     }
@@ -104,11 +108,27 @@ export const Footer = () => {
                     <ProgressBar className={'mage-xp-bar'} percentage={mageData.mageXP / mageData.mageMaxXP} />
                 </div>
             </TippyWrapper>
-            <div className={'time-spent'}>
+            {/*<div className={'time-spent footer-add-info'}>
                 {secondsToString(mageData.timeSpent)}
+            </div>*/}
+            <div className={'banked-time footer-add-info'}>
+                {secondsToString((mageData.bankedTime?.current || 0)/1000)}
+                <span className={`banked-toggle ${mageData.bankedTime?.speedUpFactor > 1 ? 'activated' : ''} ${mageData.bankedTime?.current <= 0 ? 'disabled' : ''}`} onClick={toggleSpeedUp}>
+                    X{formatInt(4)}
+                </span>
             </div>
             <div className={'unlocks'}>
-                <span className={'unlock'} onClick={() => setActivePopup('unlocks')}>View Unlocks</span>
+                <TippyWrapper content={<div className={'hint-popup'}>View unlocks</div> }>
+                    <div className={'icon-content edit-icon interface-icon'} onClick={() => setActivePopup('unlocks')}>
+                        <img src={"icons/interface/icon_unlocks.png"}/>
+                    </div>
+                </TippyWrapper>
+                <TippyWrapper content={<div className={'hint-popup'}>View statistics</div> }>
+                    <div className={'icon-content edit-icon interface-icon'} onClick={() => setActivePopup('statistics')}>
+                        <img src={"icons/interface/icon_statistics.png"}/>
+                    </div>
+                </TippyWrapper>
+
             </div>
         </div>) : null}
         {overlayPositions.map((position, index) => (

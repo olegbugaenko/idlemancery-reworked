@@ -212,6 +212,7 @@ export class SpellModule extends GameModule {
                 cooldown: 0,
                 level: 1,
                 actualLevel: 1,
+                numCasted: 0,
                 xp: 0
             }
         }
@@ -277,6 +278,7 @@ export class SpellModule extends GameModule {
                 this.spells[id] = {};
             }
             this.spells[id].isCasted = true;
+            this.spells[id].numCasted = (this.spells[id].numCasted || 0) + 1;
 
         }
         this.sendSpellData();

@@ -3,6 +3,7 @@ import { useAppContext } from '../../context/ui-context';
 import {PopupComponent} from "./popup-component.jsx";
 import {Skills} from "../mage/skills.jsx";
 import {UnlocksList} from "../mage/unlocks.jsx";
+import {Statistics} from "../mage/statistics.jsx";
 
 export const Popup = () => {
 
@@ -34,6 +35,14 @@ export const Popup = () => {
         return (
             <PopupComponent title={'Upcoming Unlocks Requirements'}>
                 <UnlocksList />
+            </PopupComponent>
+        )
+    }
+
+    if(activePopup === 'statistics') {
+        return (
+            <PopupComponent title={'Statistics'}>
+                <Statistics />
             </PopupComponent>
         )
     }
