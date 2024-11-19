@@ -82,6 +82,9 @@ export const Footer = () => {
                 {unlocks.workshop ? (<li className={openedTab === 'workshop' ? 'active' : ''} onClick={() => openTab('workshop')}>
                     <span>Workshop</span>
                 </li>) : null}
+                {unlocks.social ? (<li className={openedTab === 'social' ? 'active' : ''} onClick={() => openTab('social')}>
+                    <span>Social</span>
+                </li>) : null}
                 {unlocks.spellbook ? (<li className={openedTab === 'spellbook' ? 'active' : ''} onClick={() => openTab('spellbook')}>
                     <span>Spellbook</span>
                 </li>) : null}
@@ -111,12 +114,19 @@ export const Footer = () => {
             {/*<div className={'time-spent footer-add-info'}>
                 {secondsToString(mageData.timeSpent)}
             </div>*/}
-            <div className={'banked-time footer-add-info'}>
-                {secondsToString((mageData.bankedTime?.current || 0)/1000)}
-                <span className={`banked-toggle ${mageData.bankedTime?.speedUpFactor > 1 ? 'activated' : ''} ${mageData.bankedTime?.current <= 0 ? 'disabled' : ''}`} onClick={toggleSpeedUp}>
+            <TippyWrapper content={<div className={'hint-popup'}>
+                <p>You was offline {secondsToString((mageData.bankedTime?.current || 0)/1000)}</p>
+                <p>You can use this time to speed up your game by factor of 4</p>
+            </div> }>
+                <div className={'banked-time footer-add-info'}>
+                    <img className={'ui-icon'} src={"icons/interface/time.png"}/>
+                    {secondsToString((mageData.bankedTime?.current || 0)/1000)}
+                    <span className={`banked-toggle ${mageData.bankedTime?.speedUpFactor > 1 ? 'activated' : ''} ${mageData.bankedTime?.current <= 0 ? 'disabled' : ''}`} onClick={toggleSpeedUp}>
                     X{formatInt(4)}
                 </span>
-            </div>
+                </div>
+            </TippyWrapper>
+
             <div className={'unlocks'}>
                 <TippyWrapper content={<div className={'hint-popup'}>View unlocks</div> }>
                     <div className={'icon-content edit-icon interface-icon'} onClick={() => setActivePopup('unlocks')}>

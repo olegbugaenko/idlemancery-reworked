@@ -96,8 +96,8 @@ export const Inventory = ({}) => {
         };
     }, [detailOpenedId, editData]);
 
-    const purchaseItem = useCallback((id) => {
-        sendData('consume-inventory', { id, amount: 1, sendDetails: true });
+    const purchaseItem = useCallback((id, amount = 1) => {
+        sendData('consume-inventory', { id, amount, sendDetails: true });
         // sendData('query-inventory-details', { id, amount: 1 })
     })
 
@@ -313,7 +313,7 @@ export const Inventory = ({}) => {
 
 }
 
-export const InventoryCard = React.memo(({ isChanged, isConsumable, isRare, isSelected, id, name, amount, balance, breakDown, isConsumed, cooldownProg, cooldown, onFlash, onPurchase, onShowDetails, onEditConfig}) => {
+export const InventoryCard = React.memo(({ isChanged, allowMultiConsume, isConsumable, isRare, isSelected, id, name, amount, balance, breakDown, isConsumed, cooldownProg, cooldown, onFlash, onPurchase, onShowDetails, onEditConfig}) => {
     const elementRef = useRef(null);
 
     useFlashOnLevelUp(isConsumed, onFlash, elementRef);
@@ -328,7 +328,13 @@ export const InventoryCard = React.memo(({ isChanged, isConsumable, isRare, isSe
     const handleContextMenu = (e) => {
         e.preventDefault(); // Prevents the default context menu
         console.log('Triger onpurchase: ', id);
-        onPurchase(id); // Your custom right-click action
+        if(!isConsumable) return;
+        let amt = 1;
+        if(allowMultiConsume) {
+            if(e.shiftKey) amt = amount;
+            if(e.ctrlKey && amount >= 1) amt = Math.max(0.1*amount, 1)
+        }
+        onPurchase(id, amt); // Your custom right-click action
     };
 
     // RERENDERING
@@ -340,6 +346,8 @@ export const InventoryCard = React.memo(({ isChanged, isConsumable, isRare, isSe
             <p>Balance: {formatValue(balance)}</p>
             <p>Left click to select</p>
             {isConsumable ? (<p>Right click to consume</p>) : null}
+            {isConsumable && allowMultiConsume && amount > 10 ? (<p>Right click + CTRL to consume {formatInt(0.1*amount)}</p>) : null}
+            {isConsumable && allowMultiConsume? (<p>Right click + SHIFT to consume all</p>) : null}
         </div> }>
             <div className={'icon-content'}>
                 <CircularProgress progress={cooldownProg}>

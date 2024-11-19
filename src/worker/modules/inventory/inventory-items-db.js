@@ -1,8 +1,12 @@
 import { gameResources, gameEntity, gameCore, gameEffects } from "game-framework"
 
+const updateLevelBy = (id, amount) => {
+    gameEntity.setEntityLevel(id, gameEntity.getLevel(id) + amount, true);
+}
+
 export const registerInventoryItems = () => {
 
-    const charismaMod = (attr) => attr > 0 ? 1. / (1. + 0.02*Math.log2(attr)) : 1.;
+    const charismaMod = (attr) => attr > 0 ? 1. / (1. + 0.02*Math.log2(attr*gameEffects.getEffectValue('prices_discount'))) : 1.;
 
     const metabolismMod = (attr) => attr > 1 ? 1. / (Math.pow(attr, 0.25)) : 1.;
 
@@ -572,7 +576,7 @@ export const registerInventoryItems = () => {
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
-            gameEntity.levelUpEntity('rare_titanleaf_effect')
+            updateLevelBy('rare_titanleaf_effect', amount)
         },
         getUsageCooldown: () => {
             return 0.1*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
@@ -581,6 +585,7 @@ export const registerInventoryItems = () => {
             baseChanceMult: 1,
             entityEffect: 'rare_titanleaf_effect',
             isRare: true,
+            allowMultiConsume: true,
         },
         usageGain: {
 
@@ -602,7 +607,7 @@ export const registerInventoryItems = () => {
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
-            gameEntity.levelUpEntity('rare_heartroot_effect')
+            updateLevelBy('rare_heartroot_effect', amount)
         },
         getUsageCooldown: () => {
             return 0.1*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
@@ -611,6 +616,7 @@ export const registerInventoryItems = () => {
             baseChanceMult: 1,
             entityEffect: 'rare_heartroot_effect',
             isRare: true,
+            allowMultiConsume: true,
         },
         usageGain: {
 
@@ -632,7 +638,7 @@ export const registerInventoryItems = () => {
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
-            gameEntity.levelUpEntity('rare_energloom_effect')
+            updateLevelBy('rare_energloom_effect', amount)
         },
         getUsageCooldown: () => {
             return 0.1*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
@@ -641,6 +647,7 @@ export const registerInventoryItems = () => {
             baseChanceMult: 1,
             entityEffect: 'rare_energloom_effect',
             isRare: true,
+            allowMultiConsume: true,
         },
         usageGain: {
 
@@ -662,7 +669,7 @@ export const registerInventoryItems = () => {
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
-            gameEntity.levelUpEntity('rare_lifebloom_effect')
+            updateLevelBy('rare_lifebloom_effect', amount)
         },
         getUsageCooldown: () => {
             return 0.1*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
@@ -671,6 +678,7 @@ export const registerInventoryItems = () => {
             baseChanceMult: 1,
             entityEffect: 'rare_lifebloom_effect',
             isRare: true,
+            allowMultiConsume: true,
         },
         usageGain: {
 
@@ -692,7 +700,7 @@ export const registerInventoryItems = () => {
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
-            gameEntity.levelUpEntity('rare_stillfern_effect')
+            updateLevelBy('rare_stillfern_effect', amount)
         },
         getUsageCooldown: () => {
             return 0.1*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
@@ -701,6 +709,7 @@ export const registerInventoryItems = () => {
             baseChanceMult: 1,
             entityEffect: 'rare_stillfern_effect',
             isRare: true,
+            allowMultiConsume: true,
         },
         usageGain: {
 
@@ -721,7 +730,7 @@ export const registerInventoryItems = () => {
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
-            gameEntity.levelUpEntity('rare_mindroot_effect')
+            updateLevelBy('rare_mindroot_effect', amount)
         },
         getUsageCooldown: () => {
             return 0.1*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
@@ -730,6 +739,7 @@ export const registerInventoryItems = () => {
             baseChanceMult: 1,
             entityEffect: 'rare_mindroot_effect',
             isRare: true,
+            allowMultiConsume: true,
         },
         usageGain: {
 
@@ -750,7 +760,7 @@ export const registerInventoryItems = () => {
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
-            gameEntity.levelUpEntity('rare_azureblossom_effect')
+            updateLevelBy('rare_azureblossom_effect', amount)
         },
         getUsageCooldown: () => {
             return 0.1*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
@@ -759,6 +769,7 @@ export const registerInventoryItems = () => {
             baseChanceMult: 1,
             entityEffect: 'rare_azureblossom_effect',
             isRare: true,
+            allowMultiConsume: true,
         },
         usageGain: {
 
@@ -780,7 +791,7 @@ export const registerInventoryItems = () => {
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
-            gameEntity.levelUpEntity('rare_ironvine_effect')
+            updateLevelBy('rare_ironvine_effect', amount)
         },
         getUsageCooldown: () => {
             return 0.1*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
@@ -789,6 +800,7 @@ export const registerInventoryItems = () => {
             baseChanceMult: 1,
             entityEffect: 'rare_ironvine_effect',
             isRare: true,
+            allowMultiConsume: true,
         },
         usageGain: {
 
@@ -810,7 +822,7 @@ export const registerInventoryItems = () => {
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
-            gameEntity.levelUpEntity('rare_mindspire_effect')
+            updateLevelBy('rare_mindspire_effect', amount)
         },
         getUsageCooldown: () => {
             return 0.1*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
@@ -819,6 +831,7 @@ export const registerInventoryItems = () => {
             baseChanceMult: 1,
             entityEffect: 'rare_mindspire_effect',
             isRare: true,
+            allowMultiConsume: true,
         },
         usageGain: {
 

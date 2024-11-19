@@ -2,7 +2,7 @@ import { gameEntity, gameCore, gameEffects } from "game-framework"
 
 export const registerFurnitureStage1 = () => {
 
-    const charismaMod = (attr) => attr > 0 ? 1. / (1. + 0.02*Math.log2(attr)) : 1.;
+    const charismaMod = (attr) => attr > 0 ? 1. / (1. + 0.02*Math.log2(attr*gameEffects.getEffectValue('prices_discount'))) : 1.;
 
     gameEntity.registerGameEntity('furniture_sleeping_bag', {
         tags: ["furniture", "upgrade", "purchaseable"],

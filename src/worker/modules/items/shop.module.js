@@ -44,6 +44,12 @@ export class ShopModule extends GameModule {
             minValue: 100
         })
 
+        gameEffects.registerEffect('prices_discount', {
+            name: 'Price Discount Multiplier',
+            defaultValue: 1,
+            minValue: 1
+        })
+
         gameEffects.registerEffect('shop_stock_renew_rate', {
             name: 'Stock Renew Rate',
             defaultValue: 1,

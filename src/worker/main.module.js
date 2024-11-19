@@ -1,5 +1,5 @@
 import {GameModule} from "./shared/game-module";
-import {gameCore, GameCore, gameEntity, gameResources} from 'game-framework';
+import {gameCore, GameCore, gameEffects, gameEntity, gameResources} from 'game-framework';
 import {MageModule} from "./modules/mage/mage.module";
 import {ResourcePoolModule} from "./modules/resources/resource-pool.module";
 import {ActionsModule} from "./modules/actions/actions.module";
@@ -11,6 +11,7 @@ import {SpellModule} from "./modules/magic/spells.module";
 import {CraftingModule} from "./modules/workshop/crafting.module";
 import {prefix} from "react-beautiful-dnd/src/view/data-attributes";
 import {PlantationsModule} from "./modules/workshop/plantations.module";
+import {GuildsModule} from "./modules/social/guilds.module";
 
 
 export class MainModule extends GameModule {
@@ -27,6 +28,7 @@ export class MainModule extends GameModule {
         gameCore.registerModule('magic', SpellModule);
         gameCore.registerModule('crafting', CraftingModule);
         gameCore.registerModule('plantations', PlantationsModule);
+        gameCore.registerModule('guilds', GuildsModule);
 
 
 
@@ -68,6 +70,8 @@ export class MainModule extends GameModule {
                 'alchemy': gameEntity.getLevel('shop_item_alchemy_courses') > 0,
                 'workshop': gameEntity.getLevel('shop_item_crafting_courses') > 0 || gameEntity.getLevel('shop_item_alchemy_courses') > 0 || gameResources.getResource('plantation_slots').income > 0,
                 'plantation': gameResources.getResource('plantation_slots').income > 0,
+                'guilds': gameEffects.getEffectValue('attribute_charisma') >= 500,
+                'social': gameEffects.getEffectValue('attribute_charisma') >= 500,
             }
             let label = 'unlocks';
             if(payload?.prefix) {

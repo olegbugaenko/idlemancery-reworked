@@ -134,6 +134,10 @@ export const registerActionsStage1 = () => {
             }),
             effectDeps: ['begging_efficiency', 'coins_earned_bonus']
         },
+        getLearnRate: () => {
+            return 1;
+        },
+        learningEffects: ['job_learning_rate'],
         unlockedBy: [{
             type: 'entity',
             id: 'action_visit_city',
@@ -152,6 +156,10 @@ export const registerActionsStage1 = () => {
         allowedImpacts: ['effects'],
         description: 'Strange over city streets hoping for someones help',
         level: 1,
+        getLearnRate: () => {
+            return 1;
+        },
+        learningEffects: ['job_learning_rate'],
         resourceModifier: {
             get_income: () => ({
                 resources: {
@@ -191,6 +199,10 @@ export const registerActionsStage1 = () => {
         allowedImpacts: ['effects'],
         description: 'Clean Stables to earn some gold',
         level: 1,
+        getLearnRate: () => {
+            return 1;
+        },
+        learningEffects: ['job_learning_rate'],
         resourceModifier: {
             get_income: () => ({
                 resources: {
@@ -236,6 +248,10 @@ export const registerActionsStage1 = () => {
         allowedImpacts: ['effects'],
         description: 'Protect streets from hooligans and robbers. Its risky and hard job, but its well paid',
         level: 1,
+        getLearnRate: () => {
+            return 1;
+        },
+        learningEffects: ['job_learning_rate'],
         resourceModifier: {
             get_income: () => ({
                 resources: {
@@ -282,6 +298,10 @@ export const registerActionsStage1 = () => {
         allowedImpacts: ['effects'],
         description: 'Work as builder. Its hard job, but well paid',
         level: 1,
+        getLearnRate: () => {
+            return 1;
+        },
+        learningEffects: ['job_learning_rate'],
         resourceModifier: {
             get_income: () => ({
                 resources: {
@@ -715,12 +735,12 @@ export const registerActionsStage1 = () => {
                 resources: {
                     'energy': {
                         A: 0.0,
-                        B: 80,
+                        B: 25,
                         type: 0,
                     },
                     'knowledge': {
                         A: 0.0,
-                        B: 25,
+                        B: 10,
                         type: 0,
                     },
                 }
@@ -1602,6 +1622,78 @@ export const registerActionsStage1 = () => {
         }
     })
 
+
+
+    registerGameAction('action_dark_forest', {
+        tags: ["action", "gathering", "routine"],
+        name: 'Searching Dark Forest',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Your guild-mates told you about dark forest with some unique plants...',
+        level: 1,
+        getLearnRate: () => {
+            return 1
+        },
+        learningEffects: ['routine_learning_speed'],
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'inventory_fly_mushroom': {
+                        A: 0.001*gameEffects.getEffectValue('gathering_efficiency'),
+                        B: 0.009*gameEffects.getEffectValue('gathering_efficiency'),
+                        type: 0,
+                    },
+                    'inventory_ginseng': {
+                        A: 0.001*gameEffects.getEffectValue('gathering_efficiency'),
+                        B: 0.009*gameEffects.getEffectValue('gathering_efficiency'),
+                        type: 0,
+                    },
+                    'inventory_nightshade': {
+                        A: 0.0002*gameEffects.getEffectValue('gathering_efficiency'),
+                        B: 0.0018*gameEffects.getEffectValue('gathering_efficiency'),
+                        type: 0,
+                    },
+                    'rare_herbs_loot': {
+                        A: 0,
+                        B: 0.0004*getChanceBased(gameEffects.getEffectValue('gathering_efficiency'), 1.5, 10),
+                        type: 0
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 40,
+                        type: 0,
+                    },
+                    'health': {
+                        A: 0.0,
+                        B: 15,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['gathering_efficiency']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0
+                && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
+            && gameEntity.getLevel('guild_herbalists') > 0
+        },
+        attributes: {
+            baseXPCost: 5000,
+            primaryAttribute: 'attribute_patience',
+            possibleRareHerbs: {
+                'inventory_rare_stillfern': 1,
+                'inventory_rare_ironvine': 0.5,
+                'inventory_rare_mindspire': 0.5,
+                'inventory_rare_mindroot': 1,
+            }
+        }
+    })
+
+
     registerGameAction('action_meditate', {
         tags: ["action", "training", "magical", "spiritual"],
         name: 'Meditate',
@@ -1750,7 +1842,7 @@ export const registerActionsStage1 = () => {
 
     registerGameAction('action_craft', {
         tags: ["action", "activity", "physical", "crafting"],
-        name: 'Craft',
+        name: 'Basic Craft',
         isAbstract: false,
         allowedImpacts: ['effects'],
         description: 'Dedicate your time and efforts to crafting',
@@ -1789,6 +1881,57 @@ export const registerActionsStage1 = () => {
         },
         attributes: {
             baseXPCost: 100,
+            primaryAttribute: 'attribute_strength'
+        }
+    })
+
+
+    registerGameAction('advanced_craft', {
+        tags: ["action", "activity", "physical", "crafting"],
+        name: 'Advanced Craft',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Spend more time and efforts on crafting advanced things',
+        level: 1,
+        getLearnRate: () => {
+            return 2
+        },
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'crafting_ability': {
+                        A: 0.005,
+                        B: 0.045,
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 30,
+                        type: 0,
+                    },
+                    'health': {
+                        A: 0.0,
+                        B: 10,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: []
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 500,
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0
+        },
+        attributes: {
+            baseXPCost: 500,
             primaryAttribute: 'attribute_strength'
         }
     })
@@ -2014,5 +2157,96 @@ export const registerActionsStage1 = () => {
         }
     })
 
+
+
+    registerGameAction('action_guild_volunteering', {
+        tags: ["action", "activity", "social", "guild-activity"],
+        name: 'Guild Volunteering',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Contribute your time and effort to support guild initiatives, earning reputation and respect.',
+        level: 1,
+        getLearnRate: () => {
+            return 4
+        },
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'guild_reputation': {
+                        A: 0.0005,
+                        B: 0.0095,
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 80,
+                        type: 0,
+                    },
+                    'health': {
+                        A: 0.0,
+                        B: 40,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: []
+        },
+        unlockCondition: () => {
+            return gameCore.getModule('guilds').selectedGuild != null
+        },
+        attributes: {
+            baseXPCost: 20000,
+        }
+    })
+
+
+
+    registerGameAction('action_guild_donations', {
+        tags: ["action", "activity", "social", "guild-activity"],
+        name: 'Guild Donations',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Offer monetary support to the guild, boosting your reputation and helping fund its endeavors.',
+        level: 1,
+        getLearnRate: () => {
+            return 4
+        },
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'guild_reputation': {
+                        A: 0.001,
+                        B: 0.0019,
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 20,
+                        type: 0,
+                    },
+                    'coins': {
+                        A: 0.0,
+                        B: 25000,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: []
+        },
+        unlockCondition: () => {
+            return gameCore.getModule('guilds').selectedGuild != null
+        },
+        attributes: {
+            baseXPCost: 20000,
+        }
+    })
 
 }

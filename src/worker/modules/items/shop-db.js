@@ -2,7 +2,7 @@ import { gameEntity, gameCore, gameEffects } from "game-framework"
 
 export const registerShopItemsStage1 = () => {
 
-    const charismaMod = (attr) => attr > 0 ? 1. / (1. + 0.02*Math.log2(attr)) : 1.;
+    const charismaMod = (attr) => attr > 0 ? 1. / (1. + 0.02*Math.log2(attr*gameEffects.getEffectValue('prices_discount'))) : 1.;
 
     gameEntity.registerGameEntity('shop_item_hat', {
         tags: ["shop", "upgrade", "purchaseable"],

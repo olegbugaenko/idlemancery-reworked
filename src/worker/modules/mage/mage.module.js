@@ -223,7 +223,7 @@ export class MageModule extends GameModule {
             this.eventHandler.sendData('mage-data', data);
         }
 
-        console.log('B_TICK: ', this.bankedTime)
+        // console.log('B_TICK: ', this.bankedTime)
         if(!this.bankedTime.current) {
             this.bankedTime.current = 0;
         }
@@ -235,7 +235,7 @@ export class MageModule extends GameModule {
                 this.bankedTime.speedUpFactor = 1;
             }
         }
-        console.log('A_TICK: ', this.bankedTime);
+        // console.log('A_TICK: ', this.bankedTime);
 
     }
 

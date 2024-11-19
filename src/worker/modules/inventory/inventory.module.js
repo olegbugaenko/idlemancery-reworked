@@ -346,6 +346,7 @@ export class InventoryModule extends GameModule {
                 isConsumed: this.inventoryItems[resource.id]?.isConsumed,
                 cooldown: this.inventoryItems[resource.id]?.cooldown ?? 0,
                 cooldownProg: resource.getUsageCooldown ? (resource.getUsageCooldown() - (this.inventoryItems[resource.id]?.cooldown ?? 0)) / resource.getUsageCooldown() : 1,
+                allowMultiConsume: resource.attributes?.allowMultiConsume,
             })),
             itemCategories: Object.values(perCats).filter(cat => cat.items.length > 0),
             payload: pl,

@@ -193,8 +193,20 @@ export class ActionsModule extends GameModule {
             minValue: 1.,
         })
 
+        gameEffects.registerEffect('job_learning_rate', {
+            name: 'Jobs Learning Rate',
+            defaultValue: 1.,
+            minValue: 1.,
+        })
+
         gameEffects.registerEffect('crafting_efficiency', {
             name: 'Crafting Efficiency',
+            defaultValue: 1.,
+            minValue: 1.,
+        })
+
+        gameEffects.registerEffect('alchemy_efficiency', {
+            name: 'Alchemy Efficiency',
             defaultValue: 1.,
             minValue: 1.,
         })

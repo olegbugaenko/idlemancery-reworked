@@ -397,7 +397,7 @@ export const registerCraftingRecipes = () => {
                 resources: {
                     'inventory_small_endurance_flask': {
                         A: 1.3,
-                        B: 1,
+                        B: 1*gameEffects.getEffectValue('alchemy_efficiency'),
                         type: 1,
                     }
                 }
@@ -427,7 +427,7 @@ export const registerCraftingRecipes = () => {
                     },
                 }
             },
-            effectDeps: ['walking_learning_rate']
+            effectDeps: ['alchemy_efficiency']
         },
         unlockCondition: () => {
             return true
@@ -458,7 +458,7 @@ export const registerCraftingRecipes = () => {
                 resources: {
                     'inventory_healing_potion': {
                         A: 1.3,
-                        B: 1,
+                        B: 1*gameEffects.getEffectValue('alchemy_efficiency'),
                         type: 1,
                     }
                 }
@@ -488,7 +488,7 @@ export const registerCraftingRecipes = () => {
                     },
                 }
             },
-            effectDeps: ['walking_learning_rate']
+            effectDeps: ['alchemy_efficiency']
         },
         unlockCondition: () => {
             return true
@@ -520,7 +520,7 @@ export const registerCraftingRecipes = () => {
                 resources: {
                     'inventory_experience_potion': {
                         A: 1.3,
-                        B: 0.1,
+                        B: 0.1*gameEffects.getEffectValue('alchemy_efficiency'),
                         type: 1,
                     }
                 }
@@ -550,7 +550,7 @@ export const registerCraftingRecipes = () => {
                     },
                 }
             },
-            effectDeps: ['walking_learning_rate']
+            effectDeps: ['alchemy_efficiency']
         },
         unlockCondition: () => {
             return true
@@ -581,7 +581,7 @@ export const registerCraftingRecipes = () => {
                 resources: {
                     'inventory_amnesia_potion': {
                         A: 1.3,
-                        B: 0.1,
+                        B: 0.1*gameEffects.getEffectValue('alchemy_efficiency'),
                         type: 1,
                     }
                 }
@@ -611,7 +611,7 @@ export const registerCraftingRecipes = () => {
                     },
                 }
             },
-            effectDeps: []
+            effectDeps: ['alchemy_efficiency']
         },
         unlockCondition: () => {
             return true

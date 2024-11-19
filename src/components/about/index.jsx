@@ -8,7 +8,16 @@ export const About = () => {
             <div>
                 <h3>Idle Awakening v0.0.3</h3>
                 <div className={'features'}>
-
+                    <p>Added new actions</p>
+                    <p>Added new mechanics (Crafting, Alchemy, Plantations and Guilds)</p>
+                    <p>Added rare plants</p>
+                    <p>Added detailed XP breakdowns on hovering action's XP/second</p>
+                    <p>Action details now show future level-ups ETAs</p>
+                    <p>Added statistics page</p>
+                    <p>Added offline time bonus</p>
+                    <p>Fixed bug when trying to consume non-consumable item crashed the game</p>
+                    <p>Fixed issues with spells cooldowns calculations</p>
+                    <p>Plenty re-balances to early game actions</p>
                 </div>
                 <h3>Idle Awakening v0.0.2d</h3>
                 <div className={'features'}>

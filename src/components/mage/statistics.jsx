@@ -3,32 +3,34 @@ import {formatInt, formatValue, secondsToString} from "../../general/utils/strin
 import PerfectScrollbar from "react-perfect-scrollbar";
 import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
-import {Cell, Pie, PieChart} from "recharts";
+import {Cell, Pie, PieChart, ResponsiveContainer} from "recharts";
 import {Tooltip} from "react-tippy";
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042',
-                '#3059FE', '#30309F', '#AD09AD', '#FE66FE',
+const COLORS = ['#6088FE', '#00C49F', '#FFBB28', '#FF8042',
+                '#1019FE', '#30309F', '#AD09AD', '#FE66FE',
                 '#30F9FE', '#F0306F', '#FFFE33', '#99FE99'];
 
 const MyPieChart = ({ data, key, fmt }) => (
-    <PieChart width={500} height={300}>
-        <Pie
-            data={data}
-            cx="50%"
-            cy="50%"
-            outerRadius={75}
-            fill="#8884d8"
-            dataKey="value"
-            label={fmt}
-        >
-            {data.map((entry, index) => (
-                <Cell key={`cell-${key}-${index}`} fill={COLORS[index % COLORS.length]} />
-            ))}
-        </Pie>
-        <Tooltip
-            formatter={(value, name) => [`${value}`, `${name}`]}
-        />
-    </PieChart>
+    <ResponsiveContainer width="95%" height={300}>
+        <PieChart>
+            <Pie
+                data={data}
+                cx="50%"
+                cy="50%"
+                outerRadius={75}
+                fill="#8884d8"
+                dataKey="value"
+                label={fmt}
+            >
+                {data.map((entry, index) => (
+                    <Cell key={`cell-${key}-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+            </Pie>
+            <Tooltip
+                formatter={(value, name) => [`${value}`, `${name}`]}
+            />
+        </PieChart>
+    </ResponsiveContainer>
 );
 
 export const Statistics = () => {

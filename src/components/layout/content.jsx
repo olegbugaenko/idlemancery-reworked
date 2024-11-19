@@ -10,6 +10,7 @@ import {Spellbook} from "../spellbook/spellbook.jsx";
 import {Settings} from "../settings/index.jsx";
 import {About} from "../about/index.jsx";
 import {Workshop} from "../workshop/index.jsx";
+import {Social} from "../social/index.jsx";
 
 export const Content = () => {
 
@@ -51,6 +52,10 @@ export const GetContent = ({ tab }) => {
 
     if(tab === 'spellbook') {
         return <Spellbook />
+    }
+
+    if(tab === 'social') {
+        return <Social />
     }
 
     if(tab === 'settings') {

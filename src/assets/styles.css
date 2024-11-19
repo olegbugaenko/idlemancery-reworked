@@ -1222,13 +1222,35 @@ span.highlighted-span {
     margin: 0 4px;
 }
 
+.footer-add-info.banked-time {
+    display: flex;
+    align-items: center;
+}
+
+.footer-add-info.banked-time .ui-icon {
+    height: 24px;
+    object-fit: contain;
+    border-radius: 50%;
+    border: 1px solid #777777;
+    margin-right: 8px;
+}
+
 .footer-add-info .banked-toggle {
     cursor: pointer;
-    margin: 0 4px;
+    margin: 0 8px;
+    padding: 4px;
+    border: 1px solid #fff;
+    border-radius: 50%;
+    width: 29px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #000;
 }
 
 .footer-add-info .banked-toggle:hover {
     color: var(--highlight);
+    background: #222233;
 }
 
 .footer-add-info .banked-toggle.activated {
@@ -1258,4 +1280,84 @@ span.highlighted-span {
 
 .recharts-wrapper tspan {
     font-size: 13px;
+}
+
+.guilds-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+.guild-card {
+    width: 240px;
+    height: 300px;
+    margin: 8px;
+    border: 1px solid #777777;
+    padding: 8px;
+}
+
+.guild-card img {
+    width: 100%;
+    object-fit: contain;
+}
+
+.guilds-wrap .tier-wrap .tier-content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+.guilds-wrap .tier-wrap .tier-content .item-card {
+    width: 260px;
+}
+
+.guilds-wrap .tier-wrap .tier-content .item-card .head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.tier-title {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.guild-overview {
+    padding-top: 8px;
+}
+
+.guild-overview .right {
+    padding-left: 8px;
+}
+
+.guild-overview .right p {
+    padding-left: 0;
+    margin-left: 0;
+}
+
+.guild-overview .right .space-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 300px;
+}
+
+.guild-overview .right .guild-name {
+    font-weight: bold;
+}
+
+.guild-overview .right .buttons {
+    padding-top: 8px;
+}
+
+.guild-image {
+    border: 1px solid #777777;
+}
+
+.guilds-wrap {
+    height: calc(100% - 40px);
+}
+
+.guilds-wrap .upgrades {
+    height: calc(100% - 260px);
 }
