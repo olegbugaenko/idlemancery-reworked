@@ -9,7 +9,6 @@ import {InventoryModule} from "./modules/inventory/inventory.module";
 import {PropertyModule} from "./modules/property/property.module";
 import {SpellModule} from "./modules/magic/spells.module";
 import {CraftingModule} from "./modules/workshop/crafting.module";
-import {prefix} from "react-beautiful-dnd/src/view/data-attributes";
 import {PlantationsModule} from "./modules/workshop/plantations.module";
 import {GuildsModule} from "./modules/social/guilds.module";
 
