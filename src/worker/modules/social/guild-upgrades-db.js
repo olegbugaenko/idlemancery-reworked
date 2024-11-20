@@ -1183,7 +1183,7 @@ export const registerGuildUpgrades = () => {
         resourceModifier: {
             multiplier: {
                 effects: {
-                    'manual_labour_efficiency': {
+                    'manual_labor_efficiency': {
                         A: 0.2,
                         B: 1,
                         type: 0,
@@ -1225,7 +1225,7 @@ export const registerGuildUpgrades = () => {
         resourceModifier: {
             multiplier: {
                 effects: {
-                    'physical_learning_rate': {
+                    'physical_training_learn_speed': {
                         A: 0.2,
                         B: 1,
                         type: 0,

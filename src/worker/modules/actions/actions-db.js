@@ -750,7 +750,7 @@ export const registerActionsStage1 = () => {
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_charisma',
-            level: 400,
+            level: 625,
         }],
         unlockCondition: () => {
             return true
@@ -2045,7 +2045,7 @@ export const registerActionsStage1 = () => {
         name: 'Nail Standing',
         isAbstract: false,
         allowedImpacts: ['effects'],
-        description: 'Upon reaching 350 points in the Patience attribute, you unlock the ancient art of Nail Standing. This practice demands immense concentration and endurance as you stand on a board embedded with nails. Through this rigorous discipline, you strengthen both mind and body, enhancing your efficiency in routine tasks.',
+        description: 'This practice demands immense concentration and endurance as you stand on a board embedded with nails. Through this rigorous discipline, you strengthen both mind and body, enhancing your efficiency in routine tasks.',
         level: 1,
         getLearnRate: () => {
             return 5.
@@ -2112,7 +2112,7 @@ export const registerActionsStage1 = () => {
             income: {
                 effects: {
                     'attribute_magic_capability': {
-                        A: 10,
+                        A: 3,
                         B: 0,
                         type: 0,
                     },

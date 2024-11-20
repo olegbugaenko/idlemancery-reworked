@@ -111,7 +111,12 @@ export const Guilds = ({ setItemDetails, filterId }) => {
                             <ResourceComparison effects1={guildsData.prestige.currentEffects} effects2={guildsData.prestige.potentialEffects} />
                         </div> }>
                             <button onClick={leaveGuild}>Prestige Guild</button>
-                        </TippyWrapper> ) : (<button onClick={leaveGuild}>Abandon Guild</button>)}
+                        </TippyWrapper> ) : (<TippyWrapper content={<div className={'hint-popup'}>
+                            <p>You wont receive any new bonuses</p>
+                            <p>Reach {formatInt(guildsData.maxLevel + 1)} reputation level to increase your bonuses</p>
+                        </div> }>
+                            <button onClick={leaveGuild}>Abandon Guild</button>
+                        </TippyWrapper>)}
                     </div>
                 </div>
             </div>

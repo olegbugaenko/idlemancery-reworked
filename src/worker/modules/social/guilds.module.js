@@ -239,6 +239,7 @@ export class GuildsModule extends GameModule {
                 ...gameResources.getResource('guild_reputation'),
                 eta: gameResources.assertToCapOrEmpty('guild_reputation')
             },
+            maxLevel: this.selectedGuild ? this.guildsStats[this.selectedGuild]?.maxLevel || 1 : 1,
             prestige: this.selectedGuild ? {
                 canPrestige: this.getPotentialPermaLevel(this.selectedGuild) > this.getCurrentActualPermaLevel(this.selectedGuild),
                 currentEffects: packEffects(
