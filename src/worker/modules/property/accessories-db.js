@@ -412,4 +412,74 @@ export const registerAccessoriesStage1 = () => {
             }
         }),
     })
+
+
+    gameEntity.registerGameEntity('accessory_iron_stash', {
+        tags: ["accessory", "upgrade", "purchaseable"],
+        name: 'Iron Stash',
+        description: 'Craft better and more reliable iron containers for storing coins',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.isEntityUnlocked('action_mining');
+        },
+        resourceModifier: {
+            capMult: {
+                resources: {
+                    'coins': {
+                        A: 0.05,
+                        B: 1,
+                        C: 1.01,
+                        type: 3,
+                    }
+                }
+            },
+        },
+        get_cost: () => ({
+            'inventory_iron_plate': {
+                A: 1.1,
+                B: 1,
+                type: 1
+            }
+        }),
+    })
+
+
+
+    gameEntity.registerGameEntity('accessory_lumber_mill', {
+        tags: ["accessory", "upgrade", "purchaseable"],
+        name: 'Lumber Mill',
+        description: 'Build a machine that helps you to process wood',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.isEntityUnlocked('action_mining');
+        },
+        resourceModifier: {
+            multiplier: {
+                resources: {
+                    'inventory_refined_wood': {
+                        A: 0.05,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+        },
+        get_cost: () => ({
+            'inventory_iron_plate': {
+                A: 1.1,
+                B: 2,
+                type: 1
+            },
+            'inventory_stone': {
+                A: 1.1,
+                B: 5,
+                type: 1
+            },
+            'inventory_refined_wood': {
+                A: 1.1,
+                B: 5,
+                type: 1
+            }
+        }),
+    })
 }

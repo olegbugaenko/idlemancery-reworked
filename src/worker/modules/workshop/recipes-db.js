@@ -381,6 +381,62 @@ export const registerCraftingRecipes = () => {
         }),
     })
 
+
+    registerCraftingRecipe('craft_iron_plate', {
+        tags: ["recipe", "crafting", "material", "physical"],
+        name: 'Craft Iron Plate',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Smelt iron ore into iron plates',
+        level: 1,
+        resourceId: 'inventory_iron_plate',
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'inventory_iron_plate': {
+                        A: 1.3,
+                        B: 0.02*gameEffects.getEffectValue('crafting_efficiency'),
+                        type: 1,
+                    }
+                }
+            }),
+            consumption: {
+                resources: {
+                    'inventory_iron_ore': {
+                        A: 1.5,
+                        B: 1,
+                        type: 1
+                    },
+                    'crafting_ability': {
+                        A: 1.5,
+                        B: 1,
+                        type: 1,
+                    },
+                    'crafting_slots': {
+                        A: 1,
+                        B: 0,
+                        type: 0,
+                        ignoreEfficiency: true,
+                    },
+                }
+            },
+            effectDeps: ['crafting_efficiency']
+        },
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_iron_ore')
+        },
+        attributes: {
+            baseXPCost: 10,
+        },
+        get_cost: () => ({
+            'crafting_slots': {
+                A: 1,
+                B: 0,
+                type: 0
+            }
+        }),
+    })
+
     // alchemy
 
 

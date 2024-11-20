@@ -367,6 +367,33 @@ export const registerInventoryItems = () => {
     })
 
 
+    gameResources.registerResource('inventory_iron_ore', {
+        name: 'Iron Ore',
+        hasCap: false,
+        tags: ['inventory', 'material'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        attributes: {
+
+        },
+        unlockedBy: {
+            type: 'entity',
+            id: 'action_mining',
+            level: 1,
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.isEntityUnlocked('action_mining')
+        },
+        sellPrice: 5625,
+        get_cost: (amount = 1) => ({
+            coins: amount*125000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+        }),
+    })
+
+
     gameResources.registerResource('inventory_ruby', {
         name: 'Ruby',
         hasCap: false,
@@ -417,6 +444,33 @@ export const registerInventoryItems = () => {
         sellPrice: 16000,
         get_cost: (amount = 1) => ({
             coins: amount*1000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+        }),
+    })
+
+
+    gameResources.registerResource('inventory_iron_plate', {
+        name: 'Iron Plate',
+        hasCap: false,
+        tags: ['inventory', 'material', 'craftable'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        attributes: {
+
+        },
+        unlockedBy: [{
+            type: 'entity',
+            id: 'action_mining',
+            level: 2,
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0
+        },
+        sellPrice: 160000,
+        get_cost: (amount = 1) => ({
+            coins: amount*10000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
         }),
     })
 

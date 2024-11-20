@@ -429,6 +429,51 @@ export const registerActionsStage1 = () => {
     })
 
 
+    registerGameAction('action_mining', {
+        tags: ["action", "activity", "physical", "manual-labor"],
+        name: 'Mining',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Go to mine and get some iron ore',
+        level: 1,
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'inventory_iron_ore': {
+                        A: 0.0004*gameEffects.getEffectValue('manual_labor_efficiency'),
+                        B: 0.002*gameEffects.getEffectValue('manual_labor_efficiency'),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 42,
+                        type: 0,
+                    },
+                    'health': {
+                        A: 0.0,
+                        B: 75,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['manual_labor_efficiency']
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 1000,
+        }],
+        attributes: {
+            baseXPCost: 1500,
+            primaryAttribute: 'attribute_strength'
+        }
+    })
+
+
     registerGameAction('action_rest', {
         tags: ["action", "rest", "physical"],
         name: 'Rest in Tavern',
@@ -750,7 +795,7 @@ export const registerActionsStage1 = () => {
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_charisma',
-            level: 625,
+            level: 750,
         }],
         unlockCondition: () => {
             return true
@@ -2055,8 +2100,8 @@ export const registerActionsStage1 = () => {
             get_multiplier: () => ({
                 effects: {
                     'routine_learning_speed': {
-                        A: 0.05,
-                        B: 0.95,
+                        A: 0.02,
+                        B: 0.98,
                         type: 0,
                     }
                 }
