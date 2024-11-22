@@ -71,7 +71,7 @@ export function registerPlantations () {
 
     registerPlant('fly_mushroom_plantation', 'inventory_fly_mushroom', 0.05, 1000, {
         name: 'Grow Fly Mushroom',
-        description: 'They say you are a drugged. But nevermind, you are a mage'
+        description: 'They say you are druggie, but never mind — you are a mage.'
     })
 
     registerPlant('aloe_vera_plantation', 'inventory_aloe_vera', 0.02, 500, {

@@ -132,8 +132,8 @@ export const registerShopItemsStage1 = () => {
 
     gameEntity.registerGameEntity('shop_item_dairy', {
         tags: ["shop", "upgrade", "purchaseable"],
-        name: 'Dairy',
-        description: 'Use your dairy to write up what you have learned everyday. Improves learning rate',
+        name: 'Diary',
+        description: 'Use your diary to write up what you have learned everyday. Improves learning rate',
         level: 0,
         maxLevel: 1,
         unlockCondition: () => {
@@ -1007,7 +1007,7 @@ export const registerShopItemsStage1 = () => {
     gameEntity.registerGameEntity('shop_item_land', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Purchase Land',
-        description: 'Purchase some land for even more place',
+        description: 'Purchase some land for even more space',
         level: 0,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_storeroom') > 2

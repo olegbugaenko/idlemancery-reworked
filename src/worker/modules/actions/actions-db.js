@@ -111,7 +111,7 @@ export const registerActionsStage1 = () => {
         name: 'Beggar',
         isAbstract: false,
         allowedImpacts: ['effects'],
-        description: 'Strange over city streets hoping for someones help',
+        description: 'Wander the city streets, hoping for someone\'s help',
         level: 1,
         resourceModifier: {
             get_income: () => ({
@@ -154,7 +154,7 @@ export const registerActionsStage1 = () => {
         name: 'Street Musician',
         isAbstract: false,
         allowedImpacts: ['effects'],
-        description: 'Strange over city streets hoping for someones help',
+        description: 'Perform melodies for passersby and earn some coins through the power of music',
         level: 1,
         getLearnRate: () => {
             return 1;
@@ -756,7 +756,7 @@ export const registerActionsStage1 = () => {
 
 
     registerGameAction('action_academic_discussions', {
-        tags: ["action", "mental", "training"],
+        tags: ["action", "mental", "activity"],
         name: 'Academic Discussions',
         isAbstract: false,
         allowedImpacts: ['effects'],
@@ -765,7 +765,7 @@ export const registerActionsStage1 = () => {
         getLearnRate: () => {
             return 1.
         },
-        learningEffects: ['mental_training_learning_rate'],
+        learningEffects: [],
         resourceModifier: {
             get_multiplier: () => ({
                 effects: {
@@ -1031,7 +1031,7 @@ export const registerActionsStage1 = () => {
         name: 'Read Appretience Handbook',
         isAbstract: false,
         allowedImpacts: ['effects'],
-        description: 'Read magic book, providing you precious information about increasing your magic potential. Unfortunately, text inside encrypted with runes that you have to de-crypt using spells.',
+        description: 'Read magic book, providing you precious information about increasing your magic potential. Unfortunately, the text inside is encrypted with runes that you have to de-crypt using spells.',
         level: 1,
         getLearnRate: () => {
             return 1
@@ -1322,7 +1322,7 @@ export const registerActionsStage1 = () => {
         name: 'Train Endurance',
         isAbstract: false,
         allowedImpacts: ['effects'],
-        description: 'Take some exercises in local gym to improve your body',
+        description: 'Do some exercises in local gym to improve your body',
         level: 1,
         getLearnRate: () => {
             return 1.
@@ -1366,7 +1366,7 @@ export const registerActionsStage1 = () => {
         name: 'Train Stamina',
         isAbstract: false,
         allowedImpacts: ['effects'],
-        description: 'Better endurance unlocked harder but much more efficient way to train your stamina',
+        description: 'Your improved endurance has unlocked a harder but much more efficient way to train your stamina',
         level: 1,
         getLearnRate: () => {
             return 1
@@ -2144,6 +2144,60 @@ export const registerActionsStage1 = () => {
             isTraining: true
         }
     })
+
+
+
+    registerGameAction('action_charity', {
+        tags: ["action", "activity", "social"],
+        name: 'Charitable Deeds',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Dedicate yourself to helping others selflessly, sacrificing energy and health, but gaining patience and a boost to your charisma in return.',
+        level: 1,
+        getLearnRate: () => {
+            return 5.
+        },
+        learningEffects: [],
+        resourceModifier: {
+            get_income: () => ({
+                effects: {
+                    'attribute_charisma': {
+                        A: 2,
+                        B: -2,
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 200,
+                        type: 0,
+                    },
+                    'health': {
+                        A: 0,
+                        B: 25,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: []
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 800,
+        }],
+        unlockCondition: () => {
+            return true
+        },
+        attributes: {
+            baseXPCost: 5000,
+            isTraining: true
+        }
+    })
+
 
 
     registerGameAction('action_magic_analyzes', {
