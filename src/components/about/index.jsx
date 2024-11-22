@@ -8,8 +8,7 @@ export const About = () => {
             <div>
                 <h3>Idle Awakening v0.0.3b</h3>
                 <div className={'features'}>
-                    <p>Added</p>
-                    <p>Text fixes</p>
+                    <p>Grammar fixes</p>
                 </div>
                 <h3>Idle Awakening v0.0.3a</h3>
                 <div className={'features'}>
