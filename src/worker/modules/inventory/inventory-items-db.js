@@ -230,6 +230,107 @@ export const registerInventoryItems = () => {
     })
 
 
+    gameResources.registerResource('inventory_mystic_bloom', {
+        name: 'Mystic Bloom',
+        hasCap: false,
+        tags: ['inventory', 'consumable'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        getUsageCooldown: () => {
+            return 45*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+        },
+        attributes: {
+            duration: 60,
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    spell_xp_rate: {
+                        A: 0.5,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            })
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_3') > 0
+                && gameEntity.getLevel('shop_item_spellbook') > 0
+        },
+        sellPrice: 20,
+    })
+
+
+    gameResources.registerResource('inventory_ember_leaf', {
+        name: 'Ember Leaf',
+        hasCap: false,
+        tags: ['inventory', 'consumable'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        getUsageCooldown: () => {
+            return 20*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+        },
+        attributes: {
+            duration: 30,
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    physical_training_learn_speed: {
+                        A: 0.25,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            })
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_3') > 0
+        },
+        sellPrice: 20,
+    })
+
+
+    gameResources.registerResource('inventory_harmony_blossom', {
+        name: 'Harmony Blossom',
+        hasCap: false,
+        tags: ['inventory', 'consumable'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        getUsageCooldown: () => {
+            return 20*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+        },
+        attributes: {
+            duration: 30,
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    social_training_learning_rate: {
+                        A: 0.25,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            })
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_3') > 0
+        },
+        sellPrice: 20,
+    })
+
+
+
     gameResources.registerResource('inventory_wood', {
         name: 'Wood',
         hasCap: false,
@@ -895,6 +996,37 @@ export const registerInventoryItems = () => {
         },
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
+        },
+        sellPrice: 15000,
+    })
+
+
+    gameResources.registerResource('inventory_rare_verdant_coil', {
+        name: 'Verdant Coil',
+        hasCap: false,
+        tags: ['inventory', 'consumable', 'rare'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+            updateLevelBy('rare_verdant_coil_effect', amount)
+        },
+        getUsageCooldown: () => {
+            return 0.1*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+        },
+        attributes: {
+            baseChanceMult: 1,
+            entityEffect: 'rare_verdant_coil_effect',
+            isRare: true,
+            allowMultiConsume: true,
+        },
+        usageGain: {
+
+        },
+        resourceModifier: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_3') > 0
         },
         sellPrice: 15000,
     })

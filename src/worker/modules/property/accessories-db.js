@@ -338,7 +338,7 @@ export const registerAccessoriesStage1 = () => {
                     'health': {
                         A: 0.05,
                         B: 1,
-                        C: 0.01,
+                        C: 1.01,
                         type: 3,
                     }
                 }

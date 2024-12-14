@@ -88,4 +88,20 @@ export function registerPlantations () {
         name: 'Grow Nightshade',
         description: 'Grow some nightshade'
     })
+
+
+    registerPlant('harmony_blossom_plantation', 'inventory_harmony_blossom', 0.01, 500, {
+        name: 'Grow Harmony Blossom',
+        description: 'Grow Harmony Blossom'
+    })
+
+    registerPlant('ember_leaf_plantation', 'inventory_ember_leaf', 0.01, 500, {
+        name: 'Grow Ember Leaf',
+        description: 'Grow Ember Leaf'
+    })
+
+    registerPlant('mystic_bloom_plantation', 'inventory_mystic_bloom', 0.01, 500, {
+        name: 'Grow Mystic Bloom',
+        description: 'Grow Mystic Bloom'
+    })
 }

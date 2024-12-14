@@ -94,3 +94,14 @@ Pre-release 0.0.3
 1. Configurable consumption amounts
 2. Offline progress
 3. Statistics
+
+----
+v0.0.3a:
+1. Add Hard Reset
+2. Add search actions 
+3. Hide all maxed furniture
+4. Action trigger is not running
+5. Add flat bonus to spells per level (kinda 1 + 0.02*maxLevel)
+6. New unlocks indication
+7. Add workshop slots automation
+8. Add upgrade for shop stock capacity

@@ -47,7 +47,7 @@ export class MainModule extends GameModule {
         })
 
         this.eventHandler.registerHandler('start-ticking', () => {
-            const cheat = 1;
+            const cheat = 5;
             // const speedUpMode = gameCore.getModule('mage').bankedTime?.speedUpFactor ?? 1;
             // console.log('gameCore', GameCore.instance, speedUpMode);
             gameCore.startTicking(100, () => 0.1*cheat*(gameCore.getModule('mage').bankedTime?.speedUpFactor ?? 1), () => {

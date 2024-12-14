@@ -231,4 +231,29 @@ export const registerPermanentBonuses = () => {
             }
         }
     })
+
+
+    gameEntity.registerGameEntity('rare_verdant_coil_effect', {
+        tags: ["bonus", "permanent", "herbal"],
+        name: 'Verdant Coil',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_herbs_handbook_3') > 0;
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'routine_learning_speed': {
+                        A: 0.0005,
+                        B: 100,
+                        C: 1,
+                        type: 4,
+                    }
+                }
+            }
+        }
+    })
 }

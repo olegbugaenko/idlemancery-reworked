@@ -675,6 +675,29 @@ export const registerShopItemsStage1 = () => {
     })
 
 
+    gameEntity.registerGameEntity('shop_item_herbs_handbook_3', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Herbs Handbook III',
+        description: 'Learn even better recipes based on more rare plants',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
+                && gameEntity.getLevel('shop_item_alchemy_courses') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 100000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        }),
+    })
+
+
     gameEntity.registerGameEntity('shop_item_storeroom', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Storeroom',

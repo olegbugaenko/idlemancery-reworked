@@ -1668,6 +1668,73 @@ export const registerActionsStage1 = () => {
     })
 
 
+    registerGameAction('action_silent_fields', {
+        tags: ["action", "gathering", "routine"],
+        name: 'Searching in Silent Fields',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'TBD',
+        level: 1,
+        getLearnRate: () => {
+            return 1
+        },
+        learningEffects: ['routine_learning_speed'],
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'inventory_harmony_blossom': {
+                        A: 0.00001*gameEffects.getEffectValue('gathering_efficiency'),
+                        B: 0.00009*gameEffects.getEffectValue('gathering_efficiency'),
+                        type: 0,
+                    },
+                    'inventory_ember_leaf': {
+                        A: 0.00001*gameEffects.getEffectValue('gathering_efficiency'),
+                        B: 0.00009*gameEffects.getEffectValue('gathering_efficiency'),
+                        type: 0,
+                    },
+                    'inventory_mystic_bloom': {
+                        A: 0.00001*gameEffects.getEffectValue('gathering_efficiency'),
+                        B: 0.00009*gameEffects.getEffectValue('gathering_efficiency'),
+                        type: 0,
+                    },
+                    'rare_herbs_loot': {
+                        A: 0,
+                        B: 0.0004*getChanceBased(gameEffects.getEffectValue('gathering_efficiency'), 1.5, 10),
+                        type: 0
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 20,
+                        type: 0,
+                    },
+                    'health': {
+                        A: 0.0,
+                        B: 10,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['gathering_efficiency']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0
+                && gameEntity.getLevel('shop_item_herbs_handbook_3') > 0
+        },
+        attributes: {
+            baseXPCost: 500,
+            primaryAttribute: 'attribute_patience',
+            possibleRareHerbs: {
+                'inventory_rare_ironvine': 1,
+                'inventory_rare_mindspire': 1,
+                'inventory_rare_verdant_coil': 1,
+            }
+        }
+    })
+
 
     registerGameAction('action_dark_forest', {
         tags: ["action", "gathering", "routine"],
@@ -2347,5 +2414,56 @@ export const registerActionsStage1 = () => {
             baseXPCost: 20000,
         }
     })
+
+
+    registerGameAction('action_guild_speech', {
+        tags: ["action", "activity", "social", "guild-activity"],
+        name: 'Guild Speech',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Deliver an inspiring speech to guild members, boosting their morale and strengthening your reputation within the guild.',
+        level: 1,
+        getLearnRate: () => {
+            return 4
+        },
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'guild_reputation': {
+                        A: 0.002,
+                        B: 0.038,
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 400,
+                        type: 0,
+                    },
+                    'knowledge': {
+                        A: 0.0,
+                        B: 200,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: []
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_charisma',
+            level: 1250
+        }],
+        unlockCondition: () => {
+            return gameCore.getModule('guilds').selectedGuild != null
+        },
+        attributes: {
+            baseXPCost: 20000,
+        }
+    })
+
 
 }
