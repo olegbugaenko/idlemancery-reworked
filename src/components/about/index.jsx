@@ -12,6 +12,7 @@ export const About = () => {
                     <p>Added new unlocks notifications</p>
                     <p>Maximum spell level now affects spell cost</p>
                     <p>Added some new plants</p>
+                    <p>Added Hard Reset</p>
                     <p>Added search to furniture and actions</p>
                     <p>Fixed bugs in some actions effects</p>
                     <p>Fixed bug when "Running Action" rule didn't triggered</p>
