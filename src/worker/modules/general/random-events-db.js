@@ -359,7 +359,7 @@ export const registerRandomEventsDb = () => {
                 effects: [{
                     id: 'permanent_learning_bonus',
                     probability: 0.5,
-                    description: 'The monk shares his wisdom, and you feel your mind expand. (+2% permanent learning speed)',
+                    description: 'The monk shares his wisdom, and you feel your mind expand. Your learning rate temporarily increased',
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_learn_rate', 4)
