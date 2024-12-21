@@ -344,7 +344,7 @@ export const registerInventoryItems = () => {
 
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_backpack') > 0
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.isEntityUnlocked('action_woodcutter')
         },
         sellPrice: 300,
         get_cost: (amount = 1) => ({
