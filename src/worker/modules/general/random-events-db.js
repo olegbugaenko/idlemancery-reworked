@@ -226,7 +226,7 @@ export const registerRandomEventsDb = () => {
                 effects: [{
                     id: 'learning_speed_bonus',
                     probability: 1,
-                    description: 'You hone your new skill, gaining a temporary boost to your learning speed. (+Learning speed for 10 minutes)',
+                    description: 'You hone your new skill, gaining a temporary boost to your learning speed. (+Learning speed for 5 minutes)',
                     unlockCondition: () => true,
                     onTrigger: () => {
                         console.log('Learning speed bonus activated.')
@@ -309,7 +309,7 @@ export const registerRandomEventsDb = () => {
                 effects: [{
                     id: 'gain_stamina',
                     probability: 0.7,
-                    description: 'The mirror binds to your soul, granting you increased stamina. (+1 Stamina, -50% energy regeneration for 10 minutes)',
+                    description: 'The mirror binds to your soul, granting you increased stamina. (+1 Stamina, -50% energy regeneration for 5 minutes)',
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_stamina_effect', gameEntity.getLevel('random_events_stamina_effect')+1, true)
@@ -451,7 +451,7 @@ export const registerRandomEventsDb = () => {
                 effects: [{
                     id: 'temporary_health_regeneration',
                     probability: 0.8,
-                    description: 'The water fills you with vitality. (+Health regeneration for 10 minutes)',
+                    description: 'The water fills you with vitality. (+Health regeneration for 5 minutes)',
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_health_regen');
@@ -615,7 +615,7 @@ export const registerRandomEventsDb = () => {
                 effects: [{
                     id: 'health_bonus',
                     probability: 0.5,
-                    description: 'The altar accepts your offering, bestowing vitality upon you. (+Health regeneration for 10 minutes)',
+                    description: 'The altar accepts your offering, bestowing vitality upon you. (+Health regeneration for 5 minutes)',
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_health_regen');
@@ -803,7 +803,7 @@ export const registerRandomEventsDb = () => {
                 effects: [{
                     id: 'gold_bonus',
                     probability: 0.3,
-                    description: 'The performers thank you, and their music attracts a wealthier crowd. (Increased gold income for 10 minutes)',
+                    description: 'The performers thank you, and their music attracts a wealthier crowd. (Increased gold income for 5 minutes)',
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_gold_bonus');
@@ -1095,7 +1095,7 @@ export const registerRandomEventsDb = () => {
                 effects: [{
                     id: 'temporary_knowledge_gain',
                     probability: 0.6,
-                    description: 'The tome is full of arcane knowledge, enhancing your understanding. (+Knowledge gain for 10 minutes)',
+                    description: 'The tome is full of arcane knowledge, enhancing your understanding. (+Knowledge gain for 5 minutes)',
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_knowledge_gain');
@@ -1103,7 +1103,7 @@ export const registerRandomEventsDb = () => {
                 }, {
                     id: 'temporary_knowledge_debuff',
                     probability: 0.3,
-                    description: 'The text is confusing and gives you a headache. (-Knowledge gain for 10 minutes)',
+                    description: 'The text is confusing and gives you a headache. (-Knowledge gain for 5 minutes)',
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_knowledge_debuff');
@@ -1187,7 +1187,7 @@ export const registerRandomEventsDb = () => {
                 effects: [{
                     id: 'temporary_knowledge_gain',
                     probability: 0.5,
-                    description: 'The apparition leads you to a forgotten cache of knowledge. (+Knowledge gain for 15 minutes)',
+                    description: 'The apparition leads you to a forgotten cache of knowledge. (+Knowledge gain for 5 minutes)',
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_knowledge_gain');
@@ -1195,7 +1195,7 @@ export const registerRandomEventsDb = () => {
                 }, {
                     id: 'temporary_knowledge_debuff',
                     probability: 0.3,
-                    description: 'The apparition misleads you, wasting your time. (-Knowledge gain for 10 minutes)',
+                    description: 'The apparition misleads you, wasting your time. (-Knowledge gain for 5 minutes)',
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_knowledge_debuff');
@@ -1250,7 +1250,7 @@ export const registerRandomEventsDb = () => {
                 }, {
                     id: 'temporary_knowledge_debuff',
                     probability: 0.6,
-                    description: 'You overexert yourself and feel drained. (-Knowledge gain for 15 minutes)',
+                    description: 'You overexert yourself and feel drained. (-Knowledge gain for 5 minutes)',
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_knowledge_debuff');
@@ -1264,7 +1264,7 @@ export const registerRandomEventsDb = () => {
                 effects: [{
                     id: 'temporary_energy_regeneration_debuff',
                     probability: 0.5,
-                    description: 'The stress of the bet hampers your energy recovery. (-Energy regeneration for 10 minutes)',
+                    description: 'The stress of the bet hampers your energy recovery. (-Energy regeneration for 5 minutes)',
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_energy_regeneration_debuff');
@@ -1272,7 +1272,7 @@ export const registerRandomEventsDb = () => {
                 }, {
                     id: 'temporary_knowledge_gain',
                     probability: 0.5,
-                    description: 'You enjoy the challenge and learn a lot! (+Knowledge gain for 10 minutes)',
+                    description: 'You enjoy the challenge and learn a lot! (+Knowledge gain for 5 minutes)',
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_knowledge_gain', 2);
@@ -1409,7 +1409,7 @@ export const registerRandomEventsDb = () => {
                 effects: [{
                     id: 'temporary_knowledge_gain',
                     probability: 0.7,
-                    description: 'You learn useful details from the log. (+Knowledge gain for 15 minutes)',
+                    description: 'You learn useful details from the log. (+Knowledge gain for 5 minutes)',
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_knowledge_gain');
