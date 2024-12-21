@@ -5,8 +5,9 @@ import {formatInt, formatValue} from "../../general/utils/strings";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
 import {BreakDown} from "../layout/sidebar.jsx";
+import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
 
-export const Crafting = ({ setItemDetails, setItemLevel, filterId }) => {
+export const Crafting = ({ setItemDetails, setItemLevel, filterId, newUnlocks }) => {
 
     const worker = useContext(WorkerContext);
 
@@ -53,7 +54,9 @@ export const Crafting = ({ setItemDetails, setItemLevel, filterId }) => {
         <div className={'craftables-cat'}>
             <PerfectScrollbar>
                 <div className={'flex-container'}>
-                    {craftingData.available.map(craftable => <ItemCard key={craftable.id} {...craftable} onSetLevel={setItemLevel} onShowDetails={setItemDetails}/>)}
+                    {craftingData.available.map(craftable => <NewNotificationWrap id={`crafting_${craftable.id}`} className={'narrow-wrapper'} isNew={newUnlocks?.[`crafting_${craftable.id}`]?.hasNew}>
+                        <ItemCard key={craftable.id} {...craftable} onSetLevel={setItemLevel} onShowDetails={setItemDetails}/>
+                    </NewNotificationWrap>)}
                 </div>
             </PerfectScrollbar>
         </div>

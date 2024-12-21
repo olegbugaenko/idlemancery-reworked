@@ -4,6 +4,7 @@ import {PopupComponent} from "./popup-component.jsx";
 import {Skills} from "../mage/skills.jsx";
 import {UnlocksList} from "../mage/unlocks.jsx";
 import {Statistics} from "../mage/statistics.jsx";
+import {RandomEventPopup} from "../shared/random-events.jsx";
 
 export const Popup = () => {
 
@@ -45,6 +46,12 @@ export const Popup = () => {
                 <Statistics />
             </PopupComponent>
         )
+    }
+
+    if(activePopup === 'event') {
+        return (<PopupComponent title={'Event'}>
+            <RandomEventPopup />
+        </PopupComponent> )
     }
 
     return null

@@ -9,6 +9,7 @@ import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
 import {FlashOverlay} from "../layout/flash-overlay.jsx";
 import {useFlashOnLevelUp} from "../../general/hooks/flash";
 import {ResourceComparison} from "../shared/resource-comparison.jsx";
+import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
 
 export const Shop = ({}) => {
     const [detailOpened, setDetailOpened] = useState(null)
@@ -35,17 +36,41 @@ export const Shop = ({}) => {
         }
     }
 
+    const [newUnlocks, setNewUnlocks] = useState({});
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            sendData('query-new-unlocks-notifications', { suffix: 'shop', scope: 'shop' })
+        }, 1000)
+        return () => {
+            clearInterval(interval)
+        }
+    }, [])
+
+    onMessage('new-unlocks-notifications-shop', payload => {
+        console.log('Received unlocks: ', payload);
+        setNewUnlocks(payload);
+    })
+
     return (
         <div className={'items-wrap'}>
             <div className={'items ingame-box'}>
                 <div className={'menu-wrap'}>
                     <ul className={'menu'}>
-                        <li className={`${selectedTab === 'upgrades' ? 'active' : ''}`} onClick={() => {setSelectedTab('upgrades'); setDetailOpened(null);}}><span>Upgrades</span></li>
-                        <li className={`${selectedTab === 'items' ? 'active' : ''}`} onClick={() => {setSelectedTab('items');setDetailOpened(null);}}><span>Items</span></li>
+                        <li className={`${selectedTab === 'upgrades' ? 'active' : ''}`} onClick={() => {setSelectedTab('upgrades'); setDetailOpened(null);}}>
+                            <NewNotificationWrap isNew={newUnlocks?.['shop']?.items?.['upgrades']?.hasNew}>
+                                <span>Upgrades</span>
+                            </NewNotificationWrap>
+                        </li>
+                        <li className={`${selectedTab === 'items' ? 'active' : ''}`} onClick={() => {setSelectedTab('items');setDetailOpened(null);}}>
+                            <NewNotificationWrap isNew={newUnlocks?.['shop']?.items?.['inventory']?.hasNew}>
+                                <span>Items</span>
+                            </NewNotificationWrap>
+                        </li>
                     </ul>
                 </div>
-                {selectedTab === 'upgrades' ? (<ShopUpgrades setItemDetails={setItemDetails} purchaseItem={purchaseItem}/>) : null}
-                {selectedTab === 'items' ? (<ShopItems setItemDetails={setItemDetails} purchaseItem={purchaseResource}/>) : null}
+                {selectedTab === 'upgrades' ? (<ShopUpgrades setItemDetails={setItemDetails} purchaseItem={purchaseItem} newUnlocks={newUnlocks?.['shop']?.items?.['upgrades']?.items}/>) : null}
+                {selectedTab === 'items' ? (<ShopItems setItemDetails={setItemDetails} purchaseItem={purchaseResource} newUnlocks={newUnlocks?.['shop']?.items?.['inventory']?.items}/>) : null}
             </div>
 
             <div className={'item-detail ingame-box detail-blade'}>
@@ -57,7 +82,7 @@ export const Shop = ({}) => {
 
 }
 
-export const ShopUpgrades = ({ setItemDetails, purchaseItem }) => {
+export const ShopUpgrades = ({ setItemDetails, purchaseItem, newUnlocks }) => {
 
     const worker = useContext(WorkerContext);
 
@@ -92,7 +117,9 @@ export const ShopUpgrades = ({ setItemDetails, purchaseItem }) => {
     return (<div className={'items-cat'}>
         <PerfectScrollbar>
             <div className={'flex-container'}>
-                {itemsData.available.map(item => <ItemCard onFlash={handleFlash} key={item.id} {...item} onPurchase={purchaseItem} onShowDetails={setItemDetails}/>)}
+                {itemsData.available.map(item => <NewNotificationWrap id={`shop_${item.id}`} className={'narrow-wrapper'} isNew={newUnlocks?.[`shop_${item.id}`]?.hasNew}>
+                    <ItemCard onFlash={handleFlash} key={item.id} {...item} onPurchase={purchaseItem} onShowDetails={setItemDetails}/>
+                </NewNotificationWrap>)}
                 {overlayPositions.map((position, index) => (
                     <FlashOverlay key={index} position={position} />
                 ))}
@@ -101,7 +128,7 @@ export const ShopUpgrades = ({ setItemDetails, purchaseItem }) => {
     </div>)
 }
 
-export const ShopItems = ({ setItemDetails, purchaseItem }) => {
+export const ShopItems = ({ setItemDetails, purchaseItem, newUnlocks }) => {
 
     const worker = useContext(WorkerContext);
 
@@ -166,7 +193,9 @@ export const ShopItems = ({ setItemDetails, purchaseItem }) => {
         <div className={'items-holder'}>
             <PerfectScrollbar>
                 <div className={'flex-container'}>
-                    {itemsData.available.map(item => <ItemResourceCard onFlash={handleFlash} key={item.id} {...item} onPurchase={purchaseItem} onShowDetails={setItemDetails}/>)}
+                    {itemsData.available.map(item => <NewNotificationWrap id={`shop_${item.id}`} className={'narrow-wrapper'} isNew={newUnlocks?.[`shop_${item.id}`]?.hasNew}>
+                        <ItemResourceCard onFlash={handleFlash} key={item.id} {...item} onPurchase={purchaseItem} onShowDetails={setItemDetails}/>
+                    </NewNotificationWrap>)}
                     {overlayPositions.map((position, index) => (
                         <FlashOverlay key={index} position={position} />
                     ))}

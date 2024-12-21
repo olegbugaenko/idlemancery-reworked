@@ -9,6 +9,7 @@ import {ResourceCost} from "../shared/resource-cost.jsx";
 import {Alchemy} from "./alchemy.jsx";
 import {Plantations} from "./plantations.jsx";
 import {ResourceComparison} from "../shared/resource-comparison.jsx";
+import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
 
 export const Workshop = () => {
 
@@ -20,17 +21,28 @@ export const Workshop = () => {
 
     const [ selectedTab, setSelectedTab ] = useState('crafting');
 
-    const [detailOpened, setDetailOpened] = useState(null)
+    const [detailOpened, setDetailOpened] = useState(null);
+
+    const [newUnlocks, setNewUnlocks] = useState({});
 
 
     useEffect(() => {
         const interval = setInterval(() => {
             sendData('query-unlocks', { prefix: 'workshop' });
         }, 100);
+        const interval2 = setInterval(() => {
+            sendData('query-new-unlocks-notifications', { suffix: 'workshop', scope: 'workshop' })
+        }, 1000)
         return () => {
             clearInterval(interval);
+            clearInterval(interval2);
         }
     }, [])
+
+    onMessage('new-unlocks-notifications-workshop', payload => {
+        console.log('Received unlocks: ', payload);
+        setNewUnlocks(payload);
+    })
 
     onMessage('unlocks-workshop', (unlocks) => {
         setUnlocksData(unlocks);
@@ -52,14 +64,26 @@ export const Workshop = () => {
         <div className={'items ingame-box'}>
             <div className={'menu-wrap'}>
                 <ul className={'menu'}>
-                    {unlocks.crafting ? (<li className={`${selectedTab === 'crafting' ? 'active' : ''}`} onClick={() => {setSelectedTab('crafting'); setDetailOpened(null);}}><span>Crafting</span></li>) : null}
-                    {unlocks.alchemy ? (<li className={`${selectedTab === 'alchemy' ? 'active' : ''}`} onClick={() => {setSelectedTab('alchemy'); setDetailOpened(null);}}><span>Alchemy</span></li>) : null}
-                    {unlocks.plantation ? (<li className={`${selectedTab === 'plantation' ? 'active' : ''}`} onClick={() => {setSelectedTab('plantation'); setDetailOpened(null);}}><span>Plantations</span></li>) : null}
+                    {unlocks.crafting ? (<li className={`${selectedTab === 'crafting' ? 'active' : ''}`} onClick={() => {setSelectedTab('crafting'); setDetailOpened(null);}}>
+                        <NewNotificationWrap isNew={newUnlocks.workshop?.items?.crafting?.hasNew}>
+                            <span>Crafting</span>
+                        </NewNotificationWrap>
+                    </li>) : null}
+                    {unlocks.alchemy ? (<li className={`${selectedTab === 'alchemy' ? 'active' : ''}`} onClick={() => {setSelectedTab('alchemy'); setDetailOpened(null);}}>
+                        <NewNotificationWrap isNew={newUnlocks.workshop?.items?.alchemy?.hasNew}>
+                            <span>Alchemy</span>
+                        </NewNotificationWrap>
+                    </li>) : null}
+                    {unlocks.plantation ? (<li className={`${selectedTab === 'plantation' ? 'active' : ''}`} onClick={() => {setSelectedTab('plantation'); setDetailOpened(null);}}>
+                        <NewNotificationWrap isNew={newUnlocks.workshop?.items?.plantations?.hasNew}>
+                            <span>Plantations</span>
+                        </NewNotificationWrap>
+                    </li>) : null}
                 </ul>
             </div>
-            {selectedTab === 'crafting' ? (<Crafting filterId={selectedTab} setItemDetails={setItemDetails} setItemLevel={setItemLevel} />) : null}
-            {selectedTab === 'alchemy' ? (<Alchemy filterId={selectedTab} setItemDetails={setItemDetails} setItemLevel={setItemLevel} />) : null}
-            {selectedTab === 'plantation' ? (<Plantations setItemDetails={setItemDetails} />) : null}
+            {selectedTab === 'crafting' ? (<Crafting filterId={selectedTab} setItemDetails={setItemDetails} setItemLevel={setItemLevel} newUnlocks={newUnlocks.workshop?.items?.crafting?.items}/>) : null}
+            {selectedTab === 'alchemy' ? (<Alchemy filterId={selectedTab} setItemDetails={setItemDetails} setItemLevel={setItemLevel} newUnlocks={newUnlocks.workshop?.items?.alchemy?.items}/>) : null}
+            {selectedTab === 'plantation' ? (<Plantations setItemDetails={setItemDetails} newUnlocks={newUnlocks.workshop?.items?.plantations?.items}/>) : null}
         </div>
 
         <div className={'item-detail ingame-box detail-blade'}>

@@ -1,6 +1,6 @@
-import { gameEntity, gameResources, resourceApi, resourceCalculators, gameEffects } from "game-framework"
+import {gameEntity, gameResources, resourceApi, resourceCalculators, gameEffects, gameCore} from "game-framework"
 import {GameModule} from "../../shared/game-module";
-import {initSpellsDB1} from "./spells-db";
+import {getCostReduction, getMasteryId, getMaxId, initSpellsDB1} from "./spells-db";
 import {checkMatchingRules} from "../../shared/utils/rule-utils";
 
 export class SpellModule extends GameModule {
@@ -135,6 +135,7 @@ export class SpellModule extends GameModule {
         
         for(const key in this.purchasedItems) {
             this.setSpell(key, 0, true);
+            gameEntity.setEntityLevel(getMaxId(id), 0, true);
         }
         this.spells = {};
         if(saveObject?.spells) {
@@ -147,6 +148,7 @@ export class SpellModule extends GameModule {
                     this.spells[id].actualLevel = 1;
                     this.spells[id].xp = 0;
                 }
+                gameEntity.setEntityLevel(getMaxId(id), this.spells[id].level-1, true);
                 this.setSpell(id, saveObject.spells[id].actualLevel || 1, true);
                 this.spells[id].duration = saveObject.spells[id].duration;
                 if(this.spells[id].duration && this.spells[id].duration > 0) {
@@ -192,7 +194,7 @@ export class SpellModule extends GameModule {
                 const rsToRemove = effects.filter(eff => eff.scope === 'consumption' && eff.type === 'resources');
                 
                 rsToRemove.forEach(rs => {
-                    result.consume[rs.id] = rs.value;
+                    result.consume[rs.id] = rs.value; // *this.getSpellMaxLvlDiscount(entity.id);
                     if(result.consume[rs.id] > gameResources.getResource(rs.id).amount) {
                         result.isAffordable = false;
                     }
@@ -201,6 +203,10 @@ export class SpellModule extends GameModule {
 
         }
         return result;
+    }
+
+    getSpellMaxLvlDiscount(id) {
+        return Math.pow(0.975, this.spells[id]?.level || 0);
     }
 
     useSpell(id) {
@@ -237,6 +243,7 @@ export class SpellModule extends GameModule {
                 this.spells[id].xp = 0;
                 // level-up spell
                 this.spells[id].level++;
+                gameEntity.setEntityLevel(getMaxId(id), this.spells[id].level-1, true);
             }
         }
         
@@ -307,6 +314,20 @@ export class SpellModule extends GameModule {
         }
     }
 
+    regenerateNotifications() {
+
+        const entities = gameEntity.listEntitiesByTags(['spell']);
+
+        entities.forEach(item => {
+            gameCore.getModule('unlock-notifications').registerNewNotification(
+                'spellbook',
+                'spellbook',
+                `spell_${item.id}`,
+                item.isUnlocked
+            )
+        })
+    }
+
     getSpellsData(payload) {
         const items = gameEntity.listEntitiesByTags(['spell']);
         let presentSpells = items.filter(item => item.isUnlocked);
@@ -367,6 +388,8 @@ export class SpellModule extends GameModule {
             effects = resourceApi.unpackEffects(spell.usageGain, spell.level)
         }
 
+        console.log('Effts: ', getMasteryId(id), gameEffects.getEffect(getMasteryId(id)));
+
         return {
             id: spell.id,
             name: spell.name,
@@ -382,6 +405,7 @@ export class SpellModule extends GameModule {
             autocast: this.spells[id]?.autocast ?? { rules: [] },
             isCasted: this.spells[id]?.isCasted,
             maxLevel: this.spells[id]?.level || 1,
+            maxLevelCostReduction: getCostReduction(id),
             maxXP: this.getMaxXP(id),
             xp: this.spells[id]?.xp || 0,
             xpRate: this.getXPPerCast(id),

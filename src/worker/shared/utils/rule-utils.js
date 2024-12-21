@@ -35,7 +35,7 @@ export const checkMatchingActionRule = (rule) => {
 
     switch (rule.condition) {
         case 'true':
-            return actionRunning;
+            return !!actionRunning;
         case 'false':
             return !actionRunning;
     }
@@ -48,7 +48,7 @@ export const checkMatchingActionTagRule = (rule) => {
 
     switch (rule.condition) {
         case 'true':
-            return actionRunning;
+            return !!actionRunning;
         case 'false':
             return !actionRunning;
     }

@@ -68,6 +68,12 @@ export const SaveSettings = () => {
         }
     });
 
+    const resetGame = () => {
+        if(confirm('Are you sure you want to reset game? It will remove all your progress!')) {
+            sendData('reset-game', {})
+        }
+    }
+
     return (
         <div className={"save-settings-wrap inner-settings-wrap"}>
             <div className={"row flex-container"}>
@@ -101,6 +107,14 @@ export const SaveSettings = () => {
                         onChange={(e) => setImportText(e.target.value)}
                         value={importString}
                     />
+                </div>
+            </div>
+            <div className={"row flex-container"}>
+                <div className={"col"}>
+                    <button onClick={resetGame}>Hard Reset Game</button>
+                </div>
+                <div className={'col'}>
+
                 </div>
             </div>
         </div>

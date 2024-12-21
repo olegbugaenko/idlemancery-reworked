@@ -12,6 +12,7 @@ import RulesList from "../shared/rules-list.jsx";
 import {cloneDeep} from "lodash";
 import {BreakDown} from "../layout/sidebar.jsx";
 import {ResourceComparison} from "../shared/resource-comparison.jsx";
+import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
 
 export const Inventory = ({}) => {
 
@@ -22,6 +23,7 @@ export const Inventory = ({}) => {
         available: [],
         current: undefined,
         itemCategories: [],
+        selectedFilterId: 'all',
     });
     const [detailOpenedId, setDetailOpenedId] = useState(null); // here should be object containing id and rules
     const [viewedOpenedId, setViewedOpenedId] = useState(null);
@@ -29,6 +31,7 @@ export const Inventory = ({}) => {
     const [viewedData, setViewedData] = useState(null);
     const [resources, setResources] = useState([]);
     const [isChanged, setChanged] = useState(false);
+    const [newUnlocks, setNewUnlocks] = useState({});
 
     useEffect(() => {
         const id = viewedOpenedId ?? detailOpenedId?.id;
@@ -45,10 +48,19 @@ export const Inventory = ({}) => {
             sendData('query-inventory-data', {});
         }, 100);
         sendData('query-all-resources', {});
+        const interval2 = setInterval(() => {
+            sendData('query-new-unlocks-notifications', { suffix: 'inventory', scope: 'inventory' })
+        }, 1000)
         return () => {
             clearInterval(interval);
+            clearInterval(interval2)
         }
     }, [])
+
+    onMessage('new-unlocks-notifications-inventory', payload => {
+        // console.log('Received unlocks: ', payload);
+        setNewUnlocks(payload);
+    })
 
     onMessage('all-resources', (payload) => {
         setResources(payload);
@@ -265,13 +277,18 @@ export const Inventory = ({}) => {
             <div className={'ingame-box inventory'}>
                 <div className={'categories flex-container'}>
                     <ul className={'menu'}>
-                        {inventoryData.itemCategories.map(category => (<li className={`category ${category.isSelected ? 'active' : ''}`} onClick={() => setItemsFilter(category.id)}><span>{category.name}({category.items.length})</span></li> ))}
+                        {inventoryData.itemCategories.map(category => (<li className={`category ${category.isSelected ? 'active' : ''}`} onClick={() => setItemsFilter(category.id)}>
+                            <NewNotificationWrap isNew={newUnlocks.inventory?.items?.[category.id]?.hasNew}>
+                                <span>{category.name}({category.items.length})</span>
+                            </NewNotificationWrap>
+                        </li> ))}
                     </ul>
                 </div>
                 <div className={'inventory-items-wrap'}>
                     <PerfectScrollbar>
                         <div className={'flex-container'}>
-                            {inventoryData.available.map(item => <InventoryCard
+                            {inventoryData.available.map(item => <NewNotificationWrap id={`inventory_${item.id}`} className={'narrow-wrapper'} isNew={newUnlocks.inventory?.items?.[inventoryData.selectedFilterId]?.items?.[`inventory_${item.id}`]?.hasNew}>
+                                <InventoryCard
                                 key={item.id}
                                 isSelected={item.id === detailOpenedId?.id}
                                 isChanged={isChanged}
@@ -280,7 +297,7 @@ export const Inventory = ({}) => {
                                 onFlash={handleFlash}
                                 onShowDetails={setInventoryDetailsView}
                                 onEditConfig={setInventoryDetailsEdit}
-                            />)}
+                                /></NewNotificationWrap>)}
                             {overlayPositions.map((position, index) => (
                                 <FlashOverlay key={index} position={position} />
                             ))}

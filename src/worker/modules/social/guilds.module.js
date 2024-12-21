@@ -87,6 +87,8 @@ export class GuildsModule extends GameModule {
         })*/
         this.setPermaBonus(this.selectedGuild, this.guildsStats[this.selectedGuild].maxLevel, true);
 
+        gameCore.getModule('unlock-notifications').generateNotifications();
+
         // handle perma guild bonus
         this.selectedGuild = null;
     }
@@ -94,6 +96,7 @@ export class GuildsModule extends GameModule {
     selectGuild(id) {
         this.selectedGuild = id;
         gameEntity.setEntityLevel(this.selectedGuild, 1, true);
+        gameCore.getModule('unlock-notifications').generateNotifications();
         gameResources.setResource('guild_reputation', 0);
     }
 
@@ -130,6 +133,11 @@ export class GuildsModule extends GameModule {
             const rslt = gameEntity.levelUpEntity(this.selectedGuild);
             // gameResources.addResource('guild-points', 1);
             this.isLeveledUp = true;
+
+            gameCore.getModule('unlock-notifications').setViewedById(
+                `guild_leveled`,
+                false
+            )
             // const data = this.getMageData();
             // this.eventHandler.sendData('mage-data', data);
         }
@@ -199,6 +207,22 @@ export class GuildsModule extends GameModule {
             this.sendItemsData();
         }
         return newEnt.success;
+    }
+
+    regenerateNotifications() {
+        gameCore.getModule('unlock-notifications').registerNewNotification(
+            'social',
+            'guilds',
+            `no_guild_selected`,
+            !this.selectedGuild
+        )
+
+        gameCore.getModule('unlock-notifications').registerNewNotification(
+            'social',
+            'guilds',
+            `guild_leveled`,
+            this.selectedGuild && gameEntity.getLevel(this.selectedGuild) > 0
+        )
     }
 
     getItemsData() {

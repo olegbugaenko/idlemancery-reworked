@@ -7,6 +7,7 @@ import {ProgressBar} from "./progress-bar.jsx";
 import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
 import {useFlashOnLevelUp} from "../../general/hooks/flash";
 import {FlashOverlay} from "./flash-overlay.jsx";
+import {NewNotificationWrap} from "./new-notification-wrap.jsx";
 
 
 export const Footer = () => {
@@ -21,13 +22,19 @@ export const Footer = () => {
 
     const [mageData, setMageData] = useState({});
 
+    const [newUnlocks, setNewUnlocks] = useState({});
+
     useEffect(() => {
         const interval = setInterval(() => {
             sendData('query-unlocks', {});
             sendData('query-mage-data', {});
         }, 100);
+        const interval2 = setInterval(() => {
+            sendData('query-new-unlocks-notifications', { suffix: 'all', depth: 0 })
+        }, 1000)
         return () => {
             clearInterval(interval);
+            clearInterval(interval2);
         }
     }, [])
 
@@ -37,6 +44,11 @@ export const Footer = () => {
 
     onMessage('mage-data', (mage) => {
         setMageData(mage);
+    })
+
+    onMessage('new-unlocks-notifications-all', payload => {
+        // console.log('Received unlocks: ', payload);
+        setNewUnlocks(payload);
     })
 
     const toggleSpeedUp = () => {
@@ -65,34 +77,50 @@ export const Footer = () => {
 
         <div className={'bottom'}>
             <ul className={'menu'}>
-                {unlocks.actions ? (<li className={openedTab === 'actions' ? 'active' : ''} onClick={() => openTab('actions')}>
-                    <span>Actions</span>
-                </li>) : null}
+                {unlocks.actions ? (
+                    <li className={openedTab === 'actions' ? 'active' : ''} onClick={() => openTab('actions')}>
+                        <NewNotificationWrap isNew={newUnlocks.actions?.hasNew}>
+                            <span>Actions</span>
+                        </NewNotificationWrap>
+                    </li>
+                ) : null}
                 {unlocks.shop ? (<li className={openedTab === 'shop' ? 'active' : ''} onClick={() => openTab('shop')}>
-                    <span>Shop</span>
+                    <NewNotificationWrap isNew={newUnlocks.shop?.hasNew}>
+                        <span>Shop</span>
+                    </NewNotificationWrap>
                 </li>) : <li className={'locked'}>
                     <span>Locked (Reach 2 coins)</span>
                 </li>}
                 {unlocks.inventory ? (<li className={openedTab === 'inventory' ? 'active' : ''} onClick={() => openTab('inventory')}>
-                    <span>Inventory</span>
+                    <NewNotificationWrap isNew={newUnlocks.inventory?.hasNew}>
+                        <span>Inventory</span>
+                    </NewNotificationWrap>
                 </li>) : null}
                 {unlocks.property ? (<li className={openedTab === 'property' ? 'active' : ''} onClick={() => openTab('property')}>
-                    <span>Property</span>
+                    <NewNotificationWrap isNew={newUnlocks.property?.hasNew}>
+                        <span>Property</span>
+                    </NewNotificationWrap>
                 </li>) : null}
                 {unlocks.workshop ? (<li className={openedTab === 'workshop' ? 'active' : ''} onClick={() => openTab('workshop')}>
-                    <span>Workshop</span>
+                    <NewNotificationWrap isNew={newUnlocks.workshop?.hasNew}>
+                        <span>Workshop</span>
+                    </NewNotificationWrap>
                 </li>) : null}
                 {unlocks.social ? (<li className={openedTab === 'social' ? 'active' : ''} onClick={() => openTab('social')}>
-                    <span>Social</span>
+                    <NewNotificationWrap isNew={newUnlocks.social?.hasNew}>
+                        <span>Social</span>
+                    </NewNotificationWrap>
                 </li>) : null}
                 {unlocks.spellbook ? (<li className={openedTab === 'spellbook' ? 'active' : ''} onClick={() => openTab('spellbook')}>
-                    <span>Spellbook</span>
+                    <NewNotificationWrap isNew={newUnlocks.spellbook?.hasNew}>
+                        <span>Spellbook</span>
+                    </NewNotificationWrap>
                 </li>) : null}
                 <li className={openedTab === 'settings' ? 'active' : ''} onClick={() => openTab('settings')}>
                     <span>Settings</span>
                 </li>
                 <li className={openedTab === 'about' ? 'active' : ''} onClick={() => openTab('about')}>
-                    <span>v0.0.3b</span>
+                    <span>v0.0.4</span>
                 </li>
             </ul>
         </div>

@@ -1,6 +1,6 @@
 import {registerActionsStage1} from "./actions-db";
 import {GameModule} from "../../shared/game-module";
-import {gameEntity, gameResources, gameEffects, resourceCalculators} from "game-framework";
+import {gameEntity, gameResources, gameEffects, resourceCalculators, gameCore} from "game-framework";
 import {ActionListsSubmodule} from "./action-lists.submodule";
 import {calculateTimeToLevelUp, weightedRandomChoice} from "../../shared/utils/math";
 import {SMALL_NUMBER} from "game-framework/src/utils/consts";
@@ -15,6 +15,7 @@ export class ActionsModule extends GameModule {
         this.lists = new ActionListsSubmodule();
         this.focus = null;
         this.showHidden = false;
+        this.searchText = '';
 
         this.eventHandler.registerHandler('run-action', (payload) => {
             if(payload.isForce) {
@@ -24,7 +25,9 @@ export class ActionsModule extends GameModule {
         })
 
         this.eventHandler.registerHandler('query-actions-data', (payload) => {
-            this.sendActionsData(this.selectedFilterId)
+            this.sendActionsData(this.selectedFilterId, {
+                searchText: this.searchText,
+            })
         })
 
         this.eventHandler.registerHandler('query-all-actions', (payload) => {
@@ -45,16 +48,24 @@ export class ActionsModule extends GameModule {
 
         this.eventHandler.registerHandler('toggle-hidden-action', (payload) => {
             this.setActionHidden(payload.id, payload.flag);
-            this.sendActionsData(this.selectedFilterId)
+            this.sendActionsData(this.selectedFilterId, {
+                searchText: this.searchText,
+            })
         })
 
         this.eventHandler.registerHandler('toggle-show-hidden', (payload) => {
             this.showHidden = payload;
-            this.sendActionsData(this.selectedFilterId)
+            this.sendActionsData(this.selectedFilterId, {
+                searchText: this.searchText,
+            })
         })
 
         this.eventHandler.registerHandler('set-selected-actions-filter', ({filterId}) => {
             this.selectedFilterId = filterId;
+        })
+
+        this.eventHandler.registerHandler('set-actions-search', ({searchText}) => {
+            this.searchText = searchText;
         })
 
         this.eventHandler.registerHandler('query-action-xp-breakdown', (payload) => {
@@ -319,6 +330,7 @@ export class ActionsModule extends GameModule {
                         this.dropRunningAction(act.originalId);
                         this.reassertRunningEfforts();
                     }
+                    gameCore.getModule('unlock-notifications').generateNotifications();
                     this.sendActionsData(this.selectedFilterId);
                 }
             })
@@ -327,7 +339,7 @@ export class ActionsModule extends GameModule {
         // check for rare loot
         if(gameResources.getResource('rare_herbs_loot').balance > 0) {
             const chanceMult = delta * gameResources.getResource('rare_herbs_loot').balance;
-            console.log('Handling chances for rare loots: ', gameResources.getResource('rare_herbs_loot'), chanceMult);
+            // console.log('Handling chances for rare loots: ', gameResources.getResource('rare_herbs_loot'), chanceMult);
             if(Math.random() < chanceMult) {
                 const id = weightedRandomChoice(rareEvents['herbDrops']);
                 console.log('Add: ', id, rareEvents['herbDrops']);
@@ -363,6 +375,7 @@ export class ActionsModule extends GameModule {
                 this.actions[id].xpEarned = saveObject.actions[id].xpEarned || 0;
             }
         }
+        this.stopRunningActions();
         if(saveObject?.activeActions) {
             this.stopRunningActions();
             saveObject?.activeActions.forEach(a => {
@@ -371,6 +384,8 @@ export class ActionsModule extends GameModule {
         }
         if(saveObject?.actionLists) {
             this.lists.load(saveObject.actionLists)
+        } else {
+            this.lists.load({});
         }
         this.selectedFilterId = saveObject?.selectedFilterId || 'all';
         this.focus = saveObject?.focus;
@@ -602,7 +617,7 @@ export class ActionsModule extends GameModule {
         return eta;
     }
 
-    findNextKeypoints(currentLevel) {
+    findNextKeypoints(currentLevel, max) {
         let keypoints = [];
         [25, 50, 100].forEach(divisor => {
             let nextKeypoint = Math.ceil(currentLevel / divisor) * divisor;
@@ -612,6 +627,9 @@ export class ActionsModule extends GameModule {
             if(keypoints.includes(nextKeypoint)) {
                 nextKeypoint += divisor;
             }
+            if(max && nextKeypoint > max) {
+                nextKeypoint = max;
+            }
             keypoints.push(nextKeypoint);
         });
         return [...new Set(keypoints)].sort((a, b) => a - b);
@@ -620,13 +638,36 @@ export class ActionsModule extends GameModule {
     getEtas(id) {
         const entity = gameEntity.getEntity(id);
         const xpRate = this.isRunningAction(entity.id) ? this.getLearningRate(`runningAction_${entity.id}`) : this.getLearningRate(entity.id, 1);
-        const keypoints = this.findNextKeypoints(entity.level);
+        const keypoints = this.findNextKeypoints(entity.level, gameEntity.getEntityMaxLevel(id));
         const etaResults = {};
         keypoints.forEach(keypoint => {
             const eta = this.calculateAnalyticalETA(entity.level, keypoint, entity.attributes.baseXPCost, xpRate, this.actions[id]?.xp);
             etaResults[keypoint] = eta;
         });
         return etaResults;
+    }
+
+    matchActionSearch(one, searchText) {
+        if(!searchText) return true;
+        if(one.name.includes(searchText)) return true;
+        if(one.tags && one.tags.some(tag => tag.includes(searchText))) return true;
+
+        return false;
+    }
+
+    regenerateNotifications() {
+        // NOW - check for actions if they have any new notifications
+        this.filters.forEach(filter => {
+            const actions = gameEntity.listEntitiesByTags(['action', ...filter.tags]);
+            actions.forEach(action => {
+                gameCore.getModule('unlock-notifications').registerNewNotification(
+                    'actions',
+                    filter.id,
+                    action.id,
+                    action.isUnlocked
+                )
+            })
+        })
     }
 
     getActionsData(filterId, options) {
@@ -638,7 +679,10 @@ export class ActionsModule extends GameModule {
                 name: filter.name,
                 tags: filter.tags,
                 items: gameEntity.listEntitiesByTags(['action', ...filter.tags])
-                    .filter(one => one.isUnlocked && !one.isCapped && (options?.showHidden || this.showHidden || !this.actions?.[one.id]?.isHidden)),
+                    .filter(one => one.isUnlocked && !one.isCapped
+                        && (options?.showHidden || this.showHidden || !this.actions?.[one.id]?.isHidden)
+                        && this.matchActionSearch(one, options.searchText)
+                    ),
                 isSelected: filterId === filter.id
             }
 
@@ -697,6 +741,8 @@ export class ActionsModule extends GameModule {
             actionCategories: Object.values(perCats).filter(cat => cat.items.length > 0),
             automationEnabled: this.lists.automationEnabled,
             autotriggerIntervalSetting: this.lists.autotriggerIntervalSetting,
+            searchText: this.searchText,
+            selectedCategory: filterId,
         }
     }
 

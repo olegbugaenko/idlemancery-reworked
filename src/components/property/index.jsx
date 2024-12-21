@@ -8,6 +8,7 @@ import {ResourceCost} from "../shared/resource-cost.jsx";
 import {FurnitureUpgrades} from "./furniture.jsx";
 import {ResourceComparison} from "../shared/resource-comparison.jsx";
 import {AccessoryUpgrades} from "./accessories.jsx";
+import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
 
 export const Property = ({}) => {
     const [detailOpened, setDetailOpened] = useState(null)
@@ -20,10 +21,15 @@ export const Property = ({}) => {
 
     const [ selectedTab, setSelectedTab ] = useState('furniture');
 
+    const [newUnlocks, setNewUnlocks] = useState({});
+
+
+
     useEffect(() => {
         sendData('query-unlocks', { prefix: 'property' });
         const interval = setInterval(() => {
             sendData('query-unlocks', { prefix: 'property' });
+            sendData('query-new-unlocks-notifications', { suffix: 'property', scope: 'property' })
         }, 1000);
         return () => {
             clearInterval(interval);
@@ -32,6 +38,11 @@ export const Property = ({}) => {
 
     onMessage('unlocks-property', (unlocks) => {
         setUnlocksData(unlocks);
+    })
+
+    onMessage('new-unlocks-notifications-property', payload => {
+        // console.log('Received unlocks: ', payload);
+        setNewUnlocks(payload);
     })
 
 
@@ -57,15 +68,19 @@ export const Property = ({}) => {
                 <div className={'menu-wrap'}>
                     <ul className={'menu'}>
                         <li className={`${selectedTab === 'furniture' ? 'active' : ''}`} onClick={() => {setSelectedTab('furniture'); setDetailOpened(null);}}>
-                            <span>Furniture</span>
+                            <NewNotificationWrap isNew={newUnlocks?.['property']?.items?.['furniture']?.hasNew}>
+                                <span>Furniture</span>
+                            </NewNotificationWrap>
                         </li>
                         {unlocks.crafting ? (<li className={`${selectedTab === 'accessory' ? 'active' : ''}`} onClick={() => {setSelectedTab('accessory'); setDetailOpened(null);}}>
-                            <span>Accessories</span>
+                            <NewNotificationWrap isNew={newUnlocks?.['property']?.items?.['accessory']?.hasNew}>
+                                <span>Accessories</span>
+                            </NewNotificationWrap>
                         </li>) : null}
                     </ul>
                 </div>
-                {selectedTab === 'furniture' ? (<FurnitureUpgrades setItemDetails={setItemDetails} purchaseItem={purchaseItem} deleteItem={deleteItem}/>) : null}
-                {selectedTab === 'accessory' ? (<AccessoryUpgrades setItemDetails={setItemDetails} purchaseItem={purchaseItem} deleteItem={deleteItem}/>) : null}
+                {selectedTab === 'furniture' ? (<FurnitureUpgrades setItemDetails={setItemDetails} purchaseItem={purchaseItem} deleteItem={deleteItem} newUnlocks={newUnlocks?.['property']?.items?.['furniture']?.items}/>) : null}
+                {selectedTab === 'accessory' ? (<AccessoryUpgrades setItemDetails={setItemDetails} purchaseItem={purchaseItem} deleteItem={deleteItem} newUnlocks={newUnlocks?.['property']?.items?.['accessory']?.items}/>) : null}
             </div>
 
             <div className={'item-detail ingame-box detail-blade'}>

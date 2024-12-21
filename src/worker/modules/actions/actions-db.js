@@ -2232,6 +2232,11 @@ export const registerActionsStage1 = () => {
                         A: 2,
                         B: -2,
                         type: 0,
+                    },
+                    'attribute_patience': {
+                        A: 0.5,
+                        B: -0.5,
+                        type: 0,
                     }
                 }
             }),

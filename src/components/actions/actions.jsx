@@ -13,6 +13,7 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import RulesList from "../shared/rules-list.jsx";
 import {cloneDeep} from "lodash";
 import {ActionXPBreakdown} from "./action-xp-breakdown.jsx";
+import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
 
 export const Actions = ({}) => {
 
@@ -24,7 +25,9 @@ export const Actions = ({}) => {
         current: undefined,
         actionCategories: [],
         actionLists: [],
-        automationEnabled: false
+        automationEnabled: false,
+        searchText: '',
+        selectedCategory: 'all'
     });
     const [detailOpened, setDetailOpened] = useState(null);
     const [editingList, setEditingList] = useState(null);
@@ -32,6 +35,7 @@ export const Actions = ({}) => {
     const [listData, setListData] = useState(null);
     const [viewedData, setViewedData] = useState(null);
     const [resources, setResources] = useState(null);
+    const [newUnlocks, setNewUnlocks] = useState({});
 
     // const [filterId, setFilterId] = useState('all');
 
@@ -40,9 +44,13 @@ export const Actions = ({}) => {
             sendData('query-actions-data', {  });
         }, 100);
         sendData('query-all-resources', {});
+        const interval2 = setInterval(() => {
+            sendData('query-new-unlocks-notifications', { suffix: 'actions', scope: 'actions' })
+        }, 1000)
 
         return () => {
             clearInterval(interval);
+            clearInterval(interval2);
         }
     }, [])
 
@@ -52,6 +60,11 @@ export const Actions = ({}) => {
             sendData('load-action-list', { id });
         }
     }, [editingList, viewingList])
+
+    onMessage('new-unlocks-notifications-actions', payload => {
+        // console.log('Received unlocks: ', payload);
+        setNewUnlocks(payload);
+    })
 
     onMessage('all-resources', (payload) => {
         setResources(payload);
@@ -317,6 +330,10 @@ export const Actions = ({}) => {
         sendData('toggle-hidden-action', { id, flag });
     })
 
+    const setSearch = (searchText) => {
+        sendData('set-actions-search', { searchText });
+    }
+
     return (
         <DragDropContext onDragEnd={onDragEnd}>
             <div className={'actions-wrap'}>
@@ -324,9 +341,16 @@ export const Actions = ({}) => {
 
                     <div className={'categories flex-container'}>
                         <ul className={'menu'}>
-                            {actionsData.actionCategories.map(category => (<li className={`category ${category.isSelected ? 'active' : ''}`} onClick={() => setActionsFilter(category.id)}><span>{category.name}({category.items.length})</span></li> ))}
+                            {actionsData.actionCategories.map(category => (<li className={`category ${category.isSelected ? 'active' : ''}`} onClick={() => setActionsFilter(category.id)}>
+                                <NewNotificationWrap isNew={newUnlocks.actions?.items?.[category.id]?.hasNew}>
+                                    <span>{category.name}({category.items.length})</span>
+                                </NewNotificationWrap>
+                            </li> ))}
                         </ul>
                         <div className={'additional-filters'}>
+                            <label>
+                                <input type={'text'} placeholder={'Search'} value={actionsData.searchText} onChange={e => setSearch(e.target.value)}/>
+                            </label>
                             <label>
                                 <input type={"checkbox"} checked={actionsData.showHidden} onChange={toggleShowHidden}/>
                                 Show hidden
@@ -339,7 +363,10 @@ export const Actions = ({}) => {
                                 <Droppable droppableId="available-actions" isDropDisabled={true}>
                                     {(provided) => (
                                         <div ref={provided.innerRef} {...provided.droppableProps} className="flex-container">
-                                            {actionsData.available.map((action, index) => <ActionCard isEditingList={!!listData} index={index} key={action.id} {...action} onFlash={handleFlash} onActivate={activateAction} onShowDetails={setActionDetails} onSelect={onSelectAction} toggleHiddenAction={toggleHiddenAction}/>)}
+                                            {actionsData.available.map((action, index) =>
+                                                <NewNotificationWrap id={action.id} className={'narrow-wrapper'} isNew={newUnlocks.actions?.items?.[actionsData.selectedCategory]?.items?.[action.id]?.hasNew}>
+                                                    <ActionCard isEditingList={!!listData} index={index} key={action.id} {...action} onFlash={handleFlash} onActivate={activateAction} onShowDetails={setActionDetails} onSelect={onSelectAction} toggleHiddenAction={toggleHiddenAction}/>
+                                                </NewNotificationWrap>)}
                                             {provided.placeholder}
                                         </div>
                                     )}

@@ -95,7 +95,7 @@ const mapCompareType = {
         ],
     },
     'resource_balance': {
-        label: 'Resource Balance',
+        label: 'Resource Rate',
         subject: 'resource_id',
         availableConditions: [
             'less',

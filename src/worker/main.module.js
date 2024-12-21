@@ -11,6 +11,9 @@ import {SpellModule} from "./modules/magic/spells.module";
 import {CraftingModule} from "./modules/workshop/crafting.module";
 import {PlantationsModule} from "./modules/workshop/plantations.module";
 import {GuildsModule} from "./modules/social/guilds.module";
+import {UnlockNotificationsModule} from "./shared/modules/unlock-notifications.module";
+import {RandomEventsModule} from "./modules/general/random-events.module";
+import {TemporaryEffectsModule} from "./modules/general/temporary-effects.module";
 
 
 export class MainModule extends GameModule {
@@ -28,6 +31,9 @@ export class MainModule extends GameModule {
         gameCore.registerModule('crafting', CraftingModule);
         gameCore.registerModule('plantations', PlantationsModule);
         gameCore.registerModule('guilds', GuildsModule);
+        gameCore.registerModule('unlock-notifications', UnlockNotificationsModule);
+        gameCore.registerModule('random-events', RandomEventsModule);
+        gameCore.registerModule('temporary-effects', TemporaryEffectsModule);
 
 
 
@@ -46,8 +52,22 @@ export class MainModule extends GameModule {
             this.eventHandler.sendData('loaded', {...data, received: true});
         })
 
+        this.eventHandler.registerHandler('reset-game', () => {
+            console.log('reset-game received');
+            gameCore.stopTicking();
+            gameCore.load({});
+            console.log('reseted');
+            const cheat = 1;
+            gameCore.startTicking(100, () => 0.1*cheat*(gameCore.getModule('mage').bankedTime?.speedUpFactor ?? 1), () => {
+                if(gameCore.numTicks % 100 === 0) {
+                    this.save();
+                }
+            }, false)
+            this.eventHandler.sendData('loaded', { received: true, isReset: true });
+        })
+
         this.eventHandler.registerHandler('start-ticking', () => {
-            const cheat = 5;
+            const cheat = 1;
             // const speedUpMode = gameCore.getModule('mage').bankedTime?.speedUpFactor ?? 1;
             // console.log('gameCore', GameCore.instance, speedUpMode);
             gameCore.startTicking(100, () => 0.1*cheat*(gameCore.getModule('mage').bankedTime?.speedUpFactor ?? 1), () => {

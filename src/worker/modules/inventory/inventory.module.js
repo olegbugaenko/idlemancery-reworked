@@ -1,4 +1,4 @@
-import { gameEntity, gameResources, resourceApi, gameEffects } from "game-framework"
+import {gameEntity, gameResources, resourceApi, gameEffects, gameCore} from "game-framework"
 import {GameModule} from "../../shared/game-module";
 import {registerInventoryItems} from "./inventory-items-db";
 import {checkMatchingRules} from "../../shared/utils/rule-utils";
@@ -298,6 +298,23 @@ export class InventoryModule extends GameModule {
         }
     }
 
+    regenerateNotifications() {
+        // NOW - check for actions if they have any new notifications
+
+        this.filters.forEach(filter => {
+            const items = gameResources.listResourcesByTags(['inventory', ...filter.tags]);
+            items.forEach(item => {
+                gameCore.getModule('unlock-notifications').registerNewNotification(
+                    'inventory',
+                    filter.id,
+                    `inventory_${item.id}`,
+                    item.isUnlocked && (gameResources.getResource(item.id).amount >= 1
+                        || Math.abs(gameResources.getResource(item.id).income) >= SMALL_NUMBER)
+                )
+            })
+        })
+    }
+
     getItemsData(filterId, pl) {
         const perCats = this.filters.reduce((acc, filter) => {
 
@@ -350,6 +367,7 @@ export class InventoryModule extends GameModule {
             })),
             itemCategories: Object.values(perCats).filter(cat => cat.items.length > 0),
             payload: pl,
+            selectedFilterId: filterId,
         }
     }
 
@@ -387,7 +405,7 @@ export class InventoryModule extends GameModule {
             name: resource.name,
             description: resource.description,
             breakdown: resource.breakdown,
-            amount: resource.amount,
+            amount: Math.floor(resource.amount || 0),
             effects,
             tags: resource.tags || [],
             autoconsume: this.inventoryItems[resource.id]?.autoconsume ?? { rules: [] },

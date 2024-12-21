@@ -4,6 +4,7 @@ import {useWorkerClient} from "../../general/client";
 import {formatInt, formatValue, secondsToString} from "../../general/utils/strings";
 import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
 import {ActiveEffects} from "../shared/active-effects.jsx";
+import {RandomEventSnippet} from "../shared/random-events.jsx";
 
 export const Sidebar = () => {
 
@@ -21,6 +22,7 @@ export const Sidebar = () => {
         <div className={'main-bar'}>
             {activePanel === 'resources' ? <ResourcesBar /> : <AttributesBar />}
         </div>
+        <RandomEventSnippet />
         <div className={'effects-list'}>
             <ActiveEffects />
         </div>

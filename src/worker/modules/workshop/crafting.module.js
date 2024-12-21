@@ -1,6 +1,6 @@
 import {GameModule} from "../../shared/game-module";
 import {registerCraftingRecipes} from "./recipes-db";
-import {gameEntity, gameResources} from "game-framework";
+import {gameCore, gameEntity, gameResources} from "game-framework";
 
 export class CraftingModule extends GameModule {
 
@@ -95,6 +95,22 @@ export class CraftingModule extends GameModule {
             console.log('Update result: ', rs);
             this.craftingSlots[id].level = gameEntity.getLevel(`activeCrafting_${id}`);
         }
+    }
+
+    regenerateNotifications() {
+
+        this.filters.forEach(filter => {
+            const entities = gameEntity.listEntitiesByTags(['recipe', ...filter.tags]);
+
+            entities.forEach(item => {
+                gameCore.getModule('unlock-notifications').registerNewNotification(
+                    'workshop',
+                    filter.id,
+                    `crafting_${item.id}`,
+                    item.isUnlocked && !item.isCapped
+                )
+            })
+        })
     }
 
     getCraftingData(payload) {

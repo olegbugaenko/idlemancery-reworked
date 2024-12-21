@@ -5,8 +5,9 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import {formatInt} from "../../general/utils/strings";
 import {FlashOverlay} from "../layout/flash-overlay.jsx";
 import {useFlashOnLevelUp} from "../../general/hooks/flash";
+import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
 
-export const FurnitureUpgrades = ({ setItemDetails, purchaseItem, deleteItem }) => {
+export const FurnitureUpgrades = ({ setItemDetails, purchaseItem, deleteItem, newUnlocks }) => {
 
     const worker = useContext(WorkerContext);
 
@@ -16,7 +17,9 @@ export const FurnitureUpgrades = ({ setItemDetails, purchaseItem, deleteItem }) 
         space: {
             total: 0,
             max: 0
-        }
+        },
+        searchText: '',
+        hideMaxed: false,
     });
 
     useEffect(() => {
@@ -31,6 +34,14 @@ export const FurnitureUpgrades = ({ setItemDetails, purchaseItem, deleteItem }) 
     onMessage('furnitures-data', (furnitures) => {
         setItemsData(furnitures);
     })
+
+    const setSearch = (searchText) => {
+        sendData('set-furniture-search-text', { filterId: 'furniture', searchText: searchText });
+    }
+
+    const setHideMaxed = (hideMaxed) => {
+        sendData('set-furniture-hide-maxed', { filterId: 'furniture', hideMaxed: hideMaxed });
+    }
 
     const [overlayPositions, setOverlayPositions] = useState([]);
 
@@ -48,11 +59,22 @@ export const FurnitureUpgrades = ({ setItemDetails, purchaseItem, deleteItem }) 
                 <span>Space:</span>
                 <span>{formatInt(furnituresData.space.total)}/{formatInt(furnituresData.space.max)}</span>
             </div>
+            <div className={'filters'}>
+                <label>
+                    <input type={'text'} value={furnituresData.searchText} onChange={e => setSearch(e.target.value)}/>
+                </label>
+                <label>
+                    Hide maxed
+                    <input type={'checkbox'} checked={furnituresData.hideMaxed} onChange={e => setHideMaxed(!furnituresData.hideMaxed)}/>
+                </label>
+            </div>
         </div>
         <div className={'furnitures-cat'}>
             <PerfectScrollbar>
                 <div className={'flex-container'}>
-                    {furnituresData.available.map(furniture => <ItemCard key={furniture.id} {...furniture} onFlash={handleFlash} onPurchase={purchaseItem} onShowDetails={setItemDetails} onDelete={deleteItem}/>)}
+                    {furnituresData.available.map(furniture => <NewNotificationWrap id={furniture.id} className={'narrow-wrapper'} isNew={newUnlocks?.[furniture.id]?.hasNew}>
+                        <ItemCard key={furniture.id} {...furniture} onFlash={handleFlash} onPurchase={purchaseItem} onShowDetails={setItemDetails} onDelete={deleteItem}/>
+                    </NewNotificationWrap>)}
                     {overlayPositions.map((position, index) => (
                         <FlashOverlay key={index} position={position} />
                     ))}

@@ -711,7 +711,7 @@ export const registerGuildUpgrades = () => {
         resourceModifier: {
             multiplier: {
                 effects: {
-                    'restoration_spells_efficiency': {
+                    'illusion_spells_efficiency': {
                         A: 0.1,
                         B: 1,
                         type: 0,

@@ -1,4 +1,4 @@
-import { gameEntity, gameResources, resourceCalculators, resourceApi, gameEffects } from "game-framework"
+import {gameEntity, gameResources, resourceCalculators, resourceApi, gameEffects, gameCore} from "game-framework"
 import {GameModule} from "../../shared/game-module";
 import {registerShopItemsStage1} from "./shop-db";
 
@@ -111,6 +111,7 @@ export class ShopModule extends GameModule {
         if(newEnt.success) {
             this.purchasedItems[itemId] = gameEntity.getLevel(itemId);
             this.leveledId = itemId;
+            gameCore.getModule('unlock-notifications').generateNotifications();
             this.sendItemsData();
         }
         return newEnt.success;
@@ -136,6 +137,33 @@ export class ShopModule extends GameModule {
 
             this.sendPurchaseableItemsData();
         }
+    }
+
+    regenerateNotifications() {
+        // NOW - check for actions if they have any new notifications
+        const entities = gameEntity.listEntitiesByTags(['shop']);
+
+        entities.forEach(entity => {
+            gameCore.getModule('unlock-notifications').registerNewNotification(
+                'shop',
+                'upgrades',
+                `shop_${entity.id}`,
+                entity.isUnlocked && !entity.isCapped
+            )
+        })
+
+        const items = gameResources.listResourcesByTags(['inventory']);
+        const presentItems = items.filter(item => item.isUnlocked && item.get_cost);
+
+        presentItems.forEach(entity => {
+            gameCore.getModule('unlock-notifications').registerNewNotification(
+                'shop',
+                'inventory',
+                `shop_${entity.id}`,
+                entity.isUnlocked
+            )
+        })
+
     }
 
     getItemsData() {

@@ -11,6 +11,7 @@ import {FlashOverlay} from "../layout/flash-overlay.jsx";
 import {useFlashOnLevelUp} from "../../general/hooks/flash";
 import RulesList from "../shared/rules-list.jsx";
 import {cloneDeep} from "lodash";
+import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
 
 export const Spellbook = ({}) => {
 
@@ -27,6 +28,7 @@ export const Spellbook = ({}) => {
     const [viewedData, setViewedData] = useState(null);
     const [resources, setResources] = useState([]);
     const [isChanged, setChanged] = useState(false);
+    const [newUnlocks, setNewUnlocks] = useState({});
 
     useEffect(() => {
         const id = viewedOpenedId ?? detailOpenedId?.id;
@@ -47,10 +49,18 @@ export const Spellbook = ({}) => {
             sendData('query-spell-data', {});
         }, 100);
         sendData('query-all-resources', {});
+        const interval2 = setInterval(() => {
+            sendData('query-new-unlocks-notifications', { suffix: 'spellbook', scope: 'spellbook' })
+        }, 1000)
         return () => {
             clearInterval(interval);
         }
     }, [])
+
+    onMessage('new-unlocks-notifications-spellbook', payload => {
+        console.log('Received unlocks: ', payload);
+        setNewUnlocks(payload);
+    })
 
     onMessage('all-resources', (payload) => {
         setResources(payload);
@@ -200,7 +210,10 @@ export const Spellbook = ({}) => {
             <div className={'ingame-box spell'}>
                 <PerfectScrollbar>
                     <div className={'flex-container'}>
-                        {spellData.available.map(item => <SpellCard isChanged={isChanged} key={item.id} {...item} onPurchase={purchaseItem} onFlash={handleFlash} onShowDetails={setSpellDetailsView} onEditConfig={setSpellDetailsEdit}/>)}
+                        {spellData.available.map(item => <NewNotificationWrap id={`spell_${item.id}`} className={'narrow-wrapper'} isNew={newUnlocks.spellbook?.items?.spellbook?.items?.[`spell_${item.id}`]?.hasNew}>
+                                <SpellCard isChanged={isChanged} key={item.id} {...item} onPurchase={purchaseItem} onFlash={handleFlash} onShowDetails={setSpellDetailsView} onEditConfig={setSpellDetailsEdit}/>
+                            </NewNotificationWrap>
+                            )}
                         {overlayPositions.map((position, index) => (
                             <FlashOverlay key={index} position={position} />
                         ))}
@@ -327,6 +340,7 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
                 </div> ) : null}
                 <div className={'block'}>
                     <p>Cooldown: {formatValue(item.cooldown)} seconds</p>
+                    <p>Price reduction <span className={'hint'}>(Based on max level)</span>: x{formatValue(item.maxLevelCostReduction)}</p>
                 </div>
                 <div className={'block'}>
                     <p>Effects on usage:</p>

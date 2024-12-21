@@ -5,8 +5,9 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import {formatInt} from "../../general/utils/strings";
 import {FlashOverlay} from "../layout/flash-overlay.jsx";
 import {useFlashOnLevelUp} from "../../general/hooks/flash";
+import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
 
-export const AccessoryUpgrades = ({ setItemDetails, purchaseItem }) => {
+export const AccessoryUpgrades = ({ setItemDetails, purchaseItem, newUnlocks }) => {
 
     const worker = useContext(WorkerContext);
 
@@ -16,7 +17,9 @@ export const AccessoryUpgrades = ({ setItemDetails, purchaseItem }) => {
         space: {
             total: 0,
             max: 0
-        }
+        },
+        searchText: '',
+        hideMaxed: false,
     });
 
     useEffect(() => {
@@ -42,11 +45,28 @@ export const AccessoryUpgrades = ({ setItemDetails, purchaseItem }) => {
         }, 1000);
     };
 
+    const setSearch = (searchText) => {
+        sendData('set-furniture-search-text', { filterId: 'accessory', searchText: searchText });
+    }
+
     return (<div className={'furniture-wrap'}>
+        <div className={'head'}>
+            <div className={'filters'}>
+                <label>
+                    <input type={'text'} value={furnituresData.searchText} onChange={e => setSearch(e.target.value)}/>
+                </label>
+                <label>
+                    Hide maxed
+                    <input type={'checkbox'} checked={furnituresData.hideMaxed} onChange={e => setHideMaxed(!furnituresData.hideMaxed)}/>
+                </label>
+            </div>
+        </div>
         <div className={'furnitures-cat'}>
             <PerfectScrollbar>
                 <div className={'flex-container'}>
-                    {furnituresData.available.map(furniture => <ItemCard key={furniture.id} {...furniture} onFlash={handleFlash} onPurchase={purchaseItem} onShowDetails={setItemDetails} />)}
+                    {furnituresData.available.map(furniture => <NewNotificationWrap id={furniture.id} className={'narrow-wrapper'} isNew={newUnlocks?.[furniture.id]?.hasNew}>
+                        <ItemCard key={furniture.id} {...furniture} onFlash={handleFlash} onPurchase={purchaseItem} onShowDetails={setItemDetails} />
+                    </NewNotificationWrap>)}
                     {overlayPositions.map((position, index) => (
                         <FlashOverlay key={index} position={position} />
                     ))}

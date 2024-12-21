@@ -1,6 +1,7 @@
 import {GameModule} from "../../shared/game-module";
 import {gameEntity, gameResources, gameCore, resourceCalculators} from "game-framework";
 import {checkMatchingRules} from "../../shared/utils/rule-utils";
+import {mapObject} from "../../shared/utils/objects";
 
 export class ActionListsSubmodule extends GameModule {
 
@@ -201,7 +202,11 @@ export class ActionListsSubmodule extends GameModule {
 
     save() {
         return {
-            list: this.actionsLists,
+            list: mapObject(this.actionsLists, one => ({
+                id: one.id,
+                name: one.name,
+                actions: one.actions,
+            })),
             runningList: this.runningList,
             automationEnabled: this.automationEnabled,
             autotriggerIntervalSetting: this.autotriggerIntervalSetting,
@@ -242,7 +247,8 @@ export class ActionListsSubmodule extends GameModule {
         if (this.runningList && !this.combineLists) {
             const listToRun = this.actionsLists[this.runningList.id];
             if (!listToRun) {
-                throw new Error('Invalid list to run');
+                console.error('List: ', this.actionsLists, this.runningList);
+                throw new Error('Invalid list to run!!');
             }
 
             let action = listToRun.actions[this.runningList.actionIndex];
@@ -293,6 +299,7 @@ export class ActionListsSubmodule extends GameModule {
             // include available notpresent
             const listToRun = this.actionsLists[this.runningList.id];
             if (!listToRun) {
+                console.error('List: ', this.actionsLists, this.runningList);
                 throw new Error('Invalid list to run');
             }
 

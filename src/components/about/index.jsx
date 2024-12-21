@@ -6,6 +6,17 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+                <h3>Idle Awakening v0.0.4</h3>
+                <div className={'features'}>
+                    <p>Added random events, providing various options and possible bonuses</p>
+                    <p>Added new unlocks notifications</p>
+                    <p>Maximum spell level now affects spell cost</p>
+                    <p>Added some new plants</p>
+                    <p>Added search to furniture and actions</p>
+                    <p>Fixed bugs in some actions effects</p>
+                    <p>Fixed bug when "Running Action" rule didn't triggered</p>
+                    <p>Fixed some typos</p>
+                </div>
                 <h3>Idle Awakening v0.0.3b</h3>
                 <div className={'features'}>
                     <p>Grammar fixes</p>

@@ -7,6 +7,7 @@ import {formatInt, formatValue} from "../../general/utils/strings";
 import {ResourceCost} from "../shared/resource-cost.jsx";
 import {ResourceComparison} from "../shared/resource-comparison.jsx";
 import {Guilds} from "./guilds.jsx";
+import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
 
 export const Social = () => {
 
@@ -18,17 +19,29 @@ export const Social = () => {
 
     const [ selectedTab, setSelectedTab ] = useState('guilds');
 
-    const [detailOpened, setDetailOpened] = useState(null)
+    const [detailOpened, setDetailOpened] = useState(null);
+
+    const [newUnlocks, setNewUnlocks] = useState({});
+
 
 
     useEffect(() => {
         const interval = setInterval(() => {
             sendData('query-unlocks', { prefix: 'social' });
         }, 100);
+        const interval2 = setInterval(() => {
+            sendData('query-new-unlocks-notifications', { suffix: 'social', scope: 'social' })
+        }, 1000)
         return () => {
             clearInterval(interval);
+            clearInterval(interval2)
         }
     }, [])
+
+    onMessage('new-unlocks-notifications-social', payload => {
+        console.log('Received unlocks: ', payload);
+        setNewUnlocks(payload);
+    })
 
     onMessage('unlocks-social', (unlocks) => {
         setUnlocksData(unlocks);
@@ -46,10 +59,14 @@ export const Social = () => {
         <div className={'items ingame-box'}>
             <div className={'menu-wrap'}>
                 <ul className={'menu'}>
-                    {unlocks.guilds ? (<li className={`${selectedTab === 'guilds' ? 'active' : ''}`} onClick={() => {setSelectedTab('guilds'); setDetailOpened(null);}}><span>Guilds</span></li>) : null}
+                    {unlocks.guilds ? (<li className={`${selectedTab === 'guilds' ? 'active' : ''}`} onClick={() => {setSelectedTab('guilds'); setDetailOpened(null);}}>
+                        <NewNotificationWrap isNew={newUnlocks.social?.items?.guilds?.hasNew}>
+                            <span>Guilds</span>
+                        </NewNotificationWrap>
+                    </li>) : null}
                 </ul>
             </div>
-            {selectedTab === 'guilds' ? (<Guilds filterId={selectedTab} setItemDetails={setItemDetails} />) : null}
+            {selectedTab === 'guilds' ? (<Guilds filterId={selectedTab} setItemDetails={setItemDetails} newUnlocks={newUnlocks.social?.items?.guilds?.items}/>) : null}
         </div>
 
         <div className={'item-detail ingame-box detail-blade'}>

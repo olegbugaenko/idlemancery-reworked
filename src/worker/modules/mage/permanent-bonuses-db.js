@@ -256,4 +256,122 @@ export const registerPermanentBonuses = () => {
             }
         }
     })
+
+    gameEntity.registerGameEntity('random_events_strength_effect', {
+        tags: ["bonus", "permanent", "herbal"],
+        name: 'Random Events Bonus',
+        level: 0,
+        unlockCondition: () => {
+
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            income: {
+                effects: {
+                    'attribute_strength': {
+                        A: 1,
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            }
+        }
+    })
+
+
+    gameEntity.registerGameEntity('random_events_stamina_effect', {
+        tags: ["bonus", "permanent", "herbal"],
+        name: 'Random Events Bonus',
+        level: 0,
+        unlockCondition: () => {
+
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            income: {
+                effects: {
+                    'attribute_stamina': {
+                        A: 1,
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            }
+        }
+    })
+
+    gameEntity.registerGameEntity('random_events_recovery_effect', {
+        tags: ["bonus", "permanent", "herbal"],
+        name: 'Random Events Bonus',
+        level: 0,
+        unlockCondition: () => {
+
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            income: {
+                effects: {
+                    'attribute_recovery': {
+                        A: 1,
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            }
+        }
+    })
+
+
+    gameEntity.registerGameEntity('random_events_charisma_effect', {
+        tags: ["bonus", "permanent", "herbal"],
+        name: 'Random Events Bonus',
+        level: 0,
+        unlockCondition: () => {
+
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            income: {
+                effects: {
+                    'attribute_charisma': {
+                        A: 1,
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            }
+        }
+    })
+
+    gameEntity.registerGameEntity('random_events_memory_effect', {
+        tags: ["bonus", "permanent", "herbal"],
+        name: 'Random Events Bonus',
+        level: 0,
+        unlockCondition: () => {
+
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            income: {
+                effects: {
+                    'attribute_charisma': {
+                        A: 1,
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            }
+        }
+    })
+
 }

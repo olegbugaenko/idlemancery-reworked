@@ -1,4 +1,4 @@
-import { gameEntity, gameResources, resourceCalculators, resourceApi, gameEffects } from "game-framework"
+import {gameEntity, gameResources, resourceCalculators, resourceApi, gameEffects, gameCore} from "game-framework"
 import {GameModule} from "../../shared/game-module";
 import {registerPlantations} from "./plantation-db";
 
@@ -85,6 +85,21 @@ export class PlantationsModule extends GameModule {
 
     removeItem(itemId) {
         this.setItem(itemId, 0, true);
+    }
+
+    regenerateNotifications() {
+
+
+        const entities = gameEntity.listEntitiesByTags(['plantation']);
+
+        entities.forEach(item => {
+            gameCore.getModule('unlock-notifications').registerNewNotification(
+                'workshop',
+                'plantations',
+                `plantation_${item.id}`,
+                item.isUnlocked && !item.isCapped
+            )
+        })
     }
 
     getItemsData() {

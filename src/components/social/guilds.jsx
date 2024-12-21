@@ -6,8 +6,9 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
 import {BreakDown} from "../layout/sidebar.jsx";
 import {ResourceComparison} from "../shared/resource-comparison.jsx";
+import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
 
-export const Guilds = ({ setItemDetails, filterId }) => {
+export const Guilds = ({ setItemDetails, filterId, newUnlocks }) => {
 
     const worker = useContext(WorkerContext);
 
@@ -67,77 +68,67 @@ export const Guilds = ({ setItemDetails, filterId }) => {
     }
 
     return (<div className={'guilds-wrap'}>
-        {/*<div className={'head'}>
-            <div className={'space-item'}>
-                <span>Reputation Points:</span>
-                <span>{formatInt(guildsData.points.balance)}/{formatInt(guildsData.points.max)}</span>
-            </div>
-            <TippyWrapper content={<div className={'hint-popup'}>You can get reputation by performing jobs for your guilds</div> }>
-                <div className={'space-item'}>
-                    <span>Reputation Level:</span>
-                    <span>{formatValue(guildsData.reputation.amount)}/{formatValue(guildsData.reputation.max)}</span>
-                </div>
-            </TippyWrapper>
-        </div>*/}
-        <div className={'guild-overview'}>
-            <div className={'flex-container'}>
-                <div className={'icon-holder left'}>
-                    <img className={'guild-image'} src={`icons/guilds/${guildsData.current.icon_id}.png`}/>
-                </div>
-                <div className={'right'}>
-                    <p className={'guild-name'}>{guildsData.current.name}</p>
-                    <div className={'space-item'}>
-                        <p className={'info'}>Reputation Level: </p>
-                        <span>{formatInt(guildsData.current.level)}</span>
+        <NewNotificationWrap isNew={newUnlocks?.guild_leveled?.hasNew} id={'guild_leveled'}>
+            <div className={'guild-overview'}>
+                <div className={'flex-container'}>
+                    <div className={'icon-holder left'}>
+                        <img className={'guild-image'} src={`icons/guilds/${guildsData.current.icon_id}.png`}/>
                     </div>
-                    <TippyWrapper content={<div className={'hint-popup'}>
-                        <p>You can get reputation by performing jobs for your guilds</p>
-                        <BreakDown breakDown={guildsData.reputation.breakDown} />
-                        <p>ETA: {secondsToString(guildsData.reputation.eta)}</p>
-                        {/*<BreakDown breakDown={guildsData.reputation.storageBreakdown} />*/}
-                    </div> }>
+                    <div className={'right'}>
+                        <p className={'guild-name'}>{guildsData.current.name}</p>
                         <div className={'space-item'}>
-                            <span>Reputation Progress:</span>
-                            <span>{formatValue(guildsData.reputation.amount)}/{formatValue(guildsData.reputation.cap)}</span>
+                            <p className={'info'}>Reputation Level: </p>
+                            <span>{formatInt(guildsData.current.level)}</span>
                         </div>
-                    </TippyWrapper>
-                    <div className={'space-item'}>
-                        <span>Reputation Points:</span>
-                        <span>{formatInt(guildsData.points.balance)}/{formatInt(guildsData.points.cap)}</span>
-                    </div>
-                    <div className={'buttons'}>
-                        {guildsData.prestige.canPrestige ? (<TippyWrapper content={<div className={'hint-popup'}>
-                            <p>You will loose all your guild reputation, levels and upgrades, but will get following bonuses (based on your new max reputation level):</p>
-                            <ResourceComparison effects1={guildsData.prestige.currentEffects} effects2={guildsData.prestige.potentialEffects} />
+                        <TippyWrapper content={<div className={'hint-popup'}>
+                            <p>You can get reputation by performing jobs for your guilds</p>
+                            <BreakDown breakDown={guildsData.reputation.breakDown} />
+                            <p>ETA: {secondsToString(guildsData.reputation.eta)}</p>
+                            {/*<BreakDown breakDown={guildsData.reputation.storageBreakdown} />*/}
                         </div> }>
-                            <button onClick={leaveGuild}>Prestige Guild</button>
-                        </TippyWrapper> ) : (<TippyWrapper content={<div className={'hint-popup'}>
-                            <p>You wont receive any new bonuses</p>
-                            <p>Reach {formatInt(guildsData.maxLevel + 1)} reputation level to increase your bonuses</p>
-                        </div> }>
-                            <button onClick={leaveGuild}>Abandon Guild</button>
-                        </TippyWrapper>)}
+                            <div className={'space-item'}>
+                                <span>Reputation Progress:</span>
+                                <span>{formatValue(guildsData.reputation.amount)}/{formatValue(guildsData.reputation.cap)}</span>
+                            </div>
+                        </TippyWrapper>
+                        <div className={'space-item'}>
+                            <span>Reputation Points:</span>
+                            <span>{formatInt(guildsData.points.balance)}/{formatInt(guildsData.points.cap)}</span>
+                        </div>
+                        <div className={'buttons'}>
+                            {guildsData.prestige.canPrestige ? (<TippyWrapper content={<div className={'hint-popup'}>
+                                <p>You will loose all your guild reputation, levels and upgrades, but will get following bonuses (based on your new max reputation level):</p>
+                                <ResourceComparison effects1={guildsData.prestige.currentEffects} effects2={guildsData.prestige.potentialEffects} />
+                            </div> }>
+                                <button onClick={leaveGuild}>Prestige Guild</button>
+                            </TippyWrapper> ) : (<TippyWrapper content={<div className={'hint-popup'}>
+                                <p>You wont receive any new bonuses</p>
+                                <p>Reach {formatInt(guildsData.maxLevel + 1)} reputation level to increase your bonuses</p>
+                            </div> }>
+                                <button onClick={leaveGuild}>Abandon Guild</button>
+                            </TippyWrapper>)}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div className={'upgrades'}>
-            <PerfectScrollbar>
-                <div className={'tiers'}>
-                    {Object.values(guildsData.availableUpgrades).map((list, tier) => {
+            <div className={'upgrades'}>
+                <PerfectScrollbar>
+                    <div className={'tiers'}>
+                        {Object.values(guildsData.availableUpgrades).map((list, tier) => {
 
-                        return (<div className={'tier-wrap'}>
-                            <p className={'tier-title'}>Tier {formatInt(tier+1)}</p>
-                            <div className={'tier-content'}>
-                                {guildsData.tierUnlocks[tier]?.isUnlocked
-                                    ? list.map(upgrade => <ItemCard key={upgrade.id} {...upgrade} onPurchase={purchaseUpgrade} onShowDetails={setItemDetails}/>)
-                                    : (<p>Reach reputation level {formatInt(guildsData.tierUnlocks[tier]?.level)} to unlock</p>)}
-                            </div>
-                        </div> )
-                    })}
-                </div>
-            </PerfectScrollbar>
-        </div>
+                            return (<div className={'tier-wrap'}>
+                                <p className={'tier-title'}>Tier {formatInt(tier+1)}</p>
+                                <div className={'tier-content'}>
+                                    {guildsData.tierUnlocks[tier]?.isUnlocked
+                                        ? list.map(upgrade => <ItemCard key={upgrade.id} {...upgrade} onPurchase={purchaseUpgrade} onShowDetails={setItemDetails}/>)
+                                        : (<p>Reach reputation level {formatInt(guildsData.tierUnlocks[tier]?.level)} to unlock</p>)}
+                                </div>
+                            </div> )
+                        })}
+                    </div>
+                </PerfectScrollbar>
+            </div>
+        </NewNotificationWrap>
     </div>)
 }
 

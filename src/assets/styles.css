@@ -120,7 +120,7 @@ p {
     box-shadow: 0 0 12px #ffffff;
 }
 
-p.hint {
+p.hint, span.hint {
     font-style: italic;
     font-size: 14px;
 }
@@ -776,6 +776,9 @@ h4 {
 
 .furniture-wrap .head {
     padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .card.furniture {
@@ -914,6 +917,7 @@ h4 {
 
 .active-effects-wrap {
     display: flex;
+    flex-wrap: wrap;
 }
 
 .sidebar .effects-list {
@@ -1360,4 +1364,71 @@ span.highlighted-span {
 
 .guilds-wrap .upgrades {
     height: calc(100% - 260px);
+}
+
+.new-notification-wrapper {
+    position: relative;
+}
+
+.new-notification-wrapper.is-new:after {
+    position: absolute;
+    content: '';
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--highlight);
+    right: -8px;
+    top: -4px;
+    -webkit-animation: bgcolorchange 2s infinite; /* Chrome, Safari, Opera */
+    animation: 2s infinite bgcolorchange;
+}
+
+.new-notification-wrapper.narrow-wrapper.is-new:after {
+    right: 1px;
+    top: 1px;
+}
+
+@keyframes bgcolorchange {
+    0% {
+        background-color: var(--highlight);
+    }
+    50% {
+        background-color: #eef;
+    }
+    100% {
+        background-color: var(--highlight);
+    }
+}
+/* Chrome, Safari, Opera */
+@-webkit-keyframes bgcolorchange {
+    0%   {background: var(--highlight);}
+    50%  {background: #ddf; }
+    100% {background: var(--highlight);}
+}
+
+.event-holder .event-wrap {
+    width: 265px;
+    padding: 5px;
+}
+
+.event-holder .event-wrap button {
+    width: 255px;
+}
+
+.option-wrap {
+    padding: 10px 10px;
+}
+
+
+.option-wrap .option-button {
+    width: 300px;
+}
+
+.option-wrap .consumptions {
+    width: 300px;
+}
+
+.option-wrap .option-button.unavailable {
+    pointer-events: none;
+    background-color: #333333;
 }

@@ -1,8 +1,72 @@
 import { gameEntity, gameCore, gameEffects } from "game-framework"
 
+export const getMasteryId = id => `${id}_mastery`;
+
+export const getMaxId = id => `${id}_max`;
+
+export const getCostReduction = id => {
+    const effId = getMasteryId(id);
+    /*if(!gameEffects.effects[id]) {
+        gameEffects.registerEffect(effId, {
+            name: `Cost reduction`,
+            defaultValue: 1,
+        })
+    }*/
+    const effect = gameEffects.getEffectValue(effId);
+    return effect;
+}
+
+export const registerSpell = (id, options) => {
+
+    const cost_reduction_effect_id = getMasteryId(id);
+
+    const max_level_id = getMaxId(id);
+
+    // register effect
+    if(!gameEffects.effects[id]) {
+        gameEffects.registerEffect(cost_reduction_effect_id, {
+            name: `${options.name} cost`,
+            defaultValue: 1.,
+            minValue: 0,
+        })
+    }
+
+    //register cap
+    gameEntity.registerGameEntity(max_level_id, {
+        name: `${options.name} cap`,
+        tags: ['spell_cap'],
+        isUnlocked: options.isUnlocked,
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    [cost_reduction_effect_id]: {
+                        A: 0.975,
+                        B: 1,
+                        type: 1
+                    }
+                }
+            }
+        }
+    })
+
+    //register spell itself
+    if(options.resourceModifier) {
+        options.resourceModifier.effectDeps = [
+            ...(options.resourceModifier.effectDeps || []),
+            getMasteryId(id)
+        ]
+    }
+
+    gameEntity.registerGameEntity(id, {
+        ...options,
+    })
+}
+
 export const initSpellsDB1 = () => {
 
-    gameEntity.registerGameEntity('spell_magic_insight', {
+    registerSpell('spell_magic_insight', {
         name: 'Magic Insight',
         description: 'Use your magic capabilities to understand world better',
         hasCap: false,
@@ -30,7 +94,7 @@ export const initSpellsDB1 = () => {
                 resources: {
                     mana: {
                         A: 1.5,
-                        B: 3,
+                        B: 3*getCostReduction('spell_magic_insight'),
                         type: 1,
                     }
                 }
@@ -44,7 +108,7 @@ export const initSpellsDB1 = () => {
         }
     })
 
-    gameEntity.registerGameEntity('spell_focus', {
+    registerSpell('spell_focus', {
         name: 'Focus',
         description: 'Improve your learning capabilities using magic',
         hasCap: false,
@@ -68,22 +132,22 @@ export const initSpellsDB1 = () => {
                     }
                 }
             },
-            consumption: {
+            get_consumption: () => ({
                 resources: {
                     mana: {
                         A: 1.5,
-                        B: 1,
+                        B: 1*getCostReduction('spell_focus'),
                         type: 1,
                     }
                 }
-            }
+            })
         },
         usageGain: {
             get_consumption: () => ({
                 resources: {
                     mana: {
                         A: 1.5,
-                        B: 2,
+                        B: 2*getCostReduction('spell_focus'),
                         type: 1,
                     }
                 }
@@ -98,7 +162,7 @@ export const initSpellsDB1 = () => {
         },
     })
 
-    gameEntity.registerGameEntity('spell_magic_recovery', {
+    registerSpell('spell_magic_recovery', {
         name: 'Less Magic Recovery',
         description: 'Heal yourself using magic',
         hasCap: false,
@@ -117,7 +181,7 @@ export const initSpellsDB1 = () => {
                 resources: {
                     mana: {
                         A: 1.5,
-                        B: 4,
+                        B: 4*getCostReduction('spell_magic_recovery'),
                         type: 1,
                     }
                 }
@@ -141,7 +205,7 @@ export const initSpellsDB1 = () => {
     })
 
 
-    gameEntity.registerGameEntity('spell_small_regeneration', {
+    registerSpell('spell_small_regeneration', {
         name: 'Less Magic Regeneration',
         description: 'Enchant your body for faster recovery',
         hasCap: false,
@@ -170,15 +234,15 @@ export const initSpellsDB1 = () => {
                     }
                 },
             }),
-            consumption: {
+            get_consumption: () => ({
                 resources: {
                     mana: {
                         A: 1.5,
-                        B: 2,
+                        B: 2*getCostReduction('spell_small_regeneration'),
                         type: 1,
                     }
                 }
-            },
+            }),
             effectDeps: ['restoration_spells_efficiency']
         },
         usageGain: {
@@ -186,7 +250,7 @@ export const initSpellsDB1 = () => {
                 resources: {
                     mana: {
                         A: 1.5,
-                        B: 5/1.5,
+                        B: 5*getCostReduction('spell_small_regeneration')/1.5,
                         type: 1,
                     }
                 }
@@ -201,7 +265,7 @@ export const initSpellsDB1 = () => {
         },
     })
 
-    gameEntity.registerGameEntity('spell_perfection_illusion', {
+    registerSpell('spell_perfection_illusion', {
         name: 'Perfection Illusion',
         description: 'Use magic to create illusion that you are perfect worker. Increases coins income from jobs',
         hasCap: false,
@@ -225,15 +289,15 @@ export const initSpellsDB1 = () => {
                     }
                 }
             }),
-            consumption: {
+            get_consumption: () => ({
                 resources: {
                     mana: {
                         A: 1.5,
-                        B: 1,
+                        B: 1*getCostReduction('spell_perfection_illusion'),
                         type: 1,
                     }
                 }
-            },
+            }),
             effectDeps: ['illusion_spells_efficiency']
         },
         usageGain: {
@@ -241,7 +305,7 @@ export const initSpellsDB1 = () => {
                 resources: {
                     mana: {
                         A: 1.5,
-                        B: 4,
+                        B: 4*getCostReduction('spell_perfection_illusion'),
                         type: 1,
                     }
                 }
@@ -257,7 +321,7 @@ export const initSpellsDB1 = () => {
     })
 
 
-    gameEntity.registerGameEntity('spell_dancing_fairy', {
+    registerSpell('spell_dancing_fairy', {
         name: 'Dancing Fairy',
         description: 'Summon illusion of dancing fairy, inspiring you while performing routine actions. Improves learning rate for all routine tasks',
         hasCap: false,
@@ -281,15 +345,15 @@ export const initSpellsDB1 = () => {
                     }
                 }
             }),
-            consumption: {
+            get_consumption: () => ({
                 resources: {
                     mana: {
                         A: 1.5,
-                        B: 1.0/1.5,
+                        B: 1.0*getCostReduction('spell_dancing_fairy')/1.5,
                         type: 1,
                     }
                 }
-            },
+            }),
             effectDeps: ['illusion_spells_efficiency']
         },
         usageGain: {
@@ -297,7 +361,7 @@ export const initSpellsDB1 = () => {
                 resources: {
                     mana: {
                         A: 1.5,
-                        B: 5./1.5,
+                        B: 5.*getCostReduction('spell_dancing_fairy')/1.5,
                         type: 1,
                     }
                 }
@@ -314,7 +378,7 @@ export const initSpellsDB1 = () => {
 
 
 
-    gameEntity.registerGameEntity('spell_friendliness_mask', {
+    registerSpell('spell_friendliness_mask', {
         name: 'Mask of Friendliness',
         description: 'Cast a spell on your face to appear more friendly to others',
         hasCap: false,
@@ -338,15 +402,15 @@ export const initSpellsDB1 = () => {
                     }
                 }
             }),
-            consumption: {
+            get_consumption: () => ({
                 resources: {
                     mana: {
                         A: 1.5,
-                        B: 10.0/1.5,
+                        B: 10.0*getCostReduction('spell_friendliness_mask')/1.5,
                         type: 1,
                     }
                 }
-            },
+            }),
             effectDeps: ['illusion_spells_efficiency']
         },
         usageGain: {
@@ -354,7 +418,7 @@ export const initSpellsDB1 = () => {
                 resources: {
                     mana: {
                         A: 1.5,
-                        B: 25./1.5,
+                        B: 25.*getCostReduction('spell_friendliness_mask')/1.5,
                         type: 1,
                     }
                 }
@@ -371,7 +435,7 @@ export const initSpellsDB1 = () => {
 
 
 
-    gameEntity.registerGameEntity('spell_illusory_hammer', {
+    registerSpell('spell_illusory_hammer', {
         name: 'Illusory Hammer',
         description: 'Create an duplicated hammer. Of course, its just an imagination, but still it chops wood nice.',
         hasCap: false,
@@ -395,15 +459,15 @@ export const initSpellsDB1 = () => {
                     }
                 }
             }),
-            consumption: {
+            get_consumption: () => ({
                 resources: {
                     mana: {
                         A: 1.5,
-                        B: 25.0/1.5,
+                        B: 25.0*getCostReduction('spell_illusory_hammer')/1.5,
                         type: 1,
                     }
                 }
-            },
+            }),
             effectDeps: ['illusion_spells_efficiency']
         },
         usageGain: {
@@ -411,7 +475,7 @@ export const initSpellsDB1 = () => {
                 resources: {
                     mana: {
                         A: 1.5,
-                        B: 80./1.5,
+                        B: 80.*getCostReduction('spell_illusory_hammer')/1.5,
                         type: 1,
                     }
                 }

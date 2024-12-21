@@ -97,11 +97,13 @@ Pre-release 0.0.3
 
 ----
 v0.0.3a:
-1. Add Hard Reset
-2. Add search actions 
-3. Hide all maxed furniture
-4. Action trigger is not running
-5. Add flat bonus to spells per level (kinda 1 + 0.02*maxLevel)
-6. New unlocks indication
-7. Add workshop slots automation
-8. Add upgrade for shop stock capacity
+1. [V] Add Hard Reset
+2. [V] Add search actions 
+3. [V] Hide all maxed furniture
+4. [V] Action trigger is not running
+5. [V] Add flat bonus to spells per level (kinda 1 + 0.02*maxLevel)
+6. [V] New unlocks indication
+7. Add upgrade for shop stock capacity
+8. [V] Add new rare events effects
+9. Add workshop slots automation (Or think how to do it)
+10. Test knowledge related events

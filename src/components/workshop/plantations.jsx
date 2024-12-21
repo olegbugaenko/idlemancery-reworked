@@ -3,8 +3,9 @@ import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
 import {formatInt, formatValue} from "../../general/utils/strings";
 import PerfectScrollbar from "react-perfect-scrollbar";
+import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
 
-export const Plantations = ({ setItemDetails }) => {
+export const Plantations = ({ setItemDetails, newUnlocks }) => {
 
     const worker = useContext(WorkerContext);
 
@@ -50,7 +51,9 @@ export const Plantations = ({ setItemDetails }) => {
         <div className={'plantations-cat'}>
             <PerfectScrollbar>
                 <div className={'flex-container'}>
-                    {plantationsData.available.map(plantable => <ItemCard key={plantable.id} {...plantable} onPurchase={purchaseItem} onShowDetails={setItemDetails} onDemolish={onDemolish}/>)}
+                    {plantationsData.available.map(plantable => <NewNotificationWrap id={`plantation_${plantable.id}`} className={'narrow-wrapper'} isNew={newUnlocks?.[`plantation_${plantable.id}`]?.hasNew}>
+                        <ItemCard key={plantable.id} {...plantable} onPurchase={purchaseItem} onShowDetails={setItemDetails} onDemolish={onDemolish}/>
+                    </NewNotificationWrap>)}
                 </div>
             </PerfectScrollbar>
         </div>

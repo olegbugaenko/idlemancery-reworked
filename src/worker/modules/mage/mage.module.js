@@ -12,7 +12,7 @@ export class MageModule extends GameModule {
         this.skillUpgrades = {};
         this.bankedTime = {
             current: 0,
-            max: 3600*4*1000,
+            max: 3600*24*1000,
             speedUpFactor: 1,
         };
         /*
@@ -256,7 +256,7 @@ export class MageModule extends GameModule {
     }
 
     load(obj) {
-        this.mageLevel = obj?.mageLevel || 0;
+        this.mageLevel = obj?.mageLevel || 1;
         gameEntity.setEntityLevel('mage', this.mageLevel);
 
         for(const key in this.skillUpgrades) {
@@ -268,11 +268,20 @@ export class MageModule extends GameModule {
                 this.setSkill(id, obj.skillUpgrades[id], true);
             }
         }
+        const permanent = gameEntity.listEntitiesByTags(['bonus', 'permanent']).map(one => ({ id: one.id, level: one.level }));
+        permanent.forEach(one => {
+            gameEntity.setEntityLevel(one.id, 0, true);
+        })
         if(obj?.permanentBonuses) {
             obj.permanentBonuses.forEach(({ id, level }) => {
                 gameEntity.setEntityLevel(id, level, true);
             })
         }
+        this.bankedTime = {
+            current: 0,
+            max: 3600*24*1000,
+            speedUpFactor: 1,
+        };
         if(obj?.bankedTime) {
             this.bankedTime = obj?.bankedTime;
             if(Date.now() > this.bankedTime.lastSave + 60000) {
