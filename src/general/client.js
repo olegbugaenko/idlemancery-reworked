@@ -29,9 +29,9 @@ export function useWorkerClient(worker) {
         const parsed = JSON.parse(event.data);
 
         if (!parsed.event || !globalEventHandlers[parsed.event]) {
-            console.error('Invalid event or handler not registered', parsed.event);
-            console.warn(globalEventHandlers);
-            console.warn(parsed)
+            console.warn('Invalid event or handler not registered', parsed);
+            // console.warn(globalEventHandlers);
+            // console.warn(parsed)
             return;
         }
 

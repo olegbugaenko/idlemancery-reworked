@@ -1432,3 +1432,53 @@ span.highlighted-span {
     pointer-events: none;
     background-color: #333333;
 }
+
+.event-holder .others {
+    position: relative;
+}
+
+.event-holder .others .showMore {
+    cursor: pointer;
+    color: var(--highlight);
+    font-style: italic;
+}
+
+.events-popup.hidden {
+    display: none;
+}
+
+.events-popup.visible {
+    display: block;
+    position: absolute;
+    padding: 4px;
+    width: 240px;
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 3px;
+}
+
+.events-popup .event {
+    padding: 4px;
+    border-bottom: 1px solid #333333;
+}
+
+.events-popup .event-name {
+    font-size: 13px;
+    font-style: italic;
+    cursor: pointer;
+}
+
+.events-popup .event-time {
+    font-size: 13px;
+    font-style: italic;
+    cursor: pointer;
+}
+
+.events-popup .event-name.new {
+    color: var(--highlight);
+}
+
+.events-popup .event {
+    display: flex;
+    justify-content: space-between;
+}

@@ -6,6 +6,13 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+                <h3>Idle Awakening v0.0.4a</h3>
+                <div className={'features'}>
+                    <p>Fixed bugs and crushes when selecting specific events options</p>
+                    <p>Added few more events</p>
+                    <p>Events can be queued now (up to 5)</p>
+                    <p>Potential effects are now shown once player revealed them before</p>
+                </div>
                 <h3>Idle Awakening v0.0.4</h3>
                 <div className={'features'}>
                     <p>Added random events, providing various options and possible bonuses</p>

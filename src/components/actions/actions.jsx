@@ -349,7 +349,7 @@ export const Actions = ({}) => {
                         </ul>
                         <div className={'additional-filters'}>
                             <label>
-                                <input type={'text'} placeholder={'Search'} value={actionsData.searchText} onChange={e => setSearch(e.target.value)}/>
+                                <input type={'text'} placeholder={'Search'} value={actionsData.searchText || ''} onChange={e => setSearch(e.target.value)}/>
                             </label>
                             <label>
                                 <input type={"checkbox"} checked={actionsData.showHidden} onChange={toggleShowHidden}/>

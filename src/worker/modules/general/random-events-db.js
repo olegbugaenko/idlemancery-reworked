@@ -806,7 +806,7 @@ export const registerRandomEventsDb = () => {
                     description: 'The performers thank you, and their music attracts a wealthier crowd. (Increased gold income for 5 minutes)',
                     unlockCondition: () => true,
                     onTrigger: () => {
-                        gameCore.getModule('temporary-effects').triggerEffect('temporary_gold_bonus');
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_coins_bonus');
                         gameResources.addResource('coins', -125);
                     }
                 }, {
@@ -1242,10 +1242,10 @@ export const registerRandomEventsDb = () => {
                 }, {
                     id: 'knowledge_permanent_boost',
                     probability: 0.2,
-                    description: 'You push your limits and learn efficiently. (+1 Knowledge permanently)',
+                    description: 'You push your limits and learn efficiently. (+1 Memory)',
                     unlockCondition: () => true,
                     onTrigger: () => {
-                        gameEntity.setEntityLevel('random_events_knowledge_effect', gameEntity.getLevel('random_events_knowledge_effect') + 1, true);
+                        gameEntity.setEntityLevel('random_events_memory_effect', gameEntity.getLevel('random_events_memory_effect') + 1, true);
                     }
                 }, {
                     id: 'temporary_knowledge_debuff',
@@ -1267,7 +1267,7 @@ export const registerRandomEventsDb = () => {
                     description: 'The stress of the bet hampers your energy recovery. (-Energy regeneration for 5 minutes)',
                     unlockCondition: () => true,
                     onTrigger: () => {
-                        gameCore.getModule('temporary-effects').triggerEffect('temporary_energy_regeneration_debuff');
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_energy_debuff');
                     }
                 }, {
                     id: 'temporary_knowledge_gain',
@@ -1314,7 +1314,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameResources.addResource('energy', -0.2 * gameResources.getResource('energy').cap);
-                        gameCore.getModule('temporary-effects').triggerEffect('temporary_energy_regeneration_debuff');
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_energy_debuff');
                     }
                 }, {
                     id: 'gold_find',
@@ -1371,10 +1371,10 @@ export const registerRandomEventsDb = () => {
                 effects: [{
                     id: 'knowledge_permanent_boost',
                     probability: 0.2,
-                    description: 'The experiment succeeds, expanding your knowledge. (+1 Knowledge permanently)',
+                    description: 'The experiment succeeds, expanding your knowledge. (+1 Memory permanently)',
                     unlockCondition: () => true,
                     onTrigger: () => {
-                        gameEntity.setEntityLevel('random_events_knowledge_effect', gameEntity.getLevel('random_events_knowledge_effect') + 1, true);
+                        gameEntity.setEntityLevel('random_events_memory_effect', gameEntity.getLevel('random_events_memory_effect') + 1, true);
                     }
                 }, {
                     id: 'temporary_energy_debuff',
@@ -1427,6 +1427,519 @@ export const registerRandomEventsDb = () => {
             option3: {
                 id: 'option3',
                 name: 'Leave It Alone',
+                unlockCondition: () => true,
+                effects: []
+            }
+        }
+    });
+
+    randomEventsDB.push({
+        id: 'magic_event1',
+        name: 'The Overactive Spellbook',
+        description: 'While flipping through your spellbook in a quiet corner of the tavern, a poorly contained spell activates, filling the room with a shimmering, unstable energy. The barkeep glares at you, and the other patrons grow uneasy.',
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_spellbook') > 0;
+        },
+        probability: 1,
+        options: {
+            option1: {
+                id: 'option1',
+                name: 'Try to Dispel the Energy',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'temporary_mana_regen',
+                    probability: 0.6,
+                    description: 'Your efforts stabilize the energy, leaving you refreshed. (+Mana regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_mana_regen', 2);
+                    }
+                }, {
+                    id: 'temporary_mana_debuff',
+                    probability: 0.4,
+                    description: 'You fail to contain the spell, and it drains your energy. (-Mana regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_mana_debuff');
+                    }
+                }]
+            },
+            option2: {
+                id: 'option2',
+                name: 'Cast a Counterspell',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'temporary_mental_training_rate',
+                    probability: 0.5,
+                    description: 'The counterspell enhances your focus. (+Mental training speed for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_mental_training_rate');
+                    }
+                }, {
+                    id: 'temporary_knowledge_debuff',
+                    probability: 0.3,
+                    description: 'The counterspell backfires slightly, muddling your thoughts. (-Knowledge gain for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_knowledge_debuff');
+                    }
+                }, {
+                    id: 'temporary_health_debuff',
+                    probability: 0.2,
+                    description: 'The unstable energy shocks you, causing a minor injury. (-10% HP)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameResources.addResource('health', -0.1 * gameResources.getResource('health').cap);
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_health_debuff', 2);
+                    }
+                }]
+            },
+            option3: {
+                id: 'option3',
+                name: 'Apologize to the Tavern Patrons',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'temporary_energy_regeneration_debuff',
+                    probability: 0.4,
+                    description: 'The effort of calming everyone drains you. (-Energy regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_energy_debuff');
+                    }
+                }, {
+                    id: 'charisma_boost',
+                    probability: 0.3,
+                    description: 'Your sincerity wins over the crowd. (+1 Charisma)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameEntity.setEntityLevel('random_events_charisma_effect', gameEntity.getLevel('random_events_charisma_effect') + 1, true);
+                    }
+                }, {
+                    id: 'gold_loss',
+                    probability: 0.3,
+                    description: 'The barkeep demands compensation for the disturbance. (-50 Coins)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameResources.addResource('coins', -50);
+                    }
+                }]
+            },
+            option4: {
+                id: 'option4',
+                name: 'Flee the Scene',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'temporary_health_debuff',
+                    probability: 0.5,
+                    description: 'In your rush to escape, you trip and fall. (-10% HP)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameResources.addResource('health', -0.1 * gameResources.getResource('health').cap);
+                    }
+                }, {
+                    id: 'gold_loss',
+                    probability: 0.5,
+                    description: 'In the chaos, someone picks your pocket. (-30 Coins)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameResources.addResource('coins', -30);
+                    }
+                }]
+            }
+        }
+    });
+
+    randomEventsDB.push({
+        id: 'magic_event2',
+        name: 'Spilled Ale and Sparks',
+        description: 'A clumsy patron spills their ale on your spellbook, causing sparks to fly and minor chaos in the tavern. The barkeep looks furious, and the patron looks embarrassed.',
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_spellbook') > 0;
+        },
+        probability: 1,
+        options: {
+            option1: {
+                id: 'option1',
+                name: 'Use Magic to Dry the Book',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'temporary_mana_regen',
+                    probability: 0.5,
+                    description: 'The spell works perfectly, restoring calm. (+Mana regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_mana_regen', 2);
+                    }
+                }, {
+                    id: 'temporary_mana_debuff',
+                    probability: 0.5,
+                    description: 'The spell backfires, draining your energy further. (-Mana regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_mana_debuff', 1);
+                    }
+                }]
+            },
+            option2: {
+                id: 'option2',
+                name: 'Demand Compensation from the Patron',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'gold_gain',
+                    probability: 0.7,
+                    description: 'The patron apologizes and offers you some gold.',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameResources.addResource('coins', 50 + 0.1*gameResources.getResource('coins').cap);
+                    }
+                }, {
+                    id: 'charisma_penalty',
+                    probability: 0.3,
+                    description: 'The patron refuses and spreads rumors about your temper. (-1 Charisma)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameEntity.setEntityLevel('random_events_charisma_effect', gameEntity.getLevel('random_events_charisma_effect') - 1, true);
+                    }
+                }]
+            },
+            option3: {
+                id: 'option3',
+                name: 'Let It Slide',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'temporary_mental_training_rate',
+                    probability: 1,
+                    description: 'Your restraint impresses the crowd, enhancing your focus. (+Mental training speed for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_mental_training_rate', 2);
+                    }
+                }]
+            }
+        }
+    });
+
+    randomEventsDB.push({
+        id: 'magic_event3',
+        name: 'A Dispute Over a Spell',
+        description: 'Two rival mages are arguing loudly in the market square over the correct incantation for a complex spell. The argument draws a crowd, and you are pulled into the fray.',
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_spellbook') > 0;
+        },
+        probability: 1,
+        options: {
+            option1: {
+                id: 'option1',
+                name: 'Mediate Between Them',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'charisma_boost',
+                    probability: 0.4,
+                    description: 'Your calm demeanor and logic win the crowd’s approval. (+1 Charisma)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameEntity.setEntityLevel('random_events_charisma_effect', gameEntity.getLevel('random_events_charisma_effect') + 1, true);
+                    }
+                }, {
+                    id: 'temporary_energy_regeneration_debuff',
+                    probability: 0.6,
+                    description: 'The effort drains you significantly. (-Energy regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_energy_debuff', 2);
+                    }
+                }]
+            },
+            option2: {
+                id: 'option2',
+                name: 'Join the Argument',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'temporary_knowledge_gain',
+                    probability: 0.5,
+                    description: 'The heated debate sharpens your understanding. (+Knowledge gain for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_knowledge_gain', 2);
+                    }
+                }, {
+                    id: 'temporary_health_debuff',
+                    probability: 0.5,
+                    description: 'A stray spell hits you in the commotion, causing a minor injury. (-Health regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_health_debuff', 2);
+                    }
+                }]
+            },
+            option3: {
+                id: 'option3',
+                name: 'Walk Away',
+                unlockCondition: () => true,
+                effects: []
+            }
+        }
+    });
+
+    randomEventsDB.push({
+        id: 'magic_event4',
+        name: 'Magical Misfire',
+        description: 'During practice in the market square, your spell misfires, creating a harmless but embarrassing illusion of yourself.',
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_spellbook') > 0;
+        },
+        probability: 1,
+        options: {
+            option1: {
+                id: 'option1',
+                name: 'Laugh It Off',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'charisma_boost',
+                    probability: 0.6,
+                    description: 'Your humor and humility charm the crowd. (+1 Charisma)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameEntity.setEntityLevel('random_events_charisma_effect', gameEntity.getLevel('random_events_charisma_effect') + 1, true);
+                    }
+                }, {
+                    id: 'gold_gain',
+                    probability: 0.4,
+                    description: 'The crowd finds your antics amusing and tosses some coins your way. (Refilled 10% of your coins storage)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameResources.addResource('coins', 0.1*gameResources.getResource('coins').cap);
+                    }
+                }]
+            },
+            option2: {
+                id: 'option2',
+                name: 'Quickly Correct the Spell',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'temporary_mental_training_rate',
+                    probability: 0.7,
+                    description: 'Your quick thinking improves your focus. (+Mental training speed for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_mental_training_rate', 1);
+                    }
+                }, {
+                    id: 'temporary_mana_debuff',
+                    probability: 0.3,
+                    description: 'The correction drains your mana. (-Mana regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_mana_debuff', 2);
+                    }
+                }]
+            },
+            option3: {
+                id: 'option3',
+                name: 'Flee the Scene',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'temporary_health_debuff',
+                    probability: 0.5,
+                    description: 'In your haste to escape, you bump into someone, causing a minor injury. (-Health regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_health_debuff', 1);
+                    }
+                }]
+            }
+        }
+    });
+
+    randomEventsDB.push({
+        id: 'magic_event6',
+        name: 'The Wandering Sage',
+        description: 'An old sage approaches you, offering to share a fragment of his magical wisdom, but warns that it could be exhausting to comprehend.',
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_spellbook') > 0;
+        },
+        probability: 1,
+        options: {
+            option1: {
+                id: 'option1',
+                name: 'Accept His Wisdom',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'temporary_knowledge_gain',
+                    probability: 0.6,
+                    description: 'The sage’s wisdom broadens your understanding. (+Knowledge gain for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_knowledge_gain', 4);
+                    }
+                }, {
+                    id: 'temporary_mana_debuff',
+                    probability: 0.4,
+                    description: 'The mental effort drains your magical reserves. (-Mana regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_mana_debuff', 2);
+                    }
+                }]
+            },
+            option2: {
+                id: 'option2',
+                name: 'Politely Decline',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'charisma_boost',
+                    probability: 0.5,
+                    description: 'Your respectful refusal earns the sage’s admiration. (+1 Charisma)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameEntity.setEntityLevel('random_events_charisma_effect', gameEntity.getLevel('random_events_charisma_effect') + 1, true);
+                    }
+                }]
+            },
+            option3: {
+                id: 'option3',
+                name: 'Ask for Practical Guidance',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'temporary_mana_regen',
+                    probability: 0.7,
+                    description: 'The sage demonstrates a technique to replenish your mana. (+Mana regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_mana_regen', 2);
+                    }
+                }, {
+                    id: 'temporary_mental_training_rate',
+                    probability: 0.3,
+                    description: 'The sage’s teachings improve your focus. (+Mental training speed for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_mental_training_rate', 2);
+                    }
+                }]
+            }
+        }
+    });
+
+    randomEventsDB.push({
+        id: 'magic_event7',
+        name: 'An Enchanted Fountain',
+        description: 'You find a glowing fountain in the woods. The water sparkles with magical energy, and a faint humming fills the air.',
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_spellbook') > 0;
+        },
+        probability: 1,
+        options: {
+            option1: {
+                id: 'option1',
+                name: 'Drink the Water',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'temporary_mana_regen',
+                    probability: 0.7,
+                    description: 'The water revitalizes your magical reserves. (+Mana regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_mana_regen', 1.5);
+                    }
+                }, {
+                    id: 'temporary_knowledge_debuff',
+                    probability: 0.3,
+                    description: 'The magical water overwhelms your thoughts. (-Knowledge gain for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_knowledge_debuff', 2);
+                    }
+                }]
+            },
+            option2: {
+                id: 'option2',
+                name: 'Use the Water for Research',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'temporary_knowledge_gain',
+                    probability: 0.6,
+                    description: 'The water enhances your research, deepening your understanding. (+Knowledge gain for 15 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_knowledge_gain', 3);
+                    }
+                }, {
+                    id: 'temporary_mana_debuff',
+                    probability: 0.4,
+                    description: 'Using the water in experiments depletes your mana. (-Mana regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_mana_debuff', 1);
+                    }
+                }]
+            },
+            option3: {
+                id: 'option3',
+                name: 'Leave It Alone',
+                unlockCondition: () => true,
+                effects: []
+            }
+        }
+    });
+
+    randomEventsDB.push({
+        id: 'magic_event8',
+        name: 'A Mage’s Duel',
+        description: 'Two mages are locked in a duel, their spells lighting up the night sky. They invite you to join as a mediator or a participant.',
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_spellbook') > 0;
+        },
+        probability: 1,
+        options: {
+            option1: {
+                id: 'option1',
+                name: 'Join as a Mediator',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'temporary_knowledge_gain',
+                    probability: 0.5,
+                    description: 'Your efforts to mediate help you understand complex spell interactions. (+Knowledge gain for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_knowledge_gain', 4);
+                    }
+                }, {
+                    id: 'temporary_energy_regeneration_debuff',
+                    probability: 0.5,
+                    description: 'Mediating the duel is exhausting. (-Energy regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_energy_debuff', 1);
+                    }
+                }]
+            },
+            option2: {
+                id: 'option2',
+                name: 'Join the Duel',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'temporary_mana_regen',
+                    probability: 0.6,
+                    description: 'The duel invigorates your magical energy. (+Mana regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_mana_regen', 3);
+                    }
+                }, {
+                    id: 'temporary_health_debuff',
+                    probability: 0.4,
+                    description: 'A stray spell injures you slightly. (-Health regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_health_debuff', 2);
+                    }
+                }]
+            },
+            option3: {
+                id: 'option3',
+                name: 'Watch from the Sidelines',
                 unlockCondition: () => true,
                 effects: []
             }

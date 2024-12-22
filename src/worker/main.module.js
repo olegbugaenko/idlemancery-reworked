@@ -59,7 +59,7 @@ export class MainModule extends GameModule {
             console.log('reseted');
             const cheat = 1;
             gameCore.startTicking(100, () => 0.1*cheat*(gameCore.getModule('mage').bankedTime?.speedUpFactor ?? 1), () => {
-                if(gameCore.numTicks % 100 === 0) {
+                if(gameCore.numTicks % 300 === 0) {
                     this.save();
                 }
             }, false)
