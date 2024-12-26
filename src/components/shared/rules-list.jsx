@@ -233,9 +233,12 @@ const RulesList = React.memo(
                                 option.value === rule[subjectName]?.toString()
                         );
 
-                        if(!subjectValue) {
+                        if(!subjectValue && subjectOptions?.length) {
                             subjectValue = {...subjectOptions[0]};
-                            setRuleValue(index, mapCompareType[rule.compare_type].subject, subjectValue.value)
+                            if(subjectValue) {
+                                console.log('Setting: ', mapCompareType[rule.compare_type].subject, subjectValue, subjectOptions )
+                                setRuleValue(index, mapCompareType[rule.compare_type].subject, subjectValue.value)
+                            }
                         }
                     }
 

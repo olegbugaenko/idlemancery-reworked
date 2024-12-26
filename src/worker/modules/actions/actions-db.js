@@ -939,6 +939,52 @@ export const registerActionsStage1 = () => {
         }
     })
 
+    registerGameAction('action_gather_carefully', {
+        tags: ["action", "gathering", "routine"],
+        name: 'Careful Gathering',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Spend some time looking for items, but without many risks',
+        level: 1,
+        getLearnRate: () => {
+            return 1.
+        },
+        learningEffects: ['routine_learning_speed'],
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'gathering_effort': {
+                        A: 0.001*gameEffects.getEffectValue('gathering_efficiency'),
+                        B: 0.009*gameEffects.getEffectValue('gathering_efficiency'),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0,
+                        B: 1,
+                        type: 0,
+                    },
+                    'health': {
+                        A: 0,
+                        B: 0.1,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['gathering_efficiency']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0
+        },
+        attributes: {
+            baseXPCost: 50,
+            primaryAttribute: 'attribute_patience'
+        }
+    })
+
     registerGameAction('action_gather_berries', {
         tags: ["action", "gathering", "routine"],
         name: 'Gather Berries',
@@ -972,7 +1018,7 @@ export const registerActionsStage1 = () => {
             effectDeps: ['gathering_efficiency']
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_backpack') > 0
+            return gameEntity.getLevel('shop_item_backpack') > 0 && false
         },
         attributes: {
             baseXPCost: 50,
@@ -1506,13 +1552,8 @@ export const registerActionsStage1 = () => {
             }),
             effectDeps: ['gathering_efficiency']
         },
-        unlockedBy: [{
-            type: 'effect',
-            id: 'attribute_strength',
-            level: 20,
-        }],
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_backpack') > 0
+            return gameEntity.getLevel('shop_item_backpack') > 0 && false
         },
         attributes: {
             baseXPCost: 50,
@@ -1576,14 +1617,9 @@ export const registerActionsStage1 = () => {
             }),
             effectDeps: ['gathering_efficiency']
         },
-        unlockedBy: [{
-            type: 'effect',
-            id: 'attribute_strength',
-            level: 25,
-        }],
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0
-                && gameEntity.getLevel('shop_item_herbs_handbook_1') > 0
+                && gameEntity.getLevel('shop_item_herbs_handbook_1') > 0 && false
         },
         attributes: {
             baseXPCost: 50,
@@ -1652,7 +1688,7 @@ export const registerActionsStage1 = () => {
         },
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0
-                && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
+                && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0 && false
         },
         attributes: {
             baseXPCost: 500,
@@ -1722,7 +1758,7 @@ export const registerActionsStage1 = () => {
         },
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0
-                && gameEntity.getLevel('shop_item_herbs_handbook_3') > 0
+                && gameEntity.getLevel('shop_item_herbs_handbook_3') > 0 && false
         },
         attributes: {
             baseXPCost: 500,
@@ -1791,7 +1827,7 @@ export const registerActionsStage1 = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0
                 && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
-            && gameEntity.getLevel('guild_herbalists') > 0
+            && gameEntity.getLevel('guild_herbalists') > 0 && false
         },
         attributes: {
             baseXPCost: 5000,

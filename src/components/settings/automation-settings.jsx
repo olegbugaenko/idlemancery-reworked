@@ -41,6 +41,7 @@ export const AutomationsSettings = () => {
             {unlocks.actionLists ? (<ActionsAutomations resources={resources}/>) : null}
             {unlocks.inventory ? (<SellAutomations resources={resources}/>) : null}
             {unlocks.inventory ? (<ConsumeAutomations resources={resources} />) : null}
+            {unlocks.map ? (<MapTilesAutomations resources={resources} />) : null}
             {unlocks.spellbook ? (<SpellAutomations resources={resources} />) : null}
         </PerfectScrollbar>
     </div> )
@@ -241,6 +242,77 @@ export const AutomatedSell = ({ auto, resources, onSaveSell }) => {
     />
 
 }
+
+
+
+export const MapTilesAutomations = ({ resources }) => {
+
+    const worker = useContext(WorkerContext);
+    const { onMessage, sendData } = useWorkerClient(worker);
+    const [automations, setAutomations] = useState([]);
+    const [isOpened, setOpened] = useState(true);
+
+    useEffect(() => {
+        sendData('query-map-tile-lists', { filterAutomated: true })
+    }, []);
+
+    onMessage('map-tile-lists', (data) => {
+        console.log('automated-lists: ', data);
+        setAutomations(data.lists);
+    })
+
+    const onSaveAction = useCallback((id, saveData) => {
+        const prev = automations.find(a => a.id === id);
+        if(!prev) {
+            console.error(`Not found map tile by id: ${id}`, id, saveData);
+            return;
+        }
+        const toSave = {
+            ...prev,
+            autotrigger: {
+                priority: saveData.priority,
+                rules: saveData.rules,
+                pattern: saveData.pattern
+            }
+        }
+        console.log('Saving data: ', toSave);
+        sendData('save-map-tile-list', toSave);
+    })
+
+    if(!automations || !automations.length || !resources) return;
+
+    return (<div className={`automations-box ${isOpened ? 'opened' : 'closed'}`}>
+        <div className={'automation-panel-title'} onClick={() => setOpened(!isOpened)}>
+            <h4>Map Lists Automations</h4>
+            <span className={'arrow-down'}>&#8681;</span>
+        </div>
+        <div className={'automated-list'}>
+            {automations.map(auto => (<AutomatedMapTile auto={auto} resources={resources} onSaveAction={onSaveAction}/>))}
+        </div>
+    </div> )
+
+}
+
+export const AutomatedMapTile = ({ auto, resources, onSaveAction }) => {
+
+    const onSave = useCallback((id, data) => {
+        onSaveAction(id, data);
+    })
+
+    return <AutomatedItem
+        scope={'autoexplore'}
+        id={auto.id}
+        name={auto.name}
+        rules={auto.autotrigger.rules}
+        pattern={auto.autotrigger.pattern}
+        resources={resources}
+        isPriorityShown={true}
+        priority={auto.autotrigger.priority}
+        onSave={onSave}
+    />
+
+}
+
 
 
 export const SpellAutomations = ({ resources }) => {

@@ -918,7 +918,7 @@ export const registerGuildUpgrades = () => {
 
     gameEntity.registerGameEntity('guild_upgrades_herbalists_insight', {
         tags: ["guild-upgrade", "purchaseable"],
-        name: 'Herbalist\'s Insigh',
+        name: 'Herbalist\'s Insight',
         description: 'Enhance the effectiveness of herb gathering, finding rarer and higher-quality plants',
         level: 0,
         unlockCondition: () => {

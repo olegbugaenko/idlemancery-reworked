@@ -602,11 +602,11 @@ export const registerShopItemsStage1 = () => {
         maxLevel: 1,
         unlockedBy: [{
             type: 'entity',
-            id: 'action_deeper_forest',
+            id: 'action_gather_carefully',
             level: 2,
         }],
         unlockCondition: () => {
-            return gameEntity.getLevel('action_deeper_forest') > 1
+            return true;
         },
         attributes: {
             isCollectable: false,
@@ -1092,7 +1092,7 @@ export const registerShopItemsStage1 = () => {
         get_cost: () => ({
             'coins': {
                 A: 2.25,
-                B: 140000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 120000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 1
             }
         }),
@@ -1132,7 +1132,7 @@ export const registerShopItemsStage1 = () => {
         get_cost: () => ({
             'coins': {
                 A: 2.25,
-                B: 140000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 120000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 1
             }
         }),

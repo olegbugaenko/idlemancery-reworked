@@ -14,6 +14,7 @@ import {GuildsModule} from "./modules/social/guilds.module";
 import {UnlockNotificationsModule} from "./shared/modules/unlock-notifications.module";
 import {RandomEventsModule} from "./modules/general/random-events.module";
 import {TemporaryEffectsModule} from "./modules/general/temporary-effects.module";
+import {MapModule} from "./modules/map/map.module";
 
 
 export class MainModule extends GameModule {
@@ -34,6 +35,7 @@ export class MainModule extends GameModule {
         gameCore.registerModule('unlock-notifications', UnlockNotificationsModule);
         gameCore.registerModule('random-events', RandomEventsModule);
         gameCore.registerModule('temporary-effects', TemporaryEffectsModule);
+        gameCore.registerModule('map', MapModule);
 
 
 
@@ -56,8 +58,7 @@ export class MainModule extends GameModule {
             console.log('reset-game received');
             gameCore.stopTicking();
             gameCore.load({});
-            console.log('reseted');
-            const cheat = 1;
+            const cheat = 5;
             gameCore.startTicking(100, () => 0.1*cheat*(gameCore.getModule('mage').bankedTime?.speedUpFactor ?? 1), () => {
                 if(gameCore.numTicks % 300 === 0) {
                     this.save();
@@ -67,7 +68,7 @@ export class MainModule extends GameModule {
         })
 
         this.eventHandler.registerHandler('start-ticking', () => {
-            const cheat = 1;
+            const cheat = 5;
             // const speedUpMode = gameCore.getModule('mage').bankedTime?.speedUpFactor ?? 1;
             // console.log('gameCore', GameCore.instance, speedUpMode);
             gameCore.startTicking(100, () => 0.1*cheat*(gameCore.getModule('mage').bankedTime?.speedUpFactor ?? 1), () => {
@@ -91,6 +92,8 @@ export class MainModule extends GameModule {
                 'plantation': gameResources.getResource('plantation_slots').income > 0,
                 'guilds': gameEffects.getEffectValue('attribute_charisma') >= 500,
                 'social': gameEffects.getEffectValue('attribute_charisma') >= 500,
+                'map': gameEntity.getLevel('shop_item_backpack') > 0,
+                'world': gameEntity.getLevel('shop_item_backpack') > 0,
             }
             let label = 'unlocks';
             if(payload?.prefix) {

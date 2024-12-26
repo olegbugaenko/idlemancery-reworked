@@ -14,7 +14,7 @@ export const registerInventoryItems = () => {
     gameResources.registerResource('inventory_berry', {
         name: 'Berry',
         hasCap: false,
-        tags: ['inventory', 'consumable'],
+        tags: ['inventory', 'consumable', 'gatherable'],
         defaultCap: 0,
         onUse: (amount) => {
 
@@ -39,7 +39,9 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0
         },
-        sellPrice: 0.5
+        sellPrice: 0.5,
+        rarity: 0,
+        allowedTileTypes: ['plain', 'forest', 'lakes', 'hills']
     })
 
     gameResources.registerResource('inventory_bread', {
@@ -77,7 +79,7 @@ export const registerInventoryItems = () => {
     gameResources.registerResource('inventory_fly_mushroom', {
         name: 'Fly Mushroom',
         hasCap: false,
-        tags: ['inventory', 'consumable'],
+        tags: ['inventory', 'consumable', 'gatherable'],
         defaultCap: 0,
         onUse: (amount) => {
 
@@ -109,13 +111,15 @@ export const registerInventoryItems = () => {
             return gameEntity.getLevel('shop_item_backpack') > 0
         },
         sellPrice: 5,
+        rarity: 0,
+        allowedTileTypes: ['swamp', 'forest', 'lakes']
     })
 
 
     gameResources.registerResource('inventory_aloe_vera', {
         name: 'Aloe Vera',
         hasCap: false,
-        tags: ['inventory', 'consumable'],
+        tags: ['inventory', 'consumable', 'gatherable'],
         defaultCap: 0,
         onUse: (amount) => {
 
@@ -138,13 +142,15 @@ export const registerInventoryItems = () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_1') > 0
         },
         sellPrice: 12,
+        rarity: 1,
+        allowedTileTypes: ['plain', 'savanna']
     })
 
 
     gameResources.registerResource('inventory_ginseng', {
         name: 'Ginseng',
         hasCap: false,
-        tags: ['inventory', 'consumable'],
+        tags: ['inventory', 'consumable', 'gatherable'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -182,13 +188,15 @@ export const registerInventoryItems = () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_1') > 0
         },
         sellPrice: 15,
+        rarity: 1,
+        allowedTileTypes: ['plain', 'mountain']
     })
 
 
     gameResources.registerResource('inventory_nightshade', {
         name: 'Nightshade',
         hasCap: false,
-        tags: ['inventory', 'consumable'],
+        tags: ['inventory', 'consumable', 'gatherable'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -227,13 +235,15 @@ export const registerInventoryItems = () => {
             && gameEntity.getLevel('shop_item_spellbook') > 0
         },
         sellPrice: 20,
+        rarity: 2,
+        allowedTileTypes: ['mountain', 'savanna']
     })
 
 
     gameResources.registerResource('inventory_mystic_bloom', {
         name: 'Mystic Bloom',
         hasCap: false,
-        tags: ['inventory', 'consumable'],
+        tags: ['inventory', 'consumable', 'gatherable'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -261,13 +271,15 @@ export const registerInventoryItems = () => {
                 && gameEntity.getLevel('shop_item_spellbook') > 0
         },
         sellPrice: 20,
+        rarity: 2,
+        allowedTileTypes: ['swamp', 'mountain']
     })
 
 
     gameResources.registerResource('inventory_ember_leaf', {
         name: 'Ember Leaf',
         hasCap: false,
-        tags: ['inventory', 'consumable'],
+        tags: ['inventory', 'consumable', 'gatherable'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -294,13 +306,15 @@ export const registerInventoryItems = () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_3') > 0
         },
         sellPrice: 20,
+        rarity: 2,
+        allowedTileTypes: ['plain', 'savanna']
     })
 
 
     gameResources.registerResource('inventory_harmony_blossom', {
         name: 'Harmony Blossom',
         hasCap: false,
-        tags: ['inventory', 'consumable'],
+        tags: ['inventory', 'consumable', 'gatherable'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -327,6 +341,8 @@ export const registerInventoryItems = () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_3') > 0
         },
         sellPrice: 20,
+        rarity: 2,
+        allowedTileTypes: ['mountain', 'forest']
     })
 
 
@@ -727,7 +743,7 @@ export const registerInventoryItems = () => {
     gameResources.registerResource('inventory_rare_titanleaf', {
         name: 'Titanleaf',
         hasCap: false,
-        tags: ['inventory', 'consumable', 'rare'],
+        tags: ['inventory', 'consumable', 'rare', 'gatherable'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -752,13 +768,14 @@ export const registerInventoryItems = () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
         },
         sellPrice: 15000,
+        rarity: 5,
     })
 
 
     gameResources.registerResource('inventory_rare_heartroot', {
         name: 'Heartroot',
         hasCap: false,
-        tags: ['inventory', 'consumable', 'rare'],
+        tags: ['inventory', 'consumable', 'rare', 'gatherable'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -783,13 +800,14 @@ export const registerInventoryItems = () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
         },
         sellPrice: 15000,
+        rarity: 5,
     })
 
 
     gameResources.registerResource('inventory_rare_energloom', {
         name: 'Energloom',
         hasCap: false,
-        tags: ['inventory', 'consumable', 'rare'],
+        tags: ['inventory', 'consumable', 'rare', 'gatherable'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -814,13 +832,14 @@ export const registerInventoryItems = () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
         },
         sellPrice: 15000,
+        rarity: 5,
     })
 
 
     gameResources.registerResource('inventory_rare_lifebloom', {
         name: 'Lifebloom',
         hasCap: false,
-        tags: ['inventory', 'consumable', 'rare'],
+        tags: ['inventory', 'consumable', 'rare', 'gatherable'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -845,13 +864,14 @@ export const registerInventoryItems = () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
         },
         sellPrice: 15000,
+        rarity: 5,
     })
 
 
     gameResources.registerResource('inventory_rare_stillfern', {
         name: 'Stillfern',
         hasCap: false,
-        tags: ['inventory', 'consumable', 'rare'],
+        tags: ['inventory', 'consumable', 'rare', 'gatherable'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -876,12 +896,13 @@ export const registerInventoryItems = () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
         },
         sellPrice: 15000,
+        rarity: 5,
     })
 
     gameResources.registerResource('inventory_rare_mindroot', {
         name: 'Mindroot',
         hasCap: false,
-        tags: ['inventory', 'consumable', 'rare'],
+        tags: ['inventory', 'consumable', 'rare', 'gatherable'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -906,12 +927,13 @@ export const registerInventoryItems = () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
         },
         sellPrice: 15000,
+        rarity: 5,
     })
 
     gameResources.registerResource('inventory_rare_azureblossom', {
         name: 'Azureblossom',
         hasCap: false,
-        tags: ['inventory', 'consumable', 'rare'],
+        tags: ['inventory', 'consumable', 'rare', 'gatherable'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -936,13 +958,14 @@ export const registerInventoryItems = () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
         },
         sellPrice: 15000,
+        rarity: 5,
     })
 
 
     gameResources.registerResource('inventory_rare_ironvine', {
         name: 'Ironvine',
         hasCap: false,
-        tags: ['inventory', 'consumable', 'rare'],
+        tags: ['inventory', 'consumable', 'rare', 'gatherable'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -967,13 +990,14 @@ export const registerInventoryItems = () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
         },
         sellPrice: 15000,
+        rarity: 5,
     })
 
 
     gameResources.registerResource('inventory_rare_mindspire', {
         name: 'Mindspire',
         hasCap: false,
-        tags: ['inventory', 'consumable', 'rare'],
+        tags: ['inventory', 'consumable', 'rare', 'gatherable'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -998,13 +1022,14 @@ export const registerInventoryItems = () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
         },
         sellPrice: 15000,
+        rarity: 5,
     })
 
 
     gameResources.registerResource('inventory_rare_verdant_coil', {
         name: 'Verdant Coil',
         hasCap: false,
-        tags: ['inventory', 'consumable', 'rare'],
+        tags: ['inventory', 'consumable', 'rare', 'gatherable'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -1029,6 +1054,7 @@ export const registerInventoryItems = () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_3') > 0
         },
         sellPrice: 15000,
+        rarity: 5,
     })
 
 }

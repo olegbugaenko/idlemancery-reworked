@@ -364,7 +364,7 @@ export const registerPermanentBonuses = () => {
         resourceModifier: {
             income: {
                 effects: {
-                    'attribute_charisma': {
+                    'attribute_memory': {
                         A: 1,
                         B: 0,
                         type: 0,

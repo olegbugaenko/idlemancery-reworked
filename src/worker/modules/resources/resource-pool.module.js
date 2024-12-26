@@ -105,6 +105,12 @@ export class ResourcePoolModule extends GameModule {
             isService: true,
         })
 
+        gameResources.registerResource('gathering_effort', {
+            tags: ['exploration', 'secondary'],
+            name: 'Gathering Effort',
+            isService: true,
+        })
+
 
 
 

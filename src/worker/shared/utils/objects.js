@@ -10,7 +10,7 @@ export const packEffects = (effects, filter = (item) => true) => {
 
 export const mapObject = (o, cb) => {
     return Object.entries(o).reduce(((acc, [key, val]) => {
-        acc[key] = cb ? cb(val) : val;
+        acc[key] = cb ? cb(val, key) : val;
         return acc;
     }), {})
 }

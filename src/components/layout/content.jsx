@@ -11,6 +11,7 @@ import {Settings} from "../settings/index.jsx";
 import {About} from "../about/index.jsx";
 import {Workshop} from "../workshop/index.jsx";
 import {Social} from "../social/index.jsx";
+import {World} from "../world/index.jsx";
 
 export const Content = () => {
 
@@ -40,6 +41,10 @@ export const GetContent = ({ tab }) => {
 
     if(tab === 'inventory') {
         return <Inventory />
+    }
+
+    if(tab === 'world') {
+        return <World />
     }
 
     if(tab === 'property') {

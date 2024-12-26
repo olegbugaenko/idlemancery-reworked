@@ -101,6 +101,11 @@ export const Footer = () => {
                         <span>Property</span>
                     </NewNotificationWrap>
                 </li>) : null}
+                {unlocks.world ? (<li className={openedTab === 'world' ? 'active' : ''} onClick={() => openTab('world')}>
+                    <NewNotificationWrap isNew={newUnlocks.world?.hasNew}>
+                        <span>World</span>
+                    </NewNotificationWrap>
+                </li>) : null}
                 {unlocks.workshop ? (<li className={openedTab === 'workshop' ? 'active' : ''} onClick={() => openTab('workshop')}>
                     <NewNotificationWrap isNew={newUnlocks.workshop?.hasNew}>
                         <span>Workshop</span>

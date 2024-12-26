@@ -106,4 +106,8 @@ v0.0.3a:
 7. Add upgrade for shop stock capacity
 8. [V] Add new rare events effects
 9. Add workshop slots automation (Or think how to do it)
-10. Test knowledge related events
+10. [V] Test knowledge related events
+11. [V] Adopt chances and amounts to gathering efficiency
+12. [V] Lists
+13. Implement gathering itself (with lists)
+14. UI fixes

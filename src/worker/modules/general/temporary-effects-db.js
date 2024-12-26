@@ -353,7 +353,7 @@ export const registerTemporaryEffectsDB = () => {
         resourceModifier: {
             multiplier: {
                 effects: {
-                    physical_training_learn_speed: {
+                    mental_training_learning_rate: {
                         A: 0.1,
                         B: 1.4,
                         type: 0,
