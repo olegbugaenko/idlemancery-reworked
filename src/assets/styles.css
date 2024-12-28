@@ -434,6 +434,10 @@ h4 {
     background: var(--darkbg);
 }
 
+.detail-blade.wide-blade {
+    width: 450px;
+}
+
 .detail-blade .block {
     padding-top: 12px;
     padding-bottom: 8px;
@@ -1175,11 +1179,12 @@ h4 {
 }
 
 .crafting-wrap .craftables-cat {
-    height: calc(100% - 40px);
+    height: calc(100% - 100px);
 }
 
 .card.craftable {
     width: 300px;
+    min-height: 110px;
 }
 
 
@@ -1542,8 +1547,112 @@ span.highlighted-span {
 
 .map-wrap .head .resources-filter {
     display: flex;
+    align-items: center;
+}
+
+.map-wrap .head .resources-filter span {
+    padding-right: 8px;
 }
 
 .map-wrap .map-cat{
     height: calc(100% - 140px);;
+}
+
+.search-rel-wrap {
+    position: relative;
+}
+
+.search-rel-wrap input {
+    border: 1px solid #333333;
+    border-radius: 3px;
+    padding: 3px 6px;
+}
+
+.search-rel-wrap .scopes-popup {
+    position: absolute;
+    top: 30px;
+    left: 0px;
+    width: 300px;
+    padding: 8px;
+    background: var(--boxbg);
+    border: 1px solid #333;
+    border-radius: 3px;
+    z-index: 1;
+}
+
+.search-rel-wrap .scopes-popup .chips-container {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 4px;
+}
+
+.search-rel-wrap .scopes-popup .scope-chips {
+    border: 1px solid #777;
+    border-radius: 8px;
+    background: #111111;
+    font-size: 13px;
+    padding: 3px 6px;
+    margin-right: 4px;
+    cursor: pointer;
+}
+
+.search-rel-wrap .scopes-popup .scope-chips:hover {
+    background-color: #222233;
+}
+
+.search-rel-wrap .scopes-popup .scope-chips.selected {
+    background-color: #171922;
+    border-color: var(--highlight);
+}
+
+.actions-wrap .additional-filters {
+    display: flex;
+    align-items: center;
+}
+
+.furniture-wrap .filters {
+    display: flex;
+    align-items: center;
+}
+
+.hotkey-row {
+    display: flex;
+    align-items: center;
+}
+
+.hotkey-row .tab-label {
+    width: 250px;
+}
+
+.hotkey-row .hotkey-actions span {
+    width: 140px;
+}
+
+.hotkey-row .hotkey-actions {
+    display: flex;
+    align-items: center;
+}
+
+.ingame-box.full-size {
+    height: calc(100vh - 1px);
+}
+
+.ingame-box.full-size .loading-text {
+    color: #fff;
+    font-size: 18px;
+    text-align: center;
+    padding-top: 24px;
+}
+
+.ingame-box .image {
+    display: flex;
+    justify-content: center;
+}
+
+.ingame-box .image img {
+    max-height: calc(100vh - 200px);
+    max-width: 90vw;
+    object-fit: contain;
+    border: 1px solid #333333;
+    border-radius: 3px;
 }

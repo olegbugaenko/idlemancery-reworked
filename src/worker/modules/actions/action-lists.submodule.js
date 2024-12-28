@@ -36,7 +36,11 @@ export class ActionListsSubmodule extends GameModule {
 
         this.eventHandler.registerHandler('query-actions-lists', (pl) => {
             const lists = this.getLists(pl);
-            this.eventHandler.sendData('actions-lists', lists);
+            let label = 'actions-lists';
+            if(pl.prefix) {
+                label = `${label}-${pl.prefix}`;
+            }
+            this.eventHandler.sendData(label, lists);
         })
 
         this.eventHandler.registerHandler('run-list', ({ id }) => {
@@ -192,7 +196,10 @@ export class ActionListsSubmodule extends GameModule {
     }
 
     getLists(pl) {
-        let ls = Object.values(this.actionsLists);
+        let ls = Object.values(this.actionsLists).map(one => ({
+            ...one,
+            isUnlocked: true
+        }));
 
         if(pl?.filterAutomated) {
             ls = ls.filter(one => one.autotrigger?.rules?.length);

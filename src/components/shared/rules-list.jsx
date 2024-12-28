@@ -118,6 +118,15 @@ const mapCompareType = {
         ],
         isHideValue: true,
     },
+    'running_action_list': {
+        label: 'Running List',
+        subject: 'action_list_id',
+        availableConditions: [
+            'true',
+            'false',
+        ],
+        isHideValue: true,
+    },
     'running_action_tag': {
         label: 'Running Action With Tag',
         subject: 'tag',
@@ -150,12 +159,14 @@ const RulesList = React.memo(
         const { onMessage, sendData } = useWorkerClient(worker);
         const [resources, setResources] = useState([]);
         const [actions, setActions] = useState([]);
+        const [actionsLists, setActionsLists] = useState([]);
         const [tags, setTags] = useState([]);
 
         useEffect(() => {
             sendData('query-all-resources', { prefix });
             sendData('query-all-actions', { prefix });
             sendData('query-all-action-tags', { prefix });
+            sendData('query-actions-lists', { prefix });
             console.log('Sent queries...');
         }, [])
 
@@ -166,6 +177,10 @@ const RulesList = React.memo(
 
         onMessage(`all-actions-${prefix}`, (payload) => {
             setActions(payload);
+        })
+
+        onMessage(`actions-lists-${prefix}`, (payload) => {
+            setActionsLists(payload);
         })
 
         onMessage(`all-action-tags-${prefix}`, (payload) => {
@@ -213,6 +228,8 @@ const RulesList = React.memo(
                             subjectArray = actions;
                         } else if (subject === 'tag') {
                             subjectArray = tags;
+                        } else if (subject === 'action_list_id') {
+                            subjectArray = actionsLists;
                         }
 
                         subjectOptions = subjectArray

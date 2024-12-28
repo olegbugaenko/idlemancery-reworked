@@ -955,7 +955,7 @@ export const registerFurnitureStage1 = () => {
         resourceModifier: {
             multiplier: {
                 effects: {
-                    'gathering_efficiency': {
+                    'gathering_herbs_amount': {
                         A: 0.1,
                         B: 1,
                         type: 0,

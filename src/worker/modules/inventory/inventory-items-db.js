@@ -14,7 +14,7 @@ export const registerInventoryItems = () => {
     gameResources.registerResource('inventory_berry', {
         name: 'Berry',
         hasCap: false,
-        tags: ['inventory', 'consumable', 'gatherable'],
+        tags: ['inventory', 'consumable', 'gatherable', 'herb'],
         defaultCap: 0,
         onUse: (amount) => {
 
@@ -79,7 +79,7 @@ export const registerInventoryItems = () => {
     gameResources.registerResource('inventory_fly_mushroom', {
         name: 'Fly Mushroom',
         hasCap: false,
-        tags: ['inventory', 'consumable', 'gatherable'],
+        tags: ['inventory', 'consumable', 'gatherable', 'herb'],
         defaultCap: 0,
         onUse: (amount) => {
 
@@ -115,11 +115,116 @@ export const registerInventoryItems = () => {
         allowedTileTypes: ['swamp', 'forest', 'lakes']
     })
 
+    gameResources.registerResource('inventory_golden_algae', {
+        name: 'Golden Algae',
+        hasCap: false,
+        tags: ['inventory', 'consumable', 'gatherable', 'herb'],
+        defaultCap: 0,
+        onUse: (amount) => {
+
+        },
+        getUsageCooldown: () => {
+            return 10*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+        },
+        usageGain: {
+            get_income: () => ({
+                resources: {
+                    'mage-xp': {
+                        A: 25,
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    energy: {
+                        A: 1,
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            })
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0
+        },
+        sellPrice: 8,
+        rarity: 0,
+    })
+
+    gameResources.registerResource('inventory_knowledge_moss', {
+        name: 'Knowledge Moss',
+        hasCap: false,
+        tags: ['inventory', 'consumable', 'gatherable', 'herb'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        getUsageCooldown: () => {
+            return 30*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+        },
+        attributes: {
+            duration: 20,
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    learning_rate: {
+                        A: 0.25,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            })
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0
+        },
+        sellPrice: 35,
+        rarity: 0.6,
+        allowedTileTypes: ['plain', 'lakes', 'swamp']
+    })
+
+    gameResources.registerResource('inventory_core_duckweed', {
+        name: 'Core Duckweed',
+        hasCap: false,
+        tags: ['inventory', 'consumable', 'gatherable', 'herb'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        getUsageCooldown: () => {
+            return 30*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+        },
+        attributes: {
+            duration: 20,
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    physical_training_learn_speed: {
+                        A: 0.5,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            })
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0
+        },
+        sellPrice: 35,
+        rarity: 0.6,
+        allowedTileTypes: ['lakes', 'swamp', 'savanna']
+    })
 
     gameResources.registerResource('inventory_aloe_vera', {
         name: 'Aloe Vera',
         hasCap: false,
-        tags: ['inventory', 'consumable', 'gatherable'],
+        tags: ['inventory', 'consumable', 'gatherable', 'herb'],
         defaultCap: 0,
         onUse: (amount) => {
 
@@ -150,7 +255,7 @@ export const registerInventoryItems = () => {
     gameResources.registerResource('inventory_ginseng', {
         name: 'Ginseng',
         hasCap: false,
-        tags: ['inventory', 'consumable', 'gatherable'],
+        tags: ['inventory', 'consumable', 'gatherable', 'herb'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -196,7 +301,7 @@ export const registerInventoryItems = () => {
     gameResources.registerResource('inventory_nightshade', {
         name: 'Nightshade',
         hasCap: false,
-        tags: ['inventory', 'consumable', 'gatherable'],
+        tags: ['inventory', 'consumable', 'gatherable', 'herb'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -243,17 +348,17 @@ export const registerInventoryItems = () => {
     gameResources.registerResource('inventory_mystic_bloom', {
         name: 'Mystic Bloom',
         hasCap: false,
-        tags: ['inventory', 'consumable', 'gatherable'],
+        tags: ['inventory', 'consumable', 'gatherable', 'herb'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
 
         },
         getUsageCooldown: () => {
-            return 45*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+            return 250*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
         },
         attributes: {
-            duration: 60,
+            duration: 600,
         },
         resourceModifier: {
             get_multiplier: () => ({
@@ -270,7 +375,7 @@ export const registerInventoryItems = () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_3') > 0
                 && gameEntity.getLevel('shop_item_spellbook') > 0
         },
-        sellPrice: 20,
+        sellPrice: 20000,
         rarity: 2,
         allowedTileTypes: ['swamp', 'mountain']
     })
@@ -279,7 +384,7 @@ export const registerInventoryItems = () => {
     gameResources.registerResource('inventory_ember_leaf', {
         name: 'Ember Leaf',
         hasCap: false,
-        tags: ['inventory', 'consumable', 'gatherable'],
+        tags: ['inventory', 'consumable', 'gatherable', 'herb'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -289,7 +394,7 @@ export const registerInventoryItems = () => {
             return 20*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
         },
         attributes: {
-            duration: 30,
+            duration: 300,
         },
         resourceModifier: {
             get_multiplier: () => ({
@@ -305,7 +410,7 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_3') > 0
         },
-        sellPrice: 20,
+        sellPrice: 20000,
         rarity: 2,
         allowedTileTypes: ['plain', 'savanna']
     })
@@ -314,23 +419,23 @@ export const registerInventoryItems = () => {
     gameResources.registerResource('inventory_harmony_blossom', {
         name: 'Harmony Blossom',
         hasCap: false,
-        tags: ['inventory', 'consumable', 'gatherable'],
+        tags: ['inventory', 'consumable', 'gatherable', 'herb'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
 
         },
         getUsageCooldown: () => {
-            return 20*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+            return 200*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
         },
         attributes: {
-            duration: 30,
+            duration: 300,
         },
         resourceModifier: {
             get_multiplier: () => ({
                 effects: {
                     social_training_learning_rate: {
-                        A: 0.25,
+                        A: 0.5,
                         B: 1,
                         type: 0,
                     }
@@ -340,7 +445,7 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_3') > 0
         },
-        sellPrice: 20,
+        sellPrice: 20000,
         rarity: 2,
         allowedTileTypes: ['mountain', 'forest']
     })
@@ -529,7 +634,7 @@ export const registerInventoryItems = () => {
             level: 2,
         }],
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_crafting_courses') > 0
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.isEntityUnlocked('action_quarrying')
         },
         sellPrice: 12000,
         get_cost: (amount = 1) => ({
@@ -556,7 +661,7 @@ export const registerInventoryItems = () => {
             level: 2,
         }],
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_crafting_courses') > 0
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.isEntityUnlocked('action_quarrying')
         },
         sellPrice: 16000,
         get_cost: (amount = 1) => ({
@@ -583,7 +688,7 @@ export const registerInventoryItems = () => {
             level: 2,
         }],
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_crafting_courses') > 0
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.isEntityUnlocked('action_mining')
         },
         sellPrice: 160000,
         get_cost: (amount = 1) => ({
@@ -602,10 +707,10 @@ export const registerInventoryItems = () => {
 
         },
         getUsageCooldown: () => {
-            return 10*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+            return 150*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
         },
         attributes: {
-            duration: 5,
+            duration: 150,
         },
         resourceModifier: {
             get_income: () => ({
@@ -635,10 +740,10 @@ export const registerInventoryItems = () => {
 
         },
         getUsageCooldown: () => {
-            return 10*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+            return 150*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
         },
         attributes: {
-            duration: 5,
+            duration: 150,
         },
         resourceModifier: {
             get_income: () => ({
@@ -668,10 +773,10 @@ export const registerInventoryItems = () => {
 
         },
         getUsageCooldown: () => {
-            return 10*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+            return 150*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
         },
         attributes: {
-            duration: 20,
+            duration: 120,
         },
         resourceModifier: {
             multiplier: {
@@ -743,7 +848,7 @@ export const registerInventoryItems = () => {
     gameResources.registerResource('inventory_rare_titanleaf', {
         name: 'Titanleaf',
         hasCap: false,
-        tags: ['inventory', 'consumable', 'rare', 'gatherable'],
+        tags: ['inventory', 'consumable', 'rare', 'gatherable', 'herb'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -775,7 +880,7 @@ export const registerInventoryItems = () => {
     gameResources.registerResource('inventory_rare_heartroot', {
         name: 'Heartroot',
         hasCap: false,
-        tags: ['inventory', 'consumable', 'rare', 'gatherable'],
+        tags: ['inventory', 'consumable', 'rare', 'gatherable', 'herb'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -807,7 +912,7 @@ export const registerInventoryItems = () => {
     gameResources.registerResource('inventory_rare_energloom', {
         name: 'Energloom',
         hasCap: false,
-        tags: ['inventory', 'consumable', 'rare', 'gatherable'],
+        tags: ['inventory', 'consumable', 'rare', 'gatherable', 'herb'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -839,7 +944,7 @@ export const registerInventoryItems = () => {
     gameResources.registerResource('inventory_rare_lifebloom', {
         name: 'Lifebloom',
         hasCap: false,
-        tags: ['inventory', 'consumable', 'rare', 'gatherable'],
+        tags: ['inventory', 'consumable', 'rare', 'gatherable', 'herb'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -871,7 +976,7 @@ export const registerInventoryItems = () => {
     gameResources.registerResource('inventory_rare_stillfern', {
         name: 'Stillfern',
         hasCap: false,
-        tags: ['inventory', 'consumable', 'rare', 'gatherable'],
+        tags: ['inventory', 'consumable', 'rare', 'gatherable', 'herb'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -902,7 +1007,7 @@ export const registerInventoryItems = () => {
     gameResources.registerResource('inventory_rare_mindroot', {
         name: 'Mindroot',
         hasCap: false,
-        tags: ['inventory', 'consumable', 'rare', 'gatherable'],
+        tags: ['inventory', 'consumable', 'rare', 'gatherable', 'herb'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -933,7 +1038,7 @@ export const registerInventoryItems = () => {
     gameResources.registerResource('inventory_rare_azureblossom', {
         name: 'Azureblossom',
         hasCap: false,
-        tags: ['inventory', 'consumable', 'rare', 'gatherable'],
+        tags: ['inventory', 'consumable', 'rare', 'gatherable', 'herb'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -965,7 +1070,7 @@ export const registerInventoryItems = () => {
     gameResources.registerResource('inventory_rare_ironvine', {
         name: 'Ironvine',
         hasCap: false,
-        tags: ['inventory', 'consumable', 'rare', 'gatherable'],
+        tags: ['inventory', 'consumable', 'rare', 'gatherable', 'herb'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -997,7 +1102,7 @@ export const registerInventoryItems = () => {
     gameResources.registerResource('inventory_rare_mindspire', {
         name: 'Mindspire',
         hasCap: false,
-        tags: ['inventory', 'consumable', 'rare', 'gatherable'],
+        tags: ['inventory', 'consumable', 'rare', 'gatherable', 'herb'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -1029,7 +1134,7 @@ export const registerInventoryItems = () => {
     gameResources.registerResource('inventory_rare_verdant_coil', {
         name: 'Verdant Coil',
         hasCap: false,
-        tags: ['inventory', 'consumable', 'rare', 'gatherable'],
+        tags: ['inventory', 'consumable', 'rare', 'gatherable', 'herb'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {

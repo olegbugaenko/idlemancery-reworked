@@ -109,5 +109,7 @@ v0.0.3a:
 10. [V] Test knowledge related events
 11. [V] Adopt chances and amounts to gathering efficiency
 12. [V] Lists
-13. Implement gathering itself (with lists)
-14. UI fixes
+13. [V] Implement gathering itself (with lists)
+14. [V] UI fixes
+15. Double check rare herbs unlocks conditions
+16. Check running crafting lists

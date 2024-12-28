@@ -15,7 +15,10 @@ export class ActionsModule extends GameModule {
         this.lists = new ActionListsSubmodule();
         this.focus = null;
         this.showHidden = false;
-        this.searchText = '';
+        this.searchData = {
+            search: '',
+            selectedScopes: ['name','tags']
+        };
 
         this.eventHandler.registerHandler('run-action', (payload) => {
             if(payload.isForce) {
@@ -26,7 +29,7 @@ export class ActionsModule extends GameModule {
 
         this.eventHandler.registerHandler('query-actions-data', (payload) => {
             this.sendActionsData(this.selectedFilterId, {
-                searchText: this.searchText,
+                searchData: this.searchData,
             })
         })
 
@@ -49,14 +52,14 @@ export class ActionsModule extends GameModule {
         this.eventHandler.registerHandler('toggle-hidden-action', (payload) => {
             this.setActionHidden(payload.id, payload.flag);
             this.sendActionsData(this.selectedFilterId, {
-                searchText: this.searchText,
+                searchData: this.searchData,
             })
         })
 
         this.eventHandler.registerHandler('toggle-show-hidden', (payload) => {
             this.showHidden = payload;
             this.sendActionsData(this.selectedFilterId, {
-                searchText: this.searchText,
+                searchData: this.searchData,
             })
         })
 
@@ -64,8 +67,8 @@ export class ActionsModule extends GameModule {
             this.selectedFilterId = filterId;
         })
 
-        this.eventHandler.registerHandler('set-actions-search', ({searchText}) => {
-            this.searchText = searchText;
+        this.eventHandler.registerHandler('set-actions-search', ({searchData}) => {
+            this.searchData = searchData;
         })
 
         this.eventHandler.registerHandler('query-action-xp-breakdown', (payload) => {
@@ -127,6 +130,18 @@ export class ActionsModule extends GameModule {
 
         gameEffects.registerEffect('gathering_efficiency', {
             name: 'Gathering Efficiency',
+            defaultValue: 1.,
+            minValue: 1,
+        })
+
+        gameEffects.registerEffect('gathering_perception', {
+            name: 'Gathering Perception',
+            defaultValue: 1.,
+            minValue: 1,
+        })
+
+        gameEffects.registerEffect('gathering_herbs_amount', {
+            name: 'Herbs Gathered',
             defaultValue: 1.,
             minValue: 1,
         })
@@ -647,10 +662,13 @@ export class ActionsModule extends GameModule {
         return etaResults;
     }
 
-    matchActionSearch(one, searchText) {
-        if(!searchText) return true;
-        if(one.name.includes(searchText)) return true;
-        if(one.tags && one.tags.some(tag => tag.includes(searchText))) return true;
+    matchActionSearch(one, searchData) {
+        if(!searchData) return true;
+        const { search, selectedScopes } = searchData;
+        if(!search) return true;
+        if(selectedScopes.includes('name') && one.name.toLowerCase().includes(search)) return true;
+        if(selectedScopes.includes('tags') && one.tags && one.tags.some(tag => tag.includes(search))) return true;
+        if(selectedScopes.includes('description') && one.description && one.description.toLowerCase().includes(search)) return true;
 
         return false;
     }
@@ -681,7 +699,7 @@ export class ActionsModule extends GameModule {
                 items: gameEntity.listEntitiesByTags(['action', ...filter.tags])
                     .filter(one => one.isUnlocked && !one.isCapped
                         && (options?.showHidden || this.showHidden || !this.actions?.[one.id]?.isHidden)
-                        && this.matchActionSearch(one, options.searchText)
+                        && this.matchActionSearch(one, options.searchData)
                     ),
                 isSelected: filterId === filter.id
             }
@@ -741,7 +759,7 @@ export class ActionsModule extends GameModule {
             actionCategories: Object.values(perCats).filter(cat => cat.items.length > 0),
             automationEnabled: this.lists.automationEnabled,
             autotriggerIntervalSetting: this.lists.autotriggerIntervalSetting,
-            searchText: this.searchText,
+            searchData: this.searchData,
             selectedCategory: filterId,
         }
     }

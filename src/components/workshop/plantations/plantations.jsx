@@ -1,9 +1,9 @@
 import React, {useCallback, useContext, useEffect, useState} from "react";
-import WorkerContext from "../../context/worker-context";
-import {useWorkerClient} from "../../general/client";
-import {formatInt, formatValue} from "../../general/utils/strings";
+import WorkerContext from "../../../context/worker-context";
+import {useWorkerClient} from "../../../general/client";
+import {formatInt, formatValue} from "../../../general/utils/strings";
 import PerfectScrollbar from "react-perfect-scrollbar";
-import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
+import {NewNotificationWrap} from "../../layout/new-notification-wrap.jsx";
 
 export const Plantations = ({ setItemDetails, newUnlocks }) => {
 

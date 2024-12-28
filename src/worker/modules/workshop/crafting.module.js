@@ -1,11 +1,14 @@
 import {GameModule} from "../../shared/game-module";
 import {registerCraftingRecipes} from "./recipes-db";
 import {gameCore, gameEntity, gameResources} from "game-framework";
+import {CraftingListsSubmodule} from "./crafting-lists.submodule";
 
 export class CraftingModule extends GameModule {
 
     constructor(props) {
         super(props);
+
+        this.lists = new CraftingListsSubmodule();
 
         this.craftingSlots = {};
 
@@ -41,7 +44,8 @@ export class CraftingModule extends GameModule {
         registerCraftingRecipes()
     }
 
-    tick() {
+    tick(game, delta) {
+        this.lists.tick(game, delta);
         /*if(gameEntity.entityExists('activeCrafting_craft_herbal_fibers')) {
             console.log('DT: ',
                 gameEntity.getEntity('activeCrafting_craft_herbal_fibers'),
@@ -52,7 +56,8 @@ export class CraftingModule extends GameModule {
 
     save() {
         return {
-            slots: this.craftingSlots
+            slots: this.craftingSlots,
+            craftingLists: this.lists.save(),
         }
     }
 
@@ -69,7 +74,25 @@ export class CraftingModule extends GameModule {
         for(const id in this.craftingSlots) {
             this.setCraftingLevel({ id, level: this.craftingSlots[id].level, isForce: true });
         }
+        if(obj?.craftingLists) {
+            this.lists.load(obj.craftingLists);
+        }
+    }
 
+    stopAllCrafting(category) {
+        const tagToCat = {
+            'crafting': 'material',
+            alchemy: 'alchemy'
+        }
+        if(this.craftingSlots) {
+            for(const id in this.craftingSlots) {
+                const isIgnore = category && !gameEntity.getEntity(id).tags.includes(tagToCat[category]);
+                console.log('Stop Craft: ', category, id, isIgnore, gameEntity.getEntity(id).tags)
+                if(!isIgnore) {
+                    this.setCraftingLevel({ id, level: 0, isForce: true });
+                }
+            }
+        }
     }
 
     setCraftingLevel({ id, level, isForce = false }) {
@@ -146,7 +169,8 @@ export class CraftingModule extends GameModule {
         return {
             available,
             slots,
-            efforts: efrs
+            efforts: efrs,
+            craftingLists: this.lists.getLists({ category: filterId })
         }
     }
 

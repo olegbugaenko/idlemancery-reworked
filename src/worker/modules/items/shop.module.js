@@ -222,7 +222,7 @@ export class ShopModule extends GameModule {
                 ...resource,
                     affordable,
                     isLeveled: this.leveledId === resource.id,
-                    purchaseMultiplier: Math.min(this.purchaseMultiplier, affordable.max)
+                    purchaseMultiplier: Math.max(1, Math.min(this.purchaseMultiplier, affordable.max))
                 }
             }),
             purchaseMultiplier: this.purchaseMultiplier,
@@ -238,7 +238,7 @@ export class ShopModule extends GameModule {
         if(!id) return null;
         const entity = gameResources.getResource(id);
         const affordable = resourceCalculators.isAffordable(entity.get_cost());
-        const potPurchase = Math.min(this.purchaseMultiplier, affordable.max);
+        const potPurchase = Math.max(1, Math.min(this.purchaseMultiplier, affordable.max));
 
         return {
             id: entity.id,

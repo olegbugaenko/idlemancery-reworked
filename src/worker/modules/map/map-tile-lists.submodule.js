@@ -165,14 +165,14 @@ export class MapTileListsSubmodule extends GameModule {
     }
 
     load(obj) {
-        this.mapLists = obj?.list ?? []
-        this.stopList();
+        this.mapLists = obj?.list ?? [];
         this.runningList = obj?.runningList ?? null;
         this.automationEnabled = obj?.automationEnabled;
         this.autotriggerIntervalSetting = obj?.autotriggerIntervalSetting || 10;
         this.regenerateListsPriorityMap();
         console.log('RNN: ', this.runningList);
         if(obj?.runningList) {
+            this.stopList();
             this.runList(obj?.runningList.id);
         }
     }

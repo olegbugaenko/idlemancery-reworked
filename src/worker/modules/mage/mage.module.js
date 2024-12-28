@@ -284,6 +284,9 @@ export class MageModule extends GameModule {
         };
         if(obj?.bankedTime) {
             this.bankedTime = obj?.bankedTime;
+            if(this.bankedTime.max < 3600*24*1000) {
+                this.bankedTime.max = 3600*24*1000;
+            }
             if(Date.now() > this.bankedTime.lastSave + 60000) {
                 const delta = Date.now() - (this.bankedTime.lastSave + 60000);
                 this.bankedTime.current = Math.min(this.bankedTime.max, this.bankedTime.current + delta);

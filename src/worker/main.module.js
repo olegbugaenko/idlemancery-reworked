@@ -15,6 +15,7 @@ import {UnlockNotificationsModule} from "./shared/modules/unlock-notifications.m
 import {RandomEventsModule} from "./modules/general/random-events.module";
 import {TemporaryEffectsModule} from "./modules/general/temporary-effects.module";
 import {MapModule} from "./modules/map/map.module";
+import {HotkeysModule} from "./shared/modules/hotkeys.module";
 
 
 export class MainModule extends GameModule {
@@ -36,6 +37,7 @@ export class MainModule extends GameModule {
         gameCore.registerModule('random-events', RandomEventsModule);
         gameCore.registerModule('temporary-effects', TemporaryEffectsModule);
         gameCore.registerModule('map', MapModule);
+        gameCore.registerModule('hotkeys', HotkeysModule);
 
 
 
@@ -58,7 +60,7 @@ export class MainModule extends GameModule {
             console.log('reset-game received');
             gameCore.stopTicking();
             gameCore.load({});
-            const cheat = 5;
+            const cheat = 1;
             gameCore.startTicking(100, () => 0.1*cheat*(gameCore.getModule('mage').bankedTime?.speedUpFactor ?? 1), () => {
                 if(gameCore.numTicks % 300 === 0) {
                     this.save();
@@ -68,7 +70,7 @@ export class MainModule extends GameModule {
         })
 
         this.eventHandler.registerHandler('start-ticking', () => {
-            const cheat = 5;
+            const cheat = 1;
             // const speedUpMode = gameCore.getModule('mage').bankedTime?.speedUpFactor ?? 1;
             // console.log('gameCore', GameCore.instance, speedUpMode);
             gameCore.startTicking(100, () => 0.1*cheat*(gameCore.getModule('mage').bankedTime?.speedUpFactor ?? 1), () => {

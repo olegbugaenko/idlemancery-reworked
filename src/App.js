@@ -15,6 +15,7 @@ function App() {
     const { onMessage, sendData } = useWorkerClient(window.worker);
 
     const [readyToGo, setReadyToGo] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         sendData('initialize-game', { a: 1 });
@@ -48,13 +49,18 @@ function App() {
     useEffect(() => {
         if(readyToGo) {
             sendData('start-ticking');
+            setTimeout(() => {
+                setIsLoading(false)
+            })
+        } else {
+            setIsLoading(true)
         }
     }, [readyToGo])
 
     return (
         <WorkerContext.Provider value={worker}>
             <div className="App">
-                <Main readyToGo={readyToGo} />
+                <Main readyToGo={readyToGo} isLoading={isLoading}/>
             </div>
         </WorkerContext.Provider>
     );

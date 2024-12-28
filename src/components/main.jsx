@@ -2,10 +2,17 @@ import React from "react";
 import {Content} from "./layout/content.jsx";
 import {Footer} from "./layout/footer.jsx";
 
-export const Main = ({ readyToGo }) => {
+export const Main = ({ readyToGo, isLoading }) => {
 
-    if(!readyToGo) {
-        return (<p>Loading...</p>)
+    if(!readyToGo || isLoading) {
+        return (<div className={'ingame-box full-size'}>
+            <div className={'image'}>
+                <img src={'icons/general/preloader.png'}/>
+            </div>
+            <div className={'loading-text'}>
+                <p>Loading</p>
+            </div>
+        </div>)
     }
 
     return (

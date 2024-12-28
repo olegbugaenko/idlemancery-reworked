@@ -111,6 +111,12 @@ export class ResourcePoolModule extends GameModule {
             isService: true,
         })
 
+        gameResources.registerResource('gathering_perception', {
+            tags: ['exploration', 'secondary'],
+            name: 'Gathering Perception',
+            isService: true,
+        })
+
 
 
 

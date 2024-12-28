@@ -14,6 +14,18 @@ import RulesList from "../shared/rules-list.jsx";
 import {cloneDeep} from "lodash";
 import {ActionXPBreakdown} from "./action-xp-breakdown.jsx";
 import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
+import {SearchField} from "../shared/search-field.jsx";
+
+const ACTIONS_SEARCH_SCOPES = [{
+    id: 'name',
+    label: 'Name',
+},{
+    id: 'tags',
+    label: 'Tags'
+},{
+    id: 'description',
+    label: 'description'
+}]
 
 export const Actions = ({}) => {
 
@@ -26,7 +38,9 @@ export const Actions = ({}) => {
         actionCategories: [],
         actionLists: [],
         automationEnabled: false,
-        searchText: '',
+        searchData: {
+            search: '',
+        },
         selectedCategory: 'all'
     });
     const [detailOpened, setDetailOpened] = useState(null);
@@ -330,8 +344,9 @@ export const Actions = ({}) => {
         sendData('toggle-hidden-action', { id, flag });
     })
 
-    const setSearch = (searchText) => {
-        sendData('set-actions-search', { searchText });
+    const setSearch = (searchData) => {
+        console.log('SetSearch: ', searchData);
+        sendData('set-actions-search', { searchData });
     }
 
     return (
@@ -349,7 +364,13 @@ export const Actions = ({}) => {
                         </ul>
                         <div className={'additional-filters'}>
                             <label>
-                                <input type={'text'} placeholder={'Search'} value={actionsData.searchText || ''} onChange={e => setSearch(e.target.value)}/>
+                                <SearchField
+                                    placeholder={'Search'}
+                                    value={actionsData.searchData || ''}
+                                    onSetValue={val => setSearch(val)}
+                                    scopes={ACTIONS_SEARCH_SCOPES}
+                                    />
+                                {/*<input type={'text'} placeholder={'Search'} value={actionsData.searchText || ''} onChange={e => setSearch(e.target.value)}/>*/}
                             </label>
                             <label>
                                 <input type={"checkbox"} checked={actionsData.showHidden} onChange={toggleShowHidden}/>
@@ -380,7 +401,7 @@ export const Actions = ({}) => {
 
                     {actionsData.actionListsUnlocked ? (<ActionListsPanel editListToDetails={editListToDetails} lists={actionsData.actionLists} viewListToDetails={viewListToDetails} runningList={actionsData.runningList} automationEnabled={actionsData.automationEnabled} toggleAutomation={toggleAutomation} autotriggerIntervalSetting={actionsData.autotriggerIntervalSetting} changeAutomationInterval={changeAutomationInterval}/>) : null}
                 </div>
-                <div className={'action-detail ingame-box detail-blade'}>
+                <div className={`action-detail ingame-box detail-blade ${listData ? 'wide-blade' : ''}`}>
                     <DetailBlade
                         actionId={detailOpened}
                         editListId={editingList}

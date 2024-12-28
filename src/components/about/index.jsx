@@ -6,6 +6,14 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+                <h3>Idle Awakening v0.0.5</h3>
+                <div className={'features'}>
+                    <p>Completely changed gathering - now its happening on 2D maps</p>
+                    <p>Herbs are now harder to get but more powerful in overall</p>
+                    <p>Implemented workshop and alchemy automation</p>
+                    <p>Details sidebars adjusted in sizes</p>
+                    <p>Refined search UI</p>
+                </div>
                 <h3>Idle Awakening v0.0.4a</h3>
                 <div className={'features'}>
                     <p>Fixed bugs and crushes when selecting specific events options</p>

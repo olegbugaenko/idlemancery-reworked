@@ -130,23 +130,12 @@ export class MapModule extends GameModule {
                                     B: tileData.cost.gathering_effort.value,
                                     type: 0
                                 },
-                                'energy': {
-                                    A: 0,
-                                    B: tileData.cost.energy ?? 0,
-                                    type: 0
-                                },
-                                'health': {
-                                    A: 0,
-                                    B: tileData.cost.health ?? 0,
-                                    type: 0
-                                }
                             }
                         },
                         effectDeps: ['gathering_efficiency']
                     }
                 })
                 gameEntity.setEntityLevel(runningEntityId, 1, true);
-                console.log('Set tile: ', tileData)
             }
         }
         this.processTiles();
@@ -180,14 +169,14 @@ export class MapModule extends GameModule {
                 const lowRarityResource = rarityBuckets.low[Math.floor(Math.random() * rarityBuckets.low.length)];
                 drops.push({
                     id: lowRarityResource.id,
-                    amountMult: complexity / ((1 + lowRarityResource.rarity)),
-                    probabilityMult: (complexity ** 0.4) / ((1 + (lowRarityResource.rarity ** 0.5))*(lowRarityResource.sellPrice ** 0.5)),
+                    amountMult: complexity / ((1 + lowRarityResource.rarity)*(lowRarityResource.sellPrice ** 0.05)),
+                    probabilityMult: (complexity ** 0.4) / ((1 + (lowRarityResource.rarity ** 0.5))*(lowRarityResource.sellPrice ** 0.25)),
                 });
             }
         }
 
         // Determine how many more resources are needed (at least 3 in total)
-        const remainingDropsCount = 4 - drops.length;
+        const remainingDropsCount = 5 - drops.length;
 
         // Add resources from other rarity levels
         const additionalDrops = [];
@@ -195,10 +184,10 @@ export class MapModule extends GameModule {
             const roll = Math.random();
             let bucket;
 
-            if (roll < 0.5 && rarityBuckets.mid.length > 0) {
+            if (roll < 0.75 && rarityBuckets.mid.length > 0) {
                 // 50% chance to pick from rarity 2-3
                 bucket = rarityBuckets.mid;
-            } else if (roll < 0.75 && rarityBuckets.high.length > 0) {
+            } else if (roll < 0.95 && rarityBuckets.high.length > 0) {
                 // 25% chance to pick from rarity 4-5
                 bucket = rarityBuckets.high;
             } else if (rarityBuckets.low.length > 0) {
@@ -210,8 +199,8 @@ export class MapModule extends GameModule {
                 const selectedResource = bucket[Math.floor(Math.random() * bucket.length)];
                 additionalDrops.push({
                     id: selectedResource.id,
-                    amountMult: complexity / ((1 + selectedResource.rarity)),
-                    probabilityMult: (complexity ** 0.4) / (((1 + (selectedResource.rarity ** 0.5)) ** 2)*(selectedResource.sellPrice ** 0.5))
+                    amountMult: complexity / ((1 + selectedResource.rarity)*(selectedResource.sellPrice ** 0.05)),
+                    probabilityMult: (complexity ** 0.5) / (((1 + (selectedResource.rarity ** 0.5)))*(selectedResource.sellPrice ** 0.25))
                 });
             }
         }
@@ -223,7 +212,7 @@ export class MapModule extends GameModule {
         const uniqueDrops = Array.from(new Map(drops.map(r => [r.id, r])).values());
 
         // Trim to exactly 3 drops
-        return uniqueDrops.slice(0, 3);
+        return uniqueDrops.slice(0, 5);
     }
 
     processTiles() {
@@ -237,12 +226,26 @@ export class MapModule extends GameModule {
                     efficiency = gameEntity.getEntityEfficiency(`tile_${i}_${j}_exploration`);
                 }
                 const effEff = efficiency ** 0.5;
+                const r = this.mapTiles[i][j].r ?? [];
+                if(r.length && r.length > this.mapTiles[i][j].drops.length) {
+                    this.mapTiles[i][j].r = [...new Set(r)];
+                }
                 this.mapTilesProcessed[i][j] = {
                     ...this.mapTiles[i][j],
                     efficiency,
                     effEff,
                     drops: this.mapTiles[i][j].drops.map((d, index) => {
                         const isRevealed = this.mapTiles[i][j].r?.includes(index);
+                        const rs = gameResources.getResource(d.id);
+                        const isHerb = rs.tags.includes('herb');
+                        const isRare = rs.tags.includes('rare');
+                        let amtHerbsMult = 1.;
+                        if(isHerb) {
+                            amtHerbsMult = gameEffects.getEffectValue('gathering_herbs_amount');
+                            if(isRare) {
+                                amtHerbsMult = 0.25*amtHerbsMult ** 0.5;
+                            }
+                        }
                         if(isRevealed) {
                             if(!this.filterableLoots[d.id]) {
                                 this.filterableLoots[d.id] = [];
@@ -254,9 +257,9 @@ export class MapModule extends GameModule {
                         }
                         return {
                             ...d,
-                            probability: 0.02*d.probabilityMult*effEff,
-                            amountMin: Math.max(1, d.amountMult*effEff),
-                            amountMax: Math.max(1, 3*d.amountMult*effEff),
+                            probability: 0.02*d.probabilityMult*effEff*(1 + (gameResources.getResource('gathering_perception').amount ** 0.75)),
+                            amountMin: Math.max(1, 3*d.amountMult*effEff*amtHerbsMult),
+                            amountMax: Math.max(1, 6*d.amountMult*effEff*amtHerbsMult),
                             isRevealed,
                         }
                     }),
@@ -372,7 +375,9 @@ export class MapModule extends GameModule {
                         if(!this.mapTiles[ent.attributes.i][ent.attributes.j].r) {
                             this.mapTiles[ent.attributes.i][ent.attributes.j].r = []
                         }
-                        this.mapTiles[ent.attributes.i][ent.attributes.j].r.push(index);
+                        if(!this.mapTiles[ent.attributes.i][ent.attributes.j].r.includes(index)) {
+                            this.mapTiles[ent.attributes.i][ent.attributes.j].r.push(index);
+                        }
                         console.log(`Found ${drop.id} at ${ent.attributes.i}:${ent.attributes.j} with chance ${roll} < ${drop.probability}: ${amt}. EntEff: ${ent.efficiency}`, this.mapTiles[ent.attributes.i][ent.attributes.j]);
                     }
                 })

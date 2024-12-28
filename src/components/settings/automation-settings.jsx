@@ -42,6 +42,8 @@ export const AutomationsSettings = () => {
             {unlocks.inventory ? (<SellAutomations resources={resources}/>) : null}
             {unlocks.inventory ? (<ConsumeAutomations resources={resources} />) : null}
             {unlocks.map ? (<MapTilesAutomations resources={resources} />) : null}
+            {unlocks.crafting ? (<CraftingAutomations resources={resources} />) : null}
+            {unlocks.alchemy ? (<AlchemyAutomations resources={resources} />) : null}
             {unlocks.spellbook ? (<SpellAutomations resources={resources} />) : null}
         </PerfectScrollbar>
     </div> )
@@ -313,6 +315,144 @@ export const AutomatedMapTile = ({ auto, resources, onSaveAction }) => {
 
 }
 
+
+
+export const CraftingAutomations = ({ resources }) => {
+
+    const worker = useContext(WorkerContext);
+    const { onMessage, sendData } = useWorkerClient(worker);
+    const [automations, setAutomations] = useState([]);
+    const [isOpened, setOpened] = useState(true);
+
+    useEffect(() => {
+        sendData('query-crafting-lists', { filterAutomated: true, category: 'crafting' })
+    }, []);
+
+    onMessage('crafting-lists-crafting', (data) => {
+        console.log('automated-crafting: ', data);
+        setAutomations(data.lists);
+    })
+
+    const onSaveAction = useCallback((id, saveData) => {
+        const prev = automations.find(a => a.id === id);
+        if(!prev) {
+            console.error(`Not found map tile by id: ${id}`, id, saveData);
+            return;
+        }
+        const toSave = {
+            ...prev,
+            autotrigger: {
+                priority: saveData.priority,
+                rules: saveData.rules,
+                pattern: saveData.pattern
+            }
+        }
+        console.log('Saving data: ', toSave);
+        sendData('save-crafting-list', toSave);
+    })
+
+    if(!automations || !automations.length || !resources) return;
+
+    return (<div className={`automations-box ${isOpened ? 'opened' : 'closed'}`}>
+        <div className={'automation-panel-title'} onClick={() => setOpened(!isOpened)}>
+            <h4>Crafting Automations</h4>
+            <span className={'arrow-down'}>&#8681;</span>
+        </div>
+        <div className={'automated-list'}>
+            {automations.map(auto => (<AutomatedCrafting auto={auto} resources={resources} onSaveAction={onSaveAction}/>))}
+        </div>
+    </div> )
+
+}
+
+export const AutomatedCrafting = ({ auto, resources, onSaveAction }) => {
+
+    const onSave = useCallback((id, data) => {
+        onSaveAction(id, data);
+    })
+
+    return <AutomatedItem
+        scope={'crafting'}
+        id={auto.id}
+        name={auto.name}
+        rules={auto.autotrigger.rules}
+        pattern={auto.autotrigger.pattern}
+        resources={resources}
+        isPriorityShown={true}
+        priority={auto.autotrigger.priority}
+        onSave={onSave}
+    />
+
+}
+
+
+export const AlchemyAutomations = ({ resources }) => {
+
+    const worker = useContext(WorkerContext);
+    const { onMessage, sendData } = useWorkerClient(worker);
+    const [automations, setAutomations] = useState([]);
+    const [isOpened, setOpened] = useState(true);
+
+    useEffect(() => {
+        sendData('query-crafting-lists', { filterAutomated: true, category: 'alchemy' })
+    }, []);
+
+    onMessage('crafting-lists-alchemy', (data) => {
+        console.log('automated-crafting: ', data);
+        setAutomations(data.lists);
+    })
+
+    const onSaveAction = useCallback((id, saveData) => {
+        const prev = automations.find(a => a.id === id);
+        if(!prev) {
+            console.error(`Not found map tile by id: ${id}`, id, saveData);
+            return;
+        }
+        const toSave = {
+            ...prev,
+            autotrigger: {
+                priority: saveData.priority,
+                rules: saveData.rules,
+                pattern: saveData.pattern
+            }
+        }
+        console.log('Saving data: ', toSave);
+        sendData('save-crafting-list', toSave);
+    })
+
+    if(!automations || !automations.length || !resources) return;
+
+    return (<div className={`automations-box ${isOpened ? 'opened' : 'closed'}`}>
+        <div className={'automation-panel-title'} onClick={() => setOpened(!isOpened)}>
+            <h4>Alchemy Automations</h4>
+            <span className={'arrow-down'}>&#8681;</span>
+        </div>
+        <div className={'automated-list'}>
+            {automations.map(auto => (<AutomatedAlchemy auto={auto} resources={resources} onSaveAction={onSaveAction}/>))}
+        </div>
+    </div> )
+
+}
+
+export const AutomatedAlchemy = ({ auto, resources, onSaveAction }) => {
+
+    const onSave = useCallback((id, data) => {
+        onSaveAction(id, data);
+    })
+
+    return <AutomatedItem
+        scope={'alchemy'}
+        id={auto.id}
+        name={auto.name}
+        rules={auto.autotrigger.rules}
+        pattern={auto.autotrigger.pattern}
+        resources={resources}
+        isPriorityShown={true}
+        priority={auto.autotrigger.priority}
+        onSave={onSave}
+    />
+
+}
 
 
 export const SpellAutomations = ({ resources }) => {

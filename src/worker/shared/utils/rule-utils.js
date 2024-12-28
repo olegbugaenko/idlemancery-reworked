@@ -43,6 +43,19 @@ export const checkMatchingActionRule = (rule) => {
     return false;
 }
 
+export const checkMatchingActionListRule = (rule) => {
+    const actionListRunning = gameCore.getModule('actions').lists.runningList?.id === rule.action_list_id;
+
+    switch (rule.condition) {
+        case 'true':
+            return !!actionListRunning;
+        case 'false':
+            return !actionListRunning;
+    }
+
+    return false;
+}
+
 export const checkMatchingActionTagRule = (rule) => {
     const actionRunning = gameCore.getModule('actions').isRunningActionWithTag(rule.tag);
 
@@ -95,6 +108,9 @@ export const checkMatchingRule = (rule) => {
     }
     if(rule.compare_type === 'action_level') {
         return checkMatchingActionLevelRule(rule);
+    }
+    if(rule.compare_type === 'running_action_list') {
+        return checkMatchingActionListRule(rule);
     }
 }
 

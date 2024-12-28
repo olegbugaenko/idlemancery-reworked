@@ -24,6 +24,8 @@ export const Footer = () => {
 
     const [newUnlocks, setNewUnlocks] = useState({});
 
+    const [hotkeys, setHotkeys] = useState({});
+
     useEffect(() => {
         const interval = setInterval(() => {
             sendData('query-unlocks', {});
@@ -31,12 +33,29 @@ export const Footer = () => {
         }, 100);
         const interval2 = setInterval(() => {
             sendData('query-new-unlocks-notifications', { suffix: 'all', depth: 0 })
+            sendData('query-all-hotkeys', { suffix: 'all', depth: 0 })
         }, 1000)
         return () => {
             clearInterval(interval);
             clearInterval(interval2);
         }
     }, [])
+
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            const keys = [];
+            if (event.ctrlKey) keys.push("Ctrl");
+            if (event.shiftKey) keys.push("Shift");
+            if (event.altKey) keys.push("Alt");
+            keys.push(event.key.toUpperCase());
+            const combination = keys.join("+");
+
+            triggerHotkey(combination); // Call triggerHotkey when a combination is pressed
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [hotkeys]);
 
     onMessage('unlocks', (unlocks) => {
         setUnlocksData(unlocks);
@@ -51,12 +70,27 @@ export const Footer = () => {
         setNewUnlocks(payload);
     })
 
+    onMessage('all-hotkeys', payload => {
+        // console.log('Received unlocks: ', payload);
+        setHotkeys(payload);
+    })
+
     const toggleSpeedUp = () => {
         sendData('toggle-speedup', {});
     }
 
     const openTab = (id) => {
         setOpenedTab(id);
+    }
+
+    const triggerHotkey = (combination) => {
+        const hotkey = Object.values(hotkeys || {}).find(h => h.combination === combination);
+
+        if(!hotkey) return;
+
+        if(hotkey.action === 'selectTab') {
+            openTab(hotkey.param);
+        }
     }
 
     const elementRef = useRef(null);
@@ -125,7 +159,7 @@ export const Footer = () => {
                     <span>Settings</span>
                 </li>
                 <li className={openedTab === 'about' ? 'active' : ''} onClick={() => openTab('about')}>
-                    <span>v0.0.4a</span>
+                    <span>v0.0.5</span>
                 </li>
             </ul>
         </div>

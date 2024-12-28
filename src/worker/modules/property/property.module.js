@@ -12,11 +12,23 @@ export class PropertyModule extends GameModule {
         this.isUnlocked = false;
         this.leveledId = null;
         this.hideMaxed = {};
-        this.searchText = {};
+        this.searchData = {
+            furniture: {
+                search: '',
+                selectedScopes: ['name']
+            },
+            accessory: {
+                search: '',
+                selectedScopes: ['name']
+            },
+        };
         this.eventHandler.registerHandler('purchase-furniture', (payload) => {
             this.purchaseFurniture(payload.id, payload.filterId, payload.filterId ? {
                 hideMaxed: this.hideMaxed[payload.filterId] || false,
-                searchText: this.searchText[payload.searchText] || ''
+                searchData: this.searchData[payload.filterId] || {
+                    search: '',
+                    selectedScopes: ['name']
+                }
             } : undefined);
         })
 
@@ -28,15 +40,18 @@ export class PropertyModule extends GameModule {
 
         this.eventHandler.registerHandler('set-furniture-search-text', (payload) => {
             if(payload.filterId) {
-                this.searchText[payload.filterId] = payload.searchText;
+                this.searchData[payload.filterId] = payload.searchData;
             }
-            console.log('sendFurniture: ', payload, this.searchText);
+            console.log('sendFurniture: ', payload, this.searchData);
         })
 
         this.eventHandler.registerHandler('delete-furniture', (payload) => {
             this.deleteFurniture(payload.id, payload.filterId, payload.filterId ? {
                 hideMaxed: this.hideMaxed[payload.filterId] || false,
-                searchText: this.searchText[payload.filterId] || ''
+                searchData: this.searchData[payload.filterId]  || {
+                    search: '',
+                    selectedScopes: ['name']
+                }
             } : undefined);
         })
         
@@ -44,7 +59,10 @@ export class PropertyModule extends GameModule {
 
             this.sendFurnituresData(payload, payload.filterId ? {
                 hideMaxed: this.hideMaxed[payload.filterId] || false,
-                searchText: this.searchText[payload.filterId] || ''
+                searchData: this.searchData[payload.filterId]  || {
+                    search: '',
+                    selectedScopes: ['name']
+                }
             } : undefined)
         })
 
@@ -82,7 +100,7 @@ export class PropertyModule extends GameModule {
         return {
             furnitures: this.purchasedFurnitures,
             hideMaxed: this.hideMaxed,
-            searchText: this.searchText,
+            searchData: this.searchData,
         }
     }
 
@@ -98,7 +116,16 @@ export class PropertyModule extends GameModule {
         }
         this.isUnlocked = saveObject?.isUnlocked || false;
         this.hideMaxed = saveObject?.hideMaxed || {};
-        this.searchText = saveObject?.searchText || {};
+        this.searchData = saveObject?.searchData || {
+            furniture: {
+                search: '',
+                selectedScopes: ['name']
+            },
+            accessory: {
+                search: '',
+                selectedScopes: ['name']
+            },
+        };
         this.sendFurnituresData({ filterId: 'furniture' });
     }
 
@@ -147,18 +174,28 @@ export class PropertyModule extends GameModule {
         })
     }
 
+    matchSearch(one, searchData) {
+        if(!searchData) return true;
+        const { search, selectedScopes } = searchData;
+        if(!search) return true;
+        if(selectedScopes.includes('name') && one.name.toLowerCase().includes(search)) return true;
+        if(selectedScopes.includes('tags') && one.tags && one.tags.some(tag => tag.includes(search))) return true;
+        if(selectedScopes.includes('description') && one.description && one.description.toLowerCase().includes(search)) return true;
+
+        return false;
+    }
+
     getFurnituresData(payload, options) {
         if(!payload.filterId) {
             throw new Error('filter is required here');
         }
-        // console.log('PL: ', payload);
         const entities = gameEntity.listEntitiesByTags([payload.filterId]);
         const spaceRes = gameResources.getResource('living_space');
 
         return {
             available: entities.filter(one => one.isUnlocked
                 && (!options?.hideMaxed || !one.isCapped)
-                && (!options?.searchText || one.name.toLowerCase().includes(options?.searchText?.toLowerCase()))
+                && this.matchSearch(one, options?.searchData)
             ).map(entity => ({
                 id: entity.id,
                 name: entity.name,
@@ -175,7 +212,7 @@ export class PropertyModule extends GameModule {
                 consumption: spaceRes.consumption,
                 total: spaceRes.amount,
             },
-            searchText: options?.searchText,
+            searchData: options?.searchData,
             hideMaxed: options?.hideMaxed
         }
     }

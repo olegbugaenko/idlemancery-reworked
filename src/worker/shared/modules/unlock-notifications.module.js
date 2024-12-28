@@ -18,6 +18,10 @@ export class UnlockNotificationsModule extends GameModule {
             this.setViewed(payload.scope, payload.category, payload.id);
         })
 
+        this.eventHandler.registerHandler('set-all-new-notification-viewed', payload => {
+            this.setAllViewed();
+        })
+
         this.eventHandler.registerHandler('set-new-notification-viewed-by-id', payload => {
             this.setViewedById(payload.id);
         })
@@ -71,6 +75,14 @@ export class UnlockNotificationsModule extends GameModule {
         this.byId[id].forEach(pathData => {
             this.setViewed(pathData.scope, pathData.category, id, isViewed)
         })
+    }
+
+    setAllViewed() {
+        for(const id in this.byId) {
+            if(this.notifications[this.byId[id].scope][this.byId[id].category][id].isUnlocked) {
+                this.setViewedById(id, true);
+            }
+        }
     }
 
     load(saveObj) {

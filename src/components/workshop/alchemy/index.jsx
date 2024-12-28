@@ -2,48 +2,53 @@ import React, {useCallback, useContext, useEffect, useState} from "react";
 import WorkerContext from "../../../context/worker-context";
 import {useWorkerClient} from "../../../general/client";
 import PerfectScrollbar from "react-perfect-scrollbar";
-import {Map} from "./map.jsx";
-import {formatInt, formatValue, secondsToString} from "../../../general/utils/strings";
+import {EffectsSection} from "../../shared/effects-section.jsx";
+import {formatInt, formatValue} from "../../../general/utils/strings";
+import {ResourceCost} from "../../shared/resource-cost.jsx";
+import {Alchemy} from "./alchemy.jsx";
+import {ResourceComparison} from "../../shared/resource-comparison.jsx";
 import {cloneDeep} from "lodash";
 import RulesList from "../../shared/rules-list.jsx";
-import {Draggable} from "react-beautiful-dnd";
 
-export const MapWrap = ({ children }) => {
-    const [mapTileDetails, setMapTileDetails] = useState(null)
-
-    const [listDetails, setListDetails] = useState(null)
+export const AlchemyWrap = ({ children }) => {
 
     const worker = useContext(WorkerContext);
 
     const { onMessage, sendData } = useWorkerClient(worker);
 
-    const [unlocks, setUnlocksData] = useState({});
+    const [detailOpened, setDetailOpened] = useState(null);
 
     const [newUnlocks, setNewUnlocks] = useState({});
 
+    const [listDetails, setListDetails] = useState(null)
 
 
     useEffect(() => {
-        sendData('query-unlocks', { prefix: 'world' });
-        const interval = setInterval(() => {
-            sendData('query-unlocks', { prefix: 'world' });
-            sendData('query-new-unlocks-notifications', { suffix: 'world', scope: 'map' })
-        }, 1000);
+        const interval2 = setInterval(() => {
+            sendData('query-new-unlocks-notifications', { suffix: 'alchemy', scope: 'workshop' })
+        }, 1000)
         return () => {
-            clearInterval(interval);
+            clearInterval(interval2);
         }
     }, [])
 
-    onMessage('unlocks-world', (unlocks) => {
-        setUnlocksData(unlocks);
-    })
-
-    onMessage('new-unlocks-notifications-world', payload => {
-        // console.log('Received unlocks: ', payload);
+    onMessage('new-unlocks-notifications-alchemy', payload => {
         setNewUnlocks(payload);
     })
 
-    onMessage('map-tile-list-data', (payload) => {
+    const setItemDetails = (id) => {
+        if(!id) {
+            setDetailOpened(null);
+        } else {
+            setDetailOpened(id);
+        }
+    }
+
+    const setItemLevel = useCallback((id, level) => {
+        sendData('set-crafting-level', { id, level, filterId: 'alchemy' });
+    })
+
+    onMessage('crafting-list-data', (payload) => {
         console.log(`currViewing LIST: `, payload, listDetails);
         if(!listDetails) return;
 
@@ -56,14 +61,15 @@ export const MapWrap = ({ children }) => {
 
     })
 
-    onMessage('map-tile-list-effects', (payload) => {
-        console.log('GOT DATA: ', payload);
+    onMessage('crafting-list-effects', (payload) => {
         setListDetails({
             ...listDetails,
             listData: {
                 ...listDetails.listData,
-                drops: payload.potentialDrops,
-                costs: payload.costs,
+                potentialEffects: payload.potentialEffects,
+                resourcesEffects: payload.resourcesEffects,
+                effectEffects: payload.effectEffects,
+                prevEffects: payload.prevEffects
             }
         })
     })
@@ -157,30 +163,23 @@ export const MapWrap = ({ children }) => {
         console.log('Called select list', listDetails);
     }, [listDetails])
 
-    const setItemDetails = useCallback(({ meta }) => {
-        console.log('Called select tile', meta, listDetails);
+    const addItemToList = useCallback(({id, name}) => {
+        console.log('Add recipe to list', id, listDetails);
         if(listDetails?.listData && listDetails?.isEdit) {
-            if(meta) {
-                console.log('Insert tile to list: ', meta, listDetails);
-                if(!listDetails.listData.tiles.find(one => one.id === `${meta.i}:${meta.j}`)) {
+            if(id) {
+                console.log('Insert recipe to list: ', id, listDetails);
+                if(!listDetails.listData.recipes.find(one => one.id === id)) {
                     const newList = cloneDeep(listDetails.listData);
-                    newList.tiles.push({
-                        id: `${meta.i}:${meta.j}`,
-                        name: `Tile ${meta.i}:${meta.j}`,
-                        i: meta.i,
-                        j: meta.j,
-                        time: 2,
+                    newList.recipes.push({
+                        id,
+                        name,
+                        min: 0,
+                        max: 0,
+                        percentage: 25,
                     })
                     setListDetails({...listDetails, listData: {...newList}});
-                    sendData('query-map-tile-list-effects', { listData: newList });
+                    // sendData('query-crafting-list-effects', { listData: newList });
                 }
-            }
-        } else {
-            if(!meta) {
-                setMapTileDetails(null);
-            } else {
-                setListDetails(null);
-                setMapTileDetails(meta);
             }
         }
     }, [listDetails]);
@@ -192,15 +191,20 @@ export const MapWrap = ({ children }) => {
                 isEdit: list.isEdit,
                 isLoading: true,
             })
-            sendData('load-map-tile-list', {
+            sendData('load-crafting-list', {
                 id: list.listData?.id,
             })
         } else {
+            if(!list.isEdit) {
+                setListDetails(null);
+                return;
+            }
             setListDetails({
                 ...(list || {}),
                 listData: {
                     ...(list.listData || {}),
-                    tiles: [],
+                    recipes: [],
+                    category: 'alchemy',
                     autotrigger: {
                         priority: 10,
                         rules: [],
@@ -216,9 +220,9 @@ export const MapWrap = ({ children }) => {
         const { listData } = listDetails ?? {};
         if(listData) {
             const newList = listData;
-            newList.tiles = newList.tiles.filter(a => a.id !== id);
+            newList.recipes = newList.recipes.filter(a => a.id !== id);
             setListDetails({...listDetails, listData: {...newList}});
-            sendData('query-map-tile-list-effects', { listData: newList });
+            sendData('query-crafting-list-effects', { listData: newList });
         }
     }
 
@@ -226,9 +230,9 @@ export const MapWrap = ({ children }) => {
         const { listData } = listDetails ?? {};
         if(listData) {
             const newList = listData;
-            newList.tiles = newList.tiles.map(a => a.id !== id ? a : {...a, [key]: value});
+            newList.recipes = newList.recipes.map(a => a.id !== id ? a : {...a, [key]: value});
             setListDetails({...listDetails, listData: {...newList}});
-            sendData('query-map-tile-list-effects', { listData: newList });
+            sendData('query-crafting-list-effects', { listData: newList });
         }
     }
 
@@ -246,42 +250,37 @@ export const MapWrap = ({ children }) => {
         setListDetails(null);
     }
 
-    return (
-        <div className={'items-wrap'}>
-            <div className={'items ingame-box'}>
-                <div className={'menu-wrap'}>
-                    {children}
-                </div>
-                <Map setItemDetails={setItemDetails} newUnlocks={newUnlocks?.['world']?.items?.['map']?.items} openListDetails={openListDetails}/>
-            </div>
+    return (<div className={'items-wrap'}>
 
-            <div className={'item-detail ingame-box detail-blade'}>
-                {listDetails?.listData ? (<MapTileListDetails
-                    listDetails={listDetails.listData}
-                    isEditing={listDetails.isEdit}
-                    onUpdateActionFromList={onUpdateActionFromList}
-                    onDropActionFromList={onDropActionFromList}
-                    onUpdateListValue={onUpdateListValue}
-                    onAddAutotriggerRule={onAddAutotriggerRule}
-                    onSetAutotriggerRuleValue={onSetAutotriggerRuleValue}
-                    onDeleteAutotriggerRule={onDeleteAutotriggerRule}
-                    setAutotriggerPriority={setAutotriggerPriority}
-                    onSetAutotriggerPattern={onSetAutotriggerPattern}
-                    onCloseList={onCloseList}
-                />) : null}
-                {mapTileDetails ? (<ItemDetails
-                    itemId={mapTileDetails}
-                />) : null}
+        <div className={'items ingame-box'}>
+            <div className={'head'}>
+                {children}
             </div>
+            <Alchemy filterId={'alchemy'} setItemDetails={setItemDetails} setItemLevel={setItemLevel} newUnlocks={newUnlocks.workshop?.items?.alchemy?.items} openListDetails={openListDetails} addItemToList={addItemToList}/>
         </div>
 
-    )
+        <div className={`item-detail ingame-box detail-blade ${listDetails?.listData && (listDetails?.isEdit || !detailOpened) ? 'wide-blade' : ''}`}>
+            {listDetails?.listData && (listDetails?.isEdit || !detailOpened) ? (<AlchemyListDetails
+                listDetails={listDetails.listData}
+                isEditing={listDetails.isEdit}
+                onUpdateActionFromList={onUpdateActionFromList}
+                onDropActionFromList={onDropActionFromList}
+                onUpdateListValue={onUpdateListValue}
+                onAddAutotriggerRule={onAddAutotriggerRule}
+                onSetAutotriggerRuleValue={onSetAutotriggerRuleValue}
+                onDeleteAutotriggerRule={onDeleteAutotriggerRule}
+                setAutotriggerPriority={setAutotriggerPriority}
+                onSetAutotriggerPattern={onSetAutotriggerPattern}
+                onCloseList={onCloseList}
+            />) : null}
+            {(detailOpened && !listDetails?.isEdit) ? (<ItemDetails itemId={detailOpened} category={'alchemy'}/>) : null}
+        </div>
+    </div>)
 
 }
 
 
-
-export const ItemDetails = ({itemId}) => {
+export const ItemDetails = ({itemId, category}) => {
 
     const worker = useContext(WorkerContext);
 
@@ -289,28 +288,39 @@ export const ItemDetails = ({itemId}) => {
 
     const [item, setDetailOpened] = useState(null);
 
-
     useEffect(() => {
-        sendData('query-map-tile-details', itemId);
-        const interval = setInterval(() => {
-            // console.log('queryingMap query-map-tile-details: ', itemId)
-            sendData('query-map-tile-details', itemId);
-        }, 1000);
+        console.log('Details: ', itemId, category);
+        if(category === 'alchemy') {
+            const interval = setInterval(() => {
+                sendData('query-crafting-details', { id: itemId });
+            }, 200);
 
-        return () => {
-            clearInterval(interval);
+            return () => {
+                clearInterval(interval);
+            }
         }
+        /*if(category === 'plantation') {
+            const interval = setInterval(() => {
+                sendData('query-plantation-details', { id: itemId });
+            }, 200);
+
+            return () => {
+                clearInterval(interval);
+            }
+        }*/
 
     }, [itemId])
 
 
-    onMessage('map-tile-details', (items) => {
+    onMessage('crafting-details', (items) => {
+        console.log('CraftDetails: ', items)
         setDetailOpened(items);
     })
 
-    const toggleRunning = (i, j, flag) => {
-        sendData('toggle-map-tile-running', { i, j, flag })
-    }
+    /*onMessage('plantation-details', (items) => {
+        console.log('PlantDetails: ', items)
+        setDetailOpened(items);
+    })*/
 
     if(!itemId || !item) return null;
 
@@ -319,59 +329,54 @@ export const ItemDetails = ({itemId}) => {
         <PerfectScrollbar>
             <div className={'blade-inner'}>
                 <div className={'block'}>
-                    <h4>{item.name}</h4>
+                    <h4>{item.name} (x{formatInt(item.level)})</h4>
                     <div className={'description'}>
                         {item.description}
                     </div>
                 </div>
-                {item.isRunning ? (<div className={'block'}>
-                    <p>Efficiency: {formatValue(100*item.efficiency)}%</p>
-                    <p>Chance and amount effect: {formatValue(100*item.effEff)}%</p>
-                </div> ) : null}
-
-                {item.drops ? (<div className={'block'}>
-                    <p>Drops:</p>
-                    {item.drops.map(drop => (<p className={'drop-row'}>
-                        <span className={'name'}>{drop.resource.name}</span>
-                        <span className={'probability'}>{formatValue(drop.probability*100)}%</span>
-                        <span className={'amounts'}>{formatInt(drop.amountMin)} - {formatInt(drop.amountMax)}</span>
-                    </p> ))}
+                {item.bottleNeck ? (<div className={'block'}>
+                    <p className={'hint'}>This activity running at {formatValue(item.efficiency*100)}% due to missing {item.bottleNeck.name}</p>
                 </div> ) : null}
                 <div className={'block'}>
-                    <p>Costs:</p>
-                    <div className={'stats-block costs'}>
-                        {Object.values(item.cost || {}).map(cost => (
-                            <p><span>{cost.name}:</span> <span>{formatValue(cost.value)}</span></p>
-                        ))}
+                    <p>Cost:</p>
+                    <div className={'costs-wrap'}>
+                        {Object.values(item.affordable.affordabilities || {}).map(aff => <ResourceCost affordabilities={aff}/>)}
                     </div>
                 </div>
                 <div className={'block'}>
-                    <button onClick={() => toggleRunning(item.i, item.j, !item.isRunning)}>{item.isRunning ? 'Stop' : 'Explore'}</button>
+                    <p>Effects:</p>
+                    <div className={'effects'}>
+                        {item.currentEffects ?
+                            (<ResourceComparison effects1={item.currentEffects} effects2={item.potentialEffects}/>)
+                            : (<EffectsSection effects={item.effects} maxDisplay={10}/>)
+                        }
+                    </div>
                 </div>
             </div>
         </PerfectScrollbar>
     )
 }
 
-export const MapTileListDetails = ({
-   listDetails,
-   isEditing,
-   onUpdateActionFromList,
-   onDropActionFromList,
-   onUpdateListValue,
-   onAddAutotriggerRule,
-   onSetAutotriggerRuleValue,
-   onDeleteAutotriggerRule,
-   setAutotriggerPriority,
-   onSetAutotriggerPattern,
-   onCloseList
+export const AlchemyListDetails = ({
+    listDetails,
+    isEditing,
+    onUpdateActionFromList,
+    onDropActionFromList,
+    onUpdateListValue,
+    onAddAutotriggerRule,
+    onSetAutotriggerRuleValue,
+    onDeleteAutotriggerRule,
+    setAutotriggerPriority,
+    onSetAutotriggerPattern,
+    onCloseList
 }) => {
 
     const worker = useContext(WorkerContext);
 
     const { onMessage, sendData } = useWorkerClient(worker);
 
-    const [editing, setEditing] = useState({ tiles: [] })
+    const [editing, setEditing] = useState({ recipes: []
+    })
 
     useEffect(() => {
         console.log('SET EDITING LIST: ', listDetails);
@@ -383,7 +388,7 @@ export const MapTileListDetails = ({
         if(!isClose) {
             editing.isReopenEdit = true;
         }
-        sendData('save-map-tile-list', editing);
+        sendData('save-crafting-list', editing);
         if(isClose) {
             onCloseList();
         }
@@ -417,31 +422,53 @@ export const MapTileListDetails = ({
                     </div>
                 </div>
                 <div className={'block'}>
-                    <p>Click on tiles to add/remove them from the list</p>
-                    <div className={'tiles-list'}>
+                    <p>Click on craft recipes to add/remove them from the list</p>
+                    <div className={'recipes-list'}>
                         <div className="actions-list-wrap">
-                            {editing.tiles.length ? editing.tiles.map((tile, index) => (
-                                        <div className={`action-row flex-container ${!tile.isAvailable ? 'unavailable-tile' : ''}`}
-                                        >
-                                            <div className={'col title'}>
-                                                <span>{tile.name}</span>
-                                            </div>
-                                            <div className={'col amount'}>
-                                                {isEditing
-                                                    ? (<input type={'number'} value={tile.time}
-                                                              onChange={(e) => onUpdateActionFromList(tile.id, 'time', +e.target.value)}/>)
-                                                    : (<span>{tile.time} seconds</span>)
-                                                }
-                                            </div>
-                                            <div className={'col delete'}>
-                                                {isEditing ? (<span className={'close'} onClick={() => onDropActionFromList(tile.id)}>X</span>) : null}
-                                            </div>
-                                        </div>
-                            )) : <p className={'hint'}>No map tiles added yet</p>}
+                            {editing.recipes.length ? editing.recipes.map((recipe, index) => (
+                                <div className={`action-row flex-container ${!recipe.isAvailable ? 'unavailable-recipe' : ''}`}
+                                >
+                                    <div className={'col title'}>
+                                        <span>{recipe.name}</span>
+                                    </div>
+                                    <div className={'col amount'}>
+                                        {isEditing
+                                            ? (<span>Min: <input type={'number'} value={recipe.min}
+                                                                 onChange={(e) => onUpdateActionFromList(recipe.id, 'min', +e.target.value)}/></span>)
+                                            : (<span>Min: {recipe.min}</span>)
+                                        }
+                                    </div>
+                                    <div className={'col amount'}>
+                                        {isEditing
+                                            ? (<span>Max: <input type={'number'} value={recipe.max}
+                                                                 onChange={(e) => onUpdateActionFromList(recipe.id, 'max', +e.target.value)}/></span>)
+                                            : (<span>Max: {recipe.max}</span>)
+                                        }
+                                    </div>
+                                    <div className={'col amount'}>
+                                        {isEditing
+                                            ? (<span><input type={'number'} value={recipe.percentage}
+                                                            onChange={(e) => onUpdateActionFromList(recipe.id, 'percentage', +e.target.value)}/></span>)
+                                            : (<span> {recipe.percentage}%</span>)
+                                        }
+                                    </div>
+                                    <div className={'col delete'}>
+                                        {isEditing ? (<span className={'close'} onClick={() => onDropActionFromList(recipe.id)}>X</span>) : null}
+                                    </div>
+                                </div>
+                            )) : <p className={'hint'}>No map recipes added yet</p>}
                         </div>
                     </div>
                 </div>
-                {editing.drops ? (<div className={'block'}>
+                <div className={'effects-wrap'}>
+                    {Object.keys(editing?.resourcesEffects || {}).length ? (<div className={'block'}>
+                        <p>Average Resources per second</p>
+                        <ResourceComparison effects1={editing?.prevEffects} effects2={editing?.resourcesEffects} maxDisplay={10}/></div>) : null}
+                    {editing?.effectEffects?.length ? (<div className={'block'}>
+                        <p>Average Effects per second</p>
+                        <EffectsSection effects={editing?.effectEffects || []} maxDisplay={10}/></div>) : null}
+                </div>
+                {/*{editing.drops ? (<div className={'block'}>
                     <p>Drops:</p>
                     {editing.drops.map(drop => (<p className={'drop-row'}>
                         <span className={'name'}>{drop.resource.name}</span>
@@ -453,8 +480,8 @@ export const MapTileListDetails = ({
                     <p>Costs:</p>
                     {editing.costs.map(cost => (
                         <p><span>{cost.name}:</span> <span>{formatValue(cost.cost)}</span></p>
-                     ))}
-                </div> ) : null}
+                    ))}
+                </div> ) : null}*/}
                 <div className={'autotrigger-settings autoconsume-setting block'}>
                     <div className={'rules-header flex-container'}>
                         <p>Autotrigger rules: {editing?.autotrigger?.rules?.length ? null : 'None'}</p>

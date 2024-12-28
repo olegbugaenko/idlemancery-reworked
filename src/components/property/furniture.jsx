@@ -6,6 +6,19 @@ import {formatInt} from "../../general/utils/strings";
 import {FlashOverlay} from "../layout/flash-overlay.jsx";
 import {useFlashOnLevelUp} from "../../general/hooks/flash";
 import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
+import {SearchField} from "../shared/search-field.jsx";
+
+
+const ACTIONS_SEARCH_SCOPES = [{
+    id: 'name',
+    label: 'Name',
+},{
+    id: 'tags',
+    label: 'Tags'
+},{
+    id: 'description',
+    label: 'description'
+}]
 
 export const FurnitureUpgrades = ({ setItemDetails, purchaseItem, deleteItem, newUnlocks }) => {
 
@@ -18,7 +31,9 @@ export const FurnitureUpgrades = ({ setItemDetails, purchaseItem, deleteItem, ne
             total: 0,
             max: 0
         },
-        searchText: '',
+        searchData: {
+            search: '',
+        },
         hideMaxed: false,
     });
 
@@ -35,8 +50,8 @@ export const FurnitureUpgrades = ({ setItemDetails, purchaseItem, deleteItem, ne
         setItemsData(furnitures);
     })
 
-    const setSearch = (searchText) => {
-        sendData('set-furniture-search-text', { filterId: 'furniture', searchText: searchText });
+    const setSearch = (searchData) => {
+        sendData('set-furniture-search-text', { filterId: 'furniture', searchData: searchData });
     }
 
     const setHideMaxed = (hideMaxed) => {
@@ -61,7 +76,12 @@ export const FurnitureUpgrades = ({ setItemDetails, purchaseItem, deleteItem, ne
             </div>
             <div className={'filters'}>
                 <label>
-                    <input type={'text'} value={furnituresData.searchText} onChange={e => setSearch(e.target.value)}/>
+                    <SearchField
+                        placeholder={'Search'}
+                        value={furnituresData.searchData}
+                        onSetValue={val => setSearch(val)}
+                        scopes={ACTIONS_SEARCH_SCOPES}
+                    />
                 </label>
                 <label>
                     Hide maxed
