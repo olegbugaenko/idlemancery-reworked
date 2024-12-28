@@ -79,7 +79,10 @@ export class UnlockNotificationsModule extends GameModule {
 
     setAllViewed() {
         for(const id in this.byId) {
-            if(this.notifications[this.byId[id].scope][this.byId[id].category][id].isUnlocked) {
+            const pathsData = this.byId[id];
+            let isUnlocked = pathsData.reduce((acc, item) => acc || this.notifications[item.scope][item.category][id].isUnlocked, false);
+            console.log('id: ', id, isUnlocked)
+            if(isUnlocked) {
                 this.setViewedById(id, true);
             }
         }

@@ -13,6 +13,8 @@ export const About = () => {
                     <p>Implemented workshop and alchemy automation</p>
                     <p>Details sidebars adjusted in sizes</p>
                     <p>Refined search UI</p>
+                    <p>Added shortcuts for more convenient tabs switching</p>
+                    <p>Fixed a lot of bugs</p>
                 </div>
                 <h3>Idle Awakening v0.0.4a</h3>
                 <div className={'features'}>

@@ -297,7 +297,7 @@ export class MapModule extends GameModule {
         } else {
             this.generateMap();
         }
-        if(obj.lists) {
+        if(obj?.lists) {
             this.lists.load(obj?.lists);
         }
     }
