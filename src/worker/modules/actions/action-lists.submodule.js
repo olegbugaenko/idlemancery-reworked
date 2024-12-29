@@ -189,6 +189,7 @@ export class ActionListsSubmodule extends GameModule {
 
            return false;
         });
+        console.log('regenerateListPriority: ', listsBeingAutotrigger, listsBeingAutotriggerAvailable)
         this.listsAutotrigger = listsBeingAutotriggerAvailable.map(one => ({
             id: one.id,
             priority: one.autotrigger.priority ?? 0,

@@ -140,6 +140,12 @@ export class ActionsModule extends GameModule {
             minValue: 1,
         })
 
+        gameEffects.registerEffect('gathering_low_chance', {
+            name: 'Low Rarity Gather Prob.',
+            defaultValue: 1.,
+            minValue: 1,
+        })
+
         gameEffects.registerEffect('gathering_herbs_amount', {
             name: 'Herbs Gathered',
             defaultValue: 1.,

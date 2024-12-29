@@ -660,6 +660,57 @@ export const registerActionsStage1 = () => {
         }
     })
 
+    registerGameAction('action_trade_efficiency', {
+        tags: ["action", "training", "social"],
+        name: 'Train Trade Efficiency',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Learn more about trading and local economy. Increase amount of goods that can be sold',
+        level: 1,
+        getLearnRate: () => {
+            return 2.
+        },
+        learningEffects: ['social_training_learning_rate'],
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'shop_max_stock': {
+                        A: 0.05,
+                        B: 1,
+                        type: 0,
+                    },
+                    'shop_stock_renew_rate': {
+                        A: 0.02,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 20,
+                        type: 0,
+                    },
+                }
+            }),
+            effectDeps: []
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_charisma',
+            level: 125,
+        }],
+        unlockCondition: () => {
+            return true
+        },
+        attributes: {
+            baseXPCost: 5000,
+            isTraining: true
+        }
+    })
+
     registerGameAction('action_train_bargaining', {
         tags: ["action", "training", "mental", "social"],
         name: 'Train Bargaining',
@@ -1430,8 +1481,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 effects: {
                     'attribute_recovery': {
-                        A: 0.5,
-                        B: -0.5,
+                        A: 1,
+                        B: -1,
                         type: 0,
                     }
                 }
@@ -1499,7 +1550,7 @@ export const registerActionsStage1 = () => {
         unlockedBy: [{
             type: 'entity',
             id: 'action_endurance_training',
-            level: 200,
+            level: 175,
         }],
         attributes: {
             baseXPCost: 500,

@@ -130,7 +130,7 @@ export const registerInventoryItems = () => {
             get_income: () => ({
                 resources: {
                     'mage-xp': {
-                        A: 25,
+                        A: 50,
                         B: 0,
                         type: 0,
                     }
@@ -150,7 +150,7 @@ export const registerInventoryItems = () => {
             return gameEntity.getLevel('shop_item_backpack') > 0
         },
         sellPrice: 8,
-        rarity: 0,
+        rarity: 0.6,
     })
 
     gameResources.registerResource('inventory_knowledge_moss', {
@@ -294,7 +294,7 @@ export const registerInventoryItems = () => {
         },
         sellPrice: 15,
         rarity: 1,
-        allowedTileTypes: ['plain', 'mountain']
+        allowedTileTypes: ['plain', 'mountain', 'hills']
     })
 
 
@@ -377,7 +377,7 @@ export const registerInventoryItems = () => {
         },
         sellPrice: 20000,
         rarity: 2,
-        allowedTileTypes: ['swamp', 'mountain']
+        allowedTileTypes: ['swamp', 'mountain', 'hills']
     })
 
 

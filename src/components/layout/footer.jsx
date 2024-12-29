@@ -159,7 +159,17 @@ export const Footer = () => {
                     <span>Settings</span>
                 </li>
                 <li className={openedTab === 'about' ? 'active' : ''} onClick={() => openTab('about')}>
-                    <span>v0.0.5</span>
+                    <span>v0.0.5a</span>
+                </li>
+                <li>
+                    <span>
+                        <a href={'https://discord.gg/TRRvKf4ZTG'}>Join Discord</a>
+                    </span>
+                </li>
+                <li>
+                    <span>
+                        <a href={'https://patreon.com/user?u=83421544'}>Support Me</a>
+                    </span>
                 </li>
             </ul>
         </div>

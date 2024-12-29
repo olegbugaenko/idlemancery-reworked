@@ -631,6 +631,38 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+    gameEntity.registerGameEntity('shop_item_gathering_equipment', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Gathering Equipment',
+        description: 'Purchase Basic Gathering equipment to increase probability of finding regular items and herbs',
+        level: 0,
+        maxLevel: 4,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_knife');
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'gathering_low_chance': {
+                        A: 0.25,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 1250*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
     gameEntity.registerGameEntity('shop_item_herbs_handbook_1', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Herbs Handbook I',
@@ -1092,7 +1124,7 @@ export const registerShopItemsStage1 = () => {
         get_cost: () => ({
             'coins': {
                 A: 2.25,
-                B: 120000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 100000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 1
             }
         }),
@@ -1132,7 +1164,7 @@ export const registerShopItemsStage1 = () => {
         get_cost: () => ({
             'coins': {
                 A: 2.25,
-                B: 120000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 100000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 1
             }
         }),
@@ -1155,7 +1187,7 @@ export const registerShopItemsStage1 = () => {
         get_cost: () => ({
             'coins': {
                 A: 2.25,
-                B: 6000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 5500000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 1
             }
         }),

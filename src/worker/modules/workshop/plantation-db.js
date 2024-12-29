@@ -64,14 +64,29 @@ export const registerPlant = (id, inventoryResource, incomeBase, costBase, optio
 
 export function registerPlantations () {
 
-    registerPlant('berry_plantation', 'inventory_berry', 0.1, 1000, {
+    registerPlant('berry_plantation', 'inventory_berry', 0.1, 5000, {
         name: 'Grow Berries',
         description: 'Just plant some berries... OK?'
     })
 
-    registerPlant('fly_mushroom_plantation', 'inventory_fly_mushroom', 0.05, 1000, {
+    registerPlant('fly_mushroom_plantation', 'inventory_fly_mushroom', 0.05, 2000, {
         name: 'Grow Fly Mushroom',
         description: 'They say you are druggie, but never mind — you are a mage.'
+    })
+
+    registerPlant('golden_algae_plantation', 'inventory_golden_algae', 0.04, 2000, {
+        name: 'Grow Golden Algae',
+        description: 'Grow Golden Algae.'
+    })
+
+    registerPlant('knowledge_moss_plantation', 'inventory_knowledge_moss', 0.04, 2000, {
+        name: 'Grow Knowledge Moss',
+        description: 'Grow Knowledge Moss.'
+    })
+
+    registerPlant('core_duckweed_plantation', 'inventory_core_duckweed', 0.04, 2000, {
+        name: 'Grow Duckweed',
+        description: 'Grow core duckweed.'
     })
 
     registerPlant('aloe_vera_plantation', 'inventory_aloe_vera', 0.02, 500, {

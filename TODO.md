@@ -111,5 +111,7 @@ v0.0.3a:
 12. [V] Lists
 13. [V] Implement gathering itself (with lists)
 14. [V] UI fixes
-15. Double check rare herbs unlocks conditions
-16. Check running crafting lists
+15. [V] Double check rare herbs unlocks conditions
+16. [V] Check running crafting lists
+17. Add alchemy for instant XP effects and temporary XP boosts
+18. FUCKING PUBLISH LINK TO REDDIT

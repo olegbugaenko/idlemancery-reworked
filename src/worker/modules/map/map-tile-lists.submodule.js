@@ -171,7 +171,7 @@ export class MapTileListsSubmodule extends GameModule {
         this.autotriggerIntervalSetting = obj?.autotriggerIntervalSetting || 10;
         this.regenerateListsPriorityMap();
         console.log('RNN: ', this.runningList);
-        if(obj?.runningList) {
+        if(obj?.runningList && Object.keys(obj?.runningList).length) {
             this.stopList();
             this.runList(obj?.runningList.id);
         }

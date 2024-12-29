@@ -246,6 +246,10 @@ export class MapModule extends GameModule {
                                 amtHerbsMult = 0.25*amtHerbsMult ** 0.5;
                             }
                         }
+                        let rarityProbMult = 1.;
+                        if(rs.rarity <= 2) {
+                            rarityProbMult *= gameEffects.getEffectValue('gathering_low_chance') ** (1/(1 + 0.25*rs.rarity));
+                        }
                         if(isRevealed) {
                             if(!this.filterableLoots[d.id]) {
                                 this.filterableLoots[d.id] = [];
@@ -257,7 +261,7 @@ export class MapModule extends GameModule {
                         }
                         return {
                             ...d,
-                            probability: 0.02*d.probabilityMult*effEff*(1 + (gameResources.getResource('gathering_perception').amount ** 0.75)),
+                            probability: 0.03*d.probabilityMult*rarityProbMult*effEff*(1 + (gameResources.getResource('gathering_perception').amount ** 0.75)),
                             amountMin: Math.max(1, 3*d.amountMult*effEff*amtHerbsMult),
                             amountMax: Math.max(1, 6*d.amountMult*effEff*amtHerbsMult),
                             isRevealed,
@@ -297,9 +301,7 @@ export class MapModule extends GameModule {
         } else {
             this.generateMap();
         }
-        if(obj?.lists) {
-            this.lists.load(obj?.lists);
-        }
+        this.lists.load(obj?.lists || {});
     }
 
     getData() {
@@ -333,8 +335,8 @@ export class MapModule extends GameModule {
 
     getDetails(i, j) {
 
-        // console.log('Querying: ', i, j, this.mapTiles);
         const tile = this.mapTilesProcessed[i][j];
+        // console.log('Querying tile.drops: ', i, j, tile.drops);
 
         return {
             ...tile,
