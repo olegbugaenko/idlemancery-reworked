@@ -72,6 +72,9 @@ export class UnlockNotificationsModule extends GameModule {
     }
 
     setViewedById(id, isViewed = true) {
+        if(!this.byId[id]) {
+            return;
+        }
         this.byId[id].forEach(pathData => {
             this.setViewed(pathData.scope, pathData.category, id, isViewed)
         })

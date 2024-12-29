@@ -695,6 +695,9 @@ export class ActionsModule extends GameModule {
     }
 
     getActionsData(filterId, options) {
+        if(!filterId) {
+            filterId = 'all';
+        }
         // const entities = gameEntity.listEntitiesByTags(['action']).filter(one => one.isUnlocked && !one.isCapped);
         const perCats = this.filters.reduce((acc, filter) => {
 
