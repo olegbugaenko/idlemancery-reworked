@@ -20,6 +20,9 @@ export const Popup = () => {
         },
         'lists-automation': {
             title: 'Lists automation'
+        },
+        'map': {
+            title: 'Map Exploration'
         }
     }
 

@@ -230,6 +230,7 @@ export class MapModule extends GameModule {
                 if(r.length && r.length > this.mapTiles[i][j].drops.length) {
                     this.mapTiles[i][j].r = [...new Set(r)];
                 }
+                const isNoviceArea = Math.abs(i-7) < 2 && Math.abs(j-7) < 2;
                 this.mapTilesProcessed[i][j] = {
                     ...this.mapTiles[i][j],
                     efficiency,
@@ -270,7 +271,7 @@ export class MapModule extends GameModule {
                     cost: {
                         ['gathering_effort']: {
                             name: gameResources.getResource('gathering_effort').name,
-                            value: this.mapTiles[i][j].costMult
+                            value: this.mapTiles[i][j].costMult * (isNoviceArea ? 0.25 : 1)
                         }
                     }
                 }

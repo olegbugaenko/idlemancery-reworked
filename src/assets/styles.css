@@ -995,6 +995,12 @@ h4 {
     border-bottom: 1px solid #777777;
 }
 
+.items .menu-wrap.map {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
 .effects-table .nextVal.green {
     color: var(--green);
 }

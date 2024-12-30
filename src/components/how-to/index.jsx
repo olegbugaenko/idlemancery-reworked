@@ -3,6 +3,7 @@ import {HowActionsWorking} from "./actions.jsx";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import {HowActionListsWorking} from "./action-lists.jsx";
 import {HowListsAutomationsWorking} from "./lists-automations.jsx";
+import {HowMapWorking} from "./map.jsx";
 
 export const HowTo = ({ scope }) => {
 
@@ -17,6 +18,9 @@ export const HowTo = ({ scope }) => {
             break;
         case 'lists-automation':
             contentChunk = (<HowListsAutomationsWorking />)
+            break;
+        case 'map':
+            contentChunk = (<HowMapWorking />)
             break;
         default:
             contentChunk = (<p>{scope} tutorial</p>)

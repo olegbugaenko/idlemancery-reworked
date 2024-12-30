@@ -231,6 +231,13 @@ export class SpellModule extends GameModule {
             return;
         }
 
+        if(spell.usageGain) {
+            const aff = this.getConsumeAffordable(spell);
+            if (!aff.isAffordable) {
+                return;
+            }
+        }
+
         this.spells[id].isRunning = true;
         this.spells[id].duration = 0;
 

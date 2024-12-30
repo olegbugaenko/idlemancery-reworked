@@ -6,7 +6,7 @@ import {Map} from "./map.jsx";
 import {formatInt, formatValue, secondsToString} from "../../../general/utils/strings";
 import {cloneDeep} from "lodash";
 import RulesList from "../../shared/rules-list.jsx";
-import {Draggable} from "react-beautiful-dnd";
+import {HowToSign} from "../../shared/how-to-sign.jsx";
 
 export const MapWrap = ({ children }) => {
     const [mapTileDetails, setMapTileDetails] = useState(null)
@@ -249,8 +249,11 @@ export const MapWrap = ({ children }) => {
     return (
         <div className={'items-wrap'}>
             <div className={'items ingame-box'}>
-                <div className={'menu-wrap'}>
-                    {children}
+                <div className={'menu-wrap map'}>
+                    <div className={'head'}>
+                        {children}
+                    </div>
+                    <HowToSign scope={'map'} />
                 </div>
                 <Map setItemDetails={setItemDetails} newUnlocks={newUnlocks?.['world']?.items?.['map']?.items} openListDetails={openListDetails}/>
             </div>

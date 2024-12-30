@@ -49,7 +49,7 @@ export const registerAttributes = () => {
 
     gameEffects.registerEffect('attribute_patience', {
         name: 'Patience',
-        description: 'Patience impacts on your ability on focusing on routine tasks and increasing learning speed. Higher level unlocks more gathering and routine activities',
+        description: 'Patience impacts on your ability on focusing on routine tasks, increasing their learning speed. Higher level unlocks more gathering and routine activities',
         minValue: 1,
         defaultValue: 1,
         hasCap: false,

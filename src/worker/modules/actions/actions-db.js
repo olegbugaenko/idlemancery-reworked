@@ -1006,7 +1006,7 @@ export const registerActionsStage1 = () => {
                 resources: {
                     'gathering_effort': {
                         A: 0.001*gameEffects.getEffectValue('gathering_efficiency'),
-                        B: 0.009*gameEffects.getEffectValue('gathering_efficiency'),
+                        B: 0.049*gameEffects.getEffectValue('gathering_efficiency'),
                         type: 0,
                     }
                 }
@@ -1016,11 +1016,6 @@ export const registerActionsStage1 = () => {
                     'energy': {
                         A: 0,
                         B: 1,
-                        type: 0,
-                    },
-                    'health': {
-                        A: 0,
-                        B: 0.1,
                         type: 0,
                     }
                 }

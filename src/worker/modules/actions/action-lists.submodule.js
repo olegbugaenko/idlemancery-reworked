@@ -145,6 +145,8 @@ export class ActionListsSubmodule extends GameModule {
 
         this.actionsLists[list.id] = list;
 
+        // this.actionsLists[list.id].actions = (this.actionsLists[list.id].actions || []).filter(one => one.time > 0);
+
         if(isReopenEdit) {
             this.sendListData(list.id, true);
         }
@@ -166,7 +168,7 @@ export class ActionListsSubmodule extends GameModule {
             gameCore.getModule('actions').activeActions = gameCore.getModule('actions').activeActions.map(active => {
                 return {
                     ...active,
-                    effort: (listToRun.actions.find(o => o.id === active.originalId)?.time || 0) / newTotalTime
+                    effort: (listToRun.actions.find(o => o.id === active.originalId)?.time || 0) / Math.max(newTotalTime, 0.0001)
                 }
             })
             console.log('Reassert list onSave: ', newTotalTime, gameCore.getModule('actions').activeActions);
@@ -373,7 +375,7 @@ export class ActionListsSubmodule extends GameModule {
 
         const actionsFractions = actionsAvailable.map(action => ({
             ...action,
-            effortFraction: action.time / totalTime
+            effortFraction: action.time / Math.max(totalTime, 0.0001)
         }));
 
         // now registering entities for every action
