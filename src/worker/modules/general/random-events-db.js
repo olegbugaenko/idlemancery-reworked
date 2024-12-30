@@ -349,7 +349,7 @@ export const registerRandomEventsDb = () => {
                         resources: {
                             coins: {
                                 A: 0,
-                                B: 100*Math.pow(1 + gameEntity.getLevel('random_events_strength_effect'), 2),
+                                B: 100,
                                 type: 0,
                             }
                         }

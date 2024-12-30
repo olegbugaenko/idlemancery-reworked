@@ -6,6 +6,12 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+                <h3>Idle Awakening v0.0.5d</h3>
+                <div className={'features'}>
+                    <p>Fixed bug when actions autotrigger rules didnt saved</p>
+                    <p>Fixed bug when some automation rules, relying to equality could work incorrectly</p>
+                    <p>Fixed some events options costs</p>
+                </div>
                 <h3>Idle Awakening v0.0.5c</h3>
                 <div className={'features'}>
                     <p>Fixed few more bugs and typos</p>

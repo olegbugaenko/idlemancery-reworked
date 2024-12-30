@@ -216,6 +216,7 @@ export class ActionListsSubmodule extends GameModule {
                 id: one.id,
                 name: one.name,
                 actions: one.actions,
+                autotrigger: one.autotrigger
             })),
             runningList: this.runningList,
             automationEnabled: this.automationEnabled,

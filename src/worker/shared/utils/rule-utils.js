@@ -15,15 +15,15 @@ export const checkMatchingResourceRule = (rule, key) => {
 
     switch (rule.condition) {
         case 'less':
-            return compare < rule.value;
+            return compare < +rule.value;
         case 'less_or_eq':
-            return  compare <= rule.value;
+            return  compare <= +rule.value;
         case 'eq':
-            return compare == rule.value;
+            return compare == +rule.value;
         case 'grt_or_eq':
-            return compare >= rule.value;
+            return compare >= +rule.value;
         case 'grt':
-            return compare > rule.value;
+            return compare > +rule.value;
     }
 
     return false;
@@ -78,15 +78,15 @@ export const checkMatchingActionLevelRule = (rule, key) => {
 
     switch (rule.condition) {
         case 'less':
-            return compare < rule.value;
+            return compare < +rule.value;
         case 'less_or_eq':
-            return  compare <= rule.value;
+            return  compare <= +rule.value;
         case 'eq':
-            return compare == rule.value;
+            return compare == +rule.value;
         case 'grt_or_eq':
-            return compare >= rule.value;
+            return compare >= +rule.value;
         case 'grt':
-            return compare > rule.value;
+            return compare > +rule.value;
     }
 
     return false;
