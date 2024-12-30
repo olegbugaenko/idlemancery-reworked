@@ -15,6 +15,8 @@ import {cloneDeep} from "lodash";
 import {ActionXPBreakdown} from "./action-xp-breakdown.jsx";
 import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
 import {SearchField} from "../shared/search-field.jsx";
+import {useAppContext} from "../../context/ui-context";
+import {HowToSign} from "../shared/how-to-sign.jsx";
 
 const ACTIONS_SEARCH_SCOPES = [{
     id: 'name',
@@ -158,7 +160,7 @@ export const Actions = ({}) => {
             newList.actions.push({
                 id,
                 name,
-                time: 2,
+                time: 1,
                 isAvailable: true,
             })
             setListData({...newList});
@@ -377,6 +379,7 @@ export const Actions = ({}) => {
                                 Show hidden
                             </label>
                         </div>
+                        <HowToSign scope={'actions'} />
                     </div>
                     <div className={'list-wrap'}>
                         <PerfectScrollbar>
@@ -813,6 +816,7 @@ export const ActionListsPanel = ({ runningList, editListToDetails, lists, viewLi
                     </select>
                 </label>
             </div>
+            <HowToSign scope={'action-lists'} />
         </div>
     </div>)
 }
@@ -929,6 +933,7 @@ export const ListEditor = React.memo(({
             <div className={'main-row'}>
                 <span>Name</span>
                 {isEditing ? (<input type={'text'} value={editing.name} onChange={(e) => onUpdateListValue('name', e.target.value)}/>) : (<span>{editing.name}</span>)}
+                <HowToSign scope={'action-lists'} />
             </div>
         </div>
         <Droppable droppableId="action-list-editor">
@@ -949,7 +954,7 @@ export const ListEditor = React.memo(({
                                         {isEditing
                                             ? (<input type={'number'} value={action.time}
                                                       onChange={(e) => onUpdateActionFromList(action.id, 'time', +e.target.value)}/>)
-                                            : (<span>{action.time} seconds</span>)
+                                            : (<span>{action.time} sec.</span>)
                                         }
                                     </div>
                                     <div className={'col delete'}>
@@ -975,6 +980,7 @@ export const ListEditor = React.memo(({
             <div className={'rules-header flex-container'}>
                 <p>Autotrigger rules: {editing?.autotrigger?.rules?.length ? null : 'None'}</p>
                 {isEditing ? (<button onClick={addAutotriggerRule}>Add rule (AND)</button>) : null}
+                <HowToSign scope={'lists-automation'} />
             </div>
             <div className={'priority-line flex-container'}>
                 <p>Priority: </p>

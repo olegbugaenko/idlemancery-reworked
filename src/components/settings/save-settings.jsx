@@ -56,7 +56,7 @@ export const SaveSettings = () => {
             const seconds = String(date.getSeconds()).padStart(2, '0');
 
             const dateString = `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
-            link.download = `exported_data_${dateString}.txt`;
+            link.download = `idle_awakening_${dateString}.txt`;
 
             // Append to the document to initiate the download in all browsers
             document.body.appendChild(link);

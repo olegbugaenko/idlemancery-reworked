@@ -5,10 +5,23 @@ import {Skills} from "../mage/skills.jsx";
 import {UnlocksList} from "../mage/unlocks.jsx";
 import {Statistics} from "../mage/statistics.jsx";
 import {RandomEventPopup} from "../shared/random-events.jsx";
+import {HowTo} from "../how-to/index.jsx";
 
 export const Popup = () => {
 
-    const { activePopup, setActivePopup } = useAppContext();
+    const { activePopup, setActivePopup, popupMeta } = useAppContext();
+
+    const HOWTO_TITLES = {
+        actions: {
+            title: 'How actions works?'
+        },
+        'action-lists': {
+            title: 'How action list works?'
+        },
+        'lists-automation': {
+            title: 'Lists automation'
+        }
+    }
 
     useEffect(() => {
 
@@ -51,6 +64,15 @@ export const Popup = () => {
     if(activePopup === 'event') {
         return (<PopupComponent title={'Event'}>
             <RandomEventPopup />
+        </PopupComponent> )
+    }
+
+    if(activePopup === 'howto') {
+
+        const title = HOWTO_TITLES[popupMeta.howToScope].title;
+
+        return (<PopupComponent title={title}>
+            <HowTo scope={popupMeta.howToScope} />
         </PopupComponent> )
     }
 

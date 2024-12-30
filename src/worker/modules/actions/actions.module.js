@@ -286,7 +286,13 @@ export class ActionsModule extends GameModule {
 
     setActionHidden(id, flag) {
         if(!this.actions[id]) {
-            this.actions[id] = {};
+            this.actions[id] = {
+                level: 1,
+                xp: 0,
+                focus: {
+                    time: 0,
+                }
+            };
         }
         this.actions[id].isHidden = flag;
     }
@@ -316,6 +322,9 @@ export class ActionsModule extends GameModule {
                         time: 0,
                     }
                 }
+                if(!this.actions[act.originalId].level || Number.isNaN(this.actions[act.originalId].level)) {
+                    this.actions[act.originalId].level = 1;
+                }
 
                 if(this.actions[act.originalId].focus.time < this.getFocusCapTime(act.originalId)) {
                     this.actions[act.originalId].focus.time += delta*act.effort;
@@ -339,6 +348,7 @@ export class ActionsModule extends GameModule {
                         rareEvents['herbDrops'][key] = (rareEvents['herbDrops'][key] || 0) + herbDrops[key];
                     }
                 }
+                // console.log('Attempt to level up: ', act.originalId, this.actions, this.getActionXPMax(act.originalId))
                 gameResources.addResource('mage-xp', dxp);
                 if(this.actions[act.originalId].xp >= this.getActionXPMax(act.originalId)) {
                     this.actions[act.originalId].level++;

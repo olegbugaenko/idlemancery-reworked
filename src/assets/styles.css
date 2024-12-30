@@ -206,6 +206,12 @@ p.hint, span.hint {
     background: var(--boxbg);
 }
 
+.footer .bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
 .footer .mage-wrap {
     height: 40px;
     padding: 10px;
@@ -772,6 +778,7 @@ h4 {
 .rules-header.flex-container {
     align-items: center;
     margin-top: 8px;
+    justify-content: space-between;
 }
 
 .furniture-wrap {
@@ -1655,4 +1662,32 @@ span.highlighted-span {
     object-fit: contain;
     border: 1px solid #333333;
     border-radius: 3px;
+}
+
+.how-to-wrap {
+    height: calc(100% - 40px);
+}
+
+.how-to-wrap p {
+    margin: 12px 0;
+}
+
+.image-container img {
+    object-fit: contain;
+    max-width: 100%;
+}
+
+.how-to-sign {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    border: 2px solid #999;
+    border-radius: 50%;
+    background-color: #171922;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    cursor: pointer;
+    font-weight: bold;
 }

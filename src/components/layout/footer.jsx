@@ -110,68 +110,74 @@ export const Footer = () => {
     return (<div className={'footer'}>
 
         <div className={'bottom'}>
-            <ul className={'menu'}>
-                {unlocks.actions ? (
-                    <li className={openedTab === 'actions' ? 'active' : ''} onClick={() => openTab('actions')}>
-                        <NewNotificationWrap isNew={newUnlocks.actions?.hasNew}>
-                            <span>Actions</span>
+            <div className={'left-most'}>
+                <ul className={'menu'}>
+                    {unlocks.actions ? (
+                        <li className={openedTab === 'actions' ? 'active' : ''} onClick={() => openTab('actions')}>
+                            <NewNotificationWrap isNew={newUnlocks.actions?.hasNew}>
+                                <span>Actions</span>
+                            </NewNotificationWrap>
+                        </li>
+                    ) : null}
+                    {unlocks.shop ? (<li className={openedTab === 'shop' ? 'active' : ''} onClick={() => openTab('shop')}>
+                        <NewNotificationWrap isNew={newUnlocks.shop?.hasNew}>
+                            <span>Shop</span>
                         </NewNotificationWrap>
+                    </li>) : <li className={'locked'}>
+                        <span>Locked (Reach 2 coins)</span>
+                    </li>}
+                    {unlocks.inventory ? (<li className={openedTab === 'inventory' ? 'active' : ''} onClick={() => openTab('inventory')}>
+                        <NewNotificationWrap isNew={newUnlocks.inventory?.hasNew}>
+                            <span>Inventory</span>
+                        </NewNotificationWrap>
+                    </li>) : null}
+                    {unlocks.property ? (<li className={openedTab === 'property' ? 'active' : ''} onClick={() => openTab('property')}>
+                        <NewNotificationWrap isNew={newUnlocks.property?.hasNew}>
+                            <span>Property</span>
+                        </NewNotificationWrap>
+                    </li>) : null}
+                    {unlocks.world ? (<li className={openedTab === 'world' ? 'active' : ''} onClick={() => openTab('world')}>
+                        <NewNotificationWrap isNew={newUnlocks.world?.hasNew}>
+                            <span>World</span>
+                        </NewNotificationWrap>
+                    </li>) : null}
+                    {unlocks.workshop ? (<li className={openedTab === 'workshop' ? 'active' : ''} onClick={() => openTab('workshop')}>
+                        <NewNotificationWrap isNew={newUnlocks.workshop?.hasNew}>
+                            <span>Workshop</span>
+                        </NewNotificationWrap>
+                    </li>) : null}
+                    {unlocks.social ? (<li className={openedTab === 'social' ? 'active' : ''} onClick={() => openTab('social')}>
+                        <NewNotificationWrap isNew={newUnlocks.social?.hasNew}>
+                            <span>Social</span>
+                        </NewNotificationWrap>
+                    </li>) : null}
+                    {unlocks.spellbook ? (<li className={openedTab === 'spellbook' ? 'active' : ''} onClick={() => openTab('spellbook')}>
+                        <NewNotificationWrap isNew={newUnlocks.spellbook?.hasNew}>
+                            <span>Spellbook</span>
+                        </NewNotificationWrap>
+                    </li>) : null}
+                </ul>
+            </div>
+            <div className={'right-most'}>
+                <ul className={'menu'}>
+                    <li className={openedTab === 'settings' ? 'active' : ''} onClick={() => openTab('settings')}>
+                        <span>Settings</span>
                     </li>
-                ) : null}
-                {unlocks.shop ? (<li className={openedTab === 'shop' ? 'active' : ''} onClick={() => openTab('shop')}>
-                    <NewNotificationWrap isNew={newUnlocks.shop?.hasNew}>
-                        <span>Shop</span>
-                    </NewNotificationWrap>
-                </li>) : <li className={'locked'}>
-                    <span>Locked (Reach 2 coins)</span>
-                </li>}
-                {unlocks.inventory ? (<li className={openedTab === 'inventory' ? 'active' : ''} onClick={() => openTab('inventory')}>
-                    <NewNotificationWrap isNew={newUnlocks.inventory?.hasNew}>
-                        <span>Inventory</span>
-                    </NewNotificationWrap>
-                </li>) : null}
-                {unlocks.property ? (<li className={openedTab === 'property' ? 'active' : ''} onClick={() => openTab('property')}>
-                    <NewNotificationWrap isNew={newUnlocks.property?.hasNew}>
-                        <span>Property</span>
-                    </NewNotificationWrap>
-                </li>) : null}
-                {unlocks.world ? (<li className={openedTab === 'world' ? 'active' : ''} onClick={() => openTab('world')}>
-                    <NewNotificationWrap isNew={newUnlocks.world?.hasNew}>
-                        <span>World</span>
-                    </NewNotificationWrap>
-                </li>) : null}
-                {unlocks.workshop ? (<li className={openedTab === 'workshop' ? 'active' : ''} onClick={() => openTab('workshop')}>
-                    <NewNotificationWrap isNew={newUnlocks.workshop?.hasNew}>
-                        <span>Workshop</span>
-                    </NewNotificationWrap>
-                </li>) : null}
-                {unlocks.social ? (<li className={openedTab === 'social' ? 'active' : ''} onClick={() => openTab('social')}>
-                    <NewNotificationWrap isNew={newUnlocks.social?.hasNew}>
-                        <span>Social</span>
-                    </NewNotificationWrap>
-                </li>) : null}
-                {unlocks.spellbook ? (<li className={openedTab === 'spellbook' ? 'active' : ''} onClick={() => openTab('spellbook')}>
-                    <NewNotificationWrap isNew={newUnlocks.spellbook?.hasNew}>
-                        <span>Spellbook</span>
-                    </NewNotificationWrap>
-                </li>) : null}
-                <li className={openedTab === 'settings' ? 'active' : ''} onClick={() => openTab('settings')}>
-                    <span>Settings</span>
-                </li>
-                <li className={openedTab === 'about' ? 'active' : ''} onClick={() => openTab('about')}>
-                    <span>v0.0.5a</span>
-                </li>
-                <li>
+                    <li className={openedTab === 'about' ? 'active' : ''} onClick={() => openTab('about')}>
+                        <span>v0.0.5b</span>
+                    </li>
+                    <li>
                     <span>
                         <a href={'https://discord.gg/TRRvKf4ZTG'}>Join Discord</a>
                     </span>
-                </li>
-                <li>
+                    </li>
+                    <li>
                     <span>
                         <a href={'https://patreon.com/user?u=83421544'}>Support Me</a>
                     </span>
-                </li>
-            </ul>
+                    </li>
+                </ul>
+            </div>
         </div>
         {mageData ? (<div className={'mage-wrap flex-container'} ref={elementRef}>
             <div className={'level'}>
