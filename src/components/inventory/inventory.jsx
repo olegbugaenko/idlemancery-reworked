@@ -67,7 +67,6 @@ export const Inventory = ({}) => {
     })
 
     onMessage('inventory-details', (payload) => {
-        console.log(`currViewing: ${viewedOpenedId}, edit: ${detailOpenedId}`, payload);
         if(viewedOpenedId) {
             setViewedData(payload);
         } else if(detailOpenedId) {

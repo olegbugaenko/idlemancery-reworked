@@ -53,7 +53,6 @@ export const AccessoryUpgrades = ({ setItemDetails, purchaseItem, newUnlocks }) 
     const [overlayPositions, setOverlayPositions] = useState([]);
 
     const handleFlash = (position) => {
-        console.log('Adding flash: ', position);
         setOverlayPositions((prev) => [...prev, position]);
         setTimeout(() => {
             setOverlayPositions((prev) => prev.filter((p) => p !== position));

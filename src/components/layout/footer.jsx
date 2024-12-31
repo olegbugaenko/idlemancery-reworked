@@ -98,7 +98,6 @@ export const Footer = () => {
     const [overlayPositions, setOverlayPositions] = useState([]);
 
     const onFlash = (position) => {
-        console.log('Adding flash: ', position);
         setOverlayPositions((prev) => [...prev, position]);
         setTimeout(() => {
             setOverlayPositions((prev) => prev.filter((p) => p !== position));

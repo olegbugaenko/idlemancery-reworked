@@ -130,7 +130,7 @@ export const registerInventoryItems = () => {
             get_income: () => ({
                 resources: {
                     'mage-xp': {
-                        A: 50,
+                        A: 500,
                         B: 0,
                         type: 0,
                     }

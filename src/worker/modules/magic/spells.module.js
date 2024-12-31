@@ -264,8 +264,6 @@ export class SpellModule extends GameModule {
             if(effects.length) {
                 const rsToAdd = effects.filter(eff => eff.scope === 'income' && eff.type === 'resources');
 
-                console.log('consAddRMAGIC: ', effects, rsToAdd, aff, spell);
-
                 rsToAdd.forEach(rs => {
                     gameResources.addResource(rs.id, rs.value);
                 })
@@ -394,8 +392,6 @@ export class SpellModule extends GameModule {
         if(spell.usageGain) {
             effects = resourceApi.unpackEffects(spell.usageGain, spell.level)
         }
-
-        console.log('Effts: ', getMasteryId(id), gameEffects.getEffect(getMasteryId(id)));
 
         return {
             id: spell.id,

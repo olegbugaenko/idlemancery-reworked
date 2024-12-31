@@ -32,7 +32,6 @@ export const Guilds = ({ setItemDetails, filterId, newUnlocks }) => {
     }, [])
 
     onMessage(`guild-items-data`, (guilds) => {
-        console.log('GLDS: ', guilds);
         setGuildsData(guilds);
     })
 

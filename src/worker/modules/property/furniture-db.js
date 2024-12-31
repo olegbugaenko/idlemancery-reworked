@@ -636,7 +636,7 @@ export const registerFurnitureStage1 = () => {
     gameEntity.registerGameEntity('furniture_illusion_magic_circle', {
         tags: ["furniture", "upgrade", "purchaseable"],
         name: 'Illusion Magic Circle',
-        description: 'Improves your restoration magic efficiency',
+        description: 'Improves your illusion magic efficiency',
         level: 0,
         maxLevel: 4,
         unlockCondition: () => {

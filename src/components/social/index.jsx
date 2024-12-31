@@ -39,7 +39,6 @@ export const Social = () => {
     }, [])
 
     onMessage('new-unlocks-notifications-social', payload => {
-        console.log('Received unlocks: ', payload);
         setNewUnlocks(payload);
     })
 
@@ -86,7 +85,6 @@ export const ItemDetails = ({itemId, meta, category}) => {
     const [item, setDetailOpened] = useState(null);
 
     useEffect(() => {
-        console.log('SocialDetails: ', itemId, category, meta);
         if(category === 'guilds') {
             const interval = setInterval(() => {
                 sendData('query-guild-item-details', { id: itemId, meta });

@@ -114,4 +114,6 @@ v0.0.3a:
 15. [V] Double check rare herbs unlocks conditions
 16. [V] Check running crafting lists
 17. Add alchemy for instant XP effects and temporary XP boosts
-18. FUCKING PUBLISH LINK TO REDDIT
+18. Add spell increasing loot
+19. Display shop trade stock
+20. [V] FUCKING PUBLISH LINK TO REDDIT

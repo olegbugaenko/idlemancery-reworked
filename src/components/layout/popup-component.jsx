@@ -9,7 +9,7 @@ export const PopupComponent = ({ children, onClose, title }) => {
 
     const onClosePopup = useCallback(() => {
         if (onClose) {
-            onClose();
+            onClose(true);
         }
         setActivePopup(null);
     }, [onClose, setActivePopup]);

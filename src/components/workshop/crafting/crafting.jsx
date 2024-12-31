@@ -46,7 +46,6 @@ export const Crafting = ({ setItemDetails, setItemLevel, filterId, newUnlocks, o
     })
 
     const onEditList = useCallback(listData => {
-        console.log('onEditList: ', { listData, isEdit: true })
         openListDetails({ listData, isEdit: true });
     }, []);
 

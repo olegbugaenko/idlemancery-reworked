@@ -9,7 +9,6 @@ export const NewNotificationWrap = ({ isNew, id, className, children }) => {
 
     const setViewed = debounce(() => {
         if (id) {
-            console.log('Set viewed: ', id);
             sendData('set-new-notification-viewed-by-id', { id });
         }
     }, 1000);

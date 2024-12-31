@@ -58,7 +58,6 @@ export const Spellbook = ({}) => {
     }, [])
 
     onMessage('new-unlocks-notifications-spellbook', payload => {
-        console.log('Received unlocks: ', payload);
         setNewUnlocks(payload);
     })
 

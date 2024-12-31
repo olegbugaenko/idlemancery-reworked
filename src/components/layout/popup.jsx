@@ -9,7 +9,7 @@ import {HowTo} from "../how-to/index.jsx";
 
 export const Popup = () => {
 
-    const { activePopup, setActivePopup, popupMeta } = useAppContext();
+    const { activePopup, setActivePopup, popupMeta, onClosePopupCb } = useAppContext();
 
     const HOWTO_TITLES = {
         actions: {
@@ -42,7 +42,7 @@ export const Popup = () => {
 
     if(activePopup === 'skills') {
         return (
-            <PopupComponent title={'Skills'}>
+            <PopupComponent title={'Skills'} onClose={onClosePopupCb}>
                 <Skills />
             </PopupComponent>
         )
@@ -50,7 +50,7 @@ export const Popup = () => {
 
     if(activePopup === 'unlocks') {
         return (
-            <PopupComponent title={'Upcoming Unlocks Requirements'}>
+            <PopupComponent title={'Upcoming Unlocks Requirements'} onClose={onClosePopupCb}>
                 <UnlocksList />
             </PopupComponent>
         )
@@ -58,14 +58,14 @@ export const Popup = () => {
 
     if(activePopup === 'statistics') {
         return (
-            <PopupComponent title={'Statistics'}>
+            <PopupComponent title={'Statistics'} onClose={onClosePopupCb}>
                 <Statistics />
             </PopupComponent>
         )
     }
 
     if(activePopup === 'event') {
-        return (<PopupComponent title={'Event'}>
+        return (<PopupComponent title={'Event'} onClose={onClosePopupCb}>
             <RandomEventPopup />
         </PopupComponent> )
     }
@@ -74,7 +74,7 @@ export const Popup = () => {
 
         const title = HOWTO_TITLES[popupMeta.howToScope].title;
 
-        return (<PopupComponent title={title}>
+        return (<PopupComponent title={title} onClose={onClosePopupCb}>
             <HowTo scope={popupMeta.howToScope} />
         </PopupComponent> )
     }

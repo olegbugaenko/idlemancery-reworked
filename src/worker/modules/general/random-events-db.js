@@ -1371,10 +1371,10 @@ export const registerRandomEventsDb = () => {
                 effects: [{
                     id: 'knowledge_permanent_boost',
                     probability: 0.2,
-                    description: 'The experiment succeeds, expanding your knowledge. (+1 Memory permanently)',
+                    description: 'The experiment succeeds, expanding your knowledge. (+Knowledge gain for 5 minutes)',
                     unlockCondition: () => true,
                     onTrigger: () => {
-                        gameEntity.setEntityLevel('random_events_memory_effect', gameEntity.getLevel('random_events_memory_effect') + 1, true);
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_knowledge_gain');
                     }
                 }, {
                     id: 'temporary_energy_debuff',

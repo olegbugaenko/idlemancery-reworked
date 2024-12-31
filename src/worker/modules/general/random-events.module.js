@@ -12,7 +12,7 @@ export class RandomEventsModule extends GameModule {
         this.revealedEffects = {};
 
         this.eventHandler.registerHandler('set-event-data-opened', ({ isOpened, eventId }) => {
-            this.isEventOpened = isOpened;
+            console.log('SettOpened: ', isOpened, eventId);
             this.openedEventId = isOpened ? eventId : null; // Зберігаємо ID відкритої події
             if (eventId && this.activeEvents[eventId]) {
                 this.activeEvents[eventId].isOpened = isOpened;
@@ -75,7 +75,10 @@ export class RandomEventsModule extends GameModule {
                     selectedOptionId: null, // Вибрана опція
                     triggeredEffect: null // Ефект, що спрацював
                 };
-                this.openedEventId = event.id;
+                if(!this.openedEventId) {
+                    this.openedEventId = event.id;
+                    this.activeEvents[event.id].isOpened = true;
+                }
                 this.sendData();
                 return;
             }
