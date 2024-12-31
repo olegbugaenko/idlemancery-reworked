@@ -107,6 +107,8 @@ export class MapTileListsSubmodule extends GameModule {
 
         this.mapLists[list.id] = list;
 
+        this.mapLists[list.id].tiles = (this.mapLists[list.id].tiles || []).filter(one => one.time > 0);
+
         console.log('Saved List: ', list, payload);
 
         if(isReopenEdit) {
@@ -169,6 +171,11 @@ export class MapTileListsSubmodule extends GameModule {
         this.runningList = obj?.runningList ?? null;
         this.automationEnabled = obj?.automationEnabled;
         this.autotriggerIntervalSetting = obj?.autotriggerIntervalSetting || 10;
+        if(this.mapLists) {
+            for(const key in this.mapLists) {
+                this.mapLists[key].tiles = (this.mapLists[key].tiles || []).filter(one => one.time > 0);
+            }
+        }
         this.regenerateListsPriorityMap();
         console.log('RNN: ', this.runningList);
         if(obj?.runningList && Object.keys(obj?.runningList).length) {

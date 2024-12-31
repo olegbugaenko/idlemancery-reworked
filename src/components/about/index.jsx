@@ -6,6 +6,13 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+                <h3>Idle Awakening v0.0.5e</h3>
+                <div className={'features'}>
+                    <p>Fixed events popup behaviour</p>
+                    <p>Golden Algae now provides much better bonus</p>
+                    <p>Fixed bug when players could save and run list with negative action times</p>
+                    <p>Fixed some typos</p>
+                </div>
                 <h3>Idle Awakening v0.0.5d</h3>
                 <div className={'features'}>
                     <p>Fixed bug when actions autotrigger rules didnt saved</p>

@@ -145,7 +145,7 @@ export class ActionListsSubmodule extends GameModule {
 
         this.actionsLists[list.id] = list;
 
-        // this.actionsLists[list.id].actions = (this.actionsLists[list.id].actions || []).filter(one => one.time > 0);
+        this.actionsLists[list.id].actions = (this.actionsLists[list.id].actions || []).filter(one => one.time > 0);
 
         if(isReopenEdit) {
             this.sendListData(list.id, true);
@@ -229,6 +229,11 @@ export class ActionListsSubmodule extends GameModule {
         this.runningList = obj?.runningList ?? null;
         this.automationEnabled = obj?.automationEnabled;
         this.autotriggerIntervalSetting = obj?.autotriggerIntervalSetting || 10;
+        if(this.actionsLists) {
+            for(const key in this.actionsLists) {
+                this.actionsLists[key].actions = (this.actionsLists[key].actions || []).filter(one => one.time > 0);
+            }
+        }
         this.regenerateListsPriorityMap();
     }
 
