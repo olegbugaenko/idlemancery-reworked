@@ -11,8 +11,7 @@ export const AppProvider = ({ children }) => {
     const [onClosePopupCb, setOnClosePopupCb] = useState(null);
 
     useEffect(() => {
-        console.log('stOnClose')
-        // setOnClosePopupCb(null);
+        setOnClosePopupCb(null);
     }, [activePopup])
 
     return (
