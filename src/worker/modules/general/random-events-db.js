@@ -259,7 +259,7 @@ export const registerRandomEventsDb = () => {
                         resources: {
                             coins: {
                                 A: 0,
-                                B: 50*Math.pow(1 + gameEntity.getLevel('random_events_strength_effect'), 2),
+                                B: 50*Math.pow(1 + gameEntity.getLevel('random_events_strength_effect'), 1.5),
                                 type: 0,
                             }
                         }
@@ -274,7 +274,7 @@ export const registerRandomEventsDb = () => {
                         // set permanent attribute modifier
                         // gameResources.addResource('strength', 1);
                         gameEntity.setEntityLevel('random_events_strength_effect', gameEntity.getLevel('random_events_strength_effect')+1, true)
-                        gameResources.addResource('coins', -50*Math.pow(1 + gameEntity.getLevel('random_events_strength_effect'), 2));
+                        gameResources.addResource('coins', -50*Math.pow(1 + gameEntity.getLevel('random_events_strength_effect'), 1.5));
                     }
                 }, {
                     id: 'fail_offering',
@@ -282,7 +282,7 @@ export const registerRandomEventsDb = () => {
                     description: 'The shrine remains silent, and your gold disappears into the void.',
                     unlockCondition: () => true,
                     onTrigger: () => {
-                        gameResources.addResource('coins', -50*Math.pow(1 + gameEntity.getLevel('random_events_strength_effect'), 2));
+                        gameResources.addResource('coins', -50*Math.pow(1 + gameEntity.getLevel('random_events_strength_effect'), 1.5));
                     }
                 }]
             },
@@ -306,6 +306,17 @@ export const registerRandomEventsDb = () => {
                 id: 'option1',
                 name: 'Touch the Mirror',
                 unlockCondition: () => true,
+                usageGain: {
+                    get_consumption: () => ({
+                        resources: {
+                            energy: {
+                                A: 0,
+                                B: 5*Math.pow(1 + gameEntity.getLevel('random_events_stamina_effect'), 1.5),
+                                type: 0,
+                            }
+                        }
+                    })
+                },
                 effects: [{
                     id: 'gain_stamina',
                     probability: 0.7,
@@ -314,6 +325,7 @@ export const registerRandomEventsDb = () => {
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_stamina_effect', gameEntity.getLevel('random_events_stamina_effect')+1, true)
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_energy_debuff');
+                        gameResources.addResource('energy', -5*Math.pow(1 + gameEntity.getLevel('random_events_stamina_effect'), 1.5));
                     }
                 }, {
                     id: 'mirror_shatters',
@@ -525,29 +537,43 @@ export const registerRandomEventsDb = () => {
                 id: 'option1',
                 name: 'Receive the Blessing',
                 unlockCondition: () => true,
+                usageGain: {
+                    get_consumption: () => ({
+                        resources: {
+                            energy: {
+                                A: 0,
+                                B: 10*Math.pow(1 + gameEntity.getLevel('random_events_recovery_effect'), 1.5),
+                                type: 0,
+                            }
+                        }
+                    })
+                },
                 effects: [{
                     id: 'permanent_recovery_bonus',
-                    probability: 0.3,
+                    probability: 0.2,
                     description: 'The priest’s blessing fills you with resilience. (+1 Recovery)',
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_recovery_effect', gameEntity.getLevel('random_events_recovery_effect') + 1, true);
+                        gameResources.addResource('energy', -10*Math.pow(1 + gameEntity.getLevel('random_events_recovery_effect'), 1.5));
                     }
                 }, {
                     id: 'refill',
-                    probability: 0.5,
+                    probability: 0.6,
                     description: 'You feel yourself healthier than ever',
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_health_regen');
+                        gameResources.addResource('energy', -10*Math.pow(1 + gameEntity.getLevel('random_events_recovery_effect'), 1.5));
                     }
                 },{
                     id: 'blessing_fail',
-                    probability: 0.1,
+                    probability: 0.2,
                     description: 'The blessing backfires, leaving you slightly weakened. (-10% HP)',
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameResources.addResource('health', -0.1 * gameResources.getResource('health').cap);
+                        gameResources.addResource('energy', -10*Math.pow(1 + gameEntity.getLevel('random_events_recovery_effect'), 1.5));
                     }
                 }]
             },
@@ -570,6 +596,17 @@ export const registerRandomEventsDb = () => {
             option1: {
                 id: 'option1',
                 name: 'Offer a Prayer',
+                usageGain: {
+                    get_consumption: () => ({
+                        resources: {
+                            energy: {
+                                A: 0,
+                                B: 5*Math.pow(1 + gameEntity.getLevel('random_events_recovery_effect'), 1.5),
+                                type: 0,
+                            }
+                        }
+                    })
+                },
                 unlockCondition: () => true,
                 effects: [{
                     id: 'permanent_recovery_bonus',
@@ -578,6 +615,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_recovery_effect', gameEntity.getLevel('random_events_recovery_effect') + 1, true);
+                        gameResources.addResource('energy', -5*Math.pow(1 + gameEntity.getLevel('random_events_recovery_effect'), 1.5));
                     }
                 }, {
                     id: 'minor_blessing',
@@ -586,6 +624,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_health_regen');
+                        gameResources.addResource('energy', -5*Math.pow(1 + gameEntity.getLevel('random_events_recovery_effect'), 1.5));
                     }
                 }, {
                     id: 'negative_effect',
@@ -594,6 +633,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameResources.addResource('energy', -0.2 * gameResources.getResource('energy').cap);
+                        gameResources.addResource('energy', -5*Math.pow(1 + gameEntity.getLevel('random_events_recovery_effect'), 1.5));
                     }
                 }]
             },
@@ -651,6 +691,17 @@ export const registerRandomEventsDb = () => {
                 id: 'option1',
                 name: 'Accept the Duel',
                 unlockCondition: () => true,
+                usageGain: {
+                    get_consumption: () => ({
+                        resources: {
+                            health: {
+                                A: 0,
+                                B: 5*Math.pow(1 + gameEntity.getLevel('random_events_strength_effect'), 1.5),
+                                type: 0,
+                            }
+                        }
+                    })
+                },
                 effects: [{
                     id: 'strength_gain',
                     probability: 0.4,
@@ -658,6 +709,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_strength_effect', gameEntity.getLevel('random_events_strength_effect') + 1, true);
+                        gameResources.addResource('health', -5*Math.pow(1 + gameEntity.getLevel('random_events_strength_effect'), 1.5));
                     }
                 }, {
                     id: 'minor_injury',
@@ -677,6 +729,7 @@ export const registerRandomEventsDb = () => {
                     onTrigger: () => {
                         gameResources.addResource('health', -0.2 * gameResources.getResource('health').cap);
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_health_debuff', 2);
+                        gameResources.addResource('health', -5*Math.pow(1 + gameEntity.getLevel('random_events_strength_effect'), 1.5));
                     }
                 }]
             },
@@ -706,7 +759,7 @@ export const registerRandomEventsDb = () => {
                         resources: {
                             coins: {
                                 A: 0,
-                                B: 100*Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 2),
+                                B: 100*Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5),
                                 type: 0,
                             }
                         }
@@ -719,7 +772,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_charisma_effect', gameEntity.getLevel('random_events_charisma_effect') + 1, true);
-                        gameResources.addResource('coins', -100*Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 2));
+                        gameResources.addResource('coins', -100*Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5));
                     }
                 }, {
                     id: 'worthless_purchase',
@@ -727,7 +780,7 @@ export const registerRandomEventsDb = () => {
                     description: 'The goods turn out to be useless trinkets. You feel cheated. (-100 coins)',
                     unlockCondition: () => true,
                     onTrigger: () => {
-                        gameResources.addResource('coins', -100*Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 2));
+                        gameResources.addResource('coins', -100*Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5));
                     }
                 }]
             },
@@ -750,6 +803,17 @@ export const registerRandomEventsDb = () => {
             option1: {
                 id: 'option1',
                 name: 'Inspire the Crowd',
+                usageGain: {
+                    get_consumption: () => ({
+                        resources: {
+                            energy: {
+                                A: 0,
+                                B: 4*Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5),
+                                type: 0,
+                            }
+                        }
+                    })
+                },
                 unlockCondition: () => true,
                 effects: [{
                     id: 'permanent_charisma_bonus',
@@ -758,6 +822,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_charisma_effect', gameEntity.getLevel('random_events_charisma_effect') + 1, true);
+                        gameResources.addResource('energy', -4*Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5));
                     }
                 }, {
                     id: 'exhaustion',
@@ -825,7 +890,7 @@ export const registerRandomEventsDb = () => {
                 unlockCondition: () => true,
                 effects: [{
                     id: 'charisma_bonus',
-                    probability: 0.2,
+                    probability: 0.05,
                     description: 'The crowd loves your performance! (+1 Charisma)',
                     unlockCondition: () => true,
                     onTrigger: () => {
@@ -833,7 +898,7 @@ export const registerRandomEventsDb = () => {
                     }
                 }, {
                     id: 'voice_strain',
-                    probability: 0.5,
+                    probability: 0.65,
                     description: 'You strain your voice trying to match their skills. (-20% Energy)',
                     unlockCondition: () => true,
                     onTrigger: () => {
@@ -904,7 +969,7 @@ export const registerRandomEventsDb = () => {
                         resources: {
                             coins: {
                                 A: 0,
-                                B: 50 * Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 2),
+                                B: 50 * Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5),
                                 type: 0,
                             }
                         }
@@ -917,7 +982,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_charisma_effect', gameEntity.getLevel('random_events_charisma_effect') + 1, true);
-                        gameResources.addResource('coins', -50 * Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 2));
+                        gameResources.addResource('coins', -50 * Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5));
                     }
                 }, {
                     id: 'vague_predictions',
@@ -925,7 +990,7 @@ export const registerRandomEventsDb = () => {
                     description: 'Her predictions are vague and unhelpful.',
                     unlockCondition: () => true,
                     onTrigger: () => {
-                        gameResources.addResource('coins', -50 * Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 2));
+                        gameResources.addResource('coins', -50 * Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5));
                     }
                 }, {
                     id: 'bad_omen',
@@ -958,6 +1023,17 @@ export const registerRandomEventsDb = () => {
                 id: 'option1',
                 name: 'Take the Artifact',
                 unlockCondition: () => true,
+                usageGain: {
+                    get_consumption: () => ({
+                        resources: {
+                            health: {
+                                A: 0,
+                                B: 5 * Math.pow(1 + gameEntity.getLevel('random_events_strength_effect'), 1.5),
+                                type: 0,
+                            }
+                        }
+                    })
+                },
                 effects: [{
                     id: 'power_gain',
                     probability: 0.3,
@@ -965,6 +1041,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_strength_effect', gameEntity.getLevel('random_events_strength_effect') + 1, true);
+                        gameResources.addResource('health', -5*Math.pow(1 + gameEntity.getLevel('random_events_strength_effect'), 1.5));
                     }
                 }, {
                     id: 'artifact_curse',
@@ -1029,7 +1106,7 @@ export const registerRandomEventsDb = () => {
                 unlockCondition: () => true,
                 effects: [{
                     id: 'charisma_boost',
-                    probability: 0.3,
+                    probability: 0.05,
                     description: 'You feel a surge of confidence coursing through you. (+1 Charisma)',
                     unlockCondition: () => true,
                     onTrigger: () => {
@@ -1046,7 +1123,7 @@ export const registerRandomEventsDb = () => {
                     }
                 }, {
                     id: 'vial_nothing',
-                    probability: 0.3,
+                    probability: 0.55,
                     description: 'The liquid seems to do nothing at all.',
                     unlockCondition: () => true,
                     onTrigger: () => {}
@@ -1092,6 +1169,17 @@ export const registerRandomEventsDb = () => {
                 id: 'option1',
                 name: 'Read the Tome',
                 unlockCondition: () => true,
+                usageGain: {
+                    get_consumption: () => ({
+                        knowledge: {
+                            coins: {
+                                A: 0,
+                                B: 5 * Math.pow(1 + gameEntity.getLevel('random_events_memory_effect'), 1.5),
+                                type: 0,
+                            }
+                        }
+                    })
+                },
                 effects: [{
                     id: 'temporary_knowledge_gain',
                     probability: 0.6,
@@ -1099,6 +1187,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_knowledge_gain');
+                        gameResources.addResource('knowledge', -5*Math.pow(1 + gameEntity.getLevel('random_events_memory_effect'), 1.5));
                     }
                 }, {
                     id: 'temporary_knowledge_debuff',
@@ -1107,6 +1196,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_knowledge_debuff');
+                        gameResources.addResource('knowledge', -5*Math.pow(1 + gameEntity.getLevel('random_events_memory_effect'), 1.5));
                     }
                 }, {
                     id: 'memory_boost',
@@ -1115,6 +1205,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_memory_effect', gameEntity.getLevel('random_events_memory_effect') + 1, true);
+                        gameResources.addResource('knowledge', -5*Math.pow(1 + gameEntity.getLevel('random_events_memory_effect'), 1.5));
                     }
                 }]
             },
@@ -1184,6 +1275,17 @@ export const registerRandomEventsDb = () => {
                 id: 'option1',
                 name: 'Follow the Apparition',
                 unlockCondition: () => true,
+                usageGain: {
+                    get_consumption: () => ({
+                        resources: {
+                            knowledge: {
+                                A: 0,
+                                B: 8 * Math.pow(1 + gameEntity.getLevel('random_events_memory_effect'), 1.5),
+                                type: 0,
+                            }
+                        }
+                    })
+                },
                 effects: [{
                     id: 'temporary_knowledge_gain',
                     probability: 0.5,
@@ -1191,6 +1293,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_knowledge_gain');
+                        gameResources.addResource('knowledge', -8*Math.pow(1 + gameEntity.getLevel('random_events_memory_effect'), 1.5));
                     }
                 }, {
                     id: 'temporary_knowledge_debuff',
@@ -1199,6 +1302,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_knowledge_debuff');
+                        gameResources.addResource('knowledge', -8*Math.pow(1 + gameEntity.getLevel('random_events_memory_effect'), 1.5));
                     }
                 }, {
                     id: 'memory_boost',
@@ -1207,6 +1311,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_memory_effect', gameEntity.getLevel('random_events_memory_effect') + 1, true);
+                        gameResources.addResource('knowledge', -8*Math.pow(1 + gameEntity.getLevel('random_events_memory_effect'), 1.5));
                     }
                 }]
             },
@@ -1230,6 +1335,17 @@ export const registerRandomEventsDb = () => {
             option1: {
                 id: 'option1',
                 name: 'Accept and Give Your Best',
+                usageGain: {
+                    get_consumption: () => ({
+                        resources: {
+                            energy: {
+                                A: 0,
+                                B: 5 * Math.pow(1 + gameEntity.getLevel('random_events_memory_effect'), 1.5),
+                                type: 0,
+                            }
+                        }
+                    })
+                },
                 unlockCondition: () => true,
                 effects: [{
                     id: 'charisma_boost',
@@ -1238,6 +1354,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_charisma_effect', gameEntity.getLevel('random_events_charisma_effect') + 1, true);
+                        gameResources.addResource('energy', -5*Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5));
                     }
                 }, {
                     id: 'knowledge_permanent_boost',
@@ -1246,6 +1363,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_memory_effect', gameEntity.getLevel('random_events_memory_effect') + 1, true);
+                        gameResources.addResource('energy', -5*Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5));
                     }
                 }, {
                     id: 'temporary_knowledge_debuff',
@@ -1254,6 +1372,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_knowledge_debuff');
+                        gameResources.addResource('energy', -5*Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5));
                     }
                 }]
             },
@@ -1299,6 +1418,17 @@ export const registerRandomEventsDb = () => {
                 id: 'option1',
                 name: 'Attempt to Solve It',
                 unlockCondition: () => true,
+                usageGain: {
+                    get_consumption: () => ({
+                        resources: {
+                            knowledge: {
+                                A: 0,
+                                B: 10 * Math.pow(1 + gameEntity.getLevel('random_events_memory_effect'), 1.5),
+                                type: 0,
+                            }
+                        }
+                    })
+                },
                 effects: [{
                     id: 'memory_boost',
                     probability: 0.4,
@@ -1306,6 +1436,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_memory_effect', gameEntity.getLevel('random_events_memory_effect') + 1, true);
+                        gameResources.addResource('knowledge', -10*Math.pow(1 + gameEntity.getLevel('random_events_memory_effect'), 1.5));
                     }
                 }, {
                     id: 'temporary_energy_debuff',
@@ -1315,6 +1446,7 @@ export const registerRandomEventsDb = () => {
                     onTrigger: () => {
                         gameResources.addResource('energy', -0.2 * gameResources.getResource('energy').cap);
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_energy_debuff');
+                        gameResources.addResource('knowledge', -10*Math.pow(1 + gameEntity.getLevel('random_events_memory_effect'), 1.5));
                     }
                 }, {
                     id: 'gold_find',
@@ -1323,6 +1455,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameResources.addResource('coins', 0.1*gameResources.getResource('coins').cap);
+                        gameResources.addResource('knowledge', -10*Math.pow(1 + gameEntity.getLevel('random_events_memory_effect'), 1.5));
                     }
                 }]
             },
@@ -1367,6 +1500,17 @@ export const registerRandomEventsDb = () => {
             option1: {
                 id: 'option1',
                 name: 'Recreate the Experiment',
+                usageGain: {
+                    get_consumption: () => ({
+                        resources: {
+                            knowledge: {
+                                A: 0,
+                                B: 10 * Math.pow(1 + gameEntity.getLevel('random_events_memory_effect'), 1.5),
+                                type: 0,
+                            }
+                        }
+                    })
+                },
                 unlockCondition: () => true,
                 effects: [{
                     id: 'knowledge_permanent_boost',
@@ -1375,6 +1519,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_knowledge_gain');
+                        gameResources.addResource('knowledge', -10*Math.pow(1 + gameEntity.getLevel('random_events_memory_effect'), 1.5));
                     }
                 }, {
                     id: 'temporary_energy_debuff',
@@ -1383,6 +1528,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameResources.addResource('energy', -0.2 * gameResources.getResource('energy').cap);
+                        gameResources.addResource('knowledge', -10*Math.pow(1 + gameEntity.getLevel('random_events_memory_effect'), 1.5));
                     }
                 }, {
                     id: 'temporary_health_debuff',
@@ -1391,6 +1537,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameResources.addResource('health', -0.1 * gameResources.getResource('health').cap);
+                        gameResources.addResource('knowledge', -10*Math.pow(1 + gameEntity.getLevel('random_events_memory_effect'), 1.5));
                     }
                 }, {
                     id: 'memory_boost',
@@ -1399,6 +1546,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_memory_effect', gameEntity.getLevel('random_events_memory_effect') + 1, true);
+                        gameResources.addResource('knowledge', -10*Math.pow(1 + gameEntity.getLevel('random_events_memory_effect'), 1.5));
                     }
                 }]
             },
@@ -1499,6 +1647,17 @@ export const registerRandomEventsDb = () => {
                 id: 'option3',
                 name: 'Apologize to the Tavern Patrons',
                 unlockCondition: () => true,
+                usageGain: {
+                    get_consumption: () => ({
+                        resources: {
+                            energy: {
+                                A: 0,
+                                B: 10 * Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5),
+                                type: 0,
+                            }
+                        }
+                    })
+                },
                 effects: [{
                     id: 'temporary_energy_regeneration_debuff',
                     probability: 0.4,
@@ -1506,6 +1665,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_energy_debuff');
+                        gameResources.addResource('energy', -10*Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5));
                     }
                 }, {
                     id: 'charisma_boost',
@@ -1514,14 +1674,16 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_charisma_effect', gameEntity.getLevel('random_events_charisma_effect') + 1, true);
+                        gameResources.addResource('energy', -10*Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5));
                     }
                 }, {
                     id: 'gold_loss',
                     probability: 0.3,
-                    description: 'The barkeep demands compensation for the disturbance. (-50 Coins)',
+                    description: 'The barkeep demands compensation for the disturbance.',
                     unlockCondition: () => true,
                     onTrigger: () => {
-                        gameResources.addResource('coins', -50);
+                        gameResources.addResource('coins', 0.1*gameResources.getResource('coins').amount);
+                        gameResources.addResource('energy', -10*Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5));
                     }
                 }]
             },
@@ -1584,6 +1746,17 @@ export const registerRandomEventsDb = () => {
             option2: {
                 id: 'option2',
                 name: 'Demand Compensation from the Patron',
+                usageGain: {
+                    get_consumption: () => ({
+                        resources: {
+                            health: {
+                                A: 0,
+                                B: 10 * Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5),
+                                type: 0,
+                            }
+                        }
+                    })
+                },
                 unlockCondition: () => true,
                 effects: [{
                     id: 'gold_gain',
@@ -1592,6 +1765,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameResources.addResource('coins', 50 + 0.1*gameResources.getResource('coins').cap);
+                        gameResources.addResource('health', -10*Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5));
                     }
                 }, {
                     id: 'charisma_penalty',
@@ -1600,6 +1774,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_charisma_effect', gameEntity.getLevel('random_events_charisma_effect') - 1, true);
+                        gameResources.addResource('health', -10*Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5));
                     }
                 }]
             },
@@ -1633,6 +1808,17 @@ export const registerRandomEventsDb = () => {
                 id: 'option1',
                 name: 'Mediate Between Them',
                 unlockCondition: () => true,
+                usageGain: {
+                    get_consumption: () => ({
+                        resources: {
+                            energy: {
+                                A: 0,
+                                B: 10 * Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5),
+                                type: 0,
+                            }
+                        }
+                    })
+                },
                 effects: [{
                     id: 'charisma_boost',
                     probability: 0.4,
@@ -1640,6 +1826,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_charisma_effect', gameEntity.getLevel('random_events_charisma_effect') + 1, true);
+                        gameResources.addResource('energy', -10*Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5));
                     }
                 }, {
                     id: 'temporary_energy_regeneration_debuff',
@@ -1648,6 +1835,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_energy_debuff', 2);
+                        gameResources.addResource('energy', -10*Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5));
                     }
                 }]
             },
@@ -1697,7 +1885,7 @@ export const registerRandomEventsDb = () => {
                 unlockCondition: () => true,
                 effects: [{
                     id: 'charisma_boost',
-                    probability: 0.6,
+                    probability: 0.1,
                     description: 'Your humor and humility charm the crowd. (+1 Charisma)',
                     unlockCondition: () => true,
                     onTrigger: () => {
@@ -1705,7 +1893,7 @@ export const registerRandomEventsDb = () => {
                     }
                 }, {
                     id: 'gold_gain',
-                    probability: 0.4,
+                    probability: 0.9,
                     description: 'The crowd finds your antics amusing and tosses some coins your way. (Refilled 10% of your coins storage)',
                     unlockCondition: () => true,
                     onTrigger: () => {
@@ -1789,11 +1977,19 @@ export const registerRandomEventsDb = () => {
                 unlockCondition: () => true,
                 effects: [{
                     id: 'charisma_boost',
-                    probability: 0.5,
+                    probability: 0.6,
                     description: 'Your respectful refusal earns the sage’s admiration. (+1 Charisma)',
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_charisma_effect', gameEntity.getLevel('random_events_charisma_effect') + 1, true);
+                    }
+                },{
+                    id: 'charisma_debuff',
+                    probability: 0.4,
+                    description: 'Sage was very angry for your refusal. (-1 Charisma)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameEntity.setEntityLevel('random_events_charisma_effect', gameEntity.getLevel('random_events_charisma_effect') - 1, true);
                     }
                 }]
             },
@@ -1946,6 +2142,670 @@ export const registerRandomEventsDb = () => {
         }
     });
 
+    randomEventsDB.push({
+        id: 'magic_event9',
+        name: 'Healing Light Ritual',
+        description: 'A group of traveling healers offers to perform a ritual that could enhance your recovery abilities, but they require a donation of magical energy or health.',
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_spellbook') > 0;
+        },
+        probability: 1,
+        options: {
+            option1: {
+                id: 'option1',
+                name: 'Donate Mana',
+                usageGain: {
+                    get_consumption: () => ({
+                        resources: {
+                            mana: {
+                                A: 0,
+                                B: 5 * Math.pow(1 + gameEntity.getLevel('random_events_recovery_effect'), 1.5),
+                                type: 0,
+                            }
+                        }
+                    })
+                },
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'permanent_recovery_boost',
+                    probability: 0.7,
+                    description: 'The ritual succeeds, and you feel your body’s resilience improve. (+1 Recovery)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameEntity.setEntityLevel('random_events_recovery_effect', gameEntity.getLevel('random_events_recovery_effect') + 1, true);
+                        gameResources.addResource('mana', -5 * Math.pow(1 + gameEntity.getLevel('random_events_recovery_effect'), 1.5));
+                    }
+                }, {
+                    id: 'temporary_mana_debuff',
+                    probability: 0.3,
+                    description: 'The ritual fails, leaving you drained. (-Mana regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_mana_debuff', 1.5);
+                        gameResources.addResource('mana', -50 * Math.pow(1 + gameEntity.getLevel('random_events_recovery_effect'), 1.5));
+                    }
+                }]
+            },
+            option2: {
+                id: 'option2',
+                name: 'Donate Health',
+                usageGain: {
+                    get_consumption: () => ({
+                        resources: {
+                            health: {
+                                A: 0,
+                                B: 0.4 * gameResources.getResource('health').cap,
+                                type: 0,
+                            }
+                        }
+                    })
+                },
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'temporary_knowledge_gain',
+                    probability: 0.6,
+                    description: 'Your sacrifice inspires a burst of clarity. (+Knowledge gain for 15 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_knowledge_gain', 1.4);
+                        gameResources.addResource('health', -0.4 * gameResources.getResource('health').cap);
+                    }
+                }, {
+                    id: 'temporary_health_debuff',
+                    probability: 0.4,
+                    description: 'The ritual strains your body, weakening your recovery temporarily. (-Health regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_health_debuff', 1.3);
+                        gameResources.addResource('health', -0.4 * gameResources.getResource('health').cap);
+                    }
+                }]
+            },
+            option3: {
+                id: 'option3',
+                name: 'Decline Politely',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'charisma_boost',
+                    probability: 0.5,
+                    description: 'Your polite refusal earns their respect. (+1 Charisma)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameEntity.setEntityLevel('random_events_charisma_effect', gameEntity.getLevel('random_events_charisma_effect') + 1, true);
+                    }
+                }, {
+                    id: 'charisma_penalty',
+                    probability: 0.5,
+                    description: 'The healers take offense to your refusal. (-1 Charisma)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameEntity.setEntityLevel('random_events_charisma_effect', gameEntity.getLevel('random_events_charisma_effect') - 1, true);
+                    }
+                }]
+            }
+        }
+    });
+
+    randomEventsDB.push({
+        id: 'magic_event10',
+        name: 'Forgotten Spell Scroll',
+        description: 'You stumble upon an ancient scroll half-buried in the ground. The script shimmers with faint arcane energy.',
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_spellbook') > 0;
+        },
+        probability: 1,
+        options: {
+            option1: {
+                id: 'option1',
+                name: 'Attempt to Read It',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'temporary_mana_regen',
+                    probability: 0.6,
+                    description: 'The scroll reveals techniques that restore your mana. (+Mana regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_mana_regen', 1.5);
+                    }
+                }, {
+                    id: 'temporary_mana_debuff',
+                    probability: 0.4,
+                    description: 'The scroll’s magic backfires, sapping your strength. (-Mana regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_mana_debuff', 1.2);
+                    }
+                }]
+            },
+            option2: {
+                id: 'option2',
+                name: 'Use the Scroll for Research',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'temporary_knowledge_gain',
+                    probability: 0.8,
+                    description: 'The scroll deepens your understanding. (+Knowledge gain for 15 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_knowledge_gain', 1.6);
+                    }
+                }, {
+                    id: 'temporary_energy_debuff',
+                    probability: 0.2,
+                    description: 'The effort leaves you exhausted. (-Energy regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_energy_debuff', 1.4);
+                    }
+                }]
+            },
+            option3: {
+                id: 'option3',
+                name: 'Leave It Be',
+                unlockCondition: () => true,
+                effects: []
+            }
+        }
+    });
+
+    randomEventsDB.push({
+        id: 'magic_event13',
+        name: 'The Arcane Merchant',
+        description: 'A mysterious merchant sets up a stall in the market, offering rare magical trinkets that could enhance your abilities, for a price.',
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_spellbook') > 0;
+        },
+        probability: 1,
+        options: {
+            option1: {
+                id: 'option1',
+                name: 'Buy a Mana Crystal',
+                usageGain: {
+                    get_consumption: () => ({
+                        resources: {
+                            coins: {
+                                A: 0,
+                                B: 0.1 * gameResources.getResource('coins').cap,
+                                type: 0,
+                            }
+                        }
+                    })
+                },
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'temporary_mana_regen',
+                    probability: 0.8,
+                    description: 'The crystal revitalizes your magical energy. (+Mana regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_mana_regen', 1.5);
+                        gameResources.addResource('coins', -0.1 * gameResources.getResource('coins').cap);
+                    }
+                }, {
+                    id: 'temporary_mana_debuff',
+                    probability: 0.2,
+                    description: 'The crystal is flawed, sapping your mana instead. (-Mana regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_mana_debuff', 1.2);
+                        gameResources.addResource('coins', -0.1 * gameResources.getResource('coins').cap);
+                    }
+                }]
+            },
+            option2: {
+                id: 'option2',
+                name: 'Inspect the Merchant’s Wares',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'temporary_knowledge_gain',
+                    probability: 0.7,
+                    description: 'You learn something from the merchant’s collection. (+Knowledge gain for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_knowledge_gain', 1.4);
+                    }
+                }, {
+                    id: 'temporary_health_debuff',
+                    probability: 0.3,
+                    description: 'You cut yourself on a sharp artifact. (-Health regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_health_debuff', 1.3);
+                    }
+                }]
+            },
+            option3: {
+                id: 'option3',
+                name: 'Walk Away',
+                unlockCondition: () => true,
+                effects: []
+            }
+        }
+    });
+
+    randomEventsDB.push({
+        id: 'magic_event14',
+        name: 'The Wandering Illusionist',
+        description: 'An illusionist captivates the crowd with his dazzling tricks and offers to teach you a secret for a price.',
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_spellbook') > 0;
+        },
+        probability: 1,
+        options: {
+            option1: {
+                id: 'option1',
+                name: 'Pay for the Lesson',
+                usageGain: {
+                    get_consumption: () => ({
+                        resources: {
+                            coins: {
+                                A: 0,
+                                B: 75 * Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5),
+                                type: 0,
+                            }
+                        }
+                    })
+                },
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'charisma_boost',
+                    probability: 0.7,
+                    description: 'The lesson enhances your stage presence. (+1 Charisma)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameEntity.setEntityLevel('random_events_charisma_effect', gameEntity.getLevel('random_events_charisma_effect') + 1, true);
+                    }
+                }, {
+                    id: 'temporary_energy_debuff',
+                    probability: 0.3,
+                    description: 'The effort leaves you fatigued. (-Energy regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_energy_debuff', 1.4);
+                    }
+                }]
+            },
+            option2: {
+                id: 'option2',
+                name: 'Challenge His Tricks',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'temporary_knowledge_gain',
+                    probability: 0.5,
+                    description: 'Dissecting his illusions sharpens your mind. (+Knowledge gain for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_knowledge_gain', 1.6);
+                    }
+                }, {
+                    id: 'charisma_penalty',
+                    probability: 0.5,
+                    description: 'The crowd boos you for ruining the show. (-1 Charisma)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameEntity.setEntityLevel('random_events_charisma_effect', gameEntity.getLevel('random_events_charisma_effect') - 1, true);
+                    }
+                }]
+            },
+            option3: {
+                id: 'option3',
+                name: 'Watch Silently',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'temporary_mana_regen',
+                    probability: 0.8,
+                    description: 'Watching his tricks calms your mind. (+Mana regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_mana_regen', 1.3);
+                    }
+                }]
+            }
+        }
+    });
+
+    randomEventsDB.push({
+        id: 'magic_event16',
+        name: 'Arcane Convergence',
+        description: 'A rare alignment of celestial bodies fills the air with arcane energy. A mysterious portal appears before you, pulsating with power.',
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_spellbook') > 0;
+        },
+        probability: 1,
+        options: {
+            option1: {
+                id: 'option1',
+                name: 'Step Into the Portal',
+                usageGain: {
+                    get_consumption: () => ({
+                        resources: {
+                            mana: {
+                                A: 0,
+                                B: 10 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability'), 1.5),
+                                type: 0,
+                            }
+                        }
+                    })
+                },
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'magic_ability_boost',
+                    probability: 0.5,
+                    description: 'The arcane energies enhance your magical aptitude. (+1 Magic Ability)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameEntity.setEntityLevel('random_events_magic_ability', gameEntity.getLevel('random_events_magic_ability') + 1, true);
+                        gameResources.addResource('mana', -10 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability'), 1.5));
+                    }
+                }, {
+                    id: 'temporary_health_debuff',
+                    probability: 0.5,
+                    description: 'The portal destabilizes, sapping your vitality. (-Health regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_health_debuff', 1.5);
+                        gameResources.addResource('mana', -30 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability'), 1.5));
+                    }
+                }]
+            },
+            option2: {
+                id: 'option2',
+                name: 'Observe from a Distance',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'temporary_knowledge_gain',
+                    probability: 0.7,
+                    description: 'You glean insights from the portal’s behavior. (+Knowledge gain for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_knowledge_gain', 2);
+                    }
+                }, {
+                    id: 'temporary_mana_debuff',
+                    probability: 0.3,
+                    description: 'The portal’s energy interferes with your focus. (-Mana regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_mana_debuff', 1.3);
+                    }
+                }]
+            },
+            option3: {
+                id: 'option3',
+                name: 'Close the Portal',
+                unlockCondition: () => true,
+                usageGain: {
+                    get_consumption: () => ({
+                        resources: {
+                            energy: {
+                                A: 0,
+                                B: 0.2 * gameResources.getResource('energy').cap,
+                                type: 0,
+                            }
+                        }
+                    })
+                },
+                effects: [{
+                    id: 'temporary_mental_training_rate',
+                    probability: 0.8,
+                    description: 'Closing the portal sharpens your discipline. (+Mental training speed for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_mental_training_rate', 1.5);
+                        gameResources.addResource('energy', -0.2 * gameResources.getResource('energy').cap);
+                    }
+                }, {
+                    id: 'temporary_health_debuff',
+                    probability: 0.2,
+                    description: 'The portal lashes out, leaving you injured. (-Health regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_health_debuff', 1.3);
+                        gameResources.addResource('energy', -0.2 * gameResources.getResource('energy').cap);
+                    }
+                }]
+            }
+        }
+    });
+
+    randomEventsDB.push({
+        id: 'magic_event17',
+        name: 'The Forgotten Archive',
+        description: 'You discover a hidden library filled with ancient texts. A glowing pedestal at its center beckons you forward.',
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_spellbook') > 0;
+        },
+        probability: 1,
+        options: {
+            option1: {
+                id: 'option1',
+                name: 'Study the Ancient Texts',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'temporary_knowledge_gain',
+                    probability: 0.8,
+                    description: 'The texts expand your understanding of magic. (+Knowledge gain for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_knowledge_gain', 2);
+                    }
+                }, {
+                    id: 'temporary_mana_debuff',
+                    probability: 0.2,
+                    description: 'The effort drains your mana reserves. (-Mana regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_mana_debuff', 1.4);
+                    }
+                }]
+            },
+            option2: {
+                id: 'option2',
+                name: 'Approach the Pedestal',
+                usageGain: {
+                    get_consumption: () => ({
+                        resources: {
+                            mana: {
+                                A: 0,
+                                B: 10 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability'), 1.5),
+                                type: 0,
+                            }
+                        }
+                    })
+                },
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'magic_ability_boost',
+                    probability: 0.5,
+                    description: 'The pedestal imbues you with arcane knowledge. (+1 Magic Ability)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameEntity.setEntityLevel('random_events_magic_ability', gameEntity.getLevel('random_events_magic_ability') + 1, true);
+                        gameResources.addResource('mana', -10 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability'), 1.5));
+                    }
+                }, {
+                    id: 'temporary_health_debuff',
+                    probability: 0.5,
+                    description: 'The pedestal’s magic is unstable, causing minor harm. (-Health regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_health_debuff', 1.2);
+                        gameResources.addResource('mana', -20 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability'), 1.5));
+                    }
+                }]
+            },
+            option3: {
+                id: 'option3',
+                name: 'Catalog the Library’s Contents',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'temporary_mental_training_rate',
+                    probability: 1,
+                    description: 'Cataloging the texts improves your focus. (+Mental training speed for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_mental_training_rate', 1.5);
+                    }
+                }]
+            }
+        }
+    });
+
+    randomEventsDB.push({
+        id: 'magic_event18',
+        name: 'The Crystal Cavern',
+        description: 'You stumble upon a hidden cavern filled with glowing crystals. Their hum resonates with magical energy.',
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_spellbook') > 0;
+        },
+        probability: 1,
+        options: {
+            option1: {
+                id: 'option1',
+                name: 'Harvest the Crystals',
+                usageGain: {
+                    get_consumption: () => ({
+                        resources: {
+                            mana: {
+                                A: 0,
+                                B: 40 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability'), 1.5),
+                                type: 0,
+                            }
+                        }
+                    })
+                },
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'magic_ability_boost',
+                    probability: 0.6,
+                    description: 'The crystals enhance your magical aptitude. (+1 Magic Ability)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameEntity.setEntityLevel('random_events_magic_ability', gameEntity.getLevel('random_events_magic_ability') + 1, true);
+                        gameResources.addResource('mana', -40 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability'), 1.5));
+                    }
+                }, {
+                    id: 'temporary_health_debuff',
+                    probability: 0.4,
+                    description: 'The crystals emit a sharp energy that drains your vitality. (-Health regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_health_debuff', 1.5);
+                    }
+                }]
+            },
+            option2: {
+                id: 'option2',
+                name: 'Meditate Among the Crystals',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'temporary_mana_regen',
+                    probability: 0.8,
+                    description: 'The crystals rejuvenate your magical reserves. (+Mana regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_mana_regen', 1.5);
+                    }
+                }, {
+                    id: 'temporary_energy_debuff',
+                    probability: 0.2,
+                    description: 'The hum of the crystals leaves you slightly fatigued. (-Energy regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_energy_debuff', 1.2);
+                    }
+                }]
+            },
+            option3: {
+                id: 'option3',
+                name: 'Leave the Cavern',
+                unlockCondition: () => true,
+                effects: []
+            }
+        }
+    });
+
+    randomEventsDB.push({
+        id: 'magic_event19',
+        name: 'The Arcane Ritual',
+        description: 'A group of mages invites you to join a ritual designed to enhance magical abilities, but warns of potential risks.',
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_spellbook') > 0;
+        },
+        probability: 1,
+        options: {
+            option1: {
+                id: 'option1',
+                name: 'Participate in the Ritual',
+                usageGain: {
+                    get_consumption: () => ({
+                        resources: {
+                            mana: {
+                                A: 0,
+                                B: 50 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability'), 1.5),
+                                type: 0,
+                            }
+                        }
+                    })
+                },
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'magic_ability_boost',
+                    probability: 0.7,
+                    description: 'The ritual strengthens your magical connection. (+1 Magic Ability)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameEntity.setEntityLevel('random_events_magic_ability', gameEntity.getLevel('random_events_magic_ability') + 1, true);
+                        gameResources.addResource('mana', -50 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability'), 1.5));
+                    }
+                }, {
+                    id: 'temporary_health_debuff',
+                    probability: 0.3,
+                    description: 'The ritual drains your physical strength. (-Health regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_health_debuff', 1.5);
+                    }
+                }]
+            },
+            option2: {
+                id: 'option2',
+                name: 'Observe the Ritual',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'temporary_knowledge_gain',
+                    probability: 1,
+                    description: 'Watching the ritual provides valuable insights. (+Knowledge gain for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_knowledge_gain', 1.8);
+                    }
+                }]
+            },
+            option3: {
+                id: 'option3',
+                name: 'Politely Decline',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'health_blessings',
+                    probability: 0.5,
+                    description: 'The Gods appreciate your carefulness, giving you temporary boost to health',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_health_regen', 1.4);
+                    }
+                }, {
+                    id: 'temporary_energy_debuff',
+                    probability: 0.5,
+                    description: 'Refusing leaves you slightly uneasy. (-Energy regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_energy_debuff', 1.2);
+                    }
+                }]
+            }
+        }
+    });
 
 
     return randomEventsDB;

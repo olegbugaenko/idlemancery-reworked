@@ -374,4 +374,27 @@ export const registerPermanentBonuses = () => {
         }
     })
 
+    gameEntity.registerGameEntity('random_events_magic_ability_effect', {
+        tags: ["bonus", "permanent", "herbal"],
+        name: 'Random Events Bonus',
+        level: 0,
+        unlockCondition: () => {
+
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            income: {
+                effects: {
+                    'attribute_magic_ability': {
+                        A: 1,
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            }
+        }
+    })
+
 }

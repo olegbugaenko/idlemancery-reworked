@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useRef, useState} from "react";
+import React, {useCallback, useContext, useEffect, useRef, useState} from "react";
 import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
 import {formatInt, formatValue} from "../../general/utils/strings";
@@ -74,7 +74,7 @@ export const Shop = ({}) => {
             </div>
 
             <div className={'item-detail ingame-box detail-blade'}>
-                {detailOpened ? (<ItemDetails itemId={detailOpened} category={selectedTab}/>) : null}
+                {detailOpened ? (<ItemDetails itemId={detailOpened} category={selectedTab}/>) : (<GeneralStats />)}
             </div>
         </div>
 
@@ -89,7 +89,8 @@ export const ShopUpgrades = ({ setItemDetails, purchaseItem, newUnlocks }) => {
     const { onMessage, sendData } = useWorkerClient(worker);
     const [itemsData, setItemsData] = useState({
         available: [],
-        current: undefined
+        current: undefined,
+        isAutomationUnlocked: false
     });
 
     const [overlayPositions, setOverlayPositions] = useState([]);
@@ -114,11 +115,15 @@ export const ShopUpgrades = ({ setItemDetails, purchaseItem, newUnlocks }) => {
         setItemsData(items);
     })
 
+    const toggleAutopurchase = useCallback((id, flag) => {
+        sendData('set-shop-autopurchase', { id, flag })
+    })
+
     return (<div className={'items-cat'}>
         <PerfectScrollbar>
             <div className={'flex-container'}>
                 {itemsData.available.map(item => <NewNotificationWrap id={`shop_${item.id}`} className={'narrow-wrapper'} isNew={newUnlocks?.[`shop_${item.id}`]?.hasNew}>
-                    <ItemCard onFlash={handleFlash} key={item.id} {...item} onPurchase={purchaseItem} onShowDetails={setItemDetails}/>
+                    <ItemCard onFlash={handleFlash} key={item.id} {...item} onPurchase={purchaseItem} onShowDetails={setItemDetails} toggleAutopurchase={toggleAutopurchase} isAutomationUnlocked={itemsData.isAutomationUnlocked}/>
                 </NewNotificationWrap>)}
                 {overlayPositions.map((position, index) => (
                     <FlashOverlay key={index} position={position} />
@@ -205,14 +210,14 @@ export const ShopItems = ({ setItemDetails, purchaseItem, newUnlocks }) => {
     </div>)
 }
 
-export const ItemCard = ({ id, name, level, max, affordable, isLeveled, onFlash, onPurchase, onShowDetails}) => {
+export const ItemCard = ({ id, name, level, max, affordable, isLeveled, onFlash, onPurchase, onShowDetails, isAutoPurchase, toggleAutopurchase, isAutomationUnlocked}) => {
 
     const elementRef = useRef(null);
 
     useFlashOnLevelUp(isLeveled, onFlash, elementRef);
 
 
-    return (<div ref={elementRef} className={`card item flashable ${affordable.hardLocked ? 'hard-locked' : ''}  ${!affordable.isAffordable ? 'unavailable' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)}>
+    return (<div ref={elementRef} className={`shop-card card item flashable ${affordable.hardLocked ? 'hard-locked' : ''}  ${!affordable.isAffordable ? 'unavailable' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)}>
         <div className={'head'}>
             <p className={'title'}>{name}</p>
             <span className={'level'}>{formatInt(level)}{max ? `/${formatInt(max)}` : ''}</span>
@@ -220,12 +225,17 @@ export const ItemCard = ({ id, name, level, max, affordable, isLeveled, onFlash,
         <div className={'bottom'}>
             <div className={'buttons'}>
                 <button disabled={!affordable.isAffordable} onClick={() => onPurchase(id)}>Purchase</button>
+                {isAutomationUnlocked ? (<label className={'autobuy-label'}>
+                    <input type={'checkbox'} checked={isAutoPurchase}
+                           onChange={() => toggleAutopurchase(id, !isAutoPurchase)}/>
+                    Autobuy
+                </label>) : null}
             </div>
         </div>
     </div> )
 }
 
-export const ItemResourceCard = ({ id, name, purchaseMultiplier, level, max, affordable, isLeveled, onFlash, onPurchase, onShowDetails}) => {
+export const ItemResourceCard = ({ id, name, purchaseMultiplier, level, max, amount, affordable, isLeveled, onFlash, onPurchase, onShowDetails}) => {
 
     const elementRef = useRef(null);
 
@@ -234,7 +244,7 @@ export const ItemResourceCard = ({ id, name, purchaseMultiplier, level, max, aff
     return (<div ref={elementRef} className={`icon-card item flashable ${affordable.hardLocked ? 'hard-locked' : ''}  ${!affordable.isAffordable ? 'unavailable' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)} onClick={(e) => onPurchase(id, e.shiftKey ? 1e9 : purchaseMultiplier)}>
         <TippyWrapper
             content={<div className={'hint-popup'}>
-                <p>{name}</p>
+                <p>{name} {amount > 0 ? `(${formatInt(amount)} in inventory)` : ''}</p>
                 <p>Press to buy x{formatInt(purchaseMultiplier)}. Hold Shift to by max</p>
             </div>}>
             <div className={'icon-content'}>
@@ -311,6 +321,56 @@ export const ItemDetails = ({itemId, category}) => {
                         }
                     </div>
                 </div>) : null}
+            </div>
+        </PerfectScrollbar>
+    )
+}
+
+export const GeneralStats = ({ category }) => {
+
+    const worker = useContext(WorkerContext);
+
+    const { onMessage, sendData } = useWorkerClient(worker);
+
+    const [item, setDetailOpened] = useState(null);
+
+    useEffect(() => {
+        sendData('query-general-shop-stats', { category });
+        const interval = setInterval(() => {
+            sendData('query-general-shop-stats', { category });
+        }, 1000);
+
+        return () => {
+            clearInterval(interval);
+        }
+
+    }, [])
+
+
+    onMessage('general-shop-stats', (items) => {
+        setDetailOpened(items);
+    })
+
+    if(!item) return null;
+
+
+    return (
+        <PerfectScrollbar>
+            <div className={'blade-inner'}>
+                <div className={'block'}>
+                    <h4>General Stats</h4>
+                </div>
+                <div className={'block'}>
+                    {item.stats.map(stat => (<div className={'row flex-row'}>
+                        <p>{stat.name}</p>
+                        <p>{formatValue(stat.value)}</p>
+                    </div> ))}
+                </div>
+                <div className={'block'}>
+                    <p className={'hint'}>
+                        Hover over specific item to see it details
+                    </p>
+                </div>
             </div>
         </PerfectScrollbar>
     )

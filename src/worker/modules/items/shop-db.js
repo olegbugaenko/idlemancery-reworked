@@ -1,8 +1,9 @@
 import { gameEntity, gameCore, gameEffects } from "game-framework"
 
+export const charismaMod = (attr) => attr > 0 ? 1. / (1. + 0.02*Math.log2(attr*gameEffects.getEffectValue('prices_discount'))) : 1.;
+
 export const registerShopItemsStage1 = () => {
 
-    const charismaMod = (attr) => attr > 0 ? 1. / (1. + 0.02*Math.log2(attr*gameEffects.getEffectValue('prices_discount'))) : 1.;
 
     gameEntity.registerGameEntity('shop_item_hat', {
         tags: ["shop", "upgrade", "purchaseable"],
@@ -418,6 +419,27 @@ export const registerShopItemsStage1 = () => {
             'coins': {
                 A: 2,
                 B: 200*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_purchase_manager', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Purchase Manager',
+        description: 'An efficient tool that automates the process of buying upgrades in the shop.',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_tent') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 10000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 0
             }
         }),

@@ -260,9 +260,13 @@ export class MapModule extends GameModule {
                                 j
                             })
                         }
+                        let prob = 0.03*d.probabilityMult*rarityProbMult*effEff*(1 + (gameResources.getResource('gathering_perception').amount ** 0.75));
+                        if(prob > 0.2) {
+                            prob = Math.min(0.5, 0.2 + (prob - 0.2) ** 1.5)
+                        }
                         return {
                             ...d,
-                            probability: 0.03*d.probabilityMult*rarityProbMult*effEff*(1 + (gameResources.getResource('gathering_perception').amount ** 0.75)),
+                            probability: prob,
                             amountMin: Math.max(1, 3*d.amountMult*effEff*amtHerbsMult),
                             amountMax: Math.max(1, 6*d.amountMult*effEff*amtHerbsMult),
                             isRevealed,

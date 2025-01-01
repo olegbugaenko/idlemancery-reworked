@@ -6,12 +6,15 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
-                <h3>Idle Awakening v0.0.5e</h3>
+                <h3>Idle Awakening v0.0.6</h3>
                 <div className={'features'}>
-                    <p>Fixed events popup behaviour</p>
-                    <p>Golden Algae now provides much better bonus</p>
-                    <p>Fixed bug when players could save and run list with negative action times</p>
-                    <p>Fixed some typos</p>
+                    <p>Added new spell, improving exploration</p>
+                    <p>Added new crafting recipe</p>
+                    <p>Added shop automation (available after upgrade)</p>
+                    <p>Added new events. Existing are re-balanced.</p>
+                    <p>Added new furniture, making rest making more sense. Urns now using less space</p>
+                    <p>Shop page now shows additional useful stats, like price modifiers and sell limits</p>
+                    <p>UI fixes</p>
                 </div>
                 <h3>Idle Awakening v0.0.5d</h3>
                 <div className={'features'}>

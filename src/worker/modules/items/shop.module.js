@@ -1,6 +1,6 @@
 import {gameEntity, gameResources, resourceCalculators, resourceApi, gameEffects, gameCore} from "game-framework"
 import {GameModule} from "../../shared/game-module";
-import {registerShopItemsStage1} from "./shop-db";
+import {charismaMod, registerShopItemsStage1} from "./shop-db";
 
 export class ShopModule extends GameModule {
 
@@ -10,6 +10,17 @@ export class ShopModule extends GameModule {
         this.isUnlocked = false;
         this.leveledId = null;
         this.purchaseMultiplier = 1;
+        this.autoPurchase = {};
+        this.autoPurchaseCd = 0;
+        this.eventHandler.registerHandler('set-shop-autopurchase', ({ id, flag }) => {
+            const entities = gameEntity.listEntitiesByTags(['shop']).filter(one => one.isUnlocked && !one.isCapped);
+            entities.forEach(e => {
+                if(!id || id === e.id) {
+                    this.autoPurchase[e.id] = flag;
+                }
+            })
+            this.sendItemsData();
+        })
         this.eventHandler.registerHandler('set-purchase-multiplier', (payload) => {
             this.setPurchaseMultiplier(payload.amount);
         })
@@ -34,12 +45,16 @@ export class ShopModule extends GameModule {
         this.eventHandler.registerHandler('query-item-resource-details', (payload) => {
             this.sendPurchaseableItemDetails(payload.id);
         })
+
+        this.eventHandler.registerHandler('query-general-shop-stats', (payload) => {
+            this.sendGeneralShopStats(payload)
+        })
     }
 
     initialize() {
 
         gameEffects.registerEffect('shop_max_stock', {
-            name: 'Shop Max Stock',
+            name: 'Shop Max Sell Stock',
             defaultValue: 100,
             minValue: 100
         })
@@ -51,7 +66,7 @@ export class ShopModule extends GameModule {
         })
 
         gameEffects.registerEffect('shop_stock_renew_rate', {
-            name: 'Stock Renew Rate',
+            name: 'Sell Stock Renew Rate',
             defaultValue: 1,
             minValue: 1
         })
@@ -65,6 +80,32 @@ export class ShopModule extends GameModule {
             this.isUnlocked = true;
         }
         this.leveledId = null;
+        if(gameEntity.getLevel('shop_item_purchase_manager') > 0) {
+            if(!this.autoPurchaseCd) {
+                this.autoPurchaseCd = 10;
+            }
+            this.autoPurchaseCd -= delta;
+            if(this.autoPurchaseCd <= 0) {
+                this.autoPurchaseCd = 10;
+                for(const key in this.autoPurchase) {
+                    if(this.autoPurchase[key]) {
+                        if(!gameEntity.isEntityUnlocked(key)) {
+                            this.autoPurchase[key] = false;
+                            continue;
+                        }
+                        if(gameEntity.isCapped(key)) {
+                            this.autoPurchase[key] = false;
+                            continue;
+                        }
+                        const newEnt = this.purchaseItem(key);
+                        console.log('Purchase Auto: ', key, newEnt)
+                        if(newEnt.success) {
+                            return;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     save() {
@@ -72,6 +113,7 @@ export class ShopModule extends GameModule {
             items: this.purchasedItems,
             isUnlocked: this.isUnlocked,
             purchaseMultiplier: this.purchaseMultiplier,
+            autoPurchase: this.autoPurchase,
         }
     }
 
@@ -87,6 +129,7 @@ export class ShopModule extends GameModule {
         }
         this.isUnlocked = saveObject?.isUnlocked || false;
         this.purchaseMultiplier = saveObject?.purchaseMultiplier || 1;
+        this.autoPurchase = saveObject?.autoPurchase || {};
         this.sendItemsData();
     }
 
@@ -107,7 +150,7 @@ export class ShopModule extends GameModule {
 
     purchaseItem(itemId) {
         const newEnt = gameEntity.levelUpEntity(itemId);
-        console.log('Purchase: ', newEnt)
+        console.log('Purchase: ', itemId, newEnt)
         if(newEnt.success) {
             this.purchasedItems[itemId] = gameEntity.getLevel(itemId);
             this.leveledId = itemId;
@@ -166,6 +209,18 @@ export class ShopModule extends GameModule {
 
     }
 
+    sendGeneralShopStats(payload) {
+        const stats = [];
+        stats.push(gameEffects.getEffect('prices_discount'));
+        stats.push({
+            name: 'Charisma Price Discount',
+            value: charismaMod(gameEffects.getEffectValue('attribute_charisma'))
+        })
+        stats.push(gameEffects.getEffect('shop_max_stock'));
+        stats.push(gameEffects.getEffect('shop_stock_renew_rate'));
+        this.eventHandler.sendData('general-shop-stats', { stats })
+    }
+
     getItemsData() {
         const entities = gameEntity.listEntitiesByTags(['shop']);
         return {
@@ -177,9 +232,11 @@ export class ShopModule extends GameModule {
                 level: this.purchasedItems[entity.id] || 0,
                 affordable: gameEntity.getAffordable(entity.id),
                 potentialEffects: gameEntity.getEffects(entity.id, 1),
-                isLeveled: this.leveledId === entity.id
+                isLeveled: this.leveledId === entity.id,
+                isAutoPurchase: this.autoPurchase[entity.id] ?? false,
             })),
             purchaseMultiplier: this.purchaseMultiplier,
+            isAutomationUnlocked: gameEntity.getLevel('shop_item_purchase_manager') > 0
         }
     }
 
@@ -222,7 +279,7 @@ export class ShopModule extends GameModule {
                 ...resource,
                     affordable,
                     isLeveled: this.leveledId === resource.id,
-                    purchaseMultiplier: Math.max(1, Math.min(this.purchaseMultiplier, affordable.max))
+                    purchaseMultiplier: Math.max(1, Math.min(this.purchaseMultiplier, affordable.max)),
                 }
             }),
             purchaseMultiplier: this.purchaseMultiplier,

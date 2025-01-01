@@ -51,7 +51,7 @@ export class RandomEventsModule extends GameModule {
         }
 
         // Генеруємо нові події, якщо кількість активних подій менша за 5
-        if (Object.keys(this.activeEvents).length < 5 && Math.random() < delta * 0.008) {
+        if (Object.keys(this.activeEvents).length < 5 && Math.random() < delta * 0.005) {
             this.triggerRandomEvent();
         }
     }

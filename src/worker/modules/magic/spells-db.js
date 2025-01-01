@@ -162,6 +162,61 @@ export const initSpellsDB1 = () => {
         },
     })
 
+
+    registerSpell('spell_harvest_vision', {
+        name: 'Harvest Vision',
+        description: 'Temporarily enhances the caster\'s ability to locate valuable resources on the map. A glowing aura sharpens perception, increasing the likelihood of discovery.',
+        hasCap: false,
+        tags: ['spell', 'magic', 'mental', 'mental_magic'],
+        defaultCap: 0,
+        isAbstract: true,
+        level: 1,
+        onUse: (amount) => {
+
+        },
+        getUsageCooldown: () => {
+            return 10;
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'gathering_low_chance': {
+                        A: 0.05,
+                        B: 1.7,
+                        type: 0,
+                    }
+                }
+            },
+            get_consumption: () => ({
+                resources: {
+                    mana: {
+                        A: 1.5,
+                        B: 1.*getCostReduction('spell_harvest_vision'),
+                        type: 1,
+                    }
+                }
+            })
+        },
+        usageGain: {
+            get_consumption: () => ({
+                resources: {
+                    mana: {
+                        A: 1.5,
+                        B: 2*getCostReduction('spell_harvest_vision'),
+                        type: 1,
+                    }
+                }
+            })
+        },
+        attributes: {
+            duration: 10,
+            xpOnCast: 20,
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_spellbook') > 0
+        },
+    })
+
     registerSpell('spell_magic_recovery', {
         name: 'Less Magic Recovery',
         description: 'Heal yourself using magic',

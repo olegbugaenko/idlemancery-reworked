@@ -991,7 +991,7 @@ export const registerActionsStage1 = () => {
     })
 
     registerGameAction('action_gather_carefully', {
-        tags: ["action", "activity", "routine"],
+        tags: ["action", "activity", "routine", "gathering"],
         name: 'Careful Gathering',
         isAbstract: false,
         allowedImpacts: ['effects'],
@@ -1033,7 +1033,7 @@ export const registerActionsStage1 = () => {
 
 
     registerGameAction('action_gather_normal', {
-        tags: ["action", "activity", "routine"],
+        tags: ["action", "activity", "routine", "gathering"],
         name: 'Gathering',
         isAbstract: false,
         allowedImpacts: ['effects'],

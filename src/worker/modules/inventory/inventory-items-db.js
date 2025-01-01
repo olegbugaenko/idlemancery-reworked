@@ -809,6 +809,38 @@ export const registerInventoryItems = () => {
         sellPrice: 1500,
     })
 
+    gameResources.registerResource('inventory_insight_potion', {
+        name: 'Insight Potion',
+        hasCap: false,
+        tags: ['inventory', 'consumable'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        getUsageCooldown: () => {
+            return 20*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+        },
+        attributes: {
+
+        },
+        usageGain: {
+            income: {
+                resources: {
+                    'mage-xp': {
+                        A: 25000,
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            }
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0
+        },
+        sellPrice: 1500,
+    })
+
 
     gameResources.registerResource('inventory_amnesia_potion', {
         name: 'Amnesia Potion',

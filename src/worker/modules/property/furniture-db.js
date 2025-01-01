@@ -111,7 +111,7 @@ export const registerFurnitureStage1 = () => {
             consumption: {
                 resources: {
                     'living_space': {
-                        A: 2,
+                        A: 1,
                         B: 0,
                         type: 0
                     }
@@ -127,7 +127,7 @@ export const registerFurnitureStage1 = () => {
             },
             'living_space': {
                 A: 0,
-                B: 2,
+                B: 1,
                 type: 0
             }
         }),
@@ -312,6 +312,92 @@ export const registerFurnitureStage1 = () => {
             'coins': {
                 A: 2,
                 B: 50*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 2,
+                type: 0
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('furniture_armchair', {
+        tags: ["furniture", "upgrade", "purchaseable"],
+        name: 'Armchair',
+        description: 'Looking quite oddly, but comfortable',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_tent') > 3;
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'rest_efficiency': {
+                        A: 0.4,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 2,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 75*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 2,
+                type: 0
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('furniture_basin_bowl', {
+        tags: ["furniture", "upgrade", "purchaseable"],
+        name: 'Basin Bowl',
+        description: 'A small bowl or basin filled with water, typically used for washing hands or face.',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_tent') > 3;
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'rest_efficiency': {
+                        A: 0.5,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 2,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 150*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 1
             },
             'living_space': {

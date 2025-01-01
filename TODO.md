@@ -103,9 +103,9 @@ v0.0.3a:
 4. [V] Action trigger is not running
 5. [V] Add flat bonus to spells per level (kinda 1 + 0.02*maxLevel)
 6. [V] New unlocks indication
-7. Add upgrade for shop stock capacity
+7. [V] Add upgrade for shop stock capacity
 8. [V] Add new rare events effects
-9. Add workshop slots automation (Or think how to do it)
+9. [V] Add workshop slots automation (Or think how to do it)
 10. [V] Test knowledge related events
 11. [V] Adopt chances and amounts to gathering efficiency
 12. [V] Lists
@@ -114,6 +114,6 @@ v0.0.3a:
 15. [V] Double check rare herbs unlocks conditions
 16. [V] Check running crafting lists
 17. Add alchemy for instant XP effects and temporary XP boosts
-18. Add spell increasing loot
-19. Display shop trade stock
-20. [V] FUCKING PUBLISH LINK TO REDDIT
+18. [V] Add spell increasing loot
+19. [V] Display shop trade stock
+20. [V] Reduce urn space requirement + add "Armchair" and "Bathroom"

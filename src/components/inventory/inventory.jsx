@@ -358,6 +358,7 @@ export const InventoryCard = React.memo(({ isChanged, allowMultiConsume, isConsu
 
     return (<div ref={elementRef} className={`icon-card item flashable ${isSelected ? 'selected' : ''} ${isRare ? 'bluish' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)} onClick={handleClick} onContextMenu={handleContextMenu}>
         <TippyWrapper content={<div className={'hint-popup'}>
+            <p>{name}({formatInt(amount)})</p>
             {breakDown ? (<BreakDown breakDown={breakDown}/>) : null}
             <p>Balance: {formatValue(balance)}</p>
             <p>Left click to select</p>

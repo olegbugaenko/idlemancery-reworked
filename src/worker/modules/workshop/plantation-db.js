@@ -30,7 +30,7 @@ export const registerPlant = (id, inventoryResource, incomeBase, costBase, optio
             effectDeps: ['plantations_efficiency']
         },
         unlockCondition: () => {
-            return gameResources.isResourceUnlocked(inventoryResource)
+            return gameResources.isResourceUnlocked(inventoryResource) && gameResources.getResource('plantation_slots').income > 0
         },
         attributes: {
             baseXPCost: 10,
