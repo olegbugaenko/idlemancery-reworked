@@ -2056,7 +2056,7 @@ export const registerRandomEventsDb = () => {
                 effects: [{
                     id: 'temporary_knowledge_gain',
                     probability: 0.6,
-                    description: 'The water enhances your research, deepening your understanding. (+Knowledge gain for 15 minutes)',
+                    description: 'The water enhances your research, deepening your understanding. (+Knowledge gain for 5 minutes)',
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_knowledge_gain', 3);
@@ -2284,7 +2284,7 @@ export const registerRandomEventsDb = () => {
                 effects: [{
                     id: 'temporary_knowledge_gain',
                     probability: 0.8,
-                    description: 'The scroll deepens your understanding. (+Knowledge gain for 15 minutes)',
+                    description: 'The scroll deepens your understanding. (+Knowledge gain for 5 minutes)',
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_knowledge_gain', 1.6);
