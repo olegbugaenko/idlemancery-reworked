@@ -122,7 +122,7 @@ export const ShopUpgrades = ({ setItemDetails, purchaseItem, newUnlocks }) => {
     return (<div className={'items-cat'}>
         <PerfectScrollbar>
             <div className={'flex-container'}>
-                {itemsData.available.map(item => <NewNotificationWrap id={`shop_${item.id}`} className={'narrow-wrapper'} isNew={newUnlocks?.[`shop_${item.id}`]?.hasNew}>
+                {itemsData.available.map(item => <NewNotificationWrap key={`shop_${item.id}`} id={`shop_${item.id}`} className={'narrow-wrapper'} isNew={newUnlocks?.[`shop_${item.id}`]?.hasNew}>
                     <ItemCard onFlash={handleFlash} key={item.id} {...item} onPurchase={purchaseItem} onShowDetails={setItemDetails} toggleAutopurchase={toggleAutopurchase} isAutomationUnlocked={itemsData.isAutomationUnlocked}/>
                 </NewNotificationWrap>)}
                 {overlayPositions.map((position, index) => (
@@ -198,7 +198,7 @@ export const ShopItems = ({ setItemDetails, purchaseItem, newUnlocks }) => {
         <div className={'items-holder'}>
             <PerfectScrollbar>
                 <div className={'flex-container'}>
-                    {itemsData.available.map(item => <NewNotificationWrap id={`shop_${item.id}`} className={'narrow-wrapper'} isNew={newUnlocks?.[`shop_${item.id}`]?.hasNew}>
+                    {itemsData.available.map(item => <NewNotificationWrap key={`shop_${item.id}`} id={`shop_${item.id}`} className={'narrow-wrapper'} isNew={newUnlocks?.[`shop_${item.id}`]?.hasNew}>
                         <ItemResourceCard onFlash={handleFlash} key={item.id} {...item} onPurchase={purchaseItem} onShowDetails={setItemDetails}/>
                     </NewNotificationWrap>)}
                     {overlayPositions.map((position, index) => (
@@ -303,13 +303,13 @@ export const ItemDetails = ({itemId, category}) => {
                 </div>
                 <div className={'block'}>
                     <div className={'tags-container'}>
-                        {item.tags.map(tag => (<div className={'tag'}>{tag}</div> ))}
+                        {item.tags.map(tag => (<div key={tag} className={'tag'}>{tag}</div> ))}
                     </div>
                 </div>
                 <div className={'block'}>
                     <p>Cost: (x{formatInt(item.purchaseMultiplier)})</p>
                     <div className={'costs-wrap'}>
-                        {Object.values(item.affordable.affordabilities || {}).map(aff => <ResourceCost affordabilities={aff}/>)}
+                        {Object.values(item.affordable.affordabilities || {}).map(aff => <ResourceCost key={aff.id ?? aff.name} affordabilities={aff}/>)}
                     </div>
                 </div>
                 {(item.potentialEffects?.length || item.currentEffects) ? (<div className={'block'}>

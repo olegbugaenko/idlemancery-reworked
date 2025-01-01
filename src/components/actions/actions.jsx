@@ -358,7 +358,7 @@ export const Actions = ({}) => {
 
                     <div className={'categories flex-container'}>
                         <ul className={'menu'}>
-                            {actionsData.actionCategories.map(category => (<li className={`category ${category.isSelected ? 'active' : ''}`} onClick={() => setActionsFilter(category.id)}>
+                            {actionsData.actionCategories.map(category => (<li key={category.id} className={`category ${category.isSelected ? 'active' : ''}`} onClick={() => setActionsFilter(category.id)}>
                                 <NewNotificationWrap isNew={newUnlocks.actions?.items?.[category.id]?.hasNew}>
                                     <span>{category.name}({category.items.length})</span>
                                 </NewNotificationWrap>
@@ -375,7 +375,7 @@ export const Actions = ({}) => {
                                 {/*<input type={'text'} placeholder={'Search'} value={actionsData.searchText || ''} onChange={e => setSearch(e.target.value)}/>*/}
                             </label>
                             <label>
-                                <input type={"checkbox"} checked={actionsData.showHidden} onChange={toggleShowHidden}/>
+                                <input type={"checkbox"} checked={!!actionsData.showHidden} onChange={toggleShowHidden}/>
                                 Show hidden
                             </label>
                         </div>
@@ -388,7 +388,7 @@ export const Actions = ({}) => {
                                     {(provided) => (
                                         <div ref={provided.innerRef} {...provided.droppableProps} className="flex-container">
                                             {actionsData.available.map((action, index) =>
-                                                <NewNotificationWrap id={action.id} className={'narrow-wrapper'} isNew={newUnlocks.actions?.items?.[actionsData.selectedCategory]?.items?.[action.id]?.hasNew}>
+                                                <NewNotificationWrap key={action.id} id={action.id} className={'narrow-wrapper'} isNew={newUnlocks.actions?.items?.[actionsData.selectedCategory]?.items?.[action.id]?.hasNew}>
                                                     <ActionCard isEditingList={!!listData} index={index} key={action.id} {...action} onFlash={handleFlash} onActivate={activateAction} onShowDetails={setActionDetails} onSelect={onSelectAction} toggleHiddenAction={toggleHiddenAction}/>
                                                 </NewNotificationWrap>)}
                                             {provided.placeholder}
@@ -692,7 +692,7 @@ export const ActionDetailsComponent = React.memo(({...action}) => {
                 <p>Learn ETA's</p>
                 <div className={'stats-block'}>
                     {Object.entries(action.etas).map(([level, eta]) => (
-                        <p><span>Level {formatInt(level)}: </span> <span>{secondsToString(eta)}</span></p>
+                        <p key={level}><span>Level {formatInt(level)}: </span> <span>{secondsToString(eta)}</span></p>
                     ))}
                 </div>
             </div>
@@ -798,21 +798,21 @@ export const ActionListsPanel = ({ runningList, editListToDetails, lists, viewLi
             </div>
             <div className={'automation-enabled panel-col'}>
                 <label>
-                    <input type={'checkbox'} checked={automationEnabled} onChange={toggleAutomation}/>
+                    <input type={'checkbox'} checked={!!automationEnabled} onChange={toggleAutomation}/>
                     Lists automation enabled
                 </label>
             </div>
             <div className={'panel-col automation-interval'}>
                 <label>
                     Switch lists interval:
-                    <select onChange={e => changeAutomationInterval(+e.target.value)}>
-                        <option value={10} selected={autotriggerIntervalSetting === 10}>10 seconds</option>
-                        <option value={30} selected={autotriggerIntervalSetting === 30}>30 seconds</option>
-                        <option value={60} selected={autotriggerIntervalSetting === 60}>1 minute</option>
-                        <option value={300} selected={autotriggerIntervalSetting === 300}>5 minutes</option>
-                        <option value={900} selected={autotriggerIntervalSetting === 900}>15 minutes</option>
-                        <option value={1800} selected={autotriggerIntervalSetting === 1800}>30 minutes</option>
-                        <option value={3600} selected={autotriggerIntervalSetting === 3600}>1 hour</option>
+                    <select onChange={e => changeAutomationInterval(+e.target.value)} value={autotriggerIntervalSetting}>
+                        <option value={10}>10 seconds</option>
+                        <option value={30}>30 seconds</option>
+                        <option value={60}>1 minute</option>
+                        <option value={300}>5 minutes</option>
+                        <option value={900}>15 minutes</option>
+                        <option value={1800}>30 minutes</option>
+                        <option value={3600}>1 hour</option>
                     </select>
                 </label>
             </div>
@@ -932,7 +932,7 @@ export const ListEditor = React.memo(({
         <div className={'main-wrap'}>
             <div className={'main-row'}>
                 <span>Name</span>
-                {isEditing ? (<input type={'text'} value={editing.name} onChange={(e) => onUpdateListValue('name', e.target.value)}/>) : (<span>{editing.name}</span>)}
+                {isEditing ? (<input type={'text'} value={editing.name ?? ''} onChange={(e) => onUpdateListValue('name', e.target.value)}/>) : (<span>{editing.name}</span>)}
                 <HowToSign scope={'action-lists'} />
             </div>
         </div>

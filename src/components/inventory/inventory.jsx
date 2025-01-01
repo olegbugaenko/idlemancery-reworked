@@ -276,7 +276,7 @@ export const Inventory = ({}) => {
             <div className={'ingame-box inventory'}>
                 <div className={'categories flex-container'}>
                     <ul className={'menu'}>
-                        {inventoryData.itemCategories.map(category => (<li className={`category ${category.isSelected ? 'active' : ''}`} onClick={() => setItemsFilter(category.id)}>
+                        {inventoryData.itemCategories.map(category => (<li key={category.id} className={`category ${category.isSelected ? 'active' : ''}`} onClick={() => setItemsFilter(category.id)}>
                             <NewNotificationWrap isNew={newUnlocks.inventory?.items?.[category.id]?.hasNew}>
                                 <span>{category.name}({category.items.length})</span>
                             </NewNotificationWrap>
@@ -286,7 +286,7 @@ export const Inventory = ({}) => {
                 <div className={'inventory-items-wrap'}>
                     <PerfectScrollbar>
                         <div className={'flex-container'}>
-                            {inventoryData.available.map(item => <NewNotificationWrap id={`inventory_${item.id}`} className={'narrow-wrapper'} isNew={newUnlocks.inventory?.items?.[inventoryData.selectedFilterId]?.items?.[`inventory_${item.id}`]?.hasNew}>
+                            {inventoryData.available.map(item => <NewNotificationWrap key={`inventory_${item.id}`} id={`inventory_${item.id}`} className={'narrow-wrapper'} isNew={newUnlocks.inventory?.items?.[inventoryData.selectedFilterId]?.items?.[`inventory_${item.id}`]?.hasNew}>
                                 <InventoryCard
                                 key={item.id}
                                 isSelected={item.id === detailOpenedId?.id}
@@ -456,7 +456,7 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
                 </div>
                 <div className={'block'}>
                     <div className={'tags-container'}>
-                        {item.tags.map(tag => (<div className={'tag'}>{tag}</div> ))}
+                        {item.tags.map(tag => (<div key={tag} className={'tag'}>{tag}</div> ))}
                     </div>
                 </div>
                 {item?.effects?.length ? (<div className={'block'}>

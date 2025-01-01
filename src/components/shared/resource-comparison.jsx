@@ -25,6 +25,7 @@ export const ResourceComparison = ({ effects1, effects2 }) => {
         const nextMapped = mapEffect(nextValue);
 
         return {
+            key,
             title: prevMapped.title || nextMapped.title,
             prevValue: prevMapped.value,
             nextValue: nextMapped.value,
@@ -38,7 +39,7 @@ export const ResourceComparison = ({ effects1, effects2 }) => {
 
 
     return (<div className={'effects-table'}>
-        {table.map(({ title, prevValue, nextValue, isImprovement, isWorse}) => (<div className={'effect-line'}>
+        {table.map(({ title, prevValue, nextValue, isImprovement, isWorse, key}) => (<div key={key} className={'effect-line'}>
             <span className={'title'}>{title}</span>
             <span className={'prevVal'}>{prevValue}</span>
             <span className={`nextVal${isImprovement ? ' green' : ''}${isWorse ? ' red' : ''}`}>{nextValue}</span>

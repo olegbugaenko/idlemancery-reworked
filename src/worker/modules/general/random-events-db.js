@@ -2481,7 +2481,7 @@ export const registerRandomEventsDb = () => {
                         resources: {
                             mana: {
                                 A: 0,
-                                B: 10 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability'), 1.5),
+                                B: 10 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability_effect'), 1.5),
                                 type: 0,
                             }
                         }
@@ -2494,8 +2494,8 @@ export const registerRandomEventsDb = () => {
                     description: 'The arcane energies enhance your magical aptitude. (+1 Magic Ability)',
                     unlockCondition: () => true,
                     onTrigger: () => {
-                        gameEntity.setEntityLevel('random_events_magic_ability', gameEntity.getLevel('random_events_magic_ability') + 1, true);
-                        gameResources.addResource('mana', -10 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability'), 1.5));
+                        gameEntity.setEntityLevel('random_events_magic_ability_effect', gameEntity.getLevel('random_events_magic_ability_effect') + 1, true);
+                        gameResources.addResource('mana', -10 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability_effect'), 1.5));
                     }
                 }, {
                     id: 'temporary_health_debuff',
@@ -2504,7 +2504,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_health_debuff', 1.5);
-                        gameResources.addResource('mana', -30 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability'), 1.5));
+                        gameResources.addResource('mana', -30 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability_effect'), 1.5));
                     }
                 }]
             },
@@ -2607,7 +2607,7 @@ export const registerRandomEventsDb = () => {
                         resources: {
                             mana: {
                                 A: 0,
-                                B: 10 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability'), 1.5),
+                                B: 10 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability_effect'), 1.5),
                                 type: 0,
                             }
                         }
@@ -2620,8 +2620,8 @@ export const registerRandomEventsDb = () => {
                     description: 'The pedestal imbues you with arcane knowledge. (+1 Magic Ability)',
                     unlockCondition: () => true,
                     onTrigger: () => {
-                        gameEntity.setEntityLevel('random_events_magic_ability', gameEntity.getLevel('random_events_magic_ability') + 1, true);
-                        gameResources.addResource('mana', -10 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability'), 1.5));
+                        gameEntity.setEntityLevel('random_events_magic_ability_effect', gameEntity.getLevel('random_events_magic_ability_effect') + 1, true);
+                        gameResources.addResource('mana', -10 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability_effect'), 1.5));
                     }
                 }, {
                     id: 'temporary_health_debuff',
@@ -2630,7 +2630,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_health_debuff', 1.2);
-                        gameResources.addResource('mana', -20 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability'), 1.5));
+                        gameResources.addResource('mana', -20 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability_effect'), 1.5));
                     }
                 }]
             },
@@ -2668,7 +2668,7 @@ export const registerRandomEventsDb = () => {
                         resources: {
                             mana: {
                                 A: 0,
-                                B: 40 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability'), 1.5),
+                                B: 40 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability_effect'), 1.5),
                                 type: 0,
                             }
                         }
@@ -2681,8 +2681,8 @@ export const registerRandomEventsDb = () => {
                     description: 'The crystals enhance your magical aptitude. (+1 Magic Ability)',
                     unlockCondition: () => true,
                     onTrigger: () => {
-                        gameEntity.setEntityLevel('random_events_magic_ability', gameEntity.getLevel('random_events_magic_ability') + 1, true);
-                        gameResources.addResource('mana', -40 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability'), 1.5));
+                        gameEntity.setEntityLevel('random_events_magic_ability_effect', gameEntity.getLevel('random_events_magic_ability_effect') + 1, true);
+                        gameResources.addResource('mana', -40 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability_effect'), 1.5));
                     }
                 }, {
                     id: 'temporary_health_debuff',
@@ -2742,7 +2742,7 @@ export const registerRandomEventsDb = () => {
                         resources: {
                             mana: {
                                 A: 0,
-                                B: 50 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability'), 1.5),
+                                B: 50 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability_effect'), 1.5),
                                 type: 0,
                             }
                         }
@@ -2755,8 +2755,8 @@ export const registerRandomEventsDb = () => {
                     description: 'The ritual strengthens your magical connection. (+1 Magic Ability)',
                     unlockCondition: () => true,
                     onTrigger: () => {
-                        gameEntity.setEntityLevel('random_events_magic_ability', gameEntity.getLevel('random_events_magic_ability') + 1, true);
-                        gameResources.addResource('mana', -50 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability'), 1.5));
+                        gameEntity.setEntityLevel('random_events_magic_ability_effect', gameEntity.getLevel('random_events_magic_ability_effect') + 1, true);
+                        gameResources.addResource('mana', -50 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability_effect'), 1.5));
                     }
                 }, {
                     id: 'temporary_health_debuff',

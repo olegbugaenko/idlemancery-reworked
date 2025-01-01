@@ -133,13 +133,13 @@ export const ItemDetails = ({itemId, category}) => {
                 </div>
                 <div className={'block'}>
                     <div className={'tags-container'}>
-                        {item.tags.map(tag => (<div className={'tag'}>{tag}</div> ))}
+                        {item.tags.map(tag => (<div key={tag} className={'tag'}>{tag}</div> ))}
                     </div>
                 </div>
                 <div className={'block'}>
                     <p>Cost:</p>
                     <div className={'costs-wrap'}>
-                        {Object.values(item.affordable.affordabilities || {}).map(aff => <ResourceCost affordabilities={aff}/>)}
+                        {Object.values(item.affordable.affordabilities || {}).map(aff => <ResourceCost key={aff.id ?? aff.name} affordabilities={aff}/>)}
                     </div>
                 </div>
                 <div className={'block'}>

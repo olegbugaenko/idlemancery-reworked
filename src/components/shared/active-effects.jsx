@@ -26,7 +26,7 @@ export const ActiveEffects = () => {
     })
 
     return (<div className={'active-effects-wrap'}>
-        {effectsData.list.map(one => (<ActiveEffectItem {...one} />))}
+        {effectsData.list.map(one => (<ActiveEffectItem key={one.id} {...one} />))}
     </div> )
 }
 

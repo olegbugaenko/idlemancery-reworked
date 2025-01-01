@@ -6,6 +6,11 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+                <h3>Idle Awakening v0.0.6a</h3>
+                <div className={'features'}>
+                    <p>Hotfix freeze issue when some events are triggered</p>
+                    <p>Minor technical & performance-related changes</p>
+                </div>
                 <h3>Idle Awakening v0.0.6</h3>
                 <div className={'features'}>
                     <p>Added new spell, improving exploration</p>

@@ -60,7 +60,7 @@ export const ResourcesBar = () => {
                 affClassData = ` monitored ${aff.isAffordable ? 'affordable' : (aff.hardLocked ? 'locked' : 'unavailable')}`
             }
 
-            return (<div className={`holder ${aff ? 'monitored' : ''}`}><p className={`resource-item ${affClassData}`}>
+            return (<div key={res.id} className={`holder ${aff ? 'monitored' : ''}`}><p className={`resource-item ${affClassData}`}>
                 <span className={'resource-label'}>{res.name}</span>
                 <TippyWrapper content={<div className={'hint-popup'}><BreakDown breakDown={res.storageBreakdown}/>{res.eta >= 0 ? `${secondsToString(res.eta)} to full` : `${secondsToString(-res.eta)} to empty`}</div> }>
                     <span className={'resource-amount'}>{formatValue(res.amount || 0)}{res.hasCap ? `/${formatValue(res.cap || 0)}` : ''}</span>
@@ -110,7 +110,7 @@ export const AttributesBar = () => {
 
             // console.log('res: ', res.breakDown);
 
-            return (<div className={`holder ${aff ? 'monitored' : ''}`}><p className={`resource-item ${affClassData}`}>
+            return (<div key={res.id} className={`holder ${aff ? 'monitored' : ''}`}><p className={`resource-item ${affClassData}`}>
                 <TippyWrapper content={<div className={'hint-popup'}>
                     {res.description}
                     {res.nextUnlock ? (<div className={'unlock block'}>
@@ -139,7 +139,7 @@ export const BreakDown = ({ breakDown }) => {
             <span className={'sub-title'}>Income</span>
             <div className={'box-inner'}>
                 {breakDown.income.filter(one => Math.abs(one.value) > 1.e-8).map(one => {
-                    return (<p className={'line'}>
+                    return (<p key={one.id} className={'line'}>
                         <span className={'name'}>{one.name}: </span>
                         <span className={'value'}>+{formatValue(one.value, 3)}</span>
                     </p> )
@@ -150,7 +150,7 @@ export const BreakDown = ({ breakDown }) => {
             <span className={'sub-title'}>Multiplier</span>
             <div className={'box-inner'}>
                 {breakDown.multiplier.filter(one => Math.abs(one.value - 1) > 1.e-8).map(one => {
-                    return (<p className={'line'}>
+                    return (<p key={one.id} className={'line'}>
                         <span className={'name'}>{one.name}: </span>
                         <span className={'value'}>X{formatValue(one.value, 3)}</span>
                     </p> )
@@ -161,7 +161,7 @@ export const BreakDown = ({ breakDown }) => {
             <span className={'sub-title'}>Consumption</span>
             <div className={'box-inner'}>
                 {breakDown.consumption.filter(one => Math.abs(one.value) > 1.e-8).map(one => {
-                    return (<p className={'line'}>
+                    return (<p key={one.id} className={'line'}>
                         <span className={'name'}>{one.name}: </span>
                         <span className={'value'}>-{formatValue(one.value, 3)}</span>
                     </p> )

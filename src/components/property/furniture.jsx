@@ -92,7 +92,7 @@ export const FurnitureUpgrades = ({ setItemDetails, purchaseItem, deleteItem, ne
         <div className={'furnitures-cat'}>
             <PerfectScrollbar>
                 <div className={'flex-container'}>
-                    {furnituresData.available.map(furniture => <NewNotificationWrap id={furniture.id} className={'narrow-wrapper'} isNew={newUnlocks?.[furniture.id]?.hasNew}>
+                    {furnituresData.available.map(furniture => <NewNotificationWrap key={furniture.id} id={furniture.id} className={'narrow-wrapper'} isNew={newUnlocks?.[furniture.id]?.hasNew}>
                         <ItemCard key={furniture.id} {...furniture} onFlash={handleFlash} onPurchase={purchaseItem} onShowDetails={setItemDetails} onDelete={deleteItem}/>
                     </NewNotificationWrap>)}
                     {overlayPositions.map((position, index) => (

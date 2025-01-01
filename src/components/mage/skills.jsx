@@ -63,7 +63,7 @@ export const Skills = () => {
         <div className={'skills-container'}>
             <PerfectScrollbar>
                 <div className={'cards'}>
-                    {skillsData.available.map(skill => (<ItemSkillCard {...skill} onFlash={handleFlash} onPurchase={onPurchase} onShowDetails={onShowDetails}/>))}
+                    {skillsData.available.map(skill => (<ItemSkillCard key={skill.id} {...skill} onFlash={handleFlash} onPurchase={onPurchase} onShowDetails={onShowDetails}/>))}
                     {overlayPositions.map((position, index) => (
                         <FlashOverlay key={index} position={position} />
                     ))}
