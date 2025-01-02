@@ -1,4 +1,4 @@
-import { gameEntity, gameCore, gameEffects } from "game-framework"
+import { gameEntity } from 'game-framework';
 
 export const registerSkillsStage1 = () => {
 
@@ -331,9 +331,9 @@ export const registerSkillsStage1 = () => {
         }),
     })
 
-    gameEntity.registerGameEntity('skill_sorcer', {
+    gameEntity.registerGameEntity('skill_sorcerer', {
         tags: ["skill", "upgrade", "purchaseable"],
-        name: 'Sorcer',
+        name: 'Sorcerer',
         description: 'Increase your mana regen and capacity',
         level: 0,
         unlockCondition: () => {
