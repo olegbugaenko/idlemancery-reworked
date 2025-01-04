@@ -147,8 +147,12 @@ p.hint, span.hint {
     display: flex;
     justify-content: space-between;
     font-size: 14px;
-    margin-bottom: 3px;
+    padding-top: 3px;
     border-bottom: 1px solid #222233;
+}
+
+.content-wrap .sidebar .holder:hover {
+    background-color: #222222;
 }
 
 .sidebar .holder.monitored {
@@ -295,6 +299,18 @@ p.hint, span.hint {
     border-color: var(--highlight);
     background: var(--darkbg);
     box-shadow: 0px 0px 12px var(--highlight);
+}
+
+.card.use {
+    border-color: var(--yellow);
+    background: var(--darkbg);
+    box-shadow: 0px 0px 12px var(--yellow);
+}
+
+.card.produce {
+    border-color: var(--green);
+    background: var(--darkbg);
+    box-shadow: 0px 0px 12px var(--green);
 }
 
 .card .buttons {
@@ -714,11 +730,11 @@ h4 {
     width: 80px;
 }
 
-.list-editor .main-wrap .main-row {
+.list-editor .main-wrap.main-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px;
+    padding: 0 8px;
 }
 
 .list-editor .buttons {
@@ -777,6 +793,32 @@ h4 {
 .rules .rule input,
 .rules .rule select {
     width: 60px;
+}
+
+.rules.autocheck.matched .pattern-wrap .pattern-label {
+    color: var(--green)
+}
+
+.rules.autocheck.matched .pattern-wrap input {
+    border-color: var(--green)
+}
+
+.rules.autocheck.unmatched .pattern-wrap .pattern-label {
+    color: var(--yellow)
+}
+
+.rules.autocheck.unmatched .pattern-wrap input {
+    border-color: var(--yellow)
+}
+
+.rules.autocheck .rule.row.matched {
+    border-color: var(--green);
+    box-shadow: 0 0px 4px var(--green);
+}
+
+.rules.autocheck .rule.row.unmatched {
+    border-color: var(--yellow);
+    box-shadow: 0 0px 4px var(--yellow);
 }
 
 .autoconsume-setting .rules .rule .col {
@@ -1720,4 +1762,12 @@ span.highlighted-span {
 
 .breakdown .line {
     font-size: 13px;
+}
+
+.slots-available {
+    color: var(--green);
+}
+
+.slots-unavailable {
+    color: var(--yellow);
 }

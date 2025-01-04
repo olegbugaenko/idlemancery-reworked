@@ -33,26 +33,7 @@ export class GuildsModule extends GameModule {
 
     initialize() {
 
-        gameEffects.registerEffect('guild_reputation_rate', {
-            name: 'Guild Reputation Rate',
-            defaultValue: 1,
-            minValue: 1
-        })
 
-        gameResources.registerResource('guild_reputation', {
-            name: 'Guild Reputation',
-            hasCap: true,
-            tags: ['guild', 'reputation'],
-            defaultCap: 0,
-        })
-
-        gameResources.registerResource('guild-points', {
-            name: 'Guild Points',
-            hasCap: true,
-            tags: ['guild', 'points'],
-            defaultCap: 0,
-            isService: true,
-        })
 
         registerGuilds();
         registerGuildUpgrades();

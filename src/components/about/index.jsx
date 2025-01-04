@@ -6,6 +6,18 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+                <h3>Idle Awakening v0.0.7</h3>
+                <div className={'features'}>
+                    <p>Significantly increased sell prices</p>
+                    <p>Hovering over resources and attributes on left panel now highlights actions using/producing them</p>
+                    <p>Automation rules now highlighted green/yellow hen they complete or not in runtime, to make automations debugging easier</p>
+                    <p>Actions can be searched by resources and effects</p>
+                    <p>Action lists now can be sorted</p>
+                    <p>When editing list hover over tile will show hint with map drops</p>
+                    <p>Crafting/Plantation and other slots are now highlighted green/orange when available/unavailable to reduce confusion</p>
+                    <p>Fixed bug when hiding actions didn't saved</p>
+                    <p>Fixed UI bug with right sidebar overlapping on map</p>
+                </div>
                 <h3>Idle Awakening v0.0.6a</h3>
                 <div className={'features'}>
                     <p>Hotfix freeze issue when some events are triggered</p>

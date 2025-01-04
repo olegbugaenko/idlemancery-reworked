@@ -110,161 +110,52 @@ export class ActionsModule extends GameModule {
 
     initialize() {
 
-        gameEffects.registerEffect('rest_efficiency', {
-            name: 'Rest Efficiency',
-            defaultValue: 1.,
-            minValue: 1,
-        })
-
-        gameEffects.registerEffect('begging_efficiency', {
-            name: 'Begging Efficiency',
-            defaultValue: 1.,
-            minValue: 1,
-        })
-
-        gameEffects.registerEffect('clean_stable_efficiency', {
-            name: 'Clean Stable Efficiency',
-            defaultValue: 1.,
-            minValue: 1,
-        })
-
-        gameEffects.registerEffect('gathering_efficiency', {
-            name: 'Gathering Efficiency',
-            defaultValue: 1.,
-            minValue: 1,
-        })
-
-        gameEffects.registerEffect('gathering_perception', {
-            name: 'Gathering Perception',
-            defaultValue: 1.,
-            minValue: 1,
-        })
-
-        gameEffects.registerEffect('gathering_low_chance', {
-            name: 'Low Rarity Gather Prob.',
-            defaultValue: 1.,
-            minValue: 1,
-        })
-
-        gameEffects.registerEffect('gathering_herbs_amount', {
-            name: 'Herbs Gathered',
-            defaultValue: 1.,
-            minValue: 1,
-        })
-
-        gameEffects.registerEffect('read_books_efficiency', {
-            name: 'Read Books Efficiency',
-            defaultValue: 1.,
-            minValue: 1,
-        })
-
-        gameEffects.registerEffect('books_learning_rate', {
-            name: 'Read Books Learning Rate',
-            defaultValue: 1.,
-            minValue: 1,
-            saveBalanceTree: true,
-        })
-
-        gameEffects.registerEffect('spiritual_learning_rate', {
-            name: 'Spiritual Learning Rate',
-            defaultValue: 1.,
-            minValue: 1,
-            saveBalanceTree: true,
-        })
-
-        gameEffects.registerEffect('mental_training_learning_rate', {
-            name: 'Mental Training Rate',
-            defaultValue: 1.,
-            minValue: 1,
-            saveBalanceTree: true,
-        })
-
-        gameEffects.registerEffect('social_training_learning_rate', {
-            name: 'Social Training Rate',
-            defaultValue: 1.,
-            minValue: 1,
-            saveBalanceTree: true,
-        })
-
-        gameEffects.registerEffect('max_focus_time', {
-            name: 'Max focus time',
-            defaultValue: 300.,
-            minValue: 300,
-        })
-
-        gameEffects.registerEffect('coins_earned_bonus', {
-            name: 'Coins Earning Bonus',
-            defaultValue: 1.,
-            minValue: 1,
-        })
-
-        gameEffects.registerEffect('physical_training_learn_speed', {
-            name: 'Physical Training Learning',
-            defaultValue: 1.,
-            minValue: 1,
-            saveBalanceTree: true,
-        })
-
-        gameEffects.registerEffect('routine_learning_speed', {
-            name: 'Routine Learning',
-            defaultValue: 1.,
-            minValue: 1.,
-            saveBalanceTree: true,
-        })
-
-        gameEffects.registerEffect('yoga_learn_speed', {
-            name: 'Yoga Learning Rate',
-            defaultValue: 1.,
-            minValue: 1.,
-            saveBalanceTree: true,
-        })
-
-        gameEffects.registerEffect('manual_labor_efficiency', {
-            name: 'Manual Labor Efficiency',
-            defaultValue: 1.,
-            minValue: 1.,
-        })
-
-        gameEffects.registerEffect('job_learning_rate', {
-            name: 'Jobs Learning Rate',
-            defaultValue: 1.,
-            minValue: 1.,
-        })
-
-        gameEffects.registerEffect('crafting_efficiency', {
-            name: 'Crafting Efficiency',
-            defaultValue: 1.,
-            minValue: 1.,
-        })
-
-        gameEffects.registerEffect('alchemy_efficiency', {
-            name: 'Alchemy Efficiency',
-            defaultValue: 1.,
-            minValue: 1.,
-        })
-
-        registerActionsStage1();
-        this.actions = {};
-
-        gameEffects.registerEffect('learning_rate', {
-            name: 'Learning Rate',
-            defaultValue: 1.,
-            minValue: 1,
-            saveBalanceTree: true,
-        })
-
-        gameEffects.registerEffect('walking_learning_rate', {
-            name: 'Walking Learning Rate',
-            defaultValue: 1.,
-            minValue: 1,
-            saveBalanceTree: true,
-        })
-
         gameEntity.registerGameEntity('runningAction', {
             name: 'Idling',
             level: 0,
         })
 
+        registerActionsStage1();
+        this.actions = {};
+
+    }
+
+    setMonitored({ type, id }) {
+        if(!id) {
+            this.monitorData = null;
+            return;
+        }
+        this.monitorData = {
+            type,
+            id
+        }
+    }
+
+    getMonitoredData(entity) {
+        if(!this.monitorData || !entity) return null;
+
+        if(this.monitorData.type === 'attribute') {
+            if(entity.attributes.primaryAttribute === this.monitorData.id) {
+                return 'use'
+            }
+            const increment = this.packEffects(
+                gameEntity.getEffects(entity.id, 1, this.actions[entity.id]?.level || 1, true),
+                item => item.type === 'effects'
+            );
+            if(increment[this.monitorData.id]?.value) {
+                return 'produce'
+            }
+        }
+
+        if(this.monitorData.type === 'resource') {
+            const rsEff = this.packEffects(gameEntity.getEffects(entity.id, 0, this.actions[entity.id]?.level || 1, true)
+                    .filter(eff => eff.type === 'resources'));
+
+            if(rsEff[this.monitorData.id]?.value) {
+                return rsEff[this.monitorData.id].scope === 'consumption' ? 'use' : 'produce'
+            }
+
+        }
     }
 
     getActionXPMax(id) {
@@ -362,7 +253,9 @@ export class ActionsModule extends GameModule {
                         this.reassertRunningEfforts();
                     }
                     gameCore.getModule('unlock-notifications').generateNotifications();
-                    this.sendActionsData(this.selectedFilterId);
+                    this.sendActionsData(this.selectedFilterId, {
+                        searchData: this.searchData,
+                    });
                 }
             })
 
@@ -388,6 +281,7 @@ export class ActionsModule extends GameModule {
             activeActions: this.activeActions,
             actionLists: this.lists.save(),
             selectedFilterId: this.selectedFilterId,
+            searchData: this.searchData,
             focus: this.focus,
         }
     }
@@ -404,6 +298,7 @@ export class ActionsModule extends GameModule {
                 this.actions[id].focus = saveObject.actions[id].focus;
                 this.actions[id].timeInvested = saveObject.actions[id].timeInvested || 0;
                 this.actions[id].xpEarned = saveObject.actions[id].xpEarned || 0;
+                this.actions[id].isHidden = saveObject.actions[id].isHidden || false;
             }
         }
         this.stopRunningActions();
@@ -420,7 +315,13 @@ export class ActionsModule extends GameModule {
         }
         this.selectedFilterId = saveObject?.selectedFilterId || 'all';
         this.focus = saveObject?.focus;
-        this.sendActionsData(this.selectedFilterId);
+        this.searchData = saveObject?.searchData || {
+            search: '',
+            selectedScopes: ['name','tags']
+        };
+        this.sendActionsData(this.selectedFilterId,{
+            searchData: this.searchData,
+        });
     }
 
     setAction(actionId, amount, bForce = false) {
@@ -685,6 +586,11 @@ export class ActionsModule extends GameModule {
         if(selectedScopes.includes('name') && one.name.toLowerCase().includes(search)) return true;
         if(selectedScopes.includes('tags') && one.tags && one.tags.some(tag => tag.includes(search))) return true;
         if(selectedScopes.includes('description') && one.description && one.description.toLowerCase().includes(search)) return true;
+        if(selectedScopes.includes('resources') && one.searchableMeta?.['resources']
+            && one.searchableMeta?.['resources'].some(tag => tag.includes(search.toLowerCase()))) return true;
+        if(selectedScopes.includes('effects') && one.searchableMeta?.['effects']
+            && one.searchableMeta?.['effects'].some(tag => tag.includes(search.toLowerCase()))) return true;
+
 
         return false;
     }
@@ -698,7 +604,7 @@ export class ActionsModule extends GameModule {
                     'actions',
                     filter.id,
                     action.id,
-                    action.isUnlocked
+                    action.isUnlocked && !action.isCapped
                 )
             })
         })
@@ -763,7 +669,8 @@ export class ActionsModule extends GameModule {
                 item => item.type === 'effects'
             ),
             isTraining: gameEntity.getAttribute(entity.id, 'isTraining'),
-            isHidden: this.actions?.[entity.id]?.isHidden
+            isHidden: this.actions?.[entity.id]?.isHidden,
+            monitored: this.getMonitoredData(entity)
         }))
 
         const current = this.activeActions ? available.filter(one => this.activeActions.some(act => act.originalId === one.id)) : null;

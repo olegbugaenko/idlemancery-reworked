@@ -153,7 +153,7 @@ const mapCompareType = {
 };
 
 const RulesList = React.memo(
-    ({ prefix = 'default', rules, isEditing, setRuleValue, deleteRule, pattern, setPattern }) => {
+    ({ prefix = 'default', rules, isEditing, setRuleValue, deleteRule, pattern, setPattern, isAutoCheck }) => {
         const worker = useContext(WorkerContext);
 
         const { onMessage, sendData } = useWorkerClient(worker);
@@ -161,6 +161,7 @@ const RulesList = React.memo(
         const [actions, setActions] = useState([]);
         const [actionsLists, setActionsLists] = useState([]);
         const [tags, setTags] = useState([]);
+        const [rulesMatched, setRulesMatched] = useState(null);
 
         useEffect(() => {
             sendData('query-all-resources', { prefix });
@@ -168,7 +169,24 @@ const RulesList = React.memo(
             sendData('query-all-action-tags', { prefix });
             sendData('query-actions-lists', { prefix });
             console.log('Sent queries...');
-        }, [])
+        }, []);
+
+        useEffect(() => {
+            if (isAutoCheck) {
+                const interval = setInterval(() => {
+                    sendData('check-rule-conditions-matched', { prefix, rules, pattern });
+                }, 1000);
+
+                return () => {
+                    clearInterval(interval);
+                };
+            }
+        }, [isAutoCheck, rules, pattern, prefix]);
+
+        onMessage(`rule-conditions-matched-${prefix}`, (payload) => {
+            console.log('set-matched', payload);
+            setRulesMatched(payload);
+        })
 
         onMessage(`all-resources-${prefix}`, (payload) => {
             setResources(payload);
@@ -204,7 +222,7 @@ const RulesList = React.memo(
         }
 
         return (
-            <div className="rules">
+            <div className={`rules ${isAutoCheck ? 'autocheck' : ''} ${rulesMatched?.result ? 'matched' : 'unmatched'}`}>
                 {rules.map((rule, index) => {
                     const compareTypeOptions = Object.keys(mapCompareType).map((key) => ({
                         value: key,
@@ -293,7 +311,7 @@ const RulesList = React.memo(
                         : false;
 
                     return (
-                        <div className="rule row add-row" key={index}>
+                        <div className={`rule row add-row ${rulesMatched?.ruleResults?.[index] ? 'matched' : 'unmatched'}`} key={index}>
                             {/* Селект для compare_type */}
                             <div className="col compare-type">
                                 {isEditing ? (

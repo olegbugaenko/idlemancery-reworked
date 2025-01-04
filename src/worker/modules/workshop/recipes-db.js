@@ -486,7 +486,7 @@ export const registerCraftingRecipes = () => {
             effectDeps: ['alchemy_efficiency']
         },
         unlockCondition: () => {
-            return true
+            return gameEntity.getLevel('shop_item_alchemy_courses') > 0
         },
         attributes: {
             baseXPCost: 10,
@@ -547,7 +547,7 @@ export const registerCraftingRecipes = () => {
             effectDeps: ['alchemy_efficiency']
         },
         unlockCondition: () => {
-            return true
+            return gameEntity.getLevel('shop_item_alchemy_courses') > 0
         },
         attributes: {
             baseXPCost: 10,
@@ -609,7 +609,7 @@ export const registerCraftingRecipes = () => {
             effectDeps: ['alchemy_efficiency']
         },
         unlockCondition: () => {
-            return true
+            return gameEntity.getLevel('shop_item_alchemy_courses') > 0
         },
         attributes: {
             baseXPCost: 10,
@@ -669,7 +669,7 @@ export const registerCraftingRecipes = () => {
             effectDeps: ['alchemy_efficiency']
         },
         unlockCondition: () => {
-            return true
+            return gameEntity.getLevel('shop_item_alchemy_courses') > 0
         },
         attributes: {
             baseXPCost: 10,
@@ -730,7 +730,7 @@ export const registerCraftingRecipes = () => {
             effectDeps: ['alchemy_efficiency']
         },
         unlockCondition: () => {
-            return true
+            return gameEntity.getLevel('shop_item_alchemy_courses') > 0
         },
         attributes: {
             baseXPCost: 10,

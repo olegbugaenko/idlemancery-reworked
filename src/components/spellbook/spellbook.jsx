@@ -368,6 +368,7 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
                         deleteRule={deleteAutoconsumeRule}
                         setRuleValue={setAutoconsumeRuleValue}
                         setPattern={setAutocastPattern}
+                        isAutoCheck={true}
                     />
 
                 </div>

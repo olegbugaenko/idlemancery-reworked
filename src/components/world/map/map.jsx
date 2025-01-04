@@ -65,7 +65,7 @@ const customStyles = {
     }),
 };
 
-export const Map = ({ setItemDetails, openListDetails }) => {
+export const Map = ({ setItemDetails, openListDetails, isEditList }) => {
 
     const worker = useContext(WorkerContext);
 
@@ -85,6 +85,8 @@ export const Map = ({ setItemDetails, openListDetails }) => {
         },
         filterableLoot: []
     });
+
+    const [hintForTileShown, setHintShown] = useState(null);
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -119,9 +121,13 @@ export const Map = ({ setItemDetails, openListDetails }) => {
 
     return (<div className={'map-wrap'}>
         <div className={'head'}>
-            <TippyWrapper content={<div className={'hint-popup'}><BreakDown breakDown={mapData.explorationPoints.breakDown} /></div> }>
+            <TippyWrapper content={<div className={'hint-popup'}>
+                <p className={'hint'}>This shows your current usage of gathering effort/effort that you get from gathering actions</p>
+                <p className={'hint'}>Trying to use more than you producing will reduce loot chances and amounts</p>
+                <BreakDown breakDown={mapData.explorationPoints.breakDown} />
+            </div> }>
                 <div className={'space-item'}>
-                    <span>Exploration Efforts:</span>
+                    <span>Gathering Efforts:</span>
                     <span>{formatValue(mapData.explorationPoints.balance)}/{formatValue(mapData.explorationPoints.balance + mapData.explorationPoints.consumption)}</span>
                 </div>
             </TippyWrapper>
@@ -150,7 +156,7 @@ export const Map = ({ setItemDetails, openListDetails }) => {
                     {mapData.mapTiles.map((row, i) => {
                         return (<div className={'map-row'}>
                             {row.map((tile, j) => {
-                                return <MapTile i={i} j={j} icon={tile.metaData.icon} setItemDetails={setItemDetailsCb} isExploring={tile.isRunning} isHighlight={tile.isHighlight}/>
+                                return <MapTile i={i} j={j} icon={tile.metaData.icon} setItemDetails={setItemDetailsCb} isExploring={tile.isRunning} isHighlight={tile.isHighlight} isEditList={isEditList} hintForTileShown={hintForTileShown} setHintShown={setHintShown}/>
                             })}
                         </div> )
                     })}
@@ -175,9 +181,70 @@ export const Map = ({ setItemDetails, openListDetails }) => {
     </div> )
 }
 
-export const MapTile = React.memo(({ icon, i, j, setItemDetails, isExploring, isHighlight }) => {
-    return (<div className={`map-tile ${isExploring ? 'running' : ''} ${isHighlight ? 'highlight' : ''}`} style={{ backgroundImage: `url(icons/terrain/${icon}.png)`}} onClick={() => setItemDetails({i, j})}></div> )
-})
+export const MapTile = React.memo(
+    ({
+         icon,
+         i,
+         j,
+         setItemDetails,
+         isExploring,
+         isHighlight,
+         hintForTileShown,
+         setHintShown,
+         isEditList,
+     }) => {
+        // Тіло клітинки
+        const tileBody = (
+            <div
+                className={`map-tile ${isExploring ? "running" : ""} ${
+                    isHighlight ? "highlight" : ""
+                }`}
+                style={{ backgroundImage: `url(icons/terrain/${icon}.png)` }}
+                onClick={() => setItemDetails({ i, j })}
+            ></div>
+        );
+
+        if (!isEditList) {
+            return tileBody;
+        }
+
+        // Відображення підказки, якщо редагування увімкнено
+        const showPopup =
+            hintForTileShown &&
+            hintForTileShown.i === i &&
+            hintForTileShown.j === j;
+
+        const handleShow = () => {
+            if (!showPopup) {
+                setHintShown({ i, j });
+            }
+        };
+
+        const handleHide = () => {
+            if (showPopup) {
+                setHintShown(null);
+            }
+        };
+
+        return (
+            <TippyWrapper
+                lazy={true}
+                onHide={handleHide}
+                onShow={handleShow}
+                content={
+                    showPopup ? (
+                        <div className={"hint-popup"}>
+                            <TileDetailsPopup itemId={{ i, j }} />
+                        </div>
+                    ) : null
+                }
+            >
+                {tileBody}
+            </TippyWrapper>
+        );
+    }
+);
+
 
 export const ActionListsPopup = ({ lists, isOpened, setOpenedFor, onSelect, onHover, onRun, onDelete }) => {
 
@@ -324,4 +391,65 @@ export const MapListsPanel = ({ runningList, editListToDetails, lists, viewListT
             </div>
         </div>
     </div>)
+}
+
+export const TileDetailsPopup = ({itemId}) => {
+
+    const worker = useContext(WorkerContext);
+
+    const { onMessage, sendData } = useWorkerClient(worker);
+
+    const [item, setDetailOpened] = useState(null);
+
+
+    useEffect(() => {
+        sendData('query-map-tile-details', itemId);
+        const interval = setInterval(() => {
+            // console.log('queryingMap query-map-tile-details: ', itemId)
+            sendData('query-map-tile-details', itemId);
+        }, 1000);
+
+        return () => {
+            clearInterval(interval);
+        }
+
+    }, [])
+
+
+    onMessage('map-tile-details', (items) => {
+        console.log('Set in popup: ', item);
+        setDetailOpened(items);
+    })
+
+    if(!itemId || !item) return null;
+
+
+    return (
+            <div className={'tile-hint'}>
+                <div className={'block'}>
+                    <h4>{item.name}</h4>
+                    <div className={'description'}>
+                        {item.description}
+                    </div>
+                </div>
+
+                {item.drops ? (<div className={'block'}>
+                    <p>Drops:</p>
+                    {item.drops.map(drop => (<p className={'drop-row'}>
+                        <span className={'name'}>{drop.resource.name}</span>
+                        <span className={'probability'}>{formatValue(drop.probability*100)}%</span>
+                        <span className={'amounts'}>{formatInt(drop.amountMin)} - {formatInt(drop.amountMax)}</span>
+                    </p> ))}
+                    {item.unlockedUnrevealedAmount > 0 ? (<p className={'hint'}>{formatInt(item.unlockedUnrevealedAmount)} more items can be found</p> ) : null}
+                </div> ) : null}
+                <div className={'block'}>
+                    <p>Costs:</p>
+                    <div className={'stats-block costs'}>
+                        {Object.values(item.cost || {}).map(cost => (
+                            <p><span>{cost.name}:</span> <span>{formatValue(cost.value)}</span></p>
+                        ))}
+                    </div>
+                </div>
+            </div>
+    )
 }

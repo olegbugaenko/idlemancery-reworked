@@ -498,6 +498,7 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
                         deleteRule={deleteAutoconsumeRule}
                         setRuleValue={setAutoconsumeRuleValue}
                         setPattern={setAutoconsumePattern}
+                        isAutoCheck={true}
                     />
                 </div>
 
@@ -516,6 +517,7 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
                         deleteRule={deleteAutosellRule}
                         setRuleValue={setAutosellRuleValue}
                         setPattern={setAutosellPattern}
+                        isAutoCheck={true}
                     />
                 </div>) : null}
 

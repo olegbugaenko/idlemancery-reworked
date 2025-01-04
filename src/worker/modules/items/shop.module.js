@@ -53,23 +53,6 @@ export class ShopModule extends GameModule {
 
     initialize() {
 
-        gameEffects.registerEffect('shop_max_stock', {
-            name: 'Shop Max Sell Stock',
-            defaultValue: 100,
-            minValue: 100
-        })
-
-        gameEffects.registerEffect('prices_discount', {
-            name: 'Price Discount Multiplier',
-            defaultValue: 1,
-            minValue: 1
-        })
-
-        gameEffects.registerEffect('shop_stock_renew_rate', {
-            name: 'Sell Stock Renew Rate',
-            defaultValue: 1,
-            minValue: 1
-        })
 
         registerShopItemsStage1();
 

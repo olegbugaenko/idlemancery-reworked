@@ -490,6 +490,7 @@ export const CraftingListDetails = ({
                         setRuleValue={setAutotriggerRuleValue}
                         setPattern={setAutotriggerPattern}
                         pattern={editing.autotrigger?.pattern || ''}
+                        isAutoCheck={true}
                     />
                 </div>
                 {isEditing ? (<div className={'buttons'}>

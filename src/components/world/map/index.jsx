@@ -255,7 +255,7 @@ export const MapWrap = ({ children }) => {
                     </div>
                     <HowToSign scope={'map'} />
                 </div>
-                <Map setItemDetails={setItemDetails} newUnlocks={newUnlocks?.['world']?.items?.['map']?.items} openListDetails={openListDetails}/>
+                <Map setItemDetails={setItemDetails} newUnlocks={newUnlocks?.['world']?.items?.['map']?.items} openListDetails={openListDetails} isEditList={listDetails?.isEdit}/>
             </div>
 
             <div className={'item-detail ingame-box detail-blade'}>
@@ -272,7 +272,7 @@ export const MapWrap = ({ children }) => {
                     onSetAutotriggerPattern={onSetAutotriggerPattern}
                     onCloseList={onCloseList}
                 />) : null}
-                {mapTileDetails ? (<ItemDetails
+                {(mapTileDetails && !listDetails?.listData) ? (<ItemDetails
                     itemId={mapTileDetails}
                 />) : null}
             </div>
@@ -339,6 +339,7 @@ export const ItemDetails = ({itemId}) => {
                         <span className={'probability'}>{formatValue(drop.probability*100)}%</span>
                         <span className={'amounts'}>{formatInt(drop.amountMin)} - {formatInt(drop.amountMax)}</span>
                     </p> ))}
+                    {item.unlockedUnrevealedAmount > 0 ? (<p className={'hint'}>{formatInt(item.unlockedUnrevealedAmount)} more items can be found</p> ) : null}
                 </div> ) : null}
                 <div className={'block'}>
                     <p>Costs:</p>
@@ -414,7 +415,7 @@ export const MapTileListDetails = ({
         <PerfectScrollbar>
             <div className={'blade-inner list-editor'}>
                 <div className={'block'}>
-                    <div className={'main-row main-wrap'}>
+                    <div className={'main-row main-wrap map'}>
                         <span>Name</span>
                         {isEditing ? (<input type={'text'} value={editing.name} onChange={(e) => onUpdateListValue('name', e.target.value)}/>) : (<span>{editing.name}</span>)}
                     </div>
@@ -451,6 +452,7 @@ export const MapTileListDetails = ({
                         <span className={'probability'}>{formatValue(drop.probability*100)}%</span>
                         <span className={'amounts'}>{formatInt(drop.amountMin)} - {formatInt(drop.amountMax)}</span>
                     </p> ))}
+                    {editing.unlockedUnrevealedAmount > 0 ? (<p className={'hint'}>{formatInt(editing.unlockedUnrevealedAmount)} more items can be found</p> ) : null}
                 </div> ) : null}
                 {editing.costs ? (<div className={'block'}>
                     <p>Costs:</p>
@@ -474,6 +476,7 @@ export const MapTileListDetails = ({
                         setRuleValue={setAutotriggerRuleValue}
                         setPattern={setAutotriggerPattern}
                         pattern={editing.autotrigger?.pattern || ''}
+                        isAutoCheck={true}
                     />
                 </div>
                 {isEditing ? (<div className={'buttons'}>

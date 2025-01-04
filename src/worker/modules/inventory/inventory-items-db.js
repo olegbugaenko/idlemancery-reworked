@@ -39,7 +39,7 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0
         },
-        sellPrice: 0.5,
+        sellPrice: 5,
         rarity: 0,
         allowedTileTypes: ['plain', 'forest', 'lakes', 'hills']
     })
@@ -110,7 +110,7 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0
         },
-        sellPrice: 5,
+        sellPrice: 40,
         rarity: 0,
         allowedTileTypes: ['swamp', 'forest', 'lakes']
     })
@@ -149,7 +149,7 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0
         },
-        sellPrice: 8,
+        sellPrice: 80,
         rarity: 0.6,
     })
 
@@ -182,7 +182,7 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0
         },
-        sellPrice: 35,
+        sellPrice: 350,
         rarity: 0.6,
         allowedTileTypes: ['plain', 'lakes', 'swamp']
     })
@@ -216,7 +216,7 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0
         },
-        sellPrice: 35,
+        sellPrice: 350,
         rarity: 0.6,
         allowedTileTypes: ['lakes', 'swamp', 'savanna']
     })
@@ -246,7 +246,7 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_1') > 0
         },
-        sellPrice: 12,
+        sellPrice: 120,
         rarity: 1,
         allowedTileTypes: ['plain', 'savanna']
     })
@@ -292,7 +292,7 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_1') > 0
         },
-        sellPrice: 15,
+        sellPrice: 150,
         rarity: 1,
         allowedTileTypes: ['plain', 'mountain', 'hills']
     })
@@ -339,7 +339,7 @@ export const registerInventoryItems = () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_1') > 0
             && gameEntity.getLevel('shop_item_spellbook') > 0
         },
-        sellPrice: 20,
+        sellPrice: 200,
         rarity: 2,
         allowedTileTypes: ['mountain', 'savanna']
     })
@@ -467,7 +467,7 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.isEntityUnlocked('action_woodcutter')
         },
-        sellPrice: 300,
+        sellPrice: 1200,
         get_cost: (amount = 1) => ({
             coins: amount*5000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
         }),
@@ -489,7 +489,7 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_crafting_courses') > 0
         },
-        sellPrice: 1600,
+        sellPrice: 5600,
         get_cost: (amount = 1) => ({
             coins: amount*50000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
         }),
@@ -511,7 +511,7 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_paper_working') > 0
         },
-        sellPrice: 3200,
+        sellPrice: 14200,
         get_cost: (amount = 1) => ({
             coins: amount*125000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
         }),
@@ -555,7 +555,7 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_crafting_courses') > 0
         },
-        sellPrice: 2000,
+        sellPrice: 10000,
         get_cost: (amount = 1) => ({
             coins: amount*75000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
         }),
@@ -582,7 +582,7 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.isEntityUnlocked('action_quarrying')
         },
-        sellPrice: 625,
+        sellPrice: 1625,
         get_cost: (amount = 1) => ({
             coins: amount*12500*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
         }),
@@ -609,7 +609,7 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.isEntityUnlocked('action_mining')
         },
-        sellPrice: 5625,
+        sellPrice: 15625,
         get_cost: (amount = 1) => ({
             coins: amount*125000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
         }),

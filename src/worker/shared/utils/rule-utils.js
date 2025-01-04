@@ -114,11 +114,17 @@ export const checkMatchingRule = (rule) => {
     }
 }
 
-export const checkMatchingRules = (rules, conditionStr = null) => {
+export const checkMatchingRules = (rules, conditionStr = null, bExplain = false) => {
     const ruleResults = rules.map(rule => checkMatchingRule(rule));
 
     if (!conditionStr) {
-        return ruleResults.every(result => result === true);
+        if(!bExplain) {
+            return ruleResults.every(result => result === true);
+        }
+        return {
+            ruleResults,
+            result: ruleResults.length && ruleResults.every(result => result === true)
+        }
     }
 
     let conditionExpression = conditionStr;
@@ -130,7 +136,13 @@ export const checkMatchingRules = (rules, conditionStr = null) => {
     conditionExpression = conditionExpression.replace(/\bAND\b/g, '&&').replace(/\bOR\b/g, '||').replace(/\bNOT\b/g, '!');
 
     try {
-        return eval(conditionExpression);  // Виконуємо вираз
+        if(!bExplain)
+            return eval(conditionExpression);  // Виконуємо вираз
+
+        return {
+            ruleResults,
+            result: eval(conditionExpression)
+        }
     } catch (error) {
         console.error("Invalid condition string", error);
         return false;

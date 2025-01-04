@@ -15,31 +15,65 @@ const getChanceBased = (effect, softCap, hardCap) => {
     return hardCap;
 }
 
+const getResourceModifierDataSearchable = (rs) => {
+
+    const searchables = {
+        'effects': [],
+        'resources': []
+    };
+
+    if(!rs) return searchables;
+
+
+    ['income', 'consumption', 'multiplier'].forEach(scope => {
+        let rObj = null;
+        if(rs[`get_${scope}`]) {
+            rObj = rs[`get_${scope}`]();
+        } else {
+            rObj = rs[scope];
+        }
+        if(!rObj) return;
+
+        for(const type in rObj) {
+            searchables[type].push(...Object.keys(rObj[type]).map(one => type === 'resources' ? gameResources.getResource(one).name.toLowerCase() : gameEffects.getEffect(one)?.name.toLowerCase()))
+        }
+    })
+
+    return searchables;
+}
+
 const registerGameAction = (id, options) => {
     
     const primaryAttribute = options.attributes.primaryAttribute;
     
-    if(!primaryAttribute || !options.resourceModifier) {
+    if(!options.resourceModifier) {
         return gameEntity.registerGameEntity(id, options);
     }
-    
-    if(!options.resourceModifier.effectDeps) {
-        options.resourceModifier.effectDeps = []
+
+    if(primaryAttribute) {
+        if(!options.resourceModifier.effectDeps) {
+            options.resourceModifier.effectDeps = []
+        }
+
+        if(!options.resourceModifier.effectDeps.includes(primaryAttribute)) {
+            options.resourceModifier.effectDeps.push(primaryAttribute);
+        }
+
+        options.getPrimaryEffect = () => getPrimaryBonus(primaryAttribute);
+
+        if(options.attributes.isTraining) {
+            options.resourceModifier.customAmplifierApplyTypes = ['resources']
+        } else {
+            options.resourceModifier.customAmplifierApplyTypes = ['effects', 'resources']
+        }
+
+        options.resourceModifier.getCustomAmplifier = () => options.getPrimaryEffect();
     }
 
-    if(!options.resourceModifier.effectDeps.includes(primaryAttribute)) {
-        options.resourceModifier.effectDeps.push(primaryAttribute);
-    }
-    
-    options.getPrimaryEffect = () => getPrimaryBonus(primaryAttribute);
 
-    if(options.attributes.isTraining) {
-        options.resourceModifier.customAmplifierApplyTypes = ['resources']
-    } else {
-        options.resourceModifier.customAmplifierApplyTypes = ['effects', 'resources']
-    }
+    options.searchableMeta = getResourceModifierDataSearchable(options.resourceModifier);
 
-    options.resourceModifier.getCustomAmplifier = () => options.getPrimaryEffect();
+
     
     return gameEntity.registerGameEntity(id, options);
     
@@ -1363,7 +1397,7 @@ export const registerActionsStage1 = () => {
         name: 'Learn Anatomy',
         isAbstract: false,
         allowedImpacts: ['effects'],
-        description: 'Lear anatomy to better understand your body and improve your health regeneration',
+        description: 'Lear anatomy to better understand your body and improve your energy and health regeneration',
         level: 1,
         getLearnRate: () => {
             return 1.
@@ -2184,7 +2218,7 @@ export const registerActionsStage1 = () => {
 
 
     registerGameAction('action_alchemy', {
-        tags: ["action", "activity", "routine", "crafting"],
+        tags: ["action", "activity", "crafting", "alchemy"],
         name: 'Alchemy',
         isAbstract: false,
         allowedImpacts: ['effects'],
@@ -2341,7 +2375,7 @@ export const registerActionsStage1 = () => {
             return true
         },
         attributes: {
-            baseXPCost: 20000,
+            baseXPCost: 10000,
             isTraining: true
         }
     })

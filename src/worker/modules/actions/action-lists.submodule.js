@@ -59,6 +59,10 @@ export class ActionListsSubmodule extends GameModule {
             this.autotriggerIntervalSetting = interval;
         })
 
+        this.eventHandler.registerHandler('set-action-lists-order', (payload) => {
+            this.reorderLists(payload);
+        })
+
 
         this.eventHandler.registerHandler('query-action-list-effects', ({ id, listData }) => {
             const data = this.getListEffects(null, listData);
@@ -151,6 +155,8 @@ export class ActionListsSubmodule extends GameModule {
             this.sendListData(list.id, true);
         }
 
+        this.sortLists();
+
         this.regenerateListsPriorityMap();
 
         if(this.runningList?.id && (this.runningList?.id === payload.id)) {
@@ -179,6 +185,8 @@ export class ActionListsSubmodule extends GameModule {
     deleteActionList(id) {
         delete this.actionsLists[id];
 
+        this.sortLists();
+
         this.regenerateListsPriorityMap();
     }
 
@@ -198,8 +206,25 @@ export class ActionListsSubmodule extends GameModule {
         })).sort((a, b) => a.priority - b.priority);
     }
 
+    reorderLists(newOrder) {
+        newOrder.forEach(({ id, sort }) => {
+            if (this.actionsLists[id]) {
+                this.actionsLists[id].sort = sort;
+            }
+        });
+        console.log('newOrder: ', newOrder);
+        this.sortLists(); // Re-sort the cached list
+    }
+
+    sortLists() {
+        this._cachedSortedLists = Object.values(this.actionsLists).sort((a, b) => a.sort - b.sort);
+    }
+
     getLists(pl) {
-        let ls = Object.values(this.actionsLists).map(one => ({
+        if(!this._cachedSortedLists) {
+            this.sortLists();
+        }
+        let ls = this._cachedSortedLists.map(one => ({
             ...one,
             isUnlocked: true
         }));
@@ -215,6 +240,7 @@ export class ActionListsSubmodule extends GameModule {
             list: mapObject(this.actionsLists, one => ({
                 id: one.id,
                 name: one.name,
+                sort: one.sort,
                 actions: one.actions,
                 autotrigger: one.autotrigger
             })),
@@ -234,6 +260,7 @@ export class ActionListsSubmodule extends GameModule {
                 this.actionsLists[key].actions = (this.actionsLists[key].actions || []).filter(one => one.time > 0);
             }
         }
+        this.sortLists();
         this.regenerateListsPriorityMap();
     }
 

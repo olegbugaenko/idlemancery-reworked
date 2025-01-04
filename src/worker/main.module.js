@@ -16,6 +16,8 @@ import {RandomEventsModule} from "./modules/general/random-events.module";
 import {TemporaryEffectsModule} from "./modules/general/temporary-effects.module";
 import {MapModule} from "./modules/map/map.module";
 import {HotkeysModule} from "./shared/modules/hotkeys.module";
+import {MonitoringModule} from "./shared/modules/monitoring.module";
+import {RulesModule} from "./shared/modules/rules.module";
 
 
 export class MainModule extends GameModule {
@@ -38,7 +40,8 @@ export class MainModule extends GameModule {
         gameCore.registerModule('temporary-effects', TemporaryEffectsModule);
         gameCore.registerModule('map', MapModule);
         gameCore.registerModule('hotkeys', HotkeysModule);
-
+        gameCore.registerModule('monitoring', MonitoringModule);
+        gameCore.registerModule('rules', RulesModule);
 
 
         this.eventHandler.registerHandler('initialize-game', (data) => {

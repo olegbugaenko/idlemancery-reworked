@@ -1,5 +1,7 @@
 import {GameModule} from "../../shared/game-module";
 import { gameResources, gameEntity, gameCore, gameEffects } from "game-framework"
+import {registerInventoryItems} from "../inventory/inventory-items-db";
+import {registerCommomEffects} from "./common-effects-db";
 
 export class ResourcePoolModule extends GameModule {
     constructor() {
@@ -22,6 +24,8 @@ export class ResourcePoolModule extends GameModule {
     }
 
     initialize() {
+
+        registerCommomEffects();
 
         gameEffects.registerEffect('coins_cap_bonus', {
             name: 'Coins cap multiplier',
@@ -128,6 +132,29 @@ export class ResourcePoolModule extends GameModule {
             unlockCondition: () => {
                 return gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
             }
+        })
+
+        gameEffects.registerEffect('metabolism_rate', {
+            name: 'Consumable Cooldown Reduction',
+            defaultValue: 1,
+            minValue: 1
+        })
+
+        registerInventoryItems();
+
+        gameResources.registerResource('guild_reputation', {
+            name: 'Guild Reputation',
+            hasCap: true,
+            tags: ['guild', 'reputation'],
+            defaultCap: 0,
+        })
+
+        gameResources.registerResource('guild-points', {
+            name: 'Guild Points',
+            hasCap: true,
+            tags: ['guild', 'points'],
+            defaultCap: 0,
+            isService: true,
         })
 
     }

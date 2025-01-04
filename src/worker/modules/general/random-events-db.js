@@ -1,5 +1,14 @@
 import {gameCore, gameEntity, gameResources} from "game-framework";
 
+export const randomEventScalingFactor = (id) => {
+    const level = gameEntity.getLevel(id);
+    let result = Math.pow(1 + level, 1.5)
+    if(level > 100) {
+        result *= Math.pow(1.03, level);
+    }
+    return result;
+}
+
 export const registerRandomEventsDb = () => {
 
     const randomEventsDB = [];
@@ -259,7 +268,7 @@ export const registerRandomEventsDb = () => {
                         resources: {
                             coins: {
                                 A: 0,
-                                B: 50*Math.pow(1 + gameEntity.getLevel('random_events_strength_effect'), 1.5),
+                                B: 50*randomEventScalingFactor('random_events_strength_effect'),
                                 type: 0,
                             }
                         }
@@ -274,7 +283,7 @@ export const registerRandomEventsDb = () => {
                         // set permanent attribute modifier
                         // gameResources.addResource('strength', 1);
                         gameEntity.setEntityLevel('random_events_strength_effect', gameEntity.getLevel('random_events_strength_effect')+1, true)
-                        gameResources.addResource('coins', -50*Math.pow(1 + gameEntity.getLevel('random_events_strength_effect'), 1.5));
+                        gameResources.addResource('coins', -50*randomEventScalingFactor('random_events_strength_effect'));
                     }
                 }, {
                     id: 'fail_offering',
@@ -282,7 +291,7 @@ export const registerRandomEventsDb = () => {
                     description: 'The shrine remains silent, and your gold disappears into the void.',
                     unlockCondition: () => true,
                     onTrigger: () => {
-                        gameResources.addResource('coins', -50*Math.pow(1 + gameEntity.getLevel('random_events_strength_effect'), 1.5));
+                        gameResources.addResource('coins', -50*randomEventScalingFactor('random_events_strength_effect'));
                     }
                 }]
             },
@@ -311,7 +320,7 @@ export const registerRandomEventsDb = () => {
                         resources: {
                             energy: {
                                 A: 0,
-                                B: 5*Math.pow(1 + gameEntity.getLevel('random_events_stamina_effect'), 1.5),
+                                B: 5*randomEventScalingFactor('random_events_stamina_effect'),
                                 type: 0,
                             }
                         }
@@ -325,7 +334,7 @@ export const registerRandomEventsDb = () => {
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_stamina_effect', gameEntity.getLevel('random_events_stamina_effect')+1, true)
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_energy_debuff');
-                        gameResources.addResource('energy', -5*Math.pow(1 + gameEntity.getLevel('random_events_stamina_effect'), 1.5));
+                        gameResources.addResource('energy', -5*randomEventScalingFactor('random_events_stamina_effect'));
                     }
                 }, {
                     id: 'mirror_shatters',
@@ -542,7 +551,7 @@ export const registerRandomEventsDb = () => {
                         resources: {
                             energy: {
                                 A: 0,
-                                B: 10*Math.pow(1 + gameEntity.getLevel('random_events_recovery_effect'), 1.5),
+                                B: 10*randomEventScalingFactor('random_events_recovery_effect'),
                                 type: 0,
                             }
                         }
@@ -555,7 +564,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_recovery_effect', gameEntity.getLevel('random_events_recovery_effect') + 1, true);
-                        gameResources.addResource('energy', -10*Math.pow(1 + gameEntity.getLevel('random_events_recovery_effect'), 1.5));
+                        gameResources.addResource('energy', -10*randomEventScalingFactor('random_events_recovery_effect'));
                     }
                 }, {
                     id: 'refill',
@@ -564,7 +573,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_health_regen');
-                        gameResources.addResource('energy', -10*Math.pow(1 + gameEntity.getLevel('random_events_recovery_effect'), 1.5));
+                        gameResources.addResource('energy', -10*randomEventScalingFactor('random_events_recovery_effect'));
                     }
                 },{
                     id: 'blessing_fail',
@@ -573,7 +582,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameResources.addResource('health', -0.1 * gameResources.getResource('health').cap);
-                        gameResources.addResource('energy', -10*Math.pow(1 + gameEntity.getLevel('random_events_recovery_effect'), 1.5));
+                        gameResources.addResource('energy', -10*randomEventScalingFactor('random_events_recovery_effect'));
                     }
                 }]
             },
@@ -601,7 +610,7 @@ export const registerRandomEventsDb = () => {
                         resources: {
                             energy: {
                                 A: 0,
-                                B: 5*Math.pow(1 + gameEntity.getLevel('random_events_recovery_effect'), 1.5),
+                                B: 5*randomEventScalingFactor('random_events_recovery_effect'),
                                 type: 0,
                             }
                         }
@@ -615,7 +624,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_recovery_effect', gameEntity.getLevel('random_events_recovery_effect') + 1, true);
-                        gameResources.addResource('energy', -5*Math.pow(1 + gameEntity.getLevel('random_events_recovery_effect'), 1.5));
+                        gameResources.addResource('energy', -5*randomEventScalingFactor('random_events_recovery_effect'));
                     }
                 }, {
                     id: 'minor_blessing',
@@ -624,7 +633,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_health_regen');
-                        gameResources.addResource('energy', -5*Math.pow(1 + gameEntity.getLevel('random_events_recovery_effect'), 1.5));
+                        gameResources.addResource('energy', -5*randomEventScalingFactor('random_events_recovery_effect'));
                     }
                 }, {
                     id: 'negative_effect',
@@ -633,7 +642,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameResources.addResource('energy', -0.2 * gameResources.getResource('energy').cap);
-                        gameResources.addResource('energy', -5*Math.pow(1 + gameEntity.getLevel('random_events_recovery_effect'), 1.5));
+                        gameResources.addResource('energy', -5*randomEventScalingFactor('random_events_recovery_effect'));
                     }
                 }]
             },
@@ -696,7 +705,7 @@ export const registerRandomEventsDb = () => {
                         resources: {
                             health: {
                                 A: 0,
-                                B: 5*Math.pow(1 + gameEntity.getLevel('random_events_strength_effect'), 1.5),
+                                B: 5*randomEventScalingFactor('random_events_strength_effect'),
                                 type: 0,
                             }
                         }
@@ -709,7 +718,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_strength_effect', gameEntity.getLevel('random_events_strength_effect') + 1, true);
-                        gameResources.addResource('health', -5*Math.pow(1 + gameEntity.getLevel('random_events_strength_effect'), 1.5));
+                        gameResources.addResource('health', -5*randomEventScalingFactor('random_events_strength_effect'));
                     }
                 }, {
                     id: 'minor_injury',
@@ -729,7 +738,7 @@ export const registerRandomEventsDb = () => {
                     onTrigger: () => {
                         gameResources.addResource('health', -0.2 * gameResources.getResource('health').cap);
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_health_debuff', 2);
-                        gameResources.addResource('health', -5*Math.pow(1 + gameEntity.getLevel('random_events_strength_effect'), 1.5));
+                        gameResources.addResource('health', -5*randomEventScalingFactor('random_events_strength_effect'));
                     }
                 }]
             },
@@ -759,7 +768,7 @@ export const registerRandomEventsDb = () => {
                         resources: {
                             coins: {
                                 A: 0,
-                                B: 100*Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5),
+                                B: 100*randomEventScalingFactor('random_events_charisma_effect'),
                                 type: 0,
                             }
                         }
@@ -772,7 +781,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_charisma_effect', gameEntity.getLevel('random_events_charisma_effect') + 1, true);
-                        gameResources.addResource('coins', -100*Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5));
+                        gameResources.addResource('coins', -100*randomEventScalingFactor('random_events_charisma_effect'));
                     }
                 }, {
                     id: 'worthless_purchase',
@@ -780,7 +789,7 @@ export const registerRandomEventsDb = () => {
                     description: 'The goods turn out to be useless trinkets. You feel cheated. (-100 coins)',
                     unlockCondition: () => true,
                     onTrigger: () => {
-                        gameResources.addResource('coins', -100*Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5));
+                        gameResources.addResource('coins', -100*randomEventScalingFactor('random_events_charisma_effect'));
                     }
                 }]
             },
@@ -808,7 +817,7 @@ export const registerRandomEventsDb = () => {
                         resources: {
                             energy: {
                                 A: 0,
-                                B: 4*Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5),
+                                B: 4*randomEventScalingFactor('random_events_charisma_effect'),
                                 type: 0,
                             }
                         }
@@ -822,7 +831,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_charisma_effect', gameEntity.getLevel('random_events_charisma_effect') + 1, true);
-                        gameResources.addResource('energy', -4*Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5));
+                        gameResources.addResource('energy', -4*randomEventScalingFactor('random_events_charisma_effect'));
                     }
                 }, {
                     id: 'exhaustion',
@@ -969,7 +978,7 @@ export const registerRandomEventsDb = () => {
                         resources: {
                             coins: {
                                 A: 0,
-                                B: 50 * Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5),
+                                B: 50 * randomEventScalingFactor('random_events_charisma_effect'),
                                 type: 0,
                             }
                         }
@@ -982,7 +991,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_charisma_effect', gameEntity.getLevel('random_events_charisma_effect') + 1, true);
-                        gameResources.addResource('coins', -50 * Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5));
+                        gameResources.addResource('coins', -50 * randomEventScalingFactor('random_events_charisma_effect'));
                     }
                 }, {
                     id: 'vague_predictions',
@@ -990,7 +999,7 @@ export const registerRandomEventsDb = () => {
                     description: 'Her predictions are vague and unhelpful.',
                     unlockCondition: () => true,
                     onTrigger: () => {
-                        gameResources.addResource('coins', -50 * Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5));
+                        gameResources.addResource('coins', -50 * randomEventScalingFactor('random_events_charisma_effect'));
                     }
                 }, {
                     id: 'bad_omen',
@@ -1028,7 +1037,7 @@ export const registerRandomEventsDb = () => {
                         resources: {
                             health: {
                                 A: 0,
-                                B: 5 * Math.pow(1 + gameEntity.getLevel('random_events_strength_effect'), 1.5),
+                                B: 5 * randomEventScalingFactor('random_events_strength_effect'),
                                 type: 0,
                             }
                         }
@@ -1041,7 +1050,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_strength_effect', gameEntity.getLevel('random_events_strength_effect') + 1, true);
-                        gameResources.addResource('health', -5*Math.pow(1 + gameEntity.getLevel('random_events_strength_effect'), 1.5));
+                        gameResources.addResource('health', -5*randomEventScalingFactor('random_events_strength_effect'));
                     }
                 }, {
                     id: 'artifact_curse',
@@ -1174,7 +1183,7 @@ export const registerRandomEventsDb = () => {
                         knowledge: {
                             coins: {
                                 A: 0,
-                                B: 5 * Math.pow(1 + gameEntity.getLevel('random_events_memory_effect'), 1.5),
+                                B: 5 * randomEventScalingFactor('random_events_memory_effect'),
                                 type: 0,
                             }
                         }
@@ -1187,7 +1196,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_knowledge_gain');
-                        gameResources.addResource('knowledge', -5*Math.pow(1 + gameEntity.getLevel('random_events_memory_effect'), 1.5));
+                        gameResources.addResource('knowledge', -5*randomEventScalingFactor('random_events_memory_effect'));
                     }
                 }, {
                     id: 'temporary_knowledge_debuff',
@@ -1196,7 +1205,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_knowledge_debuff');
-                        gameResources.addResource('knowledge', -5*Math.pow(1 + gameEntity.getLevel('random_events_memory_effect'), 1.5));
+                        gameResources.addResource('knowledge', -5*randomEventScalingFactor('random_events_memory_effect'));
                     }
                 }, {
                     id: 'memory_boost',
@@ -1205,7 +1214,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_memory_effect', gameEntity.getLevel('random_events_memory_effect') + 1, true);
-                        gameResources.addResource('knowledge', -5*Math.pow(1 + gameEntity.getLevel('random_events_memory_effect'), 1.5));
+                        gameResources.addResource('knowledge', -5*randomEventScalingFactor('random_events_memory_effect'));
                     }
                 }]
             },
@@ -1280,7 +1289,7 @@ export const registerRandomEventsDb = () => {
                         resources: {
                             knowledge: {
                                 A: 0,
-                                B: 8 * Math.pow(1 + gameEntity.getLevel('random_events_memory_effect'), 1.5),
+                                B: 8 * randomEventScalingFactor('random_events_memory_effect'),
                                 type: 0,
                             }
                         }
@@ -1293,7 +1302,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_knowledge_gain');
-                        gameResources.addResource('knowledge', -8*Math.pow(1 + gameEntity.getLevel('random_events_memory_effect'), 1.5));
+                        gameResources.addResource('knowledge', -8*randomEventScalingFactor('random_events_memory_effect'));
                     }
                 }, {
                     id: 'temporary_knowledge_debuff',
@@ -1302,7 +1311,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_knowledge_debuff');
-                        gameResources.addResource('knowledge', -8*Math.pow(1 + gameEntity.getLevel('random_events_memory_effect'), 1.5));
+                        gameResources.addResource('knowledge', -8*randomEventScalingFactor('random_events_memory_effect'));
                     }
                 }, {
                     id: 'memory_boost',
@@ -1311,7 +1320,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_memory_effect', gameEntity.getLevel('random_events_memory_effect') + 1, true);
-                        gameResources.addResource('knowledge', -8*Math.pow(1 + gameEntity.getLevel('random_events_memory_effect'), 1.5));
+                        gameResources.addResource('knowledge', -8*randomEventScalingFactor('random_events_memory_effect'));
                     }
                 }]
             },
@@ -1340,7 +1349,7 @@ export const registerRandomEventsDb = () => {
                         resources: {
                             energy: {
                                 A: 0,
-                                B: 5 * Math.pow(1 + gameEntity.getLevel('random_events_memory_effect'), 1.5),
+                                B: 5 * randomEventScalingFactor('random_events_memory_effect'),
                                 type: 0,
                             }
                         }
@@ -1354,7 +1363,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_charisma_effect', gameEntity.getLevel('random_events_charisma_effect') + 1, true);
-                        gameResources.addResource('energy', -5*Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5));
+                        gameResources.addResource('energy', -5*randomEventScalingFactor('random_events_charisma_effect'));
                     }
                 }, {
                     id: 'knowledge_permanent_boost',
@@ -1363,7 +1372,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_memory_effect', gameEntity.getLevel('random_events_memory_effect') + 1, true);
-                        gameResources.addResource('energy', -5*Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5));
+                        gameResources.addResource('energy', -5*randomEventScalingFactor('random_events_charisma_effect'));
                     }
                 }, {
                     id: 'temporary_knowledge_debuff',
@@ -1372,7 +1381,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_knowledge_debuff');
-                        gameResources.addResource('energy', -5*Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5));
+                        gameResources.addResource('energy', -5*randomEventScalingFactor('random_events_charisma_effect'));
                     }
                 }]
             },
@@ -1423,7 +1432,7 @@ export const registerRandomEventsDb = () => {
                         resources: {
                             knowledge: {
                                 A: 0,
-                                B: 10 * Math.pow(1 + gameEntity.getLevel('random_events_memory_effect'), 1.5),
+                                B: 10 * randomEventScalingFactor('random_events_memory_effect'),
                                 type: 0,
                             }
                         }
@@ -1436,7 +1445,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_memory_effect', gameEntity.getLevel('random_events_memory_effect') + 1, true);
-                        gameResources.addResource('knowledge', -10*Math.pow(1 + gameEntity.getLevel('random_events_memory_effect'), 1.5));
+                        gameResources.addResource('knowledge', -10*randomEventScalingFactor('random_events_memory_effect'));
                     }
                 }, {
                     id: 'temporary_energy_debuff',
@@ -1446,7 +1455,7 @@ export const registerRandomEventsDb = () => {
                     onTrigger: () => {
                         gameResources.addResource('energy', -0.2 * gameResources.getResource('energy').cap);
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_energy_debuff');
-                        gameResources.addResource('knowledge', -10*Math.pow(1 + gameEntity.getLevel('random_events_memory_effect'), 1.5));
+                        gameResources.addResource('knowledge', -10*randomEventScalingFactor('random_events_memory_effect'));
                     }
                 }, {
                     id: 'gold_find',
@@ -1455,7 +1464,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameResources.addResource('coins', 0.1*gameResources.getResource('coins').cap);
-                        gameResources.addResource('knowledge', -10*Math.pow(1 + gameEntity.getLevel('random_events_memory_effect'), 1.5));
+                        gameResources.addResource('knowledge', -10*randomEventScalingFactor('random_events_memory_effect'));
                     }
                 }]
             },
@@ -1505,7 +1514,7 @@ export const registerRandomEventsDb = () => {
                         resources: {
                             knowledge: {
                                 A: 0,
-                                B: 10 * Math.pow(1 + gameEntity.getLevel('random_events_memory_effect'), 1.5),
+                                B: 10 * randomEventScalingFactor('random_events_memory_effect'),
                                 type: 0,
                             }
                         }
@@ -1519,7 +1528,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_knowledge_gain');
-                        gameResources.addResource('knowledge', -10*Math.pow(1 + gameEntity.getLevel('random_events_memory_effect'), 1.5));
+                        gameResources.addResource('knowledge', -10*randomEventScalingFactor('random_events_memory_effect'));
                     }
                 }, {
                     id: 'temporary_energy_debuff',
@@ -1528,7 +1537,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameResources.addResource('energy', -0.2 * gameResources.getResource('energy').cap);
-                        gameResources.addResource('knowledge', -10*Math.pow(1 + gameEntity.getLevel('random_events_memory_effect'), 1.5));
+                        gameResources.addResource('knowledge', -10*randomEventScalingFactor('random_events_memory_effect'));
                     }
                 }, {
                     id: 'temporary_health_debuff',
@@ -1537,7 +1546,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameResources.addResource('health', -0.1 * gameResources.getResource('health').cap);
-                        gameResources.addResource('knowledge', -10*Math.pow(1 + gameEntity.getLevel('random_events_memory_effect'), 1.5));
+                        gameResources.addResource('knowledge', -10*randomEventScalingFactor('random_events_memory_effect'));
                     }
                 }, {
                     id: 'memory_boost',
@@ -1546,7 +1555,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_memory_effect', gameEntity.getLevel('random_events_memory_effect') + 1, true);
-                        gameResources.addResource('knowledge', -10*Math.pow(1 + gameEntity.getLevel('random_events_memory_effect'), 1.5));
+                        gameResources.addResource('knowledge', -10*randomEventScalingFactor('random_events_memory_effect'));
                     }
                 }]
             },
@@ -1652,7 +1661,7 @@ export const registerRandomEventsDb = () => {
                         resources: {
                             energy: {
                                 A: 0,
-                                B: 10 * Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5),
+                                B: 10 * randomEventScalingFactor('random_events_charisma_effect'),
                                 type: 0,
                             }
                         }
@@ -1665,7 +1674,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_energy_debuff');
-                        gameResources.addResource('energy', -10*Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5));
+                        gameResources.addResource('energy', -10*randomEventScalingFactor('random_events_charisma_effect'));
                     }
                 }, {
                     id: 'charisma_boost',
@@ -1674,7 +1683,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_charisma_effect', gameEntity.getLevel('random_events_charisma_effect') + 1, true);
-                        gameResources.addResource('energy', -10*Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5));
+                        gameResources.addResource('energy', -10*randomEventScalingFactor('random_events_charisma_effect'));
                     }
                 }, {
                     id: 'gold_loss',
@@ -1683,7 +1692,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameResources.addResource('coins', 0.1*gameResources.getResource('coins').amount);
-                        gameResources.addResource('energy', -10*Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5));
+                        gameResources.addResource('energy', -10*randomEventScalingFactor('random_events_charisma_effect'));
                     }
                 }]
             },
@@ -1751,7 +1760,7 @@ export const registerRandomEventsDb = () => {
                         resources: {
                             health: {
                                 A: 0,
-                                B: 10 * Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5),
+                                B: 10 * randomEventScalingFactor('random_events_charisma_effect'),
                                 type: 0,
                             }
                         }
@@ -1765,7 +1774,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameResources.addResource('coins', 50 + 0.1*gameResources.getResource('coins').cap);
-                        gameResources.addResource('health', -10*Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5));
+                        gameResources.addResource('health', -10*randomEventScalingFactor('random_events_charisma_effect'));
                     }
                 }, {
                     id: 'charisma_penalty',
@@ -1774,7 +1783,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_charisma_effect', gameEntity.getLevel('random_events_charisma_effect') - 1, true);
-                        gameResources.addResource('health', -10*Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5));
+                        gameResources.addResource('health', -10*randomEventScalingFactor('random_events_charisma_effect'));
                     }
                 }]
             },
@@ -1813,7 +1822,7 @@ export const registerRandomEventsDb = () => {
                         resources: {
                             energy: {
                                 A: 0,
-                                B: 10 * Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5),
+                                B: 10 * randomEventScalingFactor('random_events_charisma_effect'),
                                 type: 0,
                             }
                         }
@@ -1826,7 +1835,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_charisma_effect', gameEntity.getLevel('random_events_charisma_effect') + 1, true);
-                        gameResources.addResource('energy', -10*Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5));
+                        gameResources.addResource('energy', -10*randomEventScalingFactor('random_events_charisma_effect'));
                     }
                 }, {
                     id: 'temporary_energy_regeneration_debuff',
@@ -1835,7 +1844,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_energy_debuff', 2);
-                        gameResources.addResource('energy', -10*Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5));
+                        gameResources.addResource('energy', -10*randomEventScalingFactor('random_events_charisma_effect'));
                     }
                 }]
             },
@@ -2159,7 +2168,7 @@ export const registerRandomEventsDb = () => {
                         resources: {
                             mana: {
                                 A: 0,
-                                B: 5 * Math.pow(1 + gameEntity.getLevel('random_events_recovery_effect'), 1.5),
+                                B: 5 * randomEventScalingFactor('random_events_recovery_effect'),
                                 type: 0,
                             }
                         }
@@ -2173,7 +2182,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_recovery_effect', gameEntity.getLevel('random_events_recovery_effect') + 1, true);
-                        gameResources.addResource('mana', -5 * Math.pow(1 + gameEntity.getLevel('random_events_recovery_effect'), 1.5));
+                        gameResources.addResource('mana', -5 * randomEventScalingFactor('random_events_recovery_effect'));
                     }
                 }, {
                     id: 'temporary_mana_debuff',
@@ -2182,7 +2191,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_mana_debuff', 1.5);
-                        gameResources.addResource('mana', -50 * Math.pow(1 + gameEntity.getLevel('random_events_recovery_effect'), 1.5));
+                        gameResources.addResource('mana', -50 * randomEventScalingFactor('random_events_recovery_effect'));
                     }
                 }]
             },
@@ -2400,7 +2409,7 @@ export const registerRandomEventsDb = () => {
                         resources: {
                             coins: {
                                 A: 0,
-                                B: 75 * Math.pow(1 + gameEntity.getLevel('random_events_charisma_effect'), 1.5),
+                                B: 75 * randomEventScalingFactor('random_events_charisma_effect'),
                                 type: 0,
                             }
                         }
@@ -2481,7 +2490,7 @@ export const registerRandomEventsDb = () => {
                         resources: {
                             mana: {
                                 A: 0,
-                                B: 10 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability_effect'), 1.5),
+                                B: 10 * randomEventScalingFactor('random_events_magic_ability_effect'),
                                 type: 0,
                             }
                         }
@@ -2495,7 +2504,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_magic_ability_effect', gameEntity.getLevel('random_events_magic_ability_effect') + 1, true);
-                        gameResources.addResource('mana', -10 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability_effect'), 1.5));
+                        gameResources.addResource('mana', -10 * randomEventScalingFactor('random_events_magic_ability_effect'));
                     }
                 }, {
                     id: 'temporary_health_debuff',
@@ -2504,7 +2513,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_health_debuff', 1.5);
-                        gameResources.addResource('mana', -30 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability_effect'), 1.5));
+                        gameResources.addResource('mana', -30 * randomEventScalingFactor('random_events_magic_ability_effect'));
                     }
                 }]
             },
@@ -2607,7 +2616,7 @@ export const registerRandomEventsDb = () => {
                         resources: {
                             mana: {
                                 A: 0,
-                                B: 10 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability_effect'), 1.5),
+                                B: 10 * randomEventScalingFactor('random_events_magic_ability_effect'),
                                 type: 0,
                             }
                         }
@@ -2621,7 +2630,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_magic_ability_effect', gameEntity.getLevel('random_events_magic_ability_effect') + 1, true);
-                        gameResources.addResource('mana', -10 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability_effect'), 1.5));
+                        gameResources.addResource('mana', -10 * randomEventScalingFactor('random_events_magic_ability_effect'));
                     }
                 }, {
                     id: 'temporary_health_debuff',
@@ -2630,7 +2639,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_health_debuff', 1.2);
-                        gameResources.addResource('mana', -20 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability_effect'), 1.5));
+                        gameResources.addResource('mana', -20 * randomEventScalingFactor('random_events_magic_ability_effect'));
                     }
                 }]
             },
@@ -2668,7 +2677,7 @@ export const registerRandomEventsDb = () => {
                         resources: {
                             mana: {
                                 A: 0,
-                                B: 40 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability_effect'), 1.5),
+                                B: 40 * randomEventScalingFactor('random_events_magic_ability_effect'),
                                 type: 0,
                             }
                         }
@@ -2682,7 +2691,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_magic_ability_effect', gameEntity.getLevel('random_events_magic_ability_effect') + 1, true);
-                        gameResources.addResource('mana', -40 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability_effect'), 1.5));
+                        gameResources.addResource('mana', -40 * randomEventScalingFactor('random_events_magic_ability_effect'));
                     }
                 }, {
                     id: 'temporary_health_debuff',
@@ -2742,7 +2751,7 @@ export const registerRandomEventsDb = () => {
                         resources: {
                             mana: {
                                 A: 0,
-                                B: 50 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability_effect'), 1.5),
+                                B: 50 * randomEventScalingFactor('random_events_magic_ability_effect'),
                                 type: 0,
                             }
                         }
@@ -2756,7 +2765,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameEntity.setEntityLevel('random_events_magic_ability_effect', gameEntity.getLevel('random_events_magic_ability_effect') + 1, true);
-                        gameResources.addResource('mana', -50 * Math.pow(1 + gameEntity.getLevel('random_events_magic_ability_effect'), 1.5));
+                        gameResources.addResource('mana', -50 * randomEventScalingFactor('random_events_magic_ability_effect'));
                     }
                 }, {
                     id: 'temporary_health_debuff',

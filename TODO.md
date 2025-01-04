@@ -113,7 +113,10 @@ v0.0.3a:
 14. [V] UI fixes
 15. [V] Double check rare herbs unlocks conditions
 16. [V] Check running crafting lists
-17. Add alchemy for instant XP effects and temporary XP boosts
+17. [V] Add alchemy for instant XP effects and temporary XP boosts
 18. [V] Add spell increasing loot
 19. [V] Display shop trade stock
 20. [V] Reduce urn space requirement + add "Armchair" and "Bathroom"
+21. [V] Adjust rare events scaling 
+22. Add new crafting resource and new accessory, improving yoga practice efficiency
+23. Highlight actions once hovering over primary attribute.

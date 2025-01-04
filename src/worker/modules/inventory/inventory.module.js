@@ -68,13 +68,7 @@ export class InventoryModule extends GameModule {
 
     initialize() {
 
-        gameEffects.registerEffect('metabolism_rate', {
-            name: 'Consumable Cooldown Reduction',
-            defaultValue: 1,
-            minValue: 1
-        })
-
-        registerInventoryItems();
+        // registerInventoryItems();
 
     }
 

@@ -27,6 +27,12 @@ const ACTIONS_SEARCH_SCOPES = [{
 },{
     id: 'description',
     label: 'description'
+},{
+    id: 'resources',
+    label: 'resources'
+},{
+    id: 'effects',
+    label: 'effects'
 }]
 
 export const Actions = ({}) => {
@@ -507,7 +513,7 @@ export const DetailBlade = ({
     return null;
 }
 
-export const ActionCard = ({ id, isEditingList, index, name, level, max, xp, maxXP, xpRate, isActive, isLeveled, focused, isTraining, actionEffect, currentEffects, potentialEffects, isHidden, onFlash, onSelect, onActivate, onShowDetails, toggleHiddenAction, ...props}) => {
+export const ActionCard = ({ id, monitored, isEditingList, index, name, level, max, xp, maxXP, xpRate, isActive, isLeveled, focused, isTraining, actionEffect, currentEffects, potentialEffects, isHidden, onFlash, onSelect, onActivate, onShowDetails, toggleHiddenAction, ...props}) => {
     const elementRef = useRef(null);
 
     useFlashOnLevelUp(isLeveled, onFlash, elementRef);
@@ -521,7 +527,7 @@ export const ActionCard = ({ id, isEditingList, index, name, level, max, xp, max
                     ref={provided.innerRef}
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
-                    className={`card action ${isActive ? 'active' : ''} flashable`} onMouseEnter={() => onShowDetails(id)} onMouseOver={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)} onClick={() => onSelect({
+                    className={`card action ${isActive ? 'active' : ''} flashable ${monitored ?? ''}`} onMouseEnter={() => onShowDetails(id)} onMouseOver={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)} onClick={() => onSelect({
                     id,
                     name,
                     level
@@ -746,35 +752,26 @@ export const ActionListsPanel = ({ runningList, editListToDetails, lists, viewLi
 
     const [openedFor, setOpenedFor] = useState(null);
 
-    useEffect(() => {
-        const setOp = () => {
-            console.log('setOpToNull ')
-            setOpenedFor(null);
-        }
-        if(openedFor) {
-            document.addEventListener('click', setOp);
-        } else {
-            document.removeEventListener('click', setOp)
-        }
-
-        return () => {
-            document.removeEventListener('click', setOp)
-        }
-    }, [openedFor])
 
     const editList = (id) => {
         console.log('Set to edit: ', id);
         editListToDetails(id);
+        setOpenedFor(null);
     }
 
     const runList = (id) => {
         sendData('run-list', { id });
+        setOpenedFor(null);
     }
 
     const onDelete = (id) => {
         sendData('delete-action-list', { id });
         setOpenedFor('edit');
     }
+
+    const setActionListOrder = (newOrder) => {
+        sendData('set-action-lists-order', newOrder);
+    };
 
     return (<div className={'action-lists-panel'}>
         <div className={'flex-container'}>
@@ -794,7 +791,7 @@ export const ActionListsPanel = ({ runningList, editListToDetails, lists, viewLi
             </div>
             <div className={'lists-editor panel-col'}>
                 <button onClick={(e) => { e.stopPropagation(); setOpenedFor('edit')}}>Pick list</button>
-                <ActionListsPopup lists={lists} isOpened={openedFor === 'edit'} setOpenedFor={setOpenedFor} onSelect={editList} onRun={runList} onHover={viewListToDetails} onDelete={onDelete}/>
+                <ActionListsPopup lists={lists} isOpened={openedFor === 'edit'} setOpenedFor={setOpenedFor} onSelect={editList} onRun={runList} onHover={viewListToDetails} onDelete={onDelete} setActionListOrder={setActionListOrder}/>
             </div>
             <div className={'automation-enabled panel-col'}>
                 <label>
@@ -821,9 +818,10 @@ export const ActionListsPanel = ({ runningList, editListToDetails, lists, viewLi
     </div>)
 }
 
-export const ActionListsPopup = ({ lists, isOpened, setOpenedFor, onSelect, onHover, onRun, onDelete }) => {
+export const ActionListsPopup = ({ lists, isOpened, setOpenedFor, onSelect, onHover, onRun, onDelete, setActionListOrder }) => {
 
-    if(!isOpened) return null;
+
+    const popupRef = useRef(null);
 
     const [search, setSearch] = useState('')
 
@@ -832,45 +830,121 @@ export const ActionListsPopup = ({ lists, isOpened, setOpenedFor, onSelect, onHo
         return lists.filter(l => l.name.includes(search));
     }, [lists, search])
 
-    return (<div className={'list-selector'}>
-        <div className={'list-selector-inner'}>
-            <div clallName={'search-wrap'}>
-                <input
-                    type={'text'}
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    onClick={(e) => e.stopPropagation()}
-                />
-            </div>
-            <div className={'lists-wrap'}>
-                <PerfectScrollbar>
-                    <div className={'list-inner'}>
-                        {listsDisplayed.map(list => (<div className={'item'} onMouseEnter={() => onHover(list.id)} onMouseLeave={() => onHover(null)}>
-                            <div className={'list-item-row flex-container'}>
-                                <span className={'list-name'}>{list.name}</span>
-                                <TippyWrapper content={<div className={'hint-popup'}>Run List</div> }>
-                                    <div className={'icon-content run-icon interface-icon small'} onClick={() => onRun(list.id)}>
-                                        <img src={"icons/interface/run.png"}/>
-                                    </div>
-                                </TippyWrapper>
-                                <TippyWrapper content={<div className={'hint-popup'}>Edit List</div> }>
-                                    <div className={'icon-content edit-icon interface-icon small'} onClick={() => onSelect(list.id)}>
-                                        <img src={"icons/interface/edit-icon.png"}/>
-                                    </div>
-                                </TippyWrapper>
-                                <TippyWrapper content={<div className={'hint-popup'}>Delete List</div> }>
-                                    <div className={'icon-content edit-icon interface-icon small'} onClick={() => onDelete(list.id)}>
-                                        <img src={"icons/interface/delete.png"}/>
-                                    </div>
-                                </TippyWrapper>
-                            </div>
+    const onDragEnd = (result) => {
+        const { source, destination } = result;
 
-                        </div> ))}
+        // If dropped outside the list, do nothing
+        if (!destination) return;
+
+        // Reorder lists based on drag-and-drop
+        const reorderedLists = Array.from(listsDisplayed);
+        const [removed] = reorderedLists.splice(source.index, 1);
+        reorderedLists.splice(destination.index, 0, removed);
+
+        // Call the callback with the new order
+        setActionListOrder(reorderedLists.map((list, index) => ({
+            id: list.id,
+            sort: index + 1, // Update the sort index
+        })));
+    };
+
+    const handleClickOutside = (event) => {
+        if (popupRef.current && !popupRef.current.contains(event.target)) {
+            setOpenedFor(null); // Close the popup if click outside
+        }
+    };
+
+    useEffect(() => {
+        if (isOpened) {
+            document.addEventListener("mousedown", handleClickOutside);
+        } else {
+            document.removeEventListener("mousedown", handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [isOpened]);
+
+    if (!isOpened) return null;
+
+    return (
+        <DragDropContext onDragEnd={onDragEnd}>
+            <div className={"list-selector"} ref={popupRef}>
+                <div className={"list-selector-inner"}>
+                    <div className={"search-wrap"}>
+                        <input
+                            type={"text"}
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            onClick={(e) => e.stopPropagation()}
+                        />
                     </div>
-                </PerfectScrollbar>
+                    <Droppable droppableId="actionLists">
+                        {(provided) => (
+                            <div
+                                className={"lists-wrap"}
+                                ref={provided.innerRef}
+                                {...provided.droppableProps}
+                            >
+                                <PerfectScrollbar>
+                                    <div className={"list-inner"}>
+                                        {listsDisplayed.map((list, index) => (
+                                            <Draggable
+                                                key={list.id}
+                                                draggableId={list.id.toString()}
+                                                index={index}
+                                            >
+                                                {(provided) => (
+                                                    <div
+                                                        className={"item"}
+                                                        ref={provided.innerRef}
+                                                        {...provided.draggableProps}
+                                                        {...provided.dragHandleProps}
+                                                        onMouseEnter={() => onHover(list.id)}
+                                                        onMouseLeave={() => onHover(null)}
+                                                    >
+                                                        <div className={"list-item-row flex-container"}>
+                                                            <span className={"list-name"}>{list.name}</span>
+                                                            <TippyWrapper content={<div className={"hint-popup"}>Run List</div>}>
+                                                                <div
+                                                                    className={"icon-content run-icon interface-icon small"}
+                                                                    onClick={() => onRun(list.id)}
+                                                                >
+                                                                    <img src={"icons/interface/run.png"} />
+                                                                </div>
+                                                            </TippyWrapper>
+                                                            <TippyWrapper content={<div className={"hint-popup"}>Edit List</div>}>
+                                                                <div
+                                                                    className={"icon-content edit-icon interface-icon small"}
+                                                                    onClick={() => onSelect(list.id)}
+                                                                >
+                                                                    <img src={"icons/interface/edit-icon.png"} />
+                                                                </div>
+                                                            </TippyWrapper>
+                                                            <TippyWrapper content={<div className={"hint-popup"}>Delete List</div>}>
+                                                                <div
+                                                                    className={"icon-content edit-icon interface-icon small"}
+                                                                    onClick={() => onDelete(list.id)}
+                                                                >
+                                                                    <img src={"icons/interface/delete.png"} />
+                                                                </div>
+                                                            </TippyWrapper>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </Draggable>
+                                        ))}
+                                        {provided.placeholder}
+                                    </div>
+                                </PerfectScrollbar>
+                            </div>
+                        )}
+                    </Droppable>
+                </div>
             </div>
-        </div>
-    </div> )
+        </DragDropContext>
+    );
 }
 
 export const ListEditor = React.memo(({
@@ -994,6 +1068,7 @@ export const ListEditor = React.memo(({
                 setRuleValue={setAutotriggerRuleValue}
                 setPattern={setAutotriggerPattern}
                 pattern={editing.autotrigger?.pattern || ''}
+                isAutoCheck={true}
             />
         </div>
         {isEditing ? (<div className={'buttons'}>

@@ -58,7 +58,7 @@ export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, op
         <div className={'head'}>
             <div className={'space-item'}>
                 <span>Alchemy Slots:</span>
-                <span>{formatInt(craftingData.slots.total)}/{formatInt(craftingData.slots.max)}</span>
+                <span className={`${craftingData.slots.total < craftingData.slots.max ? 'slots-available' : 'slots-unavailable'}`}>{formatInt(craftingData.slots.total)}/{formatInt(craftingData.slots.max)}</span>
             </div>
             <TippyWrapper content={<div className={'hint-popup'}><BreakDown breakDown={craftingData.efforts.breakDown} /></div> }>
                 <div className={'space-item'}>

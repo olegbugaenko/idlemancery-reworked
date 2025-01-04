@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, {useEffect, useState, useContext, useCallback} from "react";
 import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
 import {formatInt, formatValue, secondsToString} from "../../general/utils/strings";
@@ -50,6 +50,10 @@ export const ResourcesBar = () => {
         setResourceData(resources);
     })
 
+    const setMonitoredAttribute = useCallback((id) => {
+        sendData('set-monitored', { type: 'resource', id });
+    }, []);
+
     return (<div className={'resources'}>
         {resourceData.map(res => {
 
@@ -60,7 +64,7 @@ export const ResourcesBar = () => {
                 affClassData = ` monitored ${aff.isAffordable ? 'affordable' : (aff.hardLocked ? 'locked' : 'unavailable')}`
             }
 
-            return (<div key={res.id} className={`holder ${aff ? 'monitored' : ''}`}><p className={`resource-item ${affClassData}`}>
+            return (<div key={res.id} className={`holder ${aff ? 'monitored' : ''}`} onMouseOver={() => setMonitoredAttribute(res.id)} onMouseOut={() => setMonitoredAttribute(null)}><p className={`resource-item ${affClassData}`}>
                 <span className={'resource-label'}>{res.name}</span>
                 <TippyWrapper content={<div className={'hint-popup'}><BreakDown breakDown={res.storageBreakdown}/>{res.eta >= 0 ? `${secondsToString(res.eta)} to full` : `${secondsToString(-res.eta)} to empty`}</div> }>
                     <span className={'resource-amount'}>{formatValue(res.amount || 0)}{res.hasCap ? `/${formatValue(res.cap || 0)}` : ''}</span>
@@ -98,6 +102,10 @@ export const AttributesBar = () => {
         setAttributesData(attributes);
     })
 
+    const setMonitoredAttribute = useCallback((id) => {
+        sendData('set-monitored', { type: 'attribute', id });
+    }, []);
+
     return (<div className={'attributes-panel'}>
         {attributesData.list.map(res => {
 
@@ -110,7 +118,7 @@ export const AttributesBar = () => {
 
             // console.log('res: ', res.breakDown);
 
-            return (<div key={res.id} className={`holder ${aff ? 'monitored' : ''}`}><p className={`resource-item ${affClassData}`}>
+            return (<div key={res.id} className={`holder ${aff ? 'monitored' : ''}`} onMouseOver={() => setMonitoredAttribute(res.id)} onMouseOut={() => setMonitoredAttribute(null)}><p className={`resource-item ${affClassData}`}>
                 <TippyWrapper content={<div className={'hint-popup'}>
                     {res.description}
                     {res.nextUnlock ? (<div className={'unlock block'}>

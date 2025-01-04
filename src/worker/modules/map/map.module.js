@@ -341,11 +341,12 @@ export class MapModule extends GameModule {
     getDetails(i, j) {
 
         const tile = this.mapTilesProcessed[i][j];
-        // console.log('Querying tile.drops: ', i, j, tile.drops);
+        // console.log('Querying tile.drops: ', i, j, tile.drops, tile.drops.filter((drop, index) => (!tile.r?.includes(index)) && gameResources.isResourceUnlocked(drop.id)));
 
         return {
             ...tile,
             name: tile.metaData.name,
+            unlockedUnrevealedAmount: tile.drops.filter((drop, index) => (!tile.r?.includes(index)) && gameResources.isResourceUnlocked(drop.id)).length,
             drops: tile.drops.map((drop, index) => ({
                 ...drop,
                 resource: gameResources.getResource(drop.id),
