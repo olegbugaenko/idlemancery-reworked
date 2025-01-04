@@ -80,6 +80,11 @@ p {
     color: #fff;
 }
 
+.small-text p,
+.small-text span {
+    font-size: 13px;
+}
+
 .page-wrap input,
 .page-wrap textarea {
     color: #222233;
@@ -1260,6 +1265,14 @@ h4 {
 .card.craftable {
     width: 300px;
     min-height: 110px;
+}
+
+.card.craftable.running {
+    box-shadow: 0 0 8px var(--highlight);
+}
+
+.card.craftable.running.lower-eff {
+    box-shadow: 0 0 8px var(--yellow);
 }
 
 

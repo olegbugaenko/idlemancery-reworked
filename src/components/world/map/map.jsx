@@ -427,7 +427,7 @@ export const TileDetailsPopup = ({itemId}) => {
     return (
             <div className={'tile-hint'}>
                 <div className={'block'}>
-                    <h4>{item.name}</h4>
+                    <h4>{item.name}[{item.i}:{item.j}]</h4>
                     <div className={'description'}>
                         {item.description}
                     </div>

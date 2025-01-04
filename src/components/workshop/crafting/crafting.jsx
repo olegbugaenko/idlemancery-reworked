@@ -58,7 +58,7 @@ export const Crafting = ({ setItemDetails, setItemLevel, filterId, newUnlocks, o
         <div className={'head'}>
             <div className={'space-item'}>
                 <span>Crafting Slots:</span>
-                <span className={`${craftingData.slots.total < craftingData.slots.max ? 'slots-available' : 'slots-unavailable'}`}>{formatInt(craftingData.slots.total)}/{formatInt(craftingData.slots.max)}</span>
+                <span className={`${craftingData.slots.total > 0 ? 'slots-available' : 'slots-unavailable'}`}>{formatInt(craftingData.slots.total)}/{formatInt(craftingData.slots.max)}</span>
             </div>
             <TippyWrapper content={<div className={'hint-popup'}><BreakDown breakDown={craftingData.efforts.breakDown} /></div> }>
                 <div className={'space-item'}>
@@ -94,9 +94,9 @@ export const Crafting = ({ setItemDetails, setItemLevel, filterId, newUnlocks, o
     </div>)
 }
 
-export const ItemCard = ({ id, icon_id, name, level, maxLevel, onSetLevel, onShowDetails, addItemToList}) => {
+export const ItemCard = ({ id, icon_id, isRunning, isLowerEfficiency, name, level, resourceAmount, maxLevel, onSetLevel, onShowDetails, addItemToList}) => {
 
-    return (<div className={`card craftable`} onMouseEnter={() => onShowDetails(id)} onMouseOver={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)} onClick={() => addItemToList({id, name})}>
+    return (<div className={`card craftable ${isRunning ? 'running' : ''} ${isLowerEfficiency ? 'lower-eff' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseOver={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)} onClick={() => addItemToList({id, name})}>
         <div className={'flex-container two-side-card'}>
             <div className={'left'}>
                 <img src={`icons/resources/${icon_id}.png`} className={'resource big'}/>
@@ -105,6 +105,9 @@ export const ItemCard = ({ id, icon_id, name, level, maxLevel, onSetLevel, onSho
                 <div className={'head'}>
                     <p className={'title'}>{name}</p>
                     <span className={'level'}>{formatInt(level)}{maxLevel ? `/${formatInt(maxLevel)}` : ''}</span>
+                </div>
+                <div className={'mid small-text'}>
+                    <p>You own: {formatValue(resourceAmount)}</p>
                 </div>
                 <div className={'bottom'}>
                     <div className={'buttons'}>

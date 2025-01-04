@@ -45,7 +45,7 @@ export const Plantations = ({ setItemDetails, newUnlocks }) => {
         <div className={'head'}>
             <div className={'space-item'}>
                 <span>Plantation Slots:</span>
-                <span className={`${plantationsData.slots.total < plantationsData.slots.max ? 'slots-available' : 'slots-unavailable'}`}>{formatInt(plantationsData.slots.total)}/{formatInt(plantationsData.slots.max)}</span>
+                <span className={`${plantationsData.slots.total > 0 ? 'slots-available' : 'slots-unavailable'}`}>{formatInt(plantationsData.slots.total)}/{formatInt(plantationsData.slots.max)}</span>
             </div>
         </div>
         <div className={'plantations-cat'}>

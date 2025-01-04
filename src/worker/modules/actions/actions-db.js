@@ -794,7 +794,7 @@ export const registerActionsStage1 = () => {
 
 
     registerGameAction('action_public_engagement', {
-        tags: ["action", "mental", "social"],
+        tags: ["action", "mental", "social", "activity"],
         name: 'Public Engagement',
         isAbstract: false,
         allowedImpacts: ['effects'],
@@ -803,7 +803,7 @@ export const registerActionsStage1 = () => {
         getLearnRate: () => {
             return 4.
         },
-        learningEffects: ['social_training_learning_rate'],
+        learningEffects: ['social_training_learning_rate', 'mental_activities_learn_rate'],
         resourceModifier: {
             get_multiplier: () => ({
                 effects: {
@@ -850,7 +850,7 @@ export const registerActionsStage1 = () => {
         getLearnRate: () => {
             return 1.
         },
-        learningEffects: [],
+        learningEffects: ['mental_activities_learn_rate'],
         resourceModifier: {
             get_multiplier: () => ({
                 effects: {
@@ -1168,7 +1168,7 @@ export const registerActionsStage1 = () => {
         getLearnRate: () => {
             return 1
         },
-        learningEffects: ['books_learning_rate'],
+        learningEffects: ['books_learning_rate', 'mental_activities_learn_rate'],
         resourceModifier: {
             get_income: () => ({
                 resources: {
@@ -1206,7 +1206,7 @@ export const registerActionsStage1 = () => {
 
     registerGameAction('action_read_mages_handbook', {
         tags: ["action", "activity", "spiritual", "book"],
-        name: 'Read Appretience Handbook',
+        name: 'Read Apprentice Handbook',
         isAbstract: false,
         allowedImpacts: ['effects'],
         description: 'Read magic book, providing you precious information about increasing your magic potential. Unfortunately, the text inside is encrypted with runes that you have to de-crypt using spells.',
@@ -1444,6 +1444,55 @@ export const registerActionsStage1 = () => {
             isTraining: true,
         }
     })
+
+
+    registerGameAction('action_learn_geography', {
+        tags: ["action", "training", "mental", "book"],
+        name: 'Learn Geography',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Lear geography to find better places of finding natural resources',
+        level: 1,
+        getLearnRate: () => {
+            return 1.
+        },
+        learningEffects: ['books_learning_rate'],
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'manual_labor_efficiency': {
+                        A: 0.005,
+                        B: 0.995,
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 100,
+                        type: 0,
+                    },
+                    'knowledge': {
+                        A: 0.0,
+                        B: 20,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['read_books_efficiency']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_geography_book') > 0
+        },
+        attributes: {
+            baseXPCost: 5000,
+            displayPerLevel: 1,
+            isTraining: true,
+        }
+    })
+
 
     registerGameAction('action_learn_languages', {
         tags: ["action", "training", "mental"],
@@ -2635,6 +2684,57 @@ export const registerActionsStage1 = () => {
         },
         attributes: {
             baseXPCost: 20000,
+        }
+    })
+
+
+    registerGameAction('action_magical_immersion', {
+        tags: ["action", "magical", "training"],
+        name: 'Magical Immersion',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'You delve into the world of magical energies, training your mind to interact with forces beyond ordinary understanding. This is not just a practice – it\'s a transformation of consciousness.',
+        level: 1,
+        getLearnRate: () => {
+            return 5
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'mental_activities_learn_rate': {
+                        A: 0.01,
+                        B: 0.99,
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 500,
+                        type: 0,
+                    },
+                    'mana': {
+                        A: 0.0,
+                        B: 250,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: []
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_magic_ability',
+            level: 2000
+        }],
+        unlockCondition: () => {
+            return true
+        },
+        attributes: {
+            baseXPCost: 50000,
+            isTraining: true,
         }
     })
 

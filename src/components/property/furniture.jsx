@@ -72,7 +72,7 @@ export const FurnitureUpgrades = ({ setItemDetails, purchaseItem, deleteItem, ne
         <div className={'head'}>
             <div className={'space-item'}>
                 <span>Space:</span>
-                <span className={`${furnituresData.space.total < furnituresData.space.max ? 'slots-available' : 'slots-unavailable'}`}>{formatInt(furnituresData.space.total)}/{formatInt(furnituresData.space.max)}</span>
+                <span className={`${furnituresData.space.total > 0 ? 'slots-available' : 'slots-unavailable'}`}>{formatInt(furnituresData.space.total)}/{formatInt(furnituresData.space.max)}</span>
             </div>
             <div className={'filters'}>
                 <label>

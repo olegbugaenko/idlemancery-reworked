@@ -267,8 +267,8 @@ export class MapModule extends GameModule {
                         return {
                             ...d,
                             probability: prob,
-                            amountMin: Math.max(1, 3*d.amountMult*effEff*amtHerbsMult),
-                            amountMax: Math.max(1, 6*d.amountMult*effEff*amtHerbsMult),
+                            amountMin: Math.max(1, 3*d.amountMult*effEff*amtHerbsMult*(rs.lootAmountMult || 1)),
+                            amountMax: Math.max(1, 6*d.amountMult*effEff*amtHerbsMult*(rs.lootAmountMult || 1)),
                             isRevealed,
                         }
                     }),

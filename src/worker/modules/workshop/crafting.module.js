@@ -2,6 +2,7 @@ import {GameModule} from "../../shared/game-module";
 import {registerCraftingRecipes} from "./recipes-db";
 import {gameCore, gameEntity, gameResources} from "game-framework";
 import {CraftingListsSubmodule} from "./crafting-lists.submodule";
+import {SMALL_NUMBER} from "game-framework/src/utils/consts";
 
 export class CraftingModule extends GameModule {
 
@@ -158,7 +159,10 @@ export class CraftingModule extends GameModule {
             ...recipe,
             icon_id: recipe.resourceId,
             level: this.craftingSlots[recipe.id]?.level || 0,
-            maxLevel: rrs.amount + (this.craftingSlots[recipe.id]?.level || 0)
+            maxLevel: rrs.amount + (this.craftingSlots[recipe.id]?.level || 0),
+            resourceAmount: gameResources.getResource(recipe.resourceId)?.amount,
+            isRunning: gameEntity.entityExists(`activeCrafting_${recipe.id}`),
+            isLowerEfficiency: gameEntity.entityExists(`activeCrafting_${recipe.id}`) && gameEntity.getEntity(`activeCrafting_${recipe.id}`).modifier?.efficiency < 1 - SMALL_NUMBER
         }));
 
         const slots = {

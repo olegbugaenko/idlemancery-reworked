@@ -1298,4 +1298,30 @@ export const registerShopItemsStage1 = () => {
     })
 
 
+    gameEntity.registerGameEntity('shop_item_geography_book', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Geography Basics Book',
+        description: 'Learn basic geography course for better understanding where to search for resources',
+        level: 0,
+        maxLevel: 1,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 1250
+        }],
+        unlockCondition: () => {
+            return true
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 1.e+8*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        }),
+    })
+
 }

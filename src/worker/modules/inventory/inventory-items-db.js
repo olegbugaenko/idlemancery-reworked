@@ -358,7 +358,7 @@ export const registerInventoryItems = () => {
             return 250*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
         },
         attributes: {
-            duration: 600,
+            duration: 240,
         },
         resourceModifier: {
             get_multiplier: () => ({
@@ -377,7 +377,8 @@ export const registerInventoryItems = () => {
         },
         sellPrice: 20000,
         rarity: 2,
-        allowedTileTypes: ['swamp', 'mountain', 'hills']
+        allowedTileTypes: ['swamp', 'mountain', 'hills'],
+        lootAmountMult: 0.5,
     })
 
 
@@ -391,10 +392,10 @@ export const registerInventoryItems = () => {
 
         },
         getUsageCooldown: () => {
-            return 20*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+            return 200*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
         },
         attributes: {
-            duration: 300,
+            duration: 120,
         },
         resourceModifier: {
             get_multiplier: () => ({
@@ -412,7 +413,8 @@ export const registerInventoryItems = () => {
         },
         sellPrice: 20000,
         rarity: 2,
-        allowedTileTypes: ['plain', 'savanna']
+        allowedTileTypes: ['plain', 'savanna'],
+        lootAmountMult: 0.5,
     })
 
 
@@ -429,7 +431,7 @@ export const registerInventoryItems = () => {
             return 200*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
         },
         attributes: {
-            duration: 300,
+            duration: 120,
         },
         resourceModifier: {
             get_multiplier: () => ({
@@ -447,7 +449,8 @@ export const registerInventoryItems = () => {
         },
         sellPrice: 20000,
         rarity: 2,
-        allowedTileTypes: ['mountain', 'forest']
+        allowedTileTypes: ['mountain', 'forest'],
+        lootAmountMult: 0.5,
     })
 
 

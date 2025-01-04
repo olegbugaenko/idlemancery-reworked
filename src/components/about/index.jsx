@@ -6,6 +6,13 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+                <h3>Idle Awakening v0.0.7a</h3>
+                <div className={'features'}>
+                    <p>Added 2 more later game actions</p>
+                    <p>Refined UI representation of crafting/alchemy</p>
+                    <p>Fixed bug when slots where highlighted green, even when 100% used</p>
+                    <p>Map tile coordinates now are shown on hover and in details sidebar</p>
+                </div>
                 <h3>Idle Awakening v0.0.7</h3>
                 <div className={'features'}>
                     <p>Significantly increased sell prices</p>

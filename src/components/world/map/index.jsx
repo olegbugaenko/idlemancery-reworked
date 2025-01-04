@@ -173,6 +173,8 @@ export const MapWrap = ({ children }) => {
                     })
                     setListDetails({...listDetails, listData: {...newList}});
                     sendData('query-map-tile-list-effects', { listData: newList });
+                } else {
+                    onDropActionFromList(`${meta.i}:${meta.j}`);
                 }
             }
         } else {
@@ -322,7 +324,7 @@ export const ItemDetails = ({itemId}) => {
         <PerfectScrollbar>
             <div className={'blade-inner'}>
                 <div className={'block'}>
-                    <h4>{item.name}</h4>
+                    <h4>{item.name}[{item.i}:{item.j}]</h4>
                     <div className={'description'}>
                         {item.description}
                     </div>

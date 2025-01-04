@@ -123,6 +123,12 @@ export const registerCommomEffects = () => {
         minValue: 1.,
     })
 
+    gameEffects.registerEffect('mental_activities_learn_rate', {
+        name: 'Mental Activities Learning Rate',
+        defaultValue: 1.,
+        minValue: 1.,
+    })
+
     gameEffects.registerEffect('crafting_efficiency', {
         name: 'Crafting Efficiency',
         defaultValue: 1.,
