@@ -655,7 +655,7 @@ export const registerRandomEventsDb = () => {
                         resources: {
                             coins: {
                                 A: 0,
-                                B: Math.max(50, 0.1*gameResources.getResource('coins').cap),
+                                B: Math.max(50, 0.02*gameResources.getResource('coins').cap),
                                 type: 0,
                             }
                         }
@@ -668,7 +668,7 @@ export const registerRandomEventsDb = () => {
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_health_regen');
-                        gameResources.addResource('coins', -Math.max(50, 0.1*gameResources.getResource('coins').cap));
+                        gameResources.addResource('coins', -Math.max(50, 0.02*gameResources.getResource('coins').cap));
                     }
                 }, {
                     id: 'altar_silence',
@@ -676,7 +676,7 @@ export const registerRandomEventsDb = () => {
                     description: 'The altar remains silent, and your gold vanishes.',
                     unlockCondition: () => true,
                     onTrigger: () => {
-                        gameResources.addResource('coins', -Math.max(50, 0.1*gameResources.getResource('coins').cap));
+                        gameResources.addResource('coins', -Math.max(50, 0.02*gameResources.getResource('coins').cap));
                     }
                 }]
             },
@@ -1463,7 +1463,7 @@ export const registerRandomEventsDb = () => {
                     description: 'The librarian rewards you with a small pouch of coins.',
                     unlockCondition: () => true,
                     onTrigger: () => {
-                        gameResources.addResource('coins', 0.1*gameResources.getResource('coins').cap);
+                        gameResources.addResource('coins', 0.02*gameResources.getResource('coins').cap);
                         gameResources.addResource('knowledge', -10*randomEventScalingFactor('random_events_memory_effect'));
                     }
                 }]
@@ -1773,7 +1773,7 @@ export const registerRandomEventsDb = () => {
                     description: 'The patron apologizes and offers you some gold.',
                     unlockCondition: () => true,
                     onTrigger: () => {
-                        gameResources.addResource('coins', 50 + 0.1*gameResources.getResource('coins').cap);
+                        gameResources.addResource('coins', 50 + 0.03*gameResources.getResource('coins').cap);
                         gameResources.addResource('health', -10*randomEventScalingFactor('random_events_charisma_effect'));
                     }
                 }, {
@@ -1906,7 +1906,7 @@ export const registerRandomEventsDb = () => {
                     description: 'The crowd finds your antics amusing and tosses some coins your way. (Refilled 10% of your coins storage)',
                     unlockCondition: () => true,
                     onTrigger: () => {
-                        gameResources.addResource('coins', 0.1*gameResources.getResource('coins').cap);
+                        gameResources.addResource('coins', 0.02*gameResources.getResource('coins').cap);
                     }
                 }]
             },
