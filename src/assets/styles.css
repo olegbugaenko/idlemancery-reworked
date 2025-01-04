@@ -654,6 +654,18 @@ h4 {
     justify-content: space-between;
 }
 
+@media screen and (max-width: 1450px) {
+    .actions-wrap .categories {
+        display: flex;
+        flex-wrap: wrap;
+        height: 70px;
+    }
+
+    .actions-wrap .actions .list-wrap {
+        height: calc(100% - 160px);
+    }
+}
+
 .card.action {
     height: 120px;
 }
