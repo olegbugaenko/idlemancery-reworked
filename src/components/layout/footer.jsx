@@ -167,7 +167,7 @@ export const Footer = () => {
                     </li>
                     <li>
                     <span>
-                        <a target={'_blank'} href={'https://discord.gg/448M3TNG'}>Join Discord</a>
+                        <a target={'_blank'} href={'https://discord.gg/TRRvKf4ZTG'}>Join Discord</a>
                     </span>
                     </li>
                     <li>
