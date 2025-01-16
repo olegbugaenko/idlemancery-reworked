@@ -474,7 +474,7 @@ export const MapTileListDetails = ({
                             {editing.tiles.length ? editing.tiles.map((tile, index) => (
                                         <div className={`action-row flex-container ${!tile.isAvailable ? 'unavailable-tile' : ''}`}
                                         >
-                                            {editing.proportionsBar ? (<div style={{width: editing.proportionsBar[index]?.displayPercentage, backgroundColor: editing.proportionsBar[index]?.color}} className={'prop-bg'}></div> ) : null}
+                                            {editing.proportionsBar ? (<div style={{width: editing.proportionsBar?.[index]?.displayPercentage, backgroundColor: editing.proportionsBar[index]?.color}} className={'prop-bg'}></div> ) : null}
                                             <div className={'col title'}>
                                                 <span>{tile.name}</span>
                                             </div>
@@ -483,7 +483,7 @@ export const MapTileListDetails = ({
                                                     ? (<div className={'editing-amounts'}>
                                                         <input type={'number'} value={tile.time}
                                                               onChange={(e) => onUpdateActionFromList(tile.id, 'time', +e.target.value)}/>
-                                                        <span>{formatValue(editing.proportionsBar[index].percentage*100)} %</span>
+                                                        <span>{formatValue(editing.proportionsBar?.[index]?.percentage*100 || 0)} %</span>
                                                     </div>)
                                                     : (<span>{formatValue(editing.proportionsBar[index].percentage*100)} %</span>)
                                                 }

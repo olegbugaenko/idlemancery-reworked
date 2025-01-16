@@ -1081,7 +1081,7 @@ export const ListEditor = React.memo(({
                                      {...provided.draggableProps}
                                      {...provided.dragHandleProps}
                                 >
-                                    {editing.proportionsBar ? (<div style={{width: editing.proportionsBar[index]?.displayPercentage, backgroundColor: editing.proportionsBar[index]?.color}} className={'prop-bg'}></div> ) : null}
+                                    {editing.proportionsBar ? (<div style={{width: editing.proportionsBar?.[index]?.displayPercentage, backgroundColor: editing.proportionsBar[index]?.color}} className={'prop-bg'}></div> ) : null}
                                     <div className={'col title'}>
                                         <span>{action.name}</span>
                                     </div>
@@ -1090,7 +1090,7 @@ export const ListEditor = React.memo(({
                                             ? (<div className={'editing-amounts'}>
                                                 <input type={'number'} value={action.time}
                                                        onChange={(e) => onUpdateActionFromList(action.id, 'time', +e.target.value)}/>
-                                                <span>{formatValue(editing.proportionsBar[index].percentage*100)} %</span>
+                                                <span>{formatValue(editing.proportionsBar?.[index]?.percentage*100 || 0)} %</span>
                                             </div>
                                             )
                                             : (<span>{formatValue(editing.proportionsBar[index].percentage*100)} %</span>)
