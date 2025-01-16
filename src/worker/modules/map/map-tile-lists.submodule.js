@@ -2,6 +2,7 @@ import {GameModule} from "../../shared/game-module";
 import {gameEntity, gameResources, gameCore, resourceCalculators} from "game-framework";
 import {checkMatchingRules} from "../../shared/utils/rule-utils";
 import {mapObject} from "../../shared/utils/objects";
+import {SMALL_NUMBER} from "game-framework/src/utils/consts";
 
 export class MapTileListsSubmodule extends GameModule {
 
@@ -59,11 +60,13 @@ export class MapTileListsSubmodule extends GameModule {
         this.eventHandler.registerHandler('query-map-tile-list-effects', ({ id, listData }) => {
             const potentialDrops = this.getListEffects(null, listData);
             const costs = this.getListCosts(null, listData);
+            const proportionsBar = this.getProportionsBar(listData);
 
             this.eventHandler.sendData('map-tile-list-effects', {
                 id,
                 potentialDrops,
-                costs
+                costs,
+                proportionsBar
             });
         })
     }
@@ -124,13 +127,18 @@ export class MapTileListsSubmodule extends GameModule {
     }
 
     deleteMapTilesList(id) {
+
+        if(this.runningList?.id === id) {
+            this.stopList(id);
+        }
+
         delete this.mapLists[id];
 
         this.regenerateListsPriorityMap();
     }
 
     regenerateListsPriorityMap() {
-        const listsBeingAutotrigger = Object.values(this.mapLists).filter(one => !!one.autotrigger?.rules?.length);
+        const listsBeingAutotrigger = Object.values(this.mapLists).filter(one => !!one.autotrigger?.isEnabled);
 
         this.listsAutotrigger = listsBeingAutotrigger.map(one => ({
             id: one.id,
@@ -249,13 +257,50 @@ export class MapTileListsSubmodule extends GameModule {
 
         data.drops = this.getListEffects(id);
         data.costs = this.getListCosts(id);
+        data.proportionsBar = this.getProportionsBar(data);
 
         data.bForceOpen = bForceOpen;
 
-        // console.log('SendingData: ', JSON.stringify(data.prevEffects), JSON.stringify(data.resourcesEffects));
-
         this.eventHandler.sendData('map-tile-list-data', data);
     }
+
+
+    getProportionsBar(data) {
+        const total = data.tiles.reduce((acc, a) => acc += Math.max(0, a.time), 0);
+        const tiles = data.tiles.filter(one => one.time > 0);
+
+        if (total <= SMALL_NUMBER) return [];
+
+        const generateColor = (index, totalActions) => {
+            // Use HSL to generate deterministic colors based on the index
+            const hue = (index * 360 / totalActions) % 360; // Spread hues evenly
+            const saturation = 65; // Fixed saturation for consistency
+            const lightness = 70; // Fixed lightness for consistency
+            return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+        };
+
+        const rawPercentages = tiles.map(a => a.time / total);
+        const minimumPercentage = 0.01;
+        const totalMinimum = minimumPercentage * tiles.length;
+        const normalizeFactor = (1 - totalMinimum) / rawPercentages.reduce((acc, p) => acc + Math.max(p - minimumPercentage, 0), 0);
+
+        return tiles.map((a, index) => {
+            const percentage = a.time / total;
+            const displayPercentage = percentage < minimumPercentage
+                ? minimumPercentage
+                : (percentage - minimumPercentage) * normalizeFactor + minimumPercentage;
+
+            return {
+                id: a.id,
+                name: a.name,
+                percentage: percentage,
+                displayPercentage: `${displayPercentage*100}%`,
+                color: generateColor(index, tiles.length)
+            };
+        });
+    }
+
+
 
     getListEffects(id, listData) {
         let list = this.mapLists[id];
@@ -282,6 +327,7 @@ export class MapTileListsSubmodule extends GameModule {
                     .mapTilesProcessed[tile.i][tile.j].r?.includes(index))
                 .map(d => ({
                     ...d,
+                    // rarityTier: gameResources.getResource(d.id)?.tags?.includes('rare') ? 'rare' : 'common',
                     probability: d.probability * weight,
                     weightedAmountMin: d.probability * weight * d.amountMin,
                     weightedAmountMax: d.probability * weight * d.amountMax,
@@ -291,6 +337,7 @@ export class MapTileListsSubmodule extends GameModule {
                 if (!totalEffects[drop.id]) {
                     totalEffects[drop.id] = {
                         id: drop.id,
+                        rarityTier: drop.rarityTier,
                         probability: 0,
                         amountMin: 0,
                         amountMax: 0,

@@ -2,6 +2,7 @@ import {GameModule} from "../../shared/game-module";
 import {gameEntity, gameResources, gameCore, resourceCalculators} from "game-framework";
 import {checkMatchingRules} from "../../shared/utils/rule-utils";
 import {mapObject} from "../../shared/utils/objects";
+import {SMALL_NUMBER} from "game-framework/src/utils/consts";
 
 export class ActionListsSubmodule extends GameModule {
 
@@ -101,12 +102,14 @@ export class ActionListsSubmodule extends GameModule {
 
             console.log('SendingData: ', JSON.stringify(data.prevEffects), JSON.stringify(data.resourcesEffects), data, id);
 
+            const proportionsBar = this.getProportionsBar(listData)
 
             this.eventHandler.sendData('action-list-effects', {
                 potentialEffects: data,
                 resourcesEffects,
                 prevEffects: this.packEffects(prevEffects),
-                effectEffects: data.filter(one => one.type === 'effects')
+                effectEffects: data.filter(one => one.type === 'effects'),
+                proportionsBar
             });
         })
     }
@@ -183,6 +186,11 @@ export class ActionListsSubmodule extends GameModule {
     }
 
     deleteActionList(id) {
+
+        if(this.runningList?.id === id) {
+            this.stopList();
+        }
+
         delete this.actionsLists[id];
 
         this.sortLists();
@@ -191,7 +199,7 @@ export class ActionListsSubmodule extends GameModule {
     }
 
     regenerateListsPriorityMap() {
-        const listsBeingAutotrigger = Object.values(this.actionsLists).filter(one => !!one.autotrigger?.rules?.length);
+        const listsBeingAutotrigger = Object.values(this.actionsLists).filter(one => !!one.autotrigger?.isEnabled);
 
         const listsBeingAutotriggerAvailable = listsBeingAutotrigger.filter(lst => {
            if(lst.actions && lst.actions.find(one => gameEntity.isEntityUnlocked(one.id)
@@ -470,7 +478,11 @@ export class ActionListsSubmodule extends GameModule {
             }
         }));
 
+        const proportionsBar = this.getProportionsBar(data)
+
         data.prevEffects = this.packEffects(prevEffects);
+
+        data.proportionsBar = proportionsBar;
 
         data.bForceOpen = bForceOpen;
 
@@ -478,6 +490,42 @@ export class ActionListsSubmodule extends GameModule {
 
         this.eventHandler.sendData('action-list-data', data);
     }
+
+    getProportionsBar(data) {
+        const total = data.actions.reduce((acc, a) => acc += Math.max(0, a.time), 0);
+        const actions = data.actions.filter(one => one.time > 0);
+
+        if (total <= SMALL_NUMBER) return [];
+
+        const generateColor = (index, totalActions) => {
+            // Use HSL to generate deterministic colors based on the index
+            const hue = (index * 360 / totalActions) % 360; // Spread hues evenly
+            const saturation = 65; // Fixed saturation for consistency
+            const lightness = 70; // Fixed lightness for consistency
+            return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+        };
+
+        const rawPercentages = actions.map(a => a.time / total);
+        const minimumPercentage = 0.01;
+        const totalMinimum = minimumPercentage * actions.length;
+        const normalizeFactor = (1 - totalMinimum) / rawPercentages.reduce((acc, p) => acc + Math.max(p - minimumPercentage, 0), 0);
+
+        return actions.map((a, index) => {
+            const percentage = a.time / total;
+            const displayPercentage = percentage < minimumPercentage
+                ? minimumPercentage
+                : (percentage - minimumPercentage) * normalizeFactor + minimumPercentage;
+
+            return {
+                id: a.id,
+                name: a.name,
+                percentage: percentage,
+                displayPercentage: `${displayPercentage*100}%`,
+                color: generateColor(index, actions.length)
+            };
+        });
+    }
+
 
     getListEffects(id, listData) {
         let list = this.actionsLists[id];

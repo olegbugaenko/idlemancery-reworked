@@ -2607,8 +2607,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'guild_reputation': {
-                        A: 0.001,
-                        B: 0.0019,
+                        A: 0.0004,
+                        B: 0.0076,
                         type: 0,
                     }
                 }

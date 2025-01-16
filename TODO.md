@@ -119,4 +119,9 @@ v0.0.3a:
 20. [V] Reduce urn space requirement + add "Armchair" and "Bathroom"
 21. [V] Adjust rare events scaling 
 22. Add new crafting resource and new accessory, improving yoga practice efficiency
-23. Highlight actions once hovering over primary attribute.
+23. [V] Highlight actions once hovering over primary attribute.
+
+TODO's:
+1. [V] Add On/Off for map tiles automations
+2. Add sort lists for maps routes and crafting
+3. [V] Add automation for furniture

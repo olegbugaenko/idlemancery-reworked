@@ -59,6 +59,10 @@ export const registerSpell = (id, options) => {
         ]
     }
 
+    if(options.attributes?.duration) {
+        options.attributes.className = 'spell'
+    }
+
     gameEntity.registerGameEntity(id, {
         ...options,
     })

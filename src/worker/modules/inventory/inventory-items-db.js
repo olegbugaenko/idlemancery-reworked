@@ -4,11 +4,13 @@ const updateLevelBy = (id, amount) => {
     gameEntity.setEntityLevel(id, gameEntity.getLevel(id) + amount, true);
 }
 
+export const metabolismMod = (attr) => attr > 1 ? 1. / (Math.pow(attr, 0.25)) : 1.;
+
+export const sellPriceMod = (attr) => attr > 1 ? Math.min(5, 1. +  0.02*(Math.log2(attr) ** 2.0)) : 1.;
+
 export const registerInventoryItems = () => {
 
     const charismaMod = (attr) => attr > 0 ? 1. / (1. + 0.02*Math.log2(attr*gameEffects.getEffectValue('prices_discount'))) : 1.;
-
-    const metabolismMod = (attr) => attr > 1 ? 1. / (Math.pow(attr, 0.25)) : 1.;
 
 
     gameResources.registerResource('inventory_berry', {

@@ -159,6 +159,21 @@ export const CraftingWrap = ({ children }) => {
         }
     }, [listDetails])
 
+    const onToggleAutotrigger = useCallback(() => {
+        const { listData } = listDetails ?? {};
+        if(listData) {
+            const newList = cloneDeep(listData);
+            if(!newList.autotrigger) {
+                newList.autotrigger = {};
+            }
+            if(!newList.autotrigger.rules) {
+                newList.autotrigger.rules = [];
+            }
+            newList.autotrigger.isEnabled = !newList.autotrigger.isEnabled;
+            setListDetails({...listDetails, listData: {...newList}});
+        }
+    }, [listDetails])
+
     useEffect(() => {
         console.log('Called select list', listDetails);
     }, [listDetails])
@@ -272,6 +287,7 @@ export const CraftingWrap = ({ children }) => {
                 setAutotriggerPriority={setAutotriggerPriority}
                 onSetAutotriggerPattern={onSetAutotriggerPattern}
                 onCloseList={onCloseList}
+                onToggleAutotrigger={onToggleAutotrigger}
             />) : null}
             {detailOpened && !listDetails?.isEdit ? (<ItemDetails itemId={detailOpened} category={'crafting'}/>) : null}
         </div>
@@ -360,7 +376,8 @@ export const CraftingListDetails = ({
    onDeleteAutotriggerRule,
    setAutotriggerPriority,
    onSetAutotriggerPattern,
-   onCloseList
+   onCloseList,
+   onToggleAutotrigger
 }) => {
 
     const worker = useContext(WorkerContext);
@@ -400,6 +417,10 @@ export const CraftingListDetails = ({
 
     const setAutotriggerPattern = (pattern) => {
         onSetAutotriggerPattern(pattern)
+    }
+
+    const toggleAutotrigger = () => {
+        onToggleAutotrigger()
     }
 
     if(!listDetails) return ;
@@ -477,6 +498,10 @@ export const CraftingListDetails = ({
                 <div className={'autotrigger-settings autoconsume-setting block'}>
                     <div className={'rules-header flex-container'}>
                         <p>Autotrigger rules: {editing?.autotrigger?.rules?.length ? null : 'None'}</p>
+                        <label>
+                            <input type={'checkbox'} checked={editing.autotrigger?.isEnabled} onChange={toggleAutotrigger}/>
+                            {editing.autotrigger?.isEnabled ? ' ON' : ' OFF'}
+                        </label>
                         {isEditing ? (<button onClick={addAutotriggerRule}>Add rule (AND)</button>) : null}
                     </div>
                     <div className={'priority-line flex-container'}>
@@ -490,7 +515,7 @@ export const CraftingListDetails = ({
                         setRuleValue={setAutotriggerRuleValue}
                         setPattern={setAutotriggerPattern}
                         pattern={editing.autotrigger?.pattern || ''}
-                        isAutoCheck={true}
+                        isAutoCheck={editing.autotrigger?.isEnabled}
                     />
                 </div>
                 {isEditing ? (<div className={'buttons'}>

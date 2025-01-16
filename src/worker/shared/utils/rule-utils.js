@@ -115,6 +115,14 @@ export const checkMatchingRule = (rule) => {
 }
 
 export const checkMatchingRules = (rules, conditionStr = null, bExplain = false) => {
+    if(!rules.length) {
+        if(!bExplain) return true;
+        return {
+            ruleResults: [],
+            result: true,
+        }
+    }
+
     const ruleResults = rules.map(rule => checkMatchingRule(rule));
 
     if (!conditionStr) {

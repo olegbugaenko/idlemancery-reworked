@@ -118,7 +118,8 @@ export const Actions = ({}) => {
                 potentialEffects: payload.potentialEffects,
                 resourcesEffects: payload.resourcesEffects,
                 effectEffects: payload.effectEffects,
-                prevEffects: payload.prevEffects
+                prevEffects: payload.prevEffects,
+                proportionsBar: payload.proportionsBar,
             })
         }
     })
@@ -284,6 +285,20 @@ export const Actions = ({}) => {
         }
     }, [listData]);
 
+    const onToggleAutotrigger = useCallback(() => {
+        if(listData) {
+            const newList = cloneDeep(listData);
+            if(!newList.autotrigger) {
+                newList.autotrigger = {};
+            }
+            if(!newList.autotrigger.rules) {
+                newList.autotrigger.rules = [];
+            }
+            newList.autotrigger.isEnabled = !newList.autotrigger.isEnabled;
+            setListData({...newList});
+        }
+    }, [listData]);
+
 
     const onAddAutotriggerRule = useCallback(() => {
 
@@ -426,6 +441,7 @@ export const Actions = ({}) => {
                         onDeleteAutotriggerRule={onDeleteAutotriggerRule}
                         setAutotriggerPriority={setAutotriggerPriority}
                         onSetAutotriggerPattern={onSetAutotriggerPattern}
+                        onToggleAutotrigger={onToggleAutotrigger}
                         resources={resources}
                     />
                 </div>
@@ -451,6 +467,7 @@ export const DetailBlade = ({
     onDeleteAutotriggerRule,
     setAutotriggerPriority,
     onSetAutotriggerPattern,
+    onToggleAutotrigger,
     resources
 }) => {
 
@@ -468,6 +485,7 @@ export const DetailBlade = ({
             onDeleteAutotriggerRule={onDeleteAutotriggerRule}
             setAutotriggerPriority={setAutotriggerPriority}
             onSetAutotriggerPattern={onSetAutotriggerPattern}
+            onToggleAutotrigger={onToggleAutotrigger}
             resources={resources}
         />)
     }
@@ -489,6 +507,7 @@ export const DetailBlade = ({
             onSetAutotriggerRuleValue={onSetAutotriggerRuleValue}
             onDeleteAutotriggerRule={onDeleteAutotriggerRule}
             setAutotriggerPriority={setAutotriggerPriority}
+            onToggleAutotrigger={onToggleAutotrigger}
             resources={resources}
         />)
     }
@@ -506,6 +525,7 @@ export const DetailBlade = ({
             onSetAutotriggerRuleValue={onSetAutotriggerRuleValue}
             onDeleteAutotriggerRule={onDeleteAutotriggerRule}
             setAutotriggerPriority={setAutotriggerPriority}
+            onToggleAutotrigger={onToggleAutotrigger}
             resources={resources}
         />)
     }
@@ -555,7 +575,11 @@ export const ActionCard = ({ id, monitored, isEditingList, index, name, level, m
                         <div className={'buttons'}>
                             <div className={'buttons-inner-wrap'}>
                                 {isActive ? <button onClick={() => onActivate()}>Stop</button> : <button onClick={() => onActivate(id)}>Start</button> }
-                                <button onClick={() => toggleHiddenAction(id, !isHidden)}>
+                                <button onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    toggleHiddenAction(id, !isHidden)
+                                }}>
                                     {isHidden ? "Show" : "Hide"}
                                 </button>
                             </div>
@@ -960,6 +984,7 @@ export const ListEditor = React.memo(({
    onDeleteAutotriggerRule,
    setAutotriggerPriority,
    onSetAutotriggerPattern,
+   onToggleAutotrigger,
    resources
 }) => {
 
@@ -1000,6 +1025,10 @@ export const ListEditor = React.memo(({
         onSetAutotriggerPattern(pattern)
     }
 
+    const toggleAutotrigger = () => {
+        onToggleAutotrigger()
+    }
+
     if(!editing) return ;
 
     return (<PerfectScrollbar><div className={'list-editor'}>
@@ -1010,9 +1039,40 @@ export const ListEditor = React.memo(({
                 <HowToSign scope={'action-lists'} />
             </div>
         </div>
+        <div className={'block'}>
+            <p className={'hint'}>
+                All actions in the list are performed simultaneously.
+            </p>
+            <div className={'show-bar'}>
+                {editing?.proportionsBar ? (<div className={'proportions-bar'}>
+                    {editing?.proportionsBar.map(one => (
+                        <TippyWrapper content={
+                            <div className={'hint-popup'}>
+                                <p>{one.name}</p>
+                                <p>Effort: {formatValue(one.percentage*100)}%</p>
+                            </div> }>
+                            <div style={{width: one.displayPercentage, backgroundColor: one.color}} className={'proportion-bar'}>
+                            </div>
+                        </TippyWrapper>
+                    ))}
+                </div> ) : null}
+            </div>
+        </div>
         <Droppable droppableId="action-list-editor">
             {(provided) => (
                 <div ref={provided.innerRef} {...provided.droppableProps} className="actions-list-wrap">
+                    <div className={`action-row flex-container header`}
+                    >
+                        <div className={'col title'}>
+                            <span>Action</span>
+                        </div>
+                        <div className={'col amount'}>
+                            <span>Effort</span>
+                        </div>
+                        <div className={'col delete'}>
+                            {isEditing ? (<span>Delete</span>) : null}
+                        </div>
+                    </div>
                     {editing.actions.length ? editing.actions.map((action, index) => (
                         <Draggable key={`list-${action.id}-${index}`} draggableId={`list-${action.id}-${index}`} index={index}>
                             {(provided) => (
@@ -1021,14 +1081,19 @@ export const ListEditor = React.memo(({
                                      {...provided.draggableProps}
                                      {...provided.dragHandleProps}
                                 >
+                                    {editing.proportionsBar ? (<div style={{width: editing.proportionsBar[index]?.displayPercentage, backgroundColor: editing.proportionsBar[index]?.color}} className={'prop-bg'}></div> ) : null}
                                     <div className={'col title'}>
                                         <span>{action.name}</span>
                                     </div>
-                                    <div className={'col amount'}>
+                                    <div className={`col amount ${isEditing ? 'large' : ''}`}>
                                         {isEditing
-                                            ? (<input type={'number'} value={action.time}
-                                                      onChange={(e) => onUpdateActionFromList(action.id, 'time', +e.target.value)}/>)
-                                            : (<span>{action.time} sec.</span>)
+                                            ? (<div className={'editing-amounts'}>
+                                                <input type={'number'} value={action.time}
+                                                       onChange={(e) => onUpdateActionFromList(action.id, 'time', +e.target.value)}/>
+                                                <span>{formatValue(editing.proportionsBar[index].percentage*100)} %</span>
+                                            </div>
+                                            )
+                                            : (<span>{formatValue(editing.proportionsBar[index].percentage*100)} %</span>)
                                         }
                                     </div>
                                     <div className={'col delete'}>
@@ -1053,6 +1118,10 @@ export const ListEditor = React.memo(({
         <div className={'autotrigger-settings autoconsume-setting block'}>
             <div className={'rules-header flex-container'}>
                 <p>Autotrigger rules: {editing?.autotrigger?.rules?.length ? null : 'None'}</p>
+                <label>
+                    <input type={'checkbox'} checked={editing.autotrigger?.isEnabled} onChange={toggleAutotrigger}/>
+                    {editing.autotrigger?.isEnabled ? ' ON' : ' OFF'}
+                </label>
                 {isEditing ? (<button onClick={addAutotriggerRule}>Add rule (AND)</button>) : null}
                 <HowToSign scope={'lists-automation'} />
             </div>
@@ -1068,7 +1137,7 @@ export const ListEditor = React.memo(({
                 setRuleValue={setAutotriggerRuleValue}
                 setPattern={setAutotriggerPattern}
                 pattern={editing.autotrigger?.pattern || ''}
-                isAutoCheck={true}
+                isAutoCheck={editing.autotrigger?.isEnabled}
             />
         </div>
         {isEditing ? (<div className={'buttons'}>

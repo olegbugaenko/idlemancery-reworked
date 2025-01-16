@@ -64,6 +64,7 @@ export const MapWrap = ({ children }) => {
                 ...listDetails.listData,
                 drops: payload.potentialDrops,
                 costs: payload.costs,
+                proportionsBar: payload.proportionsBar,
             }
         })
     })
@@ -149,6 +150,21 @@ export const MapWrap = ({ children }) => {
                 newList.autotrigger.rules = [];
             }
             newList.autotrigger.rules.splice(index);
+            setListDetails({...listDetails, listData: {...newList}});
+        }
+    }, [listDetails])
+
+    const onToggleAutotrigger = useCallback(() => {
+        const { listData } = listDetails ?? {};
+        if(listData) {
+            const newList = cloneDeep(listData);
+            if(!newList.autotrigger) {
+                newList.autotrigger = {};
+            }
+            if(!newList.autotrigger.rules) {
+                newList.autotrigger.rules = [];
+            }
+            newList.autotrigger.isEnabled = !newList.autotrigger.isEnabled;
             setListDetails({...listDetails, listData: {...newList}});
         }
     }, [listDetails])
@@ -260,7 +276,7 @@ export const MapWrap = ({ children }) => {
                 <Map setItemDetails={setItemDetails} newUnlocks={newUnlocks?.['world']?.items?.['map']?.items} openListDetails={openListDetails} isEditList={listDetails?.isEdit}/>
             </div>
 
-            <div className={'item-detail ingame-box detail-blade'}>
+            <div className={`item-detail ingame-box detail-blade ${listDetails?.listData && listDetails?.isEdit ? 'wide-blade' : ''}`}>
                 {listDetails?.listData ? (<MapTileListDetails
                     listDetails={listDetails.listData}
                     isEditing={listDetails.isEdit}
@@ -272,6 +288,7 @@ export const MapWrap = ({ children }) => {
                     onDeleteAutotriggerRule={onDeleteAutotriggerRule}
                     setAutotriggerPriority={setAutotriggerPriority}
                     onSetAutotriggerPattern={onSetAutotriggerPattern}
+                    onToggleAutotrigger={onToggleAutotrigger}
                     onCloseList={onCloseList}
                 />) : null}
                 {(mapTileDetails && !listDetails?.listData) ? (<ItemDetails
@@ -336,12 +353,12 @@ export const ItemDetails = ({itemId}) => {
 
                 {item.drops ? (<div className={'block'}>
                     <p>Drops:</p>
-                    {item.drops.map(drop => (<p className={'drop-row'}>
+                    {item.drops.map(drop => (<p className={`drop-row ${drop.rarityTier}`}>
                         <span className={'name'}>{drop.resource.name}</span>
                         <span className={'probability'}>{formatValue(drop.probability*100)}%</span>
                         <span className={'amounts'}>{formatInt(drop.amountMin)} - {formatInt(drop.amountMax)}</span>
                     </p> ))}
-                    {item.unlockedUnrevealedAmount > 0 ? (<p className={'hint'}>{formatInt(item.unlockedUnrevealedAmount)} more items can be found</p> ) : null}
+                    {item.unlockedUnrevealedAmount > 0 ? (<p className={'hint pot-finds'}>{formatInt(item.unlockedUnrevealedAmount)} more items can be found</p> ) : null}
                 </div> ) : null}
                 <div className={'block'}>
                     <p>Costs:</p>
@@ -370,7 +387,8 @@ export const MapTileListDetails = ({
    onDeleteAutotriggerRule,
    setAutotriggerPriority,
    onSetAutotriggerPattern,
-   onCloseList
+   onCloseList,
+   onToggleAutotrigger
 }) => {
 
     const worker = useContext(WorkerContext);
@@ -380,7 +398,7 @@ export const MapTileListDetails = ({
     const [editing, setEditing] = useState({ tiles: [] })
 
     useEffect(() => {
-        console.log('SET EDITING LIST: ', listDetails);
+        console.log('SET EDITING LIST MAP: ', listDetails);
         setEditing(listDetails);
     }, [listDetails])
 
@@ -411,6 +429,10 @@ export const MapTileListDetails = ({
         onSetAutotriggerPattern(pattern)
     }
 
+    const toggleAutotrigger = () => {
+        onToggleAutotrigger()
+    }
+
     if(!listDetails) return ;
 
     return (
@@ -423,20 +445,47 @@ export const MapTileListDetails = ({
                     </div>
                 </div>
                 <div className={'block'}>
+                    <p className={'hint'}>
+                        All tiles in the list are gathered simultaneously with corresponding weights.
+                    </p>
+                    <div className={'show-bar'}>
+                        {editing?.proportionsBar ? (<div className={'proportions-bar'}>
+                            {editing?.proportionsBar.map(one => (<div style={{width: one.displayPercentage, backgroundColor: one.color}} className={'proportion-bar'}>
+                            </div> ))}
+                        </div> ) : null}
+                    </div>
+                </div>
+                <div className={'block'}>
                     <p>Click on tiles to add/remove them from the list</p>
                     <div className={'tiles-list'}>
                         <div className="actions-list-wrap">
+                            <div className={`action-row flex-container header`}
+                            >
+                                <div className={'col title'}>
+                                    <span>Tile</span>
+                                </div>
+                                <div className={'col amount'}>
+                                    <span>Effort</span>
+                                </div>
+                                <div className={'col delete'}>
+                                    {isEditing ? (<span>Delete</span>) : null}
+                                </div>
+                            </div>
                             {editing.tiles.length ? editing.tiles.map((tile, index) => (
                                         <div className={`action-row flex-container ${!tile.isAvailable ? 'unavailable-tile' : ''}`}
                                         >
+                                            {editing.proportionsBar ? (<div style={{width: editing.proportionsBar[index]?.displayPercentage, backgroundColor: editing.proportionsBar[index]?.color}} className={'prop-bg'}></div> ) : null}
                                             <div className={'col title'}>
                                                 <span>{tile.name}</span>
                                             </div>
-                                            <div className={'col amount'}>
+                                            <div className={`col amount ${isEditing ? 'large' : ''}`}>
                                                 {isEditing
-                                                    ? (<input type={'number'} value={tile.time}
-                                                              onChange={(e) => onUpdateActionFromList(tile.id, 'time', +e.target.value)}/>)
-                                                    : (<span>{tile.time} seconds</span>)
+                                                    ? (<div className={'editing-amounts'}>
+                                                        <input type={'number'} value={tile.time}
+                                                              onChange={(e) => onUpdateActionFromList(tile.id, 'time', +e.target.value)}/>
+                                                        <span>{formatValue(editing.proportionsBar[index].percentage*100)} %</span>
+                                                    </div>)
+                                                    : (<span>{formatValue(editing.proportionsBar[index].percentage*100)} %</span>)
                                                 }
                                             </div>
                                             <div className={'col delete'}>
@@ -449,12 +498,12 @@ export const MapTileListDetails = ({
                 </div>
                 {editing.drops ? (<div className={'block'}>
                     <p>Drops:</p>
-                    {editing.drops.map(drop => (<p className={'drop-row'}>
+                    {editing.drops.map(drop => (<p className={`drop-row ${drop.rarityTier}`}>
                         <span className={'name'}>{drop.resource.name}</span>
                         <span className={'probability'}>{formatValue(drop.probability*100)}%</span>
                         <span className={'amounts'}>{formatInt(drop.amountMin)} - {formatInt(drop.amountMax)}</span>
                     </p> ))}
-                    {editing.unlockedUnrevealedAmount > 0 ? (<p className={'hint'}>{formatInt(editing.unlockedUnrevealedAmount)} more items can be found</p> ) : null}
+                    {editing.unlockedUnrevealedAmount > 0 ? (<p className={'hint pot-finds'}>{formatInt(editing.unlockedUnrevealedAmount)} more items can be found</p> ) : null}
                 </div> ) : null}
                 {editing.costs ? (<div className={'block'}>
                     <p>Costs:</p>
@@ -465,6 +514,10 @@ export const MapTileListDetails = ({
                 <div className={'autotrigger-settings autoconsume-setting block'}>
                     <div className={'rules-header flex-container'}>
                         <p>Autotrigger rules: {editing?.autotrigger?.rules?.length ? null : 'None'}</p>
+                        <label>
+                            <input type={'checkbox'} checked={editing.autotrigger?.isEnabled} onChange={toggleAutotrigger}/>
+                            {editing.autotrigger?.isEnabled ? ' ON' : ' OFF'}
+                        </label>
                         {isEditing ? (<button onClick={addAutotriggerRule}>Add rule (AND)</button>) : null}
                     </div>
                     <div className={'priority-line flex-container'}>
@@ -478,7 +531,7 @@ export const MapTileListDetails = ({
                         setRuleValue={setAutotriggerRuleValue}
                         setPattern={setAutotriggerPattern}
                         pattern={editing.autotrigger?.pattern || ''}
-                        isAutoCheck={true}
+                        isAutoCheck={editing.autotrigger?.isEnabled}
                     />
                 </div>
                 {isEditing ? (<div className={'buttons'}>

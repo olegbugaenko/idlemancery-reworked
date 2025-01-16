@@ -29,6 +29,10 @@ export class GuildsModule extends GameModule {
             this.sendItemDetails(payload.id, payload.meta)
         })
 
+        this.eventHandler.registerHandler('query-all-guilds-effects', () => {
+            this.sendAllGuildsEffects();
+        })
+
     }
 
     initialize() {
@@ -66,7 +70,7 @@ export class GuildsModule extends GameModule {
                 gameCore.getModule('actions').actions[a.id].xp = 0;
             }
         })*/
-        this.setPermaBonus(this.selectedGuild, this.guildsStats[this.selectedGuild].maxLevel, true);
+        this.setPermaBonus(this.selectedGuild, this.guildsStats[this.selectedGuild].maxLevel - 1, true);
 
         gameCore.getModule('unlock-notifications').generateNotifications();
 
@@ -93,7 +97,7 @@ export class GuildsModule extends GameModule {
 
     getCurrentActualPermaLevel(id) {
         const ent = gameEntity.getAttribute(id, 'permaBonusId');
-        const relLevel = gameEntity.getLevel(ent);
+        const relLevel = gameEntity.getLevel(ent) ?? 1;
         return relLevel;
     }
 
@@ -273,11 +277,29 @@ export class GuildsModule extends GameModule {
             level: this.purchasedUpgrades[entity.id] || 0,
             affordable: meta === 'guild' ? undefined : gameEntity.getAffordable(entity.id),
             potentialEffects: meta === 'guild' ? undefined : gameEntity.getEffects(entity.id, 1),
-            effects: meta === 'guild' ? gameEntity.getEffects(entity.id, 1).filter(one => one.id !== 'guild_reputation') : undefined,
+            effects: meta === 'guild' ? packEffects(gameEntity.getEffects(entity.id, 1).filter(one => one.id !== 'guild_reputation')) : undefined,
             currentEffects: meta === 'guild' ? undefined : gameEntity.getEffects(entity.id),
             tags: entity.tags,
             purchaseMultiplier: 1,
         }
+    }
+
+    getAllGuildsPermas() {
+        const permas = gameEntity.listEntitiesByTags(['guild-bonus', 'permanent']);
+
+        const effects = permas.map(one => ({
+            id: one.id,
+            name: one.name,
+            effects: packEffects(gameEntity.getEffects(one.id).filter(one => one.id !== 'guild_reputation'))
+        }))
+
+        return effects;
+    }
+
+    sendAllGuildsEffects() {
+        const guildEffects = this.getAllGuildsPermas();
+
+        this.eventHandler.sendData('all-guilds-effects', guildEffects)
     }
 
     sendItemDetails(id, meta) {

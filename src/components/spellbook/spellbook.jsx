@@ -180,6 +180,18 @@ export const Spellbook = ({}) => {
         }
     }, [editData])
 
+    const onToggleAutotrigger = useCallback(() => {
+        if(editData) {
+            const newEdit = cloneDeep(editData);
+            if(!newEdit.autocast) {
+                newEdit.autocast = {};
+            }
+            newEdit.autocast.isEnabled = !newEdit.autocast.isEnabled;
+            setEditData(newEdit);
+            setChanged(true);
+        }
+    }, [editData])
+
     const onSave = useCallback(() => {
         console.log('saving: ', editData);
         sendData('save-spell-settings', editData);
@@ -220,7 +232,7 @@ export const Spellbook = ({}) => {
                 </PerfectScrollbar>
             </div>
             <div className={'item-detail ingame-box detail-blade'}>
-                {editData || viewedData ? (<SpellDetails isChanged={isChanged} editData={editData} viewedData={viewedData} resources={resources} onAddAutoconsumeRule={onAddAutoconsumeRule} onSetAutoconsumeRuleValue={onSetAutoconsumeRuleValue} onDeleteAutoconsumeRule={onDeleteAutoconsumeRule} onSetAutocastPattern={onSetAutocastPattern} onChangeLevel={onChangeLevel} onSave={onSave} onCancel={onCancel}/>) : null}
+                {editData || viewedData ? (<SpellDetails isChanged={isChanged} editData={editData} viewedData={viewedData} resources={resources} onAddAutoconsumeRule={onAddAutoconsumeRule} onSetAutoconsumeRuleValue={onSetAutoconsumeRuleValue} onDeleteAutoconsumeRule={onDeleteAutoconsumeRule} onSetAutocastPattern={onSetAutocastPattern} onChangeLevel={onChangeLevel} onSave={onSave} onCancel={onCancel} onToggleAutotrigger={onToggleAutotrigger}/>) : null}
             </div>
         </div>
 
@@ -280,7 +292,7 @@ export const SpellCard = React.memo(({ id, isChanged, name, isCasted, cooldownPr
     return true;
 }))
 
-export const SpellDetails = React.memo(({isChanged, editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onSetAutocastPattern, onChangeLevel, onSave, onCancel}) => {
+export const SpellDetails = React.memo(({isChanged, editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onSetAutocastPattern, onChangeLevel, onSave, onCancel, onToggleAutotrigger}) => {
 
     const item = viewedData ? viewedData : editData;
 
@@ -303,6 +315,10 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
 
     const setAutocastPattern = pattern => {
         onSetAutocastPattern(pattern);
+    }
+
+    const toggleAutotrigger = () => {
+        onToggleAutotrigger();
     }
 
 
@@ -332,7 +348,7 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
                     </div>
                     <div className={'set-level'}>
                         <span>Set level to </span>
-                        <input type={'number'} value={item.actualLevel} min={1} max={item.maxLevel} onChange={e => onChangeLevel(+e.target.value)}/>
+                        <input type={'number'} value={item.actualLevel} min={1} max={item.maxLevel} onChange={e => onChangeLevel(Math.floor(+e.target.value))}/>
                         <span>of {item.maxLevel}</span>
                     </div>
                     <p className={'hint'}>Increasing level will increase spells cost and consumption but also increase their output</p>
@@ -357,6 +373,10 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
                 <div className={'autoconsume-setting'}>
                     <div className={'rules-header flex-container'}>
                         <p>Autospell rules: </p>
+                        <label>
+                            <input type={'checkbox'} checked={item.autocast?.isEnabled} onChange={toggleAutotrigger}/>
+                            {item.autocast?.isEnabled ? ' ON' : ' OFF'}
+                        </label>
                         {isEditing ? (<button onClick={addAutoconsumeRule}>Add rule (AND)</button>) : null}
                     </div>
 
@@ -368,7 +388,7 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
                         deleteRule={deleteAutoconsumeRule}
                         setRuleValue={setAutoconsumeRuleValue}
                         setPattern={setAutocastPattern}
-                        isAutoCheck={true}
+                        isAutoCheck={item.autocast?.isEnabled}
                     />
 
                 </div>

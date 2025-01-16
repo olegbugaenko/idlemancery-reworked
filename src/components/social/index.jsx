@@ -3,7 +3,6 @@ import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import {EffectsSection} from "../shared/effects-section.jsx";
-import {formatInt, formatValue} from "../../general/utils/strings";
 import {ResourceCost} from "../shared/resource-cost.jsx";
 import {ResourceComparison} from "../shared/resource-comparison.jsx";
 import {Guilds} from "./guilds.jsx";
@@ -69,12 +68,41 @@ export const Social = () => {
         </div>
 
         <div className={'item-detail ingame-box detail-blade'}>
-            {detailOpened ? (<ItemDetails itemId={detailOpened?.id} meta={detailOpened?.meta} category={selectedTab}/>) : null}
+            {detailOpened?.id ? (<ItemDetails itemId={detailOpened?.id} meta={detailOpened?.meta} category={selectedTab}/>) : (<GeneralStats />)}
         </div>
     </div>)
 
 }
 
+export const GeneralStats = () => {
+
+    const worker = useContext(WorkerContext);
+
+    const { onMessage, sendData } = useWorkerClient(worker);
+
+    const [stats, setStats] = useState([]);
+
+    useEffect(() => {
+        sendData('query-all-guilds-effects', {})
+    }, [])
+
+    onMessage('all-guilds-effects', (items) => {
+        console.log('all-guilds-effects: ', items)
+        setStats(items);
+    })
+
+    return (
+        <PerfectScrollbar>
+            <div className={'blade-inner'}>
+                {stats.map(guildStat => (<div className={'block'}>
+                    <p>{guildStat.name}</p>
+                    <div className={'effects-wrap-outer'}>
+                        <EffectsSection effects={guildStat.effects} />
+                    </div>
+                </div> ))}
+            </div>
+        </PerfectScrollbar>)
+}
 
 export const ItemDetails = ({itemId, meta, category}) => {
 

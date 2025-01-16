@@ -465,6 +465,8 @@ const RulesList = React.memo(
         }
         if (prev.isEditing !== curr.isEditing) return false;
 
+        if(prev.isAutoCheck !== curr.isAutoCheck) return false;
+
         return true;
     }
 );

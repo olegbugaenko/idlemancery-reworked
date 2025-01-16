@@ -66,7 +66,7 @@ export const ResourcesBar = () => {
 
             return (<div key={res.id} className={`holder ${aff ? 'monitored' : ''}`} onMouseOver={() => setMonitoredAttribute(res.id)} onMouseOut={() => setMonitoredAttribute(null)}><p className={`resource-item ${affClassData}`}>
                 <span className={'resource-label'}>{res.name}</span>
-                <TippyWrapper content={<div className={'hint-popup'}><BreakDown breakDown={res.storageBreakdown}/>{res.eta >= 0 ? `${secondsToString(res.eta)} to full` : `${secondsToString(-res.eta)} to empty`}</div> }>
+                <TippyWrapper content={<div className={'hint-popup'}><BreakDown category={'cap'} breakDown={res.storageBreakdown}/>{res.eta >= 0 ? `${secondsToString(res.eta)} to full` : `${secondsToString(-res.eta)} to empty`}</div> }>
                     <span className={'resource-amount'}>{formatValue(res.amount || 0)}{res.hasCap ? `/${formatValue(res.cap || 0)}` : ''}</span>
                 </TippyWrapper>
                 <TippyWrapper content={<div className={'hint-popup'}><BreakDown breakDown={res.breakDown}/></div> }>
@@ -138,13 +138,13 @@ export const AttributesBar = () => {
     </div> )
 }
 
-export const BreakDown = ({ breakDown }) => {
+export const BreakDown = ({ breakDown, category }) => {
 
     if(!breakDown) return null;
 
     return (<div className={'breakdown'}>
         {breakDown.income?.length ? (<div className={'box'}>
-            <span className={'sub-title'}>Income</span>
+            <span className={'sub-title'}>{category === 'cap' ? 'Basic Storage' : 'Income'}</span>
             <div className={'box-inner'}>
                 {breakDown.income.filter(one => Math.abs(one.value) > 1.e-8).map(one => {
                     return (<p key={one.id} className={'line'}>

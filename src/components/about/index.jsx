@@ -6,6 +6,12 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+                <h3>Idle Awakening v0.0.7b</h3>
+                <div className={'features'}>
+                    <p>Furniture purchase can now also be automated</p>
+                    <p>Specific items automations can be disabled</p>
+                    <p>Improved UI and fixed bugs in a lot of places</p>
+                </div>
                 <h3>Idle Awakening v0.0.7a</h3>
                 <div className={'features'}>
                     <p>Added 2 more later game actions</p>

@@ -219,6 +219,8 @@ export class ActionsModule extends GameModule {
 
                 if(this.actions[act.originalId].focus.time < this.getFocusCapTime(act.originalId)) {
                     this.actions[act.originalId].focus.time += delta*act.effort;
+                } else {
+                    this.actions[act.originalId].focus.time = this.getFocusCapTime(act.originalId);
                 }
 
                 this.actions[act.originalId].timeInvested = (this.actions[act.originalId].timeInvested || 0) + delta*act.effort;
@@ -336,7 +338,9 @@ export class ActionsModule extends GameModule {
     }
 
     getFocusCapTime(id) {
-        return 15 + (gameEffects.getEffectValue('max_focus_time') - 15)*(Math.pow(this.isRunningAction(id)?.effort, 0.25) ?? 0);
+        const currActs = this.activeActions.length;
+        let penalty = currActs < 4 ? 1 : Math.pow(this.isRunningAction(id)?.effort, 0.25);
+        return 15 + (gameEffects.getEffectValue('max_focus_time') - 15)*(penalty ?? 0);
     }
 
     getFocusBonus(time) {
@@ -657,7 +661,7 @@ export class ActionsModule extends GameModule {
                 focusTime: this.actions[entity.id].focus.time,
                 focusBonus: this.actions[entity.id].focus.bonus,
                 isCapped: this.actions[entity.id].focus.time >= this.getFocusCapTime(entity.id),
-                cap: gameEffects.getEffectValue('max_focus_time')*this.isRunningAction(entity.id).effort,
+                cap: this.getFocusCapTime(entity.id),
             } : null,
             actionEffect: gameEntity.getEffects(entity.id, 0, this.actions[entity.id]?.level || 1, true).filter(eff => eff.type === 'resources'),
             potentialEffects: this.packEffects(

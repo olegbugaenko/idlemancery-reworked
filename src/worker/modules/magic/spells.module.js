@@ -106,7 +106,7 @@ export class SpellModule extends GameModule {
             if(this.autoConsumeCD > 0) {
                 continue;
             }
-            if(!this.spells[itemId]?.autocast?.rules?.length) {
+            if(!this.spells[itemId]?.autocast?.isEnabled) {
                 continue;
             }
 
@@ -121,7 +121,7 @@ export class SpellModule extends GameModule {
         }
 
         if(this.autoConsumeCD <= 0) {
-            this.autoConsumeCD = 2;
+            this.autoConsumeCD = 1;
         }
     }
 

@@ -908,7 +908,7 @@ export const registerRandomEventsDb = () => {
                 }, {
                     id: 'voice_strain',
                     probability: 0.65,
-                    description: 'You strain your voice trying to match their skills. (-20% Energy)',
+                    description: 'You strain your voice trying to match their skills. (-20% Energy, energy debuff)',
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameResources.addResource('energy', -0.2 * gameResources.getResource('energy').cap);
@@ -1903,7 +1903,7 @@ export const registerRandomEventsDb = () => {
                 }, {
                     id: 'gold_gain',
                     probability: 0.9,
-                    description: 'The crowd finds your antics amusing and tosses some coins your way. (Refilled 10% of your coins storage)',
+                    description: 'The crowd finds your antics amusing and tosses some coins your way. (Refilled 2% of your coins storage)',
                     unlockCondition: () => true,
                     onTrigger: () => {
                         gameResources.addResource('coins', 0.02*gameResources.getResource('coins').cap);

@@ -163,7 +163,7 @@ export const Footer = () => {
                         <span>Settings</span>
                     </li>
                     <li className={openedTab === 'about' ? 'active' : ''} onClick={() => openTab('about')}>
-                        <span>v0.0.7a</span>
+                        <span>v0.0.7b</span>
                     </li>
                     <li>
                     <span>
@@ -198,6 +198,7 @@ export const Footer = () => {
             </div>*/}
             <TippyWrapper content={<div className={'hint-popup'}>
                 <p>You were offline {secondsToString((mageData.bankedTime?.current || 0)/1000)}</p>
+                <p>Speed up bonus capped at {secondsToString((mageData.bankedTime?.max || 0)/1000)}</p>
                 <p>You can use this time to speed up your game by factor of 4</p>
             </div> }>
                 <div className={'banked-time footer-add-info'}>

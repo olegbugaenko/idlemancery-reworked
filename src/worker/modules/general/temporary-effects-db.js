@@ -27,6 +27,7 @@ export const registerTemporaryEffectsDB = () => {
         },
         attributes: {
             duration: 300,
+            className: 'buff',
         },
         unlockCondition: () => {
 
@@ -36,7 +37,7 @@ export const registerTemporaryEffectsDB = () => {
 
     gameEntity.registerGameEntity('temporary_energy_debuff', {
         name: 'Energy Debuff',
-        description: 'You fill weakened. Your energy regeneration is decreased',
+        description: 'You feel weakened. Your energy regeneration is decreased',
         hasCap: false,
         tags: ['effect', 'temporary'],
         defaultCap: 0,
@@ -58,6 +59,7 @@ export const registerTemporaryEffectsDB = () => {
         },
         attributes: {
             duration: 300,
+            className: 'debuff',
         },
         unlockCondition: () => {
 
@@ -88,6 +90,7 @@ export const registerTemporaryEffectsDB = () => {
         },
         attributes: {
             duration: 300,
+            className: 'buff',
         },
         unlockCondition: () => {
 
@@ -119,6 +122,7 @@ export const registerTemporaryEffectsDB = () => {
         },
         attributes: {
             duration: 300,
+            className: 'debuff',
         },
         unlockCondition: () => {
 
@@ -149,6 +153,7 @@ export const registerTemporaryEffectsDB = () => {
         },
         attributes: {
             duration: 300,
+            className: 'buff',
         },
         unlockCondition: () => {
 
@@ -180,6 +185,7 @@ export const registerTemporaryEffectsDB = () => {
         },
         attributes: {
             duration: 300,
+            className: 'debuff',
         },
         unlockCondition: () => {
 
@@ -210,6 +216,7 @@ export const registerTemporaryEffectsDB = () => {
         },
         attributes: {
             duration: 300,
+            className: 'buff',
         },
         unlockCondition: () => {
 
@@ -241,6 +248,7 @@ export const registerTemporaryEffectsDB = () => {
         },
         attributes: {
             duration: 300,
+            className: 'debuff',
         },
         unlockCondition: () => {
 
@@ -271,6 +279,7 @@ export const registerTemporaryEffectsDB = () => {
         },
         attributes: {
             duration: 300,
+            className: 'buff',
         },
         unlockCondition: () => {
 
@@ -302,6 +311,7 @@ export const registerTemporaryEffectsDB = () => {
         },
         attributes: {
             duration: 300,
+            className: 'buff',
         },
         unlockCondition: () => {
 
@@ -333,6 +343,7 @@ export const registerTemporaryEffectsDB = () => {
         },
         attributes: {
             duration: 300,
+            className: 'buff',
         },
         unlockCondition: () => {
 
@@ -363,6 +374,7 @@ export const registerTemporaryEffectsDB = () => {
         },
         attributes: {
             duration: 300,
+            className: 'buff',
         },
         unlockCondition: () => {
 

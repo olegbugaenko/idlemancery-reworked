@@ -191,13 +191,20 @@ export class CraftingListsSubmodule extends GameModule {
     }
 
     deleteCraftingList(id) {
+
+        const category = this.craftingLists[id]?.category;
+
+        if(this.runningList?.[category]?.id === id) {
+            this.stopList(category);
+        }
+
         delete this.craftingLists[id];
 
         this.regenerateListsPriorityMap();
     }
 
     regenerateListsPriorityMap() {
-        const listsBeingAutotrigger = Object.values(this.craftingLists).filter(one => !!one.autotrigger?.rules?.length);
+        const listsBeingAutotrigger = Object.values(this.craftingLists).filter(one => !!one.autotrigger?.isEnabled);
 
 
         this.listsAutotrigger = {

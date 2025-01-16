@@ -1,6 +1,6 @@
 import {gameEntity, gameResources, resourceApi, gameEffects, gameCore} from "game-framework"
 import {GameModule} from "../../shared/game-module";
-import {registerInventoryItems} from "./inventory-items-db";
+import {metabolismMod, registerInventoryItems, sellPriceMod} from "./inventory-items-db";
 import {checkMatchingRules} from "../../shared/utils/rule-utils";
 import {SMALL_NUMBER} from "game-framework/src/utils/consts";
 import {packEffects} from "../../shared/utils/objects";
@@ -105,7 +105,7 @@ export class InventoryModule extends GameModule {
             if(this.autoConsumeCD > 0) {
                 continue;
             }
-            if(this.inventoryItems[itemId]?.autoconsume?.rules?.length) {
+            if(this.inventoryItems[itemId]?.autoconsume?.isEnabled) {
                 // check if matching rules
                 const isMatching = checkMatchingRules(this.inventoryItems[itemId]?.autoconsume?.rules, this.inventoryItems[itemId]?.autoconsume?.pattern);
 
@@ -115,11 +115,27 @@ export class InventoryModule extends GameModule {
                 }
             }
 
-            if(this.inventoryItems[itemId]?.autosell?.rules?.length) {
+            if(this.inventoryItems[itemId]?.autosell?.isEnabled) {
+                const coinsRs = gameResources.getResource('coins');
+                if(coinsRs.cap - coinsRs.amount <= SMALL_NUMBER) return; // don't waste items since coins are capped
                 const isMatching = checkMatchingRules(this.inventoryItems[itemId]?.autosell?.rules, this.inventoryItems[itemId]?.autosell?.pattern);
 
+                if(!('stockCapacity' in this.inventoryItems[itemId])) {
+                    this.inventoryItems[itemId].stockCapacity = gameEffects.getEffectValue('shop_max_stock');
+                }
+                const sellAmount = this.inventoryItems[itemId].stockCapacity;
+                // now we should understand that we do not violate resource rule
+                const reserved = this.inventoryItems[itemId]?.autosell?.reserved || 0;
+
+                const reserveLimit = Math.floor(
+                    Math.max(0, gameResources.getResource(itemId).amount - reserved)
+                );
+
+                const realSell = Math.min(sellAmount, reserveLimit);
+                console.log('Reserved: ', itemId, reserved, reserveLimit, sellAmount, realSell, gameResources.getResource(itemId).amount, this.inventoryItems[itemId]);
+
                 if(isMatching) {
-                    this.sellItem(itemId, 1);
+                    this.sellItem(itemId, Math.min(sellAmount, reserveLimit));
                 }
             }
 
@@ -276,7 +292,7 @@ export class InventoryModule extends GameModule {
             }
             this.inventoryItems[id].stockCapacity -= realCons;
             gameResources.addResource(id, -realCons);
-            gameResources.addResource('coins', realCons*resource.sellPrice);
+            gameResources.addResource('coins', realCons*resource.sellPrice*sellPriceMod(gameEffects.getEffectValue('attribute_bargaining')));
         }
 
         this.sendInventoryData(this.selectedFilterId);
@@ -302,7 +318,7 @@ export class InventoryModule extends GameModule {
                     'inventory',
                     filter.id,
                     `inventory_${item.id}`,
-                    item.isUnlocked && (gameResources.getResource(item.id).amount >= 1
+                    item.isUnlocked && (gameResources.getResource(item.id).amount >= SMALL_NUMBER
                         || Math.abs(gameResources.getResource(item.id).income) >= SMALL_NUMBER)
                 )
             })
@@ -317,7 +333,7 @@ export class InventoryModule extends GameModule {
                 name: filter.name,
                 tags: filter.tags,
                 items: gameResources.listResourcesByTags(['inventory', ...filter.tags])
-                    .filter(one => one.isUnlocked && !one.isCapped && (gameResources.getResource(one.id).amount >= 1
+                    .filter(one => one.isUnlocked && !one.isCapped && (gameResources.getResource(one.id).amount >= SMALL_NUMBER
                         || Math.abs(gameResources.getResource(one.id).income) >= SMALL_NUMBER
                         || this.inventoryItems[one.id]?.autoconsume?.rules?.length
                         || this.inventoryItems[one.id]?.autosell?.rules?.length)),
@@ -362,6 +378,12 @@ export class InventoryModule extends GameModule {
             itemCategories: Object.values(perCats).filter(cat => cat.items.length > 0),
             payload: pl,
             selectedFilterId: filterId,
+            details: {
+                metabolism_rate: gameEffects.getEffectValue('metabolism_rate'),
+                cooldown_bonus: metabolismMod(gameEffects.getEffectValue('metabolism_rate')),
+                bargaining: gameEffects.getEffectValue('attribute_bargaining'),
+                bargaining_mod: sellPriceMod(gameEffects.getEffectValue('attribute_bargaining'))
+            }
         }
     }
 
@@ -400,13 +422,14 @@ export class InventoryModule extends GameModule {
             description: resource.description,
             breakdown: resource.breakdown,
             amount: Math.floor(resource.amount || 0),
+            isConsumable: resource.tags.includes('consumable'),
             effects,
             tags: resource.tags || [],
             autoconsume: this.inventoryItems[resource.id]?.autoconsume ?? { rules: [] },
             autosell: this.inventoryItems[resource.id]?.autosell ?? { rules: [] },
             isConsumed: this.inventoryItems[resource.id]?.isConsumed,
             isSellable: !!resource.sellPrice,
-            sellPrice: resource.sellPrice,
+            sellPrice: resource.sellPrice*sellPriceMod(gameEffects.getEffectValue('attribute_bargaining')),
             maxSell: Math.min((this.inventoryItems[resource.id]?.stockCapacity ?? gameEffects.getEffectValue('shop_max_stock')), Math.floor(resource.amount)),
             duration: resource.attributes?.duration || 0,
             potentialEffects: resource.resourceModifier ? resourceApi.unpackEffects(resource.resourceModifier, 1) : [],

@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useRef, useState} from "react";
+import React, {useCallback, useContext, useEffect, useRef, useState} from "react";
 import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
 import PerfectScrollbar from "react-perfect-scrollbar";
@@ -68,6 +68,10 @@ export const FurnitureUpgrades = ({ setItemDetails, purchaseItem, deleteItem, ne
         }, 1000);
     };
 
+    const toggleAutopurchase = useCallback((id, flag) => {
+        sendData('set-furniture-autopurchase', { id, flag, filterId: 'furniture' })
+    })
+
     return (<div className={'furniture-wrap'}>
         <div className={'head'}>
             <div className={'space-item'}>
@@ -93,7 +97,7 @@ export const FurnitureUpgrades = ({ setItemDetails, purchaseItem, deleteItem, ne
             <PerfectScrollbar>
                 <div className={'flex-container'}>
                     {furnituresData.available.map(furniture => <NewNotificationWrap key={furniture.id} id={furniture.id} className={'narrow-wrapper'} isNew={newUnlocks?.[furniture.id]?.hasNew}>
-                        <ItemCard key={furniture.id} {...furniture} onFlash={handleFlash} onPurchase={purchaseItem} onShowDetails={setItemDetails} onDelete={deleteItem}/>
+                        <ItemCard key={furniture.id} {...furniture} onFlash={handleFlash} onPurchase={purchaseItem} onShowDetails={setItemDetails} onDelete={deleteItem} toggleAutopurchase={toggleAutopurchase} isAutomationUnlocked={furnituresData.isAutomationUnlocked}/>
                     </NewNotificationWrap>)}
                     {overlayPositions.map((position, index) => (
                         <FlashOverlay key={index} position={position} />
@@ -104,12 +108,12 @@ export const FurnitureUpgrades = ({ setItemDetails, purchaseItem, deleteItem, ne
     </div>)
 }
 
-export const ItemCard = ({ id, name, level, max, affordable, isLeveled, isCapped, onFlash, onPurchase, onShowDetails, onDelete}) => {
+export const ItemCard = ({ id, name, level, max, affordable, isLeveled, isCapped, onFlash, onPurchase, onShowDetails, onDelete, isAutoPurchase, toggleAutopurchase, isAutomationUnlocked}) => {
     const elementRef = useRef(null);
 
     useFlashOnLevelUp(isLeveled, onFlash, elementRef);
 
-    return (<div ref={elementRef} className={`card furniture flashable ${affordable.hardLocked ? 'hard-locked' : ''}  ${!affordable.isAffordable ? 'unavailable' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)}>
+    return (<div ref={elementRef} className={`card furniture flashable ${isCapped ? 'complete' : ''} ${affordable.hardLocked ? 'hard-locked' : ''}  ${!affordable.isAffordable ? 'unavailable' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)}>
         <div className={'head'}>
             <p className={'title'}>{name}</p>
             <span className={'level'}>{formatInt(level)}{max ? `/${formatInt(max)}` : ''}</span>
@@ -117,6 +121,11 @@ export const ItemCard = ({ id, name, level, max, affordable, isLeveled, isCapped
         <div className={'bottom'}>
             <div className={'buttons'}>
                 <button disabled={!affordable.isAffordable || isCapped} onClick={() => onPurchase(id)}>Purchase</button>
+                {isAutomationUnlocked ? (<label className={'autobuy-label'}>
+                    <input type={'checkbox'} checked={isAutoPurchase}
+                           onChange={() => toggleAutopurchase(id, !isAutoPurchase)}/>
+                    Autobuy
+                </label>) : null}
                 <button disabled={level <= 0} onClick={() => onDelete(id)}>Remove</button>
             </div>
         </div>

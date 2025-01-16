@@ -22,6 +22,23 @@ export class PropertyModule extends GameModule {
                 selectedScopes: ['name']
             },
         };
+        this.autoPurchase = {};
+        this.autoPurchaseCd = 0;
+        this.eventHandler.registerHandler('set-furniture-autopurchase', ({ id, flag, filterId }) => {
+            const entities = gameEntity.listEntitiesByTags(['furniture']).filter(one => one.isUnlocked && !one.isCapped);
+            entities.forEach(e => {
+                if(!id || id === e.id) {
+                    this.autoPurchase[e.id] = flag;
+                }
+            })
+            this.sendFurnituresData({ filterId }, filterId ? {
+                hideMaxed: this.hideMaxed[filterId] || false,
+                searchData: this.searchData[filterId]  || {
+                    search: '',
+                    selectedScopes: ['name']
+                }
+            } : undefined)
+        })
         this.eventHandler.registerHandler('purchase-furniture', (payload) => {
             this.purchaseFurniture(payload.id, payload.filterId, payload.filterId ? {
                 hideMaxed: this.hideMaxed[payload.filterId] || false,
@@ -94,6 +111,35 @@ export class PropertyModule extends GameModule {
 
     tick(game, delta) {
         this.leveledId = null;
+
+        if(gameEntity.getLevel('shop_item_purchase_manager') > 0) {
+            if(!this.autoPurchaseCd) {
+                this.autoPurchaseCd = 10;
+            }
+            this.autoPurchaseCd -= delta;
+            if(this.autoPurchaseCd <= 0) {
+                this.autoPurchaseCd = 10;
+                for(const key in this.autoPurchase) {
+                    if(this.autoPurchase[key]) {
+                        if(!gameEntity.isEntityUnlocked(key)) {
+                            this.autoPurchase[key] = false;
+                            continue;
+                        }
+                        if(gameEntity.isCapped(key)) {
+                            this.autoPurchase[key] = false;
+                            continue;
+                        }
+                        const newEnt = this.purchaseFurniture(key, 'furniture', {
+                            isSilent: true,
+                        });
+                        console.log('Purchase Auto Furniture: ', key, newEnt)
+                        if(newEnt.success) {
+                            return;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     save() {
@@ -144,9 +190,11 @@ export class PropertyModule extends GameModule {
         if(newEnt.success) {
             this.purchasedFurnitures[furnitureId] = gameEntity.getLevel(furnitureId);
             this.leveledId = furnitureId;
-            console.log('newEntFurnNEW: ', this.purchasedFurnitures)
-            gameCore.getModule('unlock-notifications').generateNotifications();
-            this.sendFurnituresData({ filterId }, options);
+            if(!options?.isSilent) {
+                console.log('newEntFurnNEW: ', this.purchasedFurnitures)
+                gameCore.getModule('unlock-notifications').generateNotifications();
+                this.sendFurnituresData({ filterId }, options);
+            }
         }
         return newEnt.success;
     }
@@ -206,6 +254,7 @@ export class PropertyModule extends GameModule {
                 potentialEffects: gameEntity.getEffects(entity.id, 1),
                 isLeveled: this.leveledId === entity.id,
                 isCapped: entity.isCapped,
+                isAutoPurchase: this.autoPurchase[entity.id] ?? false,
             })),
             space: {
                 max: spaceRes.income * spaceRes.multiplier,
@@ -213,7 +262,8 @@ export class PropertyModule extends GameModule {
                 total: spaceRes.amount,
             },
             searchData: options?.searchData,
-            hideMaxed: options?.hideMaxed
+            hideMaxed: options?.hideMaxed,
+            isAutomationUnlocked: gameEntity.getLevel('shop_item_purchase_manager') > 0
         }
     }
 

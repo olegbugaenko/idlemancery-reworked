@@ -24,6 +24,7 @@ export const Inventory = ({}) => {
         current: undefined,
         itemCategories: [],
         selectedFilterId: 'all',
+        details: {}
     });
     const [detailOpenedId, setDetailOpenedId] = useState(null); // here should be object containing id and rules
     const [viewedOpenedId, setViewedOpenedId] = useState(null);
@@ -201,6 +202,51 @@ export const Inventory = ({}) => {
         }
     }, [editData]);
 
+    const onSetAutosellReserved = useCallback(reserved => {
+        if(editData) {
+            const newEdit = cloneDeep(editData);
+            if(!newEdit.autosell) {
+                newEdit.autosell = {};
+            }
+            if(!newEdit.autosell.rules) {
+                newEdit.autosell.rules = [];
+            }
+            newEdit.autosell.reserved = reserved;
+            setEditData({...newEdit});
+            setChanged(true);
+        }
+    }, [editData]);
+
+    const onToggleAutosell = useCallback(() => {
+        if(editData) {
+            const newEdit = cloneDeep(editData);
+            if(!newEdit.autosell) {
+                newEdit.autosell = {};
+            }
+            if(!newEdit.autosell.rules) {
+                newEdit.autosell.rules = [];
+            }
+            newEdit.autosell.isEnabled = !newEdit.autosell.isEnabled;
+            setEditData({...newEdit});
+            setChanged(true);
+        }
+    }, [editData]);
+
+    const onToggleAutoconsume = useCallback(() => {
+        if(editData) {
+            const newEdit = cloneDeep(editData);
+            if(!newEdit.autoconsume) {
+                newEdit.autoconsume = {};
+            }
+            if(!newEdit.autoconsume.rules) {
+                newEdit.autoconsume.rules = [];
+            }
+            newEdit.autoconsume.isEnabled = !newEdit.autoconsume.isEnabled;
+            setEditData({...newEdit});
+            setChanged(true);
+        }
+    }, [editData]);
+
     const onAddAutosellRule = useCallback(() => {
         if(editData) {
             const newEdit = cloneDeep(editData);;
@@ -317,11 +363,14 @@ export const Inventory = ({}) => {
                     onSetAutosellRuleValue={onSetAutosellRuleValue}
                     onDeleteAutosellRule={onDeleteAutosellRule}
                     onSetAutoconsumePattern={onSetAutoconsumePattern}
+                    onSetAutosellReserved={onSetAutosellReserved}
                     onSetAutosellPattern={onSetAutosellPattern}
+                    onToggleAutoconsume={onToggleAutoconsume}
+                    onToggleAutosell={onToggleAutosell}
                     onSave={onSave}
                     onCancel={onCancel}
                     onSell={onSell}
-                />) : null}
+                />) : (<InventoryStats details={inventoryData.details} />)}
             </div>
         </div>
 
@@ -370,7 +419,7 @@ export const InventoryCard = React.memo(({ isChanged, allowMultiConsume, isConsu
                 <CircularProgress progress={cooldownProg}>
                     <img src={`icons/resources/${id}.png`} className={'resource'} />
                 </CircularProgress>
-                <span className={'level'}>{formatInt(amount)}</span>
+                <span className={'level'}>{formatValue(amount)}</span>
             </div>
         </TippyWrapper>
 
@@ -403,7 +452,7 @@ export const InventoryCard = React.memo(({ isChanged, allowMultiConsume, isConsu
     return true;
 }))
 
-export const InventoryDetails = React.memo(({isChanged, editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onAddAutosellRule, onSetAutosellRuleValue, onDeleteAutosellRule, onSave, onCancel, onSell, onSetAutosellPattern, onSetAutoconsumePattern}) => {
+export const InventoryDetails = React.memo(({isChanged, editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onAddAutosellRule, onSetAutosellRuleValue, onDeleteAutosellRule, onSave, onCancel, onSell, onSetAutosellPattern, onSetAutoconsumePattern, onSetAutosellReserved, onToggleAutoconsume, onToggleAutosell}) => {
 
     const item = viewedData ? viewedData : editData;
 
@@ -444,6 +493,19 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
         onDeleteAutosellRule()
     }
 
+    const setReservedValue = (reserved) => {
+        onSetAutosellReserved(reserved)
+    }
+
+    const toggleAutosell = () => {
+        onToggleAutosell()
+    }
+
+    const toggleAutoconsume = () => {
+        onToggleAutoconsume()
+    }
+
+    console.log('item?.autoconsume: ', item?.autoconsume);
 
     return (
         <PerfectScrollbar>
@@ -483,9 +545,13 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
                     <p>Consumed amount: {formatInt(item.numConsumed)}</p>
                 </div>
                 ) : null}
-                <div className={'autoconsume-setting block'}>
+                {item.isConsumable ? (<div className={'autoconsume-setting block'}>
                     <div className={'rules-header flex-container'}>
                         <p>Autoconsumption rules: {item.autoconsume?.rules?.length ? null : 'None'}</p>
+                        <label>
+                            <input type={'checkbox'} checked={item.autoconsume?.isEnabled} onChange={toggleAutoconsume}/>
+                            {item.autoconsume?.isEnabled ? ' ON' : ' OFF'}
+                        </label>
                         {isEditing ? (<button onClick={addAutoconsumeRule}>Add rule (AND)</button>) : null}
                     </div>
 
@@ -498,13 +564,17 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
                         deleteRule={deleteAutoconsumeRule}
                         setRuleValue={setAutoconsumeRuleValue}
                         setPattern={setAutoconsumePattern}
-                        isAutoCheck={true}
+                        isAutoCheck={item.autoconsume?.isEnabled}
                     />
-                </div>
+                </div>) : null}
 
                 {item.isSellable ? (<div className={'autoconsume-setting block'}>
                     <div className={'rules-header flex-container'}>
                         <p>Autosell rules: {item.autosell?.rules?.length ? null : 'None'}</p>
+                        <label>
+                            <input type={'checkbox'} checked={item.autosell?.isEnabled} onChange={toggleAutosell}/>
+                            {item.autosell?.isEnabled ? ' ON' : ' OFF'}
+                        </label>
                         {isEditing ? (<button onClick={addAutosellRule}>Add rule (AND)</button>) : null}
                     </div>
 
@@ -517,8 +587,12 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
                         deleteRule={deleteAutosellRule}
                         setRuleValue={setAutosellRuleValue}
                         setPattern={setAutosellPattern}
-                        isAutoCheck={true}
+                        isAutoCheck={item.autosell?.isEnabled}
                     />
+                    <div className={'autosell-amount flex-container'}>
+                        <p>Reserved Amount:</p>
+                        <input type={'number'} onChange={e => setReservedValue(+e.target.value)} value={item.autosell?.reserved || 0}/>
+                    </div>
                 </div>) : null}
 
                 {item.isSellable ? (<div className={'block sell-block'}>
@@ -531,7 +605,7 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
 
                 {isEditing ? (<div className={'buttons flex-container'}>
                     <button disabled={!isChanged} onClick={onSave}>Save</button>
-                    <button disabled={!isChanged} onClick={onCancel}>Cancel</button>
+                    <button onClick={onCancel}>Cancel</button>
                 </div>) : null}
             </div>
         </PerfectScrollbar>
@@ -554,3 +628,26 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
 
     return true;
 })
+
+export const InventoryStats = ({ details }) => {
+
+    return (
+        <PerfectScrollbar>
+            <div className={'blade-inner'}>
+                <div className={'block'}>
+                    <p>General Stats:</p>
+                    <div className={'effects'}>
+                        {details.cooldown_bonus ? (<div className={'row flex-row'}>
+                            <p>Metabolism Potions Cooldown</p>
+                            <p>X{formatValue(details.cooldown_bonus)}</p>
+                        </div> ) : null}
+                        {details.bargaining_mod ? (<div className={'row flex-row'}>
+                            <p>Bargaining Sell Price</p>
+                            <p>X{formatValue(details.bargaining_mod)}</p>
+                        </div> ) : null}
+                    </div>
+                </div>
+            </div>
+        </PerfectScrollbar>
+    )
+}

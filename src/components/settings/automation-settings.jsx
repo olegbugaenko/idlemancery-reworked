@@ -75,7 +75,8 @@ export const ActionsAutomations = ({ resources }) => {
             autotrigger: {
                 priority: saveData.priority,
                 rules: saveData.rules,
-                pattern: saveData.pattern
+                pattern: saveData.pattern,
+                isEnabled: saveData.isEnabled
             }
         }
         console.log('Saving data: ', toSave);
@@ -112,6 +113,7 @@ export const AutomatedAction = ({ auto, resources, onSaveAction }) => {
         isPriorityShown={true}
         priority={auto.autotrigger.priority}
         onSave={onSave}
+        isEnabled={auto.autotrigger.isEnabled}
     />
 
 }
@@ -140,7 +142,8 @@ export const ConsumeAutomations = ({ resources }) => {
             ...prev,
             autoconsume: {
                 rules: saveData.rules,
-                pattern: saveData.pattern
+                pattern: saveData.pattern,
+                isEnabled: saveData.isEnabled
             }
         }
         console.log('Saving consume: ', toSave);
@@ -176,6 +179,7 @@ export const AutomatedConsumption = ({ auto, resources, onSaveConsume }) => {
         resources={resources}
         isPriorityShown={false}
         onSave={onSave}
+        isEnabled={auto.autoconsume.isEnabled}
     />
 
 }
@@ -206,6 +210,7 @@ export const SellAutomations = ({ resources }) => {
             ...prev,
             autosell: {
                 rules: saveData.rules,
+                isEnabled: saveData.isEnabled
             }
         }
         console.log('Saving sell: ', toSave);
@@ -241,6 +246,7 @@ export const AutomatedSell = ({ auto, resources, onSaveSell }) => {
         resources={resources}
         isPriorityShown={false}
         onSave={onSave}
+        isEnabled={auto.autosell.isEnabled}
     />
 
 }
@@ -274,7 +280,8 @@ export const MapTilesAutomations = ({ resources }) => {
             autotrigger: {
                 priority: saveData.priority,
                 rules: saveData.rules,
-                pattern: saveData.pattern
+                pattern: saveData.pattern,
+                isEnabled: saveData.isEnabled
             }
         }
         console.log('Saving data: ', toSave);
@@ -311,6 +318,7 @@ export const AutomatedMapTile = ({ auto, resources, onSaveAction }) => {
         isPriorityShown={true}
         priority={auto.autotrigger.priority}
         onSave={onSave}
+        isEnabled={auto.autotrigger.isEnabled}
     />
 
 }
@@ -344,7 +352,8 @@ export const CraftingAutomations = ({ resources }) => {
             autotrigger: {
                 priority: saveData.priority,
                 rules: saveData.rules,
-                pattern: saveData.pattern
+                pattern: saveData.pattern,
+                isEnabled: saveData.isEnabled
             }
         }
         console.log('Saving data: ', toSave);
@@ -381,6 +390,7 @@ export const AutomatedCrafting = ({ auto, resources, onSaveAction }) => {
         isPriorityShown={true}
         priority={auto.autotrigger.priority}
         onSave={onSave}
+        isEnabled={auto.autotrigger.isEnabled}
     />
 
 }
@@ -413,7 +423,8 @@ export const AlchemyAutomations = ({ resources }) => {
             autotrigger: {
                 priority: saveData.priority,
                 rules: saveData.rules,
-                pattern: saveData.pattern
+                pattern: saveData.pattern,
+                isEnabled: saveData.isEnabled
             }
         }
         console.log('Saving data: ', toSave);
@@ -450,6 +461,7 @@ export const AutomatedAlchemy = ({ auto, resources, onSaveAction }) => {
         isPriorityShown={true}
         priority={auto.autotrigger.priority}
         onSave={onSave}
+        isEnabled={auto.autotrigger.isEnabled}
     />
 
 }
@@ -479,7 +491,8 @@ export const SpellAutomations = ({ resources }) => {
             ...prev,
             autocast: {
                 rules: saveData.rules,
-                pattern: saveData.pattern
+                pattern: saveData.pattern,
+                isEnabled: saveData.isEnabled
             }
         }
         console.log('Saving spell: ', toSave);
@@ -515,6 +528,7 @@ export const AutomatedSpell = ({ auto, resources, onSaveSpell }) => {
         resources={resources}
         isPriorityShown={false}
         onSave={onSave}
+        isEnabled={auto.autocast.isEnabled}
     />
 
 }
@@ -529,7 +543,8 @@ export const AutomatedItem = ({
     rules,
     pattern,
     resources,
-    onSave
+    onSave,
+    isEnabled
 }) => {
 
     const [isChanged, setChanged] = useState(false);
@@ -540,9 +555,10 @@ export const AutomatedItem = ({
         setEditedValues({
             priority,
             pattern,
-            rules: rules ?? []
+            rules: rules ?? [],
+            isEnabled
         })
-    }, [rules, priority])
+    }, [rules, priority, pattern, isEnabled])
 
     const setPriority = useCallback((priority) => {
         if(isEditing && editedValues) {
@@ -563,6 +579,18 @@ export const AutomatedItem = ({
                 newValues.rules = [];
             }
             newValues.pattern = pattern;
+            setEditedValues({...newValues});
+            setChanged(true);
+        }
+    }, [editedValues, isEditing]);
+
+    const toggleEnabled = useCallback(() => {
+        if(isEditing && editedValues) {
+            const newValues = cloneDeep(editedValues);
+            if(!newValues.rules) {
+                newValues.rules = [];
+            }
+            newValues.isEnabled = !newValues.isEnabled;
             setEditedValues({...newValues});
             setChanged(true);
         }
@@ -620,6 +648,8 @@ export const AutomatedItem = ({
         setChanged(false);
         setEditedValues({
             priority,
+            pattern,
+            isEnabled,
             rules: rules ?? []
         })
     }
@@ -633,6 +663,12 @@ export const AutomatedItem = ({
     return (<div className={`automated-wrap ${isEditing ? 'editing' : ''}`}>
         <div className={'col title'}>
             {name}
+            <div className={'on-off'}>
+                <label>
+                    {isEditing ? <input type={'checkbox'} checked={editedValues.isEnabled} onChange={toggleEnabled}/> : null}
+                    <span className={`automation-turned-${editedValues.isEnabled ? 'on' : 'off'}`}>Automation {editedValues.isEnabled ? ' ON' : ' OFF'}</span>
+                </label>
+            </div>
         </div>
         {isPriorityShown ? (<div className={'col priority'}>
             {isEditing ? (<input type={'number'} onChange={e => setPriority(+e.target.value)} value={editedValues.priority}/>) : <span>{editedValues.priority}</span>}

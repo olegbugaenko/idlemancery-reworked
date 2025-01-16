@@ -86,12 +86,15 @@ export const Map = ({ setItemDetails, openListDetails, isEditList }) => {
         filterableLoot: []
     });
 
+    const [selectedTile, setSelectedTile] = useState(null)
+
     const [hintForTileShown, setHintShown] = useState(null);
 
     useEffect(() => {
         const interval = setInterval(() => {
             sendData('query-map-data');
         }, 2000);
+        sendData('query-map-data');
         return () => {
             clearInterval(interval);
         }
@@ -104,6 +107,7 @@ export const Map = ({ setItemDetails, openListDetails, isEditList }) => {
 
     const setItemDetailsCb = meta => {
         setItemDetails({ meta, type: 'map-tile' });
+        setSelectedTile(meta);
     };
 
     const onEditList = useCallback(listData => {
@@ -156,7 +160,7 @@ export const Map = ({ setItemDetails, openListDetails, isEditList }) => {
                     {mapData.mapTiles.map((row, i) => {
                         return (<div className={'map-row'}>
                             {row.map((tile, j) => {
-                                return <MapTile i={i} j={j} icon={tile.metaData.icon} setItemDetails={setItemDetailsCb} isExploring={tile.isRunning} isHighlight={tile.isHighlight} isEditList={isEditList} hintForTileShown={hintForTileShown} setHintShown={setHintShown}/>
+                                return <MapTile i={i} j={j} isSelected={selectedTile && selectedTile?.i === i && selectedTile?.j === j} icon={tile.metaData.icon} setItemDetails={setItemDetailsCb} isExploring={tile.isRunning} isHighlight={tile.isHighlight} isEditList={isEditList} hintForTileShown={hintForTileShown} setHintShown={setHintShown}/>
                             })}
                         </div> )
                     })}
@@ -186,6 +190,7 @@ export const MapTile = React.memo(
          icon,
          i,
          j,
+         isSelected,
          setItemDetails,
          isExploring,
          isHighlight,
@@ -196,7 +201,7 @@ export const MapTile = React.memo(
         // Тіло клітинки
         const tileBody = (
             <div
-                className={`map-tile ${isExploring ? "running" : ""} ${
+                className={`map-tile ${isExploring ? "running" : ""} ${isSelected ? "selected" : ""} ${
                     isHighlight ? "highlight" : ""
                 }`}
                 style={{ backgroundImage: `url(icons/terrain/${icon}.png)` }}
@@ -435,12 +440,12 @@ export const TileDetailsPopup = ({itemId}) => {
 
                 {item.drops ? (<div className={'block'}>
                     <p>Drops:</p>
-                    {item.drops.map(drop => (<p className={'drop-row'}>
+                    {item.drops.map(drop => (<p className={`drop-row ${drop.rarityTier ?? ''}`}>
                         <span className={'name'}>{drop.resource.name}</span>
                         <span className={'probability'}>{formatValue(drop.probability*100)}%</span>
                         <span className={'amounts'}>{formatInt(drop.amountMin)} - {formatInt(drop.amountMax)}</span>
                     </p> ))}
-                    {item.unlockedUnrevealedAmount > 0 ? (<p className={'hint'}>{formatInt(item.unlockedUnrevealedAmount)} more items can be found</p> ) : null}
+                    {item.unlockedUnrevealedAmount > 0 ? (<p className={'hint pot-finds'}>{formatInt(item.unlockedUnrevealedAmount)} more items can be found</p> ) : null}
                 </div> ) : null}
                 <div className={'block'}>
                     <p>Costs:</p>

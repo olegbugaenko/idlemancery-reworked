@@ -30,11 +30,11 @@ export const ActiveEffects = () => {
     </div> )
 }
 
-export const ActiveEffectItem = ({ id, originalId, scope, name, description, effects, duration, durationProg, level }) => {
+export const ActiveEffectItem = ({ id, originalId, scope, name, description, effects, duration, durationProg, level, className }) => {
 
-    return (<div className={`icon-card effect flashable`}>
+    return (<div className={`icon-card effect flashable ${className}`}>
         <TippyWrapper
-            content={<div className={'hint-popup effects-popup'}>
+            content={<div className={`hint-popup effects-popup ${className}`}>
                 <div className={'blade-inner'}>
                     <div className={'block'}>
                         <h4>{name} ({formatInt(level)})</h4>
@@ -51,7 +51,7 @@ export const ActiveEffectItem = ({ id, originalId, scope, name, description, eff
                 </div>
 
             </div>}>
-            <div className={'icon-content'}>
+            <div className={`icon-content`}>
                 <CircularProgress progress={durationProg}>
                     <img src={`icons/${scope}/${originalId}.png`} className={'resource'} />
                 </CircularProgress>

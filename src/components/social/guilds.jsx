@@ -26,6 +26,7 @@ export const Guilds = ({ setItemDetails, filterId, newUnlocks }) => {
         const interval = setInterval(() => {
             sendData('query-guild-items-data', { filterId });
         }, 1000);
+        sendData('query-guild-items-data', { filterId });
         return () => {
             clearInterval(interval);
         }
@@ -53,15 +54,19 @@ export const Guilds = ({ setItemDetails, filterId, newUnlocks }) => {
             <div className={'explanations'}>
                 <p>You can select only one guild. But you can change it anytime you want.</p>
             </div>
-            <div className={'guilds-container'}>
-                {guildsData.guilds.map(guild => (<div className={'guild-card'} onMouseOver={() => setItemDetails(guild.id, 'guild')} onMouseLeave={() => setItemDetails(null, 'guild')} onClick={() => selectGuild(guild.id)}>
-                    <div className={'guild-card-inner'}>
-                        <div className={'image-holder'}>
-                            <img src={`icons/guilds/${guild.icon_id}.png`} className={'guild big'}/>
-                        </div>
-                        <p>{guild.name}</p>
+            <div className={'guilds-list-wrap'}>
+                <PerfectScrollbar>
+                    <div className={'guilds-container'}>
+                        {guildsData.guilds.map(guild => (<div className={'guild-card'} onMouseOver={() => setItemDetails(guild.id, 'guild')} onMouseLeave={() => setItemDetails(null, 'guild')} onClick={() => selectGuild(guild.id)}>
+                            <div className={'guild-card-inner'}>
+                                <div className={'image-holder'}>
+                                    <img src={`icons/guilds/${guild.icon_id}.png`} className={'guild big'}/>
+                                </div>
+                                <p>{guild.name}</p>
+                            </div>
+                        </div> ))}
                     </div>
-                </div> ))}
+                </PerfectScrollbar>
             </div>
         </div> )
     }
