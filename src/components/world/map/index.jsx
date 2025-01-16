@@ -459,7 +459,7 @@ export const MapTileListDetails = ({
                     <p>Click on tiles to add/remove them from the list</p>
                     <div className={'tiles-list'}>
                         <div className="actions-list-wrap">
-                            <div className={`action-row flex-container header`}
+                            <div className={`action-row flex-container header action-row-wrap`}
                             >
                                 <div className={'col title'}>
                                     <span>Tile</span>
@@ -472,7 +472,7 @@ export const MapTileListDetails = ({
                                 </div>
                             </div>
                             {editing.tiles.length ? editing.tiles.map((tile, index) => (
-                                        <div className={`action-row flex-container ${!tile.isAvailable ? 'unavailable-tile' : ''}`}
+                                        <div className={`action-row flex-container action-row-wrap ${!tile.isAvailable ? 'unavailable-tile' : ''}`}
                                         >
                                             {editing.proportionsBar ? (<div style={{width: editing.proportionsBar?.[index]?.displayPercentage, backgroundColor: editing.proportionsBar[index]?.color}} className={'prop-bg'}></div> ) : null}
                                             <div className={'col title'}>

@@ -102,14 +102,17 @@ export class ActionListsSubmodule extends GameModule {
 
             console.log('SendingData: ', JSON.stringify(data.prevEffects), JSON.stringify(data.resourcesEffects), data, id);
 
-            const proportionsBar = this.getProportionsBar(listData)
+            const proportionsBar = this.getProportionsBar(listData);
+
+            const intensityMeta = this.getIntensityMeta(listData);
 
             this.eventHandler.sendData('action-list-effects', {
                 potentialEffects: data,
                 resourcesEffects,
                 prevEffects: this.packEffects(prevEffects),
                 effectEffects: data.filter(one => one.type === 'effects'),
-                proportionsBar
+                proportionsBar,
+                intensityMeta
             });
         })
     }
@@ -480,15 +483,40 @@ export class ActionListsSubmodule extends GameModule {
 
         const proportionsBar = this.getProportionsBar(data)
 
+        const intensityMeta = this.getIntensityMeta(data);
+
         data.prevEffects = this.packEffects(prevEffects);
 
         data.proportionsBar = proportionsBar;
+
+        data.intensityMeta = intensityMeta;
 
         data.bForceOpen = bForceOpen;
 
         // console.log('SendingData: ', JSON.stringify(data.prevEffects), JSON.stringify(data.resourcesEffects));
 
         this.eventHandler.sendData('action-list-data', data);
+    }
+
+    getIntensityMeta(data) {
+
+        const result = {};
+
+        data.actions.forEach(a => {
+            const ent = gameEntity.getEntity(a.id);
+
+            if(!ent.attributes.primaryAttribute) {
+                return;
+            }
+
+            const effect = ent.getPrimaryEffect();
+
+            result[a.id] = {
+                max: effect*100,
+            }
+        })
+
+        return result;
     }
 
     getProportionsBar(data) {

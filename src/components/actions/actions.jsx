@@ -120,6 +120,7 @@ export const Actions = ({}) => {
                 effectEffects: payload.effectEffects,
                 prevEffects: payload.prevEffects,
                 proportionsBar: payload.proportionsBar,
+                intensityMeta: payload.intensityMeta,
             })
         }
     })
@@ -1031,6 +1032,16 @@ export const ListEditor = React.memo(({
 
     if(!editing) return ;
 
+    const handleIntensityChange = (event, id) => {
+        const newValue = event.target.value;
+        onUpdateActionFromList(id, 'intensity', +newValue);
+        // Динамічно змінюємо стилі
+        event.target.style.setProperty(
+            '--value',
+            `${(newValue / event.target.max) * 100}%`
+        );
+    };
+
     return (<PerfectScrollbar><div className={'list-editor'}>
         <div className={'main-wrap'}>
             <div className={'main-row'}>
@@ -1076,29 +1087,59 @@ export const ListEditor = React.memo(({
                     {editing.actions.length ? editing.actions.map((action, index) => (
                         <Draggable key={`list-${action.id}-${index}`} draggableId={`list-${action.id}-${index}`} index={index}>
                             {(provided) => (
-                                <div className={`action-row flex-container ${!action.isAvailable ? 'unavailable' : ''}`}
+                                <div className={`action-row-wrap ${!action.isAvailable ? 'unavailable' : ''}`}
                                      ref={provided.innerRef}
                                      {...provided.draggableProps}
                                      {...provided.dragHandleProps}
                                 >
-                                    {editing.proportionsBar ? (<div style={{width: editing.proportionsBar?.[index]?.displayPercentage, backgroundColor: editing.proportionsBar[index]?.color}} className={'prop-bg'}></div> ) : null}
-                                    <div className={'col title'}>
-                                        <span>{action.name}</span>
+                                    <div className={'action-row flex-container'}>
+                                        {editing.proportionsBar ? (<div style={{width: editing.proportionsBar?.[index]?.displayPercentage, backgroundColor: editing.proportionsBar[index]?.color}} className={'prop-bg'}></div> ) : null}
+                                        <div className={'col title'}>
+                                            <span>{action.name}</span>
+                                        </div>
+                                        <div className={`col amount ${isEditing ? 'large' : ''}`}>
+                                            {isEditing
+                                                ? (
+                                                    <div className={'editing-amounts'}>
+                                                        <input type={'number'} value={action.time}
+                                                               onChange={(e) => onUpdateActionFromList(action.id, 'time', +e.target.value)}/>
+                                                        <span>{formatValue(editing.proportionsBar?.[index]?.percentage*100 || 0)} %</span>
+                                                    </div>
+
+                                                )
+                                                : (<span>{formatValue(editing.proportionsBar[index].percentage*100)} %</span>)
+                                            }
+                                        </div>
+                                        <div className={'col delete'}>
+                                            {isEditing ? (<span className={'close'} onClick={() => onDropActionFromList(action.id)}>X</span>) : null}
+                                        </div>
                                     </div>
-                                    <div className={`col amount ${isEditing ? 'large' : ''}`}>
-                                        {isEditing
-                                            ? (<div className={'editing-amounts'}>
-                                                <input type={'number'} value={action.time}
-                                                       onChange={(e) => onUpdateActionFromList(action.id, 'time', +e.target.value)}/>
-                                                <span>{formatValue(editing.proportionsBar?.[index]?.percentage*100 || 0)} %</span>
-                                            </div>
-                                            )
-                                            : (<span>{formatValue(editing.proportionsBar[index].percentage*100)} %</span>)
-                                        }
-                                    </div>
-                                    <div className={'col delete'}>
-                                        {isEditing ? (<span className={'close'} onClick={() => onDropActionFromList(action.id)}>X</span>) : null}
-                                    </div>
+                                    {editing.intensityMeta?.[action.id] ? (<div className={'action-row flex-container set-intensity'}>
+                                        <p>Intensity: </p>
+                                        <div className={'slider-wrap'}>
+                                            <span>100%</span>
+                                            <input
+                                                className={'intensity-input'}
+                                                type={'range'}
+                                                min={100}
+                                                max={editing.intensityMeta?.[action.id].max}
+                                                value={action.intensity ?? 100}
+                                                onChange={(e) => handleIntensityChange(e, action.id)}
+                                                style={{
+                                                    // Основні стилі слайдера
+                                                    "--value": `${(((action.intensity ?? 100) - 100) / editing.intensityMeta?.[action.id].max) * 100}%`,
+                                                    appearance: "none",
+                                                    height: "8px",
+                                                    background: `linear-gradient(to right, var(--highlight) var(--value), #444 var(--value))`,
+                                                    borderRadius: "4px",
+                                                    outline: "none",
+                                                    transition: "background 0.2s ease-in-out",
+                                                }}
+                                            />
+                                            <span>{formatValue(editing.intensityMeta?.[action.id].max)} %</span>
+                                        </div>
+
+                                    </div>) : null}
                                 </div>
                             )}
                         </Draggable>
