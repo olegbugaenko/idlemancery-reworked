@@ -267,7 +267,7 @@ export class MapTileListsSubmodule extends GameModule {
 
     getProportionsBar(data) {
         const total = data.tiles.reduce((acc, a) => acc += Math.max(0, a.time), 0);
-        const tiles = data.tiles.filter(one => one.time > 0);
+        const tiles = data.tiles.map(one => ({...one, time: Math.max(0, one.time)}));
 
         if (total <= SMALL_NUMBER) return [];
 

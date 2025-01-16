@@ -493,7 +493,7 @@ export class ActionListsSubmodule extends GameModule {
 
     getProportionsBar(data) {
         const total = data.actions.reduce((acc, a) => acc += Math.max(0, a.time), 0);
-        const actions = data.actions.filter(one => one.time > 0);
+        const actions = data.actions.map(one => ({...one, time: Math.max(0, one.time)}));
 
         if (total <= SMALL_NUMBER) return [];
 

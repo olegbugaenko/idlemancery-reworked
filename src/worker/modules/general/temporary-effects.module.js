@@ -23,6 +23,9 @@ export class TemporaryEffectsModule extends GameModule {
 
         for(const key in this.runningEffects) {
             gameEntity.setEntityLevel(key, 0, true);
+            if(gameEntity.entityExists(key)) {
+                gameEntity.unsetEntity(key);
+            }
         }
         this.runningEffects = {};
         if(saveObject?.effects) {
