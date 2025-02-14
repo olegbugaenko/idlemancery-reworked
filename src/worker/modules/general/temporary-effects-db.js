@@ -3,7 +3,7 @@ import {getCostReduction} from "../magic/spells-db";
 
 export const registerTemporaryEffectsDB = () => {
 
-    gameEntity.registerGameEntity('temporary_energized', {
+    gameEntity.registerGameEntity('temporary_energy_buff', {
         name: 'Energized',
         description: 'Your energy income is boosted',
         hasCap: false,
@@ -66,7 +66,7 @@ export const registerTemporaryEffectsDB = () => {
         },
     })
 
-    gameEntity.registerGameEntity('temporary_health_regen', {
+    gameEntity.registerGameEntity('temporary_health_buff', {
         name: 'Health Regeneration',
         description: 'Your health regeneration was increased',
         hasCap: false,
@@ -129,7 +129,7 @@ export const registerTemporaryEffectsDB = () => {
         },
     })
 
-    gameEntity.registerGameEntity('temporary_mana_regen', {
+    gameEntity.registerGameEntity('temporary_mana_buff', {
         name: 'Mana Regeneration',
         description: 'Your mana regeneration was increased',
         hasCap: false,
@@ -192,7 +192,7 @@ export const registerTemporaryEffectsDB = () => {
         },
     })
 
-    gameEntity.registerGameEntity('temporary_knowledge_gain', {
+    gameEntity.registerGameEntity('temporary_knowledge_buff', {
         name: 'Knowledge Gain',
         description: 'Your knowledge gain was increased',
         hasCap: false,
@@ -255,7 +255,7 @@ export const registerTemporaryEffectsDB = () => {
         },
     })
 
-    gameEntity.registerGameEntity('temporary_coins_bonus', {
+    gameEntity.registerGameEntity('temporary_coins_buff', {
         name: 'Coins Earned Bonus',
         description: 'Your coins income is boosted',
         hasCap: false,
@@ -287,7 +287,7 @@ export const registerTemporaryEffectsDB = () => {
     })
 
 
-    gameEntity.registerGameEntity('temporary_learn_rate', {
+    gameEntity.registerGameEntity('temporary_learn_rate_buff', {
         name: 'Learning Rate Bonus',
         description: 'Your learning speed is increased',
         hasCap: false,
@@ -319,7 +319,7 @@ export const registerTemporaryEffectsDB = () => {
     })
 
 
-    gameEntity.registerGameEntity('temporary_physical_training_rate', {
+    gameEntity.registerGameEntity('temporary_physical_training_rate_buff', {
         name: 'Physical Training Bonus',
         description: 'Your learning speed for physical training is increased',
         hasCap: false,
@@ -350,7 +350,7 @@ export const registerTemporaryEffectsDB = () => {
         },
     })
 
-    gameEntity.registerGameEntity('temporary_mental_training_rate', {
+    gameEntity.registerGameEntity('temporary_mental_training_rate_buff', {
         name: 'Mental Training Bonus',
         description: 'Your learning speed for mental training is increased',
         hasCap: false,
@@ -381,4 +381,34 @@ export const registerTemporaryEffectsDB = () => {
         },
     })
 
+    gameEntity.registerGameEntity('temporary_social_training_rate_buff', {
+        name: 'Social Training Bonus',
+        description: 'Your learning speed for social training is increased',
+        hasCap: false,
+        tags: ['effect', 'temporary'],
+        defaultCap: 0,
+        isAbstract: true,
+        level: 1,
+        onUse: (amount) => {
+
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    social_training_learning_rate: {
+                        A: 0.1,
+                        B: 1.4,
+                        type: 0,
+                    }
+                }
+            },
+        },
+        attributes: {
+            duration: 300,
+            className: 'buff',
+        },
+        unlockCondition: () => {
+
+        },
+    })
 }

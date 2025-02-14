@@ -150,13 +150,14 @@ export class MapTileListsSubmodule extends GameModule {
         let ls = Object.values(this.mapLists);
 
         if(pl?.filterAutomated) {
-            ls = ls.filter(one => one.autotrigger?.rules?.length);
+            ls = ls.filter(one => one.autotrigger?.rules?.length || one.autotrigger?.isEnabled);
         }
         return {
             lists: ls,
             runningList: this.runningList?.id ? this.mapLists[this.runningList.id] : null,
             automationEnabled: this.automationEnabled,
             autotriggerIntervalSetting: this.autotriggerIntervalSetting,
+            automationUnlocked: gameEntity.getLevel('shop_item_planner') > 0,
         };
     }
 

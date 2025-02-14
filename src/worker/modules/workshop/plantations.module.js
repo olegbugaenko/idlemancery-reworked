@@ -1,6 +1,6 @@
 import {gameEntity, gameResources, resourceCalculators, resourceApi, gameEffects, gameCore} from "game-framework"
 import {GameModule} from "../../shared/game-module";
-import {registerPlantations} from "./plantation-db";
+import {getWateringEffectId, registerPlantations} from "./plantation-db";
 
 export class PlantationsModule extends GameModule {
 
@@ -12,6 +12,10 @@ export class PlantationsModule extends GameModule {
 
         this.eventHandler.registerHandler('purchase-plantation', (payload) => {
             this.purchaseItem(payload.id);
+        })
+
+        this.eventHandler.registerHandler('set-plantation-watering', (payload) => {
+            this.setWateringLevel(payload.id, payload.level);
         })
 
         this.eventHandler.registerHandler('remove-plantation', (payload) => {
@@ -30,12 +34,6 @@ export class PlantationsModule extends GameModule {
 
     initialize() {
 
-        gameEffects.registerEffect('plantations_efficiency', {
-            name: 'Plantations Efficiency',
-            defaultValue: 1,
-            minValue: 1
-        })
-
 
         registerPlantations();
 
@@ -53,12 +51,29 @@ export class PlantationsModule extends GameModule {
 
     load(saveObject) {
         for(const key in this.purchasedItems) {
+            if(!(typeof this.purchasedItems[key] === 'object')) {
+                this.purchasedItems[key] = {
+                    level: this.purchasedItems[key],
+                    wateringLevel: 0,
+                }
+            }
+            console.log(`Set Init ${key} to: `, this.purchasedItems);
             this.setItem(key, 0, true);
         }
         this.purchasedItems = {};
         if(saveObject?.items) {
             for(const id in saveObject.items) {
-                this.setItem(id, saveObject.items[id], true);
+                if(!(typeof saveObject.items[id] === 'object')) {
+                    saveObject.items[id] = {
+                        level: saveObject.items[id] ?? 0,
+                        wateringLevel: 0,
+                    }
+                }
+                console.log(`Set Load ${id} to: `, this.purchasedItems);
+                this.setItem(id, saveObject.items[id]?.level ?? saveObject.items[id], true);
+                if(saveObject.items[id].wateringLevel) {
+                    this.setWateringLevel(id, saveObject.items[id].wateringLevel);
+                }
             }
         }
         this.sendItemsData();
@@ -70,13 +85,30 @@ export class PlantationsModule extends GameModule {
 
     setItem(itemId, amount, bForce = false) {
         gameEntity.setEntityLevel(itemId, amount, bForce);
-        this.purchasedItems[itemId] = gameEntity.getLevel(itemId);
+        if(!this.purchasedItems[itemId]) {
+            this.purchasedItems[itemId] = {
+                level: 0,
+                wateringLevel: 0,
+            }
+        }
+        this.purchasedItems[itemId].level = gameEntity.getLevel(itemId);
+    }
+
+    setWateringLevel(id, level) {
+        let rLevel = Math.max(0, Math.min(Math.floor(level), gameEffects.getEffectValue('plantations_max_watering')));
+        gameEntity.setEntityLevel(`${id}_watering_bonus`, rLevel, true);
+        this.purchasedItems[id].wateringLevel = gameEntity.getLevel(`${id}_watering_bonus`);
     }
 
     purchaseItem(itemId) {
         const newEnt = gameEntity.levelUpEntity(itemId);
         if(newEnt.success) {
-            this.purchasedItems[itemId] = gameEntity.getLevel(itemId);
+            if(!this.purchasedItems[itemId]) {
+                this.purchasedItems[itemId] = {
+                    level: 0,
+                }
+            }
+            this.purchasedItems[itemId].level = gameEntity.getLevel(itemId);
             this.leveledId = itemId;
             this.sendItemsData();
         }
@@ -84,6 +116,7 @@ export class PlantationsModule extends GameModule {
     }
 
     removeItem(itemId) {
+        console.log(`Set Remove ${itemId} to: `, this.purchasedItems);
         this.setItem(itemId, 0, true);
     }
 
@@ -96,6 +129,7 @@ export class PlantationsModule extends GameModule {
             gameCore.getModule('unlock-notifications').registerNewNotification(
                 'workshop',
                 'plantations',
+                'all',
                 `plantation_${item.id}`,
                 item.isUnlocked && !item.isCapped
             )
@@ -119,12 +153,17 @@ export class PlantationsModule extends GameModule {
                 name: entity.name,
                 description: entity.description,
                 max: gameEntity.getEntityMaxLevel(entity.id),
-                level: this.purchasedItems[entity.id] || 0,
+                level: this.purchasedItems[entity.id]?.level || 0,
+                wateringLevel: this.purchasedItems[entity.id]?.wateringLevel || 0,
                 affordable: gameEntity.getAffordable(entity.id),
                 potentialEffects: gameEntity.getEffects(entity.id, 1),
-                isLeveled: this.leveledId === entity.id
+                isLeveled: this.leveledId === entity.id,
+                wateringMult: gameEffects.getEffectValue(getWateringEffectId(entity.id))
             })),
             slots,
+            isWateringUnlocked: gameResources.isResourceUnlocked('inventory_water'),
+            maxWatering: gameEffects.getEffect('plantations_max_watering'),
+            waterResource: gameResources.getResource('inventory_water')
         }
     }
 
@@ -141,12 +180,19 @@ export class PlantationsModule extends GameModule {
             name: entity.name,
             description: entity.description,
             max: gameEntity.getEntityMaxLevel(entity.id),
-            level: this.purchasedItems[entity.id] || 0,
+            evel: this.purchasedItems[entity.id]?.level || 0,
+            wateringLevel: this.purchasedItems[entity.id]?.wateringLevel || 0,
             affordable: gameEntity.getAffordable(entity.id),
             potentialEffects: gameEntity.getEffects(entity.id, 1),
             currentEffects: gameEntity.getEffects(entity.id),
             tags: entity.tags,
             purchaseMultiplier: 1,
+            wateringMult: gameEffects.getEffectValue(getWateringEffectId(entity.id)),
+            isWateringUnlocked: gameResources.isResourceUnlocked('inventory_water'),
+            maxWatering: gameEffects.getEffect('plantations_max_watering'),
+            waterResource: gameResources.getResource('inventory_water'),
+            wateringEffects: gameEntity.getEffects(`${id}_watering_bonus`),
+            nextWateringEffects: gameEntity.getEffects(`${id}_watering_bonus`, 1)
         }
     }
 

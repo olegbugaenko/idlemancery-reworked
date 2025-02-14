@@ -29,7 +29,7 @@ export const AutomationsSettings = () => {
         setUnlocksData(unlocks);
     })
 
-    if(!unlocks.actionLists && !unlocks.inventory && !unlocks.spellbook) {
+    if(!unlocks.automations || (!unlocks.actionLists && !unlocks.inventory && !unlocks.spellbook)) {
         return (<div className={'inner-settings-wrap automations-wrap'}>
             <h4>You haven't unlocked any automations yet :=(</h4>
             <p>Don't worry, you'll unlock them pretty soon</p>

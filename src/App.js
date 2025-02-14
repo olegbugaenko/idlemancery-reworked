@@ -6,6 +6,7 @@ import 'react-tippy/dist/tippy.css'
 import WorkerContext from "./context/worker-context";
 import './assets/styles.css';
 import 'react-perfect-scrollbar/dist/css/styles.css';
+import {useAppContext} from "./context/ui-context";
 
 function App() {
     const worker = window.worker || new Worker();
@@ -16,6 +17,8 @@ function App() {
 
     const [readyToGo, setReadyToGo] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+
+    const { setOpenedTab } = useAppContext();
 
     useEffect(() => {
         sendData('initialize-game', { a: 1 });
@@ -38,8 +41,17 @@ function App() {
         sendData('load-game', JSON.parse(saveString));
     });
 
-    onMessage('loaded', () => {
+    onMessage('loading', (event) => {
+        console.log('Received from worker:', event);
+        setReadyToGo(false);
+    });
+
+    onMessage('loaded', (pl) => {
         setReadyToGo(true);
+        if(pl.isReset) {
+            console.log('Resetted: ', pl);
+            setOpenedTab('actions');
+        }
     })
 
     onMessage('save-game', (data) => {

@@ -33,24 +33,6 @@ export class SpellModule extends GameModule {
 
     initialize() {
 
-        gameEffects.registerEffect('restoration_spells_efficiency', {
-            name: 'Restoration Magic Efficiency',
-            defaultValue: 1,
-            minValue: 1,
-        })
-
-        gameEffects.registerEffect('illusion_spells_efficiency', {
-            name: 'Illusion Magic Efficiency',
-            defaultValue: 1,
-            minValue: 1,
-        })
-
-        gameEffects.registerEffect('spell_xp_rate', {
-            name: 'Spell XP Gain',
-            defaultValue: 1,
-            minValue: 1,
-        })
-
         initSpellsDB1();
 
     }
@@ -63,7 +45,8 @@ export class SpellModule extends GameModule {
         if(!level) {
             level = this.spells[id]?.level || 1;
         }
-        return 100*Math.pow(3, level)
+        const mx = gameEntity.getAttribute(id, 'baseXPCost', 100);
+        return mx*Math.pow(3, level)
     }
 
     getXPPerCast(id, level) {
@@ -327,6 +310,7 @@ export class SpellModule extends GameModule {
             gameCore.getModule('unlock-notifications').registerNewNotification(
                 'spellbook',
                 'spellbook',
+                'all',
                 `spell_${item.id}`,
                 item.isUnlocked
             )
@@ -338,7 +322,7 @@ export class SpellModule extends GameModule {
         let presentSpells = items.filter(item => item.isUnlocked);
 
         if(payload?.filterAutomated) {
-            presentSpells = presentSpells.filter(one => this.spells[one.id]?.autocast?.rules?.length)
+            presentSpells = presentSpells.filter(one => this.spells[one.id]?.autocast?.rules?.length || this.spells[one.id]?.autocast?.isEnabled)
         }
 
         if(payload?.includeAutomations) {
@@ -358,6 +342,7 @@ export class SpellModule extends GameModule {
                 cooldownProg: spell.getUsageCooldown ? (spell.getUsageCooldown() - (this.spells[spell.id]?.cooldown ?? 0)) / spell.getUsageCooldown() : 1
             })),
             isSpellLevelingAvailable: this.isSpellLevelingAvailable(),
+            automationUnlocked: gameEntity.getLevel('shop_item_planner') > 0,
         }
     }
 

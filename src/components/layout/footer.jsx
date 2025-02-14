@@ -118,11 +118,11 @@ export const Footer = () => {
                             </NewNotificationWrap>
                         </li>
                     ) : null}
-                    {unlocks.shop ? (<li className={openedTab === 'shop' ? 'active' : ''} onClick={() => openTab('shop')}>
+                    {unlocks.shop ? (<li id={'shop'} className={openedTab === 'shop' ? 'active' : ''} onClick={() => openTab('shop')}>
                         <NewNotificationWrap isNew={newUnlocks.shop?.hasNew}>
                             <span>Shop</span>
                         </NewNotificationWrap>
-                    </li>) : <li className={'locked'}>
+                    </li>) : <li id={'shop'} className={'locked'}>
                         <span>Locked (Reach 2 coins)</span>
                     </li>}
                     {unlocks.inventory ? (<li className={openedTab === 'inventory' ? 'active' : ''} onClick={() => openTab('inventory')}>
@@ -212,12 +212,12 @@ export const Footer = () => {
 
             <div className={'unlocks'}>
                 <TippyWrapper content={<div className={'hint-popup'}>View unlocks</div> }>
-                    <div className={'icon-content edit-icon interface-icon'} onClick={() => setActivePopup('unlocks')}>
+                    <div id={'goals'} className={'icon-content edit-icon interface-icon'} onClick={() => setActivePopup('unlocks')}>
                         <img src={"icons/interface/icon_unlocks.png"}/>
                     </div>
                 </TippyWrapper>
                 <TippyWrapper content={<div className={'hint-popup'}>View statistics</div> }>
-                    <div className={'icon-content edit-icon interface-icon'} onClick={() => setActivePopup('statistics')}>
+                    <div id={'statistics'} className={'icon-content edit-icon interface-icon'} onClick={() => setActivePopup('statistics')}>
                         <img src={"icons/interface/icon_statistics.png"}/>
                     </div>
                 </TippyWrapper>

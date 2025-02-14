@@ -238,7 +238,7 @@ export class ActionListsSubmodule extends GameModule {
         }));
 
         if(pl?.filterAutomated) {
-            ls = ls.filter(one => one.autotrigger?.rules?.length);
+            ls = ls.filter(one => one.autotrigger?.rules?.length || one.autotrigger?.isEnabled);
         }
         return ls;
     }

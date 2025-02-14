@@ -1,6 +1,6 @@
 import {GameModule} from "../../shared/game-module";
 import {registerCraftingRecipes} from "./recipes-db";
-import {gameCore, gameEntity, gameResources} from "game-framework";
+import {gameCore, gameEffects, gameEntity, gameResources, resourceCalculators} from "game-framework";
 import {CraftingListsSubmodule} from "./crafting-lists.submodule";
 import {SMALL_NUMBER} from "game-framework/src/utils/consts";
 
@@ -24,6 +24,10 @@ export class CraftingModule extends GameModule {
             tags: ['alchemy'],
             isDefault: false,
         }]
+
+        this.eventHandler.registerHandler('query-crafting-general-data', (payload) => {
+            this.sendGeneralData(payload.filterId)
+        })
 
         this.eventHandler.registerHandler('query-crafting-data', (payload) => {
             this.sendCraftingData(payload);
@@ -96,12 +100,24 @@ export class CraftingModule extends GameModule {
         }
     }
 
-    setCraftingLevel({ id, level, isForce = false }) {
+    setCraftingLevel({ id, level, isForce = false, filterId }) {
         if(!this.craftingSlots[id]) {
             this.craftingSlots[id] = {
                 level: 0
             }
         }
+        if(level < 0) {
+            level = 0;
+        }
+
+        if(!isForce) {
+            const rrs = filterId === 'crafting' ? gameResources.getResource('crafting_slots') : gameResources.getResource('alchemy_slots')
+            const max = this.craftingSlots[id].level + rrs.amount;
+            if(level > max) {
+                level = Math.floor(max);
+            }
+        }
+
         if(level === 0 && gameEntity.entityExists(`activeCrafting_${id}`)) {
             gameEntity.unsetEntity(`activeCrafting_${id}`)
             this.craftingSlots[id].level = 0;
@@ -130,6 +146,7 @@ export class CraftingModule extends GameModule {
                 gameCore.getModule('unlock-notifications').registerNewNotification(
                     'workshop',
                     filter.id,
+                    'all',
                     `crafting_${item.id}`,
                     item.isUnlocked && !item.isCapped
                 )
@@ -216,6 +233,20 @@ export class CraftingModule extends GameModule {
         const data = this.getCraftingDetails(payload);
         // console.log('Send crafting: crafting-details', data);
         this.eventHandler.sendData(`crafting-details`, data)
+    }
+
+
+    sendGeneralData(category_id) {
+        const rs = category_id === 'crafting' ? 'crafting_ability' : 'alchemy_ability';
+        const sl = category_id === 'crafting' ? 'crafting_slots' : 'alchemy_slots';
+        const data = {
+            isProducingEffort: gameResources.getResource(rs).income > SMALL_NUMBER,
+            hasSlots: gameResources.getResource(sl).income > SMALL_NUMBER,
+            stats: {
+
+            }
+        }
+        this.eventHandler.sendData('crafting-general-data', data);
     }
 
 }

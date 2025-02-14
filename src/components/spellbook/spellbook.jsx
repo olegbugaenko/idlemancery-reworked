@@ -42,7 +42,11 @@ export const Spellbook = ({}) => {
 
     useEffect(() => {
         console.log('SpellChanged: ', isChanged)
-    }, [isChanged])
+    }, [isChanged]);
+
+    useEffect(() => {
+        console.log('New editData: ', editData);
+    }, [editData])
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -169,16 +173,22 @@ export const Spellbook = ({}) => {
     }, [editData])
 
     const onSetAutoconsumeRuleValue = useCallback((index, key, value) => {
-        if(editData) {
-            const newEdit = cloneDeep(editData);
+        setEditData(prevEditData => {
+            if (!prevEditData) return prevEditData;
+            const newEdit = cloneDeep(prevEditData);
             newEdit.autocast.rules[index] = {
                 ...newEdit.autocast.rules[index],
                 [key]: value
-            }
-            setEditData(newEdit);
-            setChanged(true);
-        }
+            };
+            console.log('Setting Value with updated editData: ', newEdit);
+            return newEdit;
+        });
+        setChanged(true);
     }, [editData])
+
+    useEffect(() => {
+        console.log('New version of onSetAutoconsumeRuleValue created with editData:', editData);
+    }, [onSetAutoconsumeRuleValue]);
 
     const onToggleAutotrigger = useCallback(() => {
         if(editData) {
@@ -221,7 +231,7 @@ export const Spellbook = ({}) => {
             <div className={'ingame-box spell'}>
                 <PerfectScrollbar>
                     <div className={'flex-container'}>
-                        {spellData.available.map(item => <NewNotificationWrap id={`spell_${item.id}`} className={'narrow-wrapper'} isNew={newUnlocks.spellbook?.items?.spellbook?.items?.[`spell_${item.id}`]?.hasNew}>
+                        {spellData.available.map(item => <NewNotificationWrap id={`spell_${item.id}`} className={'narrow-wrapper'} isNew={newUnlocks.spellbook?.items?.spellbook?.items?.all?.items?.[`spell_${item.id}`]?.hasNew}>
                                 <SpellCard isChanged={isChanged} key={item.id} {...item} onPurchase={purchaseItem} onFlash={handleFlash} onShowDetails={setSpellDetailsView} onEditConfig={setSpellDetailsEdit}/>
                             </NewNotificationWrap>
                             )}
@@ -232,7 +242,7 @@ export const Spellbook = ({}) => {
                 </PerfectScrollbar>
             </div>
             <div className={'item-detail ingame-box detail-blade'}>
-                {editData || viewedData ? (<SpellDetails isChanged={isChanged} editData={editData} viewedData={viewedData} resources={resources} onAddAutoconsumeRule={onAddAutoconsumeRule} onSetAutoconsumeRuleValue={onSetAutoconsumeRuleValue} onDeleteAutoconsumeRule={onDeleteAutoconsumeRule} onSetAutocastPattern={onSetAutocastPattern} onChangeLevel={onChangeLevel} onSave={onSave} onCancel={onCancel} onToggleAutotrigger={onToggleAutotrigger}/>) : null}
+                {editData || viewedData ? (<SpellDetails isChanged={isChanged} editData={editData} viewedData={viewedData} resources={resources} onAddAutoconsumeRule={onAddAutoconsumeRule} onSetAutoconsumeRuleValue={onSetAutoconsumeRuleValue} onDeleteAutoconsumeRule={onDeleteAutoconsumeRule} onSetAutocastPattern={onSetAutocastPattern} onChangeLevel={onChangeLevel} onSave={onSave} onCancel={onCancel} onToggleAutotrigger={onToggleAutotrigger} automationUnlocked={spellData.automationUnlocked}/>) : null}
             </div>
         </div>
 
@@ -292,7 +302,7 @@ export const SpellCard = React.memo(({ id, isChanged, name, isCasted, cooldownPr
     return true;
 }))
 
-export const SpellDetails = React.memo(({isChanged, editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onSetAutocastPattern, onChangeLevel, onSave, onCancel, onToggleAutotrigger}) => {
+export const SpellDetails = React.memo(({isChanged, editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onSetAutocastPattern, onChangeLevel, onSave, onCancel, onToggleAutotrigger, automationUnlocked}) => {
 
     const item = viewedData ? viewedData : editData;
 
@@ -370,7 +380,7 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
                         <EffectsSection effects={item.potentialEffects} maxDisplay={10} />
                     </div>
                 ): null}
-                <div className={'autoconsume-setting'}>
+                {automationUnlocked ? (<div className={'autoconsume-setting'}>
                     <div className={'rules-header flex-container'}>
                         <p>Autospell rules: </p>
                         <label>
@@ -391,7 +401,7 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
                         isAutoCheck={item.autocast?.isEnabled}
                     />
 
-                </div>
+                </div>) : null}
                 {isEditing ? (<div className={'buttons flex-container'}>
                     <button disabled={!isChanged} onClick={onSave}>Save</button>
                     <button disabled={!isChanged} onClick={onCancel}>Cancel</button>

@@ -10,13 +10,16 @@ import {useFlashOnLevelUp} from "../../general/hooks/flash";
 import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
 import {ResourceComparison} from "../shared/resource-comparison.jsx";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import RulesList from "../shared/rules-list.jsx";
 import {cloneDeep} from "lodash";
 import {ActionXPBreakdown} from "./action-xp-breakdown.jsx";
 import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
 import {SearchField} from "../shared/search-field.jsx";
-import {useAppContext} from "../../context/ui-context";
 import {HowToSign} from "../shared/how-to-sign.jsx";
+import {useTutorial} from "../../context/tutorial-context";
+import CustomFilter from "../shared/custom-filter.jsx";
+import {ActionDetails, ListEditor, GeneralStats} from "./actions-blades.jsx";
+import {ActionListsPanel} from "./actions-lists.jsx";
+import CustomFiltersList from "../shared/custom-filter-list.jsx";
 
 const ACTIONS_SEARCH_SCOPES = [{
     id: 'name',
@@ -46,10 +49,18 @@ export const Actions = ({}) => {
         actionCategories: [],
         actionLists: [],
         automationEnabled: false,
+        automationUnlocked: false,
         searchData: {
             search: '',
         },
-        selectedCategory: 'all'
+        selectedCategory: 'all',
+        stats: {},
+        aspects: {
+            isUnlocked: false,
+            list: []
+        },
+        customFilters: {},
+        customFiltersOrder: [],
     });
     const [detailOpened, setDetailOpened] = useState(null);
     const [editingList, setEditingList] = useState(null);
@@ -58,6 +69,8 @@ export const Actions = ({}) => {
     const [viewedData, setViewedData] = useState(null);
     const [resources, setResources] = useState(null);
     const [newUnlocks, setNewUnlocks] = useState({});
+    const [isCustomFilterOpened, setCustomFilterOpened] = useState(false);
+    const [editingCustomFilter, setEditingCustomFilter] = useState(null);
 
     // const [filterId, setFilterId] = useState('all');
 
@@ -84,7 +97,6 @@ export const Actions = ({}) => {
     }, [editingList, viewingList])
 
     onMessage('new-unlocks-notifications-actions', payload => {
-        // console.log('Received unlocks: ', payload);
         setNewUnlocks(payload);
     })
 
@@ -129,7 +141,7 @@ export const Actions = ({}) => {
     }
 
     const setActionsFilter = (filterId) => {
-        sendData('set-selected-actions-filter', { filterId })
+        sendData('apply-actions-custom-filter', { id: filterId })
     }
 
     const setActionDetails = (id) => {
@@ -228,6 +240,12 @@ export const Actions = ({}) => {
 
         // Розбираємо draggableId
         const [type, actionId, actionIndex] = draggableId.split('-');
+
+        if(sourceDroppableId === 'custom-filters' && destinationDroppableId === 'custom-filters') {
+            if(source.index !== destination.index) {
+                sendData('actions-change-custom-filters-order', { sourceIndex: source.index, destinationIndex: destination.index })
+            }
+        }
 
         if (sourceDroppableId === 'available-actions' && destinationDroppableId === 'action-list-editor') {
             const action = actionsData.available.find(a => a.id.toString() === actionId);
@@ -372,6 +390,33 @@ export const Actions = ({}) => {
         sendData('set-actions-search', { searchData });
     }
 
+    const handlePinToggle = (id, newFlag) => {
+        sendData('toggle-actions-custom-filter-pinned', { id, flag: newFlag });
+    };
+
+    const handleApplyFilter = (id) => {
+        sendData('run-actions-custom-filter', { id });
+    };
+
+    const handleEditFilter = (id) => {
+        // знаходите фільтр, відкриваєте форму редагування
+        // наприклад:
+        const filterData = actionsData.customFilters[id];
+        setEditingCustomFilter({ ...filterData });
+    };
+
+    const handleDeleteFilter = (id) => {
+        sendData('delete-actions-custom-filter', { id });
+    };
+
+    const handleAddFilter = () => {
+        setEditingCustomFilter({ rules: [], condition: '', category: 'action', name: '' });
+    };
+
+    const handleClose = () => {
+        setCustomFilterOpened(false);
+    };
+
     return (
         <DragDropContext onDragEnd={onDragEnd}>
             <div className={'actions-wrap'}>
@@ -379,11 +424,49 @@ export const Actions = ({}) => {
 
                     <div className={'categories flex-container'}>
                         <ul className={'menu'}>
-                            {actionsData.actionCategories.map(category => (<li key={category.id} className={`category ${category.isSelected ? 'active' : ''}`} onClick={() => setActionsFilter(category.id)}>
-                                <NewNotificationWrap isNew={newUnlocks.actions?.items?.[category.id]?.hasNew}>
+                            {actionsData.actionCategories.filter(one => one.isPinned || one.isSelected).map(category => (<li key={category.id} className={`category ${category.isSelected ? 'active' : ''}`} onClick={() => setActionsFilter(category.id)}>
+                                <NewNotificationWrap isNew={newUnlocks.actions?.items?.all?.items?.[category.id]?.hasNew}>
                                     <span>{category.name}({category.items.length})</span>
                                 </NewNotificationWrap>
                             </li> ))}
+                            <li className={'add-custom-filter additional'}>
+                                <span className={'create-custom'} onClick={() => {
+                                    setCustomFilterOpened(true);
+                                    // setEditingCustomFilter({ rules: [], condition: '', category: 'action', name: ''})
+                                }}>Edit Filters</span>
+                                {isCustomFilterOpened ? (<div className={'custom-filter-edit-wrap'}>
+                                    {editingCustomFilter ? (
+                                        <CustomFilter
+                                            prefix={'actions-filter'}
+                                            category={'action'}
+                                            id={editingCustomFilter?.id}
+                                            name={editingCustomFilter?.name}
+                                            rules={editingCustomFilter?.rules}
+                                            condition={editingCustomFilter?.condition}
+                                            onCancel={() => {
+                                                setEditingCustomFilter(null);
+                                            }}
+                                            onSave={(data) => {
+                                                console.log('saving: ', data)
+                                                sendData('save-actions-custom-filter', data);
+                                                setEditingCustomFilter(null);
+                                            }}
+                                        />)
+                                    : (<CustomFiltersList
+                                        filterOrder={actionsData.customFiltersOrder}
+                                        filters={actionsData.customFilters}
+                                        onPinToggle={handlePinToggle}
+                                        onApply={handleApplyFilter}
+                                        onEdit={handleEditFilter}
+                                        onDelete={handleDeleteFilter}
+                                        showAddButton
+                                        onAdd={handleAddFilter}
+                                        showCloseButton
+                                        onClose={handleClose}
+                                    />)}
+                                </div> ) : null}
+
+                            </li>
                         </ul>
                         <div className={'additional-filters'}>
                             <label>
@@ -399,17 +482,17 @@ export const Actions = ({}) => {
                                 <input type={"checkbox"} checked={!!actionsData.showHidden} onChange={toggleShowHidden}/>
                                 Show hidden
                             </label>
+                            <HowToSign scope={'actions'} />
                         </div>
-                        <HowToSign scope={'actions'} />
                     </div>
-                    <div className={'list-wrap'}>
+                    <div className={'list-wrap'} id={'actions-list-wrap'}>
                         <PerfectScrollbar>
                             <div>
                                 <Droppable droppableId="available-actions" isDropDisabled={true}>
                                     {(provided) => (
                                         <div ref={provided.innerRef} {...provided.droppableProps} className="flex-container">
                                             {actionsData.available.map((action, index) =>
-                                                <NewNotificationWrap key={action.id} id={action.id} className={'narrow-wrapper'} isNew={newUnlocks.actions?.items?.[actionsData.selectedCategory]?.items?.[action.id]?.hasNew}>
+                                                <NewNotificationWrap key={action.id} id={action.id} className={'narrow-wrapper'} isNew={newUnlocks.actions?.items?.all?.items?.[actionsData.selectedCategory]?.items?.[action.id]?.hasNew}>
                                                     <ActionCard isEditingList={!!listData} index={index} key={action.id} {...action} onFlash={handleFlash} onActivate={activateAction} onShowDetails={setActionDetails} onSelect={onSelectAction} toggleHiddenAction={toggleHiddenAction}/>
                                                 </NewNotificationWrap>)}
                                             {provided.placeholder}
@@ -423,7 +506,7 @@ export const Actions = ({}) => {
                         </PerfectScrollbar>
                     </div>
 
-                    {actionsData.actionListsUnlocked ? (<ActionListsPanel editListToDetails={editListToDetails} lists={actionsData.actionLists} viewListToDetails={viewListToDetails} runningList={actionsData.runningList} automationEnabled={actionsData.automationEnabled} toggleAutomation={toggleAutomation} autotriggerIntervalSetting={actionsData.autotriggerIntervalSetting} changeAutomationInterval={changeAutomationInterval}/>) : null}
+                    {actionsData.actionListsUnlocked ? (<ActionListsPanel automationUnlocked={actionsData.automationUnlocked} editListToDetails={editListToDetails} lists={actionsData.actionLists} viewListToDetails={viewListToDetails} runningList={actionsData.runningList} automationEnabled={actionsData.automationEnabled} toggleAutomation={toggleAutomation} autotriggerIntervalSetting={actionsData.autotriggerIntervalSetting} changeAutomationInterval={changeAutomationInterval}/>) : null}
                 </div>
                 <div className={`action-detail ingame-box detail-blade ${listData ? 'wide-blade' : ''}`}>
                     <DetailBlade
@@ -443,6 +526,9 @@ export const Actions = ({}) => {
                         onSetAutotriggerPattern={onSetAutotriggerPattern}
                         onToggleAutotrigger={onToggleAutotrigger}
                         resources={resources}
+                        automationUnlocked={actionsData.automationUnlocked}
+                        stats={actionsData.stats}
+                        aspects={actionsData.aspects}
                     />
                 </div>
             </div>
@@ -468,7 +554,10 @@ export const DetailBlade = ({
     setAutotriggerPriority,
     onSetAutotriggerPattern,
     onToggleAutotrigger,
-    resources
+    resources,
+    automationUnlocked,
+    stats,
+    aspects
 }) => {
 
     if(listData) {
@@ -487,6 +576,7 @@ export const DetailBlade = ({
             onSetAutotriggerPattern={onSetAutotriggerPattern}
             onToggleAutotrigger={onToggleAutotrigger}
             resources={resources}
+            automationUnlocked={automationUnlocked}
         />)
     }
 
@@ -509,6 +599,7 @@ export const DetailBlade = ({
             setAutotriggerPriority={setAutotriggerPriority}
             onToggleAutotrigger={onToggleAutotrigger}
             resources={resources}
+            automationUnlocked={automationUnlocked}
         />)
     }
 
@@ -527,18 +618,40 @@ export const DetailBlade = ({
             setAutotriggerPriority={setAutotriggerPriority}
             onToggleAutotrigger={onToggleAutotrigger}
             resources={resources}
+            automationUnlocked={automationUnlocked}
         />)
     }
 
-    return null;
+    return (<GeneralStats stats={stats} aspects={aspects} />);
 }
 
-export const ActionCard = ({ id, monitored, isEditingList, index, name, level, max, xp, maxXP, xpRate, isActive, isLeveled, focused, isTraining, actionEffect, currentEffects, potentialEffects, isHidden, onFlash, onSelect, onActivate, onShowDetails, toggleHiddenAction, ...props}) => {
+export const ActionCard = ({ id, category, monitored, entityEfficiency, isEditingList, index, name, level, max, xp, maxXP, xpRate, isActive, isLeveled, focused, isTraining, actionEffect, currentEffects, potentialEffects, isHidden, onFlash, onSelect, onActivate, onShowDetails, toggleHiddenAction, missingResourceId, ...props}) => {
     const elementRef = useRef(null);
+
+    const { stepIndex, unlockNextById, jumpOver } = useTutorial();
 
     useFlashOnLevelUp(isLeveled, onFlash, elementRef);
 
     const [isXpVisible, setIsXpVisible] = useState(false);
+
+    if(id === 'action_visit_city') {
+        if(level < 2) {
+            console.log('AVC: ', stepIndex)
+            unlockNextById(12);
+        }
+    }
+
+    if(id === 'action_beggar') {
+        if(stepIndex < 13) {
+            unlockNextById(12);
+        }
+        unlockNextById(13);
+    }
+
+    if(id === 'action_walk' && level > 1 && stepIndex === 8) {
+        console.log('JUMP! ');
+        jumpOver(11)
+    }
 
     const comp = (
         <Draggable key={`available-${id}`} draggableId={`available-${id}`} index={index} isDragDisabled={!isEditingList}>
@@ -547,7 +660,20 @@ export const ActionCard = ({ id, monitored, isEditingList, index, name, level, m
                     ref={provided.innerRef}
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
-                    className={`card action ${isActive ? 'active' : ''} flashable ${monitored ?? ''}`} onMouseEnter={() => onShowDetails(id)} onMouseOver={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)} onClick={() => onSelect({
+                    id={`item_${id}`}
+                    className={`card ${category} action ${isActive ? 'active' : ''} ${entityEfficiency < 1 ? ' efficiency-dropped' : ''} flashable ${monitored ?? ''}`}
+                    onMouseEnter={() => {
+                        onShowDetails(id)
+                    }}
+                    onMouseOver={() => {
+                        onShowDetails(id)
+                    }}
+                    onMouseLeave={() => {
+                        if(stepIndex !== 6) {
+                            onShowDetails(null)
+                        }
+                    }}
+                    onClick={() => onSelect({
                     id,
                     name,
                     level
@@ -558,23 +684,34 @@ export const ActionCard = ({ id, monitored, isEditingList, index, name, level, m
                     </div>
                     <div className={'bottom'}>
                         <div className={'xp-box'}>
-                            <span className={'xp-text'}>XP: {formatInt(xp)}/{formatInt(maxXP)}</span>
+                            <span className={'xp-text'}>
+                                XP: {formatInt(xp)}/{formatInt(maxXP)}
+                            </span>
                             <TippyWrapper
                                 lazy={true}
                                 content={isXpVisible ? <ActionXPBreakdown id={id} /> : null}
                                 onShow={() => setIsXpVisible(true)}
                                 onHide={() => setIsXpVisible(false)}
                             >
-                                <span className={'xp-income highlighted-span'}>+{formatValue(xpRate)}</span>
+                                <span className={`xp-income highlighted-span ${entityEfficiency < 1 ? ' yellow' : ''}`}>
+                                    +{formatValue(xpRate)}
+                                    {entityEfficiency < 1 ? (<span className={'small-hint yellow'}>
+                                        &nbsp;({formatValue(100*entityEfficiency)}%)
+                                    </span> ) : ''}
+                                </span>
                             </TippyWrapper>
                         </div>
 
-                        <div>
+                        <div id={`level_up_indicator_${id}`}>
                             <ProgressBar className={'action-progress'} percentage={xp/maxXP}></ProgressBar>
                         </div>
                         <div className={'buttons'}>
                             <div className={'buttons-inner-wrap'}>
-                                {isActive ? <button onClick={() => onActivate()}>Stop</button> : <button onClick={() => onActivate(id)}>Start</button> }
+                                {isActive ? <button onClick={() => onActivate()}>Stop</button> : <button id={`activate_${id}`} onClick={() => {
+                                    console.log('RunAction: ', stepIndex)
+                                    unlockNextById(8);
+                                    onActivate(id)
+                                }}>Start</button> }
                                 <button onClick={(e) => {
                                     e.preventDefault();
                                     e.stopPropagation();
@@ -626,533 +763,3 @@ export const ActionCard = ({ id, monitored, isEditingList, index, name, level, m
         </div>
     </TippyWrapper>)
 }
-
-export const ActionDetails = ({actionId}) => {
-
-    const worker = useContext(WorkerContext);
-
-    const { onMessage, sendData } = useWorkerClient(worker);
-
-    const [action, setDetailOpened] = useState(null);
-
-    const [interval, setIntervalRef] = useState(null);
-
-    useEffect(() => {
-        const intervalLoc = setInterval(() => {
-            sendData('query-action-details', { id: actionId });
-        }, 100);
-        setIntervalRef(intervalLoc);
-
-        return () => {
-            clearInterval(intervalLoc);
-        }
-    }, [actionId])
-
-
-    onMessage('action-details', (actions) => {
-        console.log('received-details: ', actions, actionId);
-        setDetailOpened(actions);
-    })
-
-    if(!actionId || !action) return null;
-
-    return (
-        <ActionDetailsComponent {...action} />
-    )
-}
-
-export const ActionDetailsComponent = React.memo(({...action}) => {
-    // console.log('re-render');
-    return (<PerfectScrollbar>
-        <div className={'blade-inner'}>
-            <div className={'block'}>
-                <h4>{action.name}</h4>
-                <div className={'description'}>
-                    {action.description}
-                </div>
-            </div>
-            {action.nextUnlock ? (<div className={'unlock block'}>
-                <p className={'hint'}>Next unlock at level {formatInt(action.nextUnlock.level)}</p>
-            </div> ) : null}
-            <div className={'block'}>
-                <div className={'tags-container'}>
-                    {action.tags.map(tag => (<div className={'tag'}>{tag}</div> ))}
-                </div>
-            </div>
-            <div className={'block'}>
-                <div className={'bottom'}>
-                    <div className={'xp-box'}>
-                        <span className={'xp-text'}>XP: {formatInt(action.xp)}/{formatInt(action.maxXP)}</span>
-                        <span className={'xp-income'}>+{formatValue(action.xpRate)}</span>
-                    </div>
-
-                    <div>
-                        <ProgressBar className={'action-progress'} percentage={action.xp/action.maxXP}></ProgressBar>
-                    </div>
-                </div>
-            </div>
-            {action.primaryAttribute ? (<div className={'block'}>
-
-                <p>Primary Attribute: {action.primaryAttribute.name} ({formatValue(action.primaryAttribute.value)}), providing {formatValue(100*action.primaryAttributeEffect)}% intensity</p>
-                <p className={'hint'}>Primary attribute speeds up action, increasing both production and consumption</p>
-
-            </div> ) : null}
-            <div className={'block'}>
-                <p>Action Effects</p>
-                <div className={'effects'}>
-                    <EffectsSection effects={action?.actionEffect} maxDisplay={10}/>
-                </div>
-            </div>
-            {action.isTraining ? (
-                <div className={'block'}>
-                    <p>Action LevelUp bonuses</p>
-                    <div className={'effects'}>
-                        <ResourceComparison effects1={action?.currentEffects} effects2={action?.potentialEffects} />
-                    </div>
-                </div>
-            ) : null}
-            <div className={'block'}>
-                <p>Action Statistics</p>
-                <div className={'stats-block'}>
-                    <p><span>Time spent:</span> <span>{secondsToString(action.timeInvested)}</span></p>
-                    <p><span>XP earned:</span> <span>{formatValue(action.xpEarned)}</span></p>
-                </div>
-            </div>
-            <div className={'block'}>
-                <p>Learn ETA's</p>
-                <div className={'stats-block'}>
-                    {Object.entries(action.etas).map(([level, eta]) => (
-                        <p key={level}><span>Level {formatInt(level)}: </span> <span>{secondsToString(eta)}</span></p>
-                    ))}
-                </div>
-            </div>
-        </div>
-    </PerfectScrollbar>)
-}, (prevProps, currentProps) => {
-    if(!prevProps && !currentProps) return true;
-    if(!prevProps || !currentProps) {
-        //console.log('One of prp null or undefined. Re-render: ', prevProps, currentProps);
-        return false;
-    }
-    if(prevProps.level !== currentProps.level) {
-        //console.log('Level mismatch. Re-render: ', prevProps, currentProps);
-        return false;
-    }
-    if(prevProps.xp !== currentProps.xp) {
-        //console.log('XP mismatch. Re-render: ', prevProps, currentProps);
-        return false;
-    }
-    if(prevProps.id !== currentProps.id) {
-        //console.log('id mismatch. Re-render: ', prevProps, currentProps);
-        return false;
-    }
-    if(prevProps.timeInvested !== currentProps.timeInvested) {
-        //console.log('id mismatch. Re-render: ', prevProps, currentProps);
-        return false;
-    }
-
-    if(currentProps.potentialEffects.length) {
-        for(let i = 0; i < currentProps.potentialEffects.length; i++) {
-            if(!prevProps.potentialEffects[i]) {
-                //console.log('potEff mismatch length. Re-render: ', prevProps, currentProps);
-                return false;
-            }
-
-            if(prevProps.potentialEffects[i].value !== currentProps.potentialEffects[i].value) {
-               // console.log('One of prp of potEff mismatched: '+i+'. Re-render: ', prevProps, currentProps);
-                return false;
-            }
-        }
-    }
-
-    return true;
-})
-
-export const ActionListsPanel = ({ runningList, editListToDetails, lists, viewListToDetails, automationEnabled, toggleAutomation, autotriggerIntervalSetting, changeAutomationInterval }) => {
-
-    const worker = useContext(WorkerContext);
-
-    const { onMessage, sendData } = useWorkerClient(worker);
-
-    const [openedFor, setOpenedFor] = useState(null);
-
-
-    const editList = (id) => {
-        console.log('Set to edit: ', id);
-        editListToDetails(id);
-        setOpenedFor(null);
-    }
-
-    const runList = (id) => {
-        sendData('run-list', { id });
-        setOpenedFor(null);
-    }
-
-    const onDelete = (id) => {
-        sendData('delete-action-list', { id });
-        setOpenedFor('edit');
-    }
-
-    const setActionListOrder = (newOrder) => {
-        sendData('set-action-lists-order', newOrder);
-    };
-
-    return (<div className={'action-lists-panel'}>
-        <div className={'flex-container'}>
-            <div className={'current-list panel-col'}>
-                Current list: {runningList ? (<div className={'flex-container'}>
-                    <span>{runningList.name}</span>
-                    <div className={'icon-content stop-icon interface-icon'} onClick={() => runList(null)}>
-                        <img src={"icons/interface/pause.png"}/>
-                    </div>
-                    <div className={'icon-content edit-icon interface-icon'} onClick={() => editList(runningList.id)}>
-                        <img src={"icons/interface/edit-icon.png"}/>
-                    </div>
-                </div>) : 'None'}
-            </div>
-            <div className={'lists-editor panel-col'}>
-                <button onClick={() => editListToDetails()}>Create New</button>
-            </div>
-            <div className={'lists-editor panel-col'}>
-                <button onClick={(e) => { e.stopPropagation(); setOpenedFor('edit')}}>Pick list</button>
-                <ActionListsPopup lists={lists} isOpened={openedFor === 'edit'} setOpenedFor={setOpenedFor} onSelect={editList} onRun={runList} onHover={viewListToDetails} onDelete={onDelete} setActionListOrder={setActionListOrder}/>
-            </div>
-            <div className={'automation-enabled panel-col'}>
-                <label>
-                    <input type={'checkbox'} checked={!!automationEnabled} onChange={toggleAutomation}/>
-                    Lists automation enabled
-                </label>
-            </div>
-            <div className={'panel-col automation-interval'}>
-                <label>
-                    Switch lists interval:
-                    <select onChange={e => changeAutomationInterval(+e.target.value)} value={autotriggerIntervalSetting}>
-                        <option value={10}>10 seconds</option>
-                        <option value={30}>30 seconds</option>
-                        <option value={60}>1 minute</option>
-                        <option value={300}>5 minutes</option>
-                        <option value={900}>15 minutes</option>
-                        <option value={1800}>30 minutes</option>
-                        <option value={3600}>1 hour</option>
-                    </select>
-                </label>
-            </div>
-            <HowToSign scope={'action-lists'} />
-        </div>
-    </div>)
-}
-
-export const ActionListsPopup = ({ lists, isOpened, setOpenedFor, onSelect, onHover, onRun, onDelete, setActionListOrder }) => {
-
-
-    const popupRef = useRef(null);
-
-    const [search, setSearch] = useState('')
-
-    const listsDisplayed = useMemo(() => {
-        if(!search) return lists;
-        return lists.filter(l => l.name.includes(search));
-    }, [lists, search])
-
-    const onDragEnd = (result) => {
-        const { source, destination } = result;
-
-        // If dropped outside the list, do nothing
-        if (!destination) return;
-
-        // Reorder lists based on drag-and-drop
-        const reorderedLists = Array.from(listsDisplayed);
-        const [removed] = reorderedLists.splice(source.index, 1);
-        reorderedLists.splice(destination.index, 0, removed);
-
-        // Call the callback with the new order
-        setActionListOrder(reorderedLists.map((list, index) => ({
-            id: list.id,
-            sort: index + 1, // Update the sort index
-        })));
-    };
-
-    const handleClickOutside = (event) => {
-        if (popupRef.current && !popupRef.current.contains(event.target)) {
-            setOpenedFor(null); // Close the popup if click outside
-        }
-    };
-
-    useEffect(() => {
-        if (isOpened) {
-            document.addEventListener("mousedown", handleClickOutside);
-        } else {
-            document.removeEventListener("mousedown", handleClickOutside);
-        }
-
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [isOpened]);
-
-    if (!isOpened) return null;
-
-    return (
-        <DragDropContext onDragEnd={onDragEnd}>
-            <div className={"list-selector"} ref={popupRef}>
-                <div className={"list-selector-inner"}>
-                    <div className={"search-wrap"}>
-                        <input
-                            type={"text"}
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            onClick={(e) => e.stopPropagation()}
-                        />
-                    </div>
-                    <Droppable droppableId="actionLists">
-                        {(provided) => (
-                            <div
-                                className={"lists-wrap"}
-                                ref={provided.innerRef}
-                                {...provided.droppableProps}
-                            >
-                                <PerfectScrollbar>
-                                    <div className={"list-inner"}>
-                                        {listsDisplayed.map((list, index) => (
-                                            <Draggable
-                                                key={list.id}
-                                                draggableId={list.id.toString()}
-                                                index={index}
-                                            >
-                                                {(provided) => (
-                                                    <div
-                                                        className={"item"}
-                                                        ref={provided.innerRef}
-                                                        {...provided.draggableProps}
-                                                        {...provided.dragHandleProps}
-                                                        onMouseEnter={() => onHover(list.id)}
-                                                        onMouseLeave={() => onHover(null)}
-                                                    >
-                                                        <div className={"list-item-row flex-container"}>
-                                                            <span className={"list-name"}>{list.name}</span>
-                                                            <TippyWrapper content={<div className={"hint-popup"}>Run List</div>}>
-                                                                <div
-                                                                    className={"icon-content run-icon interface-icon small"}
-                                                                    onClick={() => onRun(list.id)}
-                                                                >
-                                                                    <img src={"icons/interface/run.png"} />
-                                                                </div>
-                                                            </TippyWrapper>
-                                                            <TippyWrapper content={<div className={"hint-popup"}>Edit List</div>}>
-                                                                <div
-                                                                    className={"icon-content edit-icon interface-icon small"}
-                                                                    onClick={() => onSelect(list.id)}
-                                                                >
-                                                                    <img src={"icons/interface/edit-icon.png"} />
-                                                                </div>
-                                                            </TippyWrapper>
-                                                            <TippyWrapper content={<div className={"hint-popup"}>Delete List</div>}>
-                                                                <div
-                                                                    className={"icon-content edit-icon interface-icon small"}
-                                                                    onClick={() => onDelete(list.id)}
-                                                                >
-                                                                    <img src={"icons/interface/delete.png"} />
-                                                                </div>
-                                                            </TippyWrapper>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </Draggable>
-                                        ))}
-                                        {provided.placeholder}
-                                    </div>
-                                </PerfectScrollbar>
-                            </div>
-                        )}
-                    </Droppable>
-                </div>
-            </div>
-        </DragDropContext>
-    );
-}
-
-export const ListEditor = React.memo(({
-   editListId,
-   listData,
-   onUpdateActionFromList,
-   onDropActionFromList,
-   onUpdateListValue,
-   onCloseList,
-   isEditing,
-   onAddAutotriggerRule,
-   onSetAutotriggerRuleValue,
-   onDeleteAutotriggerRule,
-   setAutotriggerPriority,
-   onSetAutotriggerPattern,
-   onToggleAutotrigger,
-   resources
-}) => {
-
-    const worker = useContext(WorkerContext);
-
-    const { onMessage, sendData } = useWorkerClient(worker);
-
-    const [editing, setEditing] = useState({ actions: [] })
-
-    useEffect(() => {
-        setEditing(listData);
-    }, [listData])
-
-    const saveAndClose = (isClose) => {
-        console.log('Saving: ', editing);
-        if(!isClose) {
-            editing.isReopenEdit = true;
-        }
-        sendData('save-action-list', editing);
-        if(isClose) {
-            onCloseList();
-        }
-    }
-
-    const addAutotriggerRule = () => {
-        onAddAutotriggerRule()
-    }
-
-    const setAutotriggerRuleValue = (index, key, value) => {
-        onSetAutotriggerRuleValue(index, key, value)
-    }
-
-    const deleteAutotriggerRule = index => {
-        onDeleteAutotriggerRule(index);
-    }
-
-    const setAutotriggerPattern = (pattern) => {
-        onSetAutotriggerPattern(pattern)
-    }
-
-    const toggleAutotrigger = () => {
-        onToggleAutotrigger()
-    }
-
-    if(!editing) return ;
-
-    return (<PerfectScrollbar><div className={'list-editor'}>
-        <div className={'main-wrap'}>
-            <div className={'main-row'}>
-                <span>Name</span>
-                {isEditing ? (<input type={'text'} value={editing.name ?? ''} onChange={(e) => onUpdateListValue('name', e.target.value)}/>) : (<span>{editing.name}</span>)}
-                <HowToSign scope={'action-lists'} />
-            </div>
-        </div>
-        <div className={'block'}>
-            <p className={'hint'}>
-                All actions in the list are performed simultaneously.
-            </p>
-            <div className={'show-bar'}>
-                {editing?.proportionsBar ? (<div className={'proportions-bar'}>
-                    {editing?.proportionsBar.map(one => (
-                        <TippyWrapper content={
-                            <div className={'hint-popup'}>
-                                <p>{one.name}</p>
-                                <p>Effort: {formatValue(one.percentage*100)}%</p>
-                            </div> }>
-                            <div style={{width: one.displayPercentage, backgroundColor: one.color}} className={'proportion-bar'}>
-                            </div>
-                        </TippyWrapper>
-                    ))}
-                </div> ) : null}
-            </div>
-        </div>
-        <Droppable droppableId="action-list-editor">
-            {(provided) => (
-                <div ref={provided.innerRef} {...provided.droppableProps} className="actions-list-wrap">
-                    <div className={`action-row flex-container header`}
-                    >
-                        <div className={'col title'}>
-                            <span>Action</span>
-                        </div>
-                        <div className={'col amount'}>
-                            <span>Effort</span>
-                        </div>
-                        <div className={'col delete'}>
-                            {isEditing ? (<span>Delete</span>) : null}
-                        </div>
-                    </div>
-                    {editing.actions.length ? editing.actions.map((action, index) => (
-                        <Draggable key={`list-${action.id}-${index}`} draggableId={`list-${action.id}-${index}`} index={index}>
-                            {(provided) => (
-                                <div className={`action-row flex-container ${!action.isAvailable ? 'unavailable' : ''}`}
-                                     ref={provided.innerRef}
-                                     {...provided.draggableProps}
-                                     {...provided.dragHandleProps}
-                                >
-                                    {editing.proportionsBar ? (<div style={{width: editing.proportionsBar?.[index]?.displayPercentage, backgroundColor: editing.proportionsBar[index]?.color}} className={'prop-bg'}></div> ) : null}
-                                    <div className={'col title'}>
-                                        <span>{action.name}</span>
-                                    </div>
-                                    <div className={`col amount ${isEditing ? 'large' : ''}`}>
-                                        {isEditing
-                                            ? (<div className={'editing-amounts'}>
-                                                <input type={'number'} value={action.time}
-                                                       onChange={(e) => onUpdateActionFromList(action.id, 'time', +e.target.value)}/>
-                                                <span>{formatValue(editing.proportionsBar?.[index]?.percentage*100 || 0)} %</span>
-                                            </div>
-                                            )
-                                            : (<span>{formatValue(editing.proportionsBar[index].percentage*100)} %</span>)
-                                        }
-                                    </div>
-                                    <div className={'col delete'}>
-                                        {isEditing ? (<span className={'close'} onClick={() => onDropActionFromList(action.id)}>X</span>) : null}
-                                    </div>
-                                </div>
-                            )}
-                        </Draggable>
-                    )) : <p className={'hint'}>Click on actions or drag & drop them to add</p>}
-                    {provided.placeholder}
-                </div>
-            )}
-        </Droppable>
-        <div className={'effects-wrap'}>
-            {Object.keys(editing?.resourcesEffects || {}).length ? (<div className={'block'}>
-            <p>Average Resources per second</p>
-            <ResourceComparison effects1={editing?.prevEffects} effects2={editing?.resourcesEffects} maxDisplay={10}/></div>) : null}
-            {editing?.effectEffects?.length ? (<div className={'block'}>
-            <p>Average Effects per second</p>
-            <EffectsSection effects={editing?.effectEffects || []} maxDisplay={10}/></div>) : null}
-        </div>
-        <div className={'autotrigger-settings autoconsume-setting block'}>
-            <div className={'rules-header flex-container'}>
-                <p>Autotrigger rules: {editing?.autotrigger?.rules?.length ? null : 'None'}</p>
-                <label>
-                    <input type={'checkbox'} checked={editing.autotrigger?.isEnabled} onChange={toggleAutotrigger}/>
-                    {editing.autotrigger?.isEnabled ? ' ON' : ' OFF'}
-                </label>
-                {isEditing ? (<button onClick={addAutotriggerRule}>Add rule (AND)</button>) : null}
-                <HowToSign scope={'lists-automation'} />
-            </div>
-            <div className={'priority-line flex-container'}>
-                <p>Priority: </p>
-                <input type={'number'} value={editing.autotrigger?.priority || 0} onChange={e => setAutotriggerPriority(+(e.target.value || 0))}/>
-            </div>
-            <RulesList
-                isEditing={isEditing}
-                rules={editing.autotrigger?.rules || []}
-                resources={resources}
-                deleteRule={deleteAutotriggerRule}
-                setRuleValue={setAutotriggerRuleValue}
-                setPattern={setAutotriggerPattern}
-                pattern={editing.autotrigger?.pattern || ''}
-                isAutoCheck={editing.autotrigger?.isEnabled}
-            />
-        </div>
-        {isEditing ? (<div className={'buttons'}>
-            <button onClick={() => saveAndClose(false)}>{listData?.id ? 'Save' : 'Create'}</button>
-            <button onClick={() => saveAndClose(true)}>{listData?.id ? 'Save & Close' : 'Create & Close'}</button>
-            <button onClick={onCloseList}>Cancel</button>
-        </div>) : null}
-    </div></PerfectScrollbar> )
-}, ((prevProps, currentProps) => {
-
-    if(prevProps.isEditing !== currentProps.isEditing) return false;
-
-    if(prevProps.listData !== currentProps.listData) return false;
-
-    // if(prevProps.editListId !== currentProps.editListId) return false;
-
-    return true;
-}))

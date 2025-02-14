@@ -105,7 +105,7 @@ export const registerCraftingRecipes = () => {
                 resources: {
                     'inventory_paper': {
                         A: 1.3,
-                        B: 0.1*gameEffects.getEffectValue('crafting_efficiency'),
+                        B: 0.05*gameEffects.getEffectValue('crafting_efficiency'),
                         type: 1,
                     }
                 }
@@ -231,12 +231,12 @@ export const registerCraftingRecipes = () => {
                 resources: {
                     'inventory_ginseng': {
                         A: 1.5,
-                        B: 1,
+                        B: 0.5,
                         type: 1
                     },
                     'inventory_aloe_vera': {
                         A: 1.5,
-                        B: 1,
+                        B: 0.5,
                         type: 1
                     },
                     'crafting_ability': {
@@ -382,6 +382,67 @@ export const registerCraftingRecipes = () => {
     })
 
 
+    registerCraftingRecipe('craft_obsidian_shards', {
+        tags: ["recipe", "crafting", "material", "physical"],
+        name: 'Extract Obsidian Shard',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Extract small shiny crystals from your stones',
+        level: 1,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 5000,
+        }],
+        resourceId: 'inventory_obsidian_shard',
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'inventory_obsidian_shard': {
+                        A: 1.3,
+                        B: 0.02*gameEffects.getEffectValue('crafting_efficiency'),
+                        type: 1,
+                    }
+                }
+            }),
+            consumption: {
+                resources: {
+                    'inventory_stone': {
+                        A: 1.5,
+                        B: 100,
+                        type: 1
+                    },
+                    'crafting_ability': {
+                        A: 1.5,
+                        B: 40,
+                        type: 1,
+                    },
+                    'crafting_slots': {
+                        A: 1,
+                        B: 0,
+                        type: 0,
+                        ignoreEfficiency: true,
+                    },
+                }
+            },
+            effectDeps: ['crafting_efficiency']
+        },
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_obsidian_shard')
+        },
+        attributes: {
+            baseXPCost: 10,
+        },
+        get_cost: () => ({
+            'crafting_slots': {
+                A: 1,
+                B: 0,
+                type: 0
+            }
+        }),
+    })
+
+
     registerCraftingRecipe('craft_iron_plate', {
         tags: ["recipe", "crafting", "material", "physical"],
         name: 'Craft Iron Plate',
@@ -436,6 +497,188 @@ export const registerCraftingRecipes = () => {
             }
         }),
     })
+
+    registerCraftingRecipe('craft_green_ink', {
+        tags: ["recipe", "crafting", "material", "physical"],
+        name: 'Green Ink',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Use your herb concentrate to create ink',
+        level: 1,
+        resourceId: 'inventory_green_ink',
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'inventory_green_ink': {
+                        A: 1.3,
+                        B: 0.02*gameEffects.getEffectValue('crafting_efficiency'),
+                        type: 1,
+                    }
+                }
+            }),
+            consumption: {
+                resources: {
+                    'inventory_knowledge_moss': {
+                        A: 1.5,
+                        B: 6,
+                        type: 1
+                    },
+                    'inventory_golden_algae': {
+                        A: 1.5,
+                        B: 6,
+                        type: 1
+                    },
+                    'crafting_ability': {
+                        A: 1.5,
+                        B: 2,
+                        type: 1,
+                    },
+                    'crafting_slots': {
+                        A: 1,
+                        B: 0,
+                        type: 0,
+                        ignoreEfficiency: true,
+                    },
+                }
+            },
+            effectDeps: ['crafting_efficiency']
+        },
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_green_ink')
+        },
+        attributes: {
+            baseXPCost: 10,
+        },
+        get_cost: () => ({
+            'crafting_slots': {
+                A: 1,
+                B: 0,
+                type: 0
+            }
+        }),
+    })
+
+
+    registerCraftingRecipe('craft_red_ink', {
+        tags: ["recipe", "crafting", "material", "physical"],
+        name: 'Red Ink',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Use your herb concentrate to create red ink',
+        level: 1,
+        resourceId: 'inventory_red_ink',
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'inventory_red_ink': {
+                        A: 1.3,
+                        B: 0.02*gameEffects.getEffectValue('crafting_efficiency'),
+                        type: 1,
+                    }
+                }
+            }),
+            consumption: {
+                resources: {
+                    'inventory_ember_leaf': {
+                        A: 1.5,
+                        B: 2,
+                        type: 1
+                    },
+                    'inventory_harmony_blossom': {
+                        A: 1.5,
+                        B: 2,
+                        type: 1
+                    },
+                    'crafting_ability': {
+                        A: 1.5,
+                        B: 4,
+                        type: 1,
+                    },
+                    'crafting_slots': {
+                        A: 1,
+                        B: 0,
+                        type: 0,
+                        ignoreEfficiency: true,
+                    },
+                }
+            },
+            effectDeps: ['crafting_efficiency']
+        },
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_red_ink')
+        },
+        attributes: {
+            baseXPCost: 10,
+        },
+        get_cost: () => ({
+            'crafting_slots': {
+                A: 1,
+                B: 0,
+                type: 0
+            }
+        }),
+    })
+
+    registerCraftingRecipe('craft_map_fragment', {
+        tags: ["recipe", "crafting", "material", "physical"],
+        name: 'Map Fragment',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Create map fragments and turn them into reality with your magic',
+        level: 1,
+        resourceId: 'inventory_map_fragment',
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'inventory_map_fragment': {
+                        A: 1.3,
+                        B: 0.02*gameEffects.getEffectValue('crafting_efficiency'),
+                        type: 1,
+                    }
+                }
+            }),
+            consumption: {
+                resources: {
+                    'inventory_paper': {
+                        A: 1.5,
+                        B: 6,
+                        type: 1
+                    },
+                    'inventory_green_ink': {
+                        A: 1.5,
+                        B: 1/1.5,
+                        type: 1
+                    },
+                    'crafting_ability': {
+                        A: 1.5,
+                        B: 4,
+                        type: 1,
+                    },
+                    'crafting_slots': {
+                        A: 1,
+                        B: 0,
+                        type: 0,
+                        ignoreEfficiency: true,
+                    },
+                }
+            },
+            effectDeps: ['crafting_efficiency']
+        },
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_map_fragment')
+        },
+        attributes: {
+            baseXPCost: 10,
+        },
+        get_cost: () => ({
+            'crafting_slots': {
+                A: 1,
+                B: 0,
+                type: 0
+            }
+        }),
+    })
+
 
     // alchemy
 

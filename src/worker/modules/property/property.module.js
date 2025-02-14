@@ -3,6 +3,71 @@ import {GameModule} from "../../shared/game-module";
 import {registerFurnitureStage1} from "./furniture-db";
 import {registerAccessoriesStage1} from "./accessories-db";
 import {SMALL_NUMBER} from "game-framework/src/utils/consts";
+import {cloneDeep} from "lodash";
+
+const DEFAULT_PROPERTY_FILTERS = {
+    'all': {
+        id: 'all',
+        condition: '',
+        rules: [],
+        name: 'All',
+        isRequired: true,
+        isPinned: true,
+        sortIndex: 0,
+    },
+    'resources': {
+        id: 'resources',
+        condition: '',
+        rules: [{ type: 'tag', object: 'resource'}],
+        name: 'Resources',
+        isPinned: true,
+        sortIndex: 1,
+    },
+    'storage': {
+        id: 'storage',
+        condition: '',
+        rules: [{ type: 'tag', object: 'storage'}],
+        name: 'Storage',
+        isPinned: true,
+        sortIndex: 2,
+    }
+}
+
+const DEFAULT_ACCESSORY_FILTERS = {
+    'all': {
+        id: 'all',
+        condition: '',
+        rules: [],
+        name: 'All',
+        isRequired: true,
+        isPinned: true,
+        sortIndex: 0,
+    },
+    'resources': {
+        id: 'resources',
+        condition: '',
+        rules: [{ type: 'tag', object: 'resource'}],
+        name: 'Resources',
+        isPinned: true,
+        sortIndex: 1,
+    },
+    'storage': {
+        id: 'storage',
+        condition: '',
+        rules: [{ type: 'tag', object: 'storage'}],
+        name: 'Storage',
+        isPinned: true,
+        sortIndex: 2,
+    },
+    'actions-learning': {
+        id: 'actions-learning',
+        condition: '',
+        rules: [{ type: 'tag', object: 'actions-learning'}],
+        name: 'Actions Learning',
+        isPinned: true,
+        sortIndex: 3,
+    }
+}
 
 export class PropertyModule extends GameModule {
 
@@ -24,6 +89,62 @@ export class PropertyModule extends GameModule {
         };
         this.autoPurchase = {};
         this.autoPurchaseCd = 0;
+        this.customFilters = {
+            furniture: cloneDeep(DEFAULT_PROPERTY_FILTERS),
+            accessory: cloneDeep(DEFAULT_ACCESSORY_FILTERS)
+        };
+        this.customFiltersOrder = {
+            furniture: Object.keys(this.customFilters.furniture),
+            accessory: Object.keys(this.customFilters.accessory)
+        };
+
+        this.eventHandler.registerHandler('actions-change-custom-filters-order', payload => {
+            //payload.sortIndex, payload.destinationIndex. Reorder this.customFiltersOrder
+            const { sourceIndex, destinationIndex, filterId } = payload;
+
+            // Захист від некоректних індексів:
+            if (sourceIndex === undefined || destinationIndex === undefined) return;
+            if (sourceIndex < 0 || destinationIndex < 0) return;
+            if (sourceIndex >= this.customFiltersOrder[filterId].length || destinationIndex >= this.customFiltersOrder[filterId].length) return;
+
+            // Копіюємо масив (якщо хочемо не мутувати оригінал),
+            // але можна й "у місці" (mutable), залежно від вашої логіки
+            const newOrder = [...this.customFiltersOrder[filterId]];
+
+            // Вирізаємо елемент зі старої позиції
+            const [removed] = newOrder.splice(sourceIndex, 1);
+            // Ставимо на нову позицію
+            newOrder.splice(destinationIndex, 0, removed);
+
+            // Зберігаємо оновлений масив
+            this.customFiltersOrder = newOrder;
+
+            console.log('Re-sorted', payload, newOrder);
+
+            this.sendFurnituresData({filterId}, {
+                searchData: this.searchData[filterId],
+                hideMaxed: this.hideMaxed[payload.filterId] || false,
+                selectedFilterId: this.selectedFilterId[payload.filterId],
+            })
+        })
+
+        this.eventHandler.registerHandler('save-property-custom-filter', (payload) => {
+            this.saveCustomFilter(payload);
+        })
+
+        this.eventHandler.registerHandler('delete-property-custom-filter', (payload) => {
+            this.deleteCustomFilter(payload);
+        })
+
+        this.eventHandler.registerHandler('toggle-property-custom-filter-pinned', (payload) => {
+            this.setCustomFilterPinned(payload);
+        })
+
+        this.eventHandler.registerHandler('apply-property-custom-filter', (payload) => {
+
+            this.applyCustomFilter(payload);
+        })
+
         this.eventHandler.registerHandler('set-furniture-autopurchase', ({ id, flag, filterId }) => {
             const entities = gameEntity.listEntitiesByTags(['furniture']).filter(one => one.isUnlocked && !one.isCapped);
             entities.forEach(e => {
@@ -36,7 +157,8 @@ export class PropertyModule extends GameModule {
                 searchData: this.searchData[filterId]  || {
                     search: '',
                     selectedScopes: ['name']
-                }
+                },
+                selectedFilterId: this.selectedFilterId[filterId],
             } : undefined)
         })
         this.eventHandler.registerHandler('purchase-furniture', (payload) => {
@@ -50,9 +172,18 @@ export class PropertyModule extends GameModule {
         })
 
         this.eventHandler.registerHandler('set-furniture-hide-maxed', (payload) => {
+            console.log('Set Hide Maxed: ', payload);
             if(payload.filterId) {
                 this.hideMaxed[payload.filterId] = payload.hideMaxed;
             }
+            this.sendFurnituresData(payload, payload.filterId ? {
+                hideMaxed: this.hideMaxed[payload.filterId] || false,
+                selectedFilterId: this.selectedFilterId[payload.filterId],
+                searchData: this.searchData[payload.filterId]  || {
+                    search: '',
+                    selectedScopes: ['name']
+                }
+            } : undefined)
         })
 
         this.eventHandler.registerHandler('set-furniture-search-text', (payload) => {
@@ -60,6 +191,14 @@ export class PropertyModule extends GameModule {
                 this.searchData[payload.filterId] = payload.searchData;
             }
             console.log('sendFurniture: ', payload, this.searchData);
+            this.sendFurnituresData(payload, payload.filterId ? {
+                hideMaxed: this.hideMaxed[payload.filterId] || false,
+                selectedFilterId: this.selectedFilterId[payload.filterId],
+                searchData: this.searchData[payload.filterId]  || {
+                    search: '',
+                    selectedScopes: ['name']
+                }
+            } : undefined)
         })
 
         this.eventHandler.registerHandler('delete-furniture', (payload) => {
@@ -76,6 +215,7 @@ export class PropertyModule extends GameModule {
 
             this.sendFurnituresData(payload, payload.filterId ? {
                 hideMaxed: this.hideMaxed[payload.filterId] || false,
+                selectedFilterId: this.selectedFilterId[payload.filterId],
                 searchData: this.searchData[payload.filterId]  || {
                     search: '',
                     selectedScopes: ['name']
@@ -86,7 +226,23 @@ export class PropertyModule extends GameModule {
         this.eventHandler.registerHandler('query-furniture-details', (payload) => {
             this.sendFurnitureDetails(payload.id)
         })
-        
+
+        this.eventHandler.registerHandler('query-all-furniture-tags', (payload) => {
+            this.sendAllFurnitureTags(payload)
+        })
+
+        this.eventHandler.registerHandler('query-all-accessory-tags', (payload) => {
+            this.sendAllAccessoryTags(payload)
+        })
+
+        this.eventHandler.registerHandler('query-all-property-effects', (payload) => {
+            this.sendAllFurnitureEffects(payload);
+        })
+
+        this.filtersCache = {
+            furniture: {},
+            accessory: {}
+        };
     }
 
     initialize() {
@@ -97,17 +253,147 @@ export class PropertyModule extends GameModule {
             isService: true,
         })
 
-        gameEffects.registerEffect('urn_storage_bonus', {
-            name: 'Urns storage bonus',
-            defaultValue: 1.,
-            minValue: 1,
-            hasCap: false,
-        })
-
         registerFurnitureStage1();
         registerAccessoriesStage1();
 
     }
+
+    /* Filters */
+
+    generateFilterCache(filterId, id) {
+        if(!this.customFilters[filterId][id]) {
+            delete this.filtersCache[filterId][id];
+        }
+        // now apply filters and find ids
+        if(!this.customFilters[filterId][id].rules) {
+            this.filtersCache[filterId][id] = {'all': true};
+            return;
+        }
+        const entities = gameEntity.listEntitiesByTags([filterId]);
+
+        this.filtersCache[filterId][id] = {};
+
+        entities.forEach(entity => {
+            const ruleResults = this.customFilters[filterId][id].rules.map(rule => {
+                if(rule.type === 'tag') return entity.tags.includes(rule.object);
+                if(rule.type === 'resource') return Object.keys(entity.modifier?.income?.resources || {}).includes(rule.object)
+                    || Object.keys(entity.modifier?.multiplier?.resources || {}).includes(rule.object);
+                if(rule.type === 'attribute') return Object.keys(entity.modifier?.income?.effects || {}).includes(rule.object)
+                    || Object.keys(entity.modifier?.multiplier?.effects || {}).includes(rule.object);
+                throw new Error('Invalid filter condition: '+rule.type);
+            })
+
+
+            if(id == '18828') {
+                console.log('CHCK_ENT_RULES: ', id, entity.id, ruleResults, this.customFilters[filterId][id].condition, !this.customFilters[filterId][id].condition);
+            }
+
+
+
+            let conditionExpression = this.customFilters[filterId][id].condition;
+
+            if(!conditionExpression) {
+                const result = ruleResults.every(one => !!one);
+                if(result) {
+                    this.filtersCache[filterId][id][entity.id] = true;
+                }
+                return true;
+            }
+
+            ruleResults.forEach((result, index) => {
+                conditionExpression = conditionExpression.replace(new RegExp(`\\b${index + 1}\\b`, 'g'), result);
+            });
+
+            conditionExpression = conditionExpression.replace(/\bAND\b/g, '&&').replace(/\bOR\b/g, '||').replace(/\bNOT\b/g, '!');
+
+            if(id == '18828') {
+                console.log('CHCK_ENT_RULES: ', id, conditionExpression, eval(conditionExpression));
+            }
+
+            try {
+                const result = eval(conditionExpression);
+                if(result) {
+                    this.filtersCache[filterId][id][entity.id] = true;
+                }
+            } catch (error) {
+                console.error("Invalid condition string", error);
+                return false;
+            }
+
+        })
+
+        console.log('Generated Filter: ', this.filtersCache);
+
+    }
+
+    generateAllFiltersCache(filterId) {
+        for(const id in this.customFilters[filterId]) {
+            this.generateFilterCache(filterId, id);
+        }
+        console.log('Caches: ', this.filtersCache[filterId]);
+    }
+
+    setCustomFilterPinned({ filterId, id, flag }) {
+        if(this.customFilters[filterId][id]) {
+            this.customFilters[filterId][id].isPinned = flag;
+        }
+    }
+
+    saveCustomFilter(payload) {
+        if(!payload.filterId) {
+            throw new Error(`filterId is required!`)
+        }
+        let id = payload.id ?? `${Math.round(Math.random()*1000000)}`;
+
+        this.customFilters[payload.filterId][id] = {...(this.customFilters[payload.filterId][id] || {}), ...payload, id};
+
+        if(!payload.id) {
+            this.customFiltersOrder[payload.filterId].push(id);
+        }
+
+        this.generateFilterCache(payload.filterId, id);
+
+        //TODO: Re-index filters
+        this.sendFurnituresData({ filterId: payload.filterId }, {
+            hideMaxed: this.hideMaxed[payload.filterId] || false,
+            searchData: this.searchData[payload.filterId]  || {
+                search: '',
+                selectedScopes: ['name']
+            },
+            selectedFilterId: this.selectedFilterId[payload.filterId],
+        })
+    }
+
+    deleteCustomFilter({ filterId, id }) {
+        const defaultFlt = filterId === 'furniture' ? DEFAULT_PROPERTY_FILTERS : DEFAULT_ACCESSORY_FILTERS;
+        if(this.customFilters[filterId][id] && !defaultFlt[id]?.isRequired) {
+            delete this.customFilters[filterId][id];
+            this.customFiltersOrder[filterId] = this.customFiltersOrder[filterId].filter(fid => fid !== id);
+            this.sendFurnituresData({ filterId }, {
+                hideMaxed: this.hideMaxed[filterId] || false,
+                searchData: this.searchData[filterId]  || {
+                    search: '',
+                    selectedScopes: ['name']
+                },
+                selectedFilterId: this.selectedFilterId[filterId],
+            })
+        }
+    }
+
+    applyCustomFilter({ filterId, id }) {
+        this.selectedFilterId[filterId] = id;
+        this.generateFilterCache(filterId, id);
+        console.log('AppliedFilter: ', this.selectedFilterId);
+        this.sendFurnituresData({ filterId }, {
+            hideMaxed: this.hideMaxed[filterId] || false,
+            searchData: this.searchData[filterId]  || {
+                search: '',
+                selectedScopes: ['name']
+            },
+            selectedFilterId: this.selectedFilterId[filterId],
+        })
+    }
+
 
     tick(game, delta) {
         this.leveledId = null;
@@ -123,10 +409,12 @@ export class PropertyModule extends GameModule {
                     if(this.autoPurchase[key]) {
                         if(!gameEntity.isEntityUnlocked(key)) {
                             this.autoPurchase[key] = false;
+                            console.log('Furniture '+key+' is locked. Toggling autopurchase');
                             continue;
                         }
                         if(gameEntity.isCapped(key)) {
                             this.autoPurchase[key] = false;
+                            console.log('Furniture '+key+' is capped. Toggling autopurchase');
                             continue;
                         }
                         const newEnt = this.purchaseFurniture(key, 'furniture', {
@@ -147,6 +435,10 @@ export class PropertyModule extends GameModule {
             furnitures: this.purchasedFurnitures,
             hideMaxed: this.hideMaxed,
             searchData: this.searchData,
+            autoPurchase: this.autoPurchase,
+            customFilters: this.customFilters,
+            customFiltersOrder: this.customFiltersOrder,
+            selectedFilterId: this.selectedFilterId,
         }
     }
 
@@ -172,7 +464,56 @@ export class PropertyModule extends GameModule {
                 selectedScopes: ['name']
             },
         };
-        this.sendFurnituresData({ filterId: 'furniture' });
+        this.autoPurchase = {};
+        if(saveObject?.autoPurchase) {
+            this.autoPurchase = saveObject?.autoPurchase;
+        }
+
+        this.customFilters = {
+            furniture: cloneDeep(DEFAULT_PROPERTY_FILTERS),
+            accessory: cloneDeep(DEFAULT_ACCESSORY_FILTERS)
+        };
+        this.customFiltersOrder = {
+            furniture: Object.keys(this.customFilters.furniture),
+            accessory: Object.keys(this.customFilters.accessory)
+        };
+        this.selectedFilterId = {};
+        if(saveObject?.customFilters) {
+            this.customFilters = saveObject?.customFilters;
+            // check if all required are prestnt
+            for(const key in this.customFilters) {
+                let isValid = true;
+                const defFlt = key === 'furniture' ? DEFAULT_PROPERTY_FILTERS : DEFAULT_ACCESSORY_FILTERS;
+                for(const fltId in defFlt) {
+                    if(defFlt[fltId].isRequired && !this.customFilters[key][fltId]) {
+                        isValid = false;
+                        break;
+                    }
+                }
+                if(!isValid) {
+                    this.customFilters = cloneDeep(defFlt);
+                    this.selectedFilterId[key] = 'all';
+                } else {
+                    this.selectedFilterId[key] = saveObject?.selectedFilterId[key] ?? 'all';
+                }
+            }
+
+        }
+        for(const key in this.customFilters) {
+            this.generateAllFiltersCache(key);
+        }
+        if(saveObject?.customFiltersOrder) {
+            this.customFiltersOrder = saveObject.customFiltersOrder;
+        } else {
+            this.customFiltersOrder = {
+                furniture: Object.keys(this.customFilters.furniture),
+                accessory: Object.keys(this.customFilters.accessory)
+            };
+        }
+
+        /*this.sendFurnituresData({ filterId: 'furniture' }, {
+            searchData: this.searchData,
+        });*/
     }
 
     reset() {
@@ -210,14 +551,18 @@ export class PropertyModule extends GameModule {
     regenerateNotifications() {
 
         ['furniture', 'accessory'].forEach(filter => {
-            const items = gameEntity.listEntitiesByTags([filter]);
-            items.forEach(item => {
-                gameCore.getModule('unlock-notifications').registerNewNotification(
-                    'property',
-                    filter,
-                    item.id,
-                    item.isUnlocked && !item.isCapped
-                )
+            // const items = gameEntity.listEntitiesByTags([filter]);
+            Object.values(this.customFilters[filter]).forEach(filterData => {
+                const items = gameEntity.listEntitiesByTags([filter]).filter(one => this.filtersCache[filter][filterData.id][one.id]);
+                items.forEach(item => {
+                    gameCore.getModule('unlock-notifications').registerNewNotification(
+                        'property',
+                        filter,
+                        filterData.id,
+                        item.id,
+                        item.isUnlocked && !item.isCapped
+                    )
+                })
             })
         })
     }
@@ -230,6 +575,11 @@ export class PropertyModule extends GameModule {
         if(selectedScopes.includes('tags') && one.tags && one.tags.some(tag => tag.includes(search))) return true;
         if(selectedScopes.includes('description') && one.description && one.description.toLowerCase().includes(search)) return true;
 
+        if(selectedScopes.includes('resources') && one.searchableMeta?.['resources']
+            && one.searchableMeta?.['resources'].some(tag => tag.includes(search.toLowerCase()))) return true;
+        if(selectedScopes.includes('effects') && one.searchableMeta?.['effects']
+            && one.searchableMeta?.['effects'].some(tag => tag.includes(search.toLowerCase()))) return true;
+
         return false;
     }
 
@@ -237,7 +587,36 @@ export class PropertyModule extends GameModule {
         if(!payload.filterId) {
             throw new Error('filter is required here');
         }
-        const entities = gameEntity.listEntitiesByTags([payload.filterId]);
+        //const entities = gameEntity.listEntitiesByTags([payload.filterId]);
+        // console.log('FLTS: ', payload.filterId, this.customFilters, this.selectedFilterId);
+
+        if(!this.selectedFilterId[payload.filterId] || !this.customFilters[payload.filterId][this.selectedFilterId[payload.filterId]]) {
+            this.selectedFilterId[payload.filterId] = 'all';
+        }
+        // const entities = gameEntity.listEntitiesByTags(['action']).filter(one => one.isUnlocked && !one.isCapped);
+        const perCats = Object.values(this.customFilters[payload.filterId]).reduce((acc, filter) => {
+
+            acc[filter.id] = {
+                id: filter.id,
+                name: filter.name,
+                rules: filter.rules,
+                isPinned: filter.isPinned,
+                sortIndex: this.customFiltersOrder[payload.filterId].findIndex(s => s === filter.id),
+                items: gameEntity.listEntitiesByTags([payload.filterId])
+                    .filter(one => this.filtersCache[payload.filterId][filter.id][one.id] && one.isUnlocked
+                        && (!options?.hideMaxed || !one.isCapped)
+                        && !one.isUnpurchaseable
+                        && this.matchSearch(one, options.searchData)
+                    ),
+                isSelected: this.selectedFilterId[payload.filterId] === filter.id
+            }
+
+            return acc;
+        }, {})
+
+
+        const entities = perCats[this.selectedFilterId[payload.filterId]].items;
+
         const spaceRes = gameResources.getResource('living_space');
 
         return {
@@ -256,14 +635,18 @@ export class PropertyModule extends GameModule {
                 isCapped: entity.isCapped,
                 isAutoPurchase: this.autoPurchase[entity.id] ?? false,
             })),
+            propertyCategories: Object.values(perCats).filter(cat => cat.items.length > 0).sort((a, b) => a.sortIndex - b.sortIndex),
             space: {
                 max: spaceRes.income * spaceRes.multiplier,
                 consumption: spaceRes.consumption,
                 total: spaceRes.amount,
             },
+            selectedCategory: this.selectedFilterId[payload.filterId],
             searchData: options?.searchData,
             hideMaxed: options?.hideMaxed,
-            isAutomationUnlocked: gameEntity.getLevel('shop_item_purchase_manager') > 0
+            isAutomationUnlocked: gameEntity.getLevel('shop_item_purchase_manager') > 0,
+            customFilters: this.customFilters[payload.filterId],
+            customFiltersOrder: this.customFiltersOrder[payload.filterId],
         }
     }
 
@@ -291,6 +674,74 @@ export class PropertyModule extends GameModule {
     sendFurnitureDetails(id) {
         const data = this.getFurnitureDetails(id);
         this.eventHandler.sendData('furniture-details', data);
+    }
+
+    getAllItemsTags(filterId) {
+        const allActions = gameEntity.listEntitiesByTags([filterId]);
+
+        const tagsByUnlocks = {};
+
+        allActions.forEach(a => {
+            a.tags.forEach(tag => {
+                tagsByUnlocks[tag] = {
+                    id: tag,
+                    name: tag,
+                    isUnlocked: tagsByUnlocks[tag]?.isUnlocked || (a.isUnlocked && !a.isCapped)
+                }
+            })
+        })
+
+        return Object.values(tagsByUnlocks);
+
+    }
+
+    sendAllFurnitureTags(payload) {
+        const data = this.getAllItemsTags('furniture');
+        let label = 'all-furniture-tags';
+        if(payload?.prefix) {
+            label = `${label}-${payload?.prefix}`
+        }
+        this.eventHandler.sendData(label, data);
+    }
+
+    sendAllAccessoryTags(payload) {
+        const data = this.getAllItemsTags('accessory');
+        let label = 'all-accessory-tags';
+        if(payload?.prefix) {
+            label = `${label}-${payload?.prefix}`
+        }
+        this.eventHandler.sendData(label, data);
+    }
+
+    getAllFurnitureEffects(filterId) {
+        const propertyEntities = gameEntity.listEntitiesByTags([filterId]);
+        const effectIdsUnique = propertyEntities.reduce((acc, entity) => {
+            const incomes = Object.keys(entity.modifier?.income?.effects || {});
+            const effects = Object.keys(entity.modifier?.multiplier?.effects || {});
+            const newAcc = acc;
+            [...incomes, ...effects].forEach(key => {
+                newAcc[key] = newAcc[key] || entity.isUnlocked;
+            })
+            return newAcc;
+        }, {});
+        const list = [];
+        for(const key in effectIdsUnique) {
+            list.push({
+                ...gameEffects.getEffect(key),
+                isUnlocked: effectIdsUnique[key] && gameEffects.isEffectUnlocked(key)
+            })
+        }
+
+        return list;
+    }
+
+    sendAllFurnitureEffects(payload) {
+        const data = this.getAllFurnitureEffects(payload.filterId);
+        let label = 'all-property-effects';
+        if(payload?.prefix) {
+            label = `${label}-${payload?.prefix}`
+        }
+        this.eventHandler.sendData(label, data);
     }
 
 }

@@ -1,7 +1,8 @@
 import {GameModule} from "../../shared/game-module";
 import {registerTileTypesDB} from "./tile-db";
-import {gameEffects, gameEntity, gameResources} from "game-framework";
+import {gameEffects, gameEntity, gameResources, resourceApi, resourceCalculators} from "game-framework";
 import {MapTileListsSubmodule} from "./map-tile-lists.submodule";
+import {SMALL_NUMBER} from "game-framework/src/utils/consts";
 
 export class MapModule extends GameModule {
 
@@ -12,10 +13,27 @@ export class MapModule extends GameModule {
         this.mapTilesProcessed = [];
         this.refreshTimeout = 0;
         this.highlightResources = {};
+        this.highlightFilters = {};
+        this.mapCreationSettings = {
+            level: 0,
+        }
+        this.relevantMapVersion = 2;
+        this.currentMapVersion = null;
 
         this.lists = new MapTileListsSubmodule();
 
         this.eventHandler.registerHandler('query-map-data', () => {
+            this.sendData();
+        })
+
+        this.eventHandler.registerHandler('map-highlight-filter', (payload) => {
+            console.log('setHighLight: ', payload);
+            if('highlightUnexplored' in payload) {
+                this.highlightFilters['highlightUnexplored'] = payload.highlightUnexplored;
+            }
+            if('highlightAvailableOnly' in payload) {
+                this.highlightFilters['highlightAvailableOnly'] = payload.highlightAvailableOnly;
+            }
             this.sendData();
         })
 
@@ -25,6 +43,22 @@ export class MapModule extends GameModule {
             payload.ids.forEach(id => {
                 this.highlightResources[id] = true;
             })
+            this.sendData();
+        })
+
+        this.eventHandler.registerHandler('map-set-generated-level', (payload) => {
+            console.log('setGeneratedLevel: ', payload);
+            this.mapCreationSettings.level = Math.max(0, Math.min(Math.floor(gameEffects.getEffectValue('max_map_level')), payload.level));
+            this.sendData();
+            this.sendGeneralData();
+        })
+
+        this.eventHandler.registerHandler('map-query-general-data', () => {
+            this.sendGeneralData();
+        })
+
+        this.eventHandler.registerHandler('map-generate-map', (payload) => {
+            this.purchaseMap()
             this.sendData();
         })
 
@@ -45,7 +79,7 @@ export class MapModule extends GameModule {
         this.generateMap();
     }
 
-    generateMap() {
+    generateMap(tier = 0) {
         for(let i = 0; i < 15; i++) {
             this.mapTiles[i] = [];
             for(let j = 0; j < 15; j++ ) {
@@ -64,19 +98,20 @@ export class MapModule extends GameModule {
                         r: []
                     }
                 } else {
-                    this.mapTiles[i][j] = this.generateRandomTile(i, j);
+                    this.mapTiles[i][j] = this.generateRandomTile(i, j, tier);
                 }
             }
         }
+        this.currentMapVersion = this.relevantMapVersion;
         this.processTiles();
     }
 
-    generateRandomTile(i, j) {
+    generateRandomTile(i, j, tier) {
         const expectType = Math.floor((Math.random()**1.5)*this.tileTypes.length);
         const distance = Math.sqrt((i-7)**2 + (j-7)**2);
         const metaData = this.tileTypes[expectType];
         const resources = gameResources.listResourcesByTags(['gatherable']);
-        const complexity = Math.max(1, (distance-2) + Math.random()*(distance-2));
+        const complexity = Math.max(1, (distance-2) + Math.random()*(distance-2))*(1 + tier);
         return {
             distance,
             i,
@@ -170,7 +205,7 @@ export class MapModule extends GameModule {
                 drops.push({
                     id: lowRarityResource.id,
                     amountMult: complexity / ((1 + lowRarityResource.rarity)*(lowRarityResource.sellPrice ** 0.05)),
-                    probabilityMult: (complexity ** 0.4) / ((1 + (lowRarityResource.rarity ** 0.5))*(lowRarityResource.sellPrice ** 0.25)),
+                    probabilityMult: (complexity ** 0.3) / ((1 + (lowRarityResource.rarity ** 0.5))*(lowRarityResource.sellPrice ** 0.25)),
                 });
             }
         }
@@ -213,6 +248,10 @@ export class MapModule extends GameModule {
 
         // Trim to exactly 3 drops
         return uniqueDrops.slice(0, 5);
+    }
+
+    getGatheringPerceptionEffect() {
+        return (1 + gameResources.getResource('gathering_perception').amount) ** 0.25;
     }
 
     processTiles() {
@@ -260,7 +299,8 @@ export class MapModule extends GameModule {
                                 j
                             })
                         }
-                        let prob = 0.03*d.probabilityMult*rarityProbMult*effEff*(1 + (gameResources.getResource('gathering_perception').amount ** 0.75));
+                        const gatheringPerceptionEffect = this.getGatheringPerceptionEffect();
+                        let prob = 0.09*d.probabilityMult*rarityProbMult*effEff*gatheringPerceptionEffect;
                         if(prob > 0.2) {
                             prob = Math.min(0.5, 0.2 + (prob - 0.2) ** 1.5)
                         }
@@ -287,12 +327,18 @@ export class MapModule extends GameModule {
     save() {
         return {
             mapTiles: this.mapTiles,
-            lists: this.lists.save()
+            lists: this.lists.save(),
+            mapCreationSettings: this.mapCreationSettings,
+            currentMapVersion: this.currentMapVersion,
         }
     }
 
     load(obj) {
-        if(obj?.mapTiles) {
+        this.currentMapVersion = obj?.currentMapVersion;
+        if(obj?.mapCreationSettings) {
+            this.mapCreationSettings = obj?.mapCreationSettings;
+        }
+        if(obj?.mapTiles && (this.currentMapVersion && this.currentMapVersion >= this.relevantMapVersion)) {
             this.mapTiles = obj.mapTiles;
             for(let i = 0; i < this.mapTiles.length; i++) {
                 for(let j = 0; j < this.mapTiles[i].length; j++) {
@@ -310,6 +356,40 @@ export class MapModule extends GameModule {
         this.lists.load(obj?.lists || {});
     }
 
+    mapGenerationCost() {
+        const level = this.mapCreationSettings.level ?? 0;
+
+        let result = {
+            isAffordable: true,
+            consume: {}
+        }
+
+        result.consume['inventory_map_fragment'] = 10*Math.pow(4, level);
+        if(result.consume['inventory_map_fragment'] > gameResources.getResource('inventory_map_fragment').amount) {
+            result.isAffordable = false;
+        }
+
+        return result;
+    }
+
+    purchaseMap() {
+        const cost = this.mapGenerationCost();
+
+        if(!cost.isAffordable) return;
+
+        for(const rId in cost.consume) {
+            gameResources.addResource(rId, -cost.consume[rId]);
+        }
+
+        this.lists.stopList();
+
+        for(const lId in this.lists.mapLists) {
+            this.lists.deleteMapTilesList(lId);
+        }
+
+        this.generateMap(this.mapCreationSettings.level);
+    }
+
     getData() {
         const filterableLoot = Object.keys(this.filterableLoots).map(one => ({
             ...gameResources.getResource(one),
@@ -317,7 +397,11 @@ export class MapModule extends GameModule {
         }));
         return {
             mapTiles: this.mapTilesProcessed.map(row => row.map(col => {
-                const isHighlight = col.drops.some(drop => this.highlightResources[drop.id] && drop.isRevealed);
+                let isHighlight = col.drops.some(drop => this.highlightResources[drop.id] && drop.isRevealed);
+                if(this.highlightFilters.highlightUnexplored) {
+                    isHighlight = (!Object.keys(this.highlightResources).length || isHighlight) && col.drops.some(drop => gameResources.isResourceUnlocked(drop.id) && !drop.isRevealed);
+                }
+
                 return {
                     ...col,
                     drops: col.drops.map((drop, index) => ({
@@ -329,8 +413,30 @@ export class MapModule extends GameModule {
             })),
             explorationPoints: gameResources.getResource('gathering_effort'),
             mapLists: this.lists.getLists(),
+            highlightFilters: this.highlightFilters,
             filterableLoot,
         }
+    }
+
+    sendGeneralData() {
+        const data = {
+            mapGeneration: {
+                isUnlocked: gameResources.isResourceUnlocked('inventory_map_fragment'),
+                level: this.mapCreationSettings.level,
+                affordable: resourceCalculators.isAffordable(this.mapGenerationCost().consume),
+                maxLevel: gameEffects.getEffectValue('max_map_level')
+            },
+            isProducingGathering: gameResources.getResource('gathering_effort').income > SMALL_NUMBER,
+            stats: {
+                effects: [
+                    {...gameEffects.getEffect('gathering_low_chance'), isMultiplier: true},
+                    {...gameEffects.getEffect('gathering_herbs_amount'), isMultiplier: true},
+                    {...gameResources.getResource('gathering_perception'), isMultiplier: false, value: gameResources.getResource('gathering_perception').amount},
+                    {id: 'perception_effect', name: 'Gathering Perception Effect', value: this.getGatheringPerceptionEffect(), description: 'Multiplier to find probabilities provided by Gathering Perception', isMultiplier: true}
+                ].filter(one => ((!one.isMultiplier && (one.value > SMALL_NUMBER)) || (one.isMultiplier && (Math.abs(one.value - 1) > SMALL_NUMBER))))
+            }
+        }
+        this.eventHandler.sendData('map-general-data', data);
     }
 
     sendData() {
@@ -340,7 +446,7 @@ export class MapModule extends GameModule {
     }
 
     getDetails(i, j) {
-
+        console.log('GetDetails: ', i, j, this.mapTilesProcessed[i])
         const tile = this.mapTilesProcessed[i][j];
         // console.log('Querying tile.drops: ', i, j, tile.drops, tile.drops.filter((drop, index) => (!tile.r?.includes(index)) && gameResources.isResourceUnlocked(drop.id)));
 

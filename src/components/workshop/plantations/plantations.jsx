@@ -4,6 +4,9 @@ import {useWorkerClient} from "../../../general/client";
 import {formatInt, formatValue} from "../../../general/utils/strings";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import {NewNotificationWrap} from "../../layout/new-notification-wrap.jsx";
+import {RawResource} from "../../shared/raw-resource.jsx";
+import {BreakDown} from "../../layout/sidebar.jsx";
+import {TippyWrapper} from "../../shared/tippy-wrapper.jsx";
 
 export const Plantations = ({ setItemDetails, newUnlocks }) => {
 
@@ -15,7 +18,8 @@ export const Plantations = ({ setItemDetails, newUnlocks }) => {
         slots: {
             total: 0,
             max: 0
-        }
+        },
+        isWateringUnlocked: false,
     });
 
     useEffect(() => {
@@ -41,18 +45,32 @@ export const Plantations = ({ setItemDetails, newUnlocks }) => {
         }
     })
 
+    const setWateringLevel = useCallback((id, level) => {
+        sendData(`set-plantation-watering`, { id, level })
+    })
+
     return (<div className={'crafting-wrap'}>
         <div className={'head'}>
             <div className={'space-item'}>
-                <span>Plantation Slots:</span>
+                <RawResource id={'plantation_slots'} name={'Plantation Slots'} />
                 <span className={`${plantationsData.slots.total > 0 ? 'slots-available' : 'slots-unavailable'}`}>{formatInt(plantationsData.slots.total)}/{formatInt(plantationsData.slots.max)}</span>
             </div>
+            {plantationsData.isWateringUnlocked ? (<TippyWrapper content={<div className={'hint-popup'}>
+                <p className={'hint'}>Congrats! You can now use water to increase your plantations efficiency by setting watering level</p>
+                <p className={'hint'}>If you try to use more water than you have - watering bonus will decrease</p>
+                <BreakDown breakDown={plantationsData.waterResource.breakDown} />
+            </div> }>
+                <div className={'space-item'}>
+                    <RawResource id={'inventory_water'} name={plantationsData.waterResource.name} />
+                    <span>{formatValue(plantationsData.waterResource.amount)}({formatValue(plantationsData.waterResource.balance)})</span>
+                </div>
+            </TippyWrapper> ) : null}
         </div>
         <div className={'plantations-cat'}>
             <PerfectScrollbar>
                 <div className={'flex-container'}>
-                    {plantationsData.available.map(plantable => <NewNotificationWrap id={`plantation_${plantable.id}`} className={'narrow-wrapper'} isNew={newUnlocks?.[`plantation_${plantable.id}`]?.hasNew}>
-                        <ItemCard key={plantable.id} {...plantable} onPurchase={purchaseItem} onShowDetails={setItemDetails} onDemolish={onDemolish}/>
+                    {plantationsData.available.map(plantable => <NewNotificationWrap id={`plantation_${plantable.id}`} className={'narrow-wrapper'} isNew={newUnlocks?.all?.items?.[`plantation_${plantable.id}`]?.hasNew}>
+                        <ItemCard key={plantable.id} {...plantable} onPurchase={purchaseItem} onShowDetails={setItemDetails} onDemolish={onDemolish} isWateringUnlocked={plantationsData.isWateringUnlocked} setWateringLevel={setWateringLevel}/>
                     </NewNotificationWrap>)}
                 </div>
             </PerfectScrollbar>
@@ -60,7 +78,7 @@ export const Plantations = ({ setItemDetails, newUnlocks }) => {
     </div>)
 }
 
-export const ItemCard = ({ id, icon_id, name, level, maxLevel, affordable, onPurchase, onDemolish, onShowDetails}) => {
+export const ItemCard = ({ id, icon_id, name, level, maxLevel, affordable, onPurchase, onDemolish, onShowDetails, wateringLevel, isWateringUnlocked, setWateringLevel}) => {
 
     return (<div className={`card craftable plantable`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)}>
         <div className={'flex-container two-side-card'}>
@@ -72,6 +90,12 @@ export const ItemCard = ({ id, icon_id, name, level, maxLevel, affordable, onPur
                     <p className={'title'}>{name}</p>
                     <span className={'level'}>{formatInt(level)}{maxLevel ? `/${formatInt(maxLevel)}` : ''}</span>
                 </div>
+                {isWateringUnlocked ? (<div className={'watering-settings'}>
+                    <label>
+                        <span>Watering Level:</span>
+                        <input type={'number'} value={wateringLevel} onChange={(e) => setWateringLevel(id, +e.target.value)}/>
+                    </label>
+                </div> ) : null}
                 <div className={'bottom'}>
                     <div className={'buttons'}>
                         <button disabled={!affordable.isAffordable} onClick={() => onPurchase(id)}>{level > 0 ? 'Upgrade' : 'Purchase'}</button>

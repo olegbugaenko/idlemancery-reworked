@@ -124,4 +124,21 @@ v0.0.3a:
 TODO's:
 1. [V] Add On/Off for map tiles automations
 2. Add sort lists for maps routes and crafting
-3. [V] Add automation for furniture
+3. [V] Map re-generation & Fragments crafting
+4. [V] Add automation for furniture
+5. [X] Knowledge Moss and Core Duckweed must be purchaseable
+6. [V] Refine Guilds screen
+7. Add action training, increasing knowledge boost (MB, gate behind even more charisma)
+8. [V] 2.25K patience should unlock new resource - mental energy. New attributes - clarity and willpower, and new courses advancing learning requirements and courses requirements
+9. [V] Howering on action lacking efficiency should show (highlight) reason
+10. [V] Papermill - a furniture that would add %-sh boost to paper and echanted paper gains
+11. Show running list in left sidebar
+12. Add descriptions to courses
+13. [V] Hover over learning effects in actions should highlight them
+14. [V] Add unlock for red ink crafting and accessories that increase reductive courses efficiency and mental energy gains 
+15. [V] 4K patience should unlock courses boosting courses
+16. 7K patience should unlock insight scrolls - reducing XP required for actions
+17. [V] 8K Magic Ability should unlock conjuration magic
+18. [V] Add spell boosting social training learn rate
+19. [V] Add custom filters for accessories and furniture
+20. Icons for gathering effort and gathering perception

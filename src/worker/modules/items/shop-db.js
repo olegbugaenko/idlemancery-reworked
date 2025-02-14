@@ -21,7 +21,7 @@ export const registerShopItemsStage1 = () => {
             multiplier: {
                 effects: {
                     'begging_efficiency': {
-                        A: 0.25,
+                        A: 0.5,
                         B: 1,
                         type: 0,
                     }
@@ -206,6 +206,37 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+    gameEntity.registerGameEntity('shop_item_street_smarts', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Street Smarts',
+        description: 'You’ve learned a few tricks to make every coin count. Increases coins earned from all jobs.',
+        level: 0,
+        maxLevel: 3,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_bag') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                resources: {
+                    'coins': {
+                        A: 0.1,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 10*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        }),
+    })
 
     gameEntity.registerGameEntity('shop_item_panpipe', {
         tags: ["shop", "upgrade", "purchaseable"],
@@ -328,6 +359,32 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+    gameEntity.registerGameEntity('shop_item_map', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Map',
+        description: 'Purchase map to unlock gathering',
+        level: 0,
+        maxLevel: 1,
+        unlockedBy: [{
+           type: 'effect',
+           id: 'attribute_patience',
+           level: 5,
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 30*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        }),
+    })
+
     gameEntity.registerGameEntity('shop_item_tent', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Tent',
@@ -402,6 +459,27 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+    gameEntity.registerGameEntity('shop_item_planner', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Planner',
+        description: 'Purchase planner to allow better tasks management. Unlocks lists automations',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_tent') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2.25,
+                B: 4000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
 
     gameEntity.registerGameEntity('shop_item_library_entrance', {
         tags: ["shop", "upgrade", "purchaseable"],
@@ -439,7 +517,33 @@ export const registerShopItemsStage1 = () => {
         get_cost: () => ({
             'coins': {
                 A: 2,
-                B: 10000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 2000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_aspects_focus', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Focused Activity',
+        description: 'Stop making things in regular way. Unlock way to control effort put on every aspect, allowing to use more resources to boost your actions output',
+        level: 0,
+        maxLevel: 1,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 25,
+        }],
+        unlockCondition: () => {
+            return true
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 5000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 0
             }
         }),
@@ -511,7 +615,7 @@ export const registerShopItemsStage1 = () => {
         level: 0,
         maxLevel: 1,
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_library_entrance') > 0
+            return gameEntity.getLevel('shop_item_library_entrance') > 0 && gameEntity.getLevel('shop_item_handbook') > 0
         },
         attributes: {
             isCollectable: false,
@@ -519,7 +623,7 @@ export const registerShopItemsStage1 = () => {
         get_cost: () => ({
             'coins': {
                 A: 2.25,
-                B: 400*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 1400*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 1
             }
         }),
@@ -669,7 +773,7 @@ export const registerShopItemsStage1 = () => {
             multiplier: {
                 effects: {
                     'gathering_low_chance': {
-                        A: 0.25,
+                        A: 0.125,
                         B: 1,
                         type: 0,
                     }
@@ -700,7 +804,7 @@ export const registerShopItemsStage1 = () => {
         get_cost: () => ({
             'coins': {
                 A: 2,
-                B: 3000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 4000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 0
             }
         }),
@@ -1107,7 +1211,7 @@ export const registerShopItemsStage1 = () => {
         get_cost: () => ({
             'coins': {
                 A: 1.3,
-                B: 15000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 15000*charismaMod(gameEffects.getEffectValue('attribute_charisma'))/gameEffects.getEffectValue('land_purchase_discount'),
                 type: 1
             }
         }),
@@ -1270,6 +1374,28 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+    gameEntity.registerGameEntity('shop_item_paper_cutting', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Paper Cutting',
+        description: 'Invent much more complicated but efficient mechanisms of making paper and paper goods',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_paper_enhance') > 0
+            //||  gameEntity.getLevel('shop_item_conjuration_magic') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2.25,
+                B: 5.e+10*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
 
     gameEntity.registerGameEntity('shop_item_minor_illusion', {
         tags: ["shop", "upgrade", "purchaseable"],
@@ -1279,6 +1405,33 @@ export const registerShopItemsStage1 = () => {
         maxLevel: 1,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_less_illusion') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'knowledge': {
+                A: 1.5,
+                B: 9000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'coins': {
+                A: 1.5,
+                B: 40000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+
+    gameEntity.registerGameEntity('shop_item_minor_restoration', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Minor Restoration',
+        description: 'Learn some better restoration spells.',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_less_restoration') > 0
         },
         attributes: {
             isCollectable: false,
@@ -1320,6 +1473,130 @@ export const registerShopItemsStage1 = () => {
                 A: 2,
                 B: 1.e+8*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 0
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_training_room', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Training Rooms',
+        description: 'Now you know about secret shop, containing a lot of knowledge',
+        level: 0,
+        maxLevel: 1,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 1500
+        }],
+        unlockCondition: () => {
+            return true
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 400000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        })
+    })
+
+    gameEntity.registerGameEntity('shop_item_breaking_limits', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Breaking Limits Instructions',
+        description: 'Learn how to use maximum of your body and soul. Unlock new intensity courses',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_training_room') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 1250000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        })
+    })
+
+    gameEntity.registerGameEntity('shop_item_ink_crafting', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Ink Crafting',
+        description: 'Learn to craft inks from herbs and algae to create useful accessories like enchanted scrolls and notes.',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_paper_working') > 0
+            //||  gameEntity.getLevel('shop_item_conjuration_magic') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2.25,
+                B: 2.e+9*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_cartography', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Cartography',
+        description: 'Learn how to create new and better maps using magical map fragments.',
+        level: 0,
+        maxLevel: 5,
+        resourceModifier: {
+            income: {
+                effects: {
+                    max_map_level: {
+                        A: 1,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_ink_crafting') > 0
+            //||  gameEntity.getLevel('shop_item_conjuration_magic') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 5.e+9*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_better_ink_crafting', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Improved Ink Crafting',
+        description: 'Learn recipe of new ink and ways to use it.',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_ink_crafting') > 0
+            //||  gameEntity.getLevel('shop_item_conjuration_magic') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2.25,
+                B: 2.e+10*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
             }
         }),
     })

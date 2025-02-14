@@ -7,6 +7,7 @@ import {formatInt, formatValue} from "../../../general/utils/strings";
 import {ResourceCost} from "../../shared/resource-cost.jsx";
 import {Plantations} from "./plantations.jsx";
 import {ResourceComparison} from "../../shared/resource-comparison.jsx";
+import {ResourceEffects} from "../../shared/resource-effects.jsx";
 
 export const PlantationsWrap = ({ children }) => {
 
@@ -115,6 +116,12 @@ export const ItemDetails = ({itemId, category}) => {
                         }
                     </div>
                 </div>
+                {item.isWateringUnlocked ? (<div className={'watering block'}>
+                    <p>Watering: {formatInt(item.wateringLevel)} / {formatInt(item.maxWatering.value)}</p>
+                    <div className={'stats-wrap'}>
+                        <ResourceComparison effects1={item.wateringEffects} effects2={item.nextWateringEffects} />
+                    </div>
+                </div> ) : null}
             </div>
         </PerfectScrollbar>
     )

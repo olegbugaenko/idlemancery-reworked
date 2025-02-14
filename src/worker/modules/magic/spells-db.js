@@ -217,7 +217,7 @@ export const initSpellsDB1 = () => {
             xpOnCast: 20,
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_spellbook') > 0
+            return gameEntity.getLevel('shop_item_spellbook') > 0 && gameEntity.getLevel('shop_item_map') > 0
         },
     })
 
@@ -321,6 +321,62 @@ export const initSpellsDB1 = () => {
         },
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_less_restoration') > 0
+        },
+    })
+
+    registerSpell('spell_body_catalyst', {
+        name: 'Body Catalyst',
+        description: 'Use magic to create illusion that you are perfect worker. Increases coins income from jobs',
+        hasCap: false,
+        tags: ['spell', 'magic', 'restoration', 'restoration_magic'],
+        defaultCap: 0,
+        isAbstract: true,
+        level: 1,
+        onUse: (amount) => {
+
+        },
+        getUsageCooldown: () => {
+            return 30;
+        },
+        resourceModifier: {
+            get_multiplier: () =>({
+                effects: {
+                    physical_training_learn_speed: {
+                        A: 0.1*gameEffects.getEffectValue('restoration_spells_efficiency'),
+                        B: 1.0 + 0.25*gameEffects.getEffectValue('restoration_spells_efficiency'),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    mana: {
+                        A: 4.5,
+                        B: 1*getCostReduction('spell_body_catalyst'),
+                        type: 1,
+                    }
+                }
+            }),
+            effectDeps: ['restoration_spells_efficiency']
+        },
+        usageGain: {
+            get_consumption: () => ({
+                resources: {
+                    mana: {
+                        A: 1.5,
+                        B: 15*getCostReduction('spell_perfection_illusion'),
+                        type: 1,
+                    }
+                }
+            })
+        },
+        attributes: {
+            duration: 20,
+            xpOnCast: 50,
+            baseXPCost: 1.e+5,
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_minor_restoration') > 0
         },
     })
 
@@ -543,6 +599,130 @@ export const initSpellsDB1 = () => {
         attributes: {
             duration: 20,
             xpOnCast: 50,
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_minor_illusion') > 0
+        },
+    })
+
+
+    registerSpell('spell_conjure_water', {
+        name: 'Conjure Water',
+        description: 'Create a stream of pure water, vital for your herbs',
+        hasCap: false,
+        tags: ['spell', 'magic', 'mental', 'conjuration_magic'],
+        defaultCap: 0,
+        isAbstract: true,
+        level: 1,
+        onUse: (amount) => {
+
+        },
+        getUsageCooldown: () => {
+            return 10;
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_magic_ability',
+            level: 8000
+        }],
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    inventory_water: {
+                        A: 1.2,
+                        B: 0.2*gameEffects.getEffectValue('conjuration_spells_efficiency'),
+                        type: 1,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    mana: {
+                        A: 1.5,
+                        B: 125.0*getCostReduction('spell_conjure_water')/1.5,
+                        type: 1,
+                    }
+                }
+            }),
+            effectDeps: ['conjuration_spells_efficiency']
+        },
+        usageGain: {
+            get_consumption: () => ({
+                resources: {
+                    mana: {
+                        A: 1.5,
+                        B: 80.*getCostReduction('spell_illusory_hammer')/1.5,
+                        type: 1,
+                    }
+                }
+            })
+        },
+        attributes: {
+            duration: 20,
+            xpOnCast: 50,
+            baseXPCost: 1.e+8,
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_minor_illusion') > 0
+        },
+    })
+
+
+    registerSpell('spell_conjure_wood', {
+        name: 'Conjure Wood',
+        description: 'Create wood without having to use this heavy axe',
+        hasCap: false,
+        tags: ['spell', 'magic', 'mental', 'conjuration_magic'],
+        defaultCap: 0,
+        isAbstract: true,
+        level: 1,
+        onUse: (amount) => {
+
+        },
+        getUsageCooldown: () => {
+            return 10;
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_magic_ability',
+            level: 8000
+        }],
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    inventory_wood: {
+                        A: 1.2,
+                        B: 0.2*gameEffects.getEffectValue('conjuration_spells_efficiency'),
+                        type: 1,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    mana: {
+                        A: 1.5,
+                        B: 125.0*getCostReduction('spell_conjure_wood')/1.5,
+                        type: 1,
+                    }
+                }
+            }),
+            effectDeps: ['conjuration_spells_efficiency']
+        },
+        usageGain: {
+            get_consumption: () => ({
+                resources: {
+                    mana: {
+                        A: 1.5,
+                        B: 80.*getCostReduction('spell_illusory_hammer')/1.5,
+                        type: 1,
+                    }
+                }
+            })
+        },
+        attributes: {
+            duration: 20,
+            xpOnCast: 50,
+            baseXPCost: 1.e+8,
         },
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_minor_illusion') > 0

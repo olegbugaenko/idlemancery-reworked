@@ -198,6 +198,7 @@ export class GuildsModule extends GameModule {
         gameCore.getModule('unlock-notifications').registerNewNotification(
             'social',
             'guilds',
+            'all',
             `no_guild_selected`,
             !this.selectedGuild
         )
@@ -205,6 +206,7 @@ export class GuildsModule extends GameModule {
         gameCore.getModule('unlock-notifications').registerNewNotification(
             'social',
             'guilds',
+            'all',
             `guild_leveled`,
             this.selectedGuild && gameEntity.getLevel(this.selectedGuild) > 0
         )

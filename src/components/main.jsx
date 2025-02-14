@@ -1,6 +1,9 @@
-import React from "react";
+import React, {useContext, useEffect} from "react";
 import {Content} from "./layout/content.jsx";
 import {Footer} from "./layout/footer.jsx";
+import {TutorialProvider, useTutorial} from "../context/tutorial-context";
+import WorkerContext from "../context/worker-context";
+import {useWorkerClient} from "../general/client";
 
 export const Main = ({ readyToGo, isLoading }) => {
 
@@ -16,9 +19,34 @@ export const Main = ({ readyToGo, isLoading }) => {
     }
 
     return (
-        <div className={'page-wrap'}>
-            <Content />
-            <Footer />
-        </div>
+        <TutorialProvider>
+            <LoadedMain />
+        </TutorialProvider>
     )
+}
+
+export const LoadedMain = () => {
+    const worker = useContext(WorkerContext);
+
+    const { onMessage, sendData } = useWorkerClient(worker);
+    const { startTutorial, stopTutorial, setStepIndex } = useTutorial();
+
+    useEffect(() => {
+        sendData('query_tour_status', {})
+        // startTutorial();
+    }, [])
+
+    onMessage('tour_status', payload => {
+        if(!payload?.isComplete) {
+            startTutorial();
+            if(payload?.skipStep) {
+                setStepIndex(payload.skipStep);
+            }
+        }
+    })
+
+    return (<div className={'page-wrap'}>
+        <Content />
+        <Footer />
+    </div>)
 }

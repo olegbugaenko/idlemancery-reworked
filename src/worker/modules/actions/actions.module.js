@@ -1,9 +1,47 @@
-import {registerActionsStage1} from "./actions-db";
+import {getRankId, registerActionsStage1} from "./actions-db";
 import {GameModule} from "../../shared/game-module";
 import {gameEntity, gameResources, gameEffects, resourceCalculators, gameCore} from "game-framework";
 import {ActionListsSubmodule} from "./action-lists.submodule";
 import {calculateTimeToLevelUp, weightedRandomChoice} from "../../shared/utils/math";
 import {SMALL_NUMBER} from "game-framework/src/utils/consts";
+import {registerAspects} from "./aspect-db";
+import {cloneDeep} from "lodash";
+
+const DEFAULT_FILTERS = {
+    'all': {
+        id: 'all',
+        condition: '',
+        rules: [],
+        name: 'All',
+        isRequired: true,
+        isPinned: true,
+        sortIndex: 0,
+    },
+    'jobs': {
+        id: 'jobs',
+        condition: '',
+        rules: [{ type: 'tag', object: 'job'}],
+        name: 'Jobs',
+        isPinned: true,
+        sortIndex: 1,
+    },
+    'training': {
+        id: 'training',
+        condition: '',
+        rules: [{ type: 'tag', object: 'training'}],
+        name: 'Training',
+        isPinned: true,
+        sortIndex: 2,
+    },
+    'activity': {
+        id: 'activity',
+        condition: '',
+        rules: [{ type: 'tag', object: 'activity'}],
+        name: 'Activity',
+        isPinned: true,
+        sortIndex: 3,
+    }
+}
 
 export class ActionsModule extends GameModule {
 
@@ -15,10 +53,59 @@ export class ActionsModule extends GameModule {
         this.lists = new ActionListsSubmodule();
         this.focus = null;
         this.showHidden = false;
+        this.aspectUpdateCd = 0;
         this.searchData = {
             search: '',
             selectedScopes: ['name','tags']
         };
+        this.aspectsSettings = {};
+
+        this.customFilters = cloneDeep(DEFAULT_FILTERS);
+        this.customFiltersOrder = Object.keys(this.customFilters);
+
+        this.eventHandler.registerHandler('actions-change-custom-filters-order', payload => {
+            //payload.sortIndex, payload.destinationIndex. Reorder this.customFiltersOrder
+            const { sourceIndex, destinationIndex } = payload;
+
+            // Захист від некоректних індексів:
+            if (sourceIndex === undefined || destinationIndex === undefined) return;
+            if (sourceIndex < 0 || destinationIndex < 0) return;
+            if (sourceIndex >= this.customFiltersOrder.length || destinationIndex >= this.customFiltersOrder.length) return;
+
+            // Копіюємо масив (якщо хочемо не мутувати оригінал),
+            // але можна й "у місці" (mutable), залежно від вашої логіки
+            const newOrder = [...this.customFiltersOrder];
+
+            // Вирізаємо елемент зі старої позиції
+            const [removed] = newOrder.splice(sourceIndex, 1);
+            // Ставимо на нову позицію
+            newOrder.splice(destinationIndex, 0, removed);
+
+            // Зберігаємо оновлений масив
+            this.customFiltersOrder = newOrder;
+
+            console.log('Re-sorted', payload, newOrder);
+
+            this.sendActionsData(this.selectedFilterId, {
+                searchData: this.searchData,
+            })
+        })
+
+        this.eventHandler.registerHandler('save-actions-custom-filter', (payload) => {
+            this.saveCustomFilter(payload);
+        })
+
+        this.eventHandler.registerHandler('delete-actions-custom-filter', (payload) => {
+            this.deleteCustomFilter(payload);
+        })
+
+        this.eventHandler.registerHandler('toggle-actions-custom-filter-pinned', (payload) => {
+            this.setCustomFilterPinned(payload);
+        })
+
+        this.eventHandler.registerHandler('apply-actions-custom-filter', (payload) => {
+            this.applyCustomFilter(payload);
+        })
 
         this.eventHandler.registerHandler('run-action', (payload) => {
             if(payload.isForce) {
@@ -41,8 +128,8 @@ export class ActionsModule extends GameModule {
             this.sendAllActionTags(payload)
         })
 
-        this.eventHandler.registerHandler('query-actions-unlocks', () => {
-            this.sendActionsUnlocks()
+        this.eventHandler.registerHandler('query-actions-unlocks', ({ showUnlocked }) => {
+            this.sendActionsUnlocks(showUnlocked)
         })
 
         this.eventHandler.registerHandler('query-action-details', (payload) => {
@@ -51,6 +138,24 @@ export class ActionsModule extends GameModule {
 
         this.eventHandler.registerHandler('toggle-hidden-action', (payload) => {
             this.setActionHidden(payload.id, payload.flag);
+            this.sendActionsData(this.selectedFilterId, {
+                searchData: this.searchData,
+            })
+        })
+
+        this.eventHandler.registerHandler('set-action-aspect-level', (payload) => {
+            const keyAttr = gameEntity.getAttribute(payload.id, 'keyAttribute')
+            this.setAspectLevel(keyAttr, payload.level);
+            this.sendActionsData(this.selectedFilterId, {
+                searchData: this.searchData,
+            })
+        })
+
+        this.eventHandler.registerHandler('toggle-action-aspect-maxed', (payload) => {
+            if(!this.aspectsSettings[payload.id]) {
+                this.aspectsSettings[payload.id] = {}
+            }
+            this.aspectsSettings[payload.id].maxed = payload.flag;
             this.sendActionsData(this.selectedFilterId, {
                 searchData: this.searchData,
             })
@@ -80,32 +185,10 @@ export class ActionsModule extends GameModule {
             this.eventHandler.sendData(`action-xp-breakdown-${payload.id}`, breakdowns);
         })
 
-        this.filters = [{
-            id: 'all',
-            name: 'All',
-            tags: [],
-            isDefault: true,
-        },{
-            id: 'jobs',
-            name: 'Jobs',
-            tags: ['job'],
-            isDefault: true,
-        },{
-            id: 'training',
-            name: 'Training',
-            tags: ['training'],
-            isDefault: true,
-        },{
-            id: 'gathering',
-            name: 'Gathering',
-            tags: ['gathering'],
-            isDefault: true,
-        },{
-            id: 'other_activity',
-            name: 'Activities',
-            tags: ['activity'],
-            isDefault: true,
-        }]
+        this.filtersCache = {};
+
+        this.rankableCached = [];
+
     }
 
     initialize() {
@@ -116,11 +199,78 @@ export class ActionsModule extends GameModule {
         })
 
         registerActionsStage1();
+        registerAspects();
+
+
         this.actions = {};
+
+        this.rankableCached = Object.values(gameEntity.entities).filter(one => one.attributes?.isRankAvailable).map(re => re.id);
 
     }
 
+    getActionRank(id) {
+        return Math.floor(gameEntity.getLevel(id) / 100);
+    }
+
+    getRankBonus(rank) {
+        return 1.05 ** rank;
+    }
+
+    regenerateRanks() {
+        if(gameEntity.entityExists('system_action_ranks_multiplier')) {
+            gameEntity.unsetEntity('system_action_ranks_multiplier');
+        }
+
+        const effectsRanks = this.rankableCached.reduce((acc, id) => {
+            const rank = this.getActionRank(id);
+            const effect_id = getRankId(id);
+            const formulaA = this.getRankBonus(rank);
+
+            return {
+                ...acc,
+                [effect_id]: {
+                    A: 0,
+                    B: formulaA,
+                    type: 2,
+                }
+            }
+        }, {})
+
+        console.log('effectsRanks', effectsRanks);
+
+        gameEntity.registerGameEntity('system_action_ranks_multiplier', {
+            name: 'Action Rank',
+            resourceModifier: {
+                multiplier: {
+                    effects: effectsRanks
+                }
+            }
+        })
+
+        gameEntity.setEntityLevel('system_action_ranks_multiplier', 1, true);
+    }
+
+    getAttributeAspectReq(attribute_id) {
+        return Math.max(1, 25 / gameEffects.getEffectValue(`aspect_${attribute_id}_reduction`))
+    }
+
+    getAspectMaxLevel(attribute_id) {
+        return Math.floor(gameEffects.getEffectValue(attribute_id) / this.getAttributeAspectReq(attribute_id));
+    }
+
+    setAspectLevel(attribute_id, level) {
+        const actLevel = Math.min(
+            this.getAspectMaxLevel(attribute_id),
+            Math.max(0, Math.floor(level ?? 0))
+        );
+
+        if(gameEntity.entityExists(`${attribute_id}_aspect`)) {
+            gameEntity.setEntityLevel(`${attribute_id}_aspect`, actLevel, true);
+        }
+    }
+
     setMonitored({ type, id }) {
+        console.log('CHMON: ', id, type);
         if(!id) {
             this.monitorData = null;
             return;
@@ -147,6 +297,12 @@ export class ActionsModule extends GameModule {
             }
         }
 
+        if(this.monitorData.type === 'learn_modifier') {
+            if((this.monitorData.id === 'learning_rate') || entity.learningEffects?.includes(this.monitorData.id)) {
+                return 'produce'
+            }
+        }
+
         if(this.monitorData.type === 'resource') {
             const rsEff = this.packEffects(gameEntity.getEffects(entity.id, 0, this.actions[entity.id]?.level || 1, true)
                     .filter(eff => eff.type === 'resources'));
@@ -160,7 +316,15 @@ export class ActionsModule extends GameModule {
 
     getActionXPMax(id) {
         const lvl = this.actions[id]?.level ?? 1;
-        return gameEntity.getAttribute(id, 'baseXPCost', 50)*Math.pow(1.01, lvl-1)*(0.8 + 0.2*lvl);
+
+        let discFactor = 1.;
+        if(gameEntity.getEntity(id).discountEffects?.length) {
+            gameEntity.getEntity(id).discountEffects.forEach(effectId => {
+                discFactor /= gameEffects.getEffectValue(effectId);
+            })
+        }
+
+        return discFactor*gameEntity.getAttribute(id, 'baseXPCost', 50)*Math.pow(1.01, lvl-1)*(0.8 + 0.2*lvl);
     }
 
     reassertRunningEfforts(bForce) {
@@ -188,6 +352,110 @@ export class ActionsModule extends GameModule {
         this.actions[id].isHidden = flag;
     }
 
+    generateFilterCache(id) {
+        if(!this.customFilters[id]) {
+            delete this.filtersCache[id];
+        }
+        // now apply filters and find ids
+        if(!this.customFilters[id].rules) {
+            this.filtersCache[id] = {'all': true};
+            return;
+        }
+        const entities = gameEntity.listEntitiesByTags(['action']);
+
+        this.filtersCache[id] = {};
+
+        entities.forEach(entity => {
+            const ruleResults = this.customFilters[id].rules.map(rule => {
+                if(rule.type === 'tag') return entity.tags.includes(rule.object);
+                if(rule.type === 'resource') return Object.keys(entity.modifier?.income?.resources || {}).includes(rule.object)
+                    || Object.keys(entity.modifier?.multiplier?.resources || {}).includes(rule.object);
+                if(rule.type === 'attribute') return Object.keys(entity.modifier?.income?.effects || {}).includes(rule.object)
+                    || Object.keys(entity.modifier?.multiplier?.effects || {}).includes(rule.object);
+                throw new Error('Invalid filter condition: '+rule.type);
+            })
+
+            let conditionExpression = this.customFilters[id].condition;
+
+            if(!conditionExpression) {
+                const result = ruleResults.every(one => !!one);
+                if(result) {
+                    this.filtersCache[id][entity.id] = true;
+                }
+                return true;
+            }
+
+            ruleResults.forEach((result, index) => {
+                conditionExpression = conditionExpression.replace(new RegExp(`\\b${index + 1}\\b`, 'g'), result);
+            });
+
+            conditionExpression = conditionExpression.replace(/\bAND\b/g, '&&').replace(/\bOR\b/g, '||').replace(/\bNOT\b/g, '!');
+
+            try {
+                const result = eval(conditionExpression);
+                if(result) {
+                    this.filtersCache[id][entity.id] = true;
+                }
+            } catch (error) {
+                console.error("Invalid condition string", error);
+                return false;
+            }
+
+        })
+
+
+    }
+
+    generateAllFiltersCache() {
+        for(const filterId in this.customFilters) {
+            this.generateFilterCache(filterId);
+        }
+        console.log('Caches: ', this.filtersCache);
+    }
+
+    setCustomFilterPinned({ id, flag }) {
+        if(this.customFilters[id]) {
+            this.customFilters[id].isPinned = flag;
+        }
+    }
+
+    saveCustomFilter(payload) {
+        let id = payload.id ?? `${Math.round(Math.random()*1000000)}`;
+
+        this.customFilters[id] = {...(this.customFilters[id] || {}), ...payload, id};
+
+        if(!payload.id) {
+            this.customFiltersOrder.push(id);
+        }
+
+        console.log('this.customFiltersOrder', this.customFiltersOrder, payload, this.customFilters[id]);
+
+        this.generateFilterCache(id);
+
+        //TODO: Re-index filters
+        this.sendActionsData(this.selectedFilterId, {
+            searchData: this.searchData,
+        })
+    }
+
+    deleteCustomFilter({ id }) {
+        if(this.customFilters[id] && !DEFAULT_FILTERS[id]?.isRequired) {
+            delete this.customFilters[id];
+            this.customFiltersOrder = this.customFiltersOrder.filter(fid => fid !== id);
+            this.sendActionsData(this.selectedFilterId, {
+                searchData: this.searchData,
+            })
+        }
+    }
+
+    applyCustomFilter({ id }) {
+        this.selectedFilterId = id;
+        this.generateFilterCache(id);
+        this.sendActionsData(this.selectedFilterId, {
+            searchData: this.searchData,
+        })
+    }
+
     tick(game, delta) {
         for(let key in this.actions) {
             this.actions[key].isLeveled = false;
@@ -196,6 +464,19 @@ export class ActionsModule extends GameModule {
             herbDrops: {},
             oreDrops: {}
         };
+
+        this.aspectUpdateCd -= delta;
+        if(this.aspectUpdateCd <= 0 && gameEntity.getLevel('shop_item_aspects_focus') > 0) {
+            this.aspectUpdateCd = 2;
+            for(const key in this.aspectsSettings) {
+                if(this.aspectsSettings[key].maxed) {
+                    const attribute_id = gameEntity.getAttribute(key, 'keyAttribute');
+                    if(Math.floor(this.getAspectMaxLevel(attribute_id)) > gameEntity.getLevel(`${attribute_id}_aspect`)) {
+                        this.setAspectLevel(attribute_id, this.getAspectMaxLevel(attribute_id));
+                    }
+                }
+            }
+        }
 
         if(this.activeActions) {
             this.activeActions.forEach(act => {
@@ -249,6 +530,7 @@ export class ActionsModule extends GameModule {
                     gameEntity.setEntityLevel(act.originalId, this.actions[act.originalId].level, true);
                     gameEntity.setEntityLevel(act.id, this.actions[act.originalId].level, true);
                     console.log('Leveled up: ', gameEntity.getLevel(act.id), gameEntity.getLevel(act.originalId));
+                    this.regenerateRanks();
                     this.actions[act.originalId].isLeveled = true;
                     if(gameEntity.isCapped(act.originalId)) {
                         this.dropRunningAction(act.originalId);
@@ -285,6 +567,13 @@ export class ActionsModule extends GameModule {
             selectedFilterId: this.selectedFilterId,
             searchData: this.searchData,
             focus: this.focus,
+            aspects: gameEntity.listEntitiesByTags(['aspect']).filter(one => one.level > 0).reduce((acc, ent) => ({
+                ...acc,
+                [ent.id]: gameEntity.getLevel(ent.id)
+            }), {}),
+            aspectsSettings: this.aspectsSettings,
+            customFilters: this.customFilters,
+            customFiltersOrder: this.customFiltersOrder,
         }
     }
 
@@ -292,7 +581,9 @@ export class ActionsModule extends GameModule {
         for(const key in this.actions) {
             this.setAction(key, 0, true);
         }
+        gameEntity.listEntitiesByTags(['aspect']).filter(one => one.level > 0).map(one => gameEntity.setEntityLevel(one.id, 0, true));
         this.actions = {};
+        this.aspectsSettings = {};
         if(saveObject?.actions) {
             for(const id in saveObject.actions) {
                 this.setAction(id, saveObject.actions[id].level, true);
@@ -310,6 +601,7 @@ export class ActionsModule extends GameModule {
                 this.addRunningAction(a.originalId, a.effort);
             })
         }
+        this.regenerateRanks();
         if(saveObject?.actionLists) {
             this.lists.load(saveObject.actionLists)
         } else {
@@ -321,6 +613,36 @@ export class ActionsModule extends GameModule {
             search: '',
             selectedScopes: ['name','tags']
         };
+        if(saveObject?.aspects) {
+            for(const key in saveObject.aspects) {
+                gameEntity.setEntityLevel(key, saveObject.aspects[key], true);
+            }
+        }
+        if(saveObject?.aspectsSettings) {
+            this.aspectsSettings = saveObject.aspectsSettings;
+        }
+        this.customFilters = cloneDeep(DEFAULT_FILTERS);
+        if(saveObject?.customFilters) {
+            this.customFilters = saveObject?.customFilters;
+            // check if all required are prestnt
+            let isValid = true;
+            for(const fltId in DEFAULT_FILTERS) {
+                if(DEFAULT_FILTERS[fltId].isRequired && !this.customFilters[fltId]) {
+                    isValid = false;
+                    break;
+                }
+            }
+            if(!isValid) {
+                this.customFilters = cloneDeep(DEFAULT_FILTERS);
+                this.selectedFilterId = 'all';
+            }
+            this.generateAllFiltersCache();
+        }
+        if(saveObject?.customFiltersOrder) {
+            this.customFiltersOrder = saveObject.customFiltersOrder;
+        } else {
+            this.customFiltersOrder = Object.keys(this.customFilters);
+        }
         this.sendActionsData(this.selectedFilterId,{
             searchData: this.searchData,
         });
@@ -352,6 +674,13 @@ export class ActionsModule extends GameModule {
         let focusBonus = 1.;
         let effortMult = 1.;
         let breakDowns = {};
+        if(gameEffects.getEffectValue('plain_learn_rate')) {
+            breakDowns['raw'] = {
+                title: 'Plain Learn Bonus',
+                value: gameEffects.getEffectValue('plain_learn_rate'),
+                isPlain: true,
+            }
+        }
         const isRunning = this.isRunningAction(id);
         if(isRunning) {
             // console.log('EffMult: ', id, eff, entEff, eff == null);
@@ -400,6 +729,7 @@ export class ActionsModule extends GameModule {
         }
 
         let primaryEffect = 1.;
+        let intensityEffect = 1.;
 
         if(gameEntity.getEntity(id).getPrimaryEffect) {
             primaryEffect = gameEntity.getEntity(id).getPrimaryEffect();
@@ -409,13 +739,25 @@ export class ActionsModule extends GameModule {
                 title: `Primary Attribute: ${pAtt ? gameEffects.getEffect(pAtt).name : ''}`,
                 value: primaryEffect
             }
+
+            intensityEffect = gameEntity.getEntity(id).getIntensityAspect();
+            if(Math.abs(intensityEffect - 1) > SMALL_NUMBER) {
+                const pAtt2 = gameEntity.getEntity(id).attributes?.primaryAttribute;
+                const iAsp = gameEffects.getEffect(`aspect_${pAtt2}`);
+                breakDowns['intensity'] = {
+                    title: `Intensity: ${iAsp ? iAsp.name : ''}`,
+                    value: intensityEffect
+                }
+            }
         }
 
-        breakDowns['learning_rate'] = {
-            title: gameEffects.getEffect('learning_rate').name,
-            value: gameEffects.getEffectValue('learning_rate'),
-            breakDown: gameEffects.getEffect('learning_rate').breakDown
-        };
+        if(Math.abs(gameEffects.getEffectValue('learning_rate') - 1.0) > SMALL_NUMBER) {
+            breakDowns['learning_rate'] = {
+                title: gameEffects.getEffect('learning_rate').name,
+                value: gameEffects.getEffectValue('learning_rate'),
+                breakDown: gameEffects.getEffect('learning_rate').breakDown
+            };
+        }
 
         if(Math.abs(1 - eff) > SMALL_NUMBER) {
             breakDowns['efficiency'] = {
@@ -424,7 +766,7 @@ export class ActionsModule extends GameModule {
             };
         }
 
-        const total = baseXPRate * primaryEffect * eff * gameEffects.getEffectValue('learning_rate')*focusBonus*effortMult;
+        const total = (gameEffects.getEffectValue('plain_learn_rate') + baseXPRate * primaryEffect * gameEffects.getEffectValue('learning_rate')*focusBonus) * eff*effortMult;
 
         if(bGetBreakdowns) {
             console.log('EffMult: ', id, baseXPRate, primaryEffect, eff, gameEffects.getEffectValue('learning_rate'), focusBonus, effortMult, total);
@@ -519,15 +861,32 @@ export class ActionsModule extends GameModule {
         this.addRunningAction(id, 1);
     }
 
-    getActionsUnlocks() {
+    getActionsUnlocks(showUnlocked) {
         const items = gameEntity
-            .listEntitiesByTags(['action'])
-            .filter(one => one.isUnlocked && !one.isCapped && one.nextUnlock)
+            .listEntitiesByTags(['action'], false, [], { listPrevious: showUnlocked })
+            .filter(one => one.isUnlocked && !one.isCapped && (one.nextUnlock || (showUnlocked && one.prevUnlocks?.length)))
             .map(one => ({
                 ...one,
-                eta: calculateTimeToLevelUp(gameEntity.getAttribute(one.id, 'baseXPCost'), 0.2, one.level, one.nextUnlock.level)
+                progress: one.nextUnlock ? 100*one.level / one.nextUnlock.level : 100,
+                eta: one.nextUnlock ? calculateTimeToLevelUp(gameEntity.getAttribute(one.id, 'baseXPCost'), 0.2, one.level, one.nextUnlock.level) : 0,
+                prevUnlocks: (one.prevUnlocks ?? []).map(unlock => {
+
+                    let data = {};
+
+                    if(gameEntity.entityExists(unlock.unlockId)) {
+                        data = gameEntity.getEntity(unlock.unlockId);
+                    }
+
+                    return {
+                        ...unlock,
+                        data
+                    }
+                }),
             }));
 
+        /*console.log('FUNC: ', showUnlocked, items, gameEntity
+            .listEntitiesByTags(['action'], false, [], { showUnlocked }).filter(one => one.id === 'action_endurance_training'));
+*/
         return items;
     }
 
@@ -601,11 +960,12 @@ export class ActionsModule extends GameModule {
 
     regenerateNotifications() {
         // NOW - check for actions if they have any new notifications
-        this.filters.forEach(filter => {
-            const actions = gameEntity.listEntitiesByTags(['action', ...filter.tags]);
+        Object.values(this.customFilters).forEach(filter => {
+            const actions = gameEntity.listEntitiesByTags(['action']).filter(one => this.filtersCache[filter.id][one.id]);
             actions.forEach(action => {
                 gameCore.getModule('unlock-notifications').registerNewNotification(
                     'actions',
+                    'all',
                     filter.id,
                     action.id,
                     action.isUnlocked && !action.isCapped
@@ -615,18 +975,20 @@ export class ActionsModule extends GameModule {
     }
 
     getActionsData(filterId, options) {
-        if(!filterId) {
+        if(!filterId || !this.customFilters[filterId]) {
             filterId = 'all';
         }
         // const entities = gameEntity.listEntitiesByTags(['action']).filter(one => one.isUnlocked && !one.isCapped);
-        const perCats = this.filters.reduce((acc, filter) => {
+        const perCats = Object.values(this.customFilters).reduce((acc, filter) => {
 
             acc[filter.id] = {
                 id: filter.id,
                 name: filter.name,
-                tags: filter.tags,
-                items: gameEntity.listEntitiesByTags(['action', ...filter.tags])
-                    .filter(one => one.isUnlocked && !one.isCapped
+                rules: filter.rules,
+                isPinned: filter.isPinned,
+                sortIndex: this.customFiltersOrder.findIndex(s => s === filter.id),
+                items: gameEntity.listEntitiesByTags(['action'])
+                    .filter(one => this.filtersCache[filter.id][one.id] && one.isUnlocked && !one.isCapped
                         && (options?.showHidden || this.showHidden || !this.actions?.[one.id]?.isHidden)
                         && this.matchActionSearch(one, options.searchData)
                     ),
@@ -645,10 +1007,12 @@ export class ActionsModule extends GameModule {
         const available = entities.map(entity => ({
             id: entity.id,
             name: entity.name,
+            category: entity.category,
             description: entity.description,
             max: entity.getMaxLevel ? entity.getMaxLevel() : entity.maxLevel || 0,
             level: this.actions[entity.id]?.level || 1,
             affordable: gameEntity.getAffordable(entity.id),
+            entityEfficiency: this.isRunningAction(entity.id) ? gameEntity.getEntityEfficiency(`runningAction_${entity.id}`) : 1,
             // potentialEffects: gameEntity.getEffects(entity.id, gameEntity.getAttribute(entity.id, 'isTraining') ? 1 : 0, this.actions[entity.id]?.level || 1, true),
             xp: this.actions[entity.id]?.xp || 0,
             maxXP: this.getActionXPMax(entity.id),
@@ -674,7 +1038,8 @@ export class ActionsModule extends GameModule {
             ),
             isTraining: gameEntity.getAttribute(entity.id, 'isTraining'),
             isHidden: this.actions?.[entity.id]?.isHidden,
-            monitored: this.getMonitoredData(entity)
+            monitored: this.getMonitoredData(entity),
+            missingResourceId: this.isRunningAction(entity.id) && gameEntity.getEntityEfficiency(`runningAction_${entity.id}`) < 1 ? gameEntity.getEntity(`runningAction_${entity.id}`)?.modifier?.bottleNeck : null,
         }))
 
         const current = this.activeActions ? available.filter(one => this.activeActions.some(act => act.originalId === one.id)) : null;
@@ -686,11 +1051,41 @@ export class ActionsModule extends GameModule {
             actionLists: this.lists.getLists(),
             runningList: this.lists.runningList,
             actionListsUnlocked: gameEntity.getLevel('shop_item_notebook') > 0,
-            actionCategories: Object.values(perCats).filter(cat => cat.items.length > 0),
+            actionCategories: Object.values(perCats).filter(cat => cat.items.length > 0).sort((a, b) => a.sortIndex - b.sortIndex),
             automationEnabled: this.lists.automationEnabled,
+            automationUnlocked: gameEntity.getLevel('shop_item_planner') > 0,
             autotriggerIntervalSetting: this.lists.autotriggerIntervalSetting,
             searchData: this.searchData,
             selectedCategory: filterId,
+            customFilters: this.customFilters,
+            customFiltersOrder: this.customFiltersOrder,
+            stats: {
+                learnMults: {
+                    learningRate: gameEffects.getEffect('learning_rate'),
+                    physicalLearningRate: gameEffects.getEffect('physical_training_learn_speed'),
+                    mentalLearningRate: gameEffects.getEffect('mental_training_learning_rate'),
+                    socialLearningRate: gameEffects.getEffect('social_training_learning_rate'),
+                    routineLearningRate: gameEffects.getEffect('routine_learning_speed'),
+                    spiritualLearningRate: gameEffects.getEffect('spiritual_learning_rate'),
+                    booksLearningRate: gameEffects.getEffect('books_learning_rate'),
+                    mentalActivitiesLearningRate: gameEffects.getEffect('mental_activities_learn_rate')
+                }
+            },
+            aspects: {
+                isUnlocked: gameEntity.getLevel('shop_item_aspects_focus') > 0, // temporary
+                list: gameEntity.listEntitiesByTags(['aspect']).map(one => ({
+                    id: one.id,
+                    name: one.name,
+                    level: one.level,
+                    effects: gameEntity.getEffects(one.id),
+                    maxLevel: this.getAspectMaxLevel(one.attributes.keyAttribute),
+                    attributeData: gameEffects.getEffect(one.attributes.keyAttribute),
+                    nextPoint: Math.ceil((gameEffects.getEffectValue(one.attributes.keyAttribute) + SMALL_NUMBER) / this.getAttributeAspectReq(one.attributes.keyAttribute))*this.getAttributeAspectReq(one.attributes.keyAttribute),
+                    progress: (gameEffects.getEffectValue(one.attributes.keyAttribute) - this.getAttributeAspectReq(one.attributes.keyAttribute)*Math.floor(gameEffects.getEffectValue(one.attributes.keyAttribute) / this.getAttributeAspectReq(one.attributes.keyAttribute)))/this.getAttributeAspectReq(one.attributes.keyAttribute),
+                    color: one.attributes.color,
+                    keepMaxed: this.aspectsSettings[one.id]?.maxed ?? false
+                }))
+            }
         }
     }
 
@@ -739,9 +1134,29 @@ export class ActionsModule extends GameModule {
             nextUnlock: entity.nextUnlock,
             timeInvested: this.actions[entity.id]?.timeInvested || 0,
             xpEarned: this.actions[entity.id]?.xpEarned || 0,
-            etas: this.getEtas(entity.id)
+            etas: this.getEtas(entity.id),
+            aspect: entity.attributes?.primaryAttribute && gameEntity.getLevel('shop_item_aspects_focus') > 0 ? {
+                intensity: entity.getIntensityAspect(),
+                aspect: gameEntity.getEntity(`${entity.attributes?.primaryAttribute}_aspect`),
+            } : null,
+            entityEfficiency: this.isRunningAction(entity.id) ? gameEntity.getEntityEfficiency(`runningAction_${entity.id}`) : 1,
         };
 
+        if(gameEntity.getAttribute(entity.id, 'isRankAvailable')) {
+            const rankData = {
+                rank: this.getActionRank(entity.id),
+                nextRankLevel: 100*Math.ceil((this.actions[entity.id]?.level + 1)/100),
+                prevRankLevel: 100*Math.floor((this.actions[entity.id]?.level + 1)/100),
+            }
+
+            rankData.progress = (this.actions[entity.id]?.level - rankData.prevRankLevel) / 100;
+            rankData.bonus = this.getRankBonus(rankData.rank);
+            entityData.rankData = rankData;
+        }
+
+        if(entityData.entityEfficiency < 1) {
+            entityData.missingResource = gameResources.getResource(gameEntity.getEntity(`runningAction_${entity.id}`)?.modifier?.bottleNeck);
+        }
         return entityData;
     }
 
@@ -813,8 +1228,8 @@ export class ActionsModule extends GameModule {
         this.eventHandler.sendData('action-details', data);
     }
 
-    sendActionsUnlocks() {
-        const data = this.getActionsUnlocks();
+    sendActionsUnlocks(showPrevious) {
+        const data = this.getActionsUnlocks(showPrevious);
         this.eventHandler.sendData('actions-unlocks', data);
     }
 

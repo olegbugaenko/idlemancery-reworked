@@ -31,6 +31,8 @@ export const mapEffect = (effect) => {
     return {
         title,
         value,
+        type: effect.type,
+        id: effect.id,
         direction,
         originalValue: effect.value,
     }

@@ -7,6 +7,9 @@ import {FlashOverlay} from "../layout/flash-overlay.jsx";
 import {useFlashOnLevelUp} from "../../general/hooks/flash";
 import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
 import {SearchField} from "../shared/search-field.jsx";
+import CustomFilter from "../shared/custom-filter.jsx";
+import CustomFiltersList from "../shared/custom-filter-list.jsx";
+import {DragDropContext} from "react-beautiful-dnd";
 
 
 const ACTIONS_SEARCH_SCOPES = [{
@@ -18,6 +21,12 @@ const ACTIONS_SEARCH_SCOPES = [{
 },{
     id: 'description',
     label: 'description'
+},{
+    id: 'resources',
+    label: 'resources'
+},{
+    id: 'effects',
+    label: 'effects'
 }]
 
 export const AccessoryUpgrades = ({ setItemDetails, purchaseItem, newUnlocks }) => {
@@ -35,7 +44,15 @@ export const AccessoryUpgrades = ({ setItemDetails, purchaseItem, newUnlocks }) 
             search: '',
         },
         hideMaxed: false,
+        propertyCategories: [],
+        selectedCategory: 'all',
+        customFilters: {},
+        customFiltersOrder: [],
     });
+
+    const [isCustomFilterOpened, setCustomFilterOpened] = useState(false);
+    const [editingCustomFilter, setEditingCustomFilter] = useState(null);
+
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -63,7 +80,53 @@ export const AccessoryUpgrades = ({ setItemDetails, purchaseItem, newUnlocks }) 
         sendData('set-furniture-search-text', { filterId: 'accessory', searchData: searchData });
     }
 
-    return (<div className={'furniture-wrap'}>
+    const handlePinToggle = (id, newFlag) => {
+        sendData('toggle-property-custom-filter-pinned', { id, flag: newFlag, filterId: 'accessory' });
+    };
+
+
+    const setActionsFilter = (filterId) => {
+        sendData('apply-property-custom-filter', { id: filterId, filterId: 'accessory' })
+    }
+
+    const handleEditFilter = (id) => {
+        // знаходите фільтр, відкриваєте форму редагування
+        // наприклад:
+        const filterData = furnituresData.customFilters[id];
+        setEditingCustomFilter({ ...filterData });
+    };
+
+    const handleDeleteFilter = (id) => {
+        sendData('delete-property-custom-filter', { id, filterId: 'accessory' });
+    };
+
+    const handleAddFilter = () => {
+        setEditingCustomFilter({ rules: [], condition: '', category: 'action', name: '' });
+    };
+
+    const handleClose = () => {
+        setCustomFilterOpened(false);
+    };
+
+    const onDragEnd = (result) => {
+        const {source, destination, draggableId} = result;
+
+        if (!destination) return;
+
+        const sourceDroppableId = source.droppableId;
+        const destinationDroppableId = destination.droppableId;
+
+        if (sourceDroppableId === 'custom-filters' && destinationDroppableId === 'custom-filters') {
+            if (source.index !== destination.index) {
+                sendData('actions-change-custom-filters-order', {
+                    sourceIndex: source.index,
+                    destinationIndex: destination.index
+                })
+            }
+        }
+    }
+
+    return (<DragDropContext onDragEnd={onDragEnd}><div className={'furniture-wrap'}>
         <div className={'head'}>
             <div className={'filters'}>
                 <label>
@@ -80,10 +143,57 @@ export const AccessoryUpgrades = ({ setItemDetails, purchaseItem, newUnlocks }) 
                 </label>
             </div>
         </div>
+        <div className={'categories flex-container sub-heading'}>
+            <ul className={'menu'}>
+                {furnituresData.propertyCategories.filter(one => one.isPinned || one.isSelected).map(category => (<li key={category.id} className={`category ${category.isSelected ? 'active' : ''}`} onClick={() => setActionsFilter(category.id)}>
+                    <NewNotificationWrap isNew={newUnlocks?.[category.id]?.hasNew}>
+                        <span>{category.name}({category.items.length})</span>
+                    </NewNotificationWrap>
+                </li> ))}
+                <li className={'add-custom-filter additional'}>
+                                <span className={'create-custom'} onClick={() => {
+                                    setCustomFilterOpened(true);
+                                    // setEditingCustomFilter({ rules: [], condition: '', category: 'action', name: ''})
+                                }}>Edit Filters</span>
+                    {isCustomFilterOpened ? (<div className={'custom-filter-edit-wrap'}>
+                        {editingCustomFilter ? (
+                                <CustomFilter
+                                    prefix={'actions-filter'}
+                                    category={'accessory'}
+                                    id={editingCustomFilter?.id}
+                                    name={editingCustomFilter?.name}
+                                    rules={editingCustomFilter?.rules}
+                                    condition={editingCustomFilter?.condition}
+                                    onCancel={() => {
+                                        setEditingCustomFilter(null);
+                                    }}
+                                    onSave={(data) => {
+                                        console.log('saving: ', data)
+                                        sendData('save-property-custom-filter', {...data, filterId: 'accessory'});
+                                        setEditingCustomFilter(null);
+                                    }}
+                                />)
+                            : (<CustomFiltersList
+                                filterOrder={furnituresData.customFiltersOrder}
+                                filters={furnituresData.customFilters}
+                                onPinToggle={handlePinToggle}
+                                onApply={setActionsFilter}
+                                onEdit={handleEditFilter}
+                                onDelete={handleDeleteFilter}
+                                showAddButton
+                                onAdd={handleAddFilter}
+                                showCloseButton
+                                onClose={handleClose}
+                            />)}
+                    </div> ) : null}
+
+                </li>
+            </ul>
+        </div>
         <div className={'furnitures-cat'}>
             <PerfectScrollbar>
                 <div className={'flex-container'}>
-                    {furnituresData.available.map(furniture => <NewNotificationWrap key={furniture.id} id={furniture.id} className={'narrow-wrapper'} isNew={newUnlocks?.[furniture.id]?.hasNew}>
+                    {furnituresData.available.map(furniture => <NewNotificationWrap key={furniture.id} id={furniture.id} className={'narrow-wrapper'} isNew={newUnlocks?.[furnituresData.selectedCategory]?.items?.[furniture.id]?.hasNew}>
                         <ItemCard key={furniture.id} {...furniture} onFlash={handleFlash} onPurchase={purchaseItem} onShowDetails={setItemDetails} />
                     </NewNotificationWrap>)}
                     {overlayPositions.map((position, index) => (
@@ -92,7 +202,7 @@ export const AccessoryUpgrades = ({ setItemDetails, purchaseItem, newUnlocks }) 
                 </div>
             </PerfectScrollbar>
         </div>
-    </div>)
+    </div></DragDropContext>)
 }
 
 export const ItemCard = ({ id, name, level, max, affordable, isLeveled, isCapped, onFlash, onPurchase, onShowDetails, onDelete}) => {

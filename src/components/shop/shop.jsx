@@ -1,7 +1,7 @@
 import React, {useCallback, useContext, useEffect, useRef, useState} from "react";
 import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
-import {formatInt, formatValue} from "../../general/utils/strings";
+import {formatInt, formatValue, secondsToString} from "../../general/utils/strings";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import {EffectsSection} from "../shared/effects-section.jsx";
 import {ResourceCost} from "../shared/resource-cost.jsx";
@@ -20,12 +20,22 @@ export const Shop = ({}) => {
 
     const [ selectedTab, setSelectedTab ] = useState('upgrades');
 
+    const [ unlocks, setUnlocksData ] = useState(null);
+
     const purchaseItem = (id) => {
         sendData('purchase-item', { id })
     }
 
     const purchaseResource = (id, amount) => {
         sendData('purchase-resource', { id, amount })
+    }
+
+    const purchaseCourse = (id, flag) => {
+        if(flag) {
+            sendData('run-course', { id })
+        } else {
+            sendData('stop-course', { id })
+        }
     }
 
     const setItemDetails = (id) => {
@@ -41,11 +51,16 @@ export const Shop = ({}) => {
     useEffect(() => {
         const interval = setInterval(() => {
             sendData('query-new-unlocks-notifications', { suffix: 'shop', scope: 'shop' })
+            sendData('query-unlocks', {});
         }, 1000)
         return () => {
             clearInterval(interval)
         }
     }, [])
+
+    onMessage('unlocks', (unlocks) => {
+        setUnlocksData(unlocks);
+    })
 
     onMessage('new-unlocks-notifications-shop', payload => {
         console.log('Received unlocks: ', payload);
@@ -67,10 +82,19 @@ export const Shop = ({}) => {
                                 <span>Items</span>
                             </NewNotificationWrap>
                         </li>
+                        {unlocks?.courses ? (<li className={`${selectedTab === 'courses' ? 'active' : ''}`} onClick={() => {
+                            setSelectedTab('courses');
+                            setDetailOpened(null);
+                        }}>
+                            <NewNotificationWrap isNew={newUnlocks?.['shop']?.items?.['courses']?.hasNew}>
+                                <span>Courses</span>
+                            </NewNotificationWrap>
+                        </li>) : null}
                     </ul>
                 </div>
                 {selectedTab === 'upgrades' ? (<ShopUpgrades setItemDetails={setItemDetails} purchaseItem={purchaseItem} newUnlocks={newUnlocks?.['shop']?.items?.['upgrades']?.items}/>) : null}
                 {selectedTab === 'items' ? (<ShopItems setItemDetails={setItemDetails} purchaseItem={purchaseResource} newUnlocks={newUnlocks?.['shop']?.items?.['inventory']?.items}/>) : null}
+                {selectedTab === 'courses' ? (<CourseItems setItemDetails={setItemDetails} purchaseItem={purchaseCourse} newUnlocks={newUnlocks?.['shop']?.items?.['courses']?.items}/>) : null}
             </div>
 
             <div className={'item-detail ingame-box detail-blade'}>
@@ -90,7 +114,8 @@ export const ShopUpgrades = ({ setItemDetails, purchaseItem, newUnlocks }) => {
     const [itemsData, setItemsData] = useState({
         available: [],
         current: undefined,
-        isAutomationUnlocked: false
+        isAutomationUnlocked: false,
+        showMaxed: false,
     });
 
     const [overlayPositions, setOverlayPositions] = useState([]);
@@ -119,17 +144,29 @@ export const ShopUpgrades = ({ setItemDetails, purchaseItem, newUnlocks }) => {
         sendData('set-shop-autopurchase', { id, flag })
     })
 
-    return (<div className={'items-cat'}>
-        <PerfectScrollbar>
-            <div className={'flex-container'}>
-                {itemsData.available.map(item => <NewNotificationWrap key={`shop_${item.id}`} id={`shop_${item.id}`} className={'narrow-wrapper'} isNew={newUnlocks?.[`shop_${item.id}`]?.hasNew}>
-                    <ItemCard onFlash={handleFlash} key={item.id} {...item} onPurchase={purchaseItem} onShowDetails={setItemDetails} toggleAutopurchase={toggleAutopurchase} isAutomationUnlocked={itemsData.isAutomationUnlocked}/>
-                </NewNotificationWrap>)}
-                {overlayPositions.map((position, index) => (
-                    <FlashOverlay key={index} position={position} />
-                ))}
-            </div>
-        </PerfectScrollbar>
+    const toggleShowMaxed = useCallback((flag) => {
+        sendData('set-shop-show-maxed', { flag })
+    })
+
+    return (<div className={'upgrades-wrap'}>
+        <div className={'sub-heading'}>
+            <label>
+                <input type={'checkbox'} checked={itemsData.showMaxed} onChange={() => toggleShowMaxed(!itemsData.showMaxed)}/>
+                Show purchased
+            </label>
+        </div>
+        <div className={'items-cat'}>
+            <PerfectScrollbar>
+                <div className={'flex-container'}>
+                    {itemsData.available.map(item => <NewNotificationWrap key={`shop_${item.id}`} id={`shop_${item.id}`} className={'narrow-wrapper'} isNew={newUnlocks?.all?.items?.[`shop_${item.id}`]?.hasNew}>
+                        <ItemCard onFlash={handleFlash} key={item.id} {...item} onPurchase={purchaseItem} onShowDetails={setItemDetails} toggleAutopurchase={toggleAutopurchase} isAutomationUnlocked={itemsData.isAutomationUnlocked}/>
+                    </NewNotificationWrap>)}
+                    {overlayPositions.map((position, index) => (
+                        <FlashOverlay key={index} position={position} />
+                    ))}
+                </div>
+            </PerfectScrollbar>
+        </div>
     </div>)
 }
 
@@ -198,7 +235,7 @@ export const ShopItems = ({ setItemDetails, purchaseItem, newUnlocks }) => {
         <div className={'items-holder'}>
             <PerfectScrollbar>
                 <div className={'flex-container'}>
-                    {itemsData.available.map(item => <NewNotificationWrap key={`shop_${item.id}`} id={`shop_${item.id}`} className={'narrow-wrapper'} isNew={newUnlocks?.[`shop_${item.id}`]?.hasNew}>
+                    {itemsData.available.map(item => <NewNotificationWrap key={`shop_${item.id}`} id={`shop_${item.id}`} className={'narrow-wrapper'} isNew={newUnlocks?.all?.items?.[`shop_${item.id}`]?.hasNew}>
                         <ItemResourceCard onFlash={handleFlash} key={item.id} {...item} onPurchase={purchaseItem} onShowDetails={setItemDetails}/>
                     </NewNotificationWrap>)}
                     {overlayPositions.map((position, index) => (
@@ -210,22 +247,74 @@ export const ShopItems = ({ setItemDetails, purchaseItem, newUnlocks }) => {
     </div>)
 }
 
-export const ItemCard = ({ id, name, level, max, affordable, isLeveled, onFlash, onPurchase, onShowDetails, isAutoPurchase, toggleAutopurchase, isAutomationUnlocked}) => {
+
+export const CourseItems = ({ setItemDetails, purchaseItem, newUnlocks }) => {
+
+    const worker = useContext(WorkerContext);
+
+    const { onMessage, sendData } = useWorkerClient(worker);
+    const [itemsData, setItemsData] = useState({
+        available: [],
+        current: undefined,
+        isAutomationUnlocked: false
+    });
+
+    const [overlayPositions, setOverlayPositions] = useState([]);
+
+    const handleFlash = (position) => {
+        setOverlayPositions((prev) => [...prev, position]);
+        setTimeout(() => {
+            setOverlayPositions((prev) => prev.filter((p) => p !== position));
+        }, 1000);
+    };
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            sendData('query-course-data', {});
+        }, 100);
+        return () => {
+            clearInterval(interval);
+        }
+    }, [])
+
+    onMessage('course-data', (items) => {
+        setItemsData(items);
+    })
+
+    const toggleAutopurchase = useCallback((id, flag) => {
+        sendData('set-course-autopurchase', { id, flag })
+    })
+
+    return (<div className={'items-cat'}>
+        <PerfectScrollbar>
+            <div className={'flex-container'}>
+                {itemsData.available.map(item => <NewNotificationWrap key={`course_${item.id}`} id={`course_${item.id}`} className={'narrow-wrapper'} isNew={newUnlocks?.all?.items?.[`course_${item.id}`]?.hasNew}>
+                    <CourseCard onFlash={handleFlash} key={item.id} {...item} onPurchase={purchaseItem} onShowDetails={setItemDetails} toggleAutopurchase={toggleAutopurchase} isAutomationUnlocked={itemsData.isAutomationUnlocked}/>
+                </NewNotificationWrap>)}
+                {overlayPositions.map((position, index) => (
+                    <FlashOverlay key={index} position={position} />
+                ))}
+            </div>
+        </PerfectScrollbar>
+    </div>)
+}
+
+export const ItemCard = ({ id, name, level, max, affordable, isLeveled, isCapped, onFlash, onPurchase, onShowDetails, isAutoPurchase, toggleAutopurchase, isAutomationUnlocked}) => {
 
     const elementRef = useRef(null);
 
     useFlashOnLevelUp(isLeveled, onFlash, elementRef);
 
 
-    return (<div ref={elementRef} className={`shop-card card item flashable ${affordable.hardLocked ? 'hard-locked' : ''}  ${!affordable.isAffordable ? 'unavailable' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)}>
+    return (<div ref={elementRef} className={`shop-card card item flashable ${affordable.hardLocked ? 'hard-locked' : ''}  ${!affordable.isAffordable ? 'unavailable' : ''} ${isCapped ? 'capped' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)}>
         <div className={'head'}>
             <p className={'title'}>{name}</p>
             <span className={'level'}>{formatInt(level)}{max ? `/${formatInt(max)}` : ''}</span>
         </div>
         <div className={'bottom'}>
             <div className={'buttons'}>
-                <button disabled={!affordable.isAffordable} onClick={() => onPurchase(id)}>Purchase</button>
-                {isAutomationUnlocked ? (<label className={'autobuy-label'}>
+                <button disabled={!affordable.isAffordable || isCapped} onClick={() => onPurchase(id)}>Purchase</button>
+                {isAutomationUnlocked && !isCapped ? (<label className={'autobuy-label'}>
                     <input type={'checkbox'} checked={isAutoPurchase}
                            onChange={() => toggleAutopurchase(id, !isAutoPurchase)}/>
                     Autobuy
@@ -255,6 +344,46 @@ export const ItemResourceCard = ({ id, name, purchaseMultiplier, level, max, amo
     </div> )
 }
 
+
+export const CourseCard = ({ toNext, id, efficiency, isRunning, name, level, progress, maxProgress, max, affordable, isLeveled, onFlash, onPurchase, onShowDetails, isAutoPurchase, toggleAutopurchase, isAutomationUnlocked}) => {
+
+    const elementRef = useRef(null);
+
+    useFlashOnLevelUp(isLeveled, onFlash, elementRef);
+
+
+    return (<div ref={elementRef} className={`course-card card item flashable ${isRunning ? ' running' : ''} ${efficiency < 1 ? ' efficiency-dropped lower-eff' : ''}  ${affordable.hardLocked ? 'hard-locked' : ''}  ${!affordable.isAffordable ? 'unavailable' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)}>
+        <div className={'progress-bg'} style={{ width: `${100*progress/maxProgress}%`}}></div>
+        <div className={'flex-container two-side-card'}>
+            <div className={'left'}>
+                <img src={`icons/courses/${id}.png`} className={'resource big'}/>
+            </div>
+            <div className={'right'}>
+                <div className={'head'}>
+                    <p className={'title'}>{name}</p>
+                    <span className={'level'}>{formatInt(level)}{max ? `/${formatInt(max)}` : ''}</span>
+                </div>
+                <div>
+                    {isRunning ? <span className={'to-next'}>ETA: {secondsToString(toNext)}</span> : null}
+                {efficiency < 1 ? (<span className={'small-hint yellow'}>
+                                        ({formatValue(100*efficiency)}%)
+                                    </span> ) : ''}
+                </div>
+                <div className={'bottom'}>
+                    <div className={'buttons'}>
+                        <button disabled={!affordable.isAffordable} onClick={() => onPurchase(id, !isRunning)}>{isRunning ? 'Stop' : 'Start'}</button>
+                        {isAutomationUnlocked ? (<label className={'autobuy-label'}>
+                            <input type={'checkbox'} checked={isAutoPurchase}
+                                   onChange={() => toggleAutopurchase(id, !isAutoPurchase)}/>
+                            Autoresume
+                        </label>) : null}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> )
+}
+
 export const ItemDetails = ({itemId, category}) => {
 
     const worker = useContext(WorkerContext);
@@ -280,6 +409,14 @@ export const ItemDetails = ({itemId, category}) => {
             return () => {
                 clearInterval(interval);
             }
+        } else if(category === 'courses'){
+            const interval = setInterval(() => {
+                sendData('query-course-details', { id: itemId });
+            }, 100);
+
+            return () => {
+                clearInterval(interval);
+            }
         }
 
     }, [itemId])
@@ -296,7 +433,11 @@ export const ItemDetails = ({itemId, category}) => {
         <PerfectScrollbar>
             <div className={'blade-inner'}>
                 <div className={'block'}>
-                    <h4>{item.name}</h4>
+                    <div className={'heading flex-container'}>
+                        <h4>{item.name}</h4>
+                        <span className={'level-indicator'}>Level {item.level} {item.max ? `of ${item.max}` : null}</span>
+                    </div>
+
                     <div className={'description'}>
                         {item.description}
                     </div>
@@ -306,12 +447,18 @@ export const ItemDetails = ({itemId, category}) => {
                         {item.tags.map(tag => (<div key={tag} className={'tag'}>{tag}</div> ))}
                     </div>
                 </div>
-                <div className={'block'}>
+                {item?.missingResource && item.entityEfficiency < 1 ? (<div className={'block'}>
+                    <p className={'hint yellow'}>
+                        This course is running {formatValue(100*item.entityEfficiency)}% efficiency due to missing {item?.missingResource?.name}
+                    </p>
+                </div> ) : null}
+                {Object.values(item.affordable.affordabilities || {}).length ? (<div className={'block'}>
                     <p>Cost: (x{formatInt(item.purchaseMultiplier)})</p>
                     <div className={'costs-wrap'}>
-                        {Object.values(item.affordable.affordabilities || {}).map(aff => <ResourceCost key={aff.id ?? aff.name} affordabilities={aff}/>)}
+                        {Object.values(item.affordable.affordabilities || {}).map(aff => <ResourceCost
+                            key={aff.id ?? aff.name} affordabilities={aff}/>)}
                     </div>
-                </div>
+                </div>) : null}
                 {(item.potentialEffects?.length || item.currentEffects) ? (<div className={'block'}>
                     <p>Effects:</p>
                     <div className={'effects'}>
@@ -320,6 +467,13 @@ export const ItemDetails = ({itemId, category}) => {
                             : (<EffectsSection effects={item.potentialEffects} maxDisplay={10}/>)
                         }
                     </div>
+                </div>) : null}
+                {(item.learningEffects?.length) ? (<div className={'block'}>
+                    <p>Learning Upkeep:</p>
+                    <div className={'effects'}>
+                        <EffectsSection effects={item.learningEffects} maxDisplay={10}/>
+                    </div>
+                    <p>Learning Duration: {secondsToString(item.maxProgress)}</p>
                 </div>) : null}
             </div>
         </PerfectScrollbar>

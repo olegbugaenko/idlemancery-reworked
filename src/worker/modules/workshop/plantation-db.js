@@ -1,6 +1,15 @@
 import {gameEffects, gameEntity, gameResources} from "game-framework";
 
+export const getWateringEffectId = id => `watering_${id}`;
+
 export const registerPlant = (id, inventoryResource, incomeBase, costBase, options) => {
+
+    gameEffects.registerEffect(getWateringEffectId(id), {
+        name: `${options.name} Watering`,
+        defaultValue: 1,
+        minValue: 1,
+    })
+
     gameEntity.registerGameEntity(id, {
         tags: ["plantation"],
         name: options.name,
@@ -12,7 +21,7 @@ export const registerPlant = (id, inventoryResource, incomeBase, costBase, optio
             get_income: () => ({
                 resources: {
                     [inventoryResource]: {
-                        A: incomeBase*gameEffects.getEffectValue('plantations_efficiency'),
+                        A: incomeBase*gameEffects.getEffectValue('plantations_efficiency')*gameEffects.getEffectValue(getWateringEffectId(id)),
                         B: 0,
                         type: 0,
                     }
@@ -24,10 +33,10 @@ export const registerPlant = (id, inventoryResource, incomeBase, costBase, optio
                         A: 1,
                         B: 0,
                         type: 2
-                    }
+                    },
                 }
             },
-            effectDeps: ['plantations_efficiency']
+            effectDeps: ['plantations_efficiency', getWateringEffectId(id)]
         },
         unlockCondition: () => {
             return gameResources.isResourceUnlocked(inventoryResource) && gameResources.getResource('plantation_slots').income > 0
@@ -60,6 +69,43 @@ export const registerPlant = (id, inventoryResource, incomeBase, costBase, optio
         }
     })
 
+    gameEntity.registerGameEntity(`${id}_watering_bonus`, {
+        tags: ["plantation-watering"],
+        name: options.name,
+        isAbstract: false,
+        description: options.description,
+        level: 0,
+        icon_id: inventoryResource,
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    [getWateringEffectId(id)]: {
+                        A: 1.2,
+                        B: 1,
+                        C: 0,
+                        type: 1,
+                    }
+                }
+            }),
+            consumption: {
+                resources: {
+                    inventory_water: {
+                        A: 1.5,
+                        B: 0.25,
+                        C: -0.25,
+                        type: 1
+                    },
+                }
+            },
+        },
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked(inventoryResource) && gameResources.isResourceUnlocked('inventory_water')
+        },
+        attributes: {
+
+        },
+    })
+
 }
 
 export function registerPlantations () {
@@ -89,17 +135,17 @@ export function registerPlantations () {
         description: 'Grow core duckweed.'
     })
 
-    registerPlant('aloe_vera_plantation', 'inventory_aloe_vera', 0.02, 500, {
+    registerPlant('aloe_vera_plantation', 'inventory_aloe_vera', 0.02, 400, {
         name: 'Grow Aloe Vera',
         description: 'Grow some aloe vera'
     })
 
-    registerPlant('ginseng_plantation', 'inventory_ginseng', 0.02, 500, {
+    registerPlant('ginseng_plantation', 'inventory_ginseng', 0.02, 400, {
         name: 'Grow Ginseng',
         description: 'Grow some ginseng'
     })
 
-    registerPlant('nightshade_plantation', 'inventory_nightshade', 0.01, 500, {
+    registerPlant('nightshade_plantation', 'inventory_nightshade', 0.01, 300, {
         name: 'Grow Nightshade',
         description: 'Grow some nightshade'
     })

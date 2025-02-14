@@ -2,6 +2,7 @@ import {GameModule} from "../../shared/game-module";
 import { gameResources, gameEntity, gameCore, gameEffects } from "game-framework"
 import {registerInventoryItems} from "../inventory/inventory-items-db";
 import {registerCommomEffects} from "./common-effects-db";
+import {SMALL_NUMBER} from "game-framework/src/utils/consts";
 
 export class ResourcePoolModule extends GameModule {
     constructor() {
@@ -119,8 +120,18 @@ export class ResourcePoolModule extends GameModule {
             tags: ['exploration', 'secondary'],
             name: 'Gathering Perception',
             isService: true,
+            description: 'Determines how much efficient you are at gathering, boosting probability to find any loot'
         })
 
+        gameResources.registerResource('mental_energy', {
+            tags: ['resource', 'mental'],
+            name: 'Mental Energy',
+            hasCap: true,
+            defaultCap: 100,
+            unlockCondition: () => {
+                return gameEntity.isEntityUnlocked('action_mind_cleansing')
+            }
+        })
 
 
 
@@ -186,7 +197,8 @@ export class ResourcePoolModule extends GameModule {
         return rs.filter(one => one.isUnlocked).map(resource => ({
             ...resource,
             isNegative: resource.balance < 0,
-            isCapped: resource.amount >= resource.cap,
+            isPositive: resource.balance > 0 && resource.amount < resource.cap - SMALL_NUMBER,
+            isCapped: resource.amount >= resource.cap - SMALL_NUMBER,
             eta: gameResources.assertToCapOrEmpty(resource.id),
             // affData: monitoredResources[resource.id] || undefined
         }))

@@ -6,6 +6,7 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import {TippyWrapper} from "../../shared/tippy-wrapper.jsx";
 import {BreakDown} from "../../layout/sidebar.jsx";
 import {NewNotificationWrap} from "../../layout/new-notification-wrap.jsx";
+import {RawResource} from "../../shared/raw-resource.jsx";
 
 export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, openListDetails, addItemToList }) => {
 
@@ -57,10 +58,14 @@ export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, op
     return (<div className={'crafting-wrap'}>
         <div className={'head'}>
             <div className={'space-item'}>
-                <span>Alchemy Slots:</span>
-                <span className={`${craftingData.slots.total > 0 ? 'slots-available' : 'slots-unavailable'}`}>{formatInt(craftingData.slots.total)}/{formatInt(craftingData.slots.max)}</span>
+                <RawResource id={'alchemy_slots'} name={'Alchemy Slots'} />
+                <span className={`slots-amount ${craftingData.slots.total > 0 ? 'slots-available' : 'slots-unavailable'}`}>{formatInt(craftingData.slots.total)}/{formatInt(craftingData.slots.max)}</span>
             </div>
-            <TippyWrapper content={<div className={'hint-popup'}><BreakDown breakDown={craftingData.efforts.breakDown} /></div> }>
+            <TippyWrapper content={<div className={'hint-popup'}>
+                <p className={'hint'}>Shows the amount of available effort you can use for alchemy.</p>
+                <p className={'hint'}>If your alchemy effort is insufficient, your alchemy efficiency will decrease.</p>
+                <BreakDown breakDown={craftingData.efforts.breakDown} />
+            </div> }>
                 <div className={'space-item'}>
                     <span>Alchemy Efforts:</span>
                     <span>{formatValue(craftingData.efforts.balance)}/{formatValue(craftingData.efforts.balance + craftingData.efforts.consumption)}</span>
@@ -70,7 +75,7 @@ export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, op
         <div className={'craftables-cat'}>
             <PerfectScrollbar>
                 <div className={'flex-container'}>
-                    {craftingData.available.map(craftable => <NewNotificationWrap id={`crafting_${craftable.id}`} className={'narrow-wrapper'} isNew={newUnlocks?.[`crafting_${craftable.id}`]?.hasNew}>
+                    {craftingData.available.map(craftable => <NewNotificationWrap id={`crafting_${craftable.id}`} className={'narrow-wrapper'} isNew={newUnlocks?.all?.items?.[`crafting_${craftable.id}`]?.hasNew}>
                         <ItemCard addItemToList={addItemToList} key={craftable.id} {...craftable} onSetLevel={setItemLevel} onShowDetails={setItemDetails}/>
                     </NewNotificationWrap>)}
                 </div>
@@ -112,7 +117,15 @@ export const ItemCard = ({ id, icon_id, isRunning, resourceAmount, isLowerEffici
                 <div className={'bottom'}>
                     <div className={'buttons'}>
                         <span className={'label'}>Set Effort:</span>
-                        <input type={'number'} min={0} max={maxLevel} value={level} onChange={e => onSetLevel(id, Math.round(+e.target.value))}/>
+                        <div className={'effort-control flex-container flex-row'}>
+                            <div className={'icon-content minimize-icon interface-icon tiny'} onClick={() => onSetLevel(id, 0)}>
+                                <img src={"icons/interface/minimize.png"}/>
+                            </div>
+                            <input type={'number'} min={0} max={maxLevel} value={level} onChange={e => onSetLevel(id, Math.round(+e.target.value))}/>
+                            <div className={'icon-content maximize-icon interface-icon tiny'} onClick={() => onSetLevel(id, 1.e+9)}>
+                                <img src={"icons/interface/maximize.png"}/>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

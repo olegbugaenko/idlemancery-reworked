@@ -7,7 +7,10 @@ export const registerAttributes = () => {
         minValue: 1,
         hasCap: false,
         saveBalanceTree: true,
-        tags: ['attribute', 'physical']
+        tags: ['attribute', 'physical'],
+        unlockCondition: () => {
+            return gameEffects.getEffectValue('attribute_stamina') >= 100
+        }
     })
 
     gameEffects.registerEffect('attribute_stamina', {
@@ -121,5 +124,29 @@ export const registerAttributes = () => {
         hasCap: false,
         saveBalanceTree: true,
         tags: ['attribute', 'magical']
+    })
+
+    gameEffects.registerEffect('attribute_clarity', {
+        name: 'Clarity',
+        description: 'Improves your mental energy regeneration',
+        minValue: 1,
+        unlockCondition: () => {
+            return gameEntity.isEntityUnlocked('action_mental_endurance')
+        },
+        hasCap: false,
+        saveBalanceTree: true,
+        tags: ['attribute', 'mental']
+    })
+
+    gameEffects.registerEffect('attribute_willpower', {
+        name: 'Willpower',
+        description: 'Improves your mental energy capability',
+        minValue: 1,
+        unlockCondition: () => {
+            return gameEntity.isEntityUnlocked('action_mind_cleansing')
+        },
+        hasCap: false,
+        saveBalanceTree: true,
+        tags: ['attribute', 'mental']
     })
 }

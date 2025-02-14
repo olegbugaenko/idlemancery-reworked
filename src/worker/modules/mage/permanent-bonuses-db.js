@@ -16,8 +16,8 @@ export const registerPermanentBonuses = () => {
             multiplier: {
                 effects: {
                     'attribute_strength': {
-                        A: 0.0005,
-                        B: 100,
+                        A: 0.004,
+                        B: 50,
                         C: 1,
                         type: 4,
                     }
@@ -41,8 +41,8 @@ export const registerPermanentBonuses = () => {
             multiplier: {
                 effects: {
                     'attribute_vitality': {
-                        A: 0.0005,
-                        B: 100,
+                        A: 0.004,
+                        B: 50,
                         C: 1,
                         type: 4,
                     }
@@ -67,8 +67,8 @@ export const registerPermanentBonuses = () => {
             multiplier: {
                 effects: {
                     'attribute_stamina': {
-                        A: 0.0005,
-                        B: 100,
+                        A: 0.004,
+                        B: 50,
                         C: 1,
                         type: 4,
                     }
@@ -93,8 +93,8 @@ export const registerPermanentBonuses = () => {
             multiplier: {
                 effects: {
                     'attribute_recovery': {
-                        A: 0.0005,
-                        B: 100,
+                        A: 0.004,
+                        B: 50,
                         C: 1,
                         type: 4,
                     }
@@ -119,8 +119,8 @@ export const registerPermanentBonuses = () => {
             multiplier: {
                 effects: {
                     'attribute_patience': {
-                        A: 0.0005,
-                        B: 100,
+                        A: 0.004,
+                        B: 50,
                         C: 1,
                         type: 4,
                     }
@@ -145,8 +145,8 @@ export const registerPermanentBonuses = () => {
             multiplier: {
                 effects: {
                     'attribute_memory': {
-                        A: 0.0005,
-                        B: 100,
+                        A: 0.004,
+                        B: 50,
                         C: 1,
                         type: 4,
                     }
@@ -171,8 +171,8 @@ export const registerPermanentBonuses = () => {
             multiplier: {
                 effects: {
                     'attribute_magic_ability': {
-                        A: 0.0005,
-                        B: 100,
+                        A: 0.004,
+                        B: 50,
                         C: 1,
                         type: 4,
                     }
@@ -188,7 +188,7 @@ export const registerPermanentBonuses = () => {
         name: 'Ironvine',
         level: 0,
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_herbs_handbook_2') > 0;
+            return gameEntity.getLevel('shop_item_herbs_handbook_1') > 0;
         },
         attributes: {
             isCollectable: false,
@@ -197,8 +197,8 @@ export const registerPermanentBonuses = () => {
             multiplier: {
                 effects: {
                     'physical_training_learn_speed': {
-                        A: 0.0005,
-                        B: 100,
+                        A: 0.005,
+                        B: 50,
                         C: 1,
                         type: 4,
                     }
@@ -213,7 +213,7 @@ export const registerPermanentBonuses = () => {
         name: 'Mindspire',
         level: 0,
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_herbs_handbook_2') > 0;
+            return gameEntity.getLevel('shop_item_herbs_handbook_1') > 0;
         },
         attributes: {
             isCollectable: false,
@@ -222,8 +222,56 @@ export const registerPermanentBonuses = () => {
             multiplier: {
                 effects: {
                     'mental_training_learning_rate': {
-                        A: 0.0005,
-                        B: 100,
+                        A: 0.005,
+                        B: 50,
+                        C: 1,
+                        type: 4,
+                    }
+                }
+            }
+        }
+    })
+
+    gameEntity.registerGameEntity('rare_whisperleaf_effect', {
+        tags: ["bonus", "permanent", "herbal"],
+        name: 'Whisperleaf',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_herbs_handbook_1') > 0;
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'social_training_learning_rate': {
+                        A: 0.005,
+                        B: 50,
+                        C: 1,
+                        type: 4,
+                    }
+                }
+            }
+        }
+    })
+
+    gameEntity.registerGameEntity('rare_sageroot_effect', {
+        tags: ["bonus", "permanent", "herbal"],
+        name: 'Sageroot',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_herbs_handbook_1') > 0;
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                resources: {
+                    'knowledge': {
+                        A: 0.003,
+                        B: 50,
                         C: 1,
                         type: 4,
                     }
@@ -247,8 +295,8 @@ export const registerPermanentBonuses = () => {
             multiplier: {
                 effects: {
                     'routine_learning_speed': {
-                        A: 0.0005,
-                        B: 100,
+                        A: 0.005,
+                        B: 50,
                         C: 1,
                         type: 4,
                     }
@@ -257,7 +305,7 @@ export const registerPermanentBonuses = () => {
         }
     })
 
-    gameEntity.registerGameEntity('random_events_strength_effect', {
+    /*gameEntity.registerGameEntity('random_events_strength_effect', {
         tags: ["bonus", "permanent", "herbal"],
         name: 'Random Events Bonus',
         level: 0,
@@ -395,6 +443,6 @@ export const registerPermanentBonuses = () => {
                 }
             }
         }
-    })
+    })*/
 
 }

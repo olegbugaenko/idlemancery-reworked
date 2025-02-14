@@ -32,6 +32,7 @@ export const SearchField = ({ value, onSetValue, scopes, placeholder }) => {
     }, [search]);
 
     const onToggleScope = (id) => {
+        console.log('Scopes: ', scopes, selectedScopes);
         if (scopes.map((s) => s.id).includes(id)) {
             const newScopes = [...selectedScopes];
             if (!newScopes.includes(id)) {
@@ -62,15 +63,18 @@ export const SearchField = ({ value, onSetValue, scopes, placeholder }) => {
 
     return (
         <div className="search-rel-wrap" ref={popupRef}>
-            <input
-                type="text"
-                placeholder={placeholder}
-                value={search}
-                onChange={onChangeSearch}
-            />
+            <div className={'search-input-wrap'}>
+                <input
+                    type="text"
+                    placeholder={placeholder}
+                    value={search}
+                    onChange={onChangeSearch}
+                />
+                <span className={'clear'} onClick={() => { setSearch('') }}>X</span>
+            </div>
             {isScopesOpened && scopes?.length ? (
                 <div className="scopes-popup">
-                    <span className="title">Search in: </span>
+                    <span className="title">Search by: </span>
                     <div className="chips-container">
                         {scopes.map((scope) => (
                             <div

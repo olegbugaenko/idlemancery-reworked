@@ -9,6 +9,7 @@ import {FurnitureUpgrades} from "./furniture.jsx";
 import {ResourceComparison} from "../shared/resource-comparison.jsx";
 import {AccessoryUpgrades} from "./accessories.jsx";
 import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
+import {useUICache} from "../../general/hooks/local-cache";
 
 export const Property = ({}) => {
     const [detailOpened, setDetailOpened] = useState(null)
@@ -19,7 +20,7 @@ export const Property = ({}) => {
 
     const [unlocks, setUnlocksData] = useState({});
 
-    const [ selectedTab, setSelectedTab ] = useState('furniture');
+    const [ selectedTab, setSelectedTab ] = useUICache('property_tab', 'furniture');
 
     const [newUnlocks, setNewUnlocks] = useState({});
 

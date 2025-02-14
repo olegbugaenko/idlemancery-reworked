@@ -80,7 +80,7 @@ export const Guilds = ({ setItemDetails, filterId, newUnlocks }) => {
                     </div>
                     <div className={'right'}>
                         <p className={'guild-name'}>{guildsData.current.name}</p>
-                        <div className={'space-item'}>
+                        <div className={'space-item padded'}>
                             <p className={'info'}>Reputation Level: </p>
                             <span>{formatInt(guildsData.current.level)}</span>
                         </div>
@@ -90,14 +90,21 @@ export const Guilds = ({ setItemDetails, filterId, newUnlocks }) => {
                             <p>ETA: {secondsToString(guildsData.reputation.eta)}</p>
                             {/*<BreakDown breakDown={guildsData.reputation.storageBreakdown} />*/}
                         </div> }>
-                            <div className={'space-item'}>
-                                <span>Reputation Progress:</span>
-                                <span>{formatValue(guildsData.reputation.amount)}/{formatValue(guildsData.reputation.cap)}</span>
+                            <div className={'padded'}>
+                                <div className={'space-item'}>
+                                    <span>Reputation Progress:</span>
+                                    <span>{formatValue(guildsData.reputation.amount)}/{formatValue(guildsData.reputation.cap)}</span>
+                                </div>
+                                <div className={'progress-wrap guilds-wrap'}>
+                                    <div className={'progress-bar'}>
+                                        <div className={'progress-bg'} style={{width: `${100*guildsData.reputation.amount/guildsData.reputation.cap}%`}}></div>
+                                    </div>
+                                </div>
                             </div>
                         </TippyWrapper>
-                        <div className={'space-item'}>
+                        <div className={'space-item padded'}>
                             <span>Reputation Points:</span>
-                            <span>{formatInt(guildsData.points.balance)}/{formatInt(guildsData.points.cap)}</span>
+                            <span className={`slots-amount ${guildsData.points.balance > 0 ? 'slots-available' : 'slots-unavailable'}`}>{formatInt(guildsData.points.balance)}/{formatInt(guildsData.points.income)}</span>
                         </div>
                         <div className={'buttons'}>
                             {guildsData.prestige.canPrestige ? (<TippyWrapper content={<div className={'hint-popup'}>

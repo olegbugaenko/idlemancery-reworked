@@ -18,6 +18,7 @@ import {MapModule} from "./modules/map/map.module";
 import {HotkeysModule} from "./shared/modules/hotkeys.module";
 import {MonitoringModule} from "./shared/modules/monitoring.module";
 import {RulesModule} from "./shared/modules/rules.module";
+import {CoursesModule} from "./modules/items/courses.module";
 
 
 export class MainModule extends GameModule {
@@ -25,11 +26,13 @@ export class MainModule extends GameModule {
     constructor() {
         super();
         gameCore.registerModule('attributes', AttributesModule);
+        gameCore.registerModule('temporary-effects', TemporaryEffectsModule);
         gameCore.registerModule('mage', MageModule);
         gameCore.registerModule('resource-pool', ResourcePoolModule);
         gameCore.registerModule('actions', ActionsModule);
         gameCore.registerModule('property', PropertyModule);
         gameCore.registerModule('shop', ShopModule);
+        gameCore.registerModule('courses', CoursesModule);
         gameCore.registerModule('inventory', InventoryModule);
         gameCore.registerModule('magic', SpellModule);
         gameCore.registerModule('crafting', CraftingModule);
@@ -37,7 +40,6 @@ export class MainModule extends GameModule {
         gameCore.registerModule('guilds', GuildsModule);
         gameCore.registerModule('unlock-notifications', UnlockNotificationsModule);
         gameCore.registerModule('random-events', RandomEventsModule);
-        gameCore.registerModule('temporary-effects', TemporaryEffectsModule);
         gameCore.registerModule('map', MapModule);
         gameCore.registerModule('hotkeys', HotkeysModule);
         gameCore.registerModule('monitoring', MonitoringModule);
@@ -54,26 +56,17 @@ export class MainModule extends GameModule {
 
         this.eventHandler.registerHandler('load-game', (data) => {
             console.log('load-game received');
-            gameCore.load(data);
-            console.log('loaded');
-            this.eventHandler.sendData('loaded', {...data, received: true});
+            this.loadGame(data);
         })
 
         this.eventHandler.registerHandler('reset-game', () => {
+
             console.log('reset-game received');
-            gameCore.stopTicking();
-            gameCore.load({});
-            const cheat = 1;
-            gameCore.startTicking(100, () => 0.1*cheat*(gameCore.getModule('mage').bankedTime?.speedUpFactor ?? 1), () => {
-                if(gameCore.numTicks % 300 === 0) {
-                    this.save();
-                }
-            }, false)
-            this.eventHandler.sendData('loaded', { received: true, isReset: true });
+            this.loadGame({}, true);
         })
 
         this.eventHandler.registerHandler('start-ticking', () => {
-            const cheat = 1;
+            const cheat = 5;
             // const speedUpMode = gameCore.getModule('mage').bankedTime?.speedUpFactor ?? 1;
             // console.log('gameCore', GameCore.instance, speedUpMode);
             gameCore.startTicking(100, () => 0.1*cheat*(gameCore.getModule('mage').bankedTime?.speedUpFactor ?? 1), () => {
@@ -97,8 +90,10 @@ export class MainModule extends GameModule {
                 'plantation': gameResources.getResource('plantation_slots').income > 0,
                 'guilds': gameEffects.getEffectValue('attribute_charisma') >= 500,
                 'social': gameEffects.getEffectValue('attribute_charisma') >= 500,
-                'map': gameEntity.getLevel('shop_item_backpack') > 0,
-                'world': gameEntity.getLevel('shop_item_backpack') > 0,
+                'map': gameEntity.getLevel('shop_item_map') > 0,
+                'world': gameEntity.getLevel('shop_item_map') > 0,
+                'automations': gameEntity.getLevel('shop_item_planner') > 0,
+                'courses': gameEntity.getLevel('shop_item_training_room') > 0,
             }
             let label = 'unlocks';
             if(payload?.prefix) {
@@ -131,6 +126,14 @@ export class MainModule extends GameModule {
 
     load() {
 
+    }
+
+    loadGame(data, isReset) {
+        this.eventHandler.sendData('loading', {...data, received: true});
+        gameCore.stopTicking();
+        gameCore.load(data);
+        console.log('loaded game -/|');
+        this.eventHandler.sendData('loaded', {...data, received: true, isReset});
     }
 
 }

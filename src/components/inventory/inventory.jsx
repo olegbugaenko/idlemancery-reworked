@@ -13,6 +13,23 @@ import {cloneDeep} from "lodash";
 import {BreakDown} from "../layout/sidebar.jsx";
 import {ResourceComparison} from "../shared/resource-comparison.jsx";
 import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
+import StatRow from "../shared/stat-row.jsx";
+import {SearchField} from "../shared/search-field.jsx";
+
+
+const INVENTORY_SEARCH_SCOPES = [{
+    id: 'name',
+    label: 'Name',
+},{
+    id: 'tags',
+    label: 'Tags'
+},{
+    id: 'resources',
+    label: 'resources'
+},{
+    id: 'effects',
+    label: 'effects'
+}]
 
 export const Inventory = ({}) => {
 
@@ -24,7 +41,11 @@ export const Inventory = ({}) => {
         current: undefined,
         itemCategories: [],
         selectedFilterId: 'all',
-        details: {}
+        automationUnlocked: false,
+        details: {},
+        searchData: {
+            search: ''
+        }
     });
     const [detailOpenedId, setDetailOpenedId] = useState(null); // here should be object containing id and rules
     const [viewedOpenedId, setViewedOpenedId] = useState(null);
@@ -59,7 +80,6 @@ export const Inventory = ({}) => {
     }, [])
 
     onMessage('new-unlocks-notifications-inventory', payload => {
-        // console.log('Received unlocks: ', payload);
         setNewUnlocks(payload);
     })
 
@@ -317,22 +337,38 @@ export const Inventory = ({}) => {
         sendData('set-selected-inventory-filter', { filterId })
     }
 
+    const setSearch = (searchData) => {
+        console.log('SetSearch: ', searchData);
+        sendData('set-inventory-search', { searchData });
+    }
+
     return (
         <div className={'inventory-wrap'}>
             <div className={'ingame-box inventory'}>
                 <div className={'categories flex-container'}>
                     <ul className={'menu'}>
                         {inventoryData.itemCategories.map(category => (<li key={category.id} className={`category ${category.isSelected ? 'active' : ''}`} onClick={() => setItemsFilter(category.id)}>
-                            <NewNotificationWrap isNew={newUnlocks.inventory?.items?.[category.id]?.hasNew}>
+                            <NewNotificationWrap isNew={newUnlocks.inventory?.items?.all?.items?.[category.id]?.hasNew}>
                                 <span>{category.name}({category.items.length})</span>
                             </NewNotificationWrap>
                         </li> ))}
                     </ul>
+                    <div className={'additional-filters'}>
+                        <label>
+                            <SearchField
+                                placeholder={'Search'}
+                                value={inventoryData.searchData || ''}
+                                onSetValue={val => setSearch(val)}
+                                scopes={INVENTORY_SEARCH_SCOPES}
+                            />
+                            {/*<input type={'text'} placeholder={'Search'} value={actionsData.searchText || ''} onChange={e => setSearch(e.target.value)}/>*/}
+                        </label>
+                    </div>
                 </div>
                 <div className={'inventory-items-wrap'}>
                     <PerfectScrollbar>
                         <div className={'flex-container'}>
-                            {inventoryData.available.map(item => <NewNotificationWrap key={`inventory_${item.id}`} id={`inventory_${item.id}`} className={'narrow-wrapper'} isNew={newUnlocks.inventory?.items?.[inventoryData.selectedFilterId]?.items?.[`inventory_${item.id}`]?.hasNew}>
+                            {inventoryData.available.map(item => <NewNotificationWrap key={`inventory_${item.id}`} id={`inventory_${item.id}`} className={'narrow-wrapper'} isNew={newUnlocks.inventory?.items?.all?.items?.[inventoryData.selectedFilterId]?.items?.[`inventory_${item.id}`]?.hasNew}>
                                 <InventoryCard
                                 key={item.id}
                                 isSelected={item.id === detailOpenedId?.id}
@@ -370,6 +406,7 @@ export const Inventory = ({}) => {
                     onSave={onSave}
                     onCancel={onCancel}
                     onSell={onSell}
+                    automationUnlocked={inventoryData.automationUnlocked}
                 />) : (<InventoryStats details={inventoryData.details} />)}
             </div>
         </div>
@@ -452,7 +489,7 @@ export const InventoryCard = React.memo(({ isChanged, allowMultiConsume, isConsu
     return true;
 }))
 
-export const InventoryDetails = React.memo(({isChanged, editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onAddAutosellRule, onSetAutosellRuleValue, onDeleteAutosellRule, onSave, onCancel, onSell, onSetAutosellPattern, onSetAutoconsumePattern, onSetAutosellReserved, onToggleAutoconsume, onToggleAutosell}) => {
+export const InventoryDetails = React.memo(({isChanged, editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onAddAutosellRule, onSetAutosellRuleValue, onDeleteAutosellRule, onSave, onCancel, onSell, onSetAutosellPattern, onSetAutoconsumePattern, onSetAutosellReserved, onToggleAutoconsume, onToggleAutosell, automationUnlocked}) => {
 
     const item = viewedData ? viewedData : editData;
 
@@ -545,7 +582,7 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
                     <p>Consumed amount: {formatInt(item.numConsumed)}</p>
                 </div>
                 ) : null}
-                {item.isConsumable ? (<div className={'autoconsume-setting block'}>
+                {item.isConsumable && automationUnlocked ? (<div className={'autoconsume-setting block'}>
                     <div className={'rules-header flex-container'}>
                         <p>Autoconsumption rules: {item.autoconsume?.rules?.length ? null : 'None'}</p>
                         <label>
@@ -568,7 +605,7 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
                     />
                 </div>) : null}
 
-                {item.isSellable ? (<div className={'autoconsume-setting block'}>
+                {item.isSellable && automationUnlocked ? (<div className={'autoconsume-setting block'}>
                     <div className={'rules-header flex-container'}>
                         <p>Autosell rules: {item.autosell?.rules?.length ? null : 'None'}</p>
                         <label>
@@ -630,6 +667,19 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
 })
 
 export const InventoryStats = ({ details }) => {
+    // Масив статистик, які потрібно відобразити
+    const statsToDisplay = [
+        details.cooldown_bonus,
+        details.bargaining_mod,
+        details.shop_max_stock,
+        details.shop_stock_renew_rate,
+        // Додайте інші статистики за потребою
+    ];
+
+    const hasEffect = useCallback((stat) => {
+        if(!stat?.value) return false;
+        return !stat.isMultiplier || Math.abs(stat?.value - 1.0) > 1.e-7;
+    }, [])
 
     return (
         <PerfectScrollbar>
@@ -637,17 +687,14 @@ export const InventoryStats = ({ details }) => {
                 <div className={'block'}>
                     <p>General Stats:</p>
                     <div className={'effects'}>
-                        {details.cooldown_bonus ? (<div className={'row flex-row'}>
-                            <p>Metabolism Potions Cooldown</p>
-                            <p>X{formatValue(details.cooldown_bonus)}</p>
-                        </div> ) : null}
-                        {details.bargaining_mod ? (<div className={'row flex-row'}>
-                            <p>Bargaining Sell Price</p>
-                            <p>X{formatValue(details.bargaining_mod)}</p>
-                        </div> ) : null}
+                        {statsToDisplay.map((stat) => (
+                            hasEffect(stat) ? (
+                                <StatRow key={stat.id} stat={stat} />
+                            ) : null
+                        ))}
                     </div>
                 </div>
             </div>
         </PerfectScrollbar>
-    )
-}
+    );
+};

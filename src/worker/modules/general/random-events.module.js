@@ -1,6 +1,7 @@
 import { GameModule } from "../../shared/game-module";
 import { registerRandomEventsDb } from "./random-events-db";
-import {gameResources, resourceApi, resourceCalculators} from "game-framework";
+import {gameEntity, gameResources, resourceApi, resourceCalculators} from "game-framework";
+import {registerRandomEventsLearnDb} from "./random-events-db-learn-rates";
 
 export class RandomEventsModule extends GameModule {
     constructor() {
@@ -10,6 +11,9 @@ export class RandomEventsModule extends GameModule {
         this.eventsDB = {}; // База всіх доступних подій
         this.openedEventId = null; // ID поточно відкритої події
         this.revealedEffects = {};
+
+        this.currentVersion = null;
+        this.relevantVersion = 1;
 
         this.eventHandler.registerHandler('set-event-data-opened', ({ isOpened, eventId }) => {
             console.log('SettOpened: ', isOpened, eventId);
@@ -31,7 +35,10 @@ export class RandomEventsModule extends GameModule {
     }
 
     initialize() {
-        this.eventsDB = registerRandomEventsDb().reduce((acc, item) => {
+        this.eventsDB = [
+            ...registerRandomEventsDb(),
+            ...registerRandomEventsLearnDb(),
+        ].reduce((acc, item) => {
             acc[item.id] = item;
             return acc;
         }, {});
@@ -51,7 +58,7 @@ export class RandomEventsModule extends GameModule {
         }
 
         // Генеруємо нові події, якщо кількість активних подій менша за 5
-        if (Object.keys(this.activeEvents).length < 5 && Math.random() < delta * 0.005) {
+        if (Object.keys(this.activeEvents).length < 5 && Math.random() < delta * 0.003 && gameEntity.getLevel('action_visit_city') > 1) {
             this.triggerRandomEvent();
         }
     }
@@ -184,6 +191,9 @@ export class RandomEventsModule extends GameModule {
     }
 
     getRevealedEffects(eventId, optionId) {
+        if(!this.eventsDB[eventId].options[optionId]) {
+            return [];
+        }
         const totalProbability = this.eventsDB[eventId].options[optionId].effects.reduce((sum, effect) => sum + effect.probability, 0);
 
         if(totalProbability <= 0) {
@@ -300,15 +310,20 @@ export class RandomEventsModule extends GameModule {
     save() {
         return {
             activeEvents: this.activeEvents,
-            revealedEffects: this.revealedEffects
+            revealedEffects: this.revealedEffects,
+            currentVersion: this.currentVersion,
         };
     }
 
     load(obj) {
-        if (obj?.activeEvents) {
-            this.activeEvents = obj.activeEvents;
+        this.activeEvents = {};
+        if(obj?.currentVersion && obj?.currentVersion >= this.relevantVersion) { // only load in case of compatibility
+            if (obj?.activeEvents) {
+                this.activeEvents = obj.activeEvents;
+            }
+            this.revealedEffects = obj?.revealedEffects || {};
         }
-        this.revealedEffects = obj?.revealedEffects || {};
+        this.currentVersion = this.relevantVersion;
         this.sendData();
     }
 }

@@ -35,7 +35,7 @@ export const ActionXPBreakdown = ({ id }) => {
     return (<div className={'hint-popup breakdowns'}>
         {breakdowns.breakDowns && Object.values(breakdowns.breakDowns).length ? (
             Object.values(breakdowns.breakDowns).map(breakDown => (<div key={breakDown.title} className={'breakdown-section'}>
-                <p className={'semi-title'}>{breakDown.title}: X{formatValue(breakDown.value)}</p>
+                <p className={'semi-title'}>{breakDown.title}: {breakDown.isPlain ? '+' : 'X'}{formatValue(breakDown.value)}</p>
                 <div className={'breakdown-section-sub'}>
                     <BreakDown breakDown={breakDown.breakDown} />
                 </div>

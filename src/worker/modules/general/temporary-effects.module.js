@@ -7,6 +7,8 @@ export class TemporaryEffectsModule extends GameModule {
     constructor() {
         super();
         this.runningEffects = {};
+        this.currentVersion = null;
+        this.relevantVersion = 1;
     }
 
     initialize() {
@@ -16,19 +18,20 @@ export class TemporaryEffectsModule extends GameModule {
     save() {
         return {
             effects: this.runningEffects,
+            currentVersion: this.currentVersion,
         }
     }
 
     load(saveObject) {
 
         for(const key in this.runningEffects) {
-            gameEntity.setEntityLevel(key, 0, true);
             if(gameEntity.entityExists(key)) {
+                gameEntity.setEntityLevel(key, 0, true);
                 gameEntity.unsetEntity(key);
             }
         }
         this.runningEffects = {};
-        if(saveObject?.effects) {
+        if(saveObject?.effects && saveObject?.currentVersion && saveObject?.currentVersion >= this.relevantVersion) {
             for(const id in saveObject.effects) {
                 this.runningEffects[id] = saveObject.effects[id];
                 if(!this.runningEffects[id].level) {
@@ -49,6 +52,8 @@ export class TemporaryEffectsModule extends GameModule {
                 }
             }
         }
+
+        this.currentVersion = this.relevantVersion;
         
     }
 

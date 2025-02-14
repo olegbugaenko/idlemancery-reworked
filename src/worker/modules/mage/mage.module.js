@@ -10,6 +10,7 @@ export class MageModule extends GameModule {
         this.mageLevel = 0;
         this.mageExp = 0;
         this.skillUpgrades = {};
+        this.tourStatus = null;
         this.bankedTime = {
             current: 0,
             max: 3600*24*1000,
@@ -25,6 +26,19 @@ export class MageModule extends GameModule {
             gameResources.addResource('meat', 1*rs.multiplier);
         })
          */
+
+        this.eventHandler.registerHandler('set_tour_finished', ({ skipStep }) => {
+            console.log('TourFinished: ', skipStep);
+            this.tourStatus = {
+                isComplete: true,
+                skipStep
+            }
+        })
+
+        this.eventHandler.registerHandler('query_tour_status', () => {
+            this.eventHandler.sendData('tour_status', this.tourStatus);
+        })
+
         this.eventHandler.registerHandler('query-mage-data', () => {
             const data = this.getMageData();
             this.eventHandler.sendData('mage-data', data);
@@ -112,22 +126,32 @@ export class MageModule extends GameModule {
                         'energy': {
                             A: 1,
                             B: 9 + gameEffects.getEffectValue('attribute_strength'),
-                            type: 0
+                            type: 0,
+                            label: 'Attribute: Strength'
                         },
                         'health': {
                             A: 1,
                             B: 9 + gameEffects.getEffectValue('attribute_vitality'),
-                            type: 1
+                            type: 1,
+                            label: 'Attribute: Vitality'
                         },
                         'knowledge': {
                             A: 1,
                             B: gameEffects.getEffectValue('attribute_memory'),
-                            type: 0
+                            type: 0,
+                            label: 'Attribute: Memory'
                         },
                         mana: {
                             A: 0,
                             B: 0.5*(gameEffects.getEffectValue('attribute_magic_capability')-1),
-                            type: 0
+                            type: 0,
+                            label: 'Attribute: Magic Capability'
+                        },
+                        mental_energy: {
+                            A: 0,
+                            B: 0.5*(gameEffects.getEffectValue('attribute_willpower')-1),
+                            type: 0,
+                            label: 'Attribute: Willpower'
                         }
                     }
                 }),
@@ -136,17 +160,26 @@ export class MageModule extends GameModule {
                         energy: {
                             A: 0,
                             B: 0.01 + 0.01*gameEffects.getEffectValue('attribute_stamina'),
-                            type: 0
+                            type: 0,
+                            label: 'Attribute: Stamina'
                         },
                         health: {
                             A: 0,
                             B: 0.01*(0.5 + gameEffects.getEffectValue('attribute_recovery')),
-                            type: 0
+                            type: 0,
+                            label: 'Attribute: Recovery'
                         },
                         mana: {
                             A: 0,
                             B: 0.01*(5 + gameEffects.getEffectValue('attribute_magic_ability')),
-                            type: 0
+                            type: 0,
+                            label: 'Attribute: Magic Ability'
+                        },
+                        mental_energy: {
+                            A: 0,
+                            B: 0.01*(5 + gameEffects.getEffectValue('attribute_clarity')),
+                            type: 0,
+                            label: 'Attribute: Clarity'
                         },
                         'skill-points': {
                             A: 1,
@@ -164,7 +197,7 @@ export class MageModule extends GameModule {
                         }
                     }
                 }),
-                effectDeps: ['workersEfficiencyPerDragonLevel', 'mage_levelup_requirement', 'attribute_stamina', 'attribute_strength', 'attribute_vitality','attribute_recovery', 'attribute_memory', 'attribute_magic_ability', 'attribute_magic_capability', 'attribute_bargaining']
+                effectDeps: ['workersEfficiencyPerDragonLevel', 'mage_levelup_requirement', 'attribute_stamina', 'attribute_strength', 'attribute_vitality','attribute_recovery', 'attribute_memory', 'attribute_magic_ability', 'attribute_magic_capability', 'attribute_bargaining', 'attribute_willpower', 'attribute_clarity']
             },
             get_cost: () => ({
                 'mage-xp': {
@@ -229,7 +262,7 @@ export class MageModule extends GameModule {
         }
 
         if(this.bankedTime?.speedUpFactor > 1) {
-            this.bankedTime.current -= dT*(this.bankedTime?.speedUpFactor - 1)*1000;
+            this.bankedTime.current -= dT*(this.bankedTime?.speedUpFactor - 1)*1000/this.bankedTime?.speedUpFactor;
             if(this.bankedTime?.current <= 0) {
                 this.bankedTime.current = 0;
                 this.bankedTime.speedUpFactor = 1;
@@ -247,7 +280,8 @@ export class MageModule extends GameModule {
             bankedTime: {
                 ...this.bankedTime,
                 lastSave: Date.now()
-            }
+            },
+            tourStatus: this.tourStatus,
         }
     }
 
@@ -274,7 +308,9 @@ export class MageModule extends GameModule {
         })
         if(obj?.permanentBonuses) {
             obj.permanentBonuses.forEach(({ id, level }) => {
-                gameEntity.setEntityLevel(id, level, true);
+                if(gameEntity.entityExists(id)) {
+                    gameEntity.setEntityLevel(id, level, true);
+                }
             })
         }
         this.bankedTime = {
@@ -293,6 +329,7 @@ export class MageModule extends GameModule {
             }
             console.log('loadedBankedTime: ', this.bankedTime, Date.now(), Date.now() - (this.bankedTime.lastSave + 60000))
         }
+        this.tourStatus = obj?.tourStatus;
     }
 
     setSkill(skillId, amount, bForce = false) {

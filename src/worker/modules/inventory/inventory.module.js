@@ -33,6 +33,8 @@ export class InventoryModule extends GameModule {
             isDefault: false,
         }]
 
+        this.searchData = {};
+
         this.eventHandler.registerHandler('consume-inventory', (payload) => {
             this.consumeItem(payload.id, payload.amount);
             if(payload.sendDetails) {
@@ -41,12 +43,16 @@ export class InventoryModule extends GameModule {
 
         })
 
+        this.eventHandler.registerHandler('set-inventory-search', ({searchData}) => {
+            this.searchData = searchData;
+        })
+
         this.eventHandler.registerHandler('sell-inventory', (payload) => {
             this.sellItem(payload.id, payload.amount);
         })
 
         this.eventHandler.registerHandler('query-inventory-data', (payload) => {
-            this.sendInventoryData(this.selectedFilterId, payload);
+            this.sendInventoryData(this.selectedFilterId, {...payload, searchData: this.searchData});
         })
 
         this.eventHandler.registerHandler('query-inventory-details', (payload) => {
@@ -76,6 +82,7 @@ export class InventoryModule extends GameModule {
         this.autoConsumeCD -= delta;
 
         // trigger autoconsume
+
         for(const itemId in this.inventoryItems) {
             this.inventoryItems[itemId].isConsumed = false;
 
@@ -85,6 +92,7 @@ export class InventoryModule extends GameModule {
                     gameEntity.setAttribute(`active_${itemId}`, 'current_duration', this.inventoryItems[itemId].duration);
                 }
             }
+
             if(this.inventoryItems[itemId].duration <= 0) {
                 this.inventoryItems[itemId].duration = 0;
                 if(gameEntity.entityExists(`active_${itemId}`)) {
@@ -93,6 +101,7 @@ export class InventoryModule extends GameModule {
                 }
             }
 
+
             if(this.inventoryItems[itemId].cooldown > 0) {
                 this.inventoryItems[itemId].cooldown -= delta;
             }
@@ -100,7 +109,6 @@ export class InventoryModule extends GameModule {
             if(this.inventoryItems[itemId].stockCapacity < gameEffects.getEffectValue('shop_max_stock')) {
                 this.inventoryItems[itemId].stockCapacity += delta*gameEffects.getEffectValue('shop_stock_renew_rate');
             }
-
 
             if(this.autoConsumeCD > 0) {
                 continue;
@@ -117,7 +125,9 @@ export class InventoryModule extends GameModule {
 
             if(this.inventoryItems[itemId]?.autosell?.isEnabled) {
                 const coinsRs = gameResources.getResource('coins');
-                if(coinsRs.cap - coinsRs.amount <= SMALL_NUMBER) return; // don't waste items since coins are capped
+                if(coinsRs.cap - coinsRs.amount <= SMALL_NUMBER) {
+                    continue;
+                }; // don't waste items since coins are capped
                 const isMatching = checkMatchingRules(this.inventoryItems[itemId]?.autosell?.rules, this.inventoryItems[itemId]?.autosell?.pattern);
 
                 if(!('stockCapacity' in this.inventoryItems[itemId])) {
@@ -132,7 +142,7 @@ export class InventoryModule extends GameModule {
                 );
 
                 const realSell = Math.min(sellAmount, reserveLimit);
-                console.log('Reserved: ', itemId, reserved, reserveLimit, sellAmount, realSell, gameResources.getResource(itemId).amount, this.inventoryItems[itemId]);
+                console.log('INVDEBUG Reserved: ', itemId, reserved, reserveLimit, sellAmount, realSell, gameResources.getResource(itemId).amount, this.inventoryItems[itemId]);
 
                 if(isMatching) {
                     this.sellItem(itemId, Math.min(sellAmount, reserveLimit));
@@ -149,7 +159,8 @@ export class InventoryModule extends GameModule {
     save() {
         return {
             inventory: this.inventoryItems,
-            selectedFilterId: this.selectedFilterId
+            selectedFilterId: this.selectedFilterId,
+            searchData: this.searchData,
         }
     }
 
@@ -166,12 +177,17 @@ export class InventoryModule extends GameModule {
 
         this.inventoryItems = saveObject?.inventory ?? {};
         this.selectedFilterId = saveObject?.selectedFilterId || 'all';
+        this.searchData = saveObject?.searchData || {
+            search: '',
+            selectedScopes: ['name','tags']
+        };
 
         for(const key in this.inventoryItems) {
             if(!('stockCapacity' in this.inventoryItems[key])) {
                 this.inventoryItems[key].stockCapacity = gameEffects.getEffectValue('shop_max_stock');
             }
             if(this.inventoryItems[key].duration && this.inventoryItems[key].duration > 0) {
+                console.log('INVDEBUG REGISTER ITEM '+key+':', this.inventoryItems[key]);
                 gameEntity.registerGameEntity(`active_${key}`, {
                     originalId: key,
                     name: gameResources.getResource(key).name,
@@ -185,7 +201,9 @@ export class InventoryModule extends GameModule {
                 gameEntity.setEntityLevel(`active_${key}`, 1);
             }
         }
-        this.sendInventoryData(this.selectedFilterId);
+        this.sendInventoryData(this.selectedFilterId, {
+            searchData: this.searchData
+        });
     }
 
     reset() {
@@ -274,7 +292,9 @@ export class InventoryModule extends GameModule {
         }
         this.inventoryItems[id].numConsumed = (this.inventoryItems[id].numConsumed || 0) + realCons;
         gameResources.addResource(id, -realCons);
-        this.sendInventoryData(this.selectedFilterId);
+        this.sendInventoryData(this.selectedFilterId, {
+            searchData: this.searchData,
+        });
     }
 
     sellItem(id, amount) {
@@ -295,7 +315,9 @@ export class InventoryModule extends GameModule {
             gameResources.addResource('coins', realCons*resource.sellPrice*sellPriceMod(gameEffects.getEffectValue('attribute_bargaining')));
         }
 
-        this.sendInventoryData(this.selectedFilterId);
+        this.sendInventoryData(this.selectedFilterId, {
+            searchData: this.searchData,
+        });
     }
 
     saveSettings(payload) {
@@ -316,6 +338,7 @@ export class InventoryModule extends GameModule {
             items.forEach(item => {
                 gameCore.getModule('unlock-notifications').registerNewNotification(
                     'inventory',
+                    'all',
                     filter.id,
                     `inventory_${item.id}`,
                     item.isUnlocked && (gameResources.getResource(item.id).amount >= SMALL_NUMBER
@@ -323,6 +346,23 @@ export class InventoryModule extends GameModule {
                 )
             })
         })
+    }
+
+
+    matchInventorySearch(one, searchData) {
+        if(!searchData) return true;
+        const { search, selectedScopes } = searchData;
+        if(!search) return true;
+        if(selectedScopes.includes('name') && one.name.toLowerCase().includes(search)) return true;
+        if(selectedScopes.includes('tags') && one.tags && one.tags.some(tag => tag.includes(search))) return true;
+
+        if(selectedScopes.includes('resources') && one.searchableMeta?.['resources']
+            && one.searchableMeta?.['resources'].some(tag => tag.includes(search.toLowerCase()))) return true;
+        if(selectedScopes.includes('effects') && one.searchableMeta?.['effects']
+            && one.searchableMeta?.['effects'].some(tag => tag.includes(search.toLowerCase()))) return true;
+
+
+        return false;
     }
 
     getItemsData(filterId, pl) {
@@ -336,7 +376,10 @@ export class InventoryModule extends GameModule {
                     .filter(one => one.isUnlocked && !one.isCapped && (gameResources.getResource(one.id).amount >= SMALL_NUMBER
                         || Math.abs(gameResources.getResource(one.id).income) >= SMALL_NUMBER
                         || this.inventoryItems[one.id]?.autoconsume?.rules?.length
-                        || this.inventoryItems[one.id]?.autosell?.rules?.length)),
+                        || this.inventoryItems[one.id]?.autoconsume?.isEnabled
+                        || this.inventoryItems[one.id]?.autosell?.rules?.length
+                        || this.inventoryItems[one.id]?.autosell?.isEnabled
+                    ) && this.matchInventorySearch(one, pl.searchData)),
                 isSelected: filterId === filter.id
             }
 
@@ -352,10 +395,10 @@ export class InventoryModule extends GameModule {
         let presentItems = entities;
 
         if(pl?.filterAutomatedSell) {
-            presentItems = presentItems.filter(p => this.inventoryItems[p.id]?.autosell?.rules?.length)
+            presentItems = presentItems.filter(p => this.inventoryItems[p.id]?.autosell?.rules?.length || this.inventoryItems[p.id]?.autosell?.isEnabled)
         }
         if(pl?.filterAutomatedConsume) {
-            presentItems = presentItems.filter(p => this.inventoryItems[p.id]?.autoconsume?.rules?.length)
+            presentItems = presentItems.filter(p => this.inventoryItems[p.id]?.autoconsume?.rules?.length || this.inventoryItems[p.id]?.autoconsume?.isEnabled)
         }
         if(pl?.includeAutomations) {
             presentItems = presentItems.map(item => ({
@@ -378,11 +421,26 @@ export class InventoryModule extends GameModule {
             itemCategories: Object.values(perCats).filter(cat => cat.items.length > 0),
             payload: pl,
             selectedFilterId: filterId,
+            searchData: this.searchData ?? {
+                search: '',
+                selectedScopes: ['name']
+            },
+            automationUnlocked: gameEntity.getLevel('shop_item_planner') > 0,
             details: {
-                metabolism_rate: gameEffects.getEffectValue('metabolism_rate'),
-                cooldown_bonus: metabolismMod(gameEffects.getEffectValue('metabolism_rate')),
-                bargaining: gameEffects.getEffectValue('attribute_bargaining'),
-                bargaining_mod: sellPriceMod(gameEffects.getEffectValue('attribute_bargaining'))
+                metabolism_rate: {...gameEffects.getEffect('metabolism_rate'), isMultiplier: true},
+                cooldown_bonus: {
+                    ...gameEffects.getEffect('metabolism_rate'),
+                    value: metabolismMod(gameEffects.getEffectValue('metabolism_rate')),
+                    isMultiplier: true,
+                },
+                bargaining: {...gameEffects.getEffect('attribute_bargaining'), isMultiplier: false},
+                bargaining_mod: {
+                    ...gameEffects.getEffect('attribute_bargaining'),
+                    value: sellPriceMod(gameEffects.getEffectValue('attribute_bargaining')),
+                    isMultiplier: true,
+                },
+                shop_max_stock: {...gameEffects.getEffect('shop_max_stock'), isMultiplier: false},
+                shop_stock_renew_rate: {...gameEffects.getEffect('shop_stock_renew_rate'), isMultiplier: false},
             }
         }
     }

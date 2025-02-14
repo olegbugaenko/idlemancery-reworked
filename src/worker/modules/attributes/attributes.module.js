@@ -2,6 +2,7 @@ import {GameModule} from "../../shared/game-module";
 import {gameCore, gameEffects, gameEntity} from "game-framework";
 import {registerAttributes} from "./attributes-db";
 import {gameUnlocks} from "game-framework/src/utils/unlocks";
+import {calculateTimeToLevelUp} from "../../shared/utils/math";
 
 export class AttributesModule extends GameModule {
 
@@ -13,8 +14,12 @@ export class AttributesModule extends GameModule {
             this.sendAttributesData()
         })
 
-        this.eventHandler.registerHandler('query-attributes-unlocks', (payload) => {
-            this.sendAttributesUnlocks()
+        this.eventHandler.registerHandler('query-attributes-unlocks', ({showUnlocked}) => {
+            this.sendAttributesUnlocks(showUnlocked)
+        })
+
+        this.eventHandler.registerHandler('query-all-attributes', (payload) => {
+            this.sendAllAttributes(payload)
         })
     }
 
@@ -37,20 +42,33 @@ export class AttributesModule extends GameModule {
 
     }
 
-    getAttributesUnlocks() {
-        console.log('Attrs: ', gameEffects.listEffectsByTags(['attribute']), gameUnlocks.unlockMapping);
-        const items = gameEffects.listEffectsByTags(['attribute'])
-            .filter(one => one.isUnlocked && one.nextUnlock)
+    getAttributesUnlocks(showUnlocked) {
+        const items = gameEffects.listEffectsByTags(['attribute'], false, [], { listPrevious: showUnlocked })
+            .filter(one => one.isUnlocked && (one.nextUnlock || (showUnlocked && one.prevUnlocks?.length)))
             .map(one => {
                 // Here we should somehow get current increment of attribute
                 // first of all we should get current income from list
-                const effects = gameCore.getModule('actions').getEffectFromRunningAction(one.id);
-                console.log('Effects: ', one);
                 return {
                     ...one,
-                    // eta: calculateTimeToLevelUp(gameEntity.getAttribute(one.id, 'baseXPCost'), 0.2, one.level, one.nextUnlock.level)
+                    progress: one.nextUnlock ? 100*one.value / one.nextUnlock.level : 100,
+                    prevUnlocks: (one.prevUnlocks ?? []).map(unlock => {
+
+                        let data = {};
+
+                        if(gameEntity.entityExists(unlock.unlockId)) {
+                            data = gameEntity.getEntity(unlock.unlockId);
+                        }
+
+                        return {
+                            ...unlock,
+                            data
+                        }
+                    }),
                 }
             });
+        console.log('Attrs: ', showUnlocked, items);
+
+
         return items;
     }
 
@@ -66,8 +84,18 @@ export class AttributesModule extends GameModule {
         }
     }
 
-    sendAttributesUnlocks() {
-        const data = this.getAttributesUnlocks();
+    getAllAttributesData() {
+        const effects = gameEffects.listEffectsByTags(['attribute']);
+        const list = effects.map(effect => ({
+            ...effect,
+            isUnlocked: effect.isUnlocked,
+        }))
+
+        return list;
+    }
+
+    sendAttributesUnlocks(showPrevious) {
+        const data = this.getAttributesUnlocks(showPrevious);
         this.eventHandler.sendData('attributes-unlocks', data);
     }
 
@@ -76,4 +104,12 @@ export class AttributesModule extends GameModule {
         this.eventHandler.sendData('attributes-data', data);
     }
 
+    sendAllAttributes(payload) {
+        const data = this.getAllAttributesData();
+        let label = 'all-attributes';
+        if(payload?.prefix) {
+            label = `${label}-${payload?.prefix}`
+        }
+        this.eventHandler.sendData(label, data);
+    }
 }

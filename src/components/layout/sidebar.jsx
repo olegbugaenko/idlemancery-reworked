@@ -5,17 +5,26 @@ import {formatInt, formatValue, secondsToString} from "../../general/utils/strin
 import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
 import {ActiveEffects} from "../shared/active-effects.jsx";
 import {RandomEventSnippet} from "../shared/random-events.jsx";
+import {useTutorial} from "../../context/tutorial-context";
+import {RawResource} from "../shared/raw-resource.jsx";
 
 export const Sidebar = () => {
 
     const [activePanel, setActivePanel] = useState('resources');
+    const { unlockNextById } = useTutorial();
 
     return (<div className={'sidebar'}>
         <ul className={'menu toogleables'}>
-            <li className={`${activePanel === 'resources' ? 'active' : ''}`} onClick={() => setActivePanel('resources')}>
+            <li id={'tutorial-res-tab'} className={`${activePanel === 'resources' ? 'active' : ''}`} onClick={() => {
+                unlockNextById(3);
+                setActivePanel('resources')
+            }}>
                 <span>Resources</span>
             </li>
-            <li className={`${activePanel === 'attributes' ? 'active' : ''}`} onClick={() => setActivePanel('attributes')}>
+            <li id={'tutorial-attr-tab'} className={`${activePanel === 'attributes' ? 'active' : ''}`} onClick={() => {
+                unlockNextById(1);
+                setActivePanel('attributes')
+            }}>
                 <span>Attributes</span>
             </li>
         </ul>
@@ -54,7 +63,7 @@ export const ResourcesBar = () => {
         sendData('set-monitored', { type: 'resource', id });
     }, []);
 
-    return (<div className={'resources'}>
+    return (<div className={'resources'} id={'tutorial-resources'}>
         {resourceData.map(res => {
 
             const aff = res.affData;
@@ -65,12 +74,14 @@ export const ResourcesBar = () => {
             }
 
             return (<div key={res.id} className={`holder ${aff ? 'monitored' : ''}`} onMouseOver={() => setMonitoredAttribute(res.id)} onMouseOut={() => setMonitoredAttribute(null)}><p className={`resource-item ${affClassData}`}>
-                <span className={'resource-label'}>{res.name}</span>
+                <div className={'resource-label'}>
+                    <RawResource name={res.name} id={res.id} />
+                </div>
                 <TippyWrapper content={<div className={'hint-popup'}><BreakDown category={'cap'} breakDown={res.storageBreakdown}/>{res.eta >= 0 ? `${secondsToString(res.eta)} to full` : `${secondsToString(-res.eta)} to empty`}</div> }>
-                    <span className={'resource-amount'}>{formatValue(res.amount || 0)}{res.hasCap ? `/${formatValue(res.cap || 0)}` : ''}</span>
+                    <span className={`resource-amount ${res.hasCap && res.isCapped ? 'capped' : ''}`}>{formatValue(res.amount || 0)}{res.hasCap ? `/${formatValue(res.cap || 0)}` : ''}</span>
                 </TippyWrapper>
                 <TippyWrapper content={<div className={'hint-popup'}><BreakDown breakDown={res.breakDown}/></div> }>
-                    <span className={'resource-balance'}>{formatValue(res.balance || 0)}</span>
+                    <span className={`resource-balance ${res.isNegative ? 'red' : ''} ${res.isPositive ? 'green' : ''}`}>{formatValue(res.balance || 0)}</span>
                 </TippyWrapper>
                 {aff ? (<div className={'appendix'}>
                     {aff.isAffordable ? (<span>{formatValue(aff.requirement)}</span>) : (<span>{formatValue(aff.actual - aff.requirement)}({secondsToString(aff.eta)})</span>)}
@@ -106,7 +117,7 @@ export const AttributesBar = () => {
         sendData('set-monitored', { type: 'attribute', id });
     }, []);
 
-    return (<div className={'attributes-panel'}>
+    return (<div className={'attributes-panel'} id={'tutorial-attributes'}>
         {attributesData.list.map(res => {
 
             const aff = res.affData;
@@ -120,7 +131,13 @@ export const AttributesBar = () => {
 
             return (<div key={res.id} className={`holder ${aff ? 'monitored' : ''}`} onMouseOver={() => setMonitoredAttribute(res.id)} onMouseOut={() => setMonitoredAttribute(null)}><p className={`resource-item ${affClassData}`}>
                 <TippyWrapper content={<div className={'hint-popup'}>
-                    {res.description}
+                    <div className={'block'}>
+                        <h4>{res.name}: {formatValue(res.value, 3)}</h4>
+                    </div>
+                    <div className={'block'}>
+                        {res.description}
+                    </div>
+
                     {res.nextUnlock ? (<div className={'unlock block'}>
                         <p className={'hint'}>Next unlock at level {formatInt(res.nextUnlock.level)}</p>
                     </div> ) : null}
@@ -148,7 +165,7 @@ export const BreakDown = ({ breakDown, category }) => {
             <div className={'box-inner'}>
                 {breakDown.income.filter(one => Math.abs(one.value) > 1.e-8).map(one => {
                     return (<p key={one.id} className={'line'}>
-                        <span className={'name'}>{one.name}: </span>
+                        <span className={'name'}>{one.label}: </span>
                         <span className={'value'}>+{formatValue(one.value, 3)}</span>
                     </p> )
                 })}
@@ -159,7 +176,7 @@ export const BreakDown = ({ breakDown, category }) => {
             <div className={'box-inner'}>
                 {breakDown.multiplier.filter(one => Math.abs(one.value - 1) > 1.e-8).map(one => {
                     return (<p key={one.id} className={'line'}>
-                        <span className={'name'}>{one.name}: </span>
+                        <span className={'name'}>{one.label}: </span>
                         <span className={'value'}>X{formatValue(one.value, 3)}</span>
                     </p> )
                 })}
@@ -170,7 +187,7 @@ export const BreakDown = ({ breakDown, category }) => {
             <div className={'box-inner'}>
                 {breakDown.consumption.filter(one => Math.abs(one.value) > 1.e-8).map(one => {
                     return (<p key={one.id} className={'line'}>
-                        <span className={'name'}>{one.name}: </span>
+                        <span className={'name'}>{one.label}: </span>
                         <span className={'value'}>-{formatValue(one.value, 3)}</span>
                     </p> )
                 })}

@@ -81,9 +81,11 @@ export const Map = ({ setItemDetails, openListDetails, isEditList }) => {
             runningList: null,
             lists: [],
             automationEnabled: false,
-            autotriggerIntervalSetting: 0
+            autotriggerIntervalSetting: 0,
+            automationUnlocked: false,
         },
-        filterableLoot: []
+        filterableLoot: [],
+        highlightFilters: {}
     });
 
     const [selectedTile, setSelectedTile] = useState(null)
@@ -110,29 +112,38 @@ export const Map = ({ setItemDetails, openListDetails, isEditList }) => {
         setSelectedTile(meta);
     };
 
+/*    const unsetItemDetailsCb = meta => {
+        setItemDetails({ meta: null, type: 'map-tile' });
+        setSelectedTile(null);
+    };*/
+
     const onEditList = useCallback(listData => {
         console.log('onEditList: ', { listData, isEdit: true })
-        openListDetails({ listData, isEdit: true });
+        openListDetails({ listData, isEdit: true, automationUnlocked: mapData.mapLists.automationUnlocked });
     }, []);
 
     const onViewList = useCallback(listData => {
-        openListDetails({ listData });
+        openListDetails({ listData, automationUnlocked: mapData.mapLists.automationUnlocked });
     }, []);
 
     const setHighlighted = useCallback(data => {
         sendData('map-highlight-resources', {ids: data.map(one => one.value)})
     })
 
+    const toggleUnexplored = useCallback(() => {
+        sendData('map-highlight-filter', { highlightUnexplored: !mapData.highlightFilters.highlightUnexplored});
+    })
+
     return (<div className={'map-wrap'}>
         <div className={'head'}>
             <TippyWrapper content={<div className={'hint-popup'}>
-                <p className={'hint'}>This shows your current usage of gathering effort/effort that you get from gathering actions</p>
-                <p className={'hint'}>Trying to use more than you producing will reduce loot chances and amounts</p>
+                <p className={'hint'}>Shows the amount of available effort you can use for gathering resources.</p>
+                <p className={'hint'}>If your gathering effort is insufficient, loot chances and quantities will decrease.</p>
                 <BreakDown breakDown={mapData.explorationPoints.breakDown} />
             </div> }>
                 <div className={'space-item'}>
-                    <span>Gathering Efforts:</span>
-                    <span>{formatValue(mapData.explorationPoints.balance)}/{formatValue(mapData.explorationPoints.balance + mapData.explorationPoints.consumption)}</span>
+                    <span className={'gather-label'}>Gathering Efforts:</span>
+                    <span className={`gather-value ${mapData.explorationPoints.balance > 1.e-7 ? 'green' : 'yellow'}`}>{formatValue(mapData.explorationPoints.balance)}/{formatValue(mapData.explorationPoints.balance + mapData.explorationPoints.consumption)}</span>
                 </div>
             </TippyWrapper>
             {mapData.filterableLoot?.length ? (<div className={'resources-filter'}>
@@ -153,6 +164,12 @@ export const Map = ({ setItemDetails, openListDetails, isEditList }) => {
 
                 </Select>
             </div> ) : null}
+            <div className={'other-filters'}>
+                <label>
+                    <input type={'checkbox'} checked={!!mapData.highlightFilters.highlightUnexplored} onChange={toggleUnexplored}/>
+                    Highlight not fully explored
+                </label>
+            </div>
         </div>
         <div className={'map-cat'}>
             <PerfectScrollbar>
@@ -180,6 +197,7 @@ export const Map = ({ setItemDetails, openListDetails, isEditList }) => {
                 viewListToDetails={(id) => {
                     onViewList({ id });
                 }}
+                automationUnlocked={mapData.mapLists.automationUnlocked}
             />
         </div>
     </div> )
@@ -205,7 +223,7 @@ export const MapTile = React.memo(
                     isHighlight ? "highlight" : ""
                 }`}
                 style={{ backgroundImage: `url(icons/terrain/${icon}.png)` }}
-                onClick={() => setItemDetails({ i, j })}
+                onClick={() => isSelected ? setItemDetails(null) : setItemDetails({ i, j })}
             ></div>
         );
 
@@ -303,7 +321,7 @@ export const ActionListsPopup = ({ lists, isOpened, setOpenedFor, onSelect, onHo
     </div> )
 }
 
-export const MapListsPanel = ({ runningList, editListToDetails, lists, viewListToDetails, automationEnabled, autotriggerIntervalSetting }) => {
+export const MapListsPanel = ({ automationUnlocked, runningList, editListToDetails, lists, viewListToDetails, automationEnabled, autotriggerIntervalSetting }) => {
 
     const worker = useContext(WorkerContext);
 
@@ -374,26 +392,26 @@ export const MapListsPanel = ({ runningList, editListToDetails, lists, viewListT
                 <button onClick={(e) => { e.stopPropagation(); setOpenedFor('edit')}}>Pick list</button>
                 <ActionListsPopup lists={lists} isOpened={openedFor === 'edit'} setOpenedFor={setOpenedFor} onSelect={editList} onRun={runList} onHover={viewListToDetails} onDelete={onDelete}/>
             </div>
-            <div className={'automation-enabled panel-col'}>
+            {automationUnlocked ? (<><div className={'automation-enabled panel-col'}>
                 <label>
                     <input type={'checkbox'} checked={automationEnabled} onChange={toggleAutomation}/>
                     Lists automation enabled
                 </label>
             </div>
-            <div className={'panel-col automation-interval'}>
-                <label>
-                    Switch lists interval:
-                    <select onChange={e => changeAutomationInterval(+e.target.value)}>
-                        <option value={10} selected={autotriggerIntervalSetting === 10}>10 seconds</option>
-                        <option value={30} selected={autotriggerIntervalSetting === 30}>30 seconds</option>
-                        <option value={60} selected={autotriggerIntervalSetting === 60}>1 minute</option>
-                        <option value={300} selected={autotriggerIntervalSetting === 300}>5 minutes</option>
-                        <option value={900} selected={autotriggerIntervalSetting === 900}>15 minutes</option>
-                        <option value={1800} selected={autotriggerIntervalSetting === 1800}>30 minutes</option>
-                        <option value={3600} selected={autotriggerIntervalSetting === 3600}>1 hour</option>
-                    </select>
-                </label>
-            </div>
+                <div className={'panel-col automation-interval'}>
+                    <label>
+                        Switch lists interval:
+                        <select onChange={e => changeAutomationInterval(+e.target.value)}>
+                            <option value={10} selected={autotriggerIntervalSetting === 10}>10 seconds</option>
+                            <option value={30} selected={autotriggerIntervalSetting === 30}>30 seconds</option>
+                            <option value={60} selected={autotriggerIntervalSetting === 60}>1 minute</option>
+                            <option value={300} selected={autotriggerIntervalSetting === 300}>5 minutes</option>
+                            <option value={900} selected={autotriggerIntervalSetting === 900}>15 minutes</option>
+                            <option value={1800} selected={autotriggerIntervalSetting === 1800}>30 minutes</option>
+                            <option value={3600} selected={autotriggerIntervalSetting === 3600}>1 hour</option>
+                        </select>
+                    </label>
+                </div></>) : null}
         </div>
     </div>)
 }

@@ -1,6 +1,14 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom/client';
 import App from './App';
-import {AppProvider} from "./context/ui-context";
+import { AppProvider } from './context/ui-context';
 
-ReactDOM.render(<AppProvider><App /></AppProvider>, document.getElementById('root'));
+const container = document.getElementById('root');
+const root = ReactDOM.createRoot(container);
+
+root.render(
+        <AppProvider>
+            <App />
+        </AppProvider>
+);
+
