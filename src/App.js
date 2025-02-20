@@ -34,7 +34,7 @@ function App() {
         console.log('Received from worker:', event);
         const saveString = window.localStorage.getItem('idlemanceryV2Reworked');
         if(!saveString) {
-            setReadyToGo(true);
+            sendData('reset-game', {});
             return
         }
         console.log('found save');

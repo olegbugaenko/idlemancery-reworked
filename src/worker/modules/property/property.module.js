@@ -566,7 +566,7 @@ export class PropertyModule extends GameModule {
                     this.customFilters = cloneDeep(defFlt);
                     this.selectedFilterId[key] = 'all';
                 } else {
-                    this.selectedFilterId[key] = saveObject?.selectedFilterId[key] ?? 'all';
+                    this.selectedFilterId[key] = saveObject?.selectedFilterId?.[key] ?? 'all';
                 }
             }
 
