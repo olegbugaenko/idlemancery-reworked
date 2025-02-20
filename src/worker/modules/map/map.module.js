@@ -31,8 +31,11 @@ export class MapModule extends GameModule {
             if('highlightUnexplored' in payload) {
                 this.highlightFilters['highlightUnexplored'] = payload.highlightUnexplored;
             }
-            if('highlightAvailableOnly' in payload) {
-                this.highlightFilters['highlightAvailableOnly'] = payload.highlightAvailableOnly;
+            if('effortMin' in payload) {
+                this.highlightFilters['effortMin'] = payload.effortMin;
+            }
+            if('effortMax' in payload) {
+                this.highlightFilters['effortMax'] = payload.effortMax;
             }
             this.sendData();
         })
@@ -111,7 +114,7 @@ export class MapModule extends GameModule {
         const distance = Math.sqrt((i-7)**2 + (j-7)**2);
         const metaData = this.tileTypes[expectType];
         const resources = gameResources.listResourcesByTags(['gatherable']);
-        const complexity = Math.max(1, (distance-2) + Math.random()*(distance-2))*(1 + tier);
+        const complexity = Math.max(1, (distance-2) + (Math.random() + 0.75*(tier**0.5))*(distance-2 + 3*(tier**0.5)))*Math.pow(1.3, tier);
         return {
             distance,
             i,
@@ -330,6 +333,7 @@ export class MapModule extends GameModule {
             lists: this.lists.save(),
             mapCreationSettings: this.mapCreationSettings,
             currentMapVersion: this.currentMapVersion,
+            highlightFilters: this.highlightFilters,
         }
     }
 
@@ -354,6 +358,10 @@ export class MapModule extends GameModule {
             this.generateMap();
         }
         this.lists.load(obj?.lists || {});
+        this.highlightFilters = {};
+        if(obj?.highlightFilters) {
+            this.highlightFilters = obj.highlightFilters;
+        }
     }
 
     mapGenerationCost() {
@@ -397,10 +405,30 @@ export class MapModule extends GameModule {
         }));
         return {
             mapTiles: this.mapTilesProcessed.map(row => row.map(col => {
-                let isHighlight = col.drops.some(drop => this.highlightResources[drop.id] && drop.isRevealed);
-                if(this.highlightFilters.highlightUnexplored) {
-                    isHighlight = (!Object.keys(this.highlightResources).length || isHighlight) && col.drops.some(drop => gameResources.isResourceUnlocked(drop.id) && !drop.isRevealed);
+                let emptyConds = !Object.keys(this.highlightResources).length
+                    && !this.highlightFilters.highlightUnexplored
+                    && !this.highlightFilters.effortMin
+                    && !this.highlightFilters.effortMax;
+
+                let isHighlight = false;
+
+                if(!emptyConds) {
+                    isHighlight = true;
+                    if(Object.keys(this.highlightResources).length) {
+                        isHighlight = col.drops.some(drop => this.highlightResources[drop.id] && drop.isRevealed);
+                    }
+
+                    if(isHighlight && this.highlightFilters.highlightUnexplored) {
+                        isHighlight = (emptyConds || isHighlight) && col.drops.some(drop => gameResources.isResourceUnlocked(drop.id) && !drop.isRevealed);
+                    }
+                    if((isHighlight) && this.highlightFilters.effortMin) {
+                        isHighlight = this.highlightFilters.effortMin <= col.cost['gathering_effort'].value;
+                    }
+                    if((isHighlight) && this.highlightFilters.effortMax) {
+                        isHighlight = this.highlightFilters.effortMax >= col.cost['gathering_effort'].value;
+                    }
                 }
+
 
                 return {
                     ...col,
@@ -493,7 +521,7 @@ export class MapModule extends GameModule {
                         if(!this.mapTiles[ent.attributes.i][ent.attributes.j].r.includes(index)) {
                             this.mapTiles[ent.attributes.i][ent.attributes.j].r.push(index);
                         }
-                        console.log(`Found ${drop.id} at ${ent.attributes.i}:${ent.attributes.j} with chance ${roll} < ${drop.probability}: ${amt}. EntEff: ${ent.efficiency}`, this.mapTiles[ent.attributes.i][ent.attributes.j]);
+                        // console.log(`Found ${drop.id} at ${ent.attributes.i}:${ent.attributes.j} with chance ${roll} < ${drop.probability}: ${amt}. EntEff: ${ent.efficiency}`, this.mapTiles[ent.attributes.i][ent.attributes.j]);
                     }
                 })
             })

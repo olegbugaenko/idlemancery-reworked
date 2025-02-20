@@ -41,11 +41,11 @@ export const registerCourseItemsStage1 = () => {
         resourceModifier: {
             capMult: {
                 resources: {
-                    'energy': {
+                    /*'energy': {
                         A: 0.1,
                         B: 1,
                         type: 0,
-                    },
+                    },*/
                     'health': {
                         A: 0.1,
                         B: 1,
@@ -57,14 +57,14 @@ export const registerCourseItemsStage1 = () => {
     }, {
         get_consumption: () => ({
             resources: {
-                'energy': {
+                /*'energy': {
                     A: 1.1,
                     B: 50,
                     type: 1,
-                },
+                },*/
                 'knowledge': {
                     A: 1.1,
-                    B: 5/gameEffects.getEffectValue('courses_knowledge_discount'),
+                    B: 15/gameEffects.getEffectValue('courses_knowledge_discount'),
                     type: 1,
                 }
             }
@@ -94,14 +94,14 @@ export const registerCourseItemsStage1 = () => {
     }, {
         get_consumption: () => ({
             resources: {
-                'coins': {
+                /*'coins': {
                     A: 1.1,
                     B: 5000,
                     type: 1,
-                },
+                },*/
                 'knowledge': {
                     A: 1.1,
-                    B: 10/gameEffects.getEffectValue('courses_knowledge_discount'),
+                    B: 30/gameEffects.getEffectValue('courses_knowledge_discount'),
                     type: 1,
                 }
             }
@@ -132,20 +132,59 @@ export const registerCourseItemsStage1 = () => {
     }, {
         get_consumption: () => ({
             resources: {
-                'energy': {
+                /*'energy': {
                     A: 1.1,
                     B: 50,
                     type: 1,
-                },
+                },*/
                 'knowledge': {
                     A: 1.1,
-                    B: 10/gameEffects.getEffectValue('courses_knowledge_discount'),
+                    B: 30/gameEffects.getEffectValue('courses_knowledge_discount'),
                     type: 1,
                 }
             }
         }),
         effectDeps: ['courses_knowledge_discount'],
     })
+
+
+    registerCourse('course_navigation', {
+        name: 'Improved Navigation',
+        tags: ['mental', 'enchancement'],
+        attributes: {
+            basicDuration: 60,
+        },
+        level: 0,
+        unlockCondition: () => gameEntity.getLevel('shop_item_training_room') > 0,
+        resourceModifier: {
+            multiplier: {
+                resources: {
+                    'gathering_perception': {
+                        A: 0.05,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+        }
+    }, {
+        get_consumption: () => ({
+            resources: {
+                /*'coins': {
+                    A: 1.1,
+                    B: 5000,
+                    type: 1,
+                },*/
+                'knowledge': {
+                    A: 1.1,
+                    B: 50/gameEffects.getEffectValue('courses_knowledge_discount'),
+                    type: 1,
+                }
+            }
+        }),
+        effectDeps: ['courses_knowledge_discount']
+    })
+
 
     registerCourse('course_strength_intensity', {
         name: 'Physical Practices',
@@ -169,14 +208,14 @@ export const registerCourseItemsStage1 = () => {
     }, {
         get_consumption: () => ({
             resources: {
-                'health': {
+                /*'health': {
                     A: 1.1,
                     B: 100,
                     type: 1,
-                },
+                },*/
                 'knowledge': {
                     A: 1.1,
-                    B: 10/gameEffects.getEffectValue('courses_knowledge_discount'),
+                    B: 30/gameEffects.getEffectValue('courses_knowledge_discount'),
                     type: 1,
                 }
             }
@@ -207,14 +246,14 @@ export const registerCourseItemsStage1 = () => {
     }, {
         get_consumption: () => ({
             resources: {
-                'energy': {
+                /*'energy': {
                     A: 1.1,
                     B: 150,
                     type: 1,
-                },
+                },*/
                 'knowledge': {
                     A: 1.1,
-                    B: 10/gameEffects.getEffectValue('courses_knowledge_discount'),
+                    B: 40/gameEffects.getEffectValue('courses_knowledge_discount'),
                     type: 1,
                 }
             }
@@ -245,14 +284,14 @@ export const registerCourseItemsStage1 = () => {
     }, {
         get_consumption: () => ({
             resources: {
-                'coins': {
+                /*'coins': {
                     A: 1.1,
                     B: 10000,
                     type: 1,
-                },
+                },*/
                 'knowledge': {
                     A: 1.1,
-                    B: 10/gameEffects.getEffectValue('courses_knowledge_discount'),
+                    B: 40/gameEffects.getEffectValue('courses_knowledge_discount'),
                     type: 1,
                 }
             }
@@ -279,9 +318,10 @@ export const registerCourseItemsStage1 = () => {
             multiplier: {
                 effects: {
                     'courses_knowledge_discount': {
-                        A: 1.025,
+                        A: 0.1,
                         B: 1,
-                        type: 1,
+                        C: 1.02,
+                        type: 3,
                     }
                 }
             },
@@ -289,11 +329,11 @@ export const registerCourseItemsStage1 = () => {
     }, {
         get_consumption: () => ({
             resources: {
-                'energy': {
+                /*'energy': {
                     A: 1.1,
                     B: 1000,
                     type: 1,
-                },
+                },*/
                 'mental_energy': {
                     A: 1.1,
                     B: 1,
@@ -322,7 +362,7 @@ export const registerCourseItemsStage1 = () => {
             get_multiplier: () => ({
                 effects: {
                     'social_actions_discount': {
-                        A: 0.1*gameEffects.getEffectValue('reductive_courses_power'),
+                        A: 0.2*gameEffects.getEffectValue('reductive_courses_power'),
                         B: 1,
                         C: 1.01,
                         type: 3,
@@ -334,11 +374,11 @@ export const registerCourseItemsStage1 = () => {
     }, {
         get_consumption: () => ({
             resources: {
-                'energy': {
+               /* 'energy': {
                     A: 1.1,
                     B: 1000,
                     type: 1,
-                },
+                },*/
                 'mental_energy': {
                     A: 1.1,
                     B: 1,
@@ -365,7 +405,7 @@ export const registerCourseItemsStage1 = () => {
             get_multiplier: () => ({
                 effects: {
                     'physical_actions_discount': {
-                        A: 0.1*gameEffects.getEffectValue('reductive_courses_power'),
+                        A: 0.2*gameEffects.getEffectValue('reductive_courses_power'),
                         B: 1,
                         C: 1.01,
                         type: 3,
@@ -377,11 +417,11 @@ export const registerCourseItemsStage1 = () => {
     }, {
         get_consumption: () => ({
             resources: {
-                'energy': {
+                /*'energy': {
                     A: 1.1,
                     B: 1000,
                     type: 1,
-                },
+                },*/
                 'mental_energy': {
                     A: 1.1,
                     B: 1,
@@ -408,7 +448,7 @@ export const registerCourseItemsStage1 = () => {
             get_multiplier: () =>({
                 effects: {
                     'mental_actions_discount': {
-                        A: 0.1*gameEffects.getEffectValue('reductive_courses_power'),
+                        A: 0.2*gameEffects.getEffectValue('reductive_courses_power'),
                         B: 1,
                         C: 1.01,
                         type: 3,
@@ -420,11 +460,11 @@ export const registerCourseItemsStage1 = () => {
     }, {
         get_consumption: () => ({
             resources: {
-                'energy': {
+                /*'energy': {
                     A: 1.1,
                     B: 1000,
                     type: 1,
-                },
+                },*/
                 'mental_energy': {
                     A: 1.1,
                     B: 1,

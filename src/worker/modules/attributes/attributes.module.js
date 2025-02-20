@@ -63,7 +63,7 @@ export class AttributesModule extends GameModule {
                             ...unlock,
                             data
                         }
-                    }),
+                    }).sort((a, b) => b.level - a.level),
                 }
             });
         console.log('Attrs: ', showUnlocked, items);

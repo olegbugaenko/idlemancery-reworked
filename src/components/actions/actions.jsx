@@ -67,6 +67,7 @@ export const Actions = ({}) => {
     const [viewingList, setViewingList] = useState(null);
     const [listData, setListData] = useState(null);
     const [viewedData, setViewedData] = useState(null);
+    const [selectedAction, setSelectedAction] = useState(null);
     const [resources, setResources] = useState(null);
     const [newUnlocks, setNewUnlocks] = useState({});
     const [isCustomFilterOpened, setCustomFilterOpened] = useState(false);
@@ -184,6 +185,12 @@ export const Actions = ({}) => {
             })
             setListData({...newList});
             sendData('query-action-list-effects', { listData: newList });
+        } else {
+            if(selectedAction === id) {
+                setSelectedAction(null)
+            } else {
+                setSelectedAction(id)
+            }
         }
     }
 
@@ -493,7 +500,7 @@ export const Actions = ({}) => {
                                         <div ref={provided.innerRef} {...provided.droppableProps} className="flex-container">
                                             {actionsData.available.map((action, index) =>
                                                 <NewNotificationWrap key={action.id} id={action.id} className={'narrow-wrapper'} isNew={newUnlocks.actions?.items?.all?.items?.[actionsData.selectedCategory]?.items?.[action.id]?.hasNew}>
-                                                    <ActionCard isEditingList={!!listData} index={index} key={action.id} {...action} onFlash={handleFlash} onActivate={activateAction} onShowDetails={setActionDetails} onSelect={onSelectAction} toggleHiddenAction={toggleHiddenAction}/>
+                                                    <ActionCard isEditingList={!!listData} index={index} key={action.id} {...action} onFlash={handleFlash} onActivate={activateAction} onShowDetails={setActionDetails} onSelect={onSelectAction} toggleHiddenAction={toggleHiddenAction} isSelected={selectedAction && (selectedAction === action.id)}/>
                                                 </NewNotificationWrap>)}
                                             {provided.placeholder}
                                         </div>
@@ -510,7 +517,8 @@ export const Actions = ({}) => {
                 </div>
                 <div className={`action-detail ingame-box detail-blade ${listData ? 'wide-blade' : ''}`}>
                     <DetailBlade
-                        actionId={detailOpened}
+                        actionId={detailOpened ?? selectedAction}
+                        isSelected={selectedAction && (!detailOpened || detailOpened === selectedAction)}
                         editListId={editingList}
                         listData={listData}
                         viewListId={viewingList}
@@ -529,6 +537,7 @@ export const Actions = ({}) => {
                         automationUnlocked={actionsData.automationUnlocked}
                         stats={actionsData.stats}
                         aspects={actionsData.aspects}
+                        onCloseDetails={() => setSelectedAction(null)}
                     />
                 </div>
             </div>
@@ -540,6 +549,7 @@ export const Actions = ({}) => {
 
 export const DetailBlade = ({
     actionId,
+    isSelected,
     viewListId,
     viewedData,
     editListId,
@@ -557,7 +567,8 @@ export const DetailBlade = ({
     resources,
     automationUnlocked,
     stats,
-    aspects
+    aspects,
+    onCloseDetails
 }) => {
 
     if(listData) {
@@ -581,7 +592,7 @@ export const DetailBlade = ({
     }
 
     if(actionId) {
-        return (<ActionDetails actionId={actionId} />)
+        return (<ActionDetails actionId={actionId} onClose={onCloseDetails} isSelected={isSelected}/>)
     }
 
     if(viewedData) {
@@ -625,7 +636,7 @@ export const DetailBlade = ({
     return (<GeneralStats stats={stats} aspects={aspects} />);
 }
 
-export const ActionCard = ({ id, category, monitored, entityEfficiency, isEditingList, index, name, level, max, xp, maxXP, xpRate, isActive, isLeveled, focused, isTraining, actionEffect, currentEffects, potentialEffects, isHidden, onFlash, onSelect, onActivate, onShowDetails, toggleHiddenAction, missingResourceId, ...props}) => {
+export const ActionCard = ({ id, category, monitored, entityEfficiency, isEditingList, index, name, level, max, xp, maxXP, xpRate, isActive, isLeveled, focused, isTraining, actionEffect, currentEffects, potentialEffects, isHidden, onFlash, onSelect, onActivate, onShowDetails, toggleHiddenAction, missingResourceId, isSelected, ...props}) => {
     const elementRef = useRef(null);
 
     const { stepIndex, unlockNextById, jumpOver } = useTutorial();
@@ -661,7 +672,7 @@ export const ActionCard = ({ id, category, monitored, entityEfficiency, isEditin
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
                     id={`item_${id}`}
-                    className={`card ${category} action ${isActive ? 'active' : ''} ${entityEfficiency < 1 ? ' efficiency-dropped' : ''} flashable ${monitored ?? ''}`}
+                    className={`card ${category} action ${isSelected ? 'selected' : ''} ${isActive ? 'active' : ''} ${entityEfficiency < 1 ? ' efficiency-dropped' : ''} flashable ${monitored ?? ''}`}
                     onMouseEnter={() => {
                         onShowDetails(id)
                     }}

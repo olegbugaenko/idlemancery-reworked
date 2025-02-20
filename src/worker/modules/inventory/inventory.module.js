@@ -119,7 +119,18 @@ export class InventoryModule extends GameModule {
 
                 // console.log('RULES MATCHED: ', isMatching);
                 if(isMatching) {
-                    this.consumeItem(itemId, 1);
+                    let amount = 1;
+                    const reserved = this.inventoryItems[itemId]?.autosell?.reserved || 0;
+                    const reserveLimit = Math.floor(
+                        Math.max(0, gameResources.getResource(itemId).amount - reserved)
+                    );
+                    if(gameResources.getResource(itemId).attributes.allowMultiConsume) {
+                        amount = reserveLimit;
+                    }
+                    if(amount > 0) {
+                        this.consumeItem(itemId, amount);
+                    }
+
                 }
             }
 
@@ -142,7 +153,7 @@ export class InventoryModule extends GameModule {
                 );
 
                 const realSell = Math.min(sellAmount, reserveLimit);
-                console.log('INVDEBUG Reserved: ', itemId, reserved, reserveLimit, sellAmount, realSell, gameResources.getResource(itemId).amount, this.inventoryItems[itemId]);
+                // console.log('INVDEBUG Reserved: ', itemId, reserved, reserveLimit, sellAmount, realSell, gameResources.getResource(itemId).amount, this.inventoryItems[itemId]);
 
                 if(isMatching) {
                     this.sellItem(itemId, Math.min(sellAmount, reserveLimit));
@@ -187,7 +198,7 @@ export class InventoryModule extends GameModule {
                 this.inventoryItems[key].stockCapacity = gameEffects.getEffectValue('shop_max_stock');
             }
             if(this.inventoryItems[key].duration && this.inventoryItems[key].duration > 0) {
-                console.log('INVDEBUG REGISTER ITEM '+key+':', this.inventoryItems[key]);
+                // console.log('INVDEBUG REGISTER ITEM '+key+':', this.inventoryItems[key]);
                 gameEntity.registerGameEntity(`active_${key}`, {
                     originalId: key,
                     name: gameResources.getResource(key).name,

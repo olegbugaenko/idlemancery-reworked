@@ -121,6 +121,9 @@ export const ItemDetails = ({itemId, category}) => {
                     <div className={'stats-wrap'}>
                         <ResourceComparison effects1={item.wateringEffects} effects2={item.nextWateringEffects} />
                     </div>
+                    {item.wateringLevel >= item.maxWatering.value ? (<div className={'warn'}>
+                        <p className={'hint yellow'}>Build more water pumps to increase watering level (See property tab)</p>
+                    </div> ) : null}
                 </div> ) : null}
             </div>
         </PerfectScrollbar>

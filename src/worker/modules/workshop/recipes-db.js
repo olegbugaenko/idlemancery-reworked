@@ -498,6 +498,66 @@ export const registerCraftingRecipes = () => {
         }),
     })
 
+    registerCraftingRecipe('craft_forged_steel', {
+        tags: ["recipe", "crafting", "material", "physical"],
+        name: 'Craft Forged Steel',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Create forged durable steel from your iron plates',
+        level: 1,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 7500,
+        }],
+        resourceId: 'inventory_forged_steel',
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'inventory_forged_steel': {
+                        A: 1.3,
+                        B: 0.02*gameEffects.getEffectValue('crafting_efficiency'),
+                        type: 1,
+                    }
+                }
+            }),
+            consumption: {
+                resources: {
+                    'inventory_iron_plate': {
+                        A: 1.5,
+                        B: 0.25,
+                        type: 1
+                    },
+                    'crafting_ability': {
+                        A: 1.5,
+                        B: 4,
+                        type: 1,
+                    },
+                    'crafting_slots': {
+                        A: 1,
+                        B: 0,
+                        type: 0,
+                        ignoreEfficiency: true,
+                    },
+                }
+            },
+            effectDeps: ['crafting_efficiency']
+        },
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_iron_ore')
+        },
+        attributes: {
+            baseXPCost: 10,
+        },
+        get_cost: () => ({
+            'crafting_slots': {
+                A: 1,
+                B: 0,
+                type: 0
+            }
+        }),
+    })
+
     registerCraftingRecipe('craft_green_ink', {
         tags: ["recipe", "crafting", "material", "physical"],
         name: 'Green Ink',

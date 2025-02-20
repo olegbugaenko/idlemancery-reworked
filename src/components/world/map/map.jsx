@@ -39,7 +39,8 @@ const customStyles = {
         ...provided,
         margin: '0',
         padding: '0',
-        fontSize: '13px'
+        fontSize: '13px',
+        color: '#fff'
     }),
     indicatorsContainer: (provided, state) => ({
         ...provided,
@@ -134,6 +135,14 @@ export const Map = ({ setItemDetails, openListDetails, isEditList }) => {
         sendData('map-highlight-filter', { highlightUnexplored: !mapData.highlightFilters.highlightUnexplored});
     })
 
+    const changeMinEffort = useCallback((val) => {
+        sendData('map-highlight-filter', { effortMin: val});
+    })
+
+    const changeMaxEffort = useCallback((val) => {
+        sendData('map-highlight-filter', { effortMax: val});
+    })
+
     return (<div className={'map-wrap'}>
         <div className={'head'}>
             <TippyWrapper content={<div className={'hint-popup'}>
@@ -165,6 +174,12 @@ export const Map = ({ setItemDetails, openListDetails, isEditList }) => {
                 </Select>
             </div> ) : null}
             <div className={'other-filters'}>
+                <label className={'effort-control'}>
+                    Effort between:
+                    <input type={'number'} value={mapData.highlightFilters.effortMin ?? 0} onChange={(e) => changeMinEffort(+e.target.value)}/>
+                    and
+                    <input type={'number'} value={mapData.highlightFilters.effortMax ?? 0} onChange={(e) => changeMaxEffort(+e.target.value)}/>
+                </label>
                 <label>
                     <input type={'checkbox'} checked={!!mapData.highlightFilters.highlightUnexplored} onChange={toggleUnexplored}/>
                     Highlight not fully explored

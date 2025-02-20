@@ -141,4 +141,6 @@ TODO's:
 17. [V] 8K Magic Ability should unlock conjuration magic
 18. [V] Add spell boosting social training learn rate
 19. [V] Add custom filters for accessories and furniture
-20. Icons for gathering effort and gathering perception
+20. [V] Icons for gathering effort and gathering perception
+21. Add icon for guild reputation and guild points
+22. Add alchemy potion for knowledge boost

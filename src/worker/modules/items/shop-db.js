@@ -1601,4 +1601,51 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+    gameEntity.registerGameEntity('shop_item_deep_drilling', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Deep Drilling',
+        description: 'Use your water pumps to get better quality of water. Every Water pump level will increase maximum Well level',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('furniture_waterPump') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 1.e+11*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        })
+    })
+
+    gameEntity.registerGameEntity('shop_item_botany_book', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Botany Book',
+        description: 'Learn secrets of growing herbs by combining science and magic',
+        level: 0,
+        maxLevel: 1,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 8000
+        }],
+        unlockCondition: () => {
+            return true
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 1.e+11*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        })
+    })
+
 }

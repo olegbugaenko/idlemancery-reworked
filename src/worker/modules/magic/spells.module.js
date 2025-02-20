@@ -55,7 +55,7 @@ export class SpellModule extends GameModule {
         }
         const sp = gameEntity.getAttribute(id, 'xpOnCast', 0);
 
-        return sp*Math.pow(1.4, level)*gameEffects.getEffectValue('spell_xp_rate')*Math.pow(1.025, gameEffects.getEffectValue('attribute_spell_reading'));
+        return sp*Math.pow(1.4, level)*gameEffects.getEffectValue('spell_xp_rate')*((1 + 0.25*gameEffects.getEffectValue('attribute_spell_reading'))**2);
     }
 
     tick(game, delta) {

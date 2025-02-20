@@ -225,7 +225,7 @@ export const initSpellsDB1 = () => {
         name: 'Less Magic Recovery',
         description: 'Heal yourself using magic',
         hasCap: false,
-        tags: ['spell', 'magic', 'restoration', 'restoration_magic'],
+        tags: ['spell', 'magic', 'recovery', 'restoration_magic'],
         defaultCap: 0,
         isAbstract: true,
         level: 1,
@@ -249,11 +249,12 @@ export const initSpellsDB1 = () => {
                 resources: {
                     health: {
                         A: 1.2,
-                        B: 10*gameEffects.getEffectValue('restoration_spells_efficiency'),
+                        B: 10*gameEffects.getEffectValue('restoration_spells_efficiency')*gameEffects.getEffectValue('recovery_spells_efficiency'),
                         type: 1,
                     }
                 }
-            })
+            }),
+            effectDeps: ['restoration_spells_efficiency','recovery_spells_efficiency']
         },
         attributes: {
             xpOnCast: 20,
@@ -268,7 +269,7 @@ export const initSpellsDB1 = () => {
         name: 'Less Magic Regeneration',
         description: 'Enchant your body for faster recovery',
         hasCap: false,
-        tags: ['spell', 'magic', 'restoration', 'restoration_magic'],
+        tags: ['spell', 'magic', 'recovery', 'restoration_magic'],
         defaultCap: 0,
         isAbstract: true,
         level: 1,
@@ -283,12 +284,12 @@ export const initSpellsDB1 = () => {
                 resources: {
                     health: {
                         A: 1.2,
-                        B: 1.0*gameEffects.getEffectValue('restoration_spells_efficiency'),
+                        B: 1.0*gameEffects.getEffectValue('restoration_spells_efficiency')*gameEffects.getEffectValue('recovery_spells_efficiency'),
                         type: 1,
                     },
                     energy: {
                         A: 1.2,
-                        B: 2*gameEffects.getEffectValue('restoration_spells_efficiency'),
+                        B: 2*gameEffects.getEffectValue('restoration_spells_efficiency')*gameEffects.getEffectValue('recovery_spells_efficiency'),
                         type: 1,
                     }
                 },
@@ -302,7 +303,7 @@ export const initSpellsDB1 = () => {
                     }
                 }
             }),
-            effectDeps: ['restoration_spells_efficiency']
+            effectDeps: ['restoration_spells_efficiency','recovery_spells_efficiency']
         },
         usageGain: {
             get_consumption: () => ({
@@ -328,7 +329,7 @@ export const initSpellsDB1 = () => {
         name: 'Body Catalyst',
         description: 'Use magic to create illusion that you are perfect worker. Increases coins income from jobs',
         hasCap: false,
-        tags: ['spell', 'magic', 'restoration', 'restoration_magic'],
+        tags: ['spell', 'magic', 'enhance', 'restoration_magic'],
         defaultCap: 0,
         isAbstract: true,
         level: 1,
@@ -351,8 +352,8 @@ export const initSpellsDB1 = () => {
             get_consumption: () => ({
                 resources: {
                     mana: {
-                        A: 4.5,
-                        B: 1*getCostReduction('spell_body_catalyst'),
+                        A: 1.5,
+                        B: 12*getCostReduction('spell_body_catalyst'),
                         type: 1,
                     }
                 }
@@ -639,7 +640,7 @@ export const initSpellsDB1 = () => {
                 resources: {
                     mana: {
                         A: 1.5,
-                        B: 125.0*getCostReduction('spell_conjure_water')/1.5,
+                        B: 45.0*getCostReduction('spell_conjure_water')/1.5,
                         type: 1,
                     }
                 }

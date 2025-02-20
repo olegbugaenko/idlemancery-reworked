@@ -300,6 +300,13 @@ export const registerCommomEffects = () => {
         minValue: 1,
     })
 
+
+    gameEffects.registerEffect('recovery_spells_efficiency', {
+        name: 'Recovery Magic Efficiency',
+        defaultValue: 1,
+        minValue: 1,
+    })
+
     gameEffects.registerEffect('illusion_spells_efficiency', {
         name: 'Illusion Magic Efficiency',
         defaultValue: 1,

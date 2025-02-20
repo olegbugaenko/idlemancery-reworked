@@ -468,7 +468,7 @@ export const registerActionsStage1 = () => {
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_strength',
-            level: 1750,
+            level: 8000,
         }],
         attributes: {
             baseXPCost: 100,
@@ -1596,7 +1596,7 @@ export const registerActionsStage1 = () => {
 
 
     registerGameAction('action_learn_anatomy', {
-        tags: ["action", "training", "mental", "book"],
+        tags: ["action", "mental", "book"],
         name: 'Learn Anatomy',
         category: ACTION_CATS.MENTAL,
         isAbstract: false,
@@ -1653,12 +1653,12 @@ export const registerActionsStage1 = () => {
 
 
     registerGameAction('action_learn_geography', {
-        tags: ["action", "training", "mental", "book"],
+        tags: ["action", "mental", "book"],
         name: 'Learn Geography',
         category: ACTION_CATS.MENTAL,
         isAbstract: false,
         allowedImpacts: ['effects'],
-        description: 'Lear geography to find better places of finding natural resources',
+        description: 'Learn geography to find better places of finding natural resources',
         level: 1,
         discountEffects: ['mental_actions_discount'],
         getLearnRate: () => {
@@ -1696,6 +1696,58 @@ export const registerActionsStage1 = () => {
         },
         attributes: {
             baseXPCost: 5000,
+            displayPerLevel: 1,
+            isTraining: true,
+            isRankAvailable: true,
+        }
+    })
+
+
+
+    registerGameAction('action_learn_botany', {
+        tags: ["action", "mental", "book"],
+        name: 'Learn Botany',
+        category: ACTION_CATS.MENTAL,
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Learn secrets of growing plants',
+        level: 1,
+        discountEffects: ['mental_actions_discount'],
+        getLearnRate: () => {
+            return 1.
+        },
+        learningEffects: ['books_learning_rate'],
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'plantations_efficiency': {
+                        A: 0.005*gameEffects.getEffectValue(getRankId('action_learn_geography')),
+                        B: 0.995,
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 400,
+                        type: 0,
+                    },
+                    'knowledge': {
+                        A: 0.0,
+                        B: 320,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['read_books_efficiency']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_botany_book') > 0
+        },
+        attributes: {
+            baseXPCost: 2500000,
             displayPerLevel: 1,
             isTraining: true,
             isRankAvailable: true,
@@ -1760,6 +1812,7 @@ export const registerActionsStage1 = () => {
         tags: ["action", "training", "physical"],
         category: ACTION_CATS.PHYSICAL,
         name: 'Train Endurance',
+        discountEffects: ['physical_actions_discount'],
         isAbstract: false,
         allowedImpacts: ['effects'],
         description: 'Do some exercises in local gym to improve your body',
@@ -1806,6 +1859,7 @@ export const registerActionsStage1 = () => {
         tags: ["action", "training", "physical"],
         category: ACTION_CATS.PHYSICAL,
         name: 'Train Stamina',
+        discountEffects: ['physical_actions_discount'],
         isAbstract: false,
         allowedImpacts: ['effects'],
         description: 'Your improved endurance has unlocked a harder but much more efficient way to train your stamina',
@@ -1857,6 +1911,7 @@ export const registerActionsStage1 = () => {
         tags: ["action", "training", "physical"],
         category: ACTION_CATS.PHYSICAL,
         name: 'Cardio Training',
+        discountEffects: ['physical_actions_discount'],
         isAbstract: false,
         allowedImpacts: ['effects'],
         description: 'Finally, you feel the power in your hands. But still, you feel like you need to train more',
@@ -2731,8 +2786,8 @@ export const registerActionsStage1 = () => {
             get_multiplier: () => ({
                 effects: {
                     'mental_training_learning_rate': {
-                        A: 0.025*gameEffects.getEffectValue(getRankId('action_deep_focus')),
-                        B: 0.975,
+                        A: 0.02*gameEffects.getEffectValue(getRankId('action_deep_focus')),
+                        B: 0.98,
                         type: 0,
                     }
                 }
@@ -2811,7 +2866,7 @@ export const registerActionsStage1 = () => {
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_patience',
-            level: 5000,
+            level: 10000,
         }],
         unlockCondition: () => {
             return true
@@ -3135,7 +3190,7 @@ export const registerActionsStage1 = () => {
             return true
         },
         attributes: {
-            baseXPCost: 50000,
+            baseXPCost: 10000,
             isTraining: true,
             isRankAvailable: true,
         }

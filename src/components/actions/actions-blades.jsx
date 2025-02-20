@@ -14,7 +14,7 @@ import {useTutorial} from "../../context/tutorial-context";
 import {ProgressBar} from "../layout/progress-bar.jsx";
 
 
-export const ActionDetails = ({actionId}) => {
+export const ActionDetails = ({actionId, onClose, isSelected}) => {
 
     const worker = useContext(WorkerContext);
 
@@ -44,11 +44,11 @@ export const ActionDetails = ({actionId}) => {
     if(!actionId || !action) return null;
 
     return (
-        <ActionDetailsComponent {...action} />
+        <ActionDetailsComponent {...action} onClose={onClose} isSelected={isSelected} />
     )
 }
 
-export const ActionDetailsComponent = React.memo(({...action}) => {
+export const ActionDetailsComponent = React.memo(({onClose, isSelected, ...action}) => {
 
     const { stepIndex, unlockNextById } = useTutorial();
 
@@ -66,8 +66,11 @@ export const ActionDetailsComponent = React.memo(({...action}) => {
         <div className={'blade-inner'}>
             <div className={'block'}>
                 <h4 className={'title'}>
-                    <span>{action.name}</span>
-                    <span>{formatInt(action.level, 3)}</span>
+                    <div>
+                        <span>{action.name}</span>
+                        <span>({formatInt(action.level, 3)})</span>
+                    </div>
+                    <span className={'close'} onClick={onClose}>X</span>
                 </h4>
                 <div className={'description'}>
                     {action.description}
@@ -160,6 +163,9 @@ export const ActionDetailsComponent = React.memo(({...action}) => {
                     ))}
                 </div>
             </div>
+            {isSelected ? (<div className={'buttons'}>
+                <button onClick={onClose}>Close</button>
+            </div>) : null}
         </div>
     </PerfectScrollbar>)
 }, (prevProps, currentProps) => {

@@ -1071,6 +1071,55 @@ export const registerFurnitureStage1 = () => {
     })
 
 
+    registerFurniture('furniture_conjuration_magic_circle', {
+        tags: ["furniture", "upgrade", "purchaseable", "magic"],
+        name: 'Conjuration Magic Circle',
+        description: 'Improves your conjuration magic efficiency',
+        level: 0,
+        maxLevel: 4,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_magic_ability',
+            level: 8000
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_less_illusion') > 0;
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'conjuration_spells_efficiency': {
+                        A: 0.25,
+                        B: 1,
+                        type: 0,
+                    }
+                },
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 3,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1.5,
+                B: 1000000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 3,
+                type: 0
+            }
+        }),
+    })
+
+
     registerFurniture('furniture_spirit_crystal', {
         tags: ["furniture", "upgrade", "purchaseable", "magic", "resource", "storage"],
         name: 'Spirit Crystal',
@@ -1432,7 +1481,13 @@ export const registerFurnitureStage1 = () => {
         name: 'Well',
         description: 'Dig well to make watering process more efficient, increasing plants growth rate',
         level: 0,
-        maxLevel: 5,
+        getMaxLevel: () => {
+            let add = 0;
+            if(gameEntity.getLevel('shop_item_deep_drilling') > 0) {
+                add = 2*gameEntity.getLevel('furniture_waterPump')
+            }
+            return 5 + add;
+        },
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_herbalists_handbook') > 0;
         },
@@ -1576,6 +1631,11 @@ export const registerFurnitureStage1 = () => {
                         A: 0.25,
                         B: 1,
                         type: 0,
+                    },
+                    'inventory_red_ink': {
+                        A: 0.25,
+                        B: 1,
+                        type: 0,
                     }
                 },
             },
@@ -1605,7 +1665,7 @@ export const registerFurnitureStage1 = () => {
 
     registerFurniture('furniture_waterPump', {
         tags: ["furniture", "upgrade", "purchaseable", "other", "planting"],
-        name: 'Waterpump',
+        name: 'Water Pump',
         description: 'A powerful machine that allows to supply water to your plantations',
         level: 0,
         unlockCondition: () => {

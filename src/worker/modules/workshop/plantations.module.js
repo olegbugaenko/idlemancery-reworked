@@ -180,7 +180,7 @@ export class PlantationsModule extends GameModule {
             name: entity.name,
             description: entity.description,
             max: gameEntity.getEntityMaxLevel(entity.id),
-            evel: this.purchasedItems[entity.id]?.level || 0,
+            level: this.purchasedItems[entity.id]?.level || 0,
             wateringLevel: this.purchasedItems[entity.id]?.wateringLevel || 0,
             affordable: gameEntity.getAffordable(entity.id),
             potentialEffects: gameEntity.getEffects(entity.id, 1),

@@ -49,6 +49,8 @@ export const Shop = ({}) => {
     const [newUnlocks, setNewUnlocks] = useState({});
 
     useEffect(() => {
+        sendData('query-new-unlocks-notifications', { suffix: 'shop', scope: 'shop' })
+        sendData('query-unlocks', { prefix: 'shop' });
         const interval = setInterval(() => {
             sendData('query-new-unlocks-notifications', { suffix: 'shop', scope: 'shop' })
             sendData('query-unlocks', {});
@@ -58,12 +60,11 @@ export const Shop = ({}) => {
         }
     }, [])
 
-    onMessage('unlocks', (unlocks) => {
+    onMessage('unlocks-shop', (unlocks) => {
         setUnlocksData(unlocks);
     })
 
     onMessage('new-unlocks-notifications-shop', payload => {
-        console.log('Received unlocks: ', payload);
         setNewUnlocks(payload);
     })
 

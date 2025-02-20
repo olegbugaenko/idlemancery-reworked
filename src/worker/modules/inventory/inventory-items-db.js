@@ -818,6 +818,30 @@ export const registerInventoryItems = () => {
     })
 
 
+    registerInventoryItem('inventory_forged_steel', {
+        name: 'Forged Steel',
+        hasCap: false,
+        tags: ['inventory', 'material', 'craftable'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        attributes: {
+
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 7500,
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.isEntityUnlocked('craft_forged_steel')
+        },
+        sellPrice: 560000,
+    })
+
+
     registerInventoryItem('inventory_green_ink', {
         name: 'Green Ink',
         hasCap: false,

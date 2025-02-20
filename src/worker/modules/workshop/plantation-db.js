@@ -23,7 +23,8 @@ export const registerPlant = (id, inventoryResource, incomeBase, costBase, optio
                     [inventoryResource]: {
                         A: incomeBase*gameEffects.getEffectValue('plantations_efficiency')*gameEffects.getEffectValue(getWateringEffectId(id)),
                         B: 0,
-                        type: 0,
+                        C: 1.02,
+                        type: 3,
                     }
                 }
             }),

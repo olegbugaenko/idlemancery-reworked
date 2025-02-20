@@ -483,8 +483,13 @@ p.small-hint, span.small-hint {
 }
 
 .card.action {
-    width: 200px;
+    width: 220px;
 }
+.card.action.selected {
+    border-width: 3px;
+    box-shadow: 0 0 15px #7797d7;
+}
+
 
 .card.action .head p {
     white-space: nowrap;
@@ -885,6 +890,11 @@ h4 {
 .card.action .bottom .xp-text * {
     font-size: 12px;
 }
+
+.action-detail .effects .row:hover {
+    background-color: #222222;
+}
+
 
 .action-lists-panel {
     height: 50px;
@@ -1495,6 +1505,7 @@ h4 {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    margin-right: 8px;
 }
 
 .crafting-wrap .head .space-item span {
@@ -1901,19 +1912,33 @@ span.highlighted-span.yellow {
 }
 
 .map-wrap {
-    height: calc(100% - 40px);;
+    height: calc(100% - 70px);
 }
 
 .map-wrap .head {
-    height: 40px;
+    height: 70px;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.map-wrap .head .other-filters {
+    display: flex;
+    justify-content: space-between;
+    flex: 1;
+    margin-right: 5px;
+}
+
+.map-wrap .head .other-filters .effort-control input {
+    width: 60px;
+    margin: 0 4px;
 }
 
 .map-wrap .head .resources-filter {
     display: flex;
     align-items: center;
+    margin-right: 5px;
 }
 
 .map-wrap .head .resources-filter span {
@@ -2395,4 +2420,12 @@ h4.title span {
 
 .prev-unlock p {
     font-size: 13px;
+}
+
+.detail-blade.ingame-box {
+    padding-right: 4px;
+}
+
+.detail-blade .blade-inner {
+    padding-right: 12px;
 }

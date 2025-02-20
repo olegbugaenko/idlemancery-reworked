@@ -204,8 +204,8 @@ export const registerAccessoriesStage1 = () => {
 
     registerAccessory('accessory_scroll_of_restoration', {
         tags: ["accessory", "upgrade", "purchaseable", "effect", "magic"],
-        name: 'Charm of Restoration Magic',
-        description: 'A delicately folded paper charm shaped like a bird, imbued with restorative magic',
+        name: 'Charm of Recovery Magic',
+        description: 'A delicately folded paper charm shaped like a bird, imbued with recovery magic (NOTE. Not every restoration spell is recovery one)',
         level: 0,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_paper_working') > 0;
@@ -213,7 +213,7 @@ export const registerAccessoriesStage1 = () => {
         resourceModifier: {
             multiplier: {
                 effects: {
-                    'restoration_spells_efficiency': {
+                    'recovery_spells_efficiency': {
                         A: 0.025,
                         B: 1,
                         C: 1.01,
@@ -275,7 +275,7 @@ export const registerAccessoriesStage1 = () => {
             },
             'inventory_nightshade': {
                 A: 1.1,
-                B: 2,
+                B: 12,
                 type: 1
             }
         }),
@@ -319,7 +319,7 @@ export const registerAccessoriesStage1 = () => {
             },
             'inventory_core_duckweed': {
                 A: 1.1,
-                B: 20,
+                B: 200,
                 type: 1
             }
         }),
@@ -397,7 +397,7 @@ export const registerAccessoriesStage1 = () => {
                 B: 2,
                 type: 1
             },
-            'inventory_herbal_fibers': {
+            'inventory_nightshade': {
                 A: 1.1,
                 B: 20,
                 type: 1
@@ -613,7 +613,7 @@ export const registerAccessoriesStage1 = () => {
             multiplier: {
                 resources: {
                     'knowledge': {
-                        A: 0.05,
+                        A: 0.1,
                         B: 1,
                         C: 1.01,
                         type: 3,
@@ -851,7 +851,6 @@ export const registerAccessoriesStage1 = () => {
         level: 0,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_crafting_courses') > 0
-                && gameEntity.isEntityUnlocked('craft_red_ink')
                 && gameResources.isResourceUnlocked('inventory_obsidian_shard')
                 && gameResources.isResourceUnlocked('inventory_green_ink');
         },
@@ -894,7 +893,6 @@ export const registerAccessoriesStage1 = () => {
         level: 0,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_crafting_courses') > 0
-                && gameEntity.isEntityUnlocked('craft_red_ink')
                 && gameResources.isResourceUnlocked('inventory_obsidian_shard');
         },
         resourceModifier: {
@@ -923,6 +921,134 @@ export const registerAccessoriesStage1 = () => {
             'energy': {
                 A: 1.1,
                 B: 25,
+                type: 1
+            }
+        }),
+    })
+
+
+    registerAccessory('accessory_steel_amulet', {
+        tags: ["accessory", "upgrade", "purchaseable", "resource"],
+        name: 'Steel Amulet',
+        description: 'A steel amulet increasing your health regeneration',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0
+                && gameResources.isResourceUnlocked('inventory_forged_steel')
+                && gameResources.isResourceUnlocked('inventory_red_ink');
+        },
+        resourceModifier: {
+            multiplier: {
+                resources: {
+                    'health': {
+                        A: 0.02,
+                        B: 1,
+                        C: 1.01,
+                        type: 3,
+                    }
+                }
+            },
+        },
+        get_cost: () => ({
+            'inventory_forged_steel': {
+                A: 1.1,
+                B: 2,
+                type: 1
+            },
+            'inventory_red_ink': {
+                A: 1.1,
+                B: 5,
+                type: 1
+            },
+            'energy': {
+                A: 1.1,
+                B: 40,
+                type: 1
+            }
+        }),
+    })
+
+    registerAccessory('accessory_steel_hammer', {
+        tags: ["accessory", "upgrade", "purchaseable", "resource"],
+        name: 'Steel Hammer',
+        description: 'Increase stone refinement efficiency',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0
+                && gameResources.isResourceUnlocked('inventory_forged_steel');
+        },
+        resourceModifier: {
+            multiplier: {
+                resources: {
+                    'inventory_sapphire': {
+                        A: 0.02,
+                        B: 1,
+                        C: 1.01,
+                        type: 3,
+                    },
+                    'inventory_ruby': {
+                        A: 0.02,
+                        B: 1,
+                        C: 1.01,
+                        type: 3,
+                    },
+                    'inventory_obsidian_shard': {
+                        A: 0.02,
+                        B: 1,
+                        C: 1.01,
+                        type: 3,
+                    }
+                }
+            },
+        },
+        get_cost: () => ({
+            'inventory_forged_steel': {
+                A: 1.1,
+                B: 2,
+                type: 1
+            },
+            'inventory_refined_wood': {
+                A: 1.1,
+                B: 50,
+                type: 1
+            }
+        }),
+    })
+
+    registerAccessory('accessory_masters_pendant', {
+        tags: ["accessory", "upgrade", "purchaseable", "resource"],
+        name: 'Masters Forge Pendant',
+        description: 'Increase amount of available crafting slots',
+        level: 0,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 12000,
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0
+                && gameResources.isResourceUnlocked('inventory_forged_steel');
+        },
+        resourceModifier: {
+            income: {
+                resources: {
+                    'crafting_slots': {
+                        A: 1,
+                        B: 0,
+                        type: 0,
+                    },
+                }
+            },
+        },
+        get_cost: () => ({
+            'inventory_forged_steel': {
+                A: 2,
+                B: 50,
+                type: 1
+            },
+            'inventory_obsidian_shard': {
+                A: 2,
+                B: 50,
                 type: 1
             }
         }),
