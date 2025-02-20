@@ -488,7 +488,7 @@ export const registerShopItemsStage1 = () => {
         level: 0,
         maxLevel: 1,
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_tent') > 0
+            return gameEntity.getLevel('shop_item_tent') > 2
         },
         attributes: {
             isCollectable: false,
