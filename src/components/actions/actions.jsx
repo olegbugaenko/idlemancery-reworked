@@ -718,8 +718,14 @@ export const ActionCard = ({ id, category, monitored, entityEfficiency, isEditin
                         </div>
                         <div className={'buttons'}>
                             <div className={'buttons-inner-wrap'}>
-                                {isActive ? <button onClick={() => onActivate()}>Stop</button> : <button id={`activate_${id}`} onClick={() => {
+                                {isActive ? <button onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    onActivate()
+                                }}>Stop</button> : <button id={`activate_${id}`} onClick={(e) => {
                                     console.log('RunAction: ', stepIndex)
+                                    e.preventDefault();
+                                    e.stopPropagation();
                                     unlockNextById(8);
                                     onActivate(id)
                                 }}>Start</button> }

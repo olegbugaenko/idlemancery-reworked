@@ -66,7 +66,7 @@ export class MainModule extends GameModule {
         })
 
         this.eventHandler.registerHandler('start-ticking', () => {
-            const cheat = 5;
+            const cheat = 1;
             // const speedUpMode = gameCore.getModule('mage').bankedTime?.speedUpFactor ?? 1;
             // console.log('gameCore', GameCore.instance, speedUpMode);
             gameCore.startTicking(100, () => 0.1*cheat*(gameCore.getModule('mage').bankedTime?.speedUpFactor ?? 1), () => {
@@ -94,6 +94,7 @@ export class MainModule extends GameModule {
                 'world': gameEntity.getLevel('shop_item_map') > 0,
                 'automations': gameEntity.getLevel('shop_item_planner') > 0,
                 'courses': gameEntity.getLevel('shop_item_training_room') > 0,
+                'amplifiers': gameEffects.getEffectValue('attribute_magic_ability') >= 12000,
             }
             let label = 'unlocks';
             if(payload?.prefix) {

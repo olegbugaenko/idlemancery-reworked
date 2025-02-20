@@ -29,7 +29,7 @@ const ACTIONS_SEARCH_SCOPES = [{
     label: 'effects'
 }]
 
-export const AccessoryUpgrades = ({ setItemDetails, purchaseItem, newUnlocks }) => {
+export const AmplifiersUpgrades = ({ setItemDetails, purchaseItem, newUnlocks }) => {
 
     const worker = useContext(WorkerContext);
 
@@ -56,7 +56,7 @@ export const AccessoryUpgrades = ({ setItemDetails, purchaseItem, newUnlocks }) 
 
     useEffect(() => {
         const interval = setInterval(() => {
-            sendData('query-furnitures-data', { filterId: 'accessory' });
+            sendData('query-furnitures-data', { filterId: 'amplifier' });
         }, 100);
         return () => {
             clearInterval(interval);
@@ -77,16 +77,16 @@ export const AccessoryUpgrades = ({ setItemDetails, purchaseItem, newUnlocks }) 
     };
 
     const setSearch = (searchData) => {
-        sendData('set-furniture-search-text', { filterId: 'accessory', searchData: searchData });
+        sendData('set-furniture-search-text', { filterId: 'amplifier', searchData: searchData });
     }
 
     const handlePinToggle = (id, newFlag) => {
-        sendData('toggle-property-custom-filter-pinned', { id, flag: newFlag, filterId: 'accessory' });
+        sendData('toggle-property-custom-filter-pinned', { id, flag: newFlag, filterId: 'amplifier' });
     };
 
 
     const setActionsFilter = (filterId) => {
-        sendData('apply-property-custom-filter', { id: filterId, filterId: 'accessory' })
+        sendData('apply-property-custom-filter', { id: filterId, filterId: 'amplifier' })
     }
 
     const handleEditFilter = (id) => {
@@ -97,7 +97,7 @@ export const AccessoryUpgrades = ({ setItemDetails, purchaseItem, newUnlocks }) 
     };
 
     const handleDeleteFilter = (id) => {
-        sendData('delete-property-custom-filter', { id, filterId: 'accessory' });
+        sendData('delete-property-custom-filter', { id, filterId: 'amplifier' });
     };
 
     const handleAddFilter = () => {
@@ -159,7 +159,7 @@ export const AccessoryUpgrades = ({ setItemDetails, purchaseItem, newUnlocks }) 
                         {editingCustomFilter ? (
                                 <CustomFilter
                                     prefix={'actions-filter'}
-                                    category={'accessory'}
+                                    category={'amplifier'}
                                     id={editingCustomFilter?.id}
                                     name={editingCustomFilter?.name}
                                     rules={editingCustomFilter?.rules}
@@ -169,7 +169,7 @@ export const AccessoryUpgrades = ({ setItemDetails, purchaseItem, newUnlocks }) 
                                     }}
                                     onSave={(data) => {
                                         console.log('saving: ', data)
-                                        sendData('save-property-custom-filter', {...data, filterId: 'accessory'});
+                                        sendData('save-property-custom-filter', {...data, filterId: 'amplifier'});
                                         setEditingCustomFilter(null);
                                     }}
                                 />)

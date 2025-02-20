@@ -1023,7 +1023,7 @@ export const registerAccessoriesStage1 = () => {
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_strength',
-            level: 12000,
+            level: 15000,
         }],
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_crafting_courses') > 0

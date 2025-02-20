@@ -1712,6 +1712,9 @@ export const registerFurnitureStage1 = () => {
         name: 'Paper Cutting Station',
         description: 'A small but complicated mechanism for cutting papers',
         level: 0,
+        getMaxLevel: () => {
+            return 5;
+        },
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_paper_cutting') > 0
         },

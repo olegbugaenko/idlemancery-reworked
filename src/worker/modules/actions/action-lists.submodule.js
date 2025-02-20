@@ -546,6 +546,7 @@ export class ActionListsSubmodule extends GameModule {
             if(!isAvailable) {
                 return;
             }
+            const isEffectChanneling = gameEntity.getAttribute(action.id, 'isEffectChanneling', false);
             const effects = gameEntity.getEffects(action.id, gameEntity.getAttribute(action.id, 'isTraining') ? 1 : 0, gameEntity.getAttribute(action.id, 'isTraining') ? 1 : gameEntity.getLevel(action.id), true, action.time / totalTime);
 
             let learnRateFactor = gameCore.getModule('actions').getLearningRate(action.id) / gameCore.getModule('actions').getActionXPMax(action.id);
@@ -560,12 +561,12 @@ export class ActionListsSubmodule extends GameModule {
                     effToAdd.value *= gameResources.getResource(effToAdd.id).multiplier;
                 }
 
-                if(effToAdd.scope === 'multiplier' && effToAdd.type === 'effects') {
+                if(effToAdd.scope === 'multiplier' && effToAdd.type === 'effects' && !isEffectChanneling) {
                     // we actually adding multiplier
                     effToAdd.value *= learnRateFactor;
                 }
 
-                if(effToAdd.scope === 'income' && effToAdd.type === 'effects') {
+                if(effToAdd.scope === 'income' && effToAdd.type === 'effects' && !isEffectChanneling) {
                     effToAdd.value *= learnRateFactor;
                 }
 

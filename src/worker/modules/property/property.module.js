@@ -4,6 +4,7 @@ import {registerFurnitureStage1} from "./furniture-db";
 import {registerAccessoriesStage1} from "./accessories-db";
 import {SMALL_NUMBER} from "game-framework/src/utils/consts";
 import {cloneDeep} from "lodash";
+import {registerAmplifiersStage1} from "./amplifiers-db";
 
 const DEFAULT_PROPERTY_FILTERS = {
     'all': {
@@ -69,6 +70,44 @@ const DEFAULT_ACCESSORY_FILTERS = {
     }
 }
 
+
+const DEFAULT_AMPLIFIERS_FILTERS = {
+    'all': {
+        id: 'all',
+        condition: '',
+        rules: [],
+        name: 'All',
+        isRequired: true,
+        isPinned: true,
+        sortIndex: 0,
+    },
+    'earth': {
+        id: 'earth',
+        condition: '',
+        rules: [{ type: 'tag', object: 'earth'}],
+        name: 'Earth',
+        isPinned: true,
+        sortIndex: 1,
+    },
+    'water': {
+        id: 'water',
+        condition: '',
+        rules: [{ type: 'tag', object: 'water'}],
+        name: 'Water',
+        isPinned: true,
+        sortIndex: 2,
+    },
+    'air': {
+        id: 'air',
+        condition: '',
+        rules: [{ type: 'tag', object: 'air'}],
+        name: 'Air',
+        isPinned: true,
+        sortIndex: 3,
+    },
+}
+
+
 export class PropertyModule extends GameModule {
 
     constructor() {
@@ -86,16 +125,22 @@ export class PropertyModule extends GameModule {
                 search: '',
                 selectedScopes: ['name']
             },
+            amplifier: {
+                search: '',
+                selectedScopes: ['name']
+            }
         };
         this.autoPurchase = {};
         this.autoPurchaseCd = 0;
         this.customFilters = {
             furniture: cloneDeep(DEFAULT_PROPERTY_FILTERS),
-            accessory: cloneDeep(DEFAULT_ACCESSORY_FILTERS)
+            accessory: cloneDeep(DEFAULT_ACCESSORY_FILTERS),
+            amplifier: cloneDeep(DEFAULT_AMPLIFIERS_FILTERS)
         };
         this.customFiltersOrder = {
             furniture: Object.keys(this.customFilters.furniture),
-            accessory: Object.keys(this.customFilters.accessory)
+            accessory: Object.keys(this.customFilters.accessory),
+            amplifier: Object.keys(this.customFilters.amplifier)
         };
 
         this.eventHandler.registerHandler('actions-change-custom-filters-order', payload => {
@@ -241,7 +286,8 @@ export class PropertyModule extends GameModule {
 
         this.filtersCache = {
             furniture: {},
-            accessory: {}
+            accessory: {},
+            amplifier: {},
         };
     }
 
@@ -255,12 +301,14 @@ export class PropertyModule extends GameModule {
 
         registerFurnitureStage1();
         registerAccessoriesStage1();
+        registerAmplifiersStage1();
 
     }
 
     /* Filters */
 
     generateFilterCache(filterId, id) {
+        console.log('generateFilterCache', filterId, id);
         if(!this.customFilters[filterId][id]) {
             delete this.filtersCache[filterId][id];
         }
@@ -463,6 +511,10 @@ export class PropertyModule extends GameModule {
                 search: '',
                 selectedScopes: ['name']
             },
+            amplifier: {
+                search: '',
+                selectedScopes: ['name']
+            },
         };
         this.autoPurchase = {};
         if(saveObject?.autoPurchase) {
@@ -471,19 +523,39 @@ export class PropertyModule extends GameModule {
 
         this.customFilters = {
             furniture: cloneDeep(DEFAULT_PROPERTY_FILTERS),
-            accessory: cloneDeep(DEFAULT_ACCESSORY_FILTERS)
+            accessory: cloneDeep(DEFAULT_ACCESSORY_FILTERS),
+            amplifier: cloneDeep(DEFAULT_AMPLIFIERS_FILTERS)
         };
         this.customFiltersOrder = {
             furniture: Object.keys(this.customFilters.furniture),
-            accessory: Object.keys(this.customFilters.accessory)
+            accessory: Object.keys(this.customFilters.accessory),
+            amplifier: Object.keys(this.customFilters.amplifier)
         };
         this.selectedFilterId = {};
         if(saveObject?.customFilters) {
-            this.customFilters = saveObject?.customFilters;
+            for(const key in saveObject.customFilters) {
+                if(!['furniture', 'accessory', 'amplifier'].includes(key)) {
+                    delete saveObject.customFilters[key];
+                }
+            }
+            for(const key in saveObject.customFiltersOrder) {
+                if(!['furniture', 'accessory', 'amplifier'].includes(key)) {
+                    delete saveObject.customFiltersOrder[key];
+                }
+            }
+            this.customFilters = {
+                ...this.customFilters,
+                ...saveObject?.customFilters
+            };
             // check if all required are prestnt
             for(const key in this.customFilters) {
                 let isValid = true;
-                const defFlt = key === 'furniture' ? DEFAULT_PROPERTY_FILTERS : DEFAULT_ACCESSORY_FILTERS;
+                const keyMap = {
+                    'furniture': DEFAULT_PROPERTY_FILTERS,
+                    'accessory': DEFAULT_ACCESSORY_FILTERS,
+                    'amplifier': DEFAULT_AMPLIFIERS_FILTERS,
+                }
+                const defFlt = keyMap[key];
                 for(const fltId in defFlt) {
                     if(defFlt[fltId].isRequired && !this.customFilters[key][fltId]) {
                         isValid = false;
@@ -499,15 +571,22 @@ export class PropertyModule extends GameModule {
             }
 
         }
+        console.log('CustomFilters: ', this.customFilters);
         for(const key in this.customFilters) {
             this.generateAllFiltersCache(key);
         }
         if(saveObject?.customFiltersOrder) {
-            this.customFiltersOrder = saveObject.customFiltersOrder;
+            this.customFiltersOrder = {
+                furniture: Object.keys(this.customFilters.furniture),
+                accessory: Object.keys(this.customFilters.accessory),
+                amplifier: Object.keys(this.customFilters.amplifier),
+                ...saveObject.customFiltersOrder
+            };
         } else {
             this.customFiltersOrder = {
                 furniture: Object.keys(this.customFilters.furniture),
-                accessory: Object.keys(this.customFilters.accessory)
+                accessory: Object.keys(this.customFilters.accessory),
+                amplifier: Object.keys(this.customFilters.amplifier)
             };
         }
 
@@ -550,7 +629,7 @@ export class PropertyModule extends GameModule {
 
     regenerateNotifications() {
 
-        ['furniture', 'accessory'].forEach(filter => {
+        ['furniture', 'accessory', 'amplifier'].forEach(filter => {
             // const items = gameEntity.listEntitiesByTags([filter]);
             Object.values(this.customFilters[filter]).forEach(filterData => {
                 const items = gameEntity.listEntitiesByTags([filter]).filter(one => this.filtersCache[filter][filterData.id][one.id]);

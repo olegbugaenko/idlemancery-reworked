@@ -256,18 +256,35 @@ export const registerCommomEffects = () => {
         name: 'Social XP Discount',
         defaultValue: 1.,
         minValue: 1.,
+        saveBalanceTree: true,
     })
 
     gameEffects.registerEffect('physical_actions_discount', {
         name: 'Physical XP Discount',
         defaultValue: 1.,
         minValue: 1.,
+        saveBalanceTree: true,
     })
 
     gameEffects.registerEffect('mental_actions_discount', {
         name: 'Mental XP Discount',
         defaultValue: 1.,
         minValue: 1.,
+        saveBalanceTree: true,
+    })
+
+    gameEffects.registerEffect('magical_actions_discount', {
+        name: 'Magical XP Discount',
+        defaultValue: 1.,
+        minValue: 1.,
+        saveBalanceTree: true,
+    })
+
+    gameEffects.registerEffect('routine_actions_discount', {
+        name: 'Routine XP Discount',
+        defaultValue: 1.,
+        minValue: 1.,
+        saveBalanceTree: true,
     })
 
     gameEffects.registerEffect('courses_learning_speed', {
@@ -315,6 +332,12 @@ export const registerCommomEffects = () => {
 
     gameEffects.registerEffect('conjuration_spells_efficiency', {
         name: 'Conjuration Magic Efficiency',
+        defaultValue: 1,
+        minValue: 1,
+    })
+
+    gameEffects.registerEffect('elemental_spells_efficiency', {
+        name: 'Elemental Magic Efficiency',
         defaultValue: 1,
         minValue: 1,
     })

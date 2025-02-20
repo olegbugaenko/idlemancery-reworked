@@ -611,7 +611,7 @@ export const initSpellsDB1 = () => {
         name: 'Conjure Water',
         description: 'Create a stream of pure water, vital for your herbs',
         hasCap: false,
-        tags: ['spell', 'magic', 'mental', 'conjuration_magic'],
+        tags: ['spell', 'magic', 'mental', 'conjuration_magic','elemental'],
         defaultCap: 0,
         isAbstract: true,
         level: 1,
@@ -631,7 +631,7 @@ export const initSpellsDB1 = () => {
                 resources: {
                     inventory_water: {
                         A: 1.2,
-                        B: 0.2*gameEffects.getEffectValue('conjuration_spells_efficiency'),
+                        B: 0.2*gameEffects.getEffectValue('conjuration_spells_efficiency')*gameEffects.getEffectValue('elemental_spells_efficiency'),
                         type: 1,
                     }
                 }
@@ -645,14 +645,14 @@ export const initSpellsDB1 = () => {
                     }
                 }
             }),
-            effectDeps: ['conjuration_spells_efficiency']
+            effectDeps: ['conjuration_spells_efficiency','elemental_spells_efficiency']
         },
         usageGain: {
             get_consumption: () => ({
                 resources: {
                     mana: {
                         A: 1.5,
-                        B: 80.*getCostReduction('spell_illusory_hammer')/1.5,
+                        B: 80.*getCostReduction('spell_conjure_water')/1.5,
                         type: 1,
                     }
                 }
@@ -673,7 +673,7 @@ export const initSpellsDB1 = () => {
         name: 'Conjure Wood',
         description: 'Create wood without having to use this heavy axe',
         hasCap: false,
-        tags: ['spell', 'magic', 'mental', 'conjuration_magic'],
+        tags: ['spell', 'magic', 'mental', 'conjuration_magic', 'natural'],
         defaultCap: 0,
         isAbstract: true,
         level: 1,
@@ -714,7 +714,7 @@ export const initSpellsDB1 = () => {
                 resources: {
                     mana: {
                         A: 1.5,
-                        B: 80.*getCostReduction('spell_illusory_hammer')/1.5,
+                        B: 80.*getCostReduction('spell_conjure_wood')/1.5,
                         type: 1,
                     }
                 }
@@ -729,5 +729,130 @@ export const initSpellsDB1 = () => {
             return gameEntity.getLevel('shop_item_minor_illusion') > 0
         },
     })
+
+
+    registerSpell('spell_conjure_earth', {
+        name: 'Conjure Earth',
+        description: 'Create a bunch of earth',
+        hasCap: false,
+        tags: ['spell', 'magic', 'mental', 'conjuration_magic','elemental'],
+        defaultCap: 0,
+        isAbstract: true,
+        level: 1,
+        onUse: (amount) => {
+
+        },
+        getUsageCooldown: () => {
+            return 10;
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_magic_ability',
+            level: 15000
+        }],
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    inventory_earth: {
+                        A: 1.2,
+                        B: 0.025*gameEffects.getEffectValue('conjuration_spells_efficiency')*gameEffects.getEffectValue('elemental_spells_efficiency'),
+                        type: 1,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    mana: {
+                        A: 1.5,
+                        B: 60.0*getCostReduction('spell_conjure_earth')/1.5,
+                        type: 1,
+                    }
+                }
+            }),
+            effectDeps: ['conjuration_spells_efficiency','elemental_spells_efficiency']
+        },
+        usageGain: {
+            get_consumption: () => ({
+                resources: {
+                    mana: {
+                        A: 1.5,
+                        B: 120.*getCostReduction('spell_conjure_earth')/1.5,
+                        type: 1,
+                    }
+                }
+            })
+        },
+        attributes: {
+            duration: 20,
+            xpOnCast: 50,
+            baseXPCost: 1.e+8,
+        },
+        unlockCondition: () => {
+            return true
+        },
+    })
+
+
+    registerSpell('spell_conjure_air', {
+        name: 'Conjure Air',
+        description: 'Create an air',
+        hasCap: false,
+        tags: ['spell', 'magic', 'mental', 'conjuration_magic','elemental'],
+        defaultCap: 0,
+        isAbstract: true,
+        level: 1,
+        onUse: (amount) => {
+
+        },
+        getUsageCooldown: () => {
+            return 10;
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_magic_ability',
+            level: 15000
+        }],
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    inventory_air: {
+                        A: 1.2,
+                        B: 0.025*gameEffects.getEffectValue('conjuration_spells_efficiency')*gameEffects.getEffectValue('elemental_spells_efficiency'),
+                        type: 1,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    mana: {
+                        A: 1.5,
+                        B: 60.0*getCostReduction('spell_conjure_air')/1.5,
+                        type: 1,
+                    }
+                }
+            }),
+            effectDeps: ['conjuration_spells_efficiency','elemental_spells_efficiency']
+        },
+        usageGain: {
+            get_consumption: () => ({
+                resources: {
+                    mana: {
+                        A: 1.5,
+                        B: 120.*getCostReduction('spell_conjure_air')/1.5,
+                        type: 1,
+                    }
+                }
+            })
+        },
+        attributes: {
+            duration: 20,
+            xpOnCast: 50,
+            baseXPCost: 1.e+8,
+        },
+        unlockCondition: () => {
+            return true
+        },
+    })
+
 
 }

@@ -142,6 +142,7 @@ export class SpellModule extends GameModule {
                         tags: ['active_spell', 'active_effect'],
                         scope: 'spells',
                         level: saveObject.spells[id].actualLevel,
+                        unlockedBy: undefined,
                     });
                 }
             }
@@ -262,7 +263,8 @@ export class SpellModule extends GameModule {
                     isAbstract: false,
                     level: spell.level,
                     tags: ['active_spell', 'active_effect'],
-                    scope: 'spells'
+                    scope: 'spells',
+                    unlockedBy: undefined,
                 });
 
                 gameEntity.setEntityLevel(`active_${id}`, spell?.level ?? 1);

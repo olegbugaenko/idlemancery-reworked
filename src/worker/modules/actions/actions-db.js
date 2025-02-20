@@ -468,7 +468,7 @@ export const registerActionsStage1 = () => {
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_strength',
-            level: 8000,
+            level: 20000,
         }],
         attributes: {
             baseXPCost: 100,
@@ -1224,6 +1224,7 @@ export const registerActionsStage1 = () => {
         allowedImpacts: ['effects'],
         description: 'Spend some time looking for items, but without many risks',
         level: 1,
+        discountEffects: ["routine_actions_discount"],
         getLearnRate: () => {
             return 1.
         },
@@ -1270,6 +1271,7 @@ export const registerActionsStage1 = () => {
         getLearnRate: () => {
             return 1.
         },
+        discountEffects: ["routine_actions_discount"],
         learningEffects: ['routine_learning_speed'],
         resourceModifier: {
             get_income: () => ({
@@ -1412,6 +1414,7 @@ export const registerActionsStage1 = () => {
             return 1
         },
         learningEffects: ['books_learning_rate'],
+        discountEffects: ['magical_actions_discount'],
         resourceModifier: {
             get_income: () => ({
                 effects: {
@@ -1509,6 +1512,7 @@ export const registerActionsStage1 = () => {
         name: 'Home Errands',
         isAbstract: false,
         allowedImpacts: ['effects'],
+        discountEffects: ["routine_actions_discount"],
         description: 'Clean your house, organize things to free more space for coins storage',
         level: 1,
         getLearnRate: () => {
@@ -1554,6 +1558,7 @@ export const registerActionsStage1 = () => {
         category: ACTION_CATS.ROUTINE,
         isAbstract: false,
         allowedImpacts: ['effects'],
+        discountEffects: ["routine_actions_discount"],
         description: 'Dig underground vaults to store your coins. Its energy consuming action, but can pay off',
         level: 1,
         getLearnRate: () => {
@@ -2302,6 +2307,7 @@ export const registerActionsStage1 = () => {
         category: ACTION_CATS.MAGICAL,
         isAbstract: false,
         allowedImpacts: ['effects'],
+        discountEffects: ['magical_actions_discount'],
         description: 'Use meditative practices to improve your mental abilities',
         level: 1,
         resourceModifier: {
@@ -2406,6 +2412,7 @@ export const registerActionsStage1 = () => {
         name: 'Magic Training',
         isAbstract: false,
         allowedImpacts: ['effects'],
+        discountEffects: ['magical_actions_discount'],
         description: 'Improve your magic capability using practices of ancient monks',
         level: 1,
         resourceModifier: {
@@ -2651,6 +2658,7 @@ export const registerActionsStage1 = () => {
         category: ACTION_CATS.MAGICAL,
         isAbstract: false,
         allowedImpacts: ['effects'],
+        discountEffects: ['magical_actions_discount'],
         description: 'Engage in a deep meditative practice with the Metaphysics Book, sharpening memory and enhancing mana regeneration by channeling profound knowledge and magical focus.',
         level: 1,
         resourceModifier: {
@@ -2767,6 +2775,60 @@ export const registerActionsStage1 = () => {
         }
     })
 
+    registerGameAction('action_routine_mastery', {
+        tags: ["action", "training", "mental"],
+        name: 'Routine Mastery',
+        category: ACTION_CATS.MENTAL,
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Through conscious effort and repetition, you refine your daily habits, making routine tasks feel lighter and more efficient.',
+        level: 1,
+        discountEffects: ['mental_actions_discount'],
+        getLearnRate: () => {
+            return 5.
+        },
+        learningEffects: ['mental_training_learning_rate'],
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'routine_actions_discount': {
+                        A: 0.02*gameEffects.getEffectValue(getRankId('action_routine_mastery')),
+                        B: 0.98,
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 50000,
+                        type: 0,
+                    },
+                    'mental_energy': {
+                        A: 0,
+                        B: 500,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: []
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 25000,
+        }],
+        unlockCondition: () => {
+            return true
+        },
+        attributes: {
+            baseXPCost: 100000000,
+            isTraining: true,
+            isRankAvailable: true,
+        }
+    })
+
 
 
     registerGameAction('action_deep_focus', {
@@ -2866,7 +2928,7 @@ export const registerActionsStage1 = () => {
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_patience',
-            level: 10000,
+            level: 15000,
         }],
         unlockCondition: () => {
             return true
@@ -2946,6 +3008,7 @@ export const registerActionsStage1 = () => {
         name: 'Magic Analysis',
         isAbstract: false,
         allowedImpacts: ['effects'],
+        discountEffects: ['magical_actions_discount'],
         description: 'Finally you achieved that point where your brain allows you to understand the nature of magic. Analyze magic, mana and how its used by spells. Its hard and exhausting task, but totally worth it',
         level: 1,
         resourceModifier: {
@@ -3150,6 +3213,7 @@ export const registerActionsStage1 = () => {
         category: ACTION_CATS.MAGICAL,
         isAbstract: false,
         allowedImpacts: ['effects'],
+        discountEffects: ['magical_actions_discount'],
         description: 'You delve into the world of magical energies, training your mind to interact with forces beyond ordinary understanding. This is not just a practice – it\'s a transformation of consciousness.',
         level: 1,
         getLearnRate: () => {
@@ -3245,7 +3309,7 @@ export const registerActionsStage1 = () => {
             return true
         },
         attributes: {
-            baseXPCost: 500000,
+            baseXPCost: 2500000,
             isTraining: true,
             isRankAvailable: true,
         }
@@ -3307,6 +3371,60 @@ export const registerActionsStage1 = () => {
         attributes: {
             baseXPCost: 500000,
             isTraining: true,
+            isRankAvailable: true,
+        }
+    })
+
+    registerGameAction('action_elemental_channeling', {
+        tags: ["action", "magical", "channeling"],
+        name: 'Elemental Channeling',
+        category: ACTION_CATS.MAGICAL,
+        isAbstract: false,
+        allowedImpacts: ['none'],
+        discountEffects: ['magical_actions_discount'],
+        description: 'Focus your mind and attune yourself to the elemental forces, enhancing the flow of elemental energy and increasing its generation rate.',
+        level: 1,
+        getLearnRate: () => {
+            return 5
+        },
+        learningEffects: [],
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'elemental_spells_efficiency': {
+                        A: 0.005*gameEffects.getEffectValue(getRankId('action_elemental_channeling')),
+                        B: 1.495,
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 5000,
+                        type: 0,
+                    },
+                    'knowledge': {
+                        A: 0.0,
+                        B: 500,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: []
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_magic_ability',
+            level: 10000
+        }],
+        unlockCondition: () => {
+            return true
+        },
+        attributes: {
+            baseXPCost: 2500000,
+            isEffectChanneling: true,
             isRankAvailable: true,
         }
     })

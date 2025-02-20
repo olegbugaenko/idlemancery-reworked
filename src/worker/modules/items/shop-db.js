@@ -1631,7 +1631,7 @@ export const registerShopItemsStage1 = () => {
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_patience',
-            level: 8000
+            level: 10000
         }],
         unlockCondition: () => {
             return true

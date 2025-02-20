@@ -163,7 +163,7 @@ export const Footer = () => {
                         <span>Settings</span>
                     </li>
                     <li className={openedTab === 'about' ? 'active' : ''} onClick={() => openTab('about')}>
-                        <span>v0.0.7d</span>
+                        <span>v0.0.1-closed_beta</span>
                     </li>
                     <li>
                     <span>

@@ -554,7 +554,7 @@ export const registerInventoryItems = () => {
     registerInventoryItem('inventory_water', {
         name: 'Water',
         hasCap: false,
-        tags: ['inventory', 'material'],
+        tags: ['inventory', 'elemental'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -566,10 +566,44 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.isEntityUnlocked('spell_conjure_water')
         },
-        sellPrice: 1600,
-        get_cost: (amount = 1) => ({
-            coins: amount*5000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
-        }),
+        sellPrice: 16000,
+    })
+
+
+    registerInventoryItem('inventory_air', {
+        name: 'Air Element',
+        hasCap: false,
+        tags: ['inventory', 'elemental'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        attributes: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.isEntityUnlocked('spell_conjure_air')
+        },
+        sellPrice: 16000,
+    })
+
+    registerInventoryItem('inventory_earth', {
+        name: 'Earth Element',
+        hasCap: false,
+        tags: ['inventory', 'elemental'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        attributes: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.isEntityUnlocked('spell_conjure_earth')
+        },
+        sellPrice: 16000,
     })
 
     registerInventoryItem('inventory_refined_wood', {

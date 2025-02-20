@@ -459,5 +459,13 @@ export const GeneralStats = ({ stats, aspects }) => {
                 ))}
             </div>
         </div>
+        <div className={'block'}>
+            <p>Learn XP Discounts:</p>
+            <div className={'effects'}>
+                {Object.values(stats?.xpDiscounts || {}).filter(one => hasEffect(one)).map(one => (
+                    <StatRow onHover={highLightAffectedActions} stat={{...one, isMultiplier: true}} />
+                ))}
+            </div>
+        </div>
     </PerfectScrollbar>)
 }

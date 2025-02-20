@@ -475,4 +475,51 @@ export const registerCourseItemsStage1 = () => {
     });
 
 
+    registerCourse('course_magical_focus', {
+        name: 'Magical Focus',
+        tags: ['magical', 'reductive'],
+        attributes: {
+            basicDuration: 130,
+        },
+        level: 0,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_clarity',
+            level: 25
+        },{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 20000
+        }],
+        unlockCondition: () => true,
+        resourceModifier: {
+            get_multiplier: () =>({
+                effects: {
+                    'magical_actions_discount': {
+                        A: 0.2*gameEffects.getEffectValue('reductive_courses_power'),
+                        B: 1,
+                        C: 1.01,
+                        type: 3,
+                    }
+                }
+            }),
+            effectDeps: ['reductive_courses_power']
+        }
+    }, {
+        get_consumption: () => ({
+            resources: {
+                /*'energy': {
+                    A: 1.1,
+                    B: 1000,
+                    type: 1,
+                },*/
+                'mental_energy': {
+                    A: 1.1,
+                    B: 10,
+                    type: 1,
+                }
+            }
+        }),
+    });
+
 }

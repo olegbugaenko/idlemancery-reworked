@@ -576,12 +576,18 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
                         <EffectsSection effects={item.potentialEffects} />
                     </div>
                 </div>) : null}
-                {item.consumptionCooldown ? (
+
                 <div className={'block'}>
-                    <p>Consumption Cooldown: {secondsToString(item.consumptionCooldown)}</p>
-                    <p>Consumed amount: {formatInt(item.numConsumed)}</p>
+                    {item.consumptionCooldown ? (<div>
+                        <p>Consumption Cooldown: {secondsToString(item.consumptionCooldown)}</p>
+                        <p>Consumed amount: {formatInt(item.numConsumed)}</p>
+                    </div>) : null}
+                    {item.isSellable ? (<div>
+                        <p>Sold amount: {formatInt(item.soldAmount)}</p>
+                        <p>Coins Earned: {formatInt(item.coinsEarned)}</p>
+                    </div>) : null}
                 </div>
-                ) : null}
+
                 {item.isConsumable && automationUnlocked ? (<div className={'autoconsume-setting block'}>
                     <div className={'rules-header flex-container'}>
                         <p>Autoconsumption rules: {item.autoconsume?.rules?.length ? null : 'None'}</p>

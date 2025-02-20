@@ -10,6 +10,7 @@ import {ResourceComparison} from "../shared/resource-comparison.jsx";
 import {AccessoryUpgrades} from "./accessories.jsx";
 import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
 import {useUICache} from "../../general/hooks/local-cache";
+import {AmplifiersUpgrades} from "./amplifiers.jsx";
 
 export const Property = ({}) => {
     const [detailOpened, setDetailOpened] = useState(null)
@@ -78,10 +79,16 @@ export const Property = ({}) => {
                                 <span>Accessories</span>
                             </NewNotificationWrap>
                         </li>) : null}
+                        {unlocks.amplifiers ? (<li className={`${selectedTab === 'amplifier' ? 'active' : ''}`} onClick={() => {setSelectedTab('amplifier'); setDetailOpened(null);}}>
+                            <NewNotificationWrap isNew={newUnlocks?.['property']?.items?.['amplifier']?.hasNew}>
+                                <span>Amplifiers</span>
+                            </NewNotificationWrap>
+                        </li>) : null}
                     </ul>
                 </div>
                 {selectedTab === 'furniture' ? (<FurnitureUpgrades setItemDetails={setItemDetails} purchaseItem={purchaseItem} deleteItem={deleteItem} newUnlocks={newUnlocks?.['property']?.items?.['furniture']?.items}/>) : null}
                 {selectedTab === 'accessory' ? (<AccessoryUpgrades setItemDetails={setItemDetails} purchaseItem={purchaseItem} deleteItem={deleteItem} newUnlocks={newUnlocks?.['property']?.items?.['accessory']?.items}/>) : null}
+                {selectedTab === 'amplifier' ? (<AmplifiersUpgrades setItemDetails={setItemDetails} purchaseItem={purchaseItem} deleteItem={deleteItem} newUnlocks={newUnlocks?.['property']?.items?.['amplifier']?.items}/>) : null}
             </div>
 
             <div className={'item-detail ingame-box detail-blade'}>
@@ -103,7 +110,7 @@ export const ItemDetails = ({itemId, category}) => {
     const [item, setDetailOpened] = useState(null);
 
     useEffect(() => {
-        if(category === 'furniture' || category === 'accessory') {
+        if(category === 'furniture' || category === 'accessory' || category === 'amplifier') {
             const interval = setInterval(() => {
                 sendData('query-furniture-details', { id: itemId });
             }, 100);

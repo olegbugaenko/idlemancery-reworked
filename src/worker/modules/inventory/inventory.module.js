@@ -31,6 +31,11 @@ export class InventoryModule extends GameModule {
             name: 'Materials',
             tags: ['material'],
             isDefault: false,
+        },{
+            id: 'elemental',
+            name: 'Elemental',
+            tags: ['elemental'],
+            isDefault: false,
         }]
 
         this.searchData = {};
@@ -322,8 +327,17 @@ export class InventoryModule extends GameModule {
                 };
             }
             this.inventoryItems[id].stockCapacity -= realCons;
+            if(!this.inventoryItems[id].soldAmount) {
+                this.inventoryItems[id].soldAmount = 0;
+            }
+            if(!this.inventoryItems[id].coinsEarned) {
+                this.inventoryItems[id].coinsEarned = 0;
+            }
+            const earnings = realCons*resource.sellPrice*sellPriceMod(gameEffects.getEffectValue('attribute_bargaining'));
             gameResources.addResource(id, -realCons);
-            gameResources.addResource('coins', realCons*resource.sellPrice*sellPriceMod(gameEffects.getEffectValue('attribute_bargaining')));
+            gameResources.addResource('coins', earnings);
+            this.inventoryItems[id].soldAmount += realCons;
+            this.inventoryItems[id].coinsEarned += earnings;
         }
 
         this.sendInventoryData(this.selectedFilterId, {
@@ -505,7 +519,9 @@ export class InventoryModule extends GameModule {
             consumptionCooldown: resource.getUsageCooldown ? resource.getUsageCooldown() : 0,
             permanentEffects,
             potentialPermanentEffects,
-            numConsumed: this.inventoryItems[resource.id]?.numConsumed || 0
+            numConsumed: this.inventoryItems[resource.id]?.numConsumed || 0,
+            soldAmount: this.inventoryItems[resource.id]?.soldAmount || 0,
+            coinsEarned: this.inventoryItems[resource.id]?.coinsEarned || 0,
         }
     }
 

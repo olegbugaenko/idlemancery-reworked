@@ -314,15 +314,20 @@ export class ActionsModule extends GameModule {
         }
     }
 
-    getActionXPMax(id) {
-        const lvl = this.actions[id]?.level ?? 1;
-
+    getDiscount(id) {
         let discFactor = 1.;
         if(gameEntity.getEntity(id).discountEffects?.length) {
             gameEntity.getEntity(id).discountEffects.forEach(effectId => {
                 discFactor /= gameEffects.getEffectValue(effectId);
             })
         }
+        return discFactor;
+    }
+
+    getActionXPMax(id) {
+        const lvl = this.actions[id]?.level ?? 1;
+
+        let discFactor = this.getDiscount(id);
 
         return discFactor*gameEntity.getAttribute(id, 'baseXPCost', 50)*Math.pow(1.01, lvl-1)*(0.8 + 0.2*lvl);
     }
@@ -822,10 +827,12 @@ export class ActionsModule extends GameModule {
             return;
         }
 
+        const isEffectChannel = gameEntity.getAttribute(id, 'isEffectChanneling', false);
+
         const rn = gameEntity.registerGameEntity(`runningAction_${id}`, {
             copyFromId: id,
             level: this.actions[id]?.level ?? 1,
-            allowedImpacts: ['resources'],
+            allowedImpacts: isEffectChannel ? ['effects','resources'] : ['resources'], // need to play around here - if some attribute is present to action: we should allow effects here
             tags: ['running','runningActions'],
             effectFactor: effort,
             unlockedBy: undefined,
@@ -936,7 +943,7 @@ export class ActionsModule extends GameModule {
         const keypoints = this.findNextKeypoints(entity.level, gameEntity.getEntityMaxLevel(id));
         const etaResults = {};
         keypoints.forEach(keypoint => {
-            const eta = this.calculateAnalyticalETA(entity.level, keypoint, entity.attributes.baseXPCost, xpRate, this.actions[id]?.xp);
+            const eta = this.calculateAnalyticalETA(entity.level, keypoint, entity.attributes.baseXPCost*this.getDiscount(id), xpRate, this.actions[id]?.xp);
             etaResults[keypoint] = eta;
         });
         return etaResults;
@@ -1069,6 +1076,12 @@ export class ActionsModule extends GameModule {
                     spiritualLearningRate: gameEffects.getEffect('spiritual_learning_rate'),
                     booksLearningRate: gameEffects.getEffect('books_learning_rate'),
                     mentalActivitiesLearningRate: gameEffects.getEffect('mental_activities_learn_rate')
+                },
+                xpDiscounts: {
+                    physical_actions_discount: gameEffects.getEffect('physical_actions_discount'),
+                    social_actions_discount: gameEffects.getEffect('social_actions_discount'),
+                    mental_actions_discount: gameEffects.getEffect('mental_actions_discount'),
+                    magical_actions_discount: gameEffects.getEffect('magical_actions_discount'),
                 }
             },
             aspects: {
@@ -1113,7 +1126,7 @@ export class ActionsModule extends GameModule {
             max: entity.getMaxLevel ? entity.getMaxLevel() : entity.maxLevel || 0,
             level: this.actions[entity.id]?.level || 1,
             affordable: gameEntity.getAffordable(entity.id),
-            actionEffect: gameEntity.getEffects(entity.id, 0, this.actions[entity.id]?.level || 1, true).filter(eff => eff.type === 'resources'),
+            actionEffect: gameEntity.getEffects(entity.id, 0, this.actions[entity.id]?.level || 1, true).filter(eff => eff.type === 'resources' || entity.attributes.isEffectChanneling),
             potentialEffects: this.packEffects(
                 gameEntity.getEffects(entity.id, 1, this.actions[entity.id]?.level || 1, true),
                 item => item.type === 'effects'
