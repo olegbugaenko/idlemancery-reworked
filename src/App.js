@@ -47,6 +47,7 @@ function App() {
     });
 
     onMessage('loaded', (pl) => {
+        console.log('Loaded received: ', pl);
         setReadyToGo(true);
         if(pl.isReset) {
             console.log('Resetted: ', pl);

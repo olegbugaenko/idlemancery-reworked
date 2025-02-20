@@ -183,7 +183,7 @@ export const registerFurnitureStage1 = () => {
                 resources: {
                     'coins': {
                         A: 75*gameEffects.getEffectValue('urn_storage_bonus'),
-                        B: -75*gameEffects.getEffectValue('urn_storage_bonus'),
+                        B: 0,
                         type: 0,
                     }
                 }

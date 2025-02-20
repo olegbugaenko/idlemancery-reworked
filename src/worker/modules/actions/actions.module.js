@@ -542,6 +542,7 @@ export class ActionsModule extends GameModule {
                         this.reassertRunningEfforts();
                     }
                     gameCore.getModule('unlock-notifications').generateNotifications();
+                    console.log('[SAD]Ticked!')
                     this.sendActionsData(this.selectedFilterId, {
                         searchData: this.searchData,
                     });
@@ -641,13 +642,14 @@ export class ActionsModule extends GameModule {
                 this.customFilters = cloneDeep(DEFAULT_FILTERS);
                 this.selectedFilterId = 'all';
             }
-            this.generateAllFiltersCache();
         }
+        this.generateAllFiltersCache();
         if(saveObject?.customFiltersOrder) {
             this.customFiltersOrder = saveObject.customFiltersOrder;
         } else {
             this.customFiltersOrder = Object.keys(this.customFilters);
         }
+        console.log('[SAD]Loaded!', this.filtersCache, this.selectedFilterId, this.customFilters);
         this.sendActionsData(this.selectedFilterId,{
             searchData: this.searchData,
         });

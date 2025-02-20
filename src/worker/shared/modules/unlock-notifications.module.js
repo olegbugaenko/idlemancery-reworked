@@ -297,7 +297,7 @@ export class UnlockNotificationsModule extends GameModule {
      */
     sendNewUnlocks(payload) {
         const result = this.hasNewNotifications(payload.scope, payload.category, payload.subcategory, payload.id);
-        console.log('NOTS: ', this.notifications, payload, result);
+        // console.log('NOTS: ', this.notifications, payload, result);
         let label = 'new-unlocks-notifications';
         if (payload.suffix) {
             label = `${label}-${payload.suffix}`;
