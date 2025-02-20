@@ -14,6 +14,7 @@ export const Footer = () => {
 
     const worker = useContext(WorkerContext);
 
+
     const { onMessage, sendData } = useWorkerClient(worker);
 
     const { openedTab, setOpenedTab, activePopup, setActivePopup } = useAppContext();
