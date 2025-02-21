@@ -129,7 +129,7 @@ export class InventoryModule extends GameModule {
                     const reserveLimit = Math.floor(
                         Math.max(0, gameResources.getResource(itemId).amount - reserved)
                     );
-                    if(gameResources.getResource(itemId).attributes.allowMultiConsume) {
+                    if(gameResources.getResource(itemId).attributes?.allowMultiConsume) {
                         amount = reserveLimit;
                     }
                     if(amount > 0) {

@@ -327,7 +327,7 @@ export const initSpellsDB1 = () => {
 
     registerSpell('spell_body_catalyst', {
         name: 'Body Catalyst',
-        description: 'Use magic to create illusion that you are perfect worker. Increases coins income from jobs',
+        description: 'Use magic to accelerate physical training. Temporarily increases the learning speed of physical exercises.',
         hasCap: false,
         tags: ['spell', 'magic', 'enhance', 'restoration_magic'],
         defaultCap: 0,
