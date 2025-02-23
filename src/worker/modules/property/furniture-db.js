@@ -1310,7 +1310,7 @@ export const registerFurnitureStage1 = () => {
             },
             'living_space': {
                 A: 0,
-                B: 2,
+                B: 4,
                 type: 0
             }
         }),
