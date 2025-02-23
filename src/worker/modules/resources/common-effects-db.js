@@ -156,12 +156,14 @@ export const registerCommomEffects = () => {
         name: 'Crafting Efficiency',
         defaultValue: 1.,
         minValue: 1.,
+        saveBalanceTree: true,
     })
 
     gameEffects.registerEffect('alchemy_efficiency', {
         name: 'Alchemy Efficiency',
         defaultValue: 1.,
         minValue: 1.,
+        saveBalanceTree: true,
     })
 
     gameEffects.registerEffect('learning_rate', {
@@ -305,6 +307,18 @@ export const registerCommomEffects = () => {
         minValue: 1.,
     })
 
+    gameEffects.registerEffect('max_wells', {
+        name: 'Max Wells',
+        defaultValue: 0.,
+        minValue: 0.,
+    })
+
+    gameEffects.registerEffect('max_wells_per_water_pump', {
+        name: 'Max Wells Per Water Pump',
+        defaultValue: 0.,
+        minValue: 0.,
+    })
+
     gameEffects.registerEffect('spell_xp_rate', {
         name: 'Spell XP Gain',
         defaultValue: 1,
@@ -366,5 +380,29 @@ export const registerCommomEffects = () => {
         defaultValue: 1.,
         minValue: 1,
         hasCap: false,
+    })
+
+    gameEffects.registerEffect('crafting_materials_discount', {
+        name: 'Crafting Materials Discount',
+        defaultValue: 1.,
+        minValue: 1,
+        hasCap: false,
+        saveBalanceTree: true,
+    })
+
+    gameEffects.registerEffect('alchemy_materials_discount', {
+        name: 'Alchemy Materials Discount',
+        defaultValue: 1.,
+        minValue: 1,
+        hasCap: false,
+        saveBalanceTree: true,
+    })
+
+    gameEffects.registerEffect('map_generation_discount', {
+        name: 'Map Generation Discount',
+        defaultValue: 1.,
+        minValue: 1,
+        hasCap: false,
+        saveBalanceTree: true,
     })
 }

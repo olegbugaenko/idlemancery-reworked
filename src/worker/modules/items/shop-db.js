@@ -1613,6 +1613,17 @@ export const registerShopItemsStage1 = () => {
         attributes: {
             isCollectable: false,
         },
+        resourceModifier: {
+            income: {
+                effects: {
+                    max_wells_per_water_pump: {
+                        A: 2,
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            }
+        },
         get_cost: () => ({
             'coins': {
                 A: 2,
@@ -1646,6 +1657,72 @@ export const registerShopItemsStage1 = () => {
                 type: 0
             }
         })
+    })
+
+    // Unlock courses reducing crafting and alchemy upkeeps
+    gameEntity.registerGameEntity('shop_item_advanced_training', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Advanced Training',
+        description: 'Learn best practices from best masters. Unlocks new reductive courses',
+        level: 0,
+        maxLevel: 1,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 40000
+        }],
+        unlockCondition: () => {
+            return true
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 1.e+12*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        })
+    })
+
+
+    gameEntity.registerGameEntity('shop_item_advanced_cartography', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Advanced Cartography',
+        description: 'Further advance your understanding of maps and far expeditions.',
+        level: 0,
+        maxLevel: 10,
+        resourceModifier: {
+            income: {
+                effects: {
+                    max_map_level: {
+                        A: 1,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 60000
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_cartography') > 0
+            //||  gameEntity.getLevel('shop_item_conjuration_magic') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 1.e+12*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
     })
 
 }

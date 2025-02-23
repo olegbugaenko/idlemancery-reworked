@@ -81,6 +81,7 @@ export const registerInventoryItems = () => {
         get_cost: (amount = 1) => ({
             coins: amount*20*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
         }),
+        purchaseRenewRate: 25,
         sellPrice: 5,
         rarity: 0.3,
         allowedTileTypes: ['plain', 'lakes', 'swamp']
@@ -114,6 +115,7 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0
         },
+        purchaseRenewRate: 100,
         sellPrice: 1,
         rarity: 0,
         allowedTileTypes: ['plain', 'forest', 'lakes', 'hills']
@@ -141,6 +143,7 @@ export const registerInventoryItems = () => {
                 }
             })
         },
+        purchaseRenewRate: 100,
         get_cost: (amount = 1) => ({
             coins: amount*5*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
         }),
@@ -606,6 +609,24 @@ export const registerInventoryItems = () => {
         sellPrice: 16000,
     })
 
+    registerInventoryItem('inventory_spark', {
+        name: 'Spark Element',
+        hasCap: false,
+        tags: ['inventory', 'elemental'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        attributes: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.isEntityUnlocked('spell_conjure_spark')
+        },
+        sellPrice: 25000,
+    })
+
     registerInventoryItem('inventory_refined_wood', {
         name: 'Refined Wood',
         hasCap: false,
@@ -669,6 +690,7 @@ export const registerInventoryItems = () => {
         get_cost: (amount = 1) => ({
             coins: amount*6400000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
         }),
+        purchaseRenewRate: 0.1,
     })
 
 
@@ -772,6 +794,7 @@ export const registerInventoryItems = () => {
         get_cost: (amount = 1) => ({
             coins: amount*800000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
         }),
+        purchaseRenewRate: 0.25,
     })
 
 
@@ -799,6 +822,7 @@ export const registerInventoryItems = () => {
         get_cost: (amount = 1) => ({
             coins: amount*1000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
         }),
+        purchaseRenewRate: 0.25,
     })
 
 
@@ -1102,6 +1126,47 @@ export const registerInventoryItems = () => {
                     }
                 }
             },
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0
+        },
+        sellPrice: 15000,
+    })
+
+    registerInventoryItem('inventory_crafting_potion', {
+        name: 'Crafting Potion',
+        hasCap: false,
+        tags: ['inventory', 'consumable'],
+        defaultCap: 0,
+        isAbstract: true,
+        getUsageCooldown: () => {
+            return 60;
+        },
+        onUse: (amount) => {
+
+        },
+        attributes: {
+            duration: 60,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    crafting_efficiency: {
+                        A: 1,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    health: {
+                        A: 100,
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            }
         },
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0

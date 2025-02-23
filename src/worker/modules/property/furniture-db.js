@@ -1259,6 +1259,63 @@ export const registerFurnitureStage1 = () => {
         }),
     })
 
+    registerFurniture('furniture_masterwork_bench', {
+        tags: ["furniture", "upgrade", "purchaseable", "crafting"],
+        name: 'Masterwork Bench',
+        description: 'A massive and meticulously crafted workbench that requires both strength and skill to wield effectively. In the hands of a true master, it turns raw materials into works of perfection, pushing the limits of craftsmanship beyond the ordinary.',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0;
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 30000,
+        }],
+        maxLevel: 5,
+        resourceModifier: {
+            income: {
+                resources: {
+                    'crafting_slots': {
+                        A: 2,
+                        B: 0,
+                        type: 0,
+                    }
+                },
+            },
+            multiplier: {
+                effects: {
+                    crafting_efficiency: {
+                        A: 0.2,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 4,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1.75,
+                B: 2.e+11*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 2,
+                type: 0
+            }
+        }),
+    })
+
     registerFurniture('furniture_masters_table', {
         tags: ["furniture", "upgrade", "purchaseable", "crafting"],
         name: 'Master’s Table',
@@ -1482,11 +1539,7 @@ export const registerFurnitureStage1 = () => {
         description: 'Dig well to make watering process more efficient, increasing plants growth rate',
         level: 0,
         getMaxLevel: () => {
-            let add = 0;
-            if(gameEntity.getLevel('shop_item_deep_drilling') > 0) {
-                add = 2*gameEntity.getLevel('furniture_waterPump')
-            }
-            return 5 + add;
+            return 5 + gameEffects.getEffectValue('max_wells');
         },
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_herbalists_handbook') > 0;
@@ -1672,15 +1725,20 @@ export const registerFurnitureStage1 = () => {
             return gameResources.isResourceUnlocked('inventory_water')
         },
         resourceModifier: {
-            income: {
+            get_income: () => ({
                 effects: {
                     'plantations_max_watering': {
                         A: 1,
                         B: 0,
                         type: 0,
+                    },
+                    'max_wells': {
+                        A: gameEffects.getEffectValue('max_wells_per_water_pump'),
+                        B: 0,
+                        type: 0,
                     }
                 },
-            },
+            }),
             consumption: {
                 resources: {
                     'living_space': {
@@ -1689,7 +1747,8 @@ export const registerFurnitureStage1 = () => {
                         type: 0
                     }
                 }
-            }
+            },
+            effectDeps: ['max_wells_per_water_pump']
         },
         get_cost: () => ({
             'coins': {

@@ -1525,6 +1525,11 @@ h4 {
     min-height: 110px;
 }
 
+.card.craftable.plantable {
+    width: 300px;
+    min-height: 140px;
+}
+
 .card.craftable.running,
 .card.course-card.running {
     box-shadow: 0 0 8px var(--highlight);
@@ -2337,6 +2342,14 @@ span.highlighted-span.yellow {
     color: var(--yellow);
 }
 
+.balance.green {
+    color: #2dfa50;
+}
+
+.balance.yellow {
+    color: var(--yellow);
+}
+
 .block .separated {
     margin-bottom: 8px;
     border-bottom: 1px solid #333333;
@@ -2373,6 +2386,8 @@ span.highlighted-span.yellow {
 
 .watering-settings {
     font-size: 13px;
+    margin-top: 8px;
+    margin-left: 4px;
 }
 
 .watering-settings input {
@@ -2428,4 +2443,12 @@ h4.title span {
 
 .detail-blade .blade-inner {
     padding-right: 12px;
+}
+
+.detail-blade .blade-inner .description {
+    font-size: 13px;
+}
+
+.hint-popup .etas-milestones .flex-row {
+    padding-left: 16px;
 }

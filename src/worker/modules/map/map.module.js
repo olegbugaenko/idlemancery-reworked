@@ -307,6 +307,12 @@ export class MapModule extends GameModule {
                         if(prob > 0.2) {
                             prob = Math.min(0.5, 0.2 + (prob - 0.2) ** 1.5)
                         }
+                        if(isRare && prob > 0.05) {
+                            prob = 0.05 + (prob - 0.05) ** 2;
+                            if(prob > 0.1) {
+                                prob = 0.1;
+                            }
+                        }
                         return {
                             ...d,
                             rarityTier: isRare ? 'rare' : 'common',
@@ -372,7 +378,7 @@ export class MapModule extends GameModule {
             consume: {}
         }
 
-        result.consume['inventory_map_fragment'] = 10*Math.pow(4, level);
+        result.consume['inventory_map_fragment'] = 10*Math.pow(4, level) / gameEffects.getEffectValue('map_generation_discount');
         if(result.consume['inventory_map_fragment'] > gameResources.getResource('inventory_map_fragment').amount) {
             result.isAffordable = false;
         }
@@ -394,6 +400,8 @@ export class MapModule extends GameModule {
         for(const lId in this.lists.mapLists) {
             this.lists.deleteMapTilesList(lId);
         }
+
+        this.highlightResources = {};
 
         this.generateMap(this.mapCreationSettings.level);
     }
@@ -460,7 +468,8 @@ export class MapModule extends GameModule {
                     {...gameEffects.getEffect('gathering_low_chance'), isMultiplier: true},
                     {...gameEffects.getEffect('gathering_herbs_amount'), isMultiplier: true},
                     {...gameResources.getResource('gathering_perception'), isMultiplier: false, value: gameResources.getResource('gathering_perception').amount},
-                    {id: 'perception_effect', name: 'Gathering Perception Effect', value: this.getGatheringPerceptionEffect(), description: 'Multiplier to find probabilities provided by Gathering Perception', isMultiplier: true}
+                    {id: 'perception_effect', name: 'Gathering Perception Effect', value: this.getGatheringPerceptionEffect(), description: 'Multiplier to find probabilities provided by Gathering Perception', isMultiplier: true},
+                    {...gameEffects.getEffect('map_generation_discount'), isMultiplier: true}
                 ].filter(one => ((!one.isMultiplier && (one.value > SMALL_NUMBER)) || (one.isMultiplier && (Math.abs(one.value - 1) > SMALL_NUMBER))))
             }
         }

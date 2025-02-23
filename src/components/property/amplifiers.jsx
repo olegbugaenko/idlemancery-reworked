@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useRef, useState} from "react";
+import React, {useCallback, useContext, useEffect, useRef, useState} from "react";
 import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
 import PerfectScrollbar from "react-perfect-scrollbar";
@@ -84,6 +84,9 @@ export const AmplifiersUpgrades = ({ setItemDetails, purchaseItem, newUnlocks })
         sendData('toggle-property-custom-filter-pinned', { id, flag: newFlag, filterId: 'amplifier' });
     };
 
+    const toggleAutopurchase = useCallback((id, flag) => {
+        sendData('set-furniture-autopurchase', { id, flag, filterId: 'amplifier' })
+    })
 
     const setActionsFilter = (filterId) => {
         sendData('apply-property-custom-filter', { id: filterId, filterId: 'amplifier' })
@@ -194,7 +197,7 @@ export const AmplifiersUpgrades = ({ setItemDetails, purchaseItem, newUnlocks })
             <PerfectScrollbar>
                 <div className={'flex-container'}>
                     {furnituresData.available.map(furniture => <NewNotificationWrap key={furniture.id} id={furniture.id} className={'narrow-wrapper'} isNew={newUnlocks?.[furnituresData.selectedCategory]?.items?.[furniture.id]?.hasNew}>
-                        <ItemCard key={furniture.id} {...furniture} onFlash={handleFlash} onPurchase={purchaseItem} onShowDetails={setItemDetails} />
+                        <ItemCard key={furniture.id} {...furniture} onFlash={handleFlash} onPurchase={purchaseItem} onShowDetails={setItemDetails}  toggleAutopurchase={toggleAutopurchase} isAutomationUnlocked={furnituresData.isAutomationUnlocked}/>
                     </NewNotificationWrap>)}
                     {overlayPositions.map((position, index) => (
                         <FlashOverlay key={index} position={position} />
@@ -205,7 +208,7 @@ export const AmplifiersUpgrades = ({ setItemDetails, purchaseItem, newUnlocks })
     </div></DragDropContext>)
 }
 
-export const ItemCard = ({ id, name, level, max, affordable, isLeveled, isCapped, onFlash, onPurchase, onShowDetails, onDelete}) => {
+export const ItemCard = ({ id, name, level, max, affordable, isLeveled, isCapped, onFlash, onPurchase, onShowDetails, isAutoPurchase, onDelete, toggleAutopurchase, isAutomationUnlocked}) => {
     const elementRef = useRef(null);
 
     useFlashOnLevelUp(isLeveled, onFlash, elementRef);
@@ -218,6 +221,11 @@ export const ItemCard = ({ id, name, level, max, affordable, isLeveled, isCapped
         <div className={'bottom'}>
             <div className={'buttons'}>
                 <button disabled={!affordable.isAffordable || isCapped} onClick={() => onPurchase(id)}>Purchase</button>
+                {isAutomationUnlocked ? (<label className={'autobuy-label'}>
+                    <input type={'checkbox'} checked={isAutoPurchase}
+                           onChange={() => toggleAutopurchase(id, !isAutoPurchase)}/>
+                    Autobuy
+                </label>) : null}
                 {/*<button disabled={level <= 0} onClick={() => onDelete(id)}>Remove</button>*/}
             </div>
         </div>

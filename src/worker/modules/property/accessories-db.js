@@ -1053,4 +1053,44 @@ export const registerAccessoriesStage1 = () => {
             }
         }),
     })
+
+
+    registerAccessory('accessory_expedition_planner', {
+        tags: ["accessory", "upgrade", "purchaseable", "effect", "maps"],
+        name: 'Expedition Planner',
+        description: 'A meticulously crafted toolset used by seasoned explorers to optimize their expeditions, reducing the cost of generating new map layers.',
+        level: 0,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 60000
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_paper_working') > 0;
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'map_generation_discount': {
+                        A: 0.05,
+                        B: 1,
+                        C: 1.005,
+                        type: 3,
+                    }
+                }
+            },
+        },
+        get_cost: () => ({
+            'inventory_paper': {
+                A: 1.1,
+                B: 2000,
+                type: 1
+            },
+            'inventory_forged_steel': {
+                A: 1.1,
+                B: 120,
+                type: 1
+            },
+        }),
+    })
 }

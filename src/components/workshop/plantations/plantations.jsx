@@ -78,7 +78,7 @@ export const Plantations = ({ setItemDetails, newUnlocks }) => {
     </div>)
 }
 
-export const ItemCard = ({ id, icon_id, name, level, maxLevel, affordable, onPurchase, onDemolish, onShowDetails, wateringLevel, isWateringUnlocked, setWateringLevel}) => {
+export const ItemCard = ({ id, icon_id, resourceAmount, resourceBalance , name, level, maxLevel, affordable, onPurchase, onDemolish, onShowDetails, wateringLevel, isWateringUnlocked, setWateringLevel}) => {
 
     return (<div className={`card craftable plantable`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)}>
         <div className={'flex-container two-side-card'}>
@@ -89,6 +89,9 @@ export const ItemCard = ({ id, icon_id, name, level, maxLevel, affordable, onPur
                 <div className={'head'}>
                     <p className={'title'}>{name}</p>
                     <span className={'level'}>{formatInt(level)}{maxLevel ? `/${formatInt(maxLevel)}` : ''}</span>
+                </div>
+                <div className={'mid small-text'}>
+                    <p>You own: {formatValue(resourceAmount)} <span className={`balance ${resourceBalance > 1.e-8 ? 'green' : ''} ${resourceBalance < -1.e-8 ? 'yellow' : ''}`}>({formatValue(resourceBalance, 2, true)})</span></p>
                 </div>
                 {isWateringUnlocked ? (<div className={'watering-settings'}>
                     <label>

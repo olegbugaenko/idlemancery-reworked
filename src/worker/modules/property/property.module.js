@@ -191,7 +191,7 @@ export class PropertyModule extends GameModule {
         })
 
         this.eventHandler.registerHandler('set-furniture-autopurchase', ({ id, flag, filterId }) => {
-            const entities = gameEntity.listEntitiesByTags(['furniture']).filter(one => one.isUnlocked && !one.isCapped);
+            const entities = gameEntity.listEntitiesByTags([filterId]).filter(one => one.isUnlocked && !one.isCapped);
             entities.forEach(e => {
                 if(!id || id === e.id) {
                     this.autoPurchase[e.id] = flag;
@@ -465,7 +465,12 @@ export class PropertyModule extends GameModule {
                             console.log('Furniture '+key+' is capped. Toggling autopurchase');
                             continue;
                         }
-                        const newEnt = this.purchaseFurniture(key, 'furniture', {
+                        let cat = gameEntity.getEntity(key).tags?.includes('accessory') ? 'accessory' : (
+                            gameEntity.getEntity(key).tags?.includes('furniture') ? 'furniture' : (
+                                gameEntity.getEntity(key).tags?.includes('amplifier') ? 'amplifier' : null
+                            )
+                        )
+                        const newEnt = this.purchaseFurniture(key, cat, {
                             isSilent: true,
                         });
                         console.log('Purchase Auto Furniture: ', key, newEnt)

@@ -44,6 +44,7 @@ export const registerPlant = (id, inventoryResource, incomeBase, costBase, optio
         },
         attributes: {
             baseXPCost: 10,
+            inventoryResource,
         },
         get_cost: () => {
 

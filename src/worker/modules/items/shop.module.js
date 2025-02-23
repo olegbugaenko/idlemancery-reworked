@@ -14,7 +14,9 @@ export class ShopModule extends GameModule {
         this.purchaseMultiplier = 1;
         this.autoPurchase = {};
         this.autoPurchaseCd = 0;
+        this.sellStocks = {};
         this.showMaxed = false;
+        this.stockRenewTimer = 0;
         this.eventHandler.registerHandler('set-shop-autopurchase', ({ id, flag }) => {
             const entities = gameEntity.listEntitiesByTags(['shop']).filter(one => one.isUnlocked && !one.isCapped);
             entities.forEach(e => {
@@ -70,6 +72,24 @@ export class ShopModule extends GameModule {
         if(!this.isUnlocked && gameResources.getResource('coins').amount >= 2) {
             this.isUnlocked = true;
         }
+        this.stockRenewTimer += delta;
+        if(this.stockRenewTimer >= 1) {
+            this.stockRenewTimer = 0;
+
+            const items = gameResources.listResourcesByTags(['inventory']);
+            // console.log('items: ', items);
+            const presentItems = items.filter(item => item.isUnlocked && item.get_cost);
+
+            presentItems.forEach(one => {
+                const purchaseRenewRate = one.purchaseRenewRate ?? 1;
+                if(!(one.id in this.sellStocks)) {
+                    this.sellStocks[one.id] = 1000*purchaseRenewRate;
+                }
+                if(this.sellStocks[one.id] < 1000*purchaseRenewRate) {
+                    this.sellStocks[one.id] += 2*purchaseRenewRate;
+                }
+            })
+        }
         this.leveledId = null;
         if(gameEntity.getLevel('shop_item_purchase_manager') > 0) {
             if(!this.autoPurchaseCd) {
@@ -105,6 +125,7 @@ export class ShopModule extends GameModule {
             isUnlocked: this.isUnlocked,
             purchaseMultiplier: this.purchaseMultiplier,
             autoPurchase: this.autoPurchase,
+            sellStocks: this.sellStocks,
         }
     }
 
@@ -121,6 +142,7 @@ export class ShopModule extends GameModule {
         this.isUnlocked = saveObject?.isUnlocked || false;
         this.purchaseMultiplier = saveObject?.purchaseMultiplier || 1;
         this.autoPurchase = saveObject?.autoPurchase || {};
+        this.sellStocks = saveObject?.sellStocks || {};
         this.sendItemsData();
     }
 
@@ -159,13 +181,14 @@ export class ShopModule extends GameModule {
         const aff = resourceCalculators.isAffordable(cost);
 
         console.log('Affb: ', aff);
-        amount = Math.min(amount, aff.max);
+        amount = Math.min(amount, aff.max, (this.sellStocks[itemId] ?? 0));
 
         if(aff.isAffordable) {
             for(const key in cost) {
                 gameResources.addResource(key, -cost[key]*amount);
             }
             gameResources.addResource(itemId, amount);
+            this.sellStocks[itemId] -= amount;
 
             this.leveledId = itemId;
 
@@ -270,14 +293,22 @@ export class ShopModule extends GameModule {
         // console.log('items: ', items);
         const presentItems = items.filter(item => item.isUnlocked && item.get_cost);
 
+        presentItems.forEach(one => {
+            if(!(one.id in this.sellStocks)) {
+                this.sellStocks[one.id] = 1000*(one.purchaseRenewRate ?? 1);
+            }
+        })
+
         return {
             available: presentItems.map(resource => {
                 const affordable = resourceCalculators.isAffordable(resource.get_cost());
+
                 return {
-                ...resource,
+                    ...resource,
+                    stock: this.sellStocks[resource.id],
                     affordable,
                     isLeveled: this.leveledId === resource.id,
-                    purchaseMultiplier: Math.max(1, Math.min(this.purchaseMultiplier, affordable.max)),
+                    purchaseMultiplier: Math.max(1, Math.min(this.purchaseMultiplier, affordable.max, (this.sellStocks[resource.id] ?? 0))),
                 }
             }),
             purchaseMultiplier: this.purchaseMultiplier,
@@ -293,7 +324,7 @@ export class ShopModule extends GameModule {
         if(!id) return null;
         const entity = gameResources.getResource(id);
         const affordable = resourceCalculators.isAffordable(entity.get_cost());
-        const potPurchase = Math.max(1, Math.min(this.purchaseMultiplier, affordable.max));
+        const potPurchase = Math.max(1, Math.min(this.purchaseMultiplier, affordable.max, this.sellStocks[id] ?? 1000**(entity.purchaseRenewRate ?? 1)));
 
         return {
             id: entity.id,

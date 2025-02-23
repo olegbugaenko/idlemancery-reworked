@@ -402,7 +402,7 @@ export const Actions = ({}) => {
     };
 
     const handleApplyFilter = (id) => {
-        sendData('run-actions-custom-filter', { id });
+        sendData('apply-actions-custom-filter', { id });
     };
 
     const handleEditFilter = (id) => {

@@ -1,9 +1,13 @@
-export const formatValue = (number, numDigits = 2) => {
+export const formatValue = (number, numDigits = 2, withSign = false) => {
     if(number == null) {
         number = 0;
     }
     const suffixes = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc', 'UDc', 'DDc', 'TDc', 'QaDc', 'QiDc', 'SxDc', 'SpDc'];
     let sign = '';
+
+    if(withSign && number > 0) {
+        sign = '+';
+    }
 
     if (number < 0) {
         sign = '-';
@@ -48,6 +52,9 @@ export const formatInt = (number, numDigits = 2) => {
 export function secondsToString(seconds) {
     if(seconds > 1.e+12) {
         return 'Never';
+    }
+    if(seconds < 0) {
+        seconds = 0;
     }
     const days = Math.floor(seconds / (24 * 3600));
     seconds %= 24 * 3600;

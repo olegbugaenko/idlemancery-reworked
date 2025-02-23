@@ -54,11 +54,11 @@ export const registerCraftingRecipes = () => {
                     }
                 }
             }),
-            consumption: {
+            get_consumption: ()=>({
                 resources: {
                     'inventory_wood': {
                         A: 1.5,
-                        B: 1,
+                        B: 1/gameEffects.getEffectValue('crafting_materials_discount'),
                         type: 1
                     },
                     'crafting_ability': {
@@ -73,8 +73,8 @@ export const registerCraftingRecipes = () => {
                         ignoreEfficiency: true,
                     },
                 }
-            },
-            effectDeps: ['crafting_efficiency']
+            }),
+            effectDeps: ['crafting_efficiency', 'crafting_materials_discount']
         },
         unlockCondition: () => {
             return true
@@ -110,11 +110,11 @@ export const registerCraftingRecipes = () => {
                     }
                 }
             }),
-            consumption: {
+            get_consumption: ()=>({
                 resources: {
                     'inventory_wood': {
                         A: 1.5,
-                        B: 1,
+                        B: 1/gameEffects.getEffectValue('crafting_materials_discount'),
                         type: 1
                     },
                     'crafting_ability': {
@@ -129,8 +129,8 @@ export const registerCraftingRecipes = () => {
                         ignoreEfficiency: true,
                     },
                 }
-            },
-            effectDeps: ['crafting_efficiency']
+            }),
+            effectDeps: ['crafting_efficiency', 'crafting_materials_discount']
         },
         unlockCondition: () => {
             return gameResources.isResourceUnlocked('inventory_paper')
@@ -166,16 +166,16 @@ export const registerCraftingRecipes = () => {
                     }
                 }
             }),
-            consumption: {
+            get_consumption: ()=>({
                 resources: {
                     'inventory_paper': {
                         A: 1.5,
-                        B: 1,
+                        B: 1/gameEffects.getEffectValue('crafting_materials_discount'),
                         type: 1
                     },
                     mana: {
                         A: 1.5,
-                        B: 40,
+                        B: 40/gameEffects.getEffectValue('crafting_materials_discount'),
                         type: 1,
                     },
                     'crafting_ability': {
@@ -190,8 +190,8 @@ export const registerCraftingRecipes = () => {
                         ignoreEfficiency: true,
                     },
                 }
-            },
-            effectDeps: ['crafting_efficiency']
+            }),
+            effectDeps: ['crafting_efficiency', 'crafting_materials_discount']
         },
         unlockCondition: () => {
             return gameResources.isResourceUnlocked('inventory_enchanted_paper')
@@ -227,16 +227,16 @@ export const registerCraftingRecipes = () => {
                     }
                 }
             }),
-            consumption: {
+            get_consumption: ()=>({
                 resources: {
                     'inventory_ginseng': {
                         A: 1.5,
-                        B: 0.5,
+                        B: 0.5/gameEffects.getEffectValue('crafting_materials_discount'),
                         type: 1
                     },
                     'inventory_aloe_vera': {
                         A: 1.5,
-                        B: 0.5,
+                        B: 0.5/gameEffects.getEffectValue('crafting_materials_discount'),
                         type: 1
                     },
                     'crafting_ability': {
@@ -251,8 +251,8 @@ export const registerCraftingRecipes = () => {
                         ignoreEfficiency: true,
                     },
                 }
-            },
-            effectDeps: ['crafting_efficiency']
+            }),
+            effectDeps: ['crafting_efficiency', 'crafting_materials_discount']
         },
         unlockCondition: () => {
             return true
@@ -288,11 +288,11 @@ export const registerCraftingRecipes = () => {
                     }
                 }
             }),
-            consumption: {
+            get_consumption: ()=>({
                 resources: {
                     'inventory_stone': {
                         A: 1.5,
-                        B: 1,
+                        B: 1/gameEffects.getEffectValue('crafting_materials_discount'),
                         type: 1
                     },
                     'crafting_ability': {
@@ -307,8 +307,8 @@ export const registerCraftingRecipes = () => {
                         ignoreEfficiency: true,
                     },
                 }
-            },
-            effectDeps: ['crafting_efficiency']
+            }),
+            effectDeps: ['crafting_efficiency', 'crafting_materials_discount']
         },
         unlockCondition: () => {
             return gameResources.isResourceUnlocked('inventory_stone')
@@ -344,11 +344,11 @@ export const registerCraftingRecipes = () => {
                     }
                 }
             }),
-            consumption: {
+            get_consumption: ()=>({
                 resources: {
                     'inventory_stone': {
                         A: 1.5,
-                        B: 1,
+                        B: 1/gameEffects.getEffectValue('crafting_materials_discount'),
                         type: 1
                     },
                     'crafting_ability': {
@@ -363,8 +363,8 @@ export const registerCraftingRecipes = () => {
                         ignoreEfficiency: true,
                     },
                 }
-            },
-            effectDeps: ['crafting_efficiency']
+            }),
+            effectDeps: ['crafting_efficiency', 'crafting_materials_discount']
         },
         unlockCondition: () => {
             return gameResources.isResourceUnlocked('inventory_stone')
@@ -405,11 +405,11 @@ export const registerCraftingRecipes = () => {
                     }
                 }
             }),
-            consumption: {
+            get_consumption: ()=>({
                 resources: {
                     'inventory_stone': {
                         A: 1.5,
-                        B: 100,
+                        B: 100/gameEffects.getEffectValue('crafting_materials_discount'),
                         type: 1
                     },
                     'crafting_ability': {
@@ -424,8 +424,8 @@ export const registerCraftingRecipes = () => {
                         ignoreEfficiency: true,
                     },
                 }
-            },
-            effectDeps: ['crafting_efficiency']
+            }),
+            effectDeps: ['crafting_efficiency', 'crafting_materials_discount']
         },
         unlockCondition: () => {
             return gameResources.isResourceUnlocked('inventory_obsidian_shard')
@@ -461,11 +461,11 @@ export const registerCraftingRecipes = () => {
                     }
                 }
             }),
-            consumption: {
+            get_consumption: ()=>({
                 resources: {
                     'inventory_iron_ore': {
                         A: 1.5,
-                        B: 1,
+                        B: 1/gameEffects.getEffectValue('crafting_materials_discount'),
                         type: 1
                     },
                     'crafting_ability': {
@@ -480,8 +480,8 @@ export const registerCraftingRecipes = () => {
                         ignoreEfficiency: true,
                     },
                 }
-            },
-            effectDeps: ['crafting_efficiency']
+            }),
+            effectDeps: ['crafting_efficiency', 'crafting_materials_discount']
         },
         unlockCondition: () => {
             return gameResources.isResourceUnlocked('inventory_iron_ore')
@@ -525,7 +525,7 @@ export const registerCraftingRecipes = () => {
                 resources: {
                     'inventory_iron_plate': {
                         A: 1.5,
-                        B: 0.25,
+                        B: 0.25/gameEffects.getEffectValue('crafting_materials_discount'),
                         type: 1
                     },
                     'crafting_ability': {
@@ -541,7 +541,7 @@ export const registerCraftingRecipes = () => {
                     },
                 }
             },
-            effectDeps: ['crafting_efficiency']
+            effectDeps: ['crafting_efficiency', 'crafting_materials_discount']
         },
         unlockCondition: () => {
             return gameResources.isResourceUnlocked('inventory_iron_ore')
@@ -576,16 +576,16 @@ export const registerCraftingRecipes = () => {
                     }
                 }
             }),
-            consumption: {
+            get_consumption: ()=>({
                 resources: {
                     'inventory_knowledge_moss': {
                         A: 1.5,
-                        B: 6,
+                        B: 6/gameEffects.getEffectValue('crafting_materials_discount'),
                         type: 1
                     },
                     'inventory_golden_algae': {
                         A: 1.5,
-                        B: 6,
+                        B: 6/gameEffects.getEffectValue('crafting_materials_discount'),
                         type: 1
                     },
                     'crafting_ability': {
@@ -600,8 +600,8 @@ export const registerCraftingRecipes = () => {
                         ignoreEfficiency: true,
                     },
                 }
-            },
-            effectDeps: ['crafting_efficiency']
+            }),
+            effectDeps: ['crafting_efficiency', 'crafting_materials_discount']
         },
         unlockCondition: () => {
             return gameResources.isResourceUnlocked('inventory_green_ink')
@@ -637,16 +637,16 @@ export const registerCraftingRecipes = () => {
                     }
                 }
             }),
-            consumption: {
+            get_consumption: ()=>({
                 resources: {
                     'inventory_ember_leaf': {
                         A: 1.5,
-                        B: 2,
+                        B: 2/gameEffects.getEffectValue('crafting_materials_discount'),
                         type: 1
                     },
                     'inventory_harmony_blossom': {
                         A: 1.5,
-                        B: 2,
+                        B: 2/gameEffects.getEffectValue('crafting_materials_discount'),
                         type: 1
                     },
                     'crafting_ability': {
@@ -661,8 +661,8 @@ export const registerCraftingRecipes = () => {
                         ignoreEfficiency: true,
                     },
                 }
-            },
-            effectDeps: ['crafting_efficiency']
+            }),
+            effectDeps: ['crafting_efficiency', 'crafting_materials_discount']
         },
         unlockCondition: () => {
             return gameResources.isResourceUnlocked('inventory_red_ink')
@@ -697,16 +697,16 @@ export const registerCraftingRecipes = () => {
                     }
                 }
             }),
-            consumption: {
+            get_consumption: ()=>({
                 resources: {
                     'inventory_paper': {
                         A: 1.5,
-                        B: 6,
+                        B: 6/gameEffects.getEffectValue('crafting_materials_discount'),
                         type: 1
                     },
                     'inventory_green_ink': {
                         A: 1.5,
-                        B: 1/1.5,
+                        B: (1/1.5)/gameEffects.getEffectValue('crafting_materials_discount'),
                         type: 1
                     },
                     'crafting_ability': {
@@ -721,8 +721,8 @@ export const registerCraftingRecipes = () => {
                         ignoreEfficiency: true,
                     },
                 }
-            },
-            effectDeps: ['crafting_efficiency']
+            }),
+            effectDeps: ['crafting_efficiency', 'crafting_materials_discount']
         },
         unlockCondition: () => {
             return gameResources.isResourceUnlocked('inventory_map_fragment')
@@ -752,7 +752,7 @@ export const registerCraftingRecipes = () => {
         level: 1,
         resourceId: 'inventory_small_endurance_flask',
         resourceModifier: {
-            income: {
+            get_income: () => ({
                 resources: {
                     'inventory_small_endurance_flask': {
                         A: 1.3,
@@ -760,8 +760,8 @@ export const registerCraftingRecipes = () => {
                         type: 1,
                     }
                 }
-            },
-            consumption: {
+            }),
+            get_consumption: ()=>({
                 resources: {
                     'inventory_ginseng': {
                         A: 1.5,
@@ -785,8 +785,8 @@ export const registerCraftingRecipes = () => {
                         ignoreEfficiency: true,
                     },
                 }
-            },
-            effectDeps: ['alchemy_efficiency']
+            }),
+            effectDeps: ['alchemy_efficiency','alchemy_materials_discount']
         },
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_alchemy_courses') > 0
@@ -813,7 +813,7 @@ export const registerCraftingRecipes = () => {
         level: 1,
         resourceId: 'inventory_healing_potion',
         resourceModifier: {
-            income: {
+            get_income: ()=>({
                 resources: {
                     'inventory_healing_potion': {
                         A: 1.3,
@@ -821,8 +821,8 @@ export const registerCraftingRecipes = () => {
                         type: 1,
                     }
                 }
-            },
-            consumption: {
+            }),
+            get_consumption: ()=>({
                 resources: {
                     'inventory_aloe_vera': {
                         A: 1.5,
@@ -846,8 +846,8 @@ export const registerCraftingRecipes = () => {
                         ignoreEfficiency: true,
                     },
                 }
-            },
-            effectDeps: ['alchemy_efficiency']
+            }),
+            effectDeps: ['alchemy_efficiency','alchemy_materials_discount']
         },
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_alchemy_courses') > 0
@@ -875,7 +875,7 @@ export const registerCraftingRecipes = () => {
         level: 1,
         resourceId: 'inventory_experience_potion',
         resourceModifier: {
-            income: {
+            get_income: ()=>({
                 resources: {
                     'inventory_experience_potion': {
                         A: 1.3,
@@ -883,8 +883,8 @@ export const registerCraftingRecipes = () => {
                         type: 1,
                     }
                 }
-            },
-            consumption: {
+            }),
+            get_consumption: ()=>({
                 resources: {
                     'inventory_nightshade': {
                         A: 1.5,
@@ -908,8 +908,8 @@ export const registerCraftingRecipes = () => {
                         ignoreEfficiency: true,
                     },
                 }
-            },
-            effectDeps: ['alchemy_efficiency']
+            }),
+            effectDeps: ['alchemy_efficiency','alchemy_materials_discount']
         },
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_alchemy_courses') > 0
@@ -935,7 +935,7 @@ export const registerCraftingRecipes = () => {
         level: 1,
         resourceId: 'inventory_insight_potion',
         resourceModifier: {
-            income: {
+            get_income: () => ({
                 resources: {
                     'inventory_insight_potion': {
                         A: 1.3,
@@ -943,8 +943,8 @@ export const registerCraftingRecipes = () => {
                         type: 1,
                     }
                 }
-            },
-            consumption: {
+            }),
+            get_consumption: ()=>({
                 resources: {
                     'inventory_knowledge_moss': {
                         A: 1.5,
@@ -968,8 +968,8 @@ export const registerCraftingRecipes = () => {
                         ignoreEfficiency: true,
                     },
                 }
-            },
-            effectDeps: ['alchemy_efficiency']
+            }),
+            effectDeps: ['alchemy_efficiency','alchemy_materials_discount']
         },
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_alchemy_courses') > 0
@@ -996,7 +996,7 @@ export const registerCraftingRecipes = () => {
         level: 1,
         resourceId: 'inventory_amnesia_potion',
         resourceModifier: {
-            income: {
+            get_income: ()=>({
                 resources: {
                     'inventory_amnesia_potion': {
                         A: 1.3,
@@ -1004,8 +1004,8 @@ export const registerCraftingRecipes = () => {
                         type: 1,
                     }
                 }
-            },
-            consumption: {
+            }),
+            get_consumption: ()=>({
                 resources: {
                     'inventory_nightshade': {
                         A: 1.5,
@@ -1029,11 +1029,72 @@ export const registerCraftingRecipes = () => {
                         ignoreEfficiency: true,
                     },
                 }
-            },
-            effectDeps: ['alchemy_efficiency']
+            }),
+            effectDeps: ['alchemy_efficiency','alchemy_materials_discount']
         },
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_alchemy_courses') > 0
+        },
+        attributes: {
+            baseXPCost: 10,
+        },
+        get_cost: () => ({
+            'alchemy_slots': {
+                A: 1,
+                B: 0,
+                type: 0
+            }
+        }),
+    })
+
+
+    registerCraftingRecipe('craft_crafting_potion', {
+        tags: ["recipe", "crafting", "alchemy", "physical"],
+        name: 'Crafting Potion',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Dangerous and toxic but still powerful elixir providing boost to your crafting efficiency',
+        level: 1,
+        resourceId: 'inventory_crafting_potion',
+        resourceModifier: {
+            get_income: ()=>({
+                resources: {
+                    'inventory_crafting_potion': {
+                        A: 1.3,
+                        B: 0.05*gameEffects.getEffectValue('alchemy_efficiency'),
+                        type: 1,
+                    }
+                }
+            }),
+            get_consumption: ()=>({
+                resources: {
+                    'inventory_ember_leaf': {
+                        A: 1.5,
+                        B: 5,
+                        type: 1
+                    },
+                    'inventory_fly_mushroom': {
+                        A: 1.5,
+                        B: 500,
+                        type: 1
+                    },
+                    'alchemy_ability': {
+                        A: 1.5,
+                        B: 8./1.5,
+                        type: 1,
+                    },
+                    'alchemy_slots': {
+                        A: 1,
+                        B: 0,
+                        type: 0,
+                        ignoreEfficiency: true,
+                    },
+                }
+            }),
+            effectDeps: ['alchemy_efficiency','alchemy_materials_discount']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_alchemy_courses') > 0 && gameResources.isResourceUnlocked('inventory_ember_leaf')
         },
         attributes: {
             baseXPCost: 10,

@@ -325,7 +325,7 @@ export const ItemCard = ({ id, name, level, max, affordable, isLeveled, isCapped
     </div> )
 }
 
-export const ItemResourceCard = ({ id, name, purchaseMultiplier, level, max, amount, affordable, isLeveled, onFlash, onPurchase, onShowDetails}) => {
+export const ItemResourceCard = ({ id, name, purchaseMultiplier, stock, level, max, amount, affordable, isLeveled, onFlash, onPurchase, onShowDetails}) => {
 
     const elementRef = useRef(null);
 
@@ -339,6 +339,7 @@ export const ItemResourceCard = ({ id, name, purchaseMultiplier, level, max, amo
             </div>}>
             <div className={'icon-content'}>
                 <img src={`icons/resources/${id}.png`} className={'resource'} />
+                <span className={'level'}>{formatValue(stock)}</span>
             </div>
         </TippyWrapper>
 

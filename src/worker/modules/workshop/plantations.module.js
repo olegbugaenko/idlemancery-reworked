@@ -158,7 +158,9 @@ export class PlantationsModule extends GameModule {
                 affordable: gameEntity.getAffordable(entity.id),
                 potentialEffects: gameEntity.getEffects(entity.id, 1),
                 isLeveled: this.leveledId === entity.id,
-                wateringMult: gameEffects.getEffectValue(getWateringEffectId(entity.id))
+                wateringMult: gameEffects.getEffectValue(getWateringEffectId(entity.id)),
+                resourceAmount: gameResources.getResource(gameEntity.getAttribute(entity.id, 'inventoryResource'))?.amount,
+                resourceBalance: gameResources.getResource(gameEntity.getAttribute(entity.id, 'inventoryResource'))?.balance,
             })),
             slots,
             isWateringUnlocked: gameResources.isResourceUnlocked('inventory_water'),

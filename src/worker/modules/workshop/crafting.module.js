@@ -178,6 +178,7 @@ export class CraftingModule extends GameModule {
             level: this.craftingSlots[recipe.id]?.level || 0,
             maxLevel: rrs.amount + (this.craftingSlots[recipe.id]?.level || 0),
             resourceAmount: gameResources.getResource(recipe.resourceId)?.amount,
+            resourceBalance: gameResources.getResource(recipe.resourceId)?.balance,
             isRunning: gameEntity.entityExists(`activeCrafting_${recipe.id}`),
             isLowerEfficiency: gameEntity.entityExists(`activeCrafting_${recipe.id}`) && gameEntity.getEntity(`activeCrafting_${recipe.id}`).modifier?.efficiency < 1 - SMALL_NUMBER
         }));
@@ -239,12 +240,23 @@ export class CraftingModule extends GameModule {
     sendGeneralData(category_id) {
         const rs = category_id === 'crafting' ? 'crafting_ability' : 'alchemy_ability';
         const sl = category_id === 'crafting' ? 'crafting_slots' : 'alchemy_slots';
+        let stats = {}
+        if(category_id === 'crafting') {
+            stats = {
+                crafting_efficiency: {...gameEffects.getEffect('crafting_efficiency'), isMultiplier: true},
+                crafting_materials_discount: {...gameEffects.getEffect('crafting_materials_discount'), isMultiplier: true},
+            }
+        }
+        if(category_id === 'alchemy') {
+            stats = {
+                alchemy_efficiency: {...gameEffects.getEffect('alchemy_efficiency'), isMultiplier: true},
+                alchemy_materials_discount: {...gameEffects.getEffect('alchemy_materials_discount'), isMultiplier: true},
+            }
+        }
         const data = {
             isProducingEffort: gameResources.getResource(rs).income > SMALL_NUMBER,
             hasSlots: gameResources.getResource(sl).income > SMALL_NUMBER,
-            stats: {
-
-            }
+            stats
         }
         this.eventHandler.sendData('crafting-general-data', data);
     }

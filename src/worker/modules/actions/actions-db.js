@@ -1606,7 +1606,7 @@ export const registerActionsStage1 = () => {
         category: ACTION_CATS.MENTAL,
         isAbstract: false,
         allowedImpacts: ['effects'],
-        description: 'Lear anatomy to better understand your body and improve your energy and health regeneration',
+        description: 'Learn anatomy to better understand your body and improve your energy and health regeneration',
         level: 1,
         discountEffects: ['mental_actions_discount'],
         getLearnRate: () => {
@@ -1766,7 +1766,7 @@ export const registerActionsStage1 = () => {
         category: ACTION_CATS.MENTAL,
         isAbstract: false,
         allowedImpacts: ['effects'],
-        description: 'Lear ancient languages to increase book reading related XP',
+        description: 'Learn ancient languages to increase book reading related XP',
         level: 1,
         getLearnRate: () => 1,
         discountEffects: ['mental_actions_discount'],
@@ -2600,6 +2600,58 @@ export const registerActionsStage1 = () => {
         },
         attributes: {
             baseXPCost: 500,
+            primaryAttribute: 'attribute_strength'
+        }
+    })
+
+
+    registerGameAction('masterwork_craft', {
+        tags: ["action", "activity", "physical", "crafting"],
+        name: 'Masterwork Craft',
+        category: ACTION_CATS.OTHER,
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'A test of endurance, skill, and precision—Masterwork Crafting pushes the limits of craftsmanship, demanding immense physical and mental effort.',
+        level: 1,
+        getLearnRate: () => {
+            return 2
+        },
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'crafting_ability': {
+                        A: 0.02,
+                        B: 0.18,
+                        type: 0,
+                    },
+                },
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 120,
+                        type: 0,
+                    },
+                    'health': {
+                        A: 0.0,
+                        B: 40,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: []
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 40000,
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0
+        },
+        attributes: {
+            baseXPCost: 100000,
             primaryAttribute: 'attribute_strength'
         }
     })

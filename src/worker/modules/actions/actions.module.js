@@ -182,6 +182,7 @@ export class ActionsModule extends GameModule {
                 eff = gameEntity.getEntityEfficiency(`runningAction_${payload.id}`);
             }
             const breakdowns = this.getLearningRate(payload.id, eff, true);
+            breakdowns.nextEtas = this.getEtasNext(payload.id);
             this.eventHandler.sendData(`action-xp-breakdown-${payload.id}`, breakdowns);
         })
 
@@ -939,10 +940,27 @@ export class ActionsModule extends GameModule {
         return [...new Set(keypoints)].sort((a, b) => a - b);
     }
 
+    findNextRankAndLvl(currentLvl, max) {
+        let keypoints = [currentLvl+1, 100*Math.floor((currentLvl + 100) / 100)].filter(one => !max || one <= max);
+        return keypoints;
+    }
+
     getEtas(id) {
         const entity = gameEntity.getEntity(id);
         const xpRate = this.isRunningAction(entity.id) ? this.getLearningRate(`runningAction_${entity.id}`) : this.getLearningRate(entity.id, 1);
         const keypoints = this.findNextKeypoints(entity.level, gameEntity.getEntityMaxLevel(id));
+        const etaResults = {};
+        keypoints.forEach(keypoint => {
+            const eta = this.calculateAnalyticalETA(entity.level, keypoint, entity.attributes.baseXPCost*this.getDiscount(id), xpRate, this.actions[id]?.xp);
+            etaResults[keypoint] = eta;
+        });
+        return etaResults;
+    }
+
+    getEtasNext(id) {
+        const entity = gameEntity.getEntity(id);
+        const xpRate = this.isRunningAction(entity.id) ? this.getLearningRate(`runningAction_${entity.id}`) : this.getLearningRate(entity.id, 1);
+        const keypoints = this.findNextRankAndLvl(entity.level, gameEntity.getEntityMaxLevel(id));
         const etaResults = {};
         keypoints.forEach(keypoint => {
             const eta = this.calculateAnalyticalETA(entity.level, keypoint, entity.attributes.baseXPCost*this.getDiscount(id), xpRate, this.actions[id]?.xp);
@@ -1049,6 +1067,7 @@ export class ActionsModule extends GameModule {
             isHidden: this.actions?.[entity.id]?.isHidden,
             monitored: this.getMonitoredData(entity),
             missingResourceId: this.isRunningAction(entity.id) && gameEntity.getEntityEfficiency(`runningAction_${entity.id}`) < 1 ? gameEntity.getEntity(`runningAction_${entity.id}`)?.modifier?.bottleNeck : null,
+            // nextEtas: this.getEtasNext(entity.id)
         }))
 
         const current = this.activeActions ? available.filter(one => this.activeActions.some(act => act.originalId === one.id)) : null;

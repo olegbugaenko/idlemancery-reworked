@@ -522,4 +522,83 @@ export const registerCourseItemsStage1 = () => {
         }),
     });
 
+
+    registerCourse('course_crafting_economy', {
+        name: 'Crafting Optimization',
+        tags: ['magical', 'reductive'],
+        description: 'Mastering the art of resource management, this course teaches how to minimize material waste and maximize output, making every crafted piece more cost-effective.',
+        attributes: {
+            basicDuration: 240,
+        },
+        level: 0,
+        unlockCondition: () => gameEntity.getLevel('shop_item_advanced_training') > 0,
+        resourceModifier: {
+            get_multiplier: () =>({
+                effects: {
+                    'crafting_materials_discount': {
+                        A: 0.025*gameEffects.getEffectValue('reductive_courses_power'),
+                        B: 1,
+                        C: 1.01,
+                        type: 3,
+                    }
+                }
+            }),
+            effectDeps: ['reductive_courses_power']
+        }
+    }, {
+        get_consumption: () => ({
+            resources: {
+                /*'energy': {
+                    A: 1.1,
+                    B: 1000,
+                    type: 1,
+                },*/
+                'mental_energy': {
+                    A: 1.1,
+                    B: 100,
+                    type: 1,
+                }
+            }
+        }),
+    });
+
+    registerCourse('course_alchemy_economy', {
+        name: 'Alchemy Optimization',
+        tags: ['magical', 'reductive'],
+        description: 'A deep dive into the refined techniques of potion-making, allowing alchemists to extract the full potential of ingredients while reducing unnecessary expenditure.',
+        attributes: {
+            basicDuration: 240,
+        },
+        level: 0,
+        unlockCondition: () => gameEntity.getLevel('shop_item_advanced_training') > 0,
+        resourceModifier: {
+            get_multiplier: () =>({
+                effects: {
+                    'alchemy_materials_discount': {
+                        A: 0.025*gameEffects.getEffectValue('reductive_courses_power'),
+                        B: 1,
+                        C: 1.01,
+                        type: 3,
+                    }
+                }
+            }),
+            effectDeps: ['reductive_courses_power']
+        }
+    }, {
+        get_consumption: () => ({
+            resources: {
+                /*'energy': {
+                    A: 1.1,
+                    B: 1000,
+                    type: 1,
+                },*/
+                'mental_energy': {
+                    A: 1.1,
+                    B: 100,
+                    type: 1,
+                }
+            }
+        }),
+    });
+
 }

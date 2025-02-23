@@ -2,7 +2,7 @@ import React, {useContext, useEffect, useState} from "react";
 import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
 import {BreakDown} from "../layout/sidebar.jsx";
-import {formatValue} from "../../general/utils/strings";
+import {formatInt, formatValue, secondsToString} from "../../general/utils/strings";
 
 export const ActionXPBreakdown = ({ id }) => {
 
@@ -12,6 +12,7 @@ export const ActionXPBreakdown = ({ id }) => {
     const [breakdowns, setBreakdowns] = useState({
         breakDowns: {},
         total: 0,
+        nextEtas: {}
     });
 
     // const [filterId, setFilterId] = useState('all');
@@ -41,5 +42,14 @@ export const ActionXPBreakdown = ({ id }) => {
                 </div>
             </div> ))
         ) : null}
+        <div className={'block etas-milestones'}>
+            <p>Level Milestones:</p>
+            {Object.entries(breakdowns.nextEtas || {}).map(([level, time]) => {
+                return (<div className={'flex-row'}>
+                    <span>Level {formatInt(level)}:</span>
+                    <span>{secondsToString(time)}</span>
+                </div> )
+            })}
+        </div>
     </div> )
 }

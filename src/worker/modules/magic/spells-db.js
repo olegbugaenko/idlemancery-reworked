@@ -693,7 +693,7 @@ export const initSpellsDB1 = () => {
                 resources: {
                     inventory_wood: {
                         A: 1.2,
-                        B: 0.2*gameEffects.getEffectValue('conjuration_spells_efficiency'),
+                        B: 2000*gameEffects.getEffectValue('conjuration_spells_efficiency'),
                         type: 1,
                     }
                 }
@@ -839,6 +839,68 @@ export const initSpellsDB1 = () => {
                     mana: {
                         A: 1.5,
                         B: 120.*getCostReduction('spell_conjure_air')/1.5,
+                        type: 1,
+                    }
+                }
+            })
+        },
+        attributes: {
+            duration: 20,
+            xpOnCast: 50,
+            baseXPCost: 1.e+8,
+        },
+        unlockCondition: () => {
+            return true
+        },
+    })
+
+
+    registerSpell('spell_conjure_spark', {
+        name: 'Conjure Spark',
+        description: 'Create a spark',
+        hasCap: false,
+        tags: ['spell', 'magic', 'mental', 'conjuration_magic','elemental'],
+        defaultCap: 0,
+        isAbstract: true,
+        level: 1,
+        onUse: (amount) => {
+
+        },
+        getUsageCooldown: () => {
+            return 10;
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_magic_ability',
+            level: 60000
+        }],
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    inventory_spark: {
+                        A: 1.2,
+                        B: 0.005*gameEffects.getEffectValue('conjuration_spells_efficiency')*gameEffects.getEffectValue('elemental_spells_efficiency'),
+                        type: 1,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    mana: {
+                        A: 1.5,
+                        B: 60.0*getCostReduction('spell_conjure_air')/1.5,
+                        type: 1,
+                    }
+                }
+            }),
+            effectDeps: ['conjuration_spells_efficiency','elemental_spells_efficiency']
+        },
+        usageGain: {
+            get_consumption: () => ({
+                resources: {
+                    mana: {
+                        A: 1.5,
+                        B: 120.*getCostReduction('spell_conjure_spark')/1.5,
                         type: 1,
                     }
                 }

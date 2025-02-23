@@ -99,7 +99,7 @@ export const Crafting = ({ setItemDetails, setItemLevel, filterId, newUnlocks, o
     </div>)
 }
 
-export const ItemCard = ({ id, icon_id, isRunning, isLowerEfficiency, name, level, resourceAmount, maxLevel, onSetLevel, onShowDetails, addItemToList}) => {
+export const ItemCard = ({ id, icon_id, isRunning, isLowerEfficiency, name, level, resourceAmount, resourceBalance, maxLevel, onSetLevel, onShowDetails, addItemToList}) => {
 
     return (<div className={`card craftable ${isRunning ? 'running' : ''} ${isLowerEfficiency ? 'lower-eff' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseOver={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)} onClick={() => addItemToList({id, name})}>
         <div className={'flex-container two-side-card'}>
@@ -112,7 +112,7 @@ export const ItemCard = ({ id, icon_id, isRunning, isLowerEfficiency, name, leve
                     <span className={'level'}>{formatInt(level)}{maxLevel ? `/${formatInt(maxLevel)}` : ''}</span>
                 </div>
                 <div className={'mid small-text'}>
-                    <p>You own: {formatValue(resourceAmount)}</p>
+                    <p>You own: {formatValue(resourceAmount)} <span className={`balance ${resourceBalance > 1.e-8 ? 'green' : ''} ${resourceBalance < -1.e-8 ? 'yellow' : ''}`}>({formatValue(resourceBalance, 2, true)})</span></p>
                 </div>
                 <div className={'bottom'}>
                     <div className={'buttons'}>

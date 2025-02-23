@@ -198,7 +198,7 @@ export const registerAmplifiersStage1 = () => {
         resourceModifier: {
             get_multiplier: ()=>({
                 effects: {
-                    'social_actions_discount': {
+                    'magical_actions_discount': {
                         A: 0.2,
                         B: 1,
                         C: 1.025,
@@ -209,6 +209,85 @@ export const registerAmplifiersStage1 = () => {
         },
         get_cost: () => ({
             'inventory_air': {
+                A: 1.2,
+                B: 100,
+                type: 1
+            }
+        }),
+    })
+
+
+    registerAmplifier('amplifier_arcane_conduit', {
+        tags: ["amplifier", "upgrade", "purchaseable", "spark", "actions"],
+        name: 'Arcane Conduit Amplifier',
+        description: 'Increase mana cap and regeneration.',
+        level: 0,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_magic_ability',
+            level: 60000,
+        }],
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_spark');
+        },
+        resourceModifier: {
+            get_multiplier: ()=>({
+                resources: {
+                    'mana': {
+                        A: 0.02,
+                        B: 1,
+                        C: 1.025,
+                        type: 3,
+                    }
+                }
+            }),
+            get_capMult: ()=>({
+                resources: {
+                    'mana': {
+                        A: 0.02,
+                        B: 1,
+                        C: 1.025,
+                        type: 3,
+                    }
+                }
+            }),
+        },
+        get_cost: () => ({
+            'inventory_spark': {
+                A: 1.2,
+                B: 100,
+                type: 1
+            }
+        }),
+    })
+
+    registerAmplifier('amplifier_scolars_ignition', {
+        tags: ["amplifier", "upgrade", "purchaseable", "spark", "actions"],
+        name: 'Scholars Ignition Amplifier',
+        description: 'Increase courses learn speed',
+        level: 0,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_magic_ability',
+            level: 60000,
+        }],
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_spark');
+        },
+        resourceModifier: {
+            get_multiplier: ()=>({
+                effects: {
+                    'courses_learning_speed': {
+                        A: 0.05,
+                        B: 1,
+                        C: 1.01,
+                        type: 3,
+                    }
+                }
+            }),
+        },
+        get_cost: () => ({
+            'inventory_spark': {
                 A: 1.2,
                 B: 100,
                 type: 1

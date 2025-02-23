@@ -142,5 +142,6 @@ TODO's:
 18. [V] Add spell boosting social training learn rate
 19. [V] Add custom filters for accessories and furniture
 20. [V] Icons for gathering effort and gathering perception
-21. Add icon for guild reputation and guild points
-22. Add alchemy potion for knowledge boost
+21. [V] Add icon for guild reputation and guild points
+22. Add alchemy potion for crafting boost
+23. Add automation for accessories and planters
