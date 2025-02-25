@@ -194,8 +194,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'coins': {
-                        A: 0.01*gameEffects.getEffectValue('begging_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
-                        B: 0.09*gameEffects.getEffectValue('begging_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
+                        A: 0.03*gameEffects.getEffectValue('begging_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
+                        B: 0.27*gameEffects.getEffectValue('begging_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
                         type: 0,
                     }
                 }
@@ -243,8 +243,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'coins': {
-                        A: 0.05*gameEffects.getEffectValue('coins_earned_bonus'),
-                        B: 0.75*gameEffects.getEffectValue('coins_earned_bonus'),
+                        A: 0.2*gameEffects.getEffectValue('coins_earned_bonus'),
+                        B: 1.8*gameEffects.getEffectValue('coins_earned_bonus'),
                         type: 0,
                     }
                 }
@@ -288,8 +288,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'coins': {
-                        A: 0.08*gameEffects.getEffectValue('clean_stable_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
-                        B: 0.92*gameEffects.getEffectValue('clean_stable_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
+                        A: 0.3*gameEffects.getEffectValue('clean_stable_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
+                        B: 2.7*gameEffects.getEffectValue('clean_stable_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
                         type: 0,
                     }
                 }
@@ -339,8 +339,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'coins': {
-                        A: 0.25*gameEffects.getEffectValue('coins_earned_bonus'),
-                        B: 2.25*gameEffects.getEffectValue('coins_earned_bonus'),
+                        A: 0.5*gameEffects.getEffectValue('coins_earned_bonus'),
+                        B: 4.5*gameEffects.getEffectValue('coins_earned_bonus'),
                         type: 0,
                     }
                 }
@@ -391,8 +391,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'coins': {
-                        A: 1*gameEffects.getEffectValue('coins_earned_bonus'),
-                        B: 9*gameEffects.getEffectValue('coins_earned_bonus'),
+                        A: 1.5*gameEffects.getEffectValue('coins_earned_bonus'),
+                        B: 13.5*gameEffects.getEffectValue('coins_earned_bonus'),
                         type: 0,
                     }
                 }
@@ -504,7 +504,7 @@ export const registerActionsStage1 = () => {
                     },
                     'health': {
                         A: 0.0,
-                        B: 3,
+                        B: 2,
                         type: 0,
                     }
                 }
@@ -637,7 +637,7 @@ export const registerActionsStage1 = () => {
                         type: 0,
                     },
                     'health': {
-                        A: 0.1,
+                        A: 0.25,
                         B: 0,
                         type: 0,
                     }
@@ -687,7 +687,7 @@ export const registerActionsStage1 = () => {
                         type: 0,
                     },
                     'health': {
-                        A: 0.1*gameEffects.getEffectValue('rest_efficiency'),
+                        A: 0.25*gameEffects.getEffectValue('rest_efficiency'),
                         B: 0,
                         type: 0,
                     }
@@ -1371,8 +1371,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'knowledge': {
-                        A: 0.0015*gameEffects.getEffectValue('read_books_efficiency'),
-                        B: 0.0135*gameEffects.getEffectValue('read_books_efficiency'),
+                        A: 0.007*gameEffects.getEffectValue('read_books_efficiency'),
+                        B: 0.027*gameEffects.getEffectValue('read_books_efficiency'),
                         type: 0,
                     }
                 }
@@ -1499,7 +1499,7 @@ export const registerActionsStage1 = () => {
             return gameEntity.getLevel('shop_item_yoga_manual') > 0
         },
         attributes: {
-            baseXPCost: 50,
+            baseXPCost: 25,
             displayPerLevel: 1,
             isTraining: true,
             isRankAvailable: true,
@@ -1853,7 +1853,7 @@ export const registerActionsStage1 = () => {
             level: 5,
         }],
         attributes: {
-            baseXPCost: 50,
+            baseXPCost: 25,
             displayPerLevel: 1,
             isTraining: true,
             isRankAvailable: true,
@@ -2536,7 +2536,7 @@ export const registerActionsStage1 = () => {
                     },
                     'health': {
                         A: 0.0,
-                        B: 1.5,
+                        B: 1.2,
                         type: 0,
                     }
                 }

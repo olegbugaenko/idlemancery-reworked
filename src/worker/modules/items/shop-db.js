@@ -496,7 +496,7 @@ export const registerShopItemsStage1 = () => {
         get_cost: () => ({
             'coins': {
                 A: 2,
-                B: 200*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 300*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 0
             }
         }),
@@ -570,7 +570,7 @@ export const registerShopItemsStage1 = () => {
             },
             'coins': {
                 A: 2,
-                B: 250*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 750*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 0
             }
         }),
@@ -602,7 +602,7 @@ export const registerShopItemsStage1 = () => {
         get_cost: () => ({
             'coins': {
                 A: 2,
-                B: 350*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 450*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 0
             }
         }),
@@ -649,7 +649,7 @@ export const registerShopItemsStage1 = () => {
             },
             'coins': {
                 A: 2,
-                B: 1000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 1500*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 0
             }
         }),

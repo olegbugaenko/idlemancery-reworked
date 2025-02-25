@@ -192,8 +192,9 @@ export class MageModule extends GameModule {
                     resources: {
                         coins: {
                             A: 0,
-                            B: 0.99 + 0.01*gameEffects.getEffectValue('attribute_bargaining'),
+                            B: 0.99 + 0.01*gameEffects.getEffectValue('attribute_bargaining')**0.75,
                             type: 0,
+                            label: 'Attribute: Bargaining'
                         }
                     }
                 }),

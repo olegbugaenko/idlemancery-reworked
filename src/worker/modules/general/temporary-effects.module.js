@@ -79,7 +79,13 @@ export class TemporaryEffectsModule extends GameModule {
     }
 
     triggerEffect(id, level = 1) {
-        const effect = gameEntity.getEntity(id);
+        try {
+            const effect = gameEntity.getEntity(id);
+        } catch (e) {
+            console.error(e);
+            console.warn('Entities: ', gameEntity.listEntitiesByTags(['temporary']));
+        }
+
 
         if(!this.runningEffects[id]) {
             this.runningEffects[id] = {

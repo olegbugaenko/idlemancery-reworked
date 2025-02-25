@@ -43,7 +43,7 @@ export const registerAttributes = () => {
 
     gameEffects.registerEffect('attribute_bargaining', {
         name: 'Bargaining',
-        description: 'Bargaining attribute slightly increase your coins income from all sources',
+        description: 'Bargaining attribute slightly increase your coins income from all sources. Uses diminish formula (attribute^0.75)',
         minValue: 1,
         hasCap: false,
         saveBalanceTree: true,

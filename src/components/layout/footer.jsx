@@ -180,7 +180,7 @@ export const Footer = () => {
             </div>
         </div>
         {mageData ? (<div className={'mage-wrap flex-container'} ref={elementRef}>
-            <div className={'level'}>
+            <div className={'level'} id={'level'}>
                 <span className={`skills-button ${mageData.skillPoints > 0 ? 'highlight' : ''}`} onClick={() => setActivePopup('skills')}>
                     <img src={'icons/ui/sp.png'}/>
                     <span>{mageData.skillPoints}</span>

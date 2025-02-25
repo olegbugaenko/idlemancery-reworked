@@ -117,15 +117,20 @@ export const ItemCard = ({ id, icon_id, isRunning, isLowerEfficiency, name, leve
                 <div className={'bottom'}>
                     <div className={'buttons'}>
                         <span className={'label'}>Set Effort:</span>
-                        <div className={'effort-control flex-container flex-row'}>
-                            <div className={'icon-content minimize-icon interface-icon tiny'} onClick={() => onSetLevel(id, 0)}>
-                                <img src={"icons/interface/minimize.png"}/>
+                        <TippyWrapper content={<div className={'hint-popup'}>
+                            <p>Increasing the effort level boosts both production and crafting costs exponentially, but costs grow faster than output. Each additional effort level multiplies costs by 1.5 while increasing output by only 1.2.</p>
+                        </div> }>
+                            <div className={'effort-control flex-container flex-row'}>
+                                <div className={'icon-content minimize-icon interface-icon tiny'} onClick={() => onSetLevel(id, 0)}>
+                                    <img src={"icons/interface/minimize.png"}/>
+                                </div>
+                                <input type={'number'} min={0} max={maxLevel} value={level} onChange={e => onSetLevel(id, Math.round(+e.target.value))}/>
+                                <div className={'icon-content maximize-icon interface-icon tiny'} onClick={() => onSetLevel(id, 1.e+9)}>
+                                    <img src={"icons/interface/maximize.png"}/>
+                                </div>
                             </div>
-                            <input type={'number'} min={0} max={maxLevel} value={level} onChange={e => onSetLevel(id, Math.round(+e.target.value))}/>
-                            <div className={'icon-content maximize-icon interface-icon tiny'} onClick={() => onSetLevel(id, 1.e+9)}>
-                                <img src={"icons/interface/maximize.png"}/>
-                            </div>
-                        </div>
+                        </TippyWrapper>
+
 
                     </div>
                 </div>

@@ -89,7 +89,7 @@ export function TutorialProvider({ children }) {
         },
         {
             target: '#item_action_walk',
-            content: 'Hovering over specific action will show you its details in the right panel',
+            content: 'Hovering over specific action will show you its details in the right panel. If you click on the action card - you will be able to pin its details to right sidebar.',
             disableBeacon: true,
             disableOverlayClose: true,
             spotlightClicks: true,
@@ -149,6 +149,13 @@ export function TutorialProvider({ children }) {
             disableOverlayClose: true,
             spotlightClicks: true,
             actionRequired: true
+        },
+        {
+            target: '#level',
+            content: 'During running actions your mage will also receive experience. Each new mage level gives you one skill point. Unspent skill points will be displayed here. Clicking this indicator allows you to allocate your skill point.',
+            disableBeacon: true,
+            disableOverlayClose: true,
+            spotlightClicks: true,
         },
         {
             target: '#shop',

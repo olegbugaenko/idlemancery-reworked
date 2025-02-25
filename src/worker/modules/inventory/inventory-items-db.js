@@ -68,7 +68,7 @@ export const registerInventoryItems = () => {
             get_income: () => ({
                 effects: {
                     plain_learn_rate: {
-                        A: 5,
+                        A: 10,
                         B: 0,
                         type: 0,
                     }

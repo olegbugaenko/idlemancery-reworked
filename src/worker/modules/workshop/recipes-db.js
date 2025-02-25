@@ -765,12 +765,12 @@ export const registerCraftingRecipes = () => {
                 resources: {
                     'inventory_ginseng': {
                         A: 1.5,
-                        B: 5,
+                        B: 5/gameEffects.getEffectValue('alchemy_materials_discount'),
                         type: 1
                     },
                     'inventory_berry': {
                         A: 1.5,
-                        B: 25,
+                        B: 25/gameEffects.getEffectValue('alchemy_materials_discount'),
                         type: 1
                     },
                     'alchemy_ability': {
@@ -826,12 +826,12 @@ export const registerCraftingRecipes = () => {
                 resources: {
                     'inventory_aloe_vera': {
                         A: 1.5,
-                        B: 5,
+                        B: 5/gameEffects.getEffectValue('alchemy_materials_discount'),
                         type: 1
                     },
                     'inventory_berry': {
                         A: 1.5,
-                        B: 25,
+                        B: 25/gameEffects.getEffectValue('alchemy_materials_discount'),
                         type: 1
                     },
                     'alchemy_ability': {
@@ -888,12 +888,12 @@ export const registerCraftingRecipes = () => {
                 resources: {
                     'inventory_nightshade': {
                         A: 1.5,
-                        B: 2.5,
+                        B: 2.5/gameEffects.getEffectValue('alchemy_materials_discount'),
                         type: 1
                     },
                     'inventory_fly_mushroom': {
                         A: 1.5,
-                        B: 10,
+                        B: 10/gameEffects.getEffectValue('alchemy_materials_discount'),
                         type: 1
                     },
                     'alchemy_ability': {
@@ -948,12 +948,12 @@ export const registerCraftingRecipes = () => {
                 resources: {
                     'inventory_knowledge_moss': {
                         A: 1.5,
-                        B: 75,
+                        B: 75/gameEffects.getEffectValue('alchemy_materials_discount'),
                         type: 1
                     },
                     'inventory_golden_algae': {
                         A: 1.5,
-                        B: 250,
+                        B: 250/gameEffects.getEffectValue('alchemy_materials_discount'),
                         type: 1
                     },
                     'alchemy_ability': {
@@ -1009,12 +1009,12 @@ export const registerCraftingRecipes = () => {
                 resources: {
                     'inventory_nightshade': {
                         A: 1.5,
-                        B: 100,
+                        B: 100/gameEffects.getEffectValue('alchemy_materials_discount'),
                         type: 1
                     },
                     'inventory_fly_mushroom': {
                         A: 1.5,
-                        B: 1000,
+                        B: 1000/gameEffects.getEffectValue('alchemy_materials_discount'),
                         type: 1
                     },
                     'alchemy_ability': {
@@ -1070,12 +1070,12 @@ export const registerCraftingRecipes = () => {
                 resources: {
                     'inventory_ember_leaf': {
                         A: 1.5,
-                        B: 5,
+                        B: 5/gameEffects.getEffectValue('alchemy_materials_discount'),
                         type: 1
                     },
                     'inventory_fly_mushroom': {
                         A: 1.5,
-                        B: 500,
+                        B: 500/gameEffects.getEffectValue('alchemy_materials_discount'),
                         type: 1
                     },
                     'alchemy_ability': {

@@ -143,5 +143,9 @@ TODO's:
 19. [V] Add custom filters for accessories and furniture
 20. [V] Icons for gathering effort and gathering perception
 21. [V] Add icon for guild reputation and guild points
-22. Add alchemy potion for crafting boost
-23. Add automation for accessories and planters
+22. [V] Add alchemy potion for crafting boost
+23. [V] Add automation for accessories and planters
+24. Intensities should be hide-able
+25. Add setting to hide actions descriptions
+26. Add setting for notation
+27. [V] Check if there is way to show/hide crafting breakdowns for higher levels
