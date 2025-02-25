@@ -462,7 +462,7 @@ export const registerShopItemsStage1 = () => {
     gameEntity.registerGameEntity('shop_item_planner', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Planner',
-        description: 'Purchase planner to allow better tasks management. Unlocks lists automations',
+        description: 'Purchase planner to allow better tasks management. Unlocks action lists, sell & consume items and others automations',
         level: 0,
         maxLevel: 1,
         unlockCondition: () => {
