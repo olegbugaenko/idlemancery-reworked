@@ -1499,7 +1499,7 @@ export const registerActionsStage1 = () => {
             return gameEntity.getLevel('shop_item_yoga_manual') > 0
         },
         attributes: {
-            baseXPCost: 25,
+            baseXPCost: 50,
             displayPerLevel: 1,
             isTraining: true,
             isRankAvailable: true,

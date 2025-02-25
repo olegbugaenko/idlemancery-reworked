@@ -68,7 +68,7 @@ export const registerInventoryItems = () => {
             get_income: () => ({
                 effects: {
                     plain_learn_rate: {
-                        A: 10,
+                        A: 5,
                         B: 0,
                         type: 0,
                     }
@@ -85,6 +85,44 @@ export const registerInventoryItems = () => {
         sellPrice: 5,
         rarity: 0.3,
         allowedTileTypes: ['plain', 'lakes', 'swamp']
+    })
+
+
+    registerInventoryItem('inventory_candle', {
+        name: 'Candle',
+        hasCap: false,
+        tags: ['inventory', 'consumable', 'common'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        getUsageCooldown: () => {
+            return 5;
+        },
+        attributes: {
+            duration: 30,
+        },
+        resourceModifier: {
+            get_income: () => ({
+                effects: {
+                    plain_learn_rate: {
+                        A: 8,
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            })
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0
+        },
+        get_cost: (amount = 1) => ({
+            coins: amount*800*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+        }),
+        purchaseRenewRate: 10,
+        sellPrice: 25,
+        rarity: 0.3,
     })
 
     registerInventoryItem('inventory_berry', {

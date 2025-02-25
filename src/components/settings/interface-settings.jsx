@@ -134,44 +134,57 @@ export const InterfaceSettings = () => {
     return (
         <div className={"inner-settings-wrap interface-wrap"}>
             <PerfectScrollbar>
-                <div className={"row flex-container"}>
-                    <div className={"col"}>
-                        <button onClick={clearAllNotifications}>
-                            Clear all notifications
-                        </button>
+                <div className={'block'}>
+                    <h4>General UI</h4>
+                    <div className={"row flex-container"}>
+                        <div className={"col"}>
+                            <button onClick={clearAllNotifications}>
+                                Clear all notifications
+                            </button>
+                        </div>
                     </div>
+                    {/*<div className={"row flex-container"}>
+                        <div className={"col"}>
+                            <label>
+                                Show extended explanations
+                            </label>
+                        </div>
+                    </div>*/}
                 </div>
-                {automatedList.filter(a => !a.checkId || unlocks[a.checkId]).map(
-                    (item) =>
-                        (
-                            <div key={item.id} className={"hotkey-row"}>
-                                <span className={"tab-label"}>{item.label}</span>
-                                {editingTab === item.id ? (
-                                    <div className={'hotkey-actions'}>
-                                        <span className={"hotkey-combination"}>
-                                            {currentCombination || "Press key combination"}
-                                        </span>
-                                        <button onClick={() => saveHotKey(item.id, currentCombination)}>
-                                            Save
-                                        </button>
-                                        <button onClick={discardChanges}>Discard</button>
-                                    </div>
-                                ) : (
-                                    <div className={'hotkey-actions'}>
-                                        <span className={"hotkey-combination"}>
-                                            {hotkeys[item.id]?.combination || "None"}
-                                        </span>
-                                        <button onClick={() => {
-                                            setEditingTab(item.id);
-                                            setCurrentCombination(hotkeys[item.id]?.id || "");
-                                        }}>
-                                            Edit
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                        )
-                )}
+                <div className={'block'}>
+                    <h4>Shortcuts</h4>
+                    {automatedList.filter(a => !a.checkId || unlocks[a.checkId]).map(
+                        (item) =>
+                            (
+                                <div key={item.id} className={"hotkey-row"}>
+                                    <span className={"tab-label"}>{item.label}</span>
+                                    {editingTab === item.id ? (
+                                        <div className={'hotkey-actions'}>
+                                            <span className={"hotkey-combination"}>
+                                                {currentCombination || "Press key combination"}
+                                            </span>
+                                            <button onClick={() => saveHotKey(item.id, currentCombination)}>
+                                                Save
+                                            </button>
+                                            <button onClick={discardChanges}>Discard</button>
+                                        </div>
+                                    ) : (
+                                        <div className={'hotkey-actions'}>
+                                            <span className={"hotkey-combination"}>
+                                                {hotkeys[item.id]?.combination || "None"}
+                                            </span>
+                                            <button onClick={() => {
+                                                setEditingTab(item.id);
+                                                setCurrentCombination(hotkeys[item.id]?.id || "");
+                                            }}>
+                                                Edit
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            )
+                    )}
+                </div>
             </PerfectScrollbar>
         </div>
     );
