@@ -179,6 +179,7 @@ export class CraftingModule extends GameModule {
             maxLevel: rrs.amount + (this.craftingSlots[recipe.id]?.level || 0),
             resourceAmount: gameResources.getResource(recipe.resourceId)?.amount,
             resourceBalance: gameResources.getResource(recipe.resourceId)?.balance,
+            breakDown: gameResources.getResource(recipe.resourceId)?.breakDown,
             isRunning: gameEntity.entityExists(`activeCrafting_${recipe.id}`),
             isLowerEfficiency: gameEntity.entityExists(`activeCrafting_${recipe.id}`) && gameEntity.getEntity(`activeCrafting_${recipe.id}`).modifier?.efficiency < 1 - SMALL_NUMBER
         }));

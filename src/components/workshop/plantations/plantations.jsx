@@ -7,6 +7,7 @@ import {NewNotificationWrap} from "../../layout/new-notification-wrap.jsx";
 import {RawResource} from "../../shared/raw-resource.jsx";
 import {BreakDown} from "../../layout/sidebar.jsx";
 import {TippyWrapper} from "../../shared/tippy-wrapper.jsx";
+import {Balances} from "../shared.jsx";
 
 export const Plantations = ({ setItemDetails, newUnlocks }) => {
 
@@ -78,7 +79,7 @@ export const Plantations = ({ setItemDetails, newUnlocks }) => {
     </div>)
 }
 
-export const ItemCard = ({ id, icon_id, resourceAmount, resourceBalance , name, level, maxLevel, affordable, onPurchase, onDemolish, onShowDetails, wateringLevel, isWateringUnlocked, setWateringLevel}) => {
+export const ItemCard = ({ id, icon_id, resourceAmount, resourceBalance, breakDown, name, level, maxLevel, affordable, onPurchase, onDemolish, onShowDetails, wateringLevel, isWateringUnlocked, setWateringLevel}) => {
 
     return (<div className={`card craftable plantable`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)}>
         <div className={'flex-container two-side-card'}>
@@ -90,9 +91,7 @@ export const ItemCard = ({ id, icon_id, resourceAmount, resourceBalance , name, 
                     <p className={'title'}>{name}</p>
                     <span className={'level'}>{formatInt(level)}{maxLevel ? `/${formatInt(maxLevel)}` : ''}</span>
                 </div>
-                <div className={'mid small-text'}>
-                    <p>You own: {formatValue(resourceAmount)} <span className={`balance ${resourceBalance > 1.e-8 ? 'green' : ''} ${resourceBalance < -1.e-8 ? 'yellow' : ''}`}>({formatValue(resourceBalance, 2, true)})</span></p>
-                </div>
+                <Balances resourceAmount={resourceAmount} resourceBalance={resourceBalance} breakDown={breakDown} />
                 {isWateringUnlocked ? (<div className={'watering-settings'}>
                     <label>
                         <span>Watering Level:</span>

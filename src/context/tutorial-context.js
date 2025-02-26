@@ -54,7 +54,7 @@ export function TutorialProvider({ children }) {
         },
         {
             target: '#tutorial-attributes',
-            content: 'Attributes are your primary character stats. Hower over specific attribute to see what it does',
+            content: 'Attributes are your primary character stats. Hover over specific attribute to see what it does',
             disableBeacon: true,
             spotlightClicks: true,
             disableOverlayClose: true,

@@ -149,3 +149,4 @@ TODO's:
 25. Add setting to hide actions descriptions
 26. Add setting for notation
 27. [V] Check if there is way to show/hide crafting breakdowns for higher levels
+28. [V] Show balance trees on crafting/alchemy pages

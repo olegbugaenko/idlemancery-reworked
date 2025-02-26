@@ -25,9 +25,9 @@ export class TemporaryEffectsModule extends GameModule {
     load(saveObject) {
 
         for(const key in this.runningEffects) {
-            if(gameEntity.entityExists(key)) {
-                gameEntity.setEntityLevel(key, 0, true);
-                gameEntity.unsetEntity(key);
+            if(gameEntity.entityExists(`active_${key}`)) {
+                gameEntity.setEntityLevel(`active_${key}`, 0, true);
+                gameEntity.unsetEntity(`active_${key}`);
             }
         }
         this.runningEffects = {};
@@ -49,6 +49,7 @@ export class TemporaryEffectsModule extends GameModule {
 
                     gameEntity.setEntityLevel(`active_${id}`, this.runningEffects[id].level, true);
                     this.runningEffects[id].duration = saveObject.effects[id].duration;
+                    // console.log('LoadedEntity: ', `[debug-error] active_${id}`, gameEntity.getEntity(`active_${id}`), gameEntity.getEntity(id));
                 }
             }
         }

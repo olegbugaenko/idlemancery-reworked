@@ -7,6 +7,7 @@ import {TippyWrapper} from "../../shared/tippy-wrapper.jsx";
 import {BreakDown} from "../../layout/sidebar.jsx";
 import {NewNotificationWrap} from "../../layout/new-notification-wrap.jsx";
 import {RawResource} from "../../shared/raw-resource.jsx";
+import {Balances} from "../shared.jsx";
 
 export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, openListDetails, addItemToList }) => {
 
@@ -99,7 +100,7 @@ export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, op
     </div>)
 }
 
-export const ItemCard = ({ id, icon_id, isRunning, resourceAmount, isLowerEfficiency, name, level, maxLevel, onSetLevel, onShowDetails, addItemToList}) => {
+export const ItemCard = ({ id, icon_id, isRunning, resourceAmount, resourceBalance, breakDown, isLowerEfficiency, name, level, maxLevel, onSetLevel, onShowDetails, addItemToList}) => {
 
     return (<div className={`card craftable ${isRunning ? 'running' : ''} ${isLowerEfficiency ? 'lower-eff' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)} onClick={() => addItemToList({id, name})}>
         <div className={'flex-container two-side-card'}>
@@ -111,9 +112,7 @@ export const ItemCard = ({ id, icon_id, isRunning, resourceAmount, isLowerEffici
                     <p className={'title'}>{name}</p>
                     <span className={'level'}>{formatInt(level)}{maxLevel ? `/${formatInt(maxLevel)}` : ''}</span>
                 </div>
-                <div className={'mid small-text'}>
-                    <p>You own: {formatValue(resourceAmount)}</p>
-                </div>
+                <Balances resourceAmount={resourceAmount} resourceBalance={resourceBalance} breakDown={breakDown} />
                 <div className={'bottom'}>
                     <div className={'buttons'}>
                         <span className={'label'}>Set Effort:</span>

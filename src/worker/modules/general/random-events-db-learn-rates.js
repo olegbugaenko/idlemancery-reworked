@@ -295,5 +295,260 @@ export const registerRandomEventsLearnDb = () => {
         }
     });
 
+    randomEventsDB.push({
+        id: 'rare_event_mind_trial',
+        name: 'Trial of the Mind',
+        description: 'A mysterious hooded figure approaches you, speaking in riddles. "Only those who push their minds beyond limits shall grasp true wisdom," they whisper. They offer you a challenge—one that will test your intellect and endurance.',
+        unlockCondition: () => true,
+        probability: 0.3, // Рідкісна подія
+        options: {
+            option1: {
+                id: 'option1',
+                name: 'Take the mental challenge',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'mental_training_boost_strong',
+                    probability: 1,
+                    description: 'Your mind sharpens as you unravel complex riddles and puzzles! (+Mental training speed for 5 minutes, level 3)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_mental_training_rate_buff', 3)
+                    }
+                }]
+            },
+            option2: {
+                id: 'option2',
+                name: 'Push your limits even further',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'mental_training_boost_max',
+                    probability: 0.8,
+                    description: 'Through sheer will, you reach a new level of understanding! (+Mental training speed for 5 minutes, -health debuff for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_mental_training_rate_buff', 4)
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_health_debuff', 1)
+                    }
+                }, {
+                    id: 'health_debuff',
+                    probability: 0.2,
+                    description: 'The trial is too intense, straining both your mind and body. (-Health regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_health_debuff', 2)
+                    }
+                }]
+            },
+            option3: {
+                id: 'option3',
+                name: 'Walk away, unsure of the risks',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'nothing_happens',
+                    probability: 1,
+                    description: 'You decide not to take the risk. Nothing changes.',
+                    unlockCondition: () => true,
+                    onTrigger: () => {}
+                }]
+            }
+        }
+    });
+
+    randomEventsDB.push({
+        id: 'rare_event_trial_of_will',
+        name: 'Trial of Will',
+        description: 'You find yourself in an ancient temple, where a mystical presence challenges you to a test of mental endurance. "True strength comes from the mind," a voice echoes in the chamber. The challenge is difficult, but great wisdom awaits those who persevere.',
+        unlockCondition: () => true,
+        probability: 0.25, // Дуже рідкісна подія
+        options: {
+            option1: {
+                id: 'option1',
+                name: 'Endure the mental strain',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'mental_training_boost_high',
+                    probability: 1,
+                    description: 'You push through the challenge, emerging stronger! (+Mental training speed for 5 minutes, level 4)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_mental_training_rate_buff', 4)
+                    }
+                }]
+            },
+            option2: {
+                id: 'option2',
+                name: 'Embrace the full trial',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'mental_training_boost_max',
+                    probability: 0.75,
+                    description: 'You reach a new peak of mental clarity! (+Mental training speed for 5 minutes, level 5, but -health regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_mental_training_rate_buff', 5)
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_health_debuff', 1)
+                    }
+                }, {
+                    id: 'overwhelming_exhaustion',
+                    probability: 0.25,
+                    description: 'The trial drains you beyond measure. (-Health regeneration for 5 minutes, stronger effect)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_health_debuff', 2)
+                    }
+                }]
+            },
+            option3: {
+                id: 'option3',
+                name: 'Leave before it’s too late',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'nothing_happens',
+                    probability: 1,
+                    description: 'You step away from the trial, unsure of what could have been. Nothing changes.',
+                    unlockCondition: () => true,
+                    onTrigger: () => {}
+                }]
+            }
+        }
+    });
+
+    randomEventsDB.push({
+        id: 'rare_event_ancient_tome',
+        name: 'The Ancient Tome',
+        description: 'You stumble upon an ancient tome hidden in a forgotten library. Its pages glow faintly, filled with knowledge beyond your comprehension. However, deciphering it may be both rewarding and exhausting.',
+        unlockCondition: () => true,
+        probability: 0.2, // Дуже рідкісна подія
+        options: {
+            option1: {
+                id: 'option1',
+                name: 'Study the tome carefully',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'general_learning_boost_high',
+                    probability: 1,
+                    description: 'You absorb its wisdom, refining your ability to learn. (+General learning speed for 5 minutes, level 4)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_learn_rate_buff', 4)
+                    }
+                }]
+            },
+            option2: {
+                id: 'option2',
+                name: 'Push your mind to its limits',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'general_learning_boost_max',
+                    probability: 0.6,
+                    description: 'You fully unlock the tome’s secrets, greatly enhancing your learning speed! (+General learning speed for 5 minutes, level 5)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_learn_rate_buff', 5)
+                    }
+                }, {
+                    id: 'mental_training_boost',
+                    probability: 0.2,
+                    description: 'The complex texts sharpen your intellect. (+Mental training speed for 5 minutes, level 3)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_mental_training_rate_buff', 3)
+                    }
+                }, {
+                    id: 'energy_drain',
+                    probability: 0.2,
+                    description: 'The strain exhausts you, making you feel mentally drained. (-Energy regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_energy_debuff', 1)
+                    }
+                }]
+            },
+            option3: {
+                id: 'option3',
+                name: 'Skim through the easier sections',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'general_learning_boost_mild',
+                    probability: 1,
+                    description: 'You gain some insights, though not as much as you could have. (+General learning speed for 5 minutes, level 3)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_learn_rate_buff', 3)
+                    }
+                }]
+            }
+        }
+    });
+
+    randomEventsDB.push({
+        id: 'rare_event_rhetoric_tournament',
+        name: 'Rhetoric Tournament',
+        description: 'You hear of a grand tournament where the greatest minds and speakers gather to compete in debate and wit. Participation could sharpen both your mental prowess and social skills—but it may also be draining.',
+        unlockCondition: () => true,
+        probability: 0.2, // Дуже рідкісна подія
+        options: {
+            option1: {
+                id: 'option1',
+                name: 'Compete with full force',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'social_training_boost_max',
+                    probability: 0.6,
+                    description: 'Your arguments dazzle the audience! (+Social training speed for 5 minutes, level 5)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_social_training_rate_buff', 5)
+                    }
+                }, {
+                    id: 'mental_training_boost',
+                    probability: 0.2,
+                    description: 'The complexity of the debate sharpens your thinking. (+Mental training speed for 5 minutes, level 3)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_mental_training_rate_buff', 3)
+                    }
+                }, {
+                    id: 'energy_drain',
+                    probability: 0.2,
+                    description: 'The intense mental effort leaves you exhausted. (-Energy regeneration for 5 minutes)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_energy_debuff', 1)
+                    }
+                }]
+            },
+            option2: {
+                id: 'option2',
+                name: 'Participate with a balanced approach',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'social_training_boost_high',
+                    probability: 1,
+                    description: 'You hold your ground and refine your rhetoric. (+Social training speed for 5 minutes, level 4)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_social_training_rate_buff', 4)
+                    }
+                }]
+            },
+            option3: {
+                id: 'option3',
+                name: 'Observe and take notes',
+                unlockCondition: () => true,
+                effects: [{
+                    id: 'mental_training_boost_mild',
+                    probability: 1,
+                    description: 'You absorb knowledge from the great debaters. (+Mental training speed for 5 minutes, level 3)',
+                    unlockCondition: () => true,
+                    onTrigger: () => {
+                        gameCore.getModule('temporary-effects').triggerEffect('temporary_mental_training_rate_buff', 3)
+                    }
+                }]
+            }
+        }
+    });
+
+
     return randomEventsDB;
 };

@@ -384,6 +384,7 @@ export class MageModule extends GameModule {
     getActiveEffectsData() {
         const items = gameEntity.listEntitiesByTags(['active_effect']);
         // const presentSpells = items.filter(item => item.isUnlocked);
+        // console.log('[debug-error] activeEvents: ', items);
 
         return {
             list: items.map(item => ({

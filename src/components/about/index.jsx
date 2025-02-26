@@ -6,6 +6,14 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+                <h3>Idle Awakening v0.1.0a</h3>
+                <div className={'features'}>
+                    <p>Fixed potential crashes issue</p>
+                    <p>Balance breakdown is now displayed at alchemy, crafting and plantations page when hover over balance</p>
+                    <p>Added few more events</p>
+                    <p>Fixed some typos</p>
+                    <p>Minor internal optimizations</p>
+                </div>
                 <h3>Idle Awakening v0.1.0</h3>
                 <div className={'features'}>
                     <p>A lot of changes to game balance and order of unlocks</p>

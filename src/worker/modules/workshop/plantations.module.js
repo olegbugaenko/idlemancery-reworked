@@ -140,8 +140,6 @@ export class PlantationsModule extends GameModule {
         const entities = gameEntity.listEntitiesByTags(['plantation']);
         const rrs = gameResources.getResource('plantation_slots');
 
-        // console.log('RSS:', rrs);
-
         const slots = {
             max: rrs.income,
             total: rrs.amount
@@ -161,6 +159,7 @@ export class PlantationsModule extends GameModule {
                 wateringMult: gameEffects.getEffectValue(getWateringEffectId(entity.id)),
                 resourceAmount: gameResources.getResource(gameEntity.getAttribute(entity.id, 'inventoryResource'))?.amount,
                 resourceBalance: gameResources.getResource(gameEntity.getAttribute(entity.id, 'inventoryResource'))?.balance,
+                breakDown: gameResources.getResource(gameEntity.getAttribute(entity.id, 'inventoryResource'))?.breakDown,
             })),
             slots,
             isWateringUnlocked: gameResources.isResourceUnlocked('inventory_water'),
