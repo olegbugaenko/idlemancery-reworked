@@ -14,27 +14,32 @@ export const Sidebar = () => {
     const { unlockNextById } = useTutorial();
 
     return (<div className={'sidebar'}>
-        <ul className={'menu toogleables'}>
-            <li id={'tutorial-res-tab'} className={`${activePanel === 'resources' ? 'active' : ''}`} onClick={() => {
-                unlockNextById(3);
-                setActivePanel('resources')
-            }}>
-                <span>Resources</span>
-            </li>
-            <li id={'tutorial-attr-tab'} className={`${activePanel === 'attributes' ? 'active' : ''}`} onClick={() => {
-                unlockNextById(1);
-                setActivePanel('attributes')
-            }}>
-                <span>Attributes</span>
-            </li>
-        </ul>
-        <div className={'main-bar'}>
-            {activePanel === 'resources' ? <ResourcesBar /> : <AttributesBar />}
+        <div className={'upper'}>
+            <ul className={'menu toogleables'}>
+                <li id={'tutorial-res-tab'} className={`${activePanel === 'resources' ? 'active' : ''}`} onClick={() => {
+                    unlockNextById(3);
+                    setActivePanel('resources')
+                }}>
+                    <span>Resources</span>
+                </li>
+                <li id={'tutorial-attr-tab'} className={`${activePanel === 'attributes' ? 'active' : ''}`} onClick={() => {
+                    unlockNextById(1);
+                    setActivePanel('attributes')
+                }}>
+                    <span>Attributes</span>
+                </li>
+            </ul>
+            <div className={'main-bar'}>
+                {activePanel === 'resources' ? <ResourcesBar /> : <AttributesBar />}
+            </div>
         </div>
-        <RandomEventSnippet />
-        <div className={'effects-list'}>
-            <ActiveEffects />
+        <div className={'lower'}>
+            <RandomEventSnippet />
+            <div className={'effects-list'}>
+                <ActiveEffects />
+            </div>
         </div>
+
     </div> )
 
 }
@@ -60,7 +65,7 @@ export const ResourcesBar = () => {
     })
 
     const setMonitoredAttribute = useCallback((id) => {
-        sendData('set-monitored', { type: 'resource', id });
+        sendData('set-monitored', { scope: 'actions', type: 'resource', id });
     }, []);
 
     return (<div className={'resources'} id={'tutorial-resources'}>
@@ -73,16 +78,25 @@ export const ResourcesBar = () => {
                 affClassData = ` monitored ${aff.isAffordable ? 'affordable' : (aff.hardLocked ? 'locked' : 'unavailable')}`
             }
 
-            return (<div key={res.id} className={`holder ${aff ? 'monitored' : ''}`} onMouseOver={() => setMonitoredAttribute(res.id)} onMouseOut={() => setMonitoredAttribute(null)}><p className={`resource-item ${affClassData}`}>
+            const isAffected = res.monitor?.direction;
+            let addClass = '';
+            if(isAffected) {
+                addClass = isAffected < 0 ? ' negative' : ' positive';
+            }
+
+            return (<div key={res.id} className={`holder ${aff ? 'monitored' : ''} ${addClass}`} onMouseOver={() => setMonitoredAttribute(res.id)} onMouseOut={() => setMonitoredAttribute(null)}><p className={`resource-item ${affClassData}`}>
                 <div className={'resource-label'}>
                     <RawResource name={res.name} id={res.id} />
                 </div>
                 <TippyWrapper content={<div className={'hint-popup'}><BreakDown category={'cap'} breakDown={res.storageBreakdown}/>{res.eta >= 0 ? `${secondsToString(res.eta)} to full` : `${secondsToString(-res.eta)} to empty`}</div> }>
-                    <span className={`resource-amount ${res.hasCap && res.isCapped ? 'capped' : ''}`}>{formatValue(res.amount || 0)}{res.hasCap ? `/${formatValue(res.cap || 0)}` : ''}</span>
+                    <span className={`resource-amount ${res.hasCap && res.isCapped ? 'capped' : ''}`}>{formatValue(res.amount || 0)}{res.hasCap ? ` / ${formatValue(res.cap || 0)}` : ''}</span>
                 </TippyWrapper>
                 <TippyWrapper content={<div className={'hint-popup'}><BreakDown breakDown={res.breakDown}/></div> }>
                     <span className={`resource-balance ${res.isNegative ? 'red' : ''} ${res.isPositive ? 'green' : ''}`}>{formatValue(res.balance || 0)}</span>
                 </TippyWrapper>
+                {res.capProgress ? (<div className={'next-unlock-holder resource'}>
+                    <div className={'next-unlock-bar'} style={{ width: `${res.capProgress*100}%`}}></div>
+                </div>) : null}
                 {aff ? (<div className={'appendix'}>
                     {aff.isAffordable ? (<span>{formatValue(aff.requirement)}</span>) : (<span>{formatValue(aff.actual - aff.requirement)}({secondsToString(aff.eta)})</span>)}
                 </div> ) : null}
@@ -103,7 +117,7 @@ export const AttributesBar = () => {
     useEffect(() => {
         const interval = setInterval(() => {
             sendData('query-attributes-data', {});
-        }, 100);
+        }, 200);
         return () => {
             clearInterval(interval);
         }
@@ -114,7 +128,7 @@ export const AttributesBar = () => {
     })
 
     const setMonitoredAttribute = useCallback((id) => {
-        sendData('set-monitored', { type: 'attribute', id });
+        sendData('set-monitored', { scope: 'actions', type: 'attribute', id });
     }, []);
 
     return (<div className={'attributes-panel'} id={'tutorial-attributes'}>
@@ -127,9 +141,15 @@ export const AttributesBar = () => {
                 affClassData = ` monitored ${aff.isAffordable ? 'affordable' : (aff.hardLocked ? 'locked' : 'unavailable')}`
             }
 
-            // console.log('res: ', res.breakDown);
+            const isAffected = res.monitor?.direction;
 
-            return (<div key={res.id} className={`holder ${aff ? 'monitored' : ''}`} onMouseOver={() => setMonitoredAttribute(res.id)} onMouseOut={() => setMonitoredAttribute(null)}><p className={`resource-item ${affClassData}`}>
+            let addClass = '';
+            if(isAffected) {
+                addClass = isAffected < 0 ? ' negative' : ' positive';
+            }
+
+
+            return (<div key={res.id} className={`holder ${aff ? 'monitored' : ''} ${addClass}`} onMouseOver={() => setMonitoredAttribute(res.id)} onMouseOut={() => setMonitoredAttribute(null)}><p className={`resource-item ${affClassData}`}>
                 <TippyWrapper content={<div className={'hint-popup'}>
                     <div className={'block'}>
                         <h4>{res.name}: {formatValue(res.value, 3)}</h4>
@@ -145,8 +165,11 @@ export const AttributesBar = () => {
                     <span className={'resource-label'}>{res.name}</span>
                 </TippyWrapper>
                 <TippyWrapper content={<div className={'hint-popup'}><BreakDown breakDown={res.breakDown}/></div> }>
-                    <span className={'resource-balance'}>{formatValue(res.value || 0)}</span>
+                    <span className={'resource-balance'}>{formatInt(Math.floor(res.value || 0), 2)}</span>
                 </TippyWrapper>
+                {res.nextProgress ? (<div className={'next-unlock-holder'}>
+                    <div className={'next-unlock-bar'} style={{ width: `${res.nextProgress*100}%`}}></div>
+                </div>) : null}
                 {aff ? (<div className={'appendix'}>
                     {aff.isAffordable ? (<span>{formatValue(aff.requirement)}</span>) : (<span>{formatValue(aff.actual - aff.requirement)}({secondsToString(aff.eta)})</span>)}
                 </div> ) : null}

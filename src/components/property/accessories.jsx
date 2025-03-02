@@ -29,7 +29,7 @@ const ACTIONS_SEARCH_SCOPES = [{
     label: 'effects'
 }]
 
-export const AccessoryUpgrades = ({ setItemDetails, purchaseItem, newUnlocks }) => {
+export const AccessoryUpgrades = ({ setItemDetails, purchaseItem, newUnlocks, isMobile }) => {
 
     const worker = useContext(WorkerContext);
 
@@ -171,7 +171,7 @@ export const AccessoryUpgrades = ({ setItemDetails, purchaseItem, newUnlocks }) 
                                         setEditingCustomFilter(null);
                                     }}
                                     onSave={(data) => {
-                                        console.log('saving: ', data)
+                                        // console.log('saving: ', data)
                                         sendData('save-property-custom-filter', {...data, filterId: 'accessory'});
                                         setEditingCustomFilter(null);
                                     }}
@@ -197,7 +197,7 @@ export const AccessoryUpgrades = ({ setItemDetails, purchaseItem, newUnlocks }) 
             <PerfectScrollbar>
                 <div className={'flex-container'}>
                     {furnituresData.available.map(furniture => <NewNotificationWrap key={furniture.id} id={furniture.id} className={'narrow-wrapper'} isNew={newUnlocks?.[furnituresData.selectedCategory]?.items?.[furniture.id]?.hasNew}>
-                        <ItemCard key={furniture.id} {...furniture} onFlash={handleFlash} onPurchase={purchaseItem} onShowDetails={setItemDetails}  toggleAutopurchase={toggleAutopurchase} isAutomationUnlocked={furnituresData.isAutomationUnlocked}/>
+                        <ItemCard key={furniture.id} {...furniture} onFlash={handleFlash} onPurchase={purchaseItem} onShowDetails={setItemDetails}  toggleAutopurchase={toggleAutopurchase} isAutomationUnlocked={furnituresData.isAutomationUnlocked} isMobile={isMobile}/>
                     </NewNotificationWrap>)}
                     {overlayPositions.map((position, index) => (
                         <FlashOverlay key={index} position={position} />
@@ -208,22 +208,38 @@ export const AccessoryUpgrades = ({ setItemDetails, purchaseItem, newUnlocks }) 
     </div></DragDropContext>)
 }
 
-export const ItemCard = ({ id, name, level, max, affordable, isLeveled, isCapped, onFlash, onPurchase, onShowDetails, isAutoPurchase, onDelete, toggleAutopurchase, isAutomationUnlocked}) => {
+export const ItemCard = ({ id, name, level, max, affordable, isLeveled, isCapped, onFlash, onPurchase, onShowDetails, isAutoPurchase, onDelete, toggleAutopurchase, isAutomationUnlocked, isMobile}) => {
     const elementRef = useRef(null);
 
     useFlashOnLevelUp(isLeveled, onFlash, elementRef);
 
-    return (<div ref={elementRef} className={`card furniture flashable ${affordable.hardLocked ? 'hard-locked' : ''}  ${!affordable.isAffordable ? 'unavailable' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)}>
+    return (<div
+        ref={elementRef}
+        className={`card furniture flashable ${affordable.hardLocked ? 'hard-locked' : ''}  ${!affordable.isAffordable ? 'unavailable' : ''}`}
+        onMouseEnter={() => !isMobile ? onShowDetails(id) : null}
+        onMouseLeave={() => !isMobile ? onShowDetails(null) : null}
+        onClick={() => isMobile ? onShowDetails(id) : null}
+    >
         <div className={'head'}>
             <p className={'title'}>{name}</p>
             <span className={'level'}>{formatInt(level)}{max ? `/${formatInt(max)}` : ''}</span>
         </div>
         <div className={'bottom'}>
             <div className={'buttons'}>
-                <button disabled={!affordable.isAffordable || isCapped} onClick={() => onPurchase(id)}>Purchase</button>
-                {isAutomationUnlocked ? (<label className={'autobuy-label'}>
+                <button disabled={!affordable.isAffordable || isCapped} onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onPurchase(id)
+                }}>Purchase</button>
+                {isAutomationUnlocked ? (<label className={'autobuy-label'} onClick={(e) => {
+                    e.stopPropagation();
+                }}>
                     <input type={'checkbox'} checked={isAutoPurchase}
-                           onChange={() => toggleAutopurchase(id, !isAutoPurchase)}/>
+                           onChange={(e) => {
+                               e.preventDefault();
+                               e.stopPropagation();
+                               toggleAutopurchase(id, !isAutoPurchase)
+                           }}/>
                     Autobuy
                 </label>) : null}
                 {/*<button disabled={level <= 0} onClick={() => onDelete(id)}>Remove</button>*/}

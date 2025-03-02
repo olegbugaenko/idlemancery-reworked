@@ -164,7 +164,7 @@ export class PropertyModule extends GameModule {
             // Зберігаємо оновлений масив
             this.customFiltersOrder = newOrder;
 
-            console.log('Re-sorted', payload, newOrder);
+            // console.log('Re-sorted', payload, newOrder);
 
             this.sendFurnituresData({filterId}, {
                 searchData: this.searchData[filterId],
@@ -217,7 +217,7 @@ export class PropertyModule extends GameModule {
         })
 
         this.eventHandler.registerHandler('set-furniture-hide-maxed', (payload) => {
-            console.log('Set Hide Maxed: ', payload);
+            // console.log('Set Hide Maxed: ', payload);
             if(payload.filterId) {
                 this.hideMaxed[payload.filterId] = payload.hideMaxed;
             }
@@ -235,7 +235,7 @@ export class PropertyModule extends GameModule {
             if(payload.filterId) {
                 this.searchData[payload.filterId] = payload.searchData;
             }
-            console.log('sendFurniture: ', payload, this.searchData);
+            // console.log('sendFurniture: ', payload, this.searchData);
             this.sendFurnituresData(payload, payload.filterId ? {
                 hideMaxed: this.hideMaxed[payload.filterId] || false,
                 selectedFilterId: this.selectedFilterId[payload.filterId],
@@ -308,7 +308,7 @@ export class PropertyModule extends GameModule {
     /* Filters */
 
     generateFilterCache(filterId, id) {
-        console.log('generateFilterCache', filterId, id);
+        // console.log('generateFilterCache', filterId, id);
         if(!this.customFilters[filterId][id]) {
             delete this.filtersCache[filterId][id];
         }
@@ -370,7 +370,7 @@ export class PropertyModule extends GameModule {
 
         })
 
-        console.log('Generated Filter: ', this.filtersCache);
+        // console.log('Generated Filter: ', this.filtersCache);
 
     }
 
@@ -378,7 +378,7 @@ export class PropertyModule extends GameModule {
         for(const id in this.customFilters[filterId]) {
             this.generateFilterCache(filterId, id);
         }
-        console.log('Caches: ', this.filtersCache[filterId]);
+        // console.log('Caches: ', this.filtersCache[filterId]);
     }
 
     setCustomFilterPinned({ filterId, id, flag }) {
@@ -473,7 +473,7 @@ export class PropertyModule extends GameModule {
                         const newEnt = this.purchaseFurniture(key, cat, {
                             isSilent: true,
                         });
-                        console.log('Purchase Auto Furniture: ', key, newEnt)
+                        // console.log('Purchase Auto Furniture: ', key, newEnt)
                         if(newEnt.success) {
                             return;
                         }

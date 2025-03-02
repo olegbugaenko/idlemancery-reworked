@@ -259,6 +259,7 @@ export const registerCommomEffects = () => {
         defaultValue: 1.,
         minValue: 1.,
         saveBalanceTree: true,
+        description: 'Reduce XP required to level-up actions with tag "social"'
     })
 
     gameEffects.registerEffect('physical_actions_discount', {
@@ -266,6 +267,7 @@ export const registerCommomEffects = () => {
         defaultValue: 1.,
         minValue: 1.,
         saveBalanceTree: true,
+        description: 'Reduce XP required to level-up actions with tag "physical"'
     })
 
     gameEffects.registerEffect('mental_actions_discount', {
@@ -273,6 +275,7 @@ export const registerCommomEffects = () => {
         defaultValue: 1.,
         minValue: 1.,
         saveBalanceTree: true,
+        description: 'Reduce XP required to level-up actions with tag "mental"'
     })
 
     gameEffects.registerEffect('magical_actions_discount', {
@@ -280,6 +283,7 @@ export const registerCommomEffects = () => {
         defaultValue: 1.,
         minValue: 1.,
         saveBalanceTree: true,
+        description: 'Reduce XP required to level-up actions with tag "magical"'
     })
 
     gameEffects.registerEffect('routine_actions_discount', {
@@ -287,6 +291,7 @@ export const registerCommomEffects = () => {
         defaultValue: 1.,
         minValue: 1.,
         saveBalanceTree: true,
+        description: 'Reduce XP required to level-up actions with tag "routine"'
     })
 
     gameEffects.registerEffect('courses_learning_speed', {

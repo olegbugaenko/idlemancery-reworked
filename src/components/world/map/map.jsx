@@ -119,7 +119,7 @@ export const Map = ({ setItemDetails, openListDetails, isEditList }) => {
     };*/
 
     const onEditList = useCallback(listData => {
-        console.log('onEditList: ', { listData, isEdit: true })
+        // console.log('onEditList: ', { listData, isEdit: true })
         openListDetails({ listData, isEdit: true, automationUnlocked: mapData.mapLists.automationUnlocked });
     }, []);
 
@@ -206,7 +206,7 @@ export const Map = ({ setItemDetails, openListDetails, isEditList }) => {
                 automationEnabled={mapData.mapLists.automationEnabled}
                 autotriggerIntervalSetting={mapData.mapLists.autotriggerIntervalSetting}
                 editListToDetails={(id) => {
-                    console.log('editListToDetails: ', id);
+                    // console.log('editListToDetails: ', id);
                     onEditList({ id });
                 }}
                 viewListToDetails={(id) => {
@@ -253,9 +253,10 @@ export const MapTile = React.memo(
             hintForTileShown.j === j;
 
         const handleShow = () => {
-            if (!showPopup) {
+            // console.log('Showing?: ', showPopup, i, j);
+            // if (!showPopup) {
                 setHintShown({ i, j });
-            }
+            //}
         };
 
         const handleHide = () => {
@@ -355,7 +356,7 @@ export const MapListsPanel = ({ automationUnlocked, runningList, editListToDetai
 
     useEffect(() => {
         const setOp = () => {
-            console.log('setOpToNull ')
+            // console.log('setOpToNull ')
             setOpenedFor(null);
         }
         if(openedFor) {
@@ -370,7 +371,7 @@ export const MapListsPanel = ({ automationUnlocked, runningList, editListToDetai
     }, [openedFor])
 
     const editList = (id) => {
-        console.log('Set to edit: ', id);
+        // console.log('Set to edit: ', id);
         editListToDetails(id);
     }
 
@@ -455,7 +456,7 @@ export const TileDetailsPopup = ({itemId}) => {
 
 
     onMessage('map-tile-details', (items) => {
-        console.log('Set in popup: ', item);
+        // console.log('Set in popup: ', item);
         setDetailOpened(items);
     })
 

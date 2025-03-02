@@ -132,8 +132,8 @@ export class AscensionModule extends GameModule {
         gameResources.setResource('perks', 0);
         gameResources.addResource('dragon-egg', gain.total);
         resourcesManager.reassertAll();
-        console.log('AP:', gameResources.resources, this.numAscensions);
-        console.log('ENTS: ', Object.values(gameEntity.entities).filter(one => one.level > 0))
+        // console.log('AP:', gameResources.resources, this.numAscensions);
+        // console.log('ENTS: ', Object.values(gameEntity.entities).filter(one => one.level > 0))
         this.sendUpgradesData();
     }
 

@@ -56,6 +56,19 @@ export const checkMatchingActionListRule = (rule) => {
     return false;
 }
 
+export const checkMatchingSpellRunningRule = (rule) => {
+    const spellIsRunning = gameCore.getModule('magic').spells[rule.spell_id]?.isRunning;
+
+    switch (rule.condition) {
+        case 'true':
+            return !!spellIsRunning;
+        case 'false':
+            return !spellIsRunning;
+    }
+
+    return false;
+}
+
 export const checkMatchingActionTagRule = (rule) => {
     const actionRunning = gameCore.getModule('actions').isRunningActionWithTag(rule.tag);
 
@@ -64,6 +77,21 @@ export const checkMatchingActionTagRule = (rule) => {
             return !!actionRunning;
         case 'false':
             return !actionRunning;
+    }
+
+    return false;
+}
+
+export const checkMatchingCraftingListRule = (rule) => {
+    const listRunning = gameCore.getModule('crafting').lists.runningList?.crafting?.id == rule.crafting_list_id;
+
+    // console.log('CraftingList: ', gameCore.getModule('crafting').lists.runningList?.crafting, rule);
+
+    switch (rule.condition) {
+        case 'true':
+            return !!listRunning;
+        case 'false':
+            return !listRunning;
     }
 
     return false;
@@ -111,6 +139,12 @@ export const checkMatchingRule = (rule) => {
     }
     if(rule.compare_type === 'running_action_list') {
         return checkMatchingActionListRule(rule);
+    }
+    if(rule.compare_type === 'spell_running') {
+        return checkMatchingSpellRunningRule(rule);
+    }
+    if(rule.compare_type === 'crafting_list_running') {
+        return checkMatchingCraftingListRule(rule);
     }
 }
 

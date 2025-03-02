@@ -8,10 +8,14 @@ import {ResourceCost} from "../../shared/resource-cost.jsx";
 import {Plantations} from "./plantations.jsx";
 import {ResourceComparison} from "../../shared/resource-comparison.jsx";
 import {ResourceEffects} from "../../shared/resource-effects.jsx";
+import {useAppContext} from "../../../context/ui-context";
 
 export const PlantationsWrap = ({ children }) => {
 
     const worker = useContext(WorkerContext);
+
+    const { isMobile } = useAppContext();
+    const [isDetailVisible, setDetailVisible] = useState(!isMobile);
 
     const { onMessage, sendData } = useWorkerClient(worker);
 
@@ -45,30 +49,32 @@ export const PlantationsWrap = ({ children }) => {
     return (<div className={'items-wrap'}>
 
         <div className={'items ingame-box'}>
-            <div className={'head'}>
+            <div className={'head workshop'}>
                 {children}
             </div>
             <Plantations setItemDetails={setItemDetails} newUnlocks={newUnlocks.workshop?.items?.plantations?.items}/>
         </div>
 
-        <div className={'item-detail ingame-box detail-blade'}>
-            {detailOpened ? (<ItemDetails itemId={detailOpened} category={'plantations'}/>) : null}
-        </div>
+        {(!isMobile || detailOpened || isDetailVisible) ? (<div className={'item-detail ingame-box detail-blade'}>
+            {detailOpened ? (<ItemDetails itemId={detailOpened} category={'plantations'} setItemDetails={setItemDetails}/>) : null}
+        </div>) : null}
     </div>)
 
 }
 
 
-export const ItemDetails = ({itemId, category}) => {
+export const ItemDetails = ({itemId, category, setItemDetails}) => {
 
     const worker = useContext(WorkerContext);
+
+    const { isMobile } = useAppContext()
 
     const { onMessage, sendData } = useWorkerClient(worker);
 
     const [item, setDetailOpened] = useState(null);
 
     useEffect(() => {
-        console.log('Details: ', itemId, category);
+        // console.log('Details: ', itemId, category);
 
         const interval = setInterval(() => {
             sendData('query-plantation-details', { id: itemId });
@@ -82,7 +88,7 @@ export const ItemDetails = ({itemId, category}) => {
     }, [itemId])
 
     onMessage('plantation-details', (items) => {
-        console.log('PlantDetails: ', items)
+        // console.log('PlantDetails: ', items)
         setDetailOpened(items);
     })
 
@@ -125,6 +131,9 @@ export const ItemDetails = ({itemId, category}) => {
                         <p className={'hint yellow'}>Build more water pumps to increase watering level (See property tab)</p>
                     </div> ) : null}
                 </div> ) : null}
+                {isMobile ? (<div className={'block buttons'}>
+                    <button onClick={() => setItemDetails(null)}>Close</button>
+                </div>) : null}
             </div>
         </PerfectScrollbar>
     )

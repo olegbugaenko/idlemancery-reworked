@@ -8,10 +8,13 @@ import {RawResource} from "../../shared/raw-resource.jsx";
 import {BreakDown} from "../../layout/sidebar.jsx";
 import {TippyWrapper} from "../../shared/tippy-wrapper.jsx";
 import {Balances} from "../shared.jsx";
+import {useAppContext} from "../../../context/ui-context";
 
 export const Plantations = ({ setItemDetails, newUnlocks }) => {
 
     const worker = useContext(WorkerContext);
+
+    const { isMobile } = useAppContext();
 
     const { onMessage, sendData } = useWorkerClient(worker);
     const [plantationsData, setItemsData] = useState({
@@ -71,7 +74,7 @@ export const Plantations = ({ setItemDetails, newUnlocks }) => {
             <PerfectScrollbar>
                 <div className={'flex-container'}>
                     {plantationsData.available.map(plantable => <NewNotificationWrap id={`plantation_${plantable.id}`} className={'narrow-wrapper'} isNew={newUnlocks?.all?.items?.[`plantation_${plantable.id}`]?.hasNew}>
-                        <ItemCard key={plantable.id} {...plantable} onPurchase={purchaseItem} onShowDetails={setItemDetails} onDemolish={onDemolish} isWateringUnlocked={plantationsData.isWateringUnlocked} setWateringLevel={setWateringLevel}/>
+                        <ItemCard key={plantable.id} {...plantable} onPurchase={purchaseItem} onShowDetails={setItemDetails} onDemolish={onDemolish} isWateringUnlocked={plantationsData.isWateringUnlocked} setWateringLevel={setWateringLevel} isMobile={isMobile}/>
                     </NewNotificationWrap>)}
                 </div>
             </PerfectScrollbar>
@@ -79,9 +82,14 @@ export const Plantations = ({ setItemDetails, newUnlocks }) => {
     </div>)
 }
 
-export const ItemCard = ({ id, icon_id, resourceAmount, resourceBalance, breakDown, name, level, maxLevel, affordable, onPurchase, onDemolish, onShowDetails, wateringLevel, isWateringUnlocked, setWateringLevel}) => {
+export const ItemCard = ({ id, icon_id, resourceAmount, resourceBalance, breakDown, name, level, maxLevel, affordable, onPurchase, onDemolish, onShowDetails, wateringLevel, isWateringUnlocked, setWateringLevel, isMobile}) => {
 
-    return (<div className={`card craftable plantable`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)}>
+    return (<div
+        className={`card craftable plantable`}
+        onMouseEnter={() => !isMobile ? onShowDetails(id) : null}
+        onMouseLeave={() => !isMobile ? onShowDetails(null) : null}
+        onClick={() => isMobile ? onShowDetails(id) : null}
+    >
         <div className={'flex-container two-side-card'}>
             <div className={'left'}>
                 <img src={`icons/resources/${icon_id}.png`} className={'resource big'}/>
@@ -95,13 +103,25 @@ export const ItemCard = ({ id, icon_id, resourceAmount, resourceBalance, breakDo
                 {isWateringUnlocked ? (<div className={'watering-settings'}>
                     <label>
                         <span>Watering Level:</span>
-                        <input type={'number'} value={wateringLevel} onChange={(e) => setWateringLevel(id, +e.target.value)}/>
+                        <input type={'number'} value={wateringLevel} onChange={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setWateringLevel(id, +e.target.value)
+                        }}/>
                     </label>
                 </div> ) : null}
                 <div className={'bottom'}>
                     <div className={'buttons'}>
-                        <button disabled={!affordable.isAffordable} onClick={() => onPurchase(id)}>{level > 0 ? 'Upgrade' : 'Purchase'}</button>
-                        <button disabled={level <= 0} onClick={() => onDemolish(id)}>Demolish</button>
+                        <button disabled={!affordable.isAffordable} onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            onPurchase(id)
+                        }}>{level > 0 ? 'Upgrade' : 'Purchase'}</button>
+                        <button disabled={level <= 0} onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            onDemolish(id)
+                        }}>Demolish</button>
                     </div>
                 </div>
             </div>

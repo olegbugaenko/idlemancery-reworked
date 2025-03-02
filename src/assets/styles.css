@@ -164,6 +164,7 @@ p.small-hint, span.small-hint {
     display: flex;
 }
 
+
 .content-wrap .sidebar {
     width: 320px;
     height: calc(100% - 10px);
@@ -175,6 +176,7 @@ p.small-hint, span.small-hint {
     position: relative;
 }
 
+
 .content-wrap .sidebar .resource-item {
     padding: 2px 5px;
     margin: 0;
@@ -183,6 +185,7 @@ p.small-hint, span.small-hint {
     font-size: 14px;
     padding-top: 3px;
     border-bottom: 1px solid #222233;
+    position: relative;
 }
 
 .content-wrap .sidebar .holder:hover {
@@ -207,6 +210,15 @@ p.small-hint, span.small-hint {
     padding-left: 4px;
 }
 
+.content-wrap .sidebar .holder.negative .resource-item span,
+.content-wrap .sidebar .holder.negative .resource-item .name-wrap {
+    color: var(--yellow);
+}
+
+.content-wrap .sidebar .holder.positive .resource-item span,
+.content-wrap .sidebar .holder.positive .resource-item .name-wrap {
+    color: var(--green);
+}
 
 .content-wrap .sidebar .resource-item.affordable {
     background: var(--darkgreen);
@@ -2451,4 +2463,166 @@ h4.title span {
 
 .hint-popup .etas-milestones .flex-row {
     padding-left: 16px;
+}
+
+.consumption-block {
+    display: flex;
+    justify-content: space-between;
+}
+
+.next-unlock-holder {
+    height: 2px;
+    background-color: #333333;
+    position: absolute;
+    bottom: 0px;
+    width: calc(100% - 10px);
+    display: block;
+}
+
+.next-unlock-holder .next-unlock-bar {
+    height: 2px;
+    background-color: var(--highlight);
+}
+
+.next-unlock-holder.resource {
+    height: 2px;
+    background-color: #555;
+    position: absolute;
+    bottom: 0px;
+    width: calc(100% - 10px);
+    display: block;
+}
+
+.next-unlock-holder.resource .next-unlock-bar {
+    height: 2px;
+    background-color: #aaa;
+}
+
+@media screen and (max-width: 1600px) {
+    .map-wrap .head {
+        height: 90px;
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .map-wrap .head .other-filters {
+        flex-basis: 300px;
+        flex-shrink: 0;
+        flex-grow: 1;
+    }
+}
+
+@media screen and (max-width: 1300px){
+    .content-wrap {
+        height: calc(100vh - 160px);
+        display: block;
+        overflow-y: scroll !important;
+        overflow-x: hidden !important;
+    }
+
+    .content-wrap .sidebar {
+        width: 100%;
+        height: auto;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+
+    .content-wrap .sidebar .upper {
+        width: 320px;
+    }
+
+    .content-wrap .sidebar .lower {
+        width: 320px;
+    }
+
+    .content-wrap .sidebar .effects-list {
+        position: relative;
+        margin-top: 12px;
+    }
+
+    .content-wrap .actions-wrap,
+    .content-wrap .items-wrap,
+    .content-wrap .inventory-wrap{
+        display: block;
+    }
+
+    .footer {
+        z-index: 1;
+        position: fixed;
+        bottom: 0px;
+    }
+
+    .page-wrap {
+        height: 100vh;
+    }
+
+    .content-wrap .content {
+        margin: 6px 18px;
+        height: auto;
+    }
+
+    ul.menu {
+        flex-wrap: wrap;
+    }
+
+    .actions-wrap .categories {
+        height: auto;
+    }
+
+    .footer {
+        height: auto;
+    }
+
+    .detail-blade {
+        width: 90%;
+        height: calc(100vh - 200px);
+        position: fixed;
+        top: 20px;
+        margin: auto;
+    }
+
+    .detail-blade .blade-inner {
+        overflow-x: hidden;
+        margin-bottom: 16px;
+    }
+
+    .detail-blade.forced-bottom {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+
+    .actions-wrap .additional-filters {
+        justify-content: space-between;
+    }
+
+    .action-lists-panel .flex-container .panel-col .list-selector {
+        position: fixed;
+        bottom: 200px;
+        left: 16px;
+    }
+    
+    span.highlighted-span {
+        cursor: pointer;
+        margin-left: 8px;
+    }
+
+    .items-wrap .items .menu-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .map-wrap .head {
+        height: 90px;
+    }
+
+    .workshop.head {
+        display: flex;
+    }
+
+    .workshop.head .menu-wrap {
+        flex: 1;
+    }
 }

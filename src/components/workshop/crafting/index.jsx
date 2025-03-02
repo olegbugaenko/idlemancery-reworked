@@ -10,10 +10,14 @@ import {ResourceComparison} from "../../shared/resource-comparison.jsx";
 import RulesList from "../../shared/rules-list.jsx";
 import {cloneDeep} from "lodash";
 import StatRow from "../../shared/stat-row.jsx";
+import {useAppContext} from "../../../context/ui-context";
 
 export const CraftingWrap = ({ children }) => {
 
     const worker = useContext(WorkerContext);
+
+    const { isMobile } = useAppContext();
+    const [isDetailVisible, setDetailVisible] = useState(!isMobile);
 
     const { onMessage, sendData } = useWorkerClient(worker);
 
@@ -50,7 +54,7 @@ export const CraftingWrap = ({ children }) => {
     })
 
     onMessage('crafting-list-data', (payload) => {
-        console.log(`currViewing LIST: `, payload, listDetails);
+        // console.log(`currViewing LIST: `, payload, listDetails);
         if(!listDetails) return;
 
         setListDetails({
@@ -176,14 +180,14 @@ export const CraftingWrap = ({ children }) => {
     }, [listDetails])
 
     useEffect(() => {
-        console.log('Called select list', listDetails);
+        // console.log('Called select list', listDetails);
     }, [listDetails])
 
     const addItemToList = useCallback(({id, name}) => {
-        console.log('Add recipe to list', id, listDetails);
+        // console.log('Add recipe to list', id, listDetails);
         if(listDetails?.listData && listDetails?.isEdit) {
             if(id) {
-                console.log('Insert recipe to list: ', id, listDetails);
+                // console.log('Insert recipe to list: ', id, listDetails);
                 if(!listDetails.listData.recipes.find(one => one.id === id)) {
                     const newList = cloneDeep(listDetails.listData);
                     newList.recipes.push({
@@ -202,7 +206,7 @@ export const CraftingWrap = ({ children }) => {
 
     const openListDetails = (list) => {
         if(list.listData?.id) {
-            console.log('loading list: ', list);
+            // console.log('loading list: ', list);
             setListDetails({
                 isEdit: list.isEdit,
                 isLoading: true,
@@ -269,13 +273,16 @@ export const CraftingWrap = ({ children }) => {
     return (<div className={'items-wrap'}>
 
         <div className={'items ingame-box'}>
-            <div className={'head'}>
+            <div className={'head workshop'}>
                 {children}
+                {isMobile ? (<div>
+                    <span className={'highlighted-span'} onClick={() => setDetailVisible(true)}>Info</span>
+                </div>) : null}
             </div>
-            <Crafting filterId={'crafting'} setItemDetails={setItemDetails} setItemLevel={setItemLevel} newUnlocks={newUnlocks.workshop?.items?.crafting?.items} openListDetails={openListDetails} addItemToList={addItemToList}/>
+            <Crafting filterId={'crafting'} setItemDetails={setItemDetails} setItemLevel={setItemLevel} newUnlocks={newUnlocks.workshop?.items?.crafting?.items} openListDetails={openListDetails} addItemToList={addItemToList} isEditList={listDetails?.isEdit}/>
         </div>
 
-        <div className={`item-detail ingame-box detail-blade ${listDetails?.listData && (listDetails?.isEdit || !detailOpened) ? 'wide-blade' : ''}`}>
+        {(!isMobile || isDetailVisible || listDetails?.listData || detailOpened) ? (<div className={`item-detail ingame-box detail-blade ${listDetails?.listData && (listDetails?.isEdit || !detailOpened) ? 'wide-blade' : ''} ${listDetails?.listData ? 'forced-bottom' : ''}`}>
             {listDetails?.listData && (listDetails?.isEdit || !detailOpened) ? (<CraftingListDetails
                 listDetails={listDetails.listData}
                 isEditing={listDetails.isEdit}
@@ -290,15 +297,15 @@ export const CraftingWrap = ({ children }) => {
                 onCloseList={onCloseList}
                 onToggleAutotrigger={onToggleAutotrigger}
             />) : null}
-            {detailOpened && !listDetails?.isEdit ? (<ItemDetails itemId={detailOpened} category={'crafting'}/>) : null}
-            {!detailOpened && !listDetails?.listData ? (<GeneralStats />) : null}
-        </div>
+            {detailOpened && !listDetails?.isEdit ? (<ItemDetails itemId={detailOpened} category={'crafting'} setItemDetails={setItemDetails}/>) : null}
+            {!detailOpened && !listDetails?.listData ? (<GeneralStats setDetailVisible={setDetailVisible}/>) : null}
+        </div>) : null}
     </div>)
 
 }
 
 
-export const GeneralStats = ({ }) => {
+export const GeneralStats = ({ setDetailVisible }) => {
 
     const [data, setData] = useState({
         isProducingEffort: false,
@@ -307,6 +314,8 @@ export const GeneralStats = ({ }) => {
     });
 
     const worker = useContext(WorkerContext);
+
+    const { isMobile } = useAppContext();
 
     const { onMessage, sendData } = useWorkerClient(worker);
 
@@ -345,22 +354,27 @@ export const GeneralStats = ({ }) => {
                         {hasEffect(stat) ? (<StatRow stat={stat} />) : null}
                     </div> ))}
                 </div>
+                {isMobile ? (<div className={'block buttons'}>
+                    <button onClick={() => setDetailVisible(false)}>Close</button>
+                </div>) : null}
             </div>
         </PerfectScrollbar>
     )
 }
 
 
-export const ItemDetails = ({itemId, category}) => {
+export const ItemDetails = ({itemId, category, setItemDetails}) => {
 
     const worker = useContext(WorkerContext);
+
+    const { isMobile } = useAppContext()
 
     const { onMessage, sendData } = useWorkerClient(worker);
 
     const [item, setDetailOpened] = useState(null);
 
     useEffect(() => {
-        console.log('Details: ', itemId, category);
+        // console.log('Details: ', itemId, category);
         if(category === 'crafting') {
             const interval = setInterval(() => {
                 sendData('query-crafting-details', { id: itemId });
@@ -375,7 +389,7 @@ export const ItemDetails = ({itemId, category}) => {
 
 
     onMessage('crafting-details', (items) => {
-        console.log('CraftDetails: ', items)
+        // console.log('CraftDetails: ', items)
         setDetailOpened(items);
     })
 
@@ -414,6 +428,9 @@ export const ItemDetails = ({itemId, category}) => {
                         }
                     </div>
                 </div>
+                {isMobile ? (<div className={'block buttons'}>
+                    <button onClick={() => setItemDetails(null)}>Close</button>
+                </div>) : null}
             </div>
         </PerfectScrollbar>
     )
@@ -443,12 +460,12 @@ export const CraftingListDetails = ({
     })
 
     useEffect(() => {
-        console.log('SET EDITING LIST: ', listDetails);
+        // console.log('SET EDITING LIST: ', listDetails);
         setEditing(listDetails);
     }, [listDetails])
 
     const saveAndClose = (isClose) => {
-        console.log('Saving: ', editing);
+        // console.log('Saving: ', editing);
         if(!isClose) {
             editing.isReopenEdit = true;
         }

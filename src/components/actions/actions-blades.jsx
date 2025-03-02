@@ -12,6 +12,7 @@ import RulesList from "../shared/rules-list.jsx";
 import StatRow from "../shared/stat-row.jsx";
 import {useTutorial} from "../../context/tutorial-context";
 import {ProgressBar} from "../layout/progress-bar.jsx";
+import {useAppContext} from "../../context/ui-context";
 
 
 export const ActionDetails = ({actionId, onClose, isSelected}) => {
@@ -37,7 +38,7 @@ export const ActionDetails = ({actionId, onClose, isSelected}) => {
 
 
     onMessage('action-details', (actions) => {
-        console.log('received-details: ', actions, actionId);
+        // console.log('received-details: ', actions, actionId);
         setDetailOpened(actions);
     })
 
@@ -55,7 +56,7 @@ export const ActionDetailsComponent = React.memo(({onClose, isSelected, ...actio
     useEffect(() => {
 
         if(action.id === 'action_walk') {
-            console.log('COMRF: ', stepIndex);
+            // console.log('COMRF: ', stepIndex);
             requestAnimationFrame(() => {
                 unlockNextById(5);
             });
@@ -238,7 +239,7 @@ export const ListEditor = React.memo(({
     }, [listData])
 
     const saveAndClose = (isClose) => {
-        console.log('Saving: ', editing);
+        // console.log('Saving: ', editing);
         if(!isClose) {
             editing.isReopenEdit = true;
         }
@@ -397,11 +398,13 @@ export const ListEditor = React.memo(({
     return true;
 }))
 
-export const GeneralStats = ({ stats, aspects }) => {
+export const GeneralStats = ({ stats, aspects, setDetailVisible }) => {
 
     const worker = useContext(WorkerContext);
 
     const { onMessage, sendData } = useWorkerClient(worker);
+
+    const {isMobile} = useAppContext();
 
     const setAspectLevel = (id, level) => {
         sendData('set-action-aspect-level', { id, level });
@@ -417,7 +420,7 @@ export const GeneralStats = ({ stats, aspects }) => {
     }
 
     const highLightAffectedActions = (id) => {
-        sendData('set-monitored', { type: 'learn_modifier', id });
+        sendData('set-monitored', { scope: 'actions', type: 'learn_modifier', id });
     }
 
 
@@ -459,13 +462,16 @@ export const GeneralStats = ({ stats, aspects }) => {
                 ))}
             </div>
         </div>
-        <div className={'block'}>
+        {Object.values(stats?.xpDiscounts || {}).filter(one => hasEffect(one)).length ? (<div className={'block'}>
             <p>Learn XP Discounts:</p>
             <div className={'effects'}>
                 {Object.values(stats?.xpDiscounts || {}).filter(one => hasEffect(one)).map(one => (
-                    <StatRow onHover={highLightAffectedActions} stat={{...one, isMultiplier: true}} />
+                    <StatRow onHover={highLightAffectedActions} stat={{...one, isMultiplier: true}}/>
                 ))}
             </div>
-        </div>
+        </div>) : null}
+        {isMobile ? (<div className={'block'}>
+            <button onClick={() => setDetailVisible(false)}>Close</button>
+        </div>) : null}
     </PerfectScrollbar>)
 }

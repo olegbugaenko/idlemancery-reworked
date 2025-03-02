@@ -10,11 +10,15 @@ import {FlashOverlay} from "../layout/flash-overlay.jsx";
 import {useFlashOnLevelUp} from "../../general/hooks/flash";
 import {ResourceComparison} from "../shared/resource-comparison.jsx";
 import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
+import {useAppContext} from "../../context/ui-context";
 
 export const Shop = ({}) => {
     const [detailOpened, setDetailOpened] = useState(null)
 
     const worker = useContext(WorkerContext);
+
+    const { isMobile } = useAppContext();
+    const [isDetailVisible, setDetailVisible] = useState(!isMobile);
 
     const { onMessage, sendData } = useWorkerClient(worker);
 
@@ -68,6 +72,11 @@ export const Shop = ({}) => {
         setNewUnlocks(payload);
     })
 
+    const onCloseDetails = useCallback((e) => {
+        setDetailVisible(false);
+        setItemDetails(null)
+    }, []);
+
     return (
         <div className={'items-wrap'}>
             <div className={'items ingame-box'}>
@@ -92,22 +101,30 @@ export const Shop = ({}) => {
                             </NewNotificationWrap>
                         </li>) : null}
                     </ul>
+                    {isMobile ? (<div>
+                        <span className={'highlighted-span'} onClick={() => setDetailVisible(true)}>Info</span>
+                    </div>) : null}
                 </div>
-                {selectedTab === 'upgrades' ? (<ShopUpgrades setItemDetails={setItemDetails} purchaseItem={purchaseItem} newUnlocks={newUnlocks?.['shop']?.items?.['upgrades']?.items}/>) : null}
-                {selectedTab === 'items' ? (<ShopItems setItemDetails={setItemDetails} purchaseItem={purchaseResource} newUnlocks={newUnlocks?.['shop']?.items?.['inventory']?.items}/>) : null}
-                {selectedTab === 'courses' ? (<CourseItems setItemDetails={setItemDetails} purchaseItem={purchaseCourse} newUnlocks={newUnlocks?.['shop']?.items?.['courses']?.items}/>) : null}
+                {selectedTab === 'upgrades' ? (<ShopUpgrades isMobile={isMobile} setItemDetails={setItemDetails} purchaseItem={purchaseItem} newUnlocks={newUnlocks?.['shop']?.items?.['upgrades']?.items}/>) : null}
+                {selectedTab === 'items' ? (<ShopItems isMobile={isMobile} setItemDetails={setItemDetails} purchaseItem={purchaseResource} newUnlocks={newUnlocks?.['shop']?.items?.['inventory']?.items}/>) : null}
+                {selectedTab === 'courses' ? (<CourseItems isMobile={isMobile} setItemDetails={setItemDetails} purchaseItem={purchaseCourse} newUnlocks={newUnlocks?.['shop']?.items?.['courses']?.items}/>) : null}
             </div>
 
-            <div className={'item-detail ingame-box detail-blade'}>
-                {detailOpened ? (<ItemDetails itemId={detailOpened} category={selectedTab}/>) : (<GeneralStats />)}
-            </div>
+            {(!isMobile || isDetailVisible || detailOpened) ? (<div className={'item-detail ingame-box detail-blade'}>
+                {detailOpened ? (<ItemDetails
+                    itemId={detailOpened}
+                    category={selectedTab}
+                    onClose={onCloseDetails}
+                    onPurchase={selectedTab === 'items' ? purchaseResource : undefined}
+                />) : (<GeneralStats setDetailVisible={setDetailVisible}/>)}
+            </div>) : null}
         </div>
 
     )
 
 }
 
-export const ShopUpgrades = ({ setItemDetails, purchaseItem, newUnlocks }) => {
+export const ShopUpgrades = ({ setItemDetails, purchaseItem, newUnlocks, isMobile }) => {
 
     const worker = useContext(WorkerContext);
 
@@ -160,7 +177,7 @@ export const ShopUpgrades = ({ setItemDetails, purchaseItem, newUnlocks }) => {
             <PerfectScrollbar>
                 <div className={'flex-container'}>
                     {itemsData.available.map(item => <NewNotificationWrap key={`shop_${item.id}`} id={`shop_${item.id}`} className={'narrow-wrapper'} isNew={newUnlocks?.all?.items?.[`shop_${item.id}`]?.hasNew}>
-                        <ItemCard onFlash={handleFlash} key={item.id} {...item} onPurchase={purchaseItem} onShowDetails={setItemDetails} toggleAutopurchase={toggleAutopurchase} isAutomationUnlocked={itemsData.isAutomationUnlocked}/>
+                        <ItemCard isMobile={isMobile} onFlash={handleFlash} key={item.id} {...item} onPurchase={purchaseItem} onShowDetails={setItemDetails} toggleAutopurchase={toggleAutopurchase} isAutomationUnlocked={itemsData.isAutomationUnlocked}/>
                     </NewNotificationWrap>)}
                     {overlayPositions.map((position, index) => (
                         <FlashOverlay key={index} position={position} />
@@ -171,7 +188,7 @@ export const ShopUpgrades = ({ setItemDetails, purchaseItem, newUnlocks }) => {
     </div>)
 }
 
-export const ShopItems = ({ setItemDetails, purchaseItem, newUnlocks }) => {
+export const ShopItems = ({ setItemDetails, purchaseItem, newUnlocks, isMobile }) => {
 
     const worker = useContext(WorkerContext);
 
@@ -185,7 +202,7 @@ export const ShopItems = ({ setItemDetails, purchaseItem, newUnlocks }) => {
     const [overlayPositions, setOverlayPositions] = useState([]);
 
     const handleFlash = (position) => {
-        console.log('Adding flash: ', position);
+        // console.log('Adding flash: ', position);
         setOverlayPositions((prev) => [...prev, position]);
         setTimeout(() => {
             setOverlayPositions((prev) => prev.filter((p) => p !== position));
@@ -237,7 +254,7 @@ export const ShopItems = ({ setItemDetails, purchaseItem, newUnlocks }) => {
             <PerfectScrollbar>
                 <div className={'flex-container'}>
                     {itemsData.available.map(item => <NewNotificationWrap key={`shop_${item.id}`} id={`shop_${item.id}`} className={'narrow-wrapper'} isNew={newUnlocks?.all?.items?.[`shop_${item.id}`]?.hasNew}>
-                        <ItemResourceCard onFlash={handleFlash} key={item.id} {...item} onPurchase={purchaseItem} onShowDetails={setItemDetails}/>
+                        <ItemResourceCard isMobile={isMobile} onFlash={handleFlash} key={item.id} {...item} onPurchase={purchaseItem} onShowDetails={setItemDetails}/>
                     </NewNotificationWrap>)}
                     {overlayPositions.map((position, index) => (
                         <FlashOverlay key={index} position={position} />
@@ -249,7 +266,7 @@ export const ShopItems = ({ setItemDetails, purchaseItem, newUnlocks }) => {
 }
 
 
-export const CourseItems = ({ setItemDetails, purchaseItem, newUnlocks }) => {
+export const CourseItems = ({ setItemDetails, purchaseItem, newUnlocks, isMobile }) => {
 
     const worker = useContext(WorkerContext);
 
@@ -290,7 +307,7 @@ export const CourseItems = ({ setItemDetails, purchaseItem, newUnlocks }) => {
         <PerfectScrollbar>
             <div className={'flex-container'}>
                 {itemsData.available.map(item => <NewNotificationWrap key={`course_${item.id}`} id={`course_${item.id}`} className={'narrow-wrapper'} isNew={newUnlocks?.all?.items?.[`course_${item.id}`]?.hasNew}>
-                    <CourseCard onFlash={handleFlash} key={item.id} {...item} onPurchase={purchaseItem} onShowDetails={setItemDetails} toggleAutopurchase={toggleAutopurchase} isAutomationUnlocked={itemsData.isAutomationUnlocked}/>
+                    <CourseCard isMobile={isMobile} onFlash={handleFlash} key={item.id} {...item} onPurchase={purchaseItem} onShowDetails={setItemDetails} toggleAutopurchase={toggleAutopurchase} isAutomationUnlocked={itemsData.isAutomationUnlocked}/>
                 </NewNotificationWrap>)}
                 {overlayPositions.map((position, index) => (
                     <FlashOverlay key={index} position={position} />
@@ -300,24 +317,32 @@ export const CourseItems = ({ setItemDetails, purchaseItem, newUnlocks }) => {
     </div>)
 }
 
-export const ItemCard = ({ id, name, level, max, affordable, isLeveled, isCapped, onFlash, onPurchase, onShowDetails, isAutoPurchase, toggleAutopurchase, isAutomationUnlocked}) => {
+export const ItemCard = ({ id, name, level, max, affordable, isLeveled, isCapped, onFlash, onPurchase, onShowDetails, isAutoPurchase, toggleAutopurchase, isAutomationUnlocked, isMobile}) => {
 
     const elementRef = useRef(null);
 
     useFlashOnLevelUp(isLeveled, onFlash, elementRef);
 
 
-    return (<div ref={elementRef} className={`shop-card card item flashable ${affordable.hardLocked ? 'hard-locked' : ''}  ${!affordable.isAffordable ? 'unavailable' : ''} ${isCapped ? 'capped' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)}>
+    return (<div ref={elementRef} className={`shop-card card item flashable ${affordable.hardLocked ? 'hard-locked' : ''}  ${!affordable.isAffordable ? 'unavailable' : ''} ${isCapped ? 'capped' : ''}`} onMouseEnter={() => {if(!isMobile) onShowDetails(id)}} onMouseLeave={() => {if(!isMobile) onShowDetails(null)}} onClick={() => {if(isMobile) onShowDetails(id)}}>
         <div className={'head'}>
             <p className={'title'}>{name}</p>
             <span className={'level'}>{formatInt(level)}{max ? `/${formatInt(max)}` : ''}</span>
         </div>
         <div className={'bottom'}>
             <div className={'buttons'}>
-                <button disabled={!affordable.isAffordable || isCapped} onClick={() => onPurchase(id)}>Purchase</button>
-                {isAutomationUnlocked && !isCapped ? (<label className={'autobuy-label'}>
+                <button
+                    disabled={!affordable.isAffordable || isCapped}
+                    onClick={(e) => {e.stopPropagation(); e.preventDefault(); onPurchase(id)}}
+                >Purchase</button>
+                {isAutomationUnlocked && !isCapped ? (<label
+                    className={'autobuy-label'}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                    }}
+                >
                     <input type={'checkbox'} checked={isAutoPurchase}
-                           onChange={() => toggleAutopurchase(id, !isAutoPurchase)}/>
+                           onChange={(e) => {e.stopPropagation(); e.preventDefault(); toggleAutopurchase(id, !isAutoPurchase)}}/>
                     Autobuy
                 </label>) : null}
             </div>
@@ -325,13 +350,25 @@ export const ItemCard = ({ id, name, level, max, affordable, isLeveled, isCapped
     </div> )
 }
 
-export const ItemResourceCard = ({ id, name, purchaseMultiplier, stock, level, max, amount, affordable, isLeveled, onFlash, onPurchase, onShowDetails}) => {
+export const ItemResourceCard = ({ id, name, purchaseMultiplier, stock, level, max, amount, affordable, isLeveled, onFlash, onPurchase, onShowDetails, isMobile}) => {
 
     const elementRef = useRef(null);
 
     useFlashOnLevelUp(isLeveled, onFlash, elementRef);
 
-    return (<div ref={elementRef} className={`icon-card item flashable ${affordable.hardLocked ? 'hard-locked' : ''}  ${!affordable.isAffordable ? 'unavailable' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)} onClick={(e) => onPurchase(id, e.shiftKey ? 1e9 : purchaseMultiplier)}>
+    return (<div
+        ref={elementRef}
+        className={`icon-card item flashable ${affordable.hardLocked ? 'hard-locked' : ''}  ${!affordable.isAffordable ? 'unavailable' : ''}`}
+        onMouseEnter={() => isMobile ? null : onShowDetails(id)}
+        onMouseLeave={() => isMobile ? null : onShowDetails(null)}
+        onClick={(e) => {
+            console.log('isMobile', isMobile);
+            if(isMobile) {
+                onShowDetails(id)
+            } else {
+                onPurchase(id, e.shiftKey ? 1e9 : purchaseMultiplier)
+            }
+        }}>
         <TippyWrapper
             content={<div className={'hint-popup'}>
                 <p>{name} {amount > 0 ? `(${formatInt(amount)} in inventory)` : ''}</p>
@@ -347,15 +384,27 @@ export const ItemResourceCard = ({ id, name, purchaseMultiplier, stock, level, m
 }
 
 
-export const CourseCard = ({ toNext, id, efficiency, isRunning, name, level, progress, maxProgress, max, affordable, isLeveled, onFlash, onPurchase, onShowDetails, isAutoPurchase, toggleAutopurchase, isAutomationUnlocked}) => {
+export const CourseCard = ({ toNext, id, efficiency, isRunning, name, level, progress, maxProgress, max, affordable, isLeveled, onFlash, onPurchase, onShowDetails, isAutoPurchase, toggleAutopurchase, isAutomationUnlocked, isMobile}) => {
 
     const elementRef = useRef(null);
 
     useFlashOnLevelUp(isLeveled, onFlash, elementRef);
 
 
-    return (<div ref={elementRef} className={`course-card card item flashable ${isRunning ? ' running' : ''} ${efficiency < 1 ? ' efficiency-dropped lower-eff' : ''}  ${affordable.hardLocked ? 'hard-locked' : ''}  ${!affordable.isAffordable ? 'unavailable' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)}>
-        <div className={'progress-bg'} style={{ width: `${100*progress/maxProgress}%`}}></div>
+    return (<div
+        ref={elementRef}
+        className={`course-card card item flashable ${isRunning ? ' running' : ''} ${efficiency < 1 ? ' efficiency-dropped lower-eff' : ''}  ${affordable.hardLocked ? 'hard-locked' : ''}  ${!affordable.isAffordable ? 'unavailable' : ''}`}
+        onMouseEnter={() => isMobile ? null : onShowDetails(id)}
+        onMouseLeave={() => isMobile ? null : onShowDetails(null)}
+        onClick={(e) => {
+            console.log('isMobile', isMobile);
+            if(isMobile) {
+                onShowDetails(id)
+            } else {
+                onPurchase(id, e.shiftKey ? 1e9 : purchaseMultiplier)
+            }
+        }}>
+        <div className={'progress-bg'} style={{ width: `${100*Math.min(1., progress/maxProgress)}%`}}></div>
         <div className={'flex-container two-side-card'}>
             <div className={'left'}>
                 <img src={`icons/courses/${id}.png`} className={'resource big'}/>
@@ -373,7 +422,11 @@ export const CourseCard = ({ toNext, id, efficiency, isRunning, name, level, pro
                 </div>
                 <div className={'bottom'}>
                     <div className={'buttons'}>
-                        <button disabled={!affordable.isAffordable} onClick={() => onPurchase(id, !isRunning)}>{isRunning ? 'Stop' : 'Start'}</button>
+                        <button disabled={!affordable.isAffordable} onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            onPurchase(id, !isRunning)
+                        }}>{isRunning ? 'Stop' : 'Start'}</button>
                         {isAutomationUnlocked ? (<label className={'autobuy-label'}>
                             <input type={'checkbox'} checked={isAutoPurchase}
                                    onChange={() => toggleAutopurchase(id, !isAutoPurchase)}/>
@@ -386,9 +439,11 @@ export const CourseCard = ({ toNext, id, efficiency, isRunning, name, level, pro
     </div> )
 }
 
-export const ItemDetails = ({itemId, category}) => {
+export const ItemDetails = ({itemId, category, onClose, onPurchase}) => {
 
     const worker = useContext(WorkerContext);
+
+    const { isMobile } = useAppContext();
 
     const { onMessage, sendData } = useWorkerClient(worker);
 
@@ -477,14 +532,24 @@ export const ItemDetails = ({itemId, category}) => {
                     </div>
                     <p>Learning Duration: {secondsToString(item.maxProgress)}</p>
                 </div>) : null}
+                {isMobile ? (<div className={'block buttons flex-container'}>
+                    <button onClick={onClose}>Close</button>
+                    {onPurchase ? (<>
+                        <button onClick={() => onPurchase(item.id)}>Purchase</button>
+                        {item.purchaseMultiplier > 1 ? (<button onClick={() => onPurchase(item.id, item.purchaseMultiplier)}>Purchase
+                            x{formatInt(item.purchaseMultiplier)}</button>) : null}
+                    </>) : null}
+                </div>) : null}
             </div>
         </PerfectScrollbar>
     )
 }
 
-export const GeneralStats = ({ category }) => {
+export const GeneralStats = ({ category, setDetailVisible }) => {
 
     const worker = useContext(WorkerContext);
+
+    const { isMobile } = useAppContext();
 
     const { onMessage, sendData } = useWorkerClient(worker);
 
@@ -527,6 +592,9 @@ export const GeneralStats = ({ category }) => {
                         Hover over specific item to see it details
                     </p>
                 </div>
+                {isMobile ? (<div className={'block buttons'}>
+                    <button onClick={() => setDetailVisible(false)}>Close</button>
+                </div>) : null}
             </div>
         </PerfectScrollbar>
     )

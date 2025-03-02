@@ -56,7 +56,7 @@ const getResourceModifierDataSearchable = (rs) => {
 
 const registerGameAction = (id, options) => {
 
-    console.log('RegAct: ', id);
+    // console.log('RegAct: ', id);
     
     const primaryAttribute = options.attributes.primaryAttribute;
     
@@ -73,7 +73,7 @@ const registerGameAction = (id, options) => {
             defaultValue: 1,
         })
 
-        console.log('Registered effect: ', getRankId(id));
+        // console.log('Registered effect: ', getRankId(id));
 
         if(!options.resourceModifier.effectDeps) {
             options.resourceModifier.effectDeps = []

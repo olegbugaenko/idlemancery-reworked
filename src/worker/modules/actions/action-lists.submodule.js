@@ -100,7 +100,7 @@ export class ActionListsSubmodule extends GameModule {
                 }
             }));
 
-            console.log('SendingData: ', JSON.stringify(data.prevEffects), JSON.stringify(data.resourcesEffects), data, id);
+            // console.log('SendingData: ', JSON.stringify(data.prevEffects), JSON.stringify(data.resourcesEffects), data, id);
 
             const proportionsBar = this.getProportionsBar(listData)
 

@@ -27,7 +27,7 @@ export class MapModule extends GameModule {
         })
 
         this.eventHandler.registerHandler('map-highlight-filter', (payload) => {
-            console.log('setHighLight: ', payload);
+            // console.log('setHighLight: ', payload);
             if('highlightUnexplored' in payload) {
                 this.highlightFilters['highlightUnexplored'] = payload.highlightUnexplored;
             }
@@ -41,7 +41,7 @@ export class MapModule extends GameModule {
         })
 
         this.eventHandler.registerHandler('map-highlight-resources', (payload) => {
-            console.log('setHighLight: ', payload);
+            // console.log('setHighLight: ', payload);
             this.highlightResources = {};
             payload.ids.forEach(id => {
                 this.highlightResources[id] = true;
@@ -50,7 +50,7 @@ export class MapModule extends GameModule {
         })
 
         this.eventHandler.registerHandler('map-set-generated-level', (payload) => {
-            console.log('setGeneratedLevel: ', payload);
+            // console.log('setGeneratedLevel: ', payload);
             this.mapCreationSettings.level = Math.max(0, Math.min(Math.floor(gameEffects.getEffectValue('max_map_level')), payload.level));
             this.sendData();
             this.sendGeneralData();
@@ -198,7 +198,7 @@ export class MapModule extends GameModule {
             high: potentialResources.filter(r => r.rarity >= 4 && r.rarity <= 5) // rarity 4-5
         };
 
-        console.log('rarityBuckets: ', rarityBuckets, potentialResources);
+        // console.log('rarityBuckets: ', rarityBuckets, potentialResources);
 
         // Ensure we have at least 1 resource with rarity 0-1
         const drops = [];

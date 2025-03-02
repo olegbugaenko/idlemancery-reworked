@@ -10,10 +10,14 @@ import {ResourceComparison} from "../../shared/resource-comparison.jsx";
 import {cloneDeep} from "lodash";
 import RulesList from "../../shared/rules-list.jsx";
 import StatRow from "../../shared/stat-row.jsx";
+import {useAppContext} from "../../../context/ui-context";
 
 export const AlchemyWrap = ({ children }) => {
 
     const worker = useContext(WorkerContext);
+
+    const { isMobile } = useAppContext();
+    const [isDetailVisible, setDetailVisible] = useState(!isMobile);
 
     const { onMessage, sendData } = useWorkerClient(worker);
 
@@ -269,13 +273,16 @@ export const AlchemyWrap = ({ children }) => {
     return (<div className={'items-wrap'}>
 
         <div className={'items ingame-box'}>
-            <div className={'head'}>
+            <div className={'head workshop'}>
                 {children}
+                {isMobile ? (<div>
+                    <span className={'highlighted-span'} onClick={() => setDetailVisible(true)}>Info</span>
+                </div>) : null}
             </div>
-            <Alchemy filterId={'alchemy'} setItemDetails={setItemDetails} setItemLevel={setItemLevel} newUnlocks={newUnlocks.workshop?.items?.alchemy?.items} openListDetails={openListDetails} addItemToList={addItemToList}/>
+            <Alchemy filterId={'alchemy'} setItemDetails={setItemDetails} setItemLevel={setItemLevel} newUnlocks={newUnlocks.workshop?.items?.alchemy?.items} openListDetails={openListDetails} addItemToList={addItemToList} isEditList={listDetails?.isEdit}/>
         </div>
 
-        <div className={`item-detail ingame-box detail-blade ${listDetails?.listData && (listDetails?.isEdit || !detailOpened) ? 'wide-blade' : ''}`}>
+        {(!isMobile || isDetailVisible || listDetails?.listData || detailOpened) ? (<div className={`item-detail ingame-box detail-blade ${listDetails?.listData && (listDetails?.isEdit || !detailOpened) ? 'wide-blade' : ''} ${listDetails?.listData ? 'forced-bottom' : ''}`}>
             {listDetails?.listData && (listDetails?.isEdit || !detailOpened) ? (<AlchemyListDetails
                 listDetails={listDetails.listData}
                 isEditing={listDetails.isEdit}
@@ -290,18 +297,19 @@ export const AlchemyWrap = ({ children }) => {
                 onToggleAutotrigger={onToggleAutotrigger}
                 onCloseList={onCloseList}
             />) : null}
-            {(detailOpened && !listDetails?.isEdit) ? (<ItemDetails itemId={detailOpened} category={'alchemy'}/>) : null}
-            {!detailOpened && !listDetails?.listData ? (<GeneralStats />) : null}
-        </div>
+            {(detailOpened && !listDetails?.isEdit) ? (<ItemDetails itemId={detailOpened} category={'alchemy'} setItemDetails={setItemDetails}/>) : null}
+            {!detailOpened && !listDetails?.listData ? (<GeneralStats setDetailVisible={setDetailVisible}/>) : null}
+        </div>) : null}
     </div>)
 
 }
 
 
-export const ItemDetails = ({itemId, category}) => {
+export const ItemDetails = ({itemId, category, setItemDetails}) => {
 
     const worker = useContext(WorkerContext);
 
+    const { isMobile } = useAppContext()
     const { onMessage, sendData } = useWorkerClient(worker);
 
     const [item, setDetailOpened] = useState(null);
@@ -370,6 +378,9 @@ export const ItemDetails = ({itemId, category}) => {
                         }
                     </div>
                 </div>
+                {isMobile ? (<div className={'block buttons'}>
+                    <button onClick={() => setItemDetails(null)}>Close</button>
+                </div>) : null}
             </div>
         </PerfectScrollbar>
     )
@@ -539,7 +550,7 @@ export const AlchemyListDetails = ({
 }
 
 
-export const GeneralStats = ({ }) => {
+export const GeneralStats = ({ setDetailVisible }) => {
 
     const [data, setData] = useState({
         isProducingEffort: false,
@@ -548,6 +559,8 @@ export const GeneralStats = ({ }) => {
     });
 
     const worker = useContext(WorkerContext);
+
+    const { isMobile } = useAppContext();
 
     const { onMessage, sendData } = useWorkerClient(worker);
 
@@ -586,6 +599,9 @@ export const GeneralStats = ({ }) => {
                         {hasEffect(stat) ? (<StatRow stat={stat} />) : null}
                     </div> ))}
                 </div>
+                {isMobile ? (<div className={'block buttons'}>
+                    <button onClick={() => setDetailVisible(false)}>Close</button>
+                </div>) : null}
             </div>
         </PerfectScrollbar>
     )

@@ -69,7 +69,7 @@ export class PlantationsModule extends GameModule {
                         wateringLevel: 0,
                     }
                 }
-                console.log(`Set Load ${id} to: `, this.purchasedItems);
+                // console.log(`Set Load ${id} to: `, this.purchasedItems);
                 this.setItem(id, saveObject.items[id]?.level ?? saveObject.items[id], true);
                 if(saveObject.items[id].wateringLevel) {
                     this.setWateringLevel(id, saveObject.items[id].wateringLevel);

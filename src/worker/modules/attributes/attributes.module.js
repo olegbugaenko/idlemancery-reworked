@@ -9,6 +9,7 @@ export class AttributesModule extends GameModule {
     constructor() {
         super();
 
+        this.monitoredData = {};
 
         this.eventHandler.registerHandler('query-attributes-data', (payload) => {
             this.sendAttributesData()
@@ -42,6 +43,25 @@ export class AttributesModule extends GameModule {
 
     }
 
+    setMonitored(data) {
+        this.monitoredData = {};
+        if(!data?.length) return;
+        data.forEach(effect => {
+            let direction = 1;
+            if(effect.scope === 'consumption') {
+                direction = -1;
+            }
+            if(effect.scope === 'multiplier' && effect.value < 1) {
+                direction = -1;
+            }
+            this.monitoredData[effect.id] = {
+                direction,
+                name: effect.name,
+                id: effect.id
+            };
+        })
+    }
+
     getAttributesUnlocks(showUnlocked) {
         const items = gameEffects.listEffectsByTags(['attribute'], false, [], { listPrevious: showUnlocked })
             .filter(one => one.isUnlocked && (one.nextUnlock || (showUnlocked && one.prevUnlocks?.length)))
@@ -66,7 +86,7 @@ export class AttributesModule extends GameModule {
                     }).sort((a, b) => b.level - a.level),
                 }
             });
-        console.log('Attrs: ', showUnlocked, items);
+
 
 
         return items;
@@ -77,8 +97,10 @@ export class AttributesModule extends GameModule {
         const effects = gameEffects.listEffectsByTags(['attribute']);
         const list = effects.filter(one => one.isUnlocked).map(effect => ({
             ...effect,
+            nextProgress: effect.nextUnlock ? effect.value / effect.nextUnlock.level : 0,
+            monitor: this.monitoredData[effect.id] ?? null,
         }))
-
+        // console.log('Attrs: ', list);
         return {
             list,
         }
@@ -88,6 +110,7 @@ export class AttributesModule extends GameModule {
         const effects = gameEffects.listEffectsByTags(['attribute']);
         const list = effects.map(effect => ({
             ...effect,
+            monitor: this.monitoredData[effect.id] ?? null,
             isUnlocked: effect.isUnlocked,
         }))
 

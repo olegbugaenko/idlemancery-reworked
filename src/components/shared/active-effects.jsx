@@ -2,7 +2,7 @@ import React, {useContext, useEffect, useState} from "react";
 import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
 import CircularProgress from "./circular-progress.jsx";
-import {formatInt} from "../../general/utils/strings";
+import {formatInt, secondsToString} from "../../general/utils/strings";
 import {EffectsSection} from "./effects-section.jsx";
 import {TippyWrapper} from "./tippy-wrapper.jsx";
 
@@ -47,6 +47,9 @@ export const ActiveEffectItem = ({ id, originalId, scope, name, description, eff
                         <div className={'effects'}>
                             <EffectsSection effects={effects} maxDisplay={10} />
                         </div>
+                    </div>
+                    <div className={'other block'}>
+                        <p>Expires in: {secondsToString(duration)}</p>
                     </div>
                 </div>
 

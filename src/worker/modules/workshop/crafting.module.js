@@ -92,7 +92,7 @@ export class CraftingModule extends GameModule {
         if(this.craftingSlots) {
             for(const id in this.craftingSlots) {
                 const isIgnore = category && !gameEntity.getEntity(id).tags.includes(tagToCat[category]);
-                console.log('Stop Craft: ', category, id, isIgnore, gameEntity.getEntity(id).tags)
+                // console.log('Stop Craft: ', category, id, isIgnore, gameEntity.getEntity(id).tags)
                 if(!isIgnore) {
                     this.setCraftingLevel({ id, level: 0, isForce: true });
                 }
@@ -132,7 +132,7 @@ export class CraftingModule extends GameModule {
                 })
             }
             const rs = gameEntity.setEntityLevel(`activeCrafting_${id}`, level, isForce);
-            console.log('Update result: ', rs);
+            // console.log('Update result: ', rs);
             this.craftingSlots[id].level = gameEntity.getLevel(`activeCrafting_${id}`);
         }
     }

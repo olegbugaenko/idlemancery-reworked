@@ -236,7 +236,7 @@ export class InventoryModule extends GameModule {
             if(effects.length) {
                 const rsToRemove = effects.filter(eff => eff.scope === 'consumption' && eff.type === 'resources');
 
-                console.log('IIII: ', effects, rsToRemove, realCons);
+                // console.log('IIII: ', effects, rsToRemove, realCons);
 
                 rsToRemove.forEach(rs => {
                     result.consume[rs.id] = rs.value;
@@ -461,6 +461,7 @@ export class InventoryModule extends GameModule {
                 bargaining: {...gameEffects.getEffect('attribute_bargaining'), isMultiplier: false},
                 bargaining_mod: {
                     ...gameEffects.getEffect('attribute_bargaining'),
+                    name: 'Bargaining Sell Price Mult',
                     value: sellPriceMod(gameEffects.getEffectValue('attribute_bargaining')),
                     isMultiplier: true,
                 },
@@ -498,7 +499,7 @@ export class InventoryModule extends GameModule {
             potentialPermanentEffects = packEffects(gameEntity.getEffects(resource.attributes?.entityEffect, 1));
         }
 
-        console.log('EEFF: ', resource.attributes?.entityEffect, permanentEffects, potentialPermanentEffects);
+        // console.log('EEFF: ', resource.attributes?.entityEffect, permanentEffects, potentialPermanentEffects);
         return {
             id: resource.id,
             name: resource.name,
@@ -517,11 +518,14 @@ export class InventoryModule extends GameModule {
             duration: resource.attributes?.duration || 0,
             potentialEffects: resource.resourceModifier ? resourceApi.unpackEffects(resource.resourceModifier, 1) : [],
             consumptionCooldown: resource.getUsageCooldown ? resource.getUsageCooldown() : 0,
+            cooldownProg: resource.getUsageCooldown ? (resource.getUsageCooldown() - (this.inventoryItems[resource.id]?.cooldown ?? 0)) / resource.getUsageCooldown() : 1,
             permanentEffects,
             potentialPermanentEffects,
             numConsumed: this.inventoryItems[resource.id]?.numConsumed || 0,
             soldAmount: this.inventoryItems[resource.id]?.soldAmount || 0,
             coinsEarned: this.inventoryItems[resource.id]?.coinsEarned || 0,
+            currentCooldown: this.inventoryItems[id]?.cooldown || 0,
+            currentDuration: this.inventoryItems[id]?.duration || 0,
         }
     }
 

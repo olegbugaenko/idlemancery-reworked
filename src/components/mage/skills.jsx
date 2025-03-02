@@ -9,10 +9,13 @@ import {EffectsSection} from "../shared/effects-section.jsx";
 import {ResourceCost} from "../shared/resource-cost.jsx";
 import {FlashOverlay} from "../layout/flash-overlay.jsx";
 import {ResourceComparison} from "../shared/resource-comparison.jsx";
+import {useAppContext} from "../../context/ui-context";
 
 export const Skills = () => {
 
     const worker = useContext(WorkerContext);
+
+    const { isMobile } = useAppContext();
 
     const { onMessage, sendData } = useWorkerClient(worker);
     const [skillsData, setSkillsData] = useState({
@@ -22,6 +25,8 @@ export const Skills = () => {
             max: 0
         }
     });
+
+    const [detailsShown, setDetailsShown] = useState(null);
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -39,7 +44,7 @@ export const Skills = () => {
     const [overlayPositions, setOverlayPositions] = useState([]);
 
     const handleFlash = (position) => {
-        console.log('Adding flash: ', position);
+        // console.log('Adding flash: ', position);
         setOverlayPositions((prev) => [...prev, position]);
         setTimeout(() => {
             setOverlayPositions((prev) => prev.filter((p) => p !== position));
@@ -47,12 +52,15 @@ export const Skills = () => {
     };
 
     const onPurchase = (id) => {
-        console.log('Purchase: ', id);
+        // console.log('Purchase: ', id);
         sendData('purchase-skill', { id })
     }
 
     const onShowDetails = (id) => {
-        console.log('onShowDetails: ', id);
+        if(isMobile) {
+            setDetailsShown(skillsData.available.find(one => one.id === id));
+        }
+        // console.log('onShowDetails: ', id);
     }
 
 
@@ -63,23 +71,57 @@ export const Skills = () => {
         <div className={'skills-container'}>
             <PerfectScrollbar>
                 <div className={'cards'}>
-                    {skillsData.available.map(skill => (<ItemSkillCard key={skill.id} {...skill} onFlash={handleFlash} onPurchase={onPurchase} onShowDetails={onShowDetails}/>))}
+                    {skillsData.available.map(skill => (<ItemSkillCard key={skill.id} {...skill} onFlash={handleFlash} onPurchase={onPurchase} onShowDetails={onShowDetails} isMobile={isMobile}/>))}
                     {overlayPositions.map((position, index) => (
                         <FlashOverlay key={index} position={position} />
                     ))}
                 </div>
             </PerfectScrollbar>
         </div>
+        {isMobile && detailsShown ? (<div className={'details-wrap'}>
+            <div className={'blade-inner'}>
+                <div className={'block'}>
+                    <h4>{detailsShown.name} ({formatInt(detailsShown.level)})</h4>
+                    <div className={'description'}>
+                        {detailsShown.description}
+                    </div>
+                </div>
+                <div className={'block'}>
+                    <p>Effects:</p>
+                    <div className={'effects'}>
+                        {detailsShown.currentEffects ?
+                            (<ResourceComparison effects1={detailsShown.currentEffects} effects2={detailsShown.effects} /> )
+                            : (<EffectsSection effects={detailsShown.effects} />)
+                        }
+                    </div>
+                </div>
+                <div className={'block'}>
+                    <p>Cost:</p>
+                    <div className={'costs-wrap'}>
+                        {Object.values(detailsShown.affordable.affordabilities || {}).map(aff => <ResourceCost affordabilities={aff}/>)}
+                    </div>
+                </div>
+                <div className={'block'}>
+                    <button disabled={!detailsShown.affordable?.isAffordable} onClick={() => onPurchase(detailsShown.id)}>Purchase</button>
+                </div>
+            </div>
+        </div> ) : null}
     </div> )
 }
 
-export const ItemSkillCard = ({ id, name, description, level, max, effects, currentEffects, affordable, isLeveled, onFlash, onPurchase, onShowDetails}) => {
+export const ItemSkillCard = ({ id, name, description, level, max, effects, currentEffects, affordable, isLeveled, onFlash, onPurchase, onShowDetails, isMobile}) => {
 
     const elementRef = useRef(null);
 
     useFlashOnLevelUp(isLeveled, onFlash, elementRef);
 
-    return (<div ref={elementRef} className={`icon-card item flashable ${!affordable.isAffordable ? 'unavailable' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)} onClick={(e) => onPurchase(id, e.shiftKey ? 1e9 : 1)}>
+    return (<div
+        ref={elementRef}
+        className={`icon-card item flashable ${!affordable.isAffordable ? 'unavailable' : ''}`}
+        onMouseEnter={() => isMobile ? null : onShowDetails(id)}
+        onMouseLeave={() => isMobile ? null : onShowDetails(null)}
+        onClick={(e) => isMobile ? onShowDetails(id) : onPurchase(id, e.shiftKey ? 1e9 : 1)}
+    >
         <TippyWrapper
             content={<div className={'hint-popup effects-popup'}>
                 <div className={'blade-inner'}>

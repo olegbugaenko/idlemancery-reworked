@@ -149,6 +149,30 @@ const mapCompareType = {
         availableValueTypes: [
             'exact'
         ],
+    },
+    'spell_running': {
+        label: 'Spell Running',
+        subject: 'spell_id',
+        availableConditions: [
+            'true',
+            'false',
+        ],
+        isHideValue: true,
+        unlockCondition: (unlocks) => {
+            return unlocks.spells;
+        }
+    },
+    'crafting_list_running': {
+        label: 'Crafting List',
+        subject: 'crafting_list_id',
+        availableConditions: [
+            'true',
+            'false',
+        ],
+        isHideValue: true,
+        unlockCondition: (unlocks) => {
+            return unlocks.crafting;
+        }
     }
 };
 
@@ -161,13 +185,20 @@ const RulesList = React.memo(
         const [actions, setActions] = useState([]);
         const [actionsLists, setActionsLists] = useState([]);
         const [tags, setTags] = useState([]);
+        const [spells, setSpells] = useState([]);
+        const [craftingLists, setCraftingLists] = useState([]);
         const [rulesMatched, setRulesMatched] = useState(null);
+        const [unlocks, setUnlocks] = useState();
 
         useEffect(() => {
             sendData('query-all-resources', { prefix });
             sendData('query-all-actions', { prefix });
             sendData('query-all-action-tags', { prefix });
             sendData('query-actions-lists', { prefix });
+            sendData('query-all-spells', { prefix });
+            sendData('query-all-crafting-lists', { prefix });
+
+            sendData('query-unlocks', { prefix: `automation-${prefix}`})
             console.log('Sent queries...');
         }, []);
 
@@ -182,6 +213,11 @@ const RulesList = React.memo(
                 };
             }
         }, [isAutoCheck, rules, pattern, prefix]);
+
+        onMessage(`unlocks-automation-${prefix}`, (payload) => {
+            console.log('receivedUnlocks', payload);
+            setUnlocks(payload);
+        })
 
         onMessage(`rule-conditions-matched-${prefix}`, (payload) => {
             console.log('set-matched', payload);
@@ -205,6 +241,14 @@ const RulesList = React.memo(
             setTags(payload);
         })
 
+        onMessage(`all-spells-${prefix}`, (payload) => {
+            setSpells(payload);
+        })
+
+        onMessage(`all-crafting-lists-${prefix}`, (payload) => {
+            setCraftingLists(payload);
+        })
+
         const checkViolation = (index, compare_type) => {
             const rule = rules[index];
             const sett = mapCompareType[compare_type];
@@ -224,7 +268,7 @@ const RulesList = React.memo(
         return (
             <div className={`rules ${isAutoCheck ? 'autocheck' : ''} ${rulesMatched?.result ? 'matched' : 'unmatched'}`}>
                 {rules.map((rule, index) => {
-                    const compareTypeOptions = Object.keys(mapCompareType).map((key) => ({
+                    const compareTypeOptions = Object.keys(mapCompareType).filter(one => !one.unlockCondition || one.unlockCondition(unlocks)).map((key) => ({
                         value: key,
                         label: mapCompareType[key].label,
                     }));
@@ -248,6 +292,10 @@ const RulesList = React.memo(
                             subjectArray = tags;
                         } else if (subject === 'action_list_id') {
                             subjectArray = actionsLists;
+                        } else if (subject === 'spell_id') {
+                            subjectArray = spells;
+                        } else if (subject === 'crafting_list_id') {
+                            subjectArray = craftingLists;
                         }
 
                         subjectOptions = subjectArray

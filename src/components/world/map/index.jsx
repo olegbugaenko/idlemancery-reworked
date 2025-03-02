@@ -9,8 +9,13 @@ import RulesList from "../../shared/rules-list.jsx";
 import {HowToSign} from "../../shared/how-to-sign.jsx";
 import {ResourceCost} from "../../shared/resource-cost.jsx";
 import StatRow from "../../shared/stat-row.jsx";
+import {useAppContext} from "../../../context/ui-context";
 
 export const MapWrap = ({ children }) => {
+
+    const { isMobile } = useAppContext();
+    const [isDetailVisible, setDetailVisible] = useState(!isMobile);
+
     const [mapTileDetails, setMapTileDetails] = useState(null)
 
     const [listDetails, setListDetails] = useState(null)
@@ -46,7 +51,7 @@ export const MapWrap = ({ children }) => {
     })
 
     onMessage('map-tile-list-data', (payload) => {
-        console.log(`currViewing LIST: `, payload, listDetails);
+        // console.log(`currViewing LIST: `, payload, listDetails);
         if(!listDetails) return;
 
         setListDetails({
@@ -60,7 +65,7 @@ export const MapWrap = ({ children }) => {
     })
 
     onMessage('map-tile-list-effects', (payload) => {
-        console.log('GOT DATA: ', payload);
+        // console.log('GOT DATA: ', payload);
         setListDetails({
             ...listDetails,
             listData: {
@@ -173,7 +178,7 @@ export const MapWrap = ({ children }) => {
     }, [listDetails])
 
     useEffect(() => {
-        console.log('Called select list', listDetails);
+        // console.log('Called select list', listDetails);
     }, [listDetails])
 
     const setItemDetails = useCallback((pl) => {
@@ -182,10 +187,10 @@ export const MapWrap = ({ children }) => {
             return;
         }
         const meta = pl?.meta;
-        console.log('Called select tile', meta, listDetails);
+        // console.log('Called select tile', meta, listDetails);
         if(listDetails?.listData && listDetails?.isEdit) {
             if(meta) {
-                console.log('Insert tile to list: ', meta, listDetails);
+                // console.log('Insert tile to list: ', meta, listDetails);
                 if(!listDetails.listData.tiles.find(one => one.id === `${meta.i}:${meta.j}`)) {
                     const newList = cloneDeep(listDetails.listData);
                     newList.tiles.push({
@@ -213,7 +218,7 @@ export const MapWrap = ({ children }) => {
 
     const openListDetails = (list) => {
         if(list.listData?.id) {
-            console.log('loading list: ', list);
+            // console.log('loading list: ', list);
             setListDetails({
                 isEdit: list.isEdit,
                 isLoading: true,
@@ -279,40 +284,48 @@ export const MapWrap = ({ children }) => {
                     <div className={'head'}>
                         {children}
                     </div>
-                    <HowToSign scope={'map'} />
+                    <div className={'flex-container additional-filters'}>
+                        {isMobile ? (<div>
+                            <span className={'highlighted-span'} onClick={() => setDetailVisible(true)}>Info</span>
+                        </div>) : null}
+                        <HowToSign scope={'map'} />
+                    </div>
                 </div>
                 <Map setItemDetails={setItemDetails} newUnlocks={newUnlocks?.['world']?.items?.['map']?.items} openListDetails={openListDetails} isEditList={listDetails?.isEdit}/>
             </div>
 
-            <div className={`item-detail ingame-box detail-blade ${listDetails?.listData && listDetails?.isEdit ? 'wide-blade' : ''}`}>
-                {listDetails?.listData ? (<MapTileListDetails
-                    listDetails={listDetails.listData}
-                    isEditing={listDetails.isEdit}
-                    onUpdateActionFromList={onUpdateActionFromList}
-                    onDropActionFromList={onDropActionFromList}
-                    onUpdateListValue={onUpdateListValue}
-                    onAddAutotriggerRule={onAddAutotriggerRule}
-                    onSetAutotriggerRuleValue={onSetAutotriggerRuleValue}
-                    onDeleteAutotriggerRule={onDeleteAutotriggerRule}
-                    setAutotriggerPriority={setAutotriggerPriority}
-                    onSetAutotriggerPattern={onSetAutotriggerPattern}
-                    onToggleAutotrigger={onToggleAutotrigger}
-                    onCloseList={onCloseList}
-                    automationUnlocked={listDetails.automationUnlocked}
-                />) : null}
-                {(mapTileDetails && !listDetails?.listData) ? (<ItemDetails
-                    itemId={mapTileDetails}
-                    setItemDetails={setItemDetails}
-                />) : null}
-                {(!mapTileDetails && !listDetails?.listData) ? (<GeneralStats />) : null}
-            </div>
+            {(!isMobile || isDetailVisible || listDetails?.listData || mapTileDetails) ? (
+                <div className={`item-detail ingame-box detail-blade ${listDetails?.listData && listDetails?.isEdit && !isMobile ? 'wide-blade' : ''} ${listDetails?.listData ? 'forced-bottom' : ''}`}>
+                    {listDetails?.listData ? (<MapTileListDetails
+                        listDetails={listDetails.listData}
+                        isEditing={listDetails.isEdit}
+                        onUpdateActionFromList={onUpdateActionFromList}
+                        onDropActionFromList={onDropActionFromList}
+                        onUpdateListValue={onUpdateListValue}
+                        onAddAutotriggerRule={onAddAutotriggerRule}
+                        onSetAutotriggerRuleValue={onSetAutotriggerRuleValue}
+                        onDeleteAutotriggerRule={onDeleteAutotriggerRule}
+                        setAutotriggerPriority={setAutotriggerPriority}
+                        onSetAutotriggerPattern={onSetAutotriggerPattern}
+                        onToggleAutotrigger={onToggleAutotrigger}
+                        onCloseList={onCloseList}
+                        automationUnlocked={listDetails.automationUnlocked}
+                    />) : null}
+                    {(mapTileDetails && !listDetails?.listData) ? (<ItemDetails
+                        itemId={mapTileDetails}
+                        setItemDetails={setItemDetails}
+                    />) : null}
+                    {(!mapTileDetails && !listDetails?.listData) ? (<GeneralStats setDetailVisible={setDetailVisible}/>) : null}
+                </div>
+            ) : null}
+
         </div>
 
     )
 
 }
 
-export const GeneralStats = ({  }) => {
+export const GeneralStats = ({ setDetailVisible }) => {
 
     const [data, setData] = useState({
         mapGeneration: {
@@ -324,6 +337,8 @@ export const GeneralStats = ({  }) => {
     });
 
     const worker = useContext(WorkerContext);
+
+    const { isMobile } = useAppContext();
 
     const { onMessage, sendData } = useWorkerClient(worker);
 
@@ -384,6 +399,9 @@ export const GeneralStats = ({  }) => {
                         Regenerating map will totally regenerate all your map tiles and remove map lists
                     </p>
                 </div>) : null}
+                <div className={'block'}>
+                    {isMobile ? (<button onClick={() => setDetailVisible(false)}>Close</button> ) : null}
+                </div>
             </div>
         </PerfectScrollbar>
     )
@@ -489,12 +507,12 @@ export const MapTileListDetails = ({
     const [editing, setEditing] = useState({ tiles: [] })
 
     useEffect(() => {
-        console.log('SET EDITING LIST MAP: ', listDetails, automationUnlocked);
+        // console.log('SET EDITING LIST MAP: ', listDetails, automationUnlocked);
         setEditing(listDetails);
     }, [listDetails])
 
     const saveAndClose = (isClose) => {
-        console.log('Saving: ', editing);
+        // console.log('Saving: ', editing);
         if(!isClose) {
             editing.isReopenEdit = true;
         }

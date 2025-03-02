@@ -8,10 +8,13 @@ import {BreakDown} from "../../layout/sidebar.jsx";
 import {NewNotificationWrap} from "../../layout/new-notification-wrap.jsx";
 import {RawResource} from "../../shared/raw-resource.jsx";
 import {Balances} from "../shared.jsx";
+import {useAppContext} from "../../../context/ui-context";
 
-export const Crafting = ({ setItemDetails, setItemLevel, filterId, newUnlocks, openListDetails, addItemToList }) => {
+export const Crafting = ({ setItemDetails, setItemLevel, filterId, newUnlocks, openListDetails, addItemToList, isEditList }) => {
 
     const worker = useContext(WorkerContext);
+
+    const { isMobile } = useAppContext();
 
     const { onMessage, sendData } = useWorkerClient(worker);
     const [craftingData, setItemsData] = useState({
@@ -77,7 +80,7 @@ export const Crafting = ({ setItemDetails, setItemLevel, filterId, newUnlocks, o
             <PerfectScrollbar>
                 <div className={'flex-container'}>
                     {craftingData.available.map(craftable => <NewNotificationWrap id={`crafting_${craftable.id}`} className={'narrow-wrapper'} isNew={newUnlocks?.all?.items?.[`crafting_${craftable.id}`]?.hasNew}>
-                        <ItemCard addItemToList={addItemToList} key={craftable.id} {...craftable} onSetLevel={setItemLevel} onShowDetails={setItemDetails}/>
+                        <ItemCard addItemToList={addItemToList} key={craftable.id} {...craftable} onSetLevel={setItemLevel} onShowDetails={setItemDetails} isMobile={isMobile} isEditList={isEditList}/>
                     </NewNotificationWrap>)}
                 </div>
             </PerfectScrollbar>
@@ -100,9 +103,15 @@ export const Crafting = ({ setItemDetails, setItemLevel, filterId, newUnlocks, o
     </div>)
 }
 
-export const ItemCard = ({ id, icon_id, isRunning, isLowerEfficiency, name, level, resourceAmount, resourceBalance, breakDown, maxLevel, onSetLevel, onShowDetails, addItemToList}) => {
+export const ItemCard = ({ id, icon_id, isRunning, isLowerEfficiency, name, level, resourceAmount, resourceBalance, breakDown, maxLevel, onSetLevel, onShowDetails, addItemToList, isMobile, isEditList}) => {
 
-    return (<div className={`card craftable ${isRunning ? 'running' : ''} ${isLowerEfficiency ? 'lower-eff' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseOver={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)} onClick={() => addItemToList({id, name})}>
+    return (<div
+        className={`card craftable ${isRunning ? 'running' : ''} ${isLowerEfficiency ? 'lower-eff' : ''}`}
+        onMouseEnter={() => !isMobile ? onShowDetails(id) : null}
+        onMouseOver={() => !isMobile ? onShowDetails(id) : null}
+        onMouseLeave={() => !isMobile ? onShowDetails(null) : null}
+        onClick={() => (isMobile && !isEditList) ? onShowDetails(id) : addItemToList({id, name})}
+    >
         <div className={'flex-container two-side-card'}>
             <div className={'left'}>
                 <img src={`icons/resources/${icon_id}.png`} className={'resource big'}/>
@@ -120,11 +129,23 @@ export const ItemCard = ({ id, icon_id, isRunning, isLowerEfficiency, name, leve
                             <p>Increasing the effort level boosts both production and crafting costs exponentially, but costs grow faster than output. Each additional effort level multiplies costs by 1.5 while increasing output by only 1.2.</p>
                         </div> }>
                             <div className={'effort-control flex-container flex-row'}>
-                                <div className={'icon-content minimize-icon interface-icon tiny'} onClick={() => onSetLevel(id, 0)}>
+                                <div className={'icon-content minimize-icon interface-icon tiny'} onClick={(e) => {
+                                    e.stopPropagation();
+                                    e.preventDefault();
+                                    onSetLevel(id, 0)
+                                }}>
                                     <img src={"icons/interface/minimize.png"}/>
                                 </div>
-                                <input type={'number'} min={0} max={maxLevel} value={level} onChange={e => onSetLevel(id, Math.round(+e.target.value))}/>
-                                <div className={'icon-content maximize-icon interface-icon tiny'} onClick={() => onSetLevel(id, 1.e+9)}>
+                                <input type={'number'} min={0} max={maxLevel} value={level} onChange={e => {
+                                    e.stopPropagation();
+                                    e.preventDefault();
+                                    onSetLevel(id, Math.round(+e.target.value))
+                                }}/>
+                                <div className={'icon-content maximize-icon interface-icon tiny'} onClick={(e) => {
+                                    e.stopPropagation();
+                                    e.preventDefault();
+                                    onSetLevel(id, 1.e+9)
+                                }}>
                                     <img src={"icons/interface/maximize.png"}/>
                                 </div>
                             </div>

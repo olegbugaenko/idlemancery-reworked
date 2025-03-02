@@ -103,7 +103,7 @@ export class GuildsModule extends GameModule {
 
     setPermaBonus(id, level, bForce = false) {
         const ent = gameEntity.getAttribute(id, 'permaBonusId');
-        console.log('Setting: ', id, ent, level);
+        // console.log('Setting: ', id, ent, level);
         gameEntity.setEntityLevel(ent, level, bForce);
     }
 
@@ -185,7 +185,7 @@ export class GuildsModule extends GameModule {
 
     purchaseItem(itemId) {
         const newEnt = gameEntity.levelUpEntity(itemId);
-        console.log('Purchase Guild Upgrade: ', newEnt)
+        // console.log('Purchase Guild Upgrade: ', newEnt)
         if(newEnt.success) {
             this.purchasedUpgrades[itemId] = gameEntity.getLevel(itemId);
             this.leveledId = itemId;

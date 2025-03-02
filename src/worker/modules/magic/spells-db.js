@@ -124,14 +124,14 @@ export const initSpellsDB1 = () => {
 
         },
         getUsageCooldown: () => {
-            return 10;
+            return 0;
         },
         resourceModifier: {
             multiplier: {
                 effects: {
                     learning_rate: {
-                        A: 0.1,
-                        B: 1.4,
+                        A: 0.05,
+                        B: 1.25,
                         type: 0,
                     }
                 }
@@ -179,14 +179,14 @@ export const initSpellsDB1 = () => {
 
         },
         getUsageCooldown: () => {
-            return 10;
+            return 0;
         },
         resourceModifier: {
             multiplier: {
                 effects: {
                     'gathering_low_chance': {
                         A: 0.05,
-                        B: 1.7,
+                        B: 1.45,
                         type: 0,
                     }
                 }
@@ -277,19 +277,19 @@ export const initSpellsDB1 = () => {
 
         },
         getUsageCooldown: () => {
-            return 10;
+            return 0;
         },
         resourceModifier: {
             get_income: () => ({
                 resources: {
                     health: {
                         A: 1.2,
-                        B: 1.0*gameEffects.getEffectValue('restoration_spells_efficiency')*gameEffects.getEffectValue('recovery_spells_efficiency'),
+                        B: 0.5*gameEffects.getEffectValue('restoration_spells_efficiency')*gameEffects.getEffectValue('recovery_spells_efficiency'),
                         type: 1,
                     },
                     energy: {
                         A: 1.2,
-                        B: 2*gameEffects.getEffectValue('restoration_spells_efficiency')*gameEffects.getEffectValue('recovery_spells_efficiency'),
+                        B: 1*gameEffects.getEffectValue('restoration_spells_efficiency')*gameEffects.getEffectValue('recovery_spells_efficiency'),
                         type: 1,
                     }
                 },
@@ -337,14 +337,14 @@ export const initSpellsDB1 = () => {
 
         },
         getUsageCooldown: () => {
-            return 30;
+            return 0;
         },
         resourceModifier: {
             get_multiplier: () =>({
                 effects: {
                     physical_training_learn_speed: {
-                        A: 0.1*gameEffects.getEffectValue('restoration_spells_efficiency'),
-                        B: 1.0 + 0.25*gameEffects.getEffectValue('restoration_spells_efficiency'),
+                        A: 0.05*gameEffects.getEffectValue('restoration_spells_efficiency'),
+                        B: 1.0 + 0.1*gameEffects.getEffectValue('restoration_spells_efficiency'),
                         type: 0,
                     }
                 }
@@ -393,14 +393,14 @@ export const initSpellsDB1 = () => {
 
         },
         getUsageCooldown: () => {
-            return 30;
+            return 0;
         },
         resourceModifier: {
             get_multiplier: () =>({
                 effects: {
                     coins_earned_bonus: {
-                        A: 0.2*gameEffects.getEffectValue('illusion_spells_efficiency'),
-                        B: 1.0 + 0.4*gameEffects.getEffectValue('illusion_spells_efficiency'),
+                        A: 0.1*gameEffects.getEffectValue('illusion_spells_efficiency'),
+                        B: 1.0 + 0.2*gameEffects.getEffectValue('illusion_spells_efficiency'),
                         type: 0,
                     }
                 }
@@ -449,14 +449,14 @@ export const initSpellsDB1 = () => {
 
         },
         getUsageCooldown: () => {
-            return 30;
+            return 0;
         },
         resourceModifier: {
             get_multiplier: () => ({
                 effects: {
                     routine_learning_speed: {
-                        A: 0.2*gameEffects.getEffectValue('illusion_spells_efficiency'),
-                        B: 1.0 + 0.8*gameEffects.getEffectValue('illusion_spells_efficiency'),
+                        A: 0.1*gameEffects.getEffectValue('illusion_spells_efficiency'),
+                        B: 1.0 + 0.4*gameEffects.getEffectValue('illusion_spells_efficiency'),
                         type: 0,
                     }
                 }
@@ -506,14 +506,14 @@ export const initSpellsDB1 = () => {
 
         },
         getUsageCooldown: () => {
-            return 30;
+            return 0;
         },
         resourceModifier: {
             get_multiplier: () => ({
                 effects: {
                     social_training_learning_rate: {
-                        A: 0.2*gameEffects.getEffectValue('illusion_spells_efficiency'),
-                        B: 1.0 + 0.8*gameEffects.getEffectValue('illusion_spells_efficiency'),
+                        A: 0.1*gameEffects.getEffectValue('illusion_spells_efficiency'),
+                        B: 1.0 + 0.4*gameEffects.getEffectValue('illusion_spells_efficiency'),
                         type: 0,
                     }
                 }
@@ -563,14 +563,14 @@ export const initSpellsDB1 = () => {
 
         },
         getUsageCooldown: () => {
-            return 30;
+            return 0;
         },
         resourceModifier: {
             get_multiplier: () => ({
                 effects: {
                     crafting_efficiency: {
-                        A: 0.05*gameEffects.getEffectValue('illusion_spells_efficiency'),
-                        B: 1.0 + 0.2*gameEffects.getEffectValue('illusion_spells_efficiency'),
+                        A: 0.02*gameEffects.getEffectValue('illusion_spells_efficiency'),
+                        B: 1.0 + 0.1*gameEffects.getEffectValue('illusion_spells_efficiency'),
                         type: 0,
                     }
                 }
@@ -619,7 +619,7 @@ export const initSpellsDB1 = () => {
 
         },
         getUsageCooldown: () => {
-            return 10;
+            return 0;
         },
         unlockedBy: [{
             type: 'effect',
@@ -652,7 +652,7 @@ export const initSpellsDB1 = () => {
                 resources: {
                     mana: {
                         A: 1.5,
-                        B: 80.*getCostReduction('spell_conjure_water')/1.5,
+                        B: 120.*getCostReduction('spell_conjure_water')/1.5,
                         type: 1,
                     }
                 }
@@ -681,7 +681,7 @@ export const initSpellsDB1 = () => {
 
         },
         getUsageCooldown: () => {
-            return 10;
+            return 0;
         },
         unlockedBy: [{
             type: 'effect',
@@ -714,7 +714,7 @@ export const initSpellsDB1 = () => {
                 resources: {
                     mana: {
                         A: 1.5,
-                        B: 80.*getCostReduction('spell_conjure_wood')/1.5,
+                        B: 120.*getCostReduction('spell_conjure_wood')/1.5,
                         type: 1,
                     }
                 }
@@ -743,7 +743,7 @@ export const initSpellsDB1 = () => {
 
         },
         getUsageCooldown: () => {
-            return 10;
+            return 0;
         },
         unlockedBy: [{
             type: 'effect',
@@ -776,7 +776,7 @@ export const initSpellsDB1 = () => {
                 resources: {
                     mana: {
                         A: 1.5,
-                        B: 120.*getCostReduction('spell_conjure_earth')/1.5,
+                        B: 180.*getCostReduction('spell_conjure_earth')/1.5,
                         type: 1,
                     }
                 }
@@ -805,7 +805,7 @@ export const initSpellsDB1 = () => {
 
         },
         getUsageCooldown: () => {
-            return 10;
+            return 0;
         },
         unlockedBy: [{
             type: 'effect',
@@ -838,7 +838,7 @@ export const initSpellsDB1 = () => {
                 resources: {
                     mana: {
                         A: 1.5,
-                        B: 120.*getCostReduction('spell_conjure_air')/1.5,
+                        B: 180.*getCostReduction('spell_conjure_air')/1.5,
                         type: 1,
                     }
                 }
@@ -867,7 +867,7 @@ export const initSpellsDB1 = () => {
 
         },
         getUsageCooldown: () => {
-            return 10;
+            return 0;
         },
         unlockedBy: [{
             type: 'effect',
@@ -900,7 +900,7 @@ export const initSpellsDB1 = () => {
                 resources: {
                     mana: {
                         A: 1.5,
-                        B: 120.*getCostReduction('spell_conjure_spark')/1.5,
+                        B: 180.*getCostReduction('spell_conjure_spark')/1.5,
                         type: 1,
                     }
                 }

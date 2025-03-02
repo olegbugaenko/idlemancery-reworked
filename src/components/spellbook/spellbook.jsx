@@ -12,10 +12,15 @@ import {useFlashOnLevelUp} from "../../general/hooks/flash";
 import RulesList from "../shared/rules-list.jsx";
 import {cloneDeep} from "lodash";
 import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
+import {useAppContext} from "../../context/ui-context";
 
 export const Spellbook = ({}) => {
 
     const worker = useContext(WorkerContext);
+
+    const { isMobile } = useAppContext();
+    const [isDetailVisible, setDetailVisible] = useState(!isMobile);
+
 
     const { onMessage, sendData } = useWorkerClient(worker);
     const [spellData, setItemsData] = useState({
@@ -41,11 +46,11 @@ export const Spellbook = ({}) => {
     }, [viewedOpenedId, detailOpenedId]);
 
     useEffect(() => {
-        console.log('SpellChanged: ', isChanged)
+        // console.log('SpellChanged: ', isChanged)
     }, [isChanged]);
 
     useEffect(() => {
-        console.log('New editData: ', editData);
+        // console.log('New editData: ', editData);
     }, [editData])
 
     useEffect(() => {
@@ -70,7 +75,7 @@ export const Spellbook = ({}) => {
     })
 
     onMessage('spell-details', (payload) => {
-        console.log(`currViewing: ${viewedOpenedId}, edit: ${detailOpenedId}`, payload);
+        // console.log(`currViewing: ${viewedOpenedId}, edit: ${detailOpenedId}`, payload);
         if(viewedOpenedId) {
             setViewedData(payload);
         } else if(detailOpenedId) {
@@ -101,8 +106,9 @@ export const Spellbook = ({}) => {
     })
 
     const setSpellDetailsEdit = useCallback(({id, name}) => {
+        sendData('set-monitored', { scope: 'effects', type: 'spell', id });
         if(id) {
-            console.log('Edit: ', id, detailOpenedId, isChanged);
+            // console.log('Edit: ', id, detailOpenedId, isChanged);
             if(detailOpenedId && isChanged) {
                 if(!confirm(`This will discard all your changes to ${detailOpenedId.name}. Are you sure`)) {
                     return;
@@ -115,6 +121,7 @@ export const Spellbook = ({}) => {
     }, [isChanged, detailOpenedId])
 
     const setSpellDetailsView = useCallback((id) => {
+        sendData('set-monitored', { scope: 'effects', type: 'spell', id });
         if(!id) {
             setViewedOpenedId(null);
             setViewedData(null);
@@ -180,14 +187,14 @@ export const Spellbook = ({}) => {
                 ...newEdit.autocast.rules[index],
                 [key]: value
             };
-            console.log('Setting Value with updated editData: ', newEdit);
+            // console.log('Setting Value with updated editData: ', newEdit);
             return newEdit;
         });
         setChanged(true);
     }, [editData])
 
     useEffect(() => {
-        console.log('New version of onSetAutoconsumeRuleValue created with editData:', editData);
+        // console.log('New version of onSetAutoconsumeRuleValue created with editData:', editData);
     }, [onSetAutoconsumeRuleValue]);
 
     const onToggleAutotrigger = useCallback(() => {
@@ -203,9 +210,12 @@ export const Spellbook = ({}) => {
     }, [editData])
 
     const onSave = useCallback(() => {
-        console.log('saving: ', editData);
+        // console.log('saving: ', editData);
         sendData('save-spell-settings', editData);
         setChanged(false);
+        if(isMobile) {
+            onCancel()
+        }
     })
 
     const onCancel = useCallback(() => {
@@ -219,7 +229,7 @@ export const Spellbook = ({}) => {
     const [overlayPositions, setOverlayPositions] = useState([]);
 
     const handleFlash = (position) => {
-        console.log('Adding flash: ', position);
+        // console.log('Adding flash: ', position);
         setOverlayPositions((prev) => [...prev, position]);
         setTimeout(() => {
             setOverlayPositions((prev) => prev.filter((p) => p !== position));
@@ -232,7 +242,7 @@ export const Spellbook = ({}) => {
                 <PerfectScrollbar>
                     <div className={'flex-container'}>
                         {spellData.available.map(item => <NewNotificationWrap id={`spell_${item.id}`} className={'narrow-wrapper'} isNew={newUnlocks.spellbook?.items?.spellbook?.items?.all?.items?.[`spell_${item.id}`]?.hasNew}>
-                                <SpellCard isChanged={isChanged} key={item.id} {...item} onPurchase={purchaseItem} onFlash={handleFlash} onShowDetails={setSpellDetailsView} onEditConfig={setSpellDetailsEdit}/>
+                                <SpellCard isChanged={isChanged} key={item.id} {...item} onPurchase={purchaseItem} onFlash={handleFlash} onShowDetails={setSpellDetailsView} onEditConfig={setSpellDetailsEdit} isMobile={isMobile}/>
                             </NewNotificationWrap>
                             )}
                         {overlayPositions.map((position, index) => (
@@ -241,16 +251,26 @@ export const Spellbook = ({}) => {
                     </div>
                 </PerfectScrollbar>
             </div>
-            <div className={'item-detail ingame-box detail-blade'}>
-                {editData || viewedData ? (<SpellDetails isChanged={isChanged} editData={editData} viewedData={viewedData} resources={resources} onAddAutoconsumeRule={onAddAutoconsumeRule} onSetAutoconsumeRuleValue={onSetAutoconsumeRuleValue} onDeleteAutoconsumeRule={onDeleteAutoconsumeRule} onSetAutocastPattern={onSetAutocastPattern} onChangeLevel={onChangeLevel} onSave={onSave} onCancel={onCancel} onToggleAutotrigger={onToggleAutotrigger} automationUnlocked={spellData.automationUnlocked}/>) : null}
-            </div>
+            {(!isMobile || editData || viewedData) ? (<div className={'item-detail ingame-box detail-blade'}>
+                {editData || viewedData ? (
+                    <SpellDetails isChanged={isChanged} editData={editData} viewedData={viewedData}
+                                  resources={resources} onAddAutoconsumeRule={onAddAutoconsumeRule}
+                                  onSetAutoconsumeRuleValue={onSetAutoconsumeRuleValue}
+                                  onDeleteAutoconsumeRule={onDeleteAutoconsumeRule}
+                                  onSetAutocastPattern={onSetAutocastPattern} onChangeLevel={onChangeLevel}
+                                  onSave={onSave} onCancel={onCancel} onToggleAutotrigger={onToggleAutotrigger}
+                                  automationUnlocked={spellData.automationUnlocked}
+                                  isMobile={isMobile}
+                                  onPurchase={purchaseItem}
+                    />) : null}
+            </div>) : null}
         </div>
 
     )
 
 }
 
-export const SpellCard = React.memo(({ id, isChanged, name, isCasted, cooldownProg, isActive, cooldown, onFlash, onPurchase, onShowDetails, onEditConfig}) => {
+export const SpellCard = React.memo(({ id, isChanged, name, isCasted, cooldownProg, isActive, cooldown, onFlash, onPurchase, onShowDetails, onEditConfig, isMobile}) => {
     const elementRef = useRef(null);
 
     useFlashOnLevelUp(isCasted, onFlash, elementRef);
@@ -264,14 +284,14 @@ export const SpellCard = React.memo(({ id, isChanged, name, isCasted, cooldownPr
 
     const handleContextMenu = (e) => {
         e.preventDefault(); // Prevents the default context menu
-        console.log('Triger onpurchase: ', id);
+        // console.log('Triger onpurchase: ', id);
         onPurchase(id); // Your custom right-click action
     };
 
     // RERENDERING
     // console.log('Item: ', id, cooldownProg, cooldown);
 
-    return (<div ref={elementRef} className={`icon-card item flashable spell-card  ${isActive ? 'active' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)} onClick={handleClick} onContextMenu={handleContextMenu}>
+    return (<div ref={elementRef} className={`icon-card item flashable spell-card  ${isActive ? 'active' : ''}`} onMouseEnter={() => !isMobile ? onShowDetails(id) : null} onMouseLeave={() => !isMobile ? onShowDetails(null) : null} onClick={handleClick} onContextMenu={handleContextMenu}>
         <div className={'icon-content'}>
             <CircularProgress progress={cooldownProg}>
                 <img src={`icons/spells/${id}.png`} className={'resource'} />
@@ -302,11 +322,33 @@ export const SpellCard = React.memo(({ id, isChanged, name, isCasted, cooldownPr
     return true;
 }))
 
-export const SpellDetails = React.memo(({isChanged, editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onSetAutocastPattern, onChangeLevel, onSave, onCancel, onToggleAutotrigger, automationUnlocked}) => {
+export const SpellDetails = React.memo(({isChanged, editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onSetAutocastPattern, onChangeLevel, onSave, onCancel, onToggleAutotrigger, automationUnlocked, isMobile, onPurchase}) => {
 
-    const item = viewedData ? viewedData : editData;
+    const item = cloneDeep(viewedData ? viewedData : editData);
 
     let isEditing = !!editData && !viewedData;
+
+    const [spellDetails, setSpellDetails] = useState(null);
+
+    const worker = useContext(WorkerContext);
+
+    const { onMessage, sendData } = useWorkerClient(worker);
+
+    useEffect(() => {
+        if(!item) return ;
+        sendData('query-spell-details', { id: item.id, prefix: 'detail' })
+        const timeout = setInterval(() => {
+            sendData('query-spell-details', { id: item.id, prefix: 'detail' })
+        }, 500)
+
+        return () => {
+            clearInterval(timeout);
+        }
+    }, [item?.id]);
+
+    onMessage('detail-spell-details', (data) => {
+        setSpellDetails(data);
+    })
 
 
     if(!item) return null;
@@ -330,7 +372,6 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
     const toggleAutotrigger = () => {
         onToggleAutotrigger();
     }
-
 
     return (
         <PerfectScrollbar>
@@ -380,6 +421,11 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
                         <EffectsSection effects={item.potentialEffects} maxDisplay={10} />
                     </div>
                 ): null}
+                {isMobile ? (<div className={'cast-block block'}>
+                    <button disabled={!spellDetails || !spellDetails.affordable?.isAffordable || spellDetails.currentDuration > 0 || spellDetails.currentCooldown > 0} onClick={() => onPurchase(item.id)}>Cast Spell</button>
+                    {spellDetails?.currentDuration ? (<p className={'small'}>Running: {secondsToString(spellDetails?.currentDuration)}</p>) : null}
+                    {spellDetails?.currentCooldown ? (<p className={'small'}>Cooldown: {secondsToString(spellDetails?.currentCooldown)}</p>) : null}
+                </div>) : null}
                 {automationUnlocked ? (<div className={'autoconsume-setting'}>
                     <div className={'rules-header flex-container'}>
                         <p>Autospell rules: </p>
@@ -404,7 +450,7 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
                 </div>) : null}
                 {isEditing ? (<div className={'buttons flex-container'}>
                     <button disabled={!isChanged} onClick={onSave}>Save</button>
-                    <button disabled={!isChanged} onClick={onCancel}>Cancel</button>
+                    <button disabled={!isChanged && !isMobile} onClick={onCancel}>Cancel</button>
                 </div>) : null}
             </div>
         </PerfectScrollbar>
@@ -417,6 +463,7 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
     }
 
     if(prevProps.editData !== currentProps.editData) {
+        console.log('editData not equals: ', currentProps.editData?.autocast?.rules, prevProps.editData?.autocast?.rules)
         return false;
     }
 

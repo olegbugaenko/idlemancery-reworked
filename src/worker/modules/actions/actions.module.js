@@ -84,7 +84,7 @@ export class ActionsModule extends GameModule {
             // Зберігаємо оновлений масив
             this.customFiltersOrder = newOrder;
 
-            console.log('Re-sorted', payload, newOrder);
+            // console.log('Re-sorted', payload, newOrder);
 
             this.sendActionsData(this.selectedFilterId, {
                 searchData: this.searchData,
@@ -237,7 +237,7 @@ export class ActionsModule extends GameModule {
             }
         }, {})
 
-        console.log('effectsRanks', effectsRanks);
+        // console.log('effectsRanks', effectsRanks);
 
         gameEntity.registerGameEntity('system_action_ranks_multiplier', {
             name: 'Action Rank',
@@ -271,7 +271,7 @@ export class ActionsModule extends GameModule {
     }
 
     setMonitored({ type, id }) {
-        console.log('CHMON: ', id, type);
+        // console.log('CHMON: ', id, type);
         if(!id) {
             this.monitorData = null;
             return;
@@ -416,7 +416,7 @@ export class ActionsModule extends GameModule {
         for(const filterId in this.customFilters) {
             this.generateFilterCache(filterId);
         }
-        console.log('Caches: ', this.filtersCache);
+        // console.log('Caches: ', this.filtersCache);
     }
 
     setCustomFilterPinned({ id, flag }) {
@@ -434,7 +434,7 @@ export class ActionsModule extends GameModule {
             this.customFiltersOrder.push(id);
         }
 
-        console.log('this.customFiltersOrder', this.customFiltersOrder, payload, this.customFilters[id]);
+        // console.log('this.customFiltersOrder', this.customFiltersOrder, payload, this.customFilters[id]);
 
         this.generateFilterCache(id);
 
@@ -535,7 +535,7 @@ export class ActionsModule extends GameModule {
                     this.actions[act.originalId].xp = 0;
                     gameEntity.setEntityLevel(act.originalId, this.actions[act.originalId].level, true);
                     gameEntity.setEntityLevel(act.id, this.actions[act.originalId].level, true);
-                    console.log('Leveled up: ', gameEntity.getLevel(act.id), gameEntity.getLevel(act.originalId));
+                    // console.log('Leveled up: ', gameEntity.getLevel(act.id), gameEntity.getLevel(act.originalId));
                     this.regenerateRanks();
                     this.actions[act.originalId].isLeveled = true;
                     if(gameEntity.isCapped(act.originalId)) {
@@ -543,7 +543,7 @@ export class ActionsModule extends GameModule {
                         this.reassertRunningEfforts();
                     }
                     gameCore.getModule('unlock-notifications').generateNotifications();
-                    console.log('[SAD]Ticked!')
+                    // console.log('[SAD]Ticked!')
                     this.sendActionsData(this.selectedFilterId, {
                         searchData: this.searchData,
                     });
@@ -557,7 +557,7 @@ export class ActionsModule extends GameModule {
             // console.log('Handling chances for rare loots: ', gameResources.getResource('rare_herbs_loot'), chanceMult);
             if(Math.random() < chanceMult) {
                 const id = weightedRandomChoice(rareEvents['herbDrops']);
-                console.log('Add: ', id, rareEvents['herbDrops']);
+                // console.log('Add: ', id, rareEvents['herbDrops']);
 
                 gameResources.addResource(id, 1);
             }
@@ -650,7 +650,7 @@ export class ActionsModule extends GameModule {
         } else {
             this.customFiltersOrder = Object.keys(this.customFilters);
         }
-        console.log('[SAD]Loaded!', this.filtersCache, this.selectedFilterId, this.customFilters);
+        // console.log('[SAD]Loaded!', this.filtersCache, this.selectedFilterId, this.customFilters);
         this.sendActionsData(this.selectedFilterId,{
             searchData: this.searchData,
         });
@@ -1103,6 +1103,7 @@ export class ActionsModule extends GameModule {
                     social_actions_discount: gameEffects.getEffect('social_actions_discount'),
                     mental_actions_discount: gameEffects.getEffect('mental_actions_discount'),
                     magical_actions_discount: gameEffects.getEffect('magical_actions_discount'),
+                    routine_actions_discount: gameEffects.getEffect('routine_actions_discount'),
                 }
             },
             aspects: {

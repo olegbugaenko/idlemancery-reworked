@@ -16,7 +16,7 @@ export class RandomEventsModule extends GameModule {
         this.relevantVersion = 1;
 
         this.eventHandler.registerHandler('set-event-data-opened', ({ isOpened, eventId }) => {
-            console.log('SettOpened: ', isOpened, eventId);
+            // console.log('SettOpened: ', isOpened, eventId);
             this.openedEventId = isOpened ? eventId : null; // Зберігаємо ID відкритої події
             if (eventId && this.activeEvents[eventId]) {
                 this.activeEvents[eventId].isOpened = isOpened;
@@ -142,14 +142,14 @@ export class RandomEventsModule extends GameModule {
                 d: true
             }
         }
-        console.log('REVELATION_EVENT: ', eventId,wholeRevealed);
+        // console.log('REVELATION_EVENT: ', eventId,wholeRevealed);
 
         return wholeRevealed;
     }
 
     revealEffect(eventId, optionId, effectId) {
 
-        console.log('REVELATION_CHECK: ', eventId, this.revealedEffects[eventId]);
+        // console.log('REVELATION_CHECK: ', eventId, this.revealedEffects[eventId]);
 
         if(!this.revealedEffects[eventId]) {
             this.revealedEffects[eventId] = {};
@@ -181,7 +181,7 @@ export class RandomEventsModule extends GameModule {
         }
 
         delete this.revealedEffects[eventId][optionId].u[effectId]; // deleting from unrevealed
-        console.log('REVELATION: ', eventId, optionId, effectId, this.revealedEffects[eventId][optionId]);
+        // console.log('REVELATION: ', eventId, optionId, effectId, this.revealedEffects[eventId][optionId]);
 
         if(Object.values(this.revealedEffects[eventId][optionId].u).length <= 0) {
             this.revealedEffects[eventId][optionId].d = true;

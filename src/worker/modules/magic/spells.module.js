@@ -2,6 +2,7 @@ import {gameEntity, gameResources, resourceApi, resourceCalculators, gameEffects
 import {GameModule} from "../../shared/game-module";
 import {getCostReduction, getMasteryId, getMaxId, initSpellsDB1} from "./spells-db";
 import {checkMatchingRules} from "../../shared/utils/rule-utils";
+import {SMALL_NUMBER} from "game-framework/src/utils/consts";
 
 export class SpellModule extends GameModule {
 
@@ -18,7 +19,7 @@ export class SpellModule extends GameModule {
         })
 
         this.eventHandler.registerHandler('query-spell-details', (payload) => {
-            this.sendSpellDetails(payload.id)
+            this.sendSpellDetails(payload.id, payload.prefix)
         })
 
         this.eventHandler.registerHandler('save-spell-settings', payload => {
@@ -28,6 +29,10 @@ export class SpellModule extends GameModule {
         this.eventHandler.registerHandler('get-spell-level-effects', payload => {
             const effects = this.querySpellEffects(payload.id, payload.level);
             this.eventHandler.sendData('spell-level-effects', effects);
+        })
+
+        this.eventHandler.registerHandler('query-all-spells', payload => {
+            this.sendAllSpells(payload);
         })
     }
 
@@ -76,7 +81,7 @@ export class SpellModule extends GameModule {
                 this.spells[itemId].duration = 0;
                 this.spells[itemId].isRunning = false;
                 this.spells[itemId].cooldown = gameEntity.getEntity(itemId).getUsageCooldown() ?? 0;
-                console.log('Set cooldown of '+itemId, this.spells[itemId].cooldown);
+                // console.log('Set cooldown of '+itemId, this.spells[itemId].cooldown);
                 if(gameEntity.entityExists(`active_${itemId}`)) {
                     gameEntity.unsetEntity(`active_${itemId}`);
                 }
@@ -341,7 +346,7 @@ export class SpellModule extends GameModule {
                 isActive: this.spells[spell.id]?.duration > 0,
                 isCasted: this.spells[spell.id]?.isCasted,
                 cooldown: this.spells[spell.id]?.cooldown ?? 0,
-                cooldownProg: spell.getUsageCooldown ? (spell.getUsageCooldown() - (this.spells[spell.id]?.cooldown ?? 0)) / spell.getUsageCooldown() : 1
+                cooldownProg: spell.getUsageCooldown ? (spell.getUsageCooldown() + SMALL_NUMBER - (this.spells[spell.id]?.cooldown ?? 0)) / (spell.getUsageCooldown() + SMALL_NUMBER) : 1
             })),
             isSpellLevelingAvailable: this.isSpellLevelingAvailable(),
             automationUnlocked: gameEntity.getLevel('shop_item_planner') > 0,
@@ -402,12 +407,35 @@ export class SpellModule extends GameModule {
             actualLevel: spell.level,
             isSpellLevelingAvailable: this.isSpellLevelingAvailable(),
             cooldown: spell.getUsageCooldown(),
+            currentCooldown: this.spells[id]?.cooldown,
         }
     }
 
-    sendSpellDetails(id) {
+    sendSpellDetails(id, prefix) {
         const data = this.getSpellDetails(id);
-        this.eventHandler.sendData('spell-details', data);
+        let label = 'spell-details';
+        if(prefix) {
+            label = `${prefix}-${label}`;
+        }
+        this.eventHandler.sendData(label, data);
     }
 
+    getAllSpellsData() {
+        const items = gameEntity.listEntitiesByTags(['spell']);
+
+        return items.map(spell => ({
+            ...spell,
+            // monitor: this.monitoredData[effect.id] ?? null, // Will need it in nearest future
+            isUnlocked: spell.isUnlocked,
+        }))
+    }
+
+    sendAllSpells(payload) {
+        const data = this.getAllSpellsData();
+        let label = 'all-spells';
+        if(payload?.prefix) {
+            label = `${label}-${payload?.prefix}`
+        }
+        this.eventHandler.sendData(label, data);
+    }
 }

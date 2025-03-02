@@ -7,10 +7,14 @@ import {ResourceCost} from "../shared/resource-cost.jsx";
 import {ResourceComparison} from "../shared/resource-comparison.jsx";
 import {Guilds} from "./guilds.jsx";
 import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
+import {useAppContext} from "../../context/ui-context";
 
 export const Social = () => {
 
     const worker = useContext(WorkerContext);
+
+    const { isMobile } = useAppContext();
+    const [isDetailVisible, setDetailVisible] = useState(!isMobile);
 
     const { onMessage, sendData } = useWorkerClient(worker);
 
@@ -53,6 +57,10 @@ export const Social = () => {
         }
     }
 
+    const purchaseGuildUpgrade = useCallback((id) => {
+        sendData(`purchase-guild-item`, { id })
+    })
+
     return (<div className={'items-wrap'}>
         <div className={'items ingame-box'}>
             <div className={'menu-wrap'}>
@@ -63,20 +71,27 @@ export const Social = () => {
                         </NewNotificationWrap>
                     </li>) : null}
                 </ul>
+                {isMobile ? (<div>
+                    <span className={'highlighted-span'} onClick={() => setDetailVisible(true)}>Info</span>
+                </div>) : null}
             </div>
-            {selectedTab === 'guilds' ? (<Guilds filterId={selectedTab} setItemDetails={setItemDetails} newUnlocks={newUnlocks.social?.items?.guilds?.items}/>) : null}
+            {selectedTab === 'guilds' ? (<Guilds filterId={selectedTab} setItemDetails={setItemDetails} newUnlocks={newUnlocks.social?.items?.guilds?.items} isMobile={isMobile}/>) : null}
         </div>
 
-        <div className={'item-detail ingame-box detail-blade'}>
-            {detailOpened?.id ? (<ItemDetails itemId={detailOpened?.id} meta={detailOpened?.meta} category={selectedTab}/>) : (<GeneralStats />)}
-        </div>
+        {(!isMobile || isDetailVisible || detailOpened?.id) ? (<div className={'item-detail ingame-box detail-blade'}>
+            {detailOpened?.id ? (
+                <ItemDetails itemId={detailOpened?.id} meta={detailOpened?.meta} category={selectedTab} setItemDetails={setItemDetails} purchaseGuildUpgrade={purchaseGuildUpgrade}/>) : (
+                <GeneralStats setDetailVisible={setDetailVisible}/>)}
+        </div>) : null}
     </div>)
 
 }
 
-export const GeneralStats = () => {
+export const GeneralStats = ({ setDetailVisible }) => {
 
     const worker = useContext(WorkerContext);
+
+    const { isMobile } = useAppContext();
 
     const { onMessage, sendData } = useWorkerClient(worker);
 
@@ -87,7 +102,7 @@ export const GeneralStats = () => {
     }, [])
 
     onMessage('all-guilds-effects', (items) => {
-        console.log('all-guilds-effects: ', items)
+        // console.log('all-guilds-effects: ', items)
         setStats(items);
     })
 
@@ -100,15 +115,20 @@ export const GeneralStats = () => {
                         <EffectsSection effects={guildStat.effects} />
                     </div>
                 </div> ))}
+                {isMobile ? (<div className={'block buttons'}>
+                    <button onClick={() => setDetailVisible(false)}>Close</button>
+                </div>) : null}
             </div>
         </PerfectScrollbar>)
 }
 
-export const ItemDetails = ({itemId, meta, category}) => {
+export const ItemDetails = ({itemId, meta, category, setItemDetails, purchaseGuildUpgrade}) => {
 
     const worker = useContext(WorkerContext);
 
     const { onMessage, sendData } = useWorkerClient(worker);
+
+    const { isMobile } = useAppContext();
 
     const [item, setDetailOpened] = useState(null);
 
@@ -127,7 +147,7 @@ export const ItemDetails = ({itemId, meta, category}) => {
 
 
     onMessage('guild-item-details', (items) => {
-        console.log('GuildDetails: ', items)
+        // console.log('GuildDetails: ', items)
         setDetailOpened(items);
     })
 
@@ -159,6 +179,10 @@ export const ItemDetails = ({itemId, meta, category}) => {
                         }
                     </div>
                 </div>
+                {isMobile ? (<div className={'block buttons flex-container'}>
+                    <button disabled={!item.affordable.isAffordable} onClick={() => purchaseGuildUpgrade(item.id)}>Purchase</button>
+                    <button onClick={() => setItemDetails(null)}>Close</button>
+                </div>) : null}
             </div>
         </PerfectScrollbar>
     )

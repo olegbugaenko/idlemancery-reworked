@@ -151,7 +151,7 @@ export const registerRandomEventsDbBK = () => {
                     description: 'The deal pays off handsomely! Your gold income increases for the next 5 minutes.',
                     unlockCondition: () => true,
                     onTrigger: () => {
-                        console.log('Gold income bonus activated.')
+                        // console.log('Gold income bonus activated.')
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_coins_bonus')
                     }
                 },{
@@ -204,7 +204,7 @@ export const registerRandomEventsDbBK = () => {
                     description: 'You focus your mind and reflect on the journey. (Gained some experience)',
                     unlockCondition: () => true,
                     onTrigger: () => {
-                        console.log('You gained 20 experience.')
+                        // console.log('You gained 20 experience.')
                         gameResources.addResource('mage-xp', 20 + 0.01*gameResources.getResource('mage-xp').cap)
                     }
                 },{
@@ -213,7 +213,7 @@ export const registerRandomEventsDbBK = () => {
                     description: 'Meditation proves taxing, and you feel your energy drain away.',
                     unlockCondition: () => true,
                     onTrigger: () => {
-                        console.log('You lost energy.')
+                        // console.log('You lost energy.')
                         gameResources.setResource('energy', 0.1)
                     }
                 }]
@@ -238,7 +238,7 @@ export const registerRandomEventsDbBK = () => {
                     description: 'You hone your new skill, gaining a temporary boost to your learning speed. (+Learning speed for 5 minutes)',
                     unlockCondition: () => true,
                     onTrigger: () => {
-                        console.log('Learning speed bonus activated.')
+                        // console.log('Learning speed bonus activated.')
                         gameCore.getModule('temporary-effects').triggerEffect('temporary_learn_rate')
                     }
                 }]

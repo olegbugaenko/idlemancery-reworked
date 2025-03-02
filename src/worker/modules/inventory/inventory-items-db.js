@@ -1178,7 +1178,7 @@ export const registerInventoryItems = () => {
         defaultCap: 0,
         isAbstract: true,
         getUsageCooldown: () => {
-            return 60;
+            return 60*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
         },
         onUse: (amount) => {
 

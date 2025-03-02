@@ -9,8 +9,12 @@ export class ResourcePoolModule extends GameModule {
         super();
         this.dragonLevel = 0;
         this.dragonPower = 0;
+        this.monitoredData = {};
         this.eventHandler.registerHandler('query-resources-data', () => {
-            const data = this.getResourcesData();
+            const data = this.getResourcesData().map(one => ({
+                ...one,
+                capProgress: one.hasCap ? one.amount / Math.max(1.e-8, one.cap) : 0,
+            }));
             this.eventHandler.sendData('resources-data', data);
         })
 
@@ -184,6 +188,25 @@ export class ResourcePoolModule extends GameModule {
 
     }
 
+    setMonitored(data) {
+        this.monitoredData = {};
+        if(!data?.length) return;
+        data.forEach(effect => {
+            let direction = 1;
+            if(effect.scope === 'consumption') {
+                direction = -1;
+            }
+            if(effect.scope === 'multiplier' && effect.value < 1) {
+                direction = -1;
+            }
+            this.monitoredData[effect.id] = {
+                direction,
+                name: effect.name,
+                id: effect.id
+            };
+        })
+    }
+
     reset() {
         const rs = gameResources.listResourcesByTags(['resource', 'population'], true);
         rs.forEach(r => {
@@ -200,6 +223,7 @@ export class ResourcePoolModule extends GameModule {
             isPositive: resource.balance > 0 && resource.amount < resource.cap - SMALL_NUMBER,
             isCapped: resource.amount >= resource.cap - SMALL_NUMBER,
             eta: gameResources.assertToCapOrEmpty(resource.id),
+            monitor: this.monitoredData[resource.id] ?? null,
             // affData: monitoredResources[resource.id] || undefined
         }))
     }

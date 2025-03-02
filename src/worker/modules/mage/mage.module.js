@@ -28,7 +28,7 @@ export class MageModule extends GameModule {
          */
 
         this.eventHandler.registerHandler('set_tour_finished', ({ skipStep }) => {
-            console.log('TourFinished: ', skipStep);
+            // console.log('TourFinished: ', skipStep);
             this.tourStatus = {
                 isComplete: true,
                 skipStep
@@ -240,7 +240,7 @@ export class MageModule extends GameModule {
                 value: spell.numCasted
             }
         }))
-        console.log('RS: ', result);
+        // console.log('RS: ', result);
         return result;
     }
 
@@ -250,7 +250,7 @@ export class MageModule extends GameModule {
         const rs = gameResources.getResource('mage-xp');
         if(rs.amount >= rs.cap) {
             const rslt = gameEntity.levelUpEntity('mage');
-            console.log('levelUp: ', rslt);
+            // console.log('levelUp: ', rslt);
             gameResources.addResource('skill-points', 1);
             this.isLeveledUp = true;
             const data = this.getMageData();
@@ -328,7 +328,7 @@ export class MageModule extends GameModule {
                 const delta = Date.now() - (this.bankedTime.lastSave + 60000);
                 this.bankedTime.current = Math.min(this.bankedTime.max, this.bankedTime.current + delta);
             }
-            console.log('loadedBankedTime: ', this.bankedTime, Date.now(), Date.now() - (this.bankedTime.lastSave + 60000))
+            // console.log('loadedBankedTime: ', this.bankedTime, Date.now(), Date.now() - (this.bankedTime.lastSave + 60000))
         }
         this.tourStatus = obj?.tourStatus;
     }
@@ -339,7 +339,7 @@ export class MageModule extends GameModule {
     }
 
     resetPerks() {
-        console.log('resetPerks');
+        // console.log('resetPerks');
         for(const id in this.skillUpgrades) {
             this.setSkill(id, 0, true);
         }

@@ -73,7 +73,7 @@ export class CoursesModule extends GameModule {
                     },
                     true
                 );
-                console.log('Leveled Running Course: ', this.courses[this.runningCourse]);
+                // console.log('Leveled Running Course: ', this.courses[this.runningCourse]);
                 gameEntity.setEntityLevel(`learning_${this.runningCourse}`, this.courses[this.runningCourse].level, true);
                 this.leveledId = this.runningCourse;
             }

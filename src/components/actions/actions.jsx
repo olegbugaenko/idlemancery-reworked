@@ -20,6 +20,7 @@ import CustomFilter from "../shared/custom-filter.jsx";
 import {ActionDetails, ListEditor, GeneralStats} from "./actions-blades.jsx";
 import {ActionListsPanel} from "./actions-lists.jsx";
 import CustomFiltersList from "../shared/custom-filter-list.jsx";
+import {useAppContext} from "../../context/ui-context";
 
 const ACTIONS_SEARCH_SCOPES = [{
     id: 'name',
@@ -43,6 +44,8 @@ export const Actions = ({}) => {
     const worker = useContext(WorkerContext);
 
     const { onMessage, sendData } = useWorkerClient(worker);
+    const { isMobile } = useAppContext();
+    const [isDetailVisible, setDetailVisible] = useState(!isMobile);
     const [actionsData, setActionsData] = useState({
         available: [],
         current: undefined,
@@ -116,7 +119,7 @@ export const Actions = ({}) => {
         } else if(editingList || payload.bForceOpen) {
             if(payload.bForceOpen && !editingList) {
                 setEditingList(payload.id);
-                console.log('Set Editing to: ', payload);
+                // console.log('Set Editing to: ', payload);
             }
             setListData(payload);
             setViewedData(null);
@@ -146,7 +149,10 @@ export const Actions = ({}) => {
     }
 
     const setActionDetails = (id) => {
-        console.log('SettingOpened: ', id);
+        // console.log('SettingOpened: ', id);
+        // Additionally send signal to highlight action
+        sendData('set-monitored', { scope: 'effects', type: 'action', id });
+
         if(!id) {
             setDetailOpened(null);
         } else {
@@ -159,7 +165,7 @@ export const Actions = ({}) => {
             setViewingList(null);
             setEditingList(id);
         } else {
-            console.log('Create new list. Setting listData')
+            // console.log('Create new list. Setting listData')
             setViewingList(null);
             setEditingList(null);
             setListData({ name: '', actions: []})
@@ -489,6 +495,9 @@ export const Actions = ({}) => {
                                 <input type={"checkbox"} checked={!!actionsData.showHidden} onChange={toggleShowHidden}/>
                                 Show hidden
                             </label>
+                            {isMobile ? (<div>
+                                <span className={'highlighted-span'} onClick={() => setDetailVisible(true)}>Info</span>
+                            </div>) : null}
                             <HowToSign scope={'actions'} />
                         </div>
                     </div>
@@ -515,7 +524,7 @@ export const Actions = ({}) => {
 
                     {actionsData.actionListsUnlocked ? (<ActionListsPanel automationUnlocked={actionsData.automationUnlocked} editListToDetails={editListToDetails} lists={actionsData.actionLists} viewListToDetails={viewListToDetails} runningList={actionsData.runningList} automationEnabled={actionsData.automationEnabled} toggleAutomation={toggleAutomation} autotriggerIntervalSetting={actionsData.autotriggerIntervalSetting} changeAutomationInterval={changeAutomationInterval}/>) : null}
                 </div>
-                <div className={`action-detail ingame-box detail-blade ${listData ? 'wide-blade' : ''}`}>
+                {(!isMobile || isDetailVisible || listData || viewedData || selectedAction) ? (<div className={`action-detail ingame-box detail-blade ${listData ? 'wide-blade' : ''} ${viewedData || listData ? 'forced-bottom' : ''}`}>
                     <DetailBlade
                         actionId={detailOpened ?? selectedAction}
                         isSelected={selectedAction && (!detailOpened || detailOpened === selectedAction)}
@@ -538,8 +547,9 @@ export const Actions = ({}) => {
                         stats={actionsData.stats}
                         aspects={actionsData.aspects}
                         onCloseDetails={() => setSelectedAction(null)}
+                        setDetailVisible = {setDetailVisible}
                     />
-                </div>
+                </div>) : null}
             </div>
         </DragDropContext>
 
@@ -568,7 +578,8 @@ export const DetailBlade = ({
     automationUnlocked,
     stats,
     aspects,
-    onCloseDetails
+    onCloseDetails,
+    setDetailVisible
 }) => {
 
     if(listData) {
@@ -633,7 +644,7 @@ export const DetailBlade = ({
         />)
     }
 
-    return (<GeneralStats stats={stats} aspects={aspects} />);
+    return (<GeneralStats stats={stats} aspects={aspects} setDetailVisible={setDetailVisible}/>);
 }
 
 export const ActionCard = ({ id, category, monitored, entityEfficiency, isEditingList, index, name, level, max, xp, maxXP, xpRate, isActive, isLeveled, focused, isTraining, actionEffect, currentEffects, potentialEffects, isHidden, onFlash, onSelect, onActivate, onShowDetails, toggleHiddenAction, missingResourceId, isSelected, ...props}) => {
@@ -723,7 +734,6 @@ export const ActionCard = ({ id, category, monitored, entityEfficiency, isEditin
                                     e.stopPropagation();
                                     onActivate()
                                 }}>Stop</button> : <button id={`activate_${id}`} onClick={(e) => {
-                                    console.log('RunAction: ', stepIndex)
                                     e.preventDefault();
                                     e.stopPropagation();
                                     unlockNextById(8);

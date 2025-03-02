@@ -47,21 +47,21 @@ export class MainModule extends GameModule {
 
 
         this.eventHandler.registerHandler('initialize-game', (data) => {
-            console.log('gameCoreBeforeInited', GameCore.instance);
+            // console.log('gameCoreBeforeInited', GameCore.instance);
             gameCore.initialize();
-            console.log('gameCoreInited', GameCore.instance);
+            // console.log('gameCoreInited', GameCore.instance);
             this.eventHandler.sendData('initialized', {...data, received: true});
-            console.log('sent initialized')
+            // console.log('sent initialized')
         })
 
         this.eventHandler.registerHandler('load-game', (data) => {
-            console.log('load-game received');
+            // console.log('load-game received');
             this.loadGame(data);
         })
 
         this.eventHandler.registerHandler('reset-game', () => {
 
-            console.log('reset-game received');
+            // console.log('reset-game received');
             this.loadGame({}, true);
         })
 
@@ -133,7 +133,7 @@ export class MainModule extends GameModule {
         this.eventHandler.sendData('loading', {...data, received: true});
         gameCore.stopTicking();
         gameCore.load(data);
-        console.log('loaded game -/|');
+        // console.log('loaded game -/|');
         this.eventHandler.sendData('loaded', {...data, received: true, isReset});
     }
 

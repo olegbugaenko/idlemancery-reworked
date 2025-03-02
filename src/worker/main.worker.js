@@ -1,6 +1,6 @@
 import {mainModule, MainModule} from "./main.module";
 
-console.log('re-inc', MainModule.instance);
+// console.log('re-inc', MainModule.instance);
 
 const mainGame = mainModule();
 

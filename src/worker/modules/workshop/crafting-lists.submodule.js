@@ -61,6 +61,10 @@ export class CraftingListsSubmodule extends GameModule {
             this.eventHandler.sendData(label, lists);
         })
 
+        this.eventHandler.registerHandler('query-all-crafting-lists', payload => {
+            this.sendAllCraftingLists(payload);
+        })
+
         this.eventHandler.registerHandler('run-crafting-list', ({ id }) => {
             console.log('Running List: ', id);
             this.runList(id);
@@ -496,5 +500,24 @@ export class CraftingListsSubmodule extends GameModule {
         })
 
         return totalEffects.map(eff => eff.scope === 'income' && eff.value < 0 ? {...eff, scope: 'consumption', value: -eff.value} : eff);
+    }
+
+
+    getAllCraftingLists() {
+        const items = Object.values(this.craftingLists);
+
+        return items.map(craft => ({
+            ...craft,
+            isUnlocked: true,
+        }))
+    }
+
+    sendAllCraftingLists(payload) {
+        const data = this.getAllCraftingLists();
+        let label = 'all-crafting-lists';
+        if(payload?.prefix) {
+            label = `${label}-${payload?.prefix}`
+        }
+        this.eventHandler.sendData(label, data);
     }
 }

@@ -8,9 +8,12 @@ const TutorialContext = createContext(null);
 function MyTooltip({ step, closeProps, primaryProps }) {
 
     const handleSkip = (e) => {
-        console.log('Skip button clicked');
+        // console.log('Skip button clicked');
+
         if (closeProps.onClick) {
-            closeProps.onClick(e);
+            if(confirm('Are you sure you want to skip tutorial? If you do so, you won\'t be able to restart it.')) {
+                closeProps.onClick(e);
+            }
         }
     };
 
@@ -18,8 +21,13 @@ function MyTooltip({ step, closeProps, primaryProps }) {
         <div className={'hint-popup tutorial-popup'}>
             <div className={'step-content'}>{step.content}</div>
             <div className={'buttons'}>
-                {!step.actionRequired ? (<button {...primaryProps}>Next</button>) : null}
-                <button onClick={handleSkip}>Skip</button>
+                <div className={'left'}>
+                    {!step.actionRequired ? (<button {...primaryProps}>Next</button>) : null}
+                </div>
+                <div>
+                    <button onClick={handleSkip}>Skip</button>
+                </div>
+
             </div>
             {/* Кнопки Next/Back/Close */}
 
@@ -230,7 +238,7 @@ export function TutorialProvider({ children }) {
                 callback={(data) => {
                     const { index, type, action, status } = data;
 
-                    console.log('UNN: ', data);
+                    // console.log('UNN: ', data);
 
                     if (type === 'tour:end') {
                         if (status === 'skipped') {
@@ -245,7 +253,7 @@ export function TutorialProvider({ children }) {
 
                     if (type === 'step:after' && action === 'next') {
                         if(index >= steps.length - 1) {
-                            console.log('Finishhh!');
+                            // console.log('Finishhh!');
                             sendData('set_tour_finished', {});
                         }
                         setStepIndex(index + 1);

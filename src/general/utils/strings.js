@@ -25,7 +25,7 @@ export const formatValue = (number, numDigits = 2, withSign = false) => {
 };
 
 export const formatInt = (number, numDigits = 2) => {
-    const suffixes = ['', 'K', 'M', 'B', 'T'];
+    const suffixes = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc'];
     let sign = '';
 
     if (number < 0) {

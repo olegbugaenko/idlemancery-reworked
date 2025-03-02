@@ -8,7 +8,7 @@ import {BreakDown} from "../layout/sidebar.jsx";
 import {ResourceComparison} from "../shared/resource-comparison.jsx";
 import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
 
-export const Guilds = ({ setItemDetails, filterId, newUnlocks }) => {
+export const Guilds = ({ setItemDetails, filterId, newUnlocks, isMobile }) => {
 
     const worker = useContext(WorkerContext);
 
@@ -131,7 +131,7 @@ export const Guilds = ({ setItemDetails, filterId, newUnlocks }) => {
                                 <p className={'tier-title'}>Tier {formatInt(tier+1)}</p>
                                 <div className={'tier-content'}>
                                     {guildsData.tierUnlocks[tier]?.isUnlocked
-                                        ? list.map(upgrade => <ItemCard key={upgrade.id} {...upgrade} onPurchase={purchaseUpgrade} onShowDetails={setItemDetails}/>)
+                                        ? list.map(upgrade => <ItemCard key={upgrade.id} {...upgrade} onPurchase={purchaseUpgrade} onShowDetails={setItemDetails} isMobile={isMobile}/>)
                                         : (<p>Reach reputation level {formatInt(guildsData.tierUnlocks[tier]?.level)} to unlock</p>)}
                                 </div>
                             </div> )
@@ -143,9 +143,15 @@ export const Guilds = ({ setItemDetails, filterId, newUnlocks }) => {
     </div>)
 }
 
-export const ItemCard = ({ id, name, level, maxLevel, affordable, onPurchase, onShowDetails}) => {
+export const ItemCard = ({ id, name, level, maxLevel, affordable, onPurchase, onShowDetails, isMobile}) => {
 
-    return (<div className={`card upgrade`} onMouseEnter={() => onShowDetails(id)} onMouseOver={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)}>
+    return (<div
+        className={`card upgrade`}
+        onMouseEnter={() => isMobile ? null : onShowDetails(id)}
+        onMouseOver={() => isMobile ? null : onShowDetails(id)}
+        onMouseLeave={() => isMobile ? null : onShowDetails(null)}
+        onClick={() => isMobile ? onShowDetails(id) : null}
+    >
         <div className={'item-card'}>
             <div className={'head'}>
                 <p className={'title'}>{name}</p>
@@ -153,7 +159,11 @@ export const ItemCard = ({ id, name, level, maxLevel, affordable, onPurchase, on
             </div>
             <div className={'bottom'}>
                 <div className={'buttons'}>
-                    <button disabled={!affordable.isAffordable} onClick={() => onPurchase(id)}>Upgrade</button>
+                    <button disabled={!affordable.isAffordable} onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        onPurchase(id)
+                    }}>Upgrade</button>
                 </div>
             </div>
         </div>

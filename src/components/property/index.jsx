@@ -11,6 +11,7 @@ import {AccessoryUpgrades} from "./accessories.jsx";
 import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
 import {useUICache} from "../../general/hooks/local-cache";
 import {AmplifiersUpgrades} from "./amplifiers.jsx";
+import {useAppContext} from "../../context/ui-context";
 
 export const Property = ({}) => {
     const [detailOpened, setDetailOpened] = useState(null)
@@ -24,6 +25,8 @@ export const Property = ({}) => {
     const [ selectedTab, setSelectedTab ] = useUICache('property_tab', 'furniture');
 
     const [newUnlocks, setNewUnlocks] = useState({});
+
+    const { isMobile } = useAppContext();
 
 
 
@@ -86,14 +89,14 @@ export const Property = ({}) => {
                         </li>) : null}
                     </ul>
                 </div>
-                {selectedTab === 'furniture' ? (<FurnitureUpgrades setItemDetails={setItemDetails} purchaseItem={purchaseItem} deleteItem={deleteItem} newUnlocks={newUnlocks?.['property']?.items?.['furniture']?.items}/>) : null}
-                {selectedTab === 'accessory' ? (<AccessoryUpgrades setItemDetails={setItemDetails} purchaseItem={purchaseItem} deleteItem={deleteItem} newUnlocks={newUnlocks?.['property']?.items?.['accessory']?.items}/>) : null}
-                {selectedTab === 'amplifier' ? (<AmplifiersUpgrades setItemDetails={setItemDetails} purchaseItem={purchaseItem} deleteItem={deleteItem} newUnlocks={newUnlocks?.['property']?.items?.['amplifier']?.items}/>) : null}
+                {selectedTab === 'furniture' ? (<FurnitureUpgrades setItemDetails={setItemDetails} purchaseItem={purchaseItem} deleteItem={deleteItem} newUnlocks={newUnlocks?.['property']?.items?.['furniture']?.items} isMobile={isMobile}/>) : null}
+                {selectedTab === 'accessory' ? (<AccessoryUpgrades setItemDetails={setItemDetails} purchaseItem={purchaseItem} deleteItem={deleteItem} newUnlocks={newUnlocks?.['property']?.items?.['accessory']?.items} isMobile={isMobile}/>) : null}
+                {selectedTab === 'amplifier' ? (<AmplifiersUpgrades setItemDetails={setItemDetails} purchaseItem={purchaseItem} deleteItem={deleteItem} newUnlocks={newUnlocks?.['property']?.items?.['amplifier']?.items} isMobile={isMobile}/>) : null}
             </div>
 
-            <div className={'item-detail ingame-box detail-blade'}>
-                {detailOpened ? (<ItemDetails itemId={detailOpened} category={selectedTab}/>) : null}
-            </div>
+            {(!isMobile || detailOpened) ? (<div className={'item-detail ingame-box detail-blade'}>
+                {detailOpened ? (<ItemDetails itemId={detailOpened} category={selectedTab} setItemDetails={setItemDetails} purchaseItem={purchaseItem}/>) : null}
+            </div>) : null}
         </div>
 
     )
@@ -101,13 +104,15 @@ export const Property = ({}) => {
 }
 
 
-export const ItemDetails = ({itemId, category}) => {
+export const ItemDetails = ({itemId, category, setItemDetails, purchaseItem}) => {
 
     const worker = useContext(WorkerContext);
 
     const { onMessage, sendData } = useWorkerClient(worker);
 
     const [item, setDetailOpened] = useState(null);
+
+    const { isMobile } = useAppContext();
 
     useEffect(() => {
         if(category === 'furniture' || category === 'accessory' || category === 'amplifier') {
@@ -159,6 +164,19 @@ export const ItemDetails = ({itemId, category}) => {
                         }
                     </div>
                 </div>
+                {isMobile ? (<div className={'buttons flex-container'}>
+                    <button
+                        disabled={!item.affordable.isAffordable}
+                        onClick={e => purchaseItem(item.id)}
+                    >
+                        Purchase
+                    </button>
+                    <button
+                        onClick={e => setItemDetails(null)}
+                    >
+                        Close
+                    </button>
+                </div> ) : null}
             </div>
         </PerfectScrollbar>
     )

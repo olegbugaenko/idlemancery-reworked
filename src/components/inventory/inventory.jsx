@@ -15,6 +15,7 @@ import {ResourceComparison} from "../shared/resource-comparison.jsx";
 import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
 import StatRow from "../shared/stat-row.jsx";
 import {SearchField} from "../shared/search-field.jsx";
+import {useAppContext} from "../../context/ui-context";
 
 
 const INVENTORY_SEARCH_SCOPES = [{
@@ -34,6 +35,8 @@ const INVENTORY_SEARCH_SCOPES = [{
 export const Inventory = ({}) => {
 
     const worker = useContext(WorkerContext);
+    const { isMobile } = useAppContext();
+    const [isDetailVisible, setDetailVisible] = useState(!isMobile);
 
     const { onMessage, sendData } = useWorkerClient(worker);
     const [inventoryData, setItemsData] = useState({
@@ -363,6 +366,9 @@ export const Inventory = ({}) => {
                             />
                             {/*<input type={'text'} placeholder={'Search'} value={actionsData.searchText || ''} onChange={e => setSearch(e.target.value)}/>*/}
                         </label>
+                        {isMobile ? (<div>
+                            <span className={'highlighted-span'} onClick={() => setDetailVisible(true)}>Info</span>
+                        </div>) : null}
                     </div>
                 </div>
                 <div className={'inventory-items-wrap'}>
@@ -378,6 +384,7 @@ export const Inventory = ({}) => {
                                 onFlash={handleFlash}
                                 onShowDetails={setInventoryDetailsView}
                                 onEditConfig={setInventoryDetailsEdit}
+                                isMobile={isMobile}
                                 /></NewNotificationWrap>)}
                             {overlayPositions.map((position, index) => (
                                 <FlashOverlay key={index} position={position} />
@@ -386,7 +393,7 @@ export const Inventory = ({}) => {
                     </PerfectScrollbar>
                 </div>
             </div>
-            <div className={'item-detail ingame-box detail-blade'}>
+            {(!isMobile || isDetailVisible || editData || viewedData) ? (<div className={'item-detail ingame-box detail-blade'}>
                 {editData || viewedData ? (<InventoryDetails
                     isChanged={isChanged}
                     editData={editData}
@@ -407,15 +414,16 @@ export const Inventory = ({}) => {
                     onCancel={onCancel}
                     onSell={onSell}
                     automationUnlocked={inventoryData.automationUnlocked}
-                />) : (<InventoryStats details={inventoryData.details} />)}
-            </div>
+                    onConsume={purchaseItem}
+                />) : (<InventoryStats details={inventoryData.details} setDetailVisible={setDetailVisible}/>)}
+            </div>) : null}
         </div>
 
     )
 
 }
 
-export const InventoryCard = React.memo(({ isChanged, allowMultiConsume, isConsumable, isRare, isSelected, id, name, amount, balance, breakDown, isConsumed, cooldownProg, cooldown, onFlash, onPurchase, onShowDetails, onEditConfig}) => {
+export const InventoryCard = React.memo(({ isChanged, allowMultiConsume, isConsumable, isRare, isSelected, id, name, amount, balance, breakDown, isConsumed, cooldownProg, cooldown, onFlash, onPurchase, onShowDetails, onEditConfig, isMobile}) => {
     const elementRef = useRef(null);
 
     useFlashOnLevelUp(isConsumed, onFlash, elementRef);
@@ -442,7 +450,14 @@ export const InventoryCard = React.memo(({ isChanged, allowMultiConsume, isConsu
     // RERENDERING
     // console.log('Item: ', id, cooldownProg, cooldown);
 
-    return (<div ref={elementRef} className={`icon-card item flashable ${isSelected ? 'selected' : ''} ${isRare ? 'bluish' : ''}`} onMouseEnter={() => onShowDetails(id)} onMouseLeave={() => onShowDetails(null)} onClick={handleClick} onContextMenu={handleContextMenu}>
+    return (<div
+        ref={elementRef}
+        className={`icon-card item flashable ${isSelected ? 'selected' : ''} ${isRare ? 'bluish' : ''}`}
+        onMouseEnter={() => !isMobile ? onShowDetails(id) : null}
+        onMouseLeave={() => !isMobile ? onShowDetails(null) : null}
+        onClick={handleClick}
+        onContextMenu={handleContextMenu}
+    >
         <TippyWrapper content={<div className={'hint-popup'}>
             <p>{name}({formatInt(amount)})</p>
             {breakDown ? (<BreakDown breakDown={breakDown}/>) : null}
@@ -489,7 +504,13 @@ export const InventoryCard = React.memo(({ isChanged, allowMultiConsume, isConsu
     return true;
 }))
 
-export const InventoryDetails = React.memo(({isChanged, editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onAddAutosellRule, onSetAutosellRuleValue, onDeleteAutosellRule, onSave, onCancel, onSell, onSetAutosellPattern, onSetAutoconsumePattern, onSetAutosellReserved, onToggleAutoconsume, onToggleAutosell, automationUnlocked}) => {
+export const InventoryDetails = React.memo(({isChanged, editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onAddAutosellRule, onSetAutosellRuleValue, onDeleteAutosellRule, onSave, onCancel, onSell, onSetAutosellPattern, onSetAutoconsumePattern, onSetAutosellReserved, onToggleAutoconsume, onToggleAutosell, automationUnlocked, onConsume}) => {
+
+    const worker = useContext(WorkerContext);
+
+    const { sendData, onMessage } = useWorkerClient(worker);
+
+    const [details, setDetails] = useState(null);
 
     const item = viewedData ? viewedData : editData;
 
@@ -497,6 +518,20 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
 
 
     if(!item) return null;
+
+    useEffect(() => {
+
+        if(item) {
+            sendData('query-inventory-details', { id: item.id })
+        }
+    }, [item]);
+
+    console.log('ItemReceived: ', item);
+
+    onMessage('inventory-details', (data) => {
+        console.log('inventory-details', data);
+        setDetails(data);
+    })
 
     const setAutoconsumePattern = (pattern) => {
       onSetAutoconsumePattern(pattern)
@@ -542,6 +577,10 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
         onToggleAutoconsume()
     }
 
+    const consumeItem = () => {
+        onConsume(item.id);
+    }
+
     console.log('item?.autoconsume: ', item?.autoconsume);
 
     return (
@@ -578,9 +617,16 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
                 </div>) : null}
 
                 <div className={'block'}>
-                    {item.consumptionCooldown ? (<div>
-                        <p>Consumption Cooldown: {secondsToString(item.consumptionCooldown)}</p>
-                        <p>Consumed amount: {formatInt(item.numConsumed)}</p>
+                    {item.consumptionCooldown ? (<div className={'flex-container consumption-block'}>
+                        <div className={'stats'}>
+                            <p>Consumption Cooldown: {secondsToString(item.consumptionCooldown)}</p>
+                            <p>Consumed amount: {formatInt(item.numConsumed)}</p>
+                        </div>
+                        <div className={'consume-block'}>
+                            <button onClick={consumeItem} disabled={details?.currentCooldown > 0 || details?.currentDuration > 0}>Consume</button>
+                            {details?.currentDuration ? (<p className={'small'}>Running: {secondsToString(details?.currentDuration)}</p>) : null}
+                            {details?.currentCooldown ? (<p className={'small'}>Cooldown: {secondsToString(details?.currentCooldown)}</p>) : null}
+                        </div>
                     </div>) : null}
                     {item.isSellable ? (<div>
                         <p>Sold amount: {formatInt(item.soldAmount)}</p>
@@ -672,7 +718,9 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
     return true;
 })
 
-export const InventoryStats = ({ details }) => {
+export const InventoryStats = ({ details, setDetailVisible }) => {
+
+    const { isMobile } = useAppContext();
     // Масив статистик, які потрібно відобразити
     const statsToDisplay = [
         details.cooldown_bonus,
@@ -700,6 +748,9 @@ export const InventoryStats = ({ details }) => {
                         ))}
                     </div>
                 </div>
+                {isMobile ? (<div className={'block buttons'}>
+                    <button onClick={() => setDetailVisible(false)}>Close</button>
+                </div>) : null}
             </div>
         </PerfectScrollbar>
     );
