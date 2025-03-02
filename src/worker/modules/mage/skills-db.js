@@ -195,7 +195,7 @@ export const registerSkillsStage1 = () => {
     gameEntity.registerGameEntity('skill_metabolism', {
         tags: ["skill", "upgrade", "purchaseable"],
         name: 'Metabolism',
-        description: 'Decrease cooldown of consumable items usage',
+        description: 'Increase potions and herbs consumption effects (Affect both negative and positive ones)',
         level: 0,
         unlockCondition: () => {
             // console.log('ACTLVL: ', )

@@ -6,6 +6,15 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+                <h3>Idle Awakening v0.1.1</h3>
+                <div className={'features'}>
+                    <p>Spells and potions having lasting effects now have no cooldown</p>
+                    <p>Added new automation rules</p>
+                    <p>Added possibility to pin resources from inventory to main panel</p>
+                    <p>Added support for smaller screen sizes</p>
+                    <p>Few UI improvements</p>
+                    <p>Fixed some typos</p>
+                </div>
                 <h3>Idle Awakening v0.1.0a</h3>
                 <div className={'features'}>
                     <p>Fixed potential crashes issue</p>

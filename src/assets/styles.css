@@ -178,12 +178,11 @@ p.small-hint, span.small-hint {
 
 
 .content-wrap .sidebar .resource-item {
-    padding: 2px 5px;
     margin: 0;
     display: flex;
     justify-content: space-between;
     font-size: 14px;
-    padding-top: 3px;
+    padding: 2px 5px 4px;
     border-bottom: 1px solid #222233;
     position: relative;
 }
@@ -237,7 +236,7 @@ p.small-hint, span.small-hint {
 }
 
 .content-wrap .sidebar .resource-item .resource-amount {
-    width: 100px;
+    width: 120px;
 }
 
 .content-wrap .sidebar .resource-item .resource-amount.capped {

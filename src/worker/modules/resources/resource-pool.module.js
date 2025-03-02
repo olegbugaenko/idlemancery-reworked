@@ -10,8 +10,8 @@ export class ResourcePoolModule extends GameModule {
         this.dragonLevel = 0;
         this.dragonPower = 0;
         this.monitoredData = {};
-        this.eventHandler.registerHandler('query-resources-data', () => {
-            const data = this.getResourcesData().map(one => ({
+        this.eventHandler.registerHandler('query-resources-data', (pl) => {
+            const data = this.getResourcesData(pl).map(one => ({
                 ...one,
                 capProgress: one.hasCap ? one.amount / Math.max(1.e-8, one.cap) : 0,
             }));
@@ -150,9 +150,10 @@ export class ResourcePoolModule extends GameModule {
         })
 
         gameEffects.registerEffect('metabolism_rate', {
-            name: 'Consumable Cooldown Reduction',
+            name: 'Consumable Effects Multiplier',
             defaultValue: 1,
-            minValue: 1
+            minValue: 1,
+            description: 'Increase effect from herbs ant potions consumption'
         })
 
         registerInventoryItems();
@@ -214,9 +215,14 @@ export class ResourcePoolModule extends GameModule {
         })
     }
 
-    getResourcesData() {
+    getResourcesData(pl) {
         const rs = gameResources.listResourcesByTags(['resource', 'population'], true);
         // console.log('RS: ', JSON.stringify(gameResources.getResource('coins')));
+        if(pl.includePinned) {
+            const inventory = gameResources.listResourcesByTags(['inventory']);
+            const pinned = inventory.filter(one => gameCore.getModule('inventory').inventoryItems?.[one.id]?.isPinned);
+            rs.push(...pinned);
+        }
         return rs.filter(one => one.isUnlocked).map(resource => ({
             ...resource,
             isNegative: resource.balance < 0,

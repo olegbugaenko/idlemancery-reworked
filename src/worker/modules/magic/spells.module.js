@@ -68,6 +68,7 @@ export class SpellModule extends GameModule {
 
         // trigger autocast
         for(const itemId in this.spells) {
+            let checkAutoThisTick = false;
             this.spells[itemId].isCasted = false;
 
             if(this.spells[itemId].duration > 0) {
@@ -85,13 +86,15 @@ export class SpellModule extends GameModule {
                 if(gameEntity.entityExists(`active_${itemId}`)) {
                     gameEntity.unsetEntity(`active_${itemId}`);
                 }
+                // Check automation right away
+                checkAutoThisTick = !this.spells[itemId].cooldown;
             }
 
             if(this.spells[itemId].cooldown > 0) {
                 this.spells[itemId].cooldown -= delta;
             }
 
-            if(this.autoConsumeCD > 0) {
+            if(this.autoConsumeCD > 0 && !checkAutoThisTick) {
                 continue;
             }
             if(!this.spells[itemId]?.autocast?.isEnabled) {
@@ -121,9 +124,12 @@ export class SpellModule extends GameModule {
 
     load(saveObject) {
         
-        for(const key in this.purchasedItems) {
+        for(const key in this.spells) {
             this.setSpell(key, 0, true);
-            gameEntity.setEntityLevel(getMaxId(id), 0, true);
+            gameEntity.setEntityLevel(getMaxId(key), 0, true);
+            if(gameEntity.entityExists(`active_${key}`)) {
+                gameEntity.unsetEntity(`active_${key}`)
+            }
         }
         this.spells = {};
         if(saveObject?.spells) {

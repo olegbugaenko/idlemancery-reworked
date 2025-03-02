@@ -345,6 +345,11 @@ export const Inventory = ({}) => {
         sendData('set-inventory-search', { searchData });
     }
 
+    const onTogglePinned = (id, flag) => {
+        console.log('toggle-pinned: ', id, flag);
+        sendData('set-inventory-pinned', { id, flag });
+    }
+
     return (
         <div className={'inventory-wrap'}>
             <div className={'ingame-box inventory'}>
@@ -415,6 +420,7 @@ export const Inventory = ({}) => {
                     onSell={onSell}
                     automationUnlocked={inventoryData.automationUnlocked}
                     onConsume={purchaseItem}
+                    onTogglePinned={onTogglePinned}
                 />) : (<InventoryStats details={inventoryData.details} setDetailVisible={setDetailVisible}/>)}
             </div>) : null}
         </div>
@@ -504,7 +510,7 @@ export const InventoryCard = React.memo(({ isChanged, allowMultiConsume, isConsu
     return true;
 }))
 
-export const InventoryDetails = React.memo(({isChanged, editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onAddAutosellRule, onSetAutosellRuleValue, onDeleteAutosellRule, onSave, onCancel, onSell, onSetAutosellPattern, onSetAutoconsumePattern, onSetAutosellReserved, onToggleAutoconsume, onToggleAutosell, automationUnlocked, onConsume}) => {
+export const InventoryDetails = React.memo(({isChanged, editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onAddAutosellRule, onSetAutosellRuleValue, onDeleteAutosellRule, onSave, onCancel, onSell, onSetAutosellPattern, onSetAutoconsumePattern, onSetAutosellReserved, onToggleAutoconsume, onToggleAutosell, automationUnlocked, onConsume, onTogglePinned}) => {
 
     const worker = useContext(WorkerContext);
 
@@ -579,6 +585,10 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
 
     const consumeItem = () => {
         onConsume(item.id);
+    }
+
+    const togglePinned = () => {
+        onTogglePinned(item.id, !(details || item).isPinned);
     }
 
     console.log('item?.autoconsume: ', item?.autoconsume);
@@ -694,6 +704,9 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
 
                 {isEditing ? (<div className={'buttons flex-container'}>
                     <button disabled={!isChanged} onClick={onSave}>Save</button>
+                    <TippyWrapper content={<div className={'hint-popup'}>Pinning item will make it visible at resources panel</div> }>
+                        <button onClick={togglePinned}>{details?.isPinned ? 'Unpin' : 'Pin'}</button>
+                    </TippyWrapper>
                     <button onClick={onCancel}>Cancel</button>
                 </div>) : null}
             </div>

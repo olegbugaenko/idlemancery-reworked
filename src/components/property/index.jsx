@@ -43,6 +43,19 @@ export const Property = ({}) => {
 
     onMessage('unlocks-property', (unlocks) => {
         setUnlocksData(unlocks);
+
+        const mapToPages = {
+            furniture: 'property',
+            accessory: 'crafting',
+            amplifier: 'amplifiers'
+        }
+
+        if(!unlocks[mapToPages[selectedTab]]) {
+            const acceptable = Object.entries(mapToPages).filter(([tab, unlock]) => unlocks[unlock]);
+            if(acceptable.length) {
+                setSelectedTab(acceptable[0][0]);
+            }
+        }
     })
 
     onMessage('new-unlocks-notifications-property', payload => {
@@ -60,6 +73,7 @@ export const Property = ({}) => {
     }
 
     const setItemDetails = (id) => {
+        sendData('set-monitored', { scope: 'effects', type: selectedTab, id });
         if(!id) {
             setDetailOpened(null);
         } else {

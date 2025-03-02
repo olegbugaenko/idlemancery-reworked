@@ -53,7 +53,7 @@ export const ResourcesBar = () => {
 
     useEffect(() => {
         const interval = setInterval(() => {
-            sendData('query-resources-data', {});
+            sendData('query-resources-data', { includePinned: true });
         }, 100);
         return () => {
             clearInterval(interval);

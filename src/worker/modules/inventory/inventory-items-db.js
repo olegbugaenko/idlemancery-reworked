@@ -6,6 +6,8 @@ const updateLevelBy = (id, amount) => {
 
 export const metabolismMod = (attr) => attr > 1 ? 1. / (Math.pow(attr, 0.25)) : 1.;
 
+export const metabolismIntensityMod = (attr) => attr > 1 ? Math.pow(attr, 0.25) : 1.;
+
 export const sellPriceMod = (attr) => attr > 1 ? Math.min(5, 1. +  0.02*(Math.log2(attr) ** 2.0)) : 1.;
 
 
@@ -59,7 +61,7 @@ export const registerInventoryItems = () => {
 
         },
         getUsageCooldown: () => {
-            return 30*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+            return 0;
         },
         attributes: {
             duration: 20,
@@ -68,7 +70,7 @@ export const registerInventoryItems = () => {
             get_income: () => ({
                 effects: {
                     plain_learn_rate: {
-                        A: 5,
+                        A: 5*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
                         B: 0,
                         type: 0,
                     }
@@ -134,13 +136,13 @@ export const registerInventoryItems = () => {
 
         },
         getUsageCooldown: () => {
-            return 5*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+            return 5;
         },
         usageGain: {
             get_income: () => ({
                 resources: {
                     health: {
-                        A: 1,
+                        A: 1*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
                         B: 0,
                         type: 0,
                     }
@@ -168,13 +170,13 @@ export const registerInventoryItems = () => {
 
         },
         getUsageCooldown: () => {
-            return 10*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+            return 10;
         },
         usageGain: {
             get_income: () => ({
                 resources: {
                     energy: {
-                        A: 5,
+                        A: 5*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
                         B: 0,
                         type: 0,
                     }
@@ -201,13 +203,13 @@ export const registerInventoryItems = () => {
 
         },
         getUsageCooldown: () => {
-            return 10*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+            return 10;
         },
         usageGain: {
             get_income: () => ({
                 resources: {
                     knowledge: {
-                        A: 3,
+                        A: 3*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
                         B: 0,
                         type: 0,
                     }
@@ -216,7 +218,7 @@ export const registerInventoryItems = () => {
             get_consumption: () => ({
                 resources: {
                     health: {
-                        A: 5,
+                        A: 5*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
                         B: 0,
                         type: 0,
                     }
@@ -240,13 +242,13 @@ export const registerInventoryItems = () => {
 
         },
         getUsageCooldown: () => {
-            return 10*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+            return 10;
         },
         usageGain: {
             get_income: () => ({
                 resources: {
                     'mage-xp': {
-                        A: 500,
+                        A: 500*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
                         B: 0,
                         type: 0,
                     }
@@ -255,7 +257,7 @@ export const registerInventoryItems = () => {
             get_consumption: () => ({
                 resources: {
                     energy: {
-                        A: 1,
+                        A: 1*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
                         B: 0,
                         type: 0,
                     }
@@ -279,7 +281,7 @@ export const registerInventoryItems = () => {
 
         },
         getUsageCooldown: () => {
-            return 30*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+            return 0;
         },
         attributes: {
             duration: 20,
@@ -288,7 +290,7 @@ export const registerInventoryItems = () => {
             get_multiplier: () => ({
                 effects: {
                     learning_rate: {
-                        A: 0.25,
+                        A: 0.1,
                         B: 1,
                         type: 0,
                     }
@@ -313,7 +315,7 @@ export const registerInventoryItems = () => {
 
         },
         getUsageCooldown: () => {
-            return 30*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+            return 0;
         },
         attributes: {
             duration: 20,
@@ -322,7 +324,7 @@ export const registerInventoryItems = () => {
             get_multiplier: () => ({
                 effects: {
                     physical_training_learn_speed: {
-                        A: 0.5,
+                        A: 0.2*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
                         B: 1,
                         type: 0,
                     }
@@ -346,13 +348,13 @@ export const registerInventoryItems = () => {
 
         },
         getUsageCooldown: () => {
-            return 20*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+            return 20;
         },
         usageGain: {
             get_income: () => ({
                 resources: {
                     health: {
-                        A: 10,
+                        A: 20*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
                         B: 0,
                         type: 0,
                     }
@@ -378,7 +380,7 @@ export const registerInventoryItems = () => {
 
         },
         getUsageCooldown: () => {
-            return 30*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+            return 0;
         },
         attributes: {
             duration: 20,
@@ -387,7 +389,7 @@ export const registerInventoryItems = () => {
             get_consumption: () => ({
                 resources: {
                     health: {
-                        A: 5,
+                        A: 5*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
                         B: 0,
                         type: 0,
                     }
@@ -398,7 +400,7 @@ export const registerInventoryItems = () => {
             get_multiplier: () => ({
                 resources: {
                     energy: {
-                        A: 0.2,
+                        A: 0.2*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
                         B: 1,
                         type: 0,
                     }
@@ -424,7 +426,7 @@ export const registerInventoryItems = () => {
 
         },
         getUsageCooldown: () => {
-            return 30*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+            return 0;
         },
         attributes: {
             duration: 20,
@@ -433,7 +435,7 @@ export const registerInventoryItems = () => {
             get_consumption: () => ({
                 resources: {
                     health: {
-                        A: 15,
+                        A: 15*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
                         B: 0,
                         type: 0,
                     }
@@ -444,7 +446,7 @@ export const registerInventoryItems = () => {
             get_multiplier: () => ({
                 resources: {
                     mana: {
-                        A: 0.2,
+                        A: 0.1*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
                         B: 1,
                         type: 0,
                     }
@@ -471,16 +473,16 @@ export const registerInventoryItems = () => {
 
         },
         getUsageCooldown: () => {
-            return 250*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+            return 0;
         },
         attributes: {
-            duration: 240,
+            duration: 120,
         },
         resourceModifier: {
             get_multiplier: () => ({
                 effects: {
                     spell_xp_rate: {
-                        A: 0.5,
+                        A: 0.5*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
                         B: 1,
                         type: 0,
                     }
@@ -508,16 +510,16 @@ export const registerInventoryItems = () => {
 
         },
         getUsageCooldown: () => {
-            return 200*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+            return 0;
         },
         attributes: {
-            duration: 120,
+            duration: 60,
         },
         resourceModifier: {
             get_multiplier: () => ({
                 effects: {
                     physical_training_learn_speed: {
-                        A: 0.25,
+                        A: 0.2*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
                         B: 1,
                         type: 0,
                     }
@@ -544,16 +546,16 @@ export const registerInventoryItems = () => {
 
         },
         getUsageCooldown: () => {
-            return 200*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+            return 0;
         },
         attributes: {
-            duration: 120,
+            duration: 60,
         },
         resourceModifier: {
             get_multiplier: () => ({
                 effects: {
                     social_training_learning_rate: {
-                        A: 0.5,
+                        A: 0.2*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
                         B: 1,
                         type: 0,
                     }
@@ -1004,7 +1006,7 @@ export const registerInventoryItems = () => {
 
         },
         getUsageCooldown: () => {
-            return 150*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+            return 0;
         },
         attributes: {
             duration: 600,
@@ -1014,7 +1016,7 @@ export const registerInventoryItems = () => {
                 resources: {
                     energy: {
                         A: 0,
-                        B: 5,
+                        B: 5*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
                         type: 0,
                     }
                 }
@@ -1037,7 +1039,7 @@ export const registerInventoryItems = () => {
 
         },
         getUsageCooldown: () => {
-            return 150*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+            return 0;
         },
         attributes: {
             duration: 600,
@@ -1047,7 +1049,7 @@ export const registerInventoryItems = () => {
                 resources: {
                     health: {
                         A: 0,
-                        B: 5,
+                        B: 5*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
                         type: 0,
                     }
                 }
@@ -1070,7 +1072,7 @@ export const registerInventoryItems = () => {
 
         },
         getUsageCooldown: () => {
-            return 150*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+            return 0;
         },
         attributes: {
             duration: 120,
@@ -1079,7 +1081,7 @@ export const registerInventoryItems = () => {
             multiplier: {
                 effects: {
                     learning_rate: {
-                        A: 1,
+                        A: 0.5*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
                         B: 1,
                         type: 0,
                     }
@@ -1116,7 +1118,7 @@ export const registerInventoryItems = () => {
 
         },
         getUsageCooldown: () => {
-            return 20*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+            return 20;
         },
         attributes: {
 
@@ -1125,7 +1127,7 @@ export const registerInventoryItems = () => {
             income: {
                 resources: {
                     'mage-xp': {
-                        A: 25000,
+                        A: 25000*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
                         B: 0,
                         type: 0,
                     }
@@ -1178,7 +1180,7 @@ export const registerInventoryItems = () => {
         defaultCap: 0,
         isAbstract: true,
         getUsageCooldown: () => {
-            return 60*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+            return 0;
         },
         onUse: (amount) => {
 
@@ -1190,7 +1192,7 @@ export const registerInventoryItems = () => {
             multiplier: {
                 effects: {
                     crafting_efficiency: {
-                        A: 1,
+                        A: 0.5*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
                         B: 1,
                         type: 0,
                     }
@@ -1199,7 +1201,7 @@ export const registerInventoryItems = () => {
             consumption: {
                 resources: {
                     health: {
-                        A: 100,
+                        A: 100*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
                         B: 0,
                         type: 0,
                     }
@@ -1224,7 +1226,7 @@ export const registerInventoryItems = () => {
             updateLevelBy('rare_ironvine_effect', amount)
         },
         getUsageCooldown: () => {
-            return 0.1*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+            return 0.1;
         },
         attributes: {
             baseChanceMult: 1,
@@ -1256,7 +1258,7 @@ export const registerInventoryItems = () => {
             updateLevelBy('rare_mindspire_effect', amount)
         },
         getUsageCooldown: () => {
-            return 0.1*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+            return 0.1;
         },
         attributes: {
             baseChanceMult: 1,
@@ -1287,7 +1289,7 @@ export const registerInventoryItems = () => {
             updateLevelBy('rare_whisperleaf_effect', amount)
         },
         getUsageCooldown: () => {
-            return 0.1*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+            return 0.1;
         },
         attributes: {
             baseChanceMult: 1,
@@ -1318,7 +1320,7 @@ export const registerInventoryItems = () => {
             updateLevelBy('rare_sageroot_effect', amount)
         },
         getUsageCooldown: () => {
-            return 0.1*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+            return 0.1;
         },
         attributes: {
             baseChanceMult: 1,
@@ -1350,7 +1352,7 @@ export const registerInventoryItems = () => {
             updateLevelBy('rare_titanleaf_effect', amount)
         },
         getUsageCooldown: () => {
-            return 0.1*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+            return 0.1;
         },
         attributes: {
             baseChanceMult: 1,
@@ -1382,7 +1384,7 @@ export const registerInventoryItems = () => {
             updateLevelBy('rare_heartroot_effect', amount)
         },
         getUsageCooldown: () => {
-            return 0.1*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+            return 0.1;
         },
         attributes: {
             baseChanceMult: 1,
@@ -1414,7 +1416,7 @@ export const registerInventoryItems = () => {
             updateLevelBy('rare_energloom_effect', amount)
         },
         getUsageCooldown: () => {
-            return 0.1*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+            return 0.1;
         },
         attributes: {
             baseChanceMult: 1,
@@ -1446,7 +1448,7 @@ export const registerInventoryItems = () => {
             updateLevelBy('rare_lifebloom_effect', amount)
         },
         getUsageCooldown: () => {
-            return 0.1*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+            return 0.1;
         },
         attributes: {
             baseChanceMult: 1,
@@ -1478,7 +1480,7 @@ export const registerInventoryItems = () => {
             updateLevelBy('rare_stillfern_effect', amount)
         },
         getUsageCooldown: () => {
-            return 0.1*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+            return 0.1;
         },
         attributes: {
             baseChanceMult: 1,
@@ -1509,7 +1511,7 @@ export const registerInventoryItems = () => {
             updateLevelBy('rare_mindroot_effect', amount)
         },
         getUsageCooldown: () => {
-            return 0.1*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+            return 0.1;
         },
         attributes: {
             baseChanceMult: 1,
@@ -1540,7 +1542,7 @@ export const registerInventoryItems = () => {
             updateLevelBy('rare_azureblossom_effect', amount)
         },
         getUsageCooldown: () => {
-            return 0.1*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+            return 0.1;
         },
         attributes: {
             baseChanceMult: 1,
@@ -1572,7 +1574,7 @@ export const registerInventoryItems = () => {
             updateLevelBy('rare_verdant_coil_effect', amount)
         },
         getUsageCooldown: () => {
-            return 0.1*metabolismMod(gameEffects.getEffectValue('metabolism_rate'));
+            return 0.1;
         },
         attributes: {
             baseChanceMult: 1,

@@ -53,6 +53,21 @@ export class MonitoringModule extends GameModule {
                         gameCore.getModule('resource-pool').setMonitored([]);
                     }
                 }
+
+                if(['furniture', 'accessory', 'amplifier'].includes(type)) {
+                    // if id null - clear monitors, else - replace em
+                    if(id) {
+                        const data = gameEntity.getEffects(id, 1, 1, true)
+                        const effects = data.filter(one => one.type === 'effects');
+                        const resources = data.filter(one => one.type === 'resources');
+
+                        gameCore.getModule('attributes').setMonitored(effects);
+                        gameCore.getModule('resource-pool').setMonitored(resources);
+                    } else {
+                        gameCore.getModule('attributes').setMonitored([]);
+                        gameCore.getModule('resource-pool').setMonitored([]);
+                    }
+                }
             }
 
         })

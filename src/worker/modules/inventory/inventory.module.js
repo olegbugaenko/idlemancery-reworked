@@ -1,6 +1,6 @@
 import {gameEntity, gameResources, resourceApi, gameEffects, gameCore} from "game-framework"
 import {GameModule} from "../../shared/game-module";
-import {metabolismMod, registerInventoryItems, sellPriceMod} from "./inventory-items-db";
+import {metabolismIntensityMod, metabolismMod, registerInventoryItems, sellPriceMod} from "./inventory-items-db";
 import {checkMatchingRules} from "../../shared/utils/rule-utils";
 import {SMALL_NUMBER} from "game-framework/src/utils/consts";
 import {packEffects} from "../../shared/utils/objects";
@@ -48,6 +48,16 @@ export class InventoryModule extends GameModule {
 
         })
 
+        this.eventHandler.registerHandler('set-inventory-pinned', (payload) => {
+            if(!this.inventoryItems[payload.id]) {
+                this.inventoryItems[payload.id] = {
+                    stockCapacity: gameEffects.getEffectValue('shop_max_stock')
+                };
+            }
+            this.inventoryItems[payload.id].isPinned = payload.flag;
+
+        })
+
         this.eventHandler.registerHandler('set-inventory-search', ({searchData}) => {
             this.searchData = searchData;
         })
@@ -89,6 +99,7 @@ export class InventoryModule extends GameModule {
         // trigger autoconsume
 
         for(const itemId in this.inventoryItems) {
+            let checkAutoThisTick = false;
             this.inventoryItems[itemId].isConsumed = false;
 
             if(this.inventoryItems[itemId].duration > 0) {
@@ -104,6 +115,7 @@ export class InventoryModule extends GameModule {
                     gameEntity.unsetEntity(`active_${itemId}`);
                     this.inventoryItems[itemId].cooldown = gameResources.getResource(itemId).getUsageCooldown() ?? 0;
                 }
+                checkAutoThisTick = !this.inventoryItems[itemId].cooldown;
             }
 
 
@@ -115,7 +127,7 @@ export class InventoryModule extends GameModule {
                 this.inventoryItems[itemId].stockCapacity += delta*gameEffects.getEffectValue('shop_stock_renew_rate');
             }
 
-            if(this.autoConsumeCD > 0) {
+            if(this.autoConsumeCD > 0 && !checkAutoThisTick) {
                 continue;
             }
             if(this.inventoryItems[itemId]?.autoconsume?.isEnabled) {
@@ -440,8 +452,9 @@ export class InventoryModule extends GameModule {
                 isConsumable: resource.tags.includes('consumable'),
                 isConsumed: this.inventoryItems[resource.id]?.isConsumed,
                 cooldown: this.inventoryItems[resource.id]?.cooldown ?? 0,
-                cooldownProg: resource.getUsageCooldown ? (resource.getUsageCooldown() - (this.inventoryItems[resource.id]?.cooldown ?? 0)) / resource.getUsageCooldown() : 1,
+                cooldownProg: resource.getUsageCooldown ? (resource.getUsageCooldown() + SMALL_NUMBER - (this.inventoryItems[resource.id]?.cooldown ?? 0)) / (resource.getUsageCooldown() + SMALL_NUMBER) : 1,
                 allowMultiConsume: resource.attributes?.allowMultiConsume,
+                isPinned: this.inventoryItems[resource.id]?.isPinned,
             })),
             itemCategories: Object.values(perCats).filter(cat => cat.items.length > 0),
             payload: pl,
@@ -455,7 +468,7 @@ export class InventoryModule extends GameModule {
                 metabolism_rate: {...gameEffects.getEffect('metabolism_rate'), isMultiplier: true},
                 cooldown_bonus: {
                     ...gameEffects.getEffect('metabolism_rate'),
-                    value: metabolismMod(gameEffects.getEffectValue('metabolism_rate')),
+                    value: metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
                     isMultiplier: true,
                 },
                 bargaining: {...gameEffects.getEffect('attribute_bargaining'), isMultiplier: false},
@@ -526,6 +539,7 @@ export class InventoryModule extends GameModule {
             coinsEarned: this.inventoryItems[resource.id]?.coinsEarned || 0,
             currentCooldown: this.inventoryItems[id]?.cooldown || 0,
             currentDuration: this.inventoryItems[id]?.duration || 0,
+            isPinned: this.inventoryItems[resource.id]?.isPinned,
         }
     }
 
