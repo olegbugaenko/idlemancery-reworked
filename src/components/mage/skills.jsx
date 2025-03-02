@@ -117,7 +117,7 @@ export const ItemSkillCard = ({ id, name, description, level, max, effects, curr
 
     return (<div
         ref={elementRef}
-        className={`icon-card item flashable ${!affordable.isAffordable ? 'unavailable' : ''}`}
+        className={`icon-card bigger item flashable ${!affordable.isAffordable ? 'unavailable' : ''}`}
         onMouseEnter={() => isMobile ? null : onShowDetails(id)}
         onMouseLeave={() => isMobile ? null : onShowDetails(null)}
         onClick={(e) => isMobile ? onShowDetails(id) : onPurchase(id, e.shiftKey ? 1e9 : 1)}

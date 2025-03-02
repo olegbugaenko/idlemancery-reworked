@@ -331,6 +331,13 @@ export const ItemCard = ({ id, name, level, max, affordable, isLeveled, isCapped
         </div>
         <div className={'bottom'}>
             <div className={'buttons'}>
+                {/*<TippyWrapper content={<div className={'hint-popup'}>Purchase</div> }>
+                    <div className={`icon-content interface-icon ${(!affordable.isAffordable || isCapped) ? 'disabled' : ''}`}
+                         onClick={(e) => {e.stopPropagation(); e.preventDefault(); onPurchase(id)}}>
+                        <img src={"icons/interface/icon_purchase.png"}/>
+                    </div>
+                </TippyWrapper>*/}
+
                 <button
                     disabled={!affordable.isAffordable || isCapped}
                     onClick={(e) => {e.stopPropagation(); e.preventDefault(); onPurchase(id)}}

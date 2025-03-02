@@ -458,7 +458,7 @@ export const InventoryCard = React.memo(({ isChanged, allowMultiConsume, isConsu
 
     return (<div
         ref={elementRef}
-        className={`icon-card item flashable ${isSelected ? 'selected' : ''} ${isRare ? 'bluish' : ''}`}
+        className={`icon-card item bigger flashable ${isSelected ? 'selected' : ''} ${isRare ? 'bluish' : ''}`}
         onMouseEnter={() => !isMobile ? onShowDetails(id) : null}
         onMouseLeave={() => !isMobile ? onShowDetails(null) : null}
         onClick={handleClick}

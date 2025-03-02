@@ -291,7 +291,7 @@ export const SpellCard = React.memo(({ id, isChanged, name, isCasted, cooldownPr
     // RERENDERING
     // console.log('Item: ', id, cooldownProg, cooldown);
 
-    return (<div ref={elementRef} className={`icon-card item flashable spell-card  ${isActive ? 'active' : ''}`} onMouseEnter={() => !isMobile ? onShowDetails(id) : null} onMouseLeave={() => !isMobile ? onShowDetails(null) : null} onClick={handleClick} onContextMenu={handleContextMenu}>
+    return (<div ref={elementRef} className={`icon-card item bigger flashable spell-card  ${isActive ? 'active' : ''}`} onMouseEnter={() => !isMobile ? onShowDetails(id) : null} onMouseLeave={() => !isMobile ? onShowDetails(null) : null} onClick={handleClick} onContextMenu={handleContextMenu}>
         <div className={'icon-content'}>
             <CircularProgress progress={cooldownProg}>
                 <img src={`icons/spells/${id}.png`} className={'resource'} />

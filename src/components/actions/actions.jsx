@@ -729,23 +729,33 @@ export const ActionCard = ({ id, category, monitored, entityEfficiency, isEditin
                         </div>
                         <div className={'buttons'}>
                             <div className={'buttons-inner-wrap'}>
-                                {isActive ? <button onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    onActivate()
-                                }}>Stop</button> : <button id={`activate_${id}`} onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    unlockNextById(8);
-                                    onActivate(id)
-                                }}>Start</button> }
-                                <button onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    toggleHiddenAction(id, !isHidden)
-                                }}>
-                                    {isHidden ? "Show" : "Hide"}
-                                </button>
+                                {isActive ? <TippyWrapper content={<div className={'hint-popup'}>Stop Action</div> }>
+                                        <div className={'icon-content interface-icon small'} onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            onActivate()
+                                        }}>
+                                            <img src={"icons/interface/pause.png"}/>
+                                        </div>
+                                    </TippyWrapper> : <TippyWrapper content={<div className={'hint-popup'}>Start Action</div> }>
+                                        <div id={`activate_${id}`} className={'icon-content interface-icon small'} onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            unlockNextById(8);
+                                            onActivate(id)
+                                        }}>
+                                            <img src={"icons/interface/run.png"}/>
+                                        </div>
+                                    </TippyWrapper> }
+                                <TippyWrapper content={<div className={'hint-popup'}>{isHidden ? 'Show Action' : 'Hide Action'}</div> }>
+                                    <div className={'icon-content interface-icon small'} onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        toggleHiddenAction(id, !isHidden)
+                                    }}>
+                                        {isHidden ? (<img src={"icons/interface/icon_show.png"}/>) : (<img src={"icons/interface/icon_hide.png"}/>)}
+                                    </div>
+                                </TippyWrapper>
                             </div>
                             {focused && focused.isFocused ? (
                                 <TippyWrapper content={<div className={'hint-popup'}>
