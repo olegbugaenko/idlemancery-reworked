@@ -18,7 +18,7 @@ export const registerTemporaryEffectsDB = () => {
             multiplier: {
                 resources: {
                     energy: {
-                        A: 0.1,
+                        A: 0.2,
                         B: 1.4,
                         type: 0,
                     }
@@ -81,7 +81,7 @@ export const registerTemporaryEffectsDB = () => {
             multiplier: {
                 resources: {
                     health: {
-                        A: 0.1,
+                        A: 0.2,
                         B: 1.4,
                         type: 0,
                     }
@@ -144,7 +144,7 @@ export const registerTemporaryEffectsDB = () => {
             multiplier: {
                 resources: {
                     mana: {
-                        A: 0.1,
+                        A: 0.2,
                         B: 1.4,
                         type: 0,
                     }
@@ -207,7 +207,7 @@ export const registerTemporaryEffectsDB = () => {
             multiplier: {
                 resources: {
                     knowledge: {
-                        A: 0.1,
+                        A: 0.2,
                         B: 1.4,
                         type: 0,
                     }
@@ -270,7 +270,7 @@ export const registerTemporaryEffectsDB = () => {
             multiplier: {
                 resources: {
                     coins: {
-                        A: 0.1,
+                        A: 0.2,
                         B: 1.4,
                         type: 0,
                     }
@@ -302,7 +302,7 @@ export const registerTemporaryEffectsDB = () => {
             multiplier: {
                 effects: {
                     learning_rate: {
-                        A: 0.05,
+                        A: 0.1,
                         B: 1.2,
                         type: 0,
                     }
@@ -334,7 +334,7 @@ export const registerTemporaryEffectsDB = () => {
             multiplier: {
                 effects: {
                     physical_training_learn_speed: {
-                        A: 0.1,
+                        A: 0.2,
                         B: 1.4,
                         type: 0,
                     }
@@ -365,7 +365,7 @@ export const registerTemporaryEffectsDB = () => {
             multiplier: {
                 effects: {
                     mental_training_learning_rate: {
-                        A: 0.1,
+                        A: 0.2,
                         B: 1.4,
                         type: 0,
                     }
@@ -396,7 +396,7 @@ export const registerTemporaryEffectsDB = () => {
             multiplier: {
                 effects: {
                     social_training_learning_rate: {
-                        A: 0.1,
+                        A: 0.2,
                         B: 1.4,
                         type: 0,
                     }
