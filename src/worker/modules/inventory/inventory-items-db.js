@@ -6,7 +6,7 @@ const updateLevelBy = (id, amount) => {
 
 export const metabolismMod = (attr) => attr > 1 ? 1. / (Math.pow(attr, 0.25)) : 1.;
 
-export const metabolismIntensityMod = (attr) => attr > 1 ? Math.pow(attr, 0.25) : 1.;
+export const metabolismIntensityMod = (attr) => 1.; //attr > 1 ? Math.pow(attr, 0.25) : 1.;
 
 export const sellPriceMod = (attr) => attr > 1 ? Math.min(5, 1. +  0.02*(Math.log2(attr) ** 2.0)) : 1.;
 
@@ -290,7 +290,7 @@ export const registerInventoryItems = () => {
             get_multiplier: () => ({
                 effects: {
                     learning_rate: {
-                        A: 0.1*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
+                        A: 0.2*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
                         B: 1,
                         type: 0,
                     }
@@ -324,7 +324,7 @@ export const registerInventoryItems = () => {
             get_multiplier: () => ({
                 effects: {
                     physical_training_learn_speed: {
-                        A: 0.2*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
+                        A: 0.25*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
                         B: 1,
                         type: 0,
                     }

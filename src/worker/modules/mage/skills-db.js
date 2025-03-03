@@ -199,7 +199,7 @@ export const registerSkillsStage1 = () => {
         level: 0,
         unlockCondition: () => {
             // console.log('ACTLVL: ', )
-            return gameEntity.getLevel('shop_item_backpack') >= 1
+            return false;
         },
         attributes: {
             isCollectable: false,

@@ -800,7 +800,11 @@ export class ActionsModule extends GameModule {
 
         for(const running of this.activeActions) {
             const ent = gameEntity.getEntity(running.originalId);
-            if(ent.tags.includes(id)) return true;
+            if(Array.isArray(id)) {
+                if(id.every(one => ent.tags.includes(one))) return true;
+            } else {
+                if(ent.tags.includes(id)) return true;
+            }
         }
 
         return false;

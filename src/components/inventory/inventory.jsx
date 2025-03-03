@@ -191,6 +191,7 @@ export const Inventory = ({}) => {
 
     const onSetAutoconsumeRuleValue = useCallback((index, key, value) => {
         if(editData) {
+            console.log('Changing: ', index, key, value);
             const newEdit = cloneDeep(editData);
             newEdit.autoconsume.rules[index] = {
                 ...newEdit.autoconsume.rules[index],
@@ -547,6 +548,7 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
     }
 
     const setAutoconsumeRuleValue = (index, key, value) => {
+        console.log('Setting: ', key, value)
         onSetAutoconsumeRuleValue(index, key, value)
     }
 
@@ -735,8 +737,8 @@ export const InventoryStats = ({ details, setDetailVisible }) => {
     const { isMobile } = useAppContext();
     // Масив статистик, які потрібно відобразити
     const statsToDisplay = [
-        details.metabolism_rate,
-        details.cooldown_bonus,
+        /*details.metabolism_rate,
+        details.cooldown_bonus,*/
         details.bargaining,
         details.bargaining_mod,
         details.shop_max_stock,

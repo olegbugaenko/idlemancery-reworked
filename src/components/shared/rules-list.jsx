@@ -12,7 +12,8 @@ const customStyles = {
         height: '22px',
         padding: '0', // Видаляємо паддінги
         borderRadius: '1px', // Можливо, зменшимо border-radius
-        fontSize: '13px'
+        fontSize: '13px',
+        width: state.selectProps?.isMulti ? '280px' : '200px',
     }),
     valueContainer: (provided, state) => ({
         ...provided,
@@ -48,6 +49,17 @@ const customStyles = {
         padding: '2px 10px', // Зменшуємо відступи опцій
         color: '#000'
     }),
+    multiValue: (provided, state) => ({
+        ...provided,
+        background: '#112',
+        padding: '1px',
+        borderRadius: '2px',
+        marginTop: '-1px'
+    }),
+    multiValueLabel: (provided, state) => ({
+        ...provided,
+        color: '#fff',
+    })
 };
 
 const mapRuleCond = cond => {
@@ -135,6 +147,7 @@ const mapCompareType = {
             'false',
         ],
         isHideValue: true,
+        allowMultiSubject: true,
     },
     'action_level': {
         label: 'Action Level',
@@ -220,7 +233,7 @@ const RulesList = React.memo(
         })
 
         onMessage(`rule-conditions-matched-${prefix}`, (payload) => {
-            console.log('set-matched', payload);
+            // console.log('set-matched', payload);
             setRulesMatched(payload);
         })
 
@@ -310,19 +323,27 @@ const RulesList = React.memo(
                                 label: item.name,
                             }));
 
-                        subjectValue = subjectOptions.find(
-                            (option) =>
-                                option.value === rule[subjectName] ||
-                                option.value === rule[subjectName]?.toString()
-                        );
+                        if(mapCompareType[rule.compare_type].allowMultiSubject) {
+                            subjectValue = subjectOptions.filter(
+                                (option) =>
+                                    (rule[subjectName] || []).includes(option.value)
+                            );
+                        } else {
+                            subjectValue = subjectOptions.find(
+                                (option) =>
+                                    option.value === rule[subjectName] ||
+                                    option.value === rule[subjectName]?.toString()
+                            );
 
-                        if(!subjectValue && subjectOptions?.length) {
-                            subjectValue = {...subjectOptions[0]};
-                            if(subjectValue) {
-                                console.log('Setting: ', mapCompareType[rule.compare_type].subject, subjectValue, subjectOptions )
-                                setRuleValue(index, mapCompareType[rule.compare_type].subject, subjectValue.value)
+                            if(!subjectValue && subjectOptions?.length) {
+                                subjectValue = {...subjectOptions[0]};
+                                if(subjectValue) {
+                                    console.log('Setting: ', mapCompareType[rule.compare_type].subject, subjectValue, subjectOptions )
+                                    setRuleValue(index, mapCompareType[rule.compare_type].subject, subjectValue.value)
+                                }
                             }
                         }
+
                     }
 
                     const conditionOptions = selectedCompareType
@@ -392,19 +413,22 @@ const RulesList = React.memo(
                                             name={subjectName}
                                             options={subjectOptions}
                                             value={subjectValue}
-                                            onChange={(selectedOption) =>
+                                            isMulti={mapCompareType[rule.compare_type]?.allowMultiSubject}
+                                            onChange={(selectedOption) => {
                                                 setRuleValue(
                                                     index,
                                                     subjectName,
-                                                    selectedOption.value
+                                                    mapCompareType[rule.compare_type]?.allowMultiSubject
+                                                        ? selectedOption.map(option => option.value)
+                                                        : selectedOption.value
                                                 )
-                                            }
-                                            className="react-select-container"
+                                            }}
+                                            className={`react-select-container ${mapCompareType[rule.compare_type]?.allowMultiSubject ? 'multi' : ''}`}
                                             classNamePrefix="react-select"
                                             styles={customStyles}
                                         />
                                     ) : (
-                                        <span>{subjectValue?.label || 'Invalid'}</span>
+                                        <span>{Array.isArray(subjectValue) ? subjectValue.map(one => `${one?.label}`).join(',') : (subjectValue?.label || 'Invalid')}</span>
                                     )}
                                 </div>
                             )}

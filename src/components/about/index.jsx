@@ -6,6 +6,13 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+                <h3>Idle Awakening v0.1.1c</h3>
+                <div className={'features'}>
+                    <p>Action Tags automation now allows multiple tags for single action</p>
+                    <p>Removed Metabolism skill</p>
+                    <p>Increased bonus from Knowledge Moss and Core Duckweed</p>
+                    <p>Fixed glitch on inventory page caused some stats duplications</p>
+                </div>
                 <h3>Idle Awakening v0.1.1b</h3>
                 <div className={'features'}>
                     <p>Fixed some potions and herbs bonuses</p>

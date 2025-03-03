@@ -611,12 +611,12 @@ export class PropertyModule extends GameModule {
 
     purchaseFurniture(furnitureId, filterId, options) {
         const newEnt = gameEntity.levelUpEntity(furnitureId);
-        console.log('newEntFurn: ', newEnt);
+        // console.log('newEntFurn: ', newEnt);
         if(newEnt.success) {
             this.purchasedFurnitures[furnitureId] = gameEntity.getLevel(furnitureId);
             this.leveledId = furnitureId;
             if(!options?.isSilent) {
-                console.log('newEntFurnNEW: ', this.purchasedFurnitures)
+                // console.log('newEntFurnNEW: ', this.purchasedFurnitures)
                 gameCore.getModule('unlock-notifications').generateNotifications();
                 this.sendFurnituresData({ filterId }, options);
             }

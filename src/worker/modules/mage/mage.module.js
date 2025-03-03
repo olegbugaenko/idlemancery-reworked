@@ -300,7 +300,9 @@ export class MageModule extends GameModule {
         this.skillUpgrades = {};
         if(obj?.skillUpgrades) {
             for(const id in obj.skillUpgrades) {
-                this.setSkill(id, obj.skillUpgrades[id], true);
+                if(id !== 'skill_metabolism') {
+                    this.setSkill(id, obj.skillUpgrades[id], true);
+                }
             }
         }
         const permanent = gameEntity.listEntitiesByTags(['bonus', 'permanent']).map(one => ({ id: one.id, level: one.level }));

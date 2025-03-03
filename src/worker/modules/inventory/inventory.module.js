@@ -465,7 +465,7 @@ export class InventoryModule extends GameModule {
             },
             automationUnlocked: gameEntity.getLevel('shop_item_planner') > 0,
             details: {
-                metabolism_rate: {...gameEffects.getEffect('metabolism_rate'), isMultiplier: false},
+                /*metabolism_rate: {...gameEffects.getEffect('metabolism_rate'), isMultiplier: false},
                 cooldown_bonus: {
                     ...gameEffects.getEffect('metabolism_rate'),
                     id: 'cooldown_bonus',
@@ -473,17 +473,18 @@ export class InventoryModule extends GameModule {
                     description: 'Herbs and Potions effects multiplier (metabolism^0.25)',
                     value: metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
                     isMultiplier: true,
-                },
+                },*/
                 bargaining: {...gameEffects.getEffect('attribute_bargaining'), isMultiplier: false},
                 bargaining_mod: {
                     ...gameEffects.getEffect('attribute_bargaining'),
+                    id: 'bargaining_mod',
                     description: 'Sell price multiplier from bargaining (1 + 0.02*log2(bargaining)^2)',
                     name: 'Bargaining Sell Price Mult',
                     value: sellPriceMod(gameEffects.getEffectValue('attribute_bargaining')),
                     isMultiplier: true,
                 },
                 shop_max_stock: {...gameEffects.getEffect('shop_max_stock'), isMultiplier: false},
-                shop_stock_renew_rate: {...gameEffects.getEffect('shop_stock_renew_rate'), isMultiplier: false},
+                shop_stock_renew_rate: {...gameEffects.getEffect('shop_stock_renew_rate'), id: 'shop_stock_renew_rate', isMultiplier: false},
             }
         }
     }
