@@ -6,6 +6,12 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+                <h3>Idle Awakening v0.1.1a</h3>
+                <div className={'features'}>
+                    <p>Fixed bug when inventory item details reloaded too frequently</p>
+                    <p>Added few descriptions and explanations</p>
+                    <p>Fixed bug when some items were not affected by metabolism by mistake</p>
+                </div>
                 <h3>Idle Awakening v0.1.1</h3>
                 <div className={'features'}>
                     <p>Spells and potions having lasting effects now have no cooldown</p>

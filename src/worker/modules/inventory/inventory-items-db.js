@@ -100,7 +100,7 @@ export const registerInventoryItems = () => {
 
         },
         getUsageCooldown: () => {
-            return 5;
+            return 0;
         },
         attributes: {
             duration: 30,
@@ -164,7 +164,7 @@ export const registerInventoryItems = () => {
     registerInventoryItem('inventory_bread', {
         name: 'Bread',
         hasCap: false,
-        tags: ['inventory', 'consumable'],
+        tags: ['inventory', 'consumable', 'food'],
         defaultCap: 0,
         onUse: (amount) => {
 
@@ -290,7 +290,7 @@ export const registerInventoryItems = () => {
             get_multiplier: () => ({
                 effects: {
                     learning_rate: {
-                        A: 0.1,
+                        A: 0.1*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
                         B: 1,
                         type: 0,
                     }
@@ -999,7 +999,7 @@ export const registerInventoryItems = () => {
     registerInventoryItem('inventory_small_endurance_flask', {
         name: 'Small Endurance Flask',
         hasCap: false,
-        tags: ['inventory', 'consumable'],
+        tags: ['inventory', 'consumable', 'potion'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -1032,7 +1032,7 @@ export const registerInventoryItems = () => {
     registerInventoryItem('inventory_healing_potion', {
         name: 'Small Healing Potion',
         hasCap: false,
-        tags: ['inventory', 'consumable'],
+        tags: ['inventory', 'consumable', 'potion'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -1065,7 +1065,7 @@ export const registerInventoryItems = () => {
     registerInventoryItem('inventory_experience_potion', {
         name: 'Small Experience Potion',
         hasCap: false,
-        tags: ['inventory', 'consumable'],
+        tags: ['inventory', 'consumable', 'potion'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -1090,12 +1090,12 @@ export const registerInventoryItems = () => {
             consumption: {
                 resources: {
                     health: {
-                        A: 10,
+                        A: 10*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
                         B: 0,
                         type: 0
                     },
                     mana: {
-                        A: 5,
+                        A: 5*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
                         B: 0,
                         type: 0
                     }
@@ -1111,7 +1111,7 @@ export const registerInventoryItems = () => {
     registerInventoryItem('inventory_insight_potion', {
         name: 'Insight Potion',
         hasCap: false,
-        tags: ['inventory', 'consumable'],
+        tags: ['inventory', 'consumable', 'potion'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -1144,7 +1144,7 @@ export const registerInventoryItems = () => {
     registerInventoryItem('inventory_amnesia_potion', {
         name: 'Amnesia Potion',
         hasCap: false,
-        tags: ['inventory', 'consumable'],
+        tags: ['inventory', 'consumable', 'special-potion'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -1176,7 +1176,7 @@ export const registerInventoryItems = () => {
     registerInventoryItem('inventory_crafting_potion', {
         name: 'Crafting Potion',
         hasCap: false,
-        tags: ['inventory', 'consumable'],
+        tags: ['inventory', 'consumable', 'potion'],
         defaultCap: 0,
         isAbstract: true,
         getUsageCooldown: () => {

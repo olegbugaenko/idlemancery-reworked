@@ -528,14 +528,13 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
     useEffect(() => {
 
         if(item) {
-            sendData('query-inventory-details', { id: item.id })
+            sendData('query-inventory-details', { id: item.id, prefix: 'detail-blade' })
         }
     }, [item]);
 
-    console.log('ItemReceived: ', item);
+    // console.log('ItemReceived: ', item);
 
-    onMessage('inventory-details', (data) => {
-        console.log('inventory-details', data);
+    onMessage('detail-blade-inventory-details', (data) => {
         setDetails(data);
     })
 
@@ -591,7 +590,7 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
         onTogglePinned(item.id, !(details || item).isPinned);
     }
 
-    console.log('item?.autoconsume: ', item?.autoconsume);
+    //console.log('item?.autoconsume: ', item?.autoconsume);
 
     return (
         <PerfectScrollbar>
@@ -736,7 +735,9 @@ export const InventoryStats = ({ details, setDetailVisible }) => {
     const { isMobile } = useAppContext();
     // Масив статистик, які потрібно відобразити
     const statsToDisplay = [
+        details.metabolism_rate,
         details.cooldown_bonus,
+        details.bargaining,
         details.bargaining_mod,
         details.shop_max_stock,
         details.shop_stock_renew_rate,

@@ -150,10 +150,10 @@ export class ResourcePoolModule extends GameModule {
         })
 
         gameEffects.registerEffect('metabolism_rate', {
-            name: 'Consumable Effects Multiplier',
+            name: 'Metabolism Rate',
             defaultValue: 1,
             minValue: 1,
-            description: 'Increase effect from herbs ant potions consumption'
+            description: 'Increase effect from herbs, food and potions consumption (Affect both positive and negative effects)'
         })
 
         registerInventoryItems();

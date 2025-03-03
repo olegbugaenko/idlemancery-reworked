@@ -233,6 +233,7 @@ export class ShopModule extends GameModule {
         if(Math.abs(charismaMod(gameEffects.getEffectValue('attribute_charisma')) - 1) > SMALL_NUMBER) {
             stats.push({
                 name: 'Charisma Price Discount',
+                description: 'Upgrades and items purchase discount based on your charisma attribute (1./(1 + 0.02*log2(charisma)^2))',
                 value: charismaMod(gameEffects.getEffectValue('attribute_charisma'))
             })
         }

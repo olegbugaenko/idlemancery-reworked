@@ -71,7 +71,7 @@ export class InventoryModule extends GameModule {
         })
 
         this.eventHandler.registerHandler('query-inventory-details', (payload) => {
-            this.sendItemDetails(payload.id)
+            this.sendItemDetails(payload.id, payload.prefix)
         })
 
         this.eventHandler.registerHandler('query-sell-details', (payload) => {
@@ -468,12 +468,16 @@ export class InventoryModule extends GameModule {
                 metabolism_rate: {...gameEffects.getEffect('metabolism_rate'), isMultiplier: true},
                 cooldown_bonus: {
                     ...gameEffects.getEffect('metabolism_rate'),
+                    id: 'cooldown_bonus',
+                    name: 'Consumable Effects Multiplier',
+                    description: 'Herbs and Potions effects multiplier (metabolism^0.25)',
                     value: metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
                     isMultiplier: true,
                 },
                 bargaining: {...gameEffects.getEffect('attribute_bargaining'), isMultiplier: false},
                 bargaining_mod: {
                     ...gameEffects.getEffect('attribute_bargaining'),
+                    description: 'Sell price multiplier from bargaining (1 + 0.02*log2(bargaining)^2)',
                     name: 'Bargaining Sell Price Mult',
                     value: sellPriceMod(gameEffects.getEffectValue('attribute_bargaining')),
                     isMultiplier: true,
@@ -543,9 +547,13 @@ export class InventoryModule extends GameModule {
         }
     }
 
-    sendItemDetails(id) {
+    sendItemDetails(id, prefix) {
         const data = this.getItemDetails(id);
-        this.eventHandler.sendData('inventory-details', data);
+        let label = 'inventory-details';
+        if(prefix) {
+            label = `${prefix}-${label}`;
+        }
+        this.eventHandler.sendData(label, data);
     }
 
     sendSellDetails(id) {

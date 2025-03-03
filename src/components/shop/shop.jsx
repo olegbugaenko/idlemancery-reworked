@@ -590,7 +590,9 @@ export const GeneralStats = ({ category, setDetailVisible }) => {
                 </div>
                 <div className={'block'}>
                     {item.stats.map(stat => (<div className={'row flex-row'}>
-                        <p>{stat.name}</p>
+                        <TippyWrapper content={<div className={'hint-popup'}><p>{stat.description}</p></div> }>
+                            <p>{stat.name}</p>
+                        </TippyWrapper>
                         <p>{formatValue(stat.value)}</p>
                     </div> ))}
                 </div>
