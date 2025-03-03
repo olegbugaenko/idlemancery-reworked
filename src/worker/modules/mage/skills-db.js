@@ -208,7 +208,7 @@ export const registerSkillsStage1 = () => {
             multiplier: {
                 effects: {
                     'metabolism_rate': {
-                        A: 0.1,
+                        A: 0.25,
                         B: 1,
                         type: 0,
                     }

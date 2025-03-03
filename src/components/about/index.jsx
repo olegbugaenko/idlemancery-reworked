@@ -6,6 +6,11 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+                <h3>Idle Awakening v0.1.1b</h3>
+                <div className={'features'}>
+                    <p>Fixed some potions and herbs bonuses</p>
+                    <p>Fixed metabolism bonus</p>
+                </div>
                 <h3>Idle Awakening v0.1.1a</h3>
                 <div className={'features'}>
                     <p>Fixed bug when inventory item details reloaded too frequently</p>

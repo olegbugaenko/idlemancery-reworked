@@ -465,7 +465,7 @@ export class InventoryModule extends GameModule {
             },
             automationUnlocked: gameEntity.getLevel('shop_item_planner') > 0,
             details: {
-                metabolism_rate: {...gameEffects.getEffect('metabolism_rate'), isMultiplier: true},
+                metabolism_rate: {...gameEffects.getEffect('metabolism_rate'), isMultiplier: false},
                 cooldown_bonus: {
                     ...gameEffects.getEffect('metabolism_rate'),
                     id: 'cooldown_bonus',

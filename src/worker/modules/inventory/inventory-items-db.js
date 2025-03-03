@@ -284,7 +284,7 @@ export const registerInventoryItems = () => {
             return 0;
         },
         attributes: {
-            duration: 20,
+            duration: 30,
         },
         resourceModifier: {
             get_multiplier: () => ({
@@ -318,7 +318,7 @@ export const registerInventoryItems = () => {
             return 0;
         },
         attributes: {
-            duration: 20,
+            duration: 30,
         },
         resourceModifier: {
             get_multiplier: () => ({
@@ -383,7 +383,7 @@ export const registerInventoryItems = () => {
             return 0;
         },
         attributes: {
-            duration: 20,
+            duration: 30,
         },
         usageGain: {
             get_consumption: () => ({
@@ -429,7 +429,7 @@ export const registerInventoryItems = () => {
             return 0;
         },
         attributes: {
-            duration: 20,
+            duration: 30,
         },
         usageGain: {
             get_consumption: () => ({
@@ -513,7 +513,7 @@ export const registerInventoryItems = () => {
             return 0;
         },
         attributes: {
-            duration: 60,
+            duration: 120,
         },
         resourceModifier: {
             get_multiplier: () => ({
@@ -549,7 +549,7 @@ export const registerInventoryItems = () => {
             return 0;
         },
         attributes: {
-            duration: 60,
+            duration: 120,
         },
         resourceModifier: {
             get_multiplier: () => ({
@@ -1075,10 +1075,10 @@ export const registerInventoryItems = () => {
             return 0;
         },
         attributes: {
-            duration: 120,
+            duration: 300,
         },
         resourceModifier: {
-            multiplier: {
+            get_multiplier: () => ({
                 effects: {
                     learning_rate: {
                         A: 0.5*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
@@ -1086,8 +1086,8 @@ export const registerInventoryItems = () => {
                         type: 0,
                     }
                 }
-            },
-            consumption: {
+            }),
+            get_consumption: () => ({
                 resources: {
                     health: {
                         A: 10*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
@@ -1100,7 +1100,7 @@ export const registerInventoryItems = () => {
                         type: 0
                     }
                 }
-            }
+            })
         },
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0
@@ -1124,7 +1124,7 @@ export const registerInventoryItems = () => {
 
         },
         usageGain: {
-            income: {
+            get_income: () => ({
                 resources: {
                     'mage-xp': {
                         A: 25000*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
@@ -1132,7 +1132,7 @@ export const registerInventoryItems = () => {
                         type: 0,
                     }
                 }
-            }
+            })
         },
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0
@@ -1186,10 +1186,10 @@ export const registerInventoryItems = () => {
 
         },
         attributes: {
-            duration: 60,
+            duration: 300,
         },
         resourceModifier: {
-            multiplier: {
+            get_multiplier: () => ({
                 effects: {
                     crafting_efficiency: {
                         A: 0.5*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
@@ -1197,8 +1197,8 @@ export const registerInventoryItems = () => {
                         type: 0,
                     }
                 }
-            },
-            consumption: {
+            }),
+            get_consumption: () => ({
                 resources: {
                     health: {
                         A: 100*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
@@ -1206,7 +1206,7 @@ export const registerInventoryItems = () => {
                         type: 0,
                     }
                 }
-            }
+            })
         },
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0
