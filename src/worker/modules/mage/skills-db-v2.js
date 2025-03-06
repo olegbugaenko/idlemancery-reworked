@@ -2420,7 +2420,7 @@ export const registerSkillsStage1 = () => {
     gameEntity.registerGameEntity('skill_general_training_0', {
         tags: ["skill", "upgrade", "purchaseable"],
         name: 'General Training',
-        description: 'Increase mental training learning speed',
+        description: 'Increase general training learning speed',
         level: 0,
         maxLevel: 1,
         uiPosition: {
