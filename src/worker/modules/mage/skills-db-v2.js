@@ -1044,7 +1044,7 @@ export const registerSkillsStage1 = () => {
         resourceModifier: {
             multiplier: {
                 resources: {
-                    'energy': {
+                    'health': {
                         A: 0.05,
                         B: 1,
                         type: 0,

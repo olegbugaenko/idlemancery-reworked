@@ -127,7 +127,6 @@ const SkillTree = () => {
                                 skill.unlockBySkills?.map((req, index) => {
                                     const from = skillsData.available[req.id];
                                     if (!from) return null;
-                                    console.log('Skill: ', skill);
                                     const x1 = center.x + from.position.left * scale;
                                     const y1 = center.y + from.position.top * scale;
                                     const x2 = center.x + skill.position.left * scale;

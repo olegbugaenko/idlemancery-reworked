@@ -1,5 +1,5 @@
 import {GameModule} from "../../shared/game-module";
-import { gameResources, gameEntity, gameEffects, gameCore } from 'game-framework';
+import {gameResources, gameEntity, gameEffects, gameCore, resourceModifiers} from 'game-framework';
 import {registerSkillsStage1} from "./skills-db-v2";
 import {registerPermanentBonuses} from "./permanent-bonuses-db";
 
@@ -11,6 +11,7 @@ export class MageModule extends GameModule {
         this.mageExp = 0;
         this.skillUpgrades = {};
         this.tourStatus = null;
+        this.shouldSendSkills = false;
         this.bankedTime = {
             current: 0,
             max: 3600*24*1000,
@@ -83,12 +84,14 @@ export class MageModule extends GameModule {
         }
 
         const newEnt = gameEntity.levelUpEntity(itemId);
+        console.log('Modifier: ', JSON.stringify(resourceModifiers.getModifier(`entity_${itemId}`)), resourceModifiers.getDependenciesToRegenerate(`entity_${itemId}`), gameResources.getResource('skill-points').balance);
         if(newEnt.success) {
             this.skillUpgrades[itemId] = gameEntity.getLevel(itemId);
             this.leveledId = itemId;
-            const data = this.getSkillsData();
-            this.eventHandler.sendData('skills-data', data);
+            /*const data = this.getSkillsData();
+            this.eventHandler.sendData('skills-data', data);*/
         }
+        this.shouldSendSkills = true;
         return newEnt.success;
     }
 
@@ -276,6 +279,13 @@ export class MageModule extends GameModule {
                 this.bankedTime.speedUpFactor = 1;
             }
         }
+
+        if(this.shouldSendSkills) {
+            this.shouldSendSkills = false;
+            console.log('Sending skill through reassert');
+            const data = this.getSkillsData();
+            this.eventHandler.sendData('skills-data', data);
+        }
         // console.log('A_TICK: ', this.bankedTime);
 
     }
@@ -364,7 +374,7 @@ export class MageModule extends GameModule {
             mageLevel: gameEntity.getLevel('mage'),
             mageXP: rs.amount,
             mageMaxXP: rs.cap,
-            skillPoints: skills.amount,
+            skillPoints: skills.balance,
             timeSpent: gameCore.globalTime,
             isLeveledUp: this.isLeveledUp,
             bankedTime: this.bankedTime,
@@ -374,6 +384,7 @@ export class MageModule extends GameModule {
     getSkillsData() {
         const skills = gameEntity.listEntitiesByTags(['skill']);
         const skillsRs = gameResources.getResource('skill-points');
+        console.log('rsData: ', skillsRs.balance);
         return {
             available: skills.map(entity => ({
                 isUnlocked: entity.isUnlocked,
@@ -399,7 +410,7 @@ export class MageModule extends GameModule {
                 return acc;
                 }, {}),
             sp: {
-                total: skillsRs.amount,
+                total: skillsRs.balance,
                 max: skillsRs.income,
             }
         }
