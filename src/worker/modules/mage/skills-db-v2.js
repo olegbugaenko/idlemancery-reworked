@@ -96,7 +96,7 @@ export const registerSkillsStage1 = () => {
     gameEntity.registerGameEntity('skill_routine_scholar', {
         tags: ["skill", "upgrade", "purchaseable"],
         name: 'Diligent Scholar',
-        description: 'Increase your physical learning ability',
+        description: 'Increase your routine learning ability',
         level: 0,
         maxLevel: 8,
         uiPosition: {
