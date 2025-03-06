@@ -32,6 +32,14 @@ export class ResourcePoolModule extends GameModule {
 
         registerCommomEffects();
 
+        gameResources.registerResource('mage-xp', {
+            name: 'XP',
+            hasCap: true,
+            tags: ['mage', 'xp'],
+            defaultCap: 0,
+        })
+
+
         gameEffects.registerEffect('coins_cap_bonus', {
             name: 'Coins cap multiplier',
             defaultValue: 1,

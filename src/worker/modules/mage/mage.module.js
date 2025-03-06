@@ -1,6 +1,6 @@
 import {GameModule} from "../../shared/game-module";
 import { gameResources, gameEntity, gameEffects, gameCore } from 'game-framework';
-import {registerSkillsStage1} from "./skills-db";
+import {registerSkillsStage1} from "./skills-db-v2";
 import {registerPermanentBonuses} from "./permanent-bonuses-db";
 
 export class MageModule extends GameModule {
@@ -16,6 +16,8 @@ export class MageModule extends GameModule {
             max: 3600*24*1000,
             speedUpFactor: 1,
         };
+        this.actualVersion = 3;
+        this.currentVersion = 2;
         /*
         this.eventHandler.registerHandler('feed-dragon', (data) => {
             this.feedDragon();
@@ -51,6 +53,8 @@ export class MageModule extends GameModule {
 
         this.eventHandler.registerHandler('purchase-skill', ({ id }) => {
             this.purchaseItem(id);
+            const data = this.getSkillsData();
+            this.eventHandler.sendData('skills-data', data);
         })
 
         this.eventHandler.registerHandler('toggle-speedup', () => {
@@ -69,6 +73,15 @@ export class MageModule extends GameModule {
     }
 
     purchaseItem(itemId) {
+        const ent = gameEntity.getEntity(itemId);
+
+        if(ent.unlockBySkills?.length) {
+            const isMatched = ent.unlockBySkills.some(unlock => unlock.level <= this.skillUpgrades[unlock.id]);
+            if(!isMatched) {
+                return ;
+            }
+        }
+
         const newEnt = gameEntity.levelUpEntity(itemId);
         if(newEnt.success) {
             this.skillUpgrades[itemId] = gameEntity.getLevel(itemId);
@@ -80,12 +93,6 @@ export class MageModule extends GameModule {
     }
 
     initialize() {
-        gameResources.registerResource('mage-xp', {
-            name: 'XP',
-            hasCap: true,
-            tags: ['mage', 'xp'],
-            defaultCap: 0,
-        })
 
         gameResources.registerResource('skill-points', {
             name: 'Skill Points',
@@ -276,7 +283,10 @@ export class MageModule extends GameModule {
     save() {
         return {
             mageLevel: gameEntity.getLevel('mage'),
-            skillUpgrades: this.skillUpgrades,
+            skillUpgrades: {
+                skills: this.skillUpgrades,
+                currentVersion: this.actualVersion,
+            },
             permanentBonuses: gameEntity.listEntitiesByTags(['bonus', 'permanent']).map(one => ({ id: one.id, level: one.level })),
             bankedTime: {
                 ...this.bankedTime,
@@ -298,10 +308,10 @@ export class MageModule extends GameModule {
             this.setSkill(key, 0, true);
         }
         this.skillUpgrades = {};
-        if(obj?.skillUpgrades) {
-            for(const id in obj.skillUpgrades) {
-                if(id !== 'skill_metabolism') {
-                    this.setSkill(id, obj.skillUpgrades[id], true);
+        if(obj?.skillUpgrades && obj?.skillUpgrades?.skills && obj?.skillUpgrades.currentVersion && obj?.skillUpgrades.currentVersion >= this.actualVersion) {
+            for(const id in obj.skillUpgrades.skills) {
+                if(gameEntity.entityExists(id)) {
+                    this.setSkill(id, obj.skillUpgrades.skills[id], true);
                 }
             }
         }
@@ -365,17 +375,29 @@ export class MageModule extends GameModule {
         const skills = gameEntity.listEntitiesByTags(['skill']);
         const skillsRs = gameResources.getResource('skill-points');
         return {
-            available: skills.filter(one => one.isUnlocked && !one.isCapped).map(entity => ({
+            available: skills.map(entity => ({
+                isUnlocked: entity.isUnlocked,
                 id: entity.id,
                 name: entity.name,
+                position: entity.uiPosition,
                 description: entity.description,
                 max: gameEntity.getEntityMaxLevel(entity.id) || 0,
                 level: this.skillUpgrades[entity.id] || 0,
                 affordable: gameEntity.getAffordable(entity.id),
                 effects: gameEntity.getEffects(entity.id, 1),
                 currentEffects: gameEntity.getEffects(entity.id, 0),
-                isLeveled: this.leveledId === entity.id
-            })),
+                isLeveled: this.leveledId === entity.id,
+                isCapped: entity.isCapped,
+                icon: entity.icon,
+                unlockBySkills: (entity.unlockBySkills || []).map(unlock => ({
+                    ...unlock,
+                    isMet: unlock.level <= this.skillUpgrades[unlock.id],
+                })),
+            })).reduce((acc, skill) => {
+                skill.isRequirementsMet = !skill.unlockBySkills.length || skill.unlockBySkills.some(one => one.isMet);
+                acc[skill.id] = skill;
+                return acc;
+                }, {}),
             sp: {
                 total: skillsRs.amount,
                 max: skillsRs.income,

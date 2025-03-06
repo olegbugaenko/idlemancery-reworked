@@ -27,8 +27,8 @@ export class MainModule extends GameModule {
         super();
         gameCore.registerModule('attributes', AttributesModule);
         gameCore.registerModule('temporary-effects', TemporaryEffectsModule);
-        gameCore.registerModule('mage', MageModule);
         gameCore.registerModule('resource-pool', ResourcePoolModule);
+        gameCore.registerModule('mage', MageModule);
         gameCore.registerModule('actions', ActionsModule);
         gameCore.registerModule('property', PropertyModule);
         gameCore.registerModule('shop', ShopModule);

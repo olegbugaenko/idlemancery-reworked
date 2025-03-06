@@ -6,6 +6,7 @@ import {UnlocksList} from "../mage/unlocks.jsx";
 import {Statistics} from "../mage/statistics.jsx";
 import {RandomEventPopup} from "../shared/random-events.jsx";
 import {HowTo} from "../how-to/index.jsx";
+import SkillTree from "../mage/skill-tree.jsx";
 
 export const Popup = () => {
 
@@ -43,7 +44,8 @@ export const Popup = () => {
     if(activePopup === 'skills') {
         return (
             <PopupComponent title={'Skills'} onClose={onClosePopupCb}>
-                <Skills />
+                {/*<Skills />*/}
+                <SkillTree />
             </PopupComponent>
         )
     }

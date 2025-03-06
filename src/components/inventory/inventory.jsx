@@ -204,8 +204,8 @@ export const Inventory = ({}) => {
 
     const onDeleteAutoconsumeRule = useCallback((index) => {
         if(editData) {
-            const newEdit = cloneDeep(editData);;
-            newEdit.autoconsume.rules.splice(index)
+            const newEdit = cloneDeep(editData);
+            newEdit.autoconsume.rules.splice(index, 1)
             setEditData(newEdit);
             setChanged(true);
         }
@@ -552,8 +552,8 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
         onSetAutoconsumeRuleValue(index, key, value)
     }
 
-    const deleteAutoconsumeRule = () => {
-        onDeleteAutoconsumeRule()
+    const deleteAutoconsumeRule = (index) => {
+        onDeleteAutoconsumeRule(index)
     }
 
     const setAutosellPattern = (pattern) => {
@@ -568,8 +568,8 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
         onSetAutosellRuleValue(index, key, value)
     }
 
-    const deleteAutosellRule = () => {
-        onDeleteAutosellRule()
+    const deleteAutosellRule = (index) => {
+        onDeleteAutosellRule(index)
     }
 
     const setReservedValue = (reserved) => {

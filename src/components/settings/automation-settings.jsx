@@ -637,7 +637,7 @@ export const AutomatedItem = ({
             if(!newList.rules) {
                 newList.rules = [];
             }
-            newList.rules.splice(index);
+            newList.rules.splice(index, 1);
             setEditedValues({...newList});
             setChanged(true);
         }

@@ -178,7 +178,7 @@ export const AttributesBar = () => {
     </div> )
 }
 
-export const BreakDown = ({ breakDown, category }) => {
+export const BreakDown = ({ breakDown, category, collapseByLabel = true }) => {
 
     if(!breakDown) return null;
 

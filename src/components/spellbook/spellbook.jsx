@@ -173,7 +173,7 @@ export const Spellbook = ({}) => {
     const onDeleteAutoconsumeRule = useCallback((index) => {
         if(editData) {
             const newEdit = cloneDeep(editData);
-            newEdit.autocast.rules.splice(index)
+            newEdit.autocast.rules.splice(index, 1)
             setEditData(newEdit);
             setChanged(true);
         }

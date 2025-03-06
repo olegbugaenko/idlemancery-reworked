@@ -377,7 +377,7 @@ export const Actions = ({}) => {
             if(!newList.autotrigger.rules) {
                 newList.autotrigger.rules = [];
             }
-            newList.autotrigger.rules.splice(index);
+            newList.autotrigger.rules.splice(index, 1);
             setListData({...newList});
         }
     }, [listData])

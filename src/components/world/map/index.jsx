@@ -198,7 +198,7 @@ export const MapWrap = ({ children }) => {
                         name: `Tile ${meta.i}:${meta.j}`,
                         i: meta.i,
                         j: meta.j,
-                        time: 2,
+                        time: 1,
                     })
                     setListDetails({...listDetails, listData: {...newList}});
                     sendData('query-map-tile-list-effects', { listData: newList });

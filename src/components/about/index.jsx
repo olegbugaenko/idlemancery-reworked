@@ -6,6 +6,12 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+                <h3>Idle Awakening v0.1.2</h3>
+                <div className={'features'}>
+                    <p>Implemented skills tree</p>
+                    <p>Fixed bug when deleting automation rules behaved unexpectedly</p>
+                    <p>Fixed issue when fake unlock notification appeared in the shop tab</p>
+                </div>
                 <h3>Idle Awakening v0.1.1c</h3>
                 <div className={'features'}>
                     <p>Action Tags automation now allows multiple tags for single action</p>

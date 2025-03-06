@@ -193,7 +193,7 @@ export const registerCourseItemsStage1 = () => {
             basicDuration: 120,
         },
         level: 0,
-        unlockCondition: () => gameEntity.getLevel('shop_item_breaking_limits') > 0,
+        unlockCondition: () => gameEntity.getLevel('shop_item_breaking_limits') > 0 && gameEntity.getLevel('shop_item_training_room') > 0,
         resourceModifier: {
             multiplier: {
                 effects: {
@@ -231,7 +231,7 @@ export const registerCourseItemsStage1 = () => {
             basicDuration: 120,
         },
         level: 0,
-        unlockCondition: () => gameEntity.getLevel('shop_item_breaking_limits') > 0,
+        unlockCondition: () => gameEntity.getLevel('shop_item_breaking_limits') > 0 && gameEntity.getLevel('shop_item_training_room') > 0,
         resourceModifier: {
             multiplier: {
                 effects: {
@@ -269,7 +269,7 @@ export const registerCourseItemsStage1 = () => {
             basicDuration: 120,
         },
         level: 0,
-        unlockCondition: () => gameEntity.getLevel('shop_item_breaking_limits') > 0,
+        unlockCondition: () => gameEntity.getLevel('shop_item_breaking_limits') > 0 && gameEntity.getLevel('shop_item_training_room') > 0,
         resourceModifier: {
             multiplier: {
                 effects: {
@@ -313,7 +313,7 @@ export const registerCourseItemsStage1 = () => {
             id: 'attribute_clarity',
             level: 25
         }],
-        unlockCondition: () => true,
+        unlockCondition: () => gameEntity.getLevel('shop_item_training_room') > 0,
         resourceModifier: {
             multiplier: {
                 effects: {
@@ -357,7 +357,7 @@ export const registerCourseItemsStage1 = () => {
             id: 'attribute_clarity',
             level: 25
         }],
-        unlockCondition: () => true,
+        unlockCondition: () => gameEntity.getLevel('shop_item_training_room') > 0,
         resourceModifier: {
             get_multiplier: () => ({
                 effects: {
@@ -400,7 +400,7 @@ export const registerCourseItemsStage1 = () => {
             id: 'attribute_clarity',
             level: 25
         }],
-        unlockCondition: () => true,
+        unlockCondition: () => gameEntity.getLevel('shop_item_training_room') > 0,
         resourceModifier: {
             get_multiplier: () => ({
                 effects: {
@@ -443,7 +443,7 @@ export const registerCourseItemsStage1 = () => {
             id: 'attribute_clarity',
             level: 25
         }],
-        unlockCondition: () => true,
+        unlockCondition: () => gameEntity.getLevel('shop_item_training_room') > 0,
         resourceModifier: {
             get_multiplier: () =>({
                 effects: {
@@ -491,7 +491,7 @@ export const registerCourseItemsStage1 = () => {
             id: 'attribute_patience',
             level: 20000
         }],
-        unlockCondition: () => true,
+        unlockCondition: () => gameEntity.getLevel('shop_item_training_room') > 0,
         resourceModifier: {
             get_multiplier: () =>({
                 effects: {
@@ -531,7 +531,7 @@ export const registerCourseItemsStage1 = () => {
             basicDuration: 240,
         },
         level: 0,
-        unlockCondition: () => gameEntity.getLevel('shop_item_advanced_training') > 0,
+        unlockCondition: () => gameEntity.getLevel('shop_item_advanced_training') > 0 && gameEntity.getLevel('shop_item_training_room') > 0,
         resourceModifier: {
             get_multiplier: () =>({
                 effects: {
@@ -570,7 +570,7 @@ export const registerCourseItemsStage1 = () => {
             basicDuration: 240,
         },
         level: 0,
-        unlockCondition: () => gameEntity.getLevel('shop_item_advanced_training') > 0,
+        unlockCondition: () => gameEntity.getLevel('shop_item_advanced_training') > 0 && gameEntity.getLevel('shop_item_training_room') > 0,
         resourceModifier: {
             get_multiplier: () =>({
                 effects: {
