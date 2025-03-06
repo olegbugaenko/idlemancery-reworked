@@ -838,7 +838,7 @@ export const registerSkillsStage1 = () => {
     gameEntity.registerGameEntity('skill_physical_talents', {
         tags: ["skill", "upgrade", "purchaseable"],
         name: 'Physical Talents',
-        description: 'Increase efficiency of physical activity',
+        description: 'Increase efficiency of physical activity learning by increasing its learn speed and decreasing XP requirements',
         level: 0,
         maxLevel: 1,
         uiPosition: {
@@ -2620,7 +2620,7 @@ export const registerSkillsStage1 = () => {
     gameEntity.registerGameEntity('skill_social_training_0', {
         tags: ["skill", "upgrade", "purchaseable"],
         name: 'Social Training',
-        description: 'Increase mental training learning speed',
+        description: 'Increase social training learning speed',
         level: 0,
         maxLevel: 3,
         uiPosition: {
@@ -2720,7 +2720,7 @@ export const registerSkillsStage1 = () => {
     gameEntity.registerGameEntity('skill_social_training_1', {
         tags: ["skill", "upgrade", "purchaseable"],
         name: 'Social Training',
-        description: 'Increase mental training learning speed',
+        description: 'Increase social training learning speed',
         level: 0,
         maxLevel: 3,
         uiPosition: {
@@ -2870,7 +2870,7 @@ export const registerSkillsStage1 = () => {
     gameEntity.registerGameEntity('skill_physical_training_1', {
         tags: ["skill", "upgrade", "purchaseable"],
         name: 'Physical Training',
-        description: 'Increase mental training learning speed',
+        description: 'Increase physical training learning speed',
         level: 0,
         maxLevel: 3,
         uiPosition: {
@@ -2970,7 +2970,7 @@ export const registerSkillsStage1 = () => {
     gameEntity.registerGameEntity('skill_physical_training_2', {
         tags: ["skill", "upgrade", "purchaseable"],
         name: 'Physical Training',
-        description: 'Increase mental training learning speed',
+        description: 'Increase physical training learning speed',
         level: 0,
         maxLevel: 3,
         uiPosition: {
@@ -3119,8 +3119,8 @@ export const registerSkillsStage1 = () => {
 
     gameEntity.registerGameEntity('skill_routine_training_1', {
         tags: ["skill", "upgrade", "purchaseable"],
-        name: 'Routine Training',
-        description: 'Increase mental training learning speed',
+        name: 'Routine Learning',
+        description: 'Increase routine learning speed',
         level: 0,
         maxLevel: 3,
         uiPosition: {
@@ -3219,8 +3219,8 @@ export const registerSkillsStage1 = () => {
 
     gameEntity.registerGameEntity('skill_routine_training_2', {
         tags: ["skill", "upgrade", "purchaseable"],
-        name: 'Routine Training',
-        description: 'Increase mental training learning speed',
+        name: 'Routine Learning',
+        description: 'Increase routine learning speed',
         level: 0,
         maxLevel: 3,
         uiPosition: {
