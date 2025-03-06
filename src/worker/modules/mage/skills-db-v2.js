@@ -336,7 +336,7 @@ export const registerSkillsStage1 = () => {
         unlockCondition: () => {
             return true;
         },
-        unlockBySkills: [{ id: "skill_physical_discount", level: 8 },{ id: "skill_mental_discount", level: 8 },{ id: "skill_routine_discount", level: 8 }],
+        unlockBySkills: [{ id: "skill_physical_discount", level: 8 },{ id: "skill_mental_discount", level: 8 },{ id: "skill_routine_discount", level: 8 },{id: "skill_general_training_-0", level: 1},{id: "skill_general_training_11", level: 1}],
         attributes: {
             isCollectable: false,
         },

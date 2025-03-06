@@ -143,6 +143,10 @@ const SkillTree = () => {
                                         currentLevel = Math.max(currentLevel, skillsData.available[id]?.level || 0);
                                     }
 
+                                    const arrowPosition = 0.75; // 75% ближче до дочірнього скіла
+                                    const arrowX = x1 + (x2 - x1) * arrowPosition;
+                                    const arrowY = y1 + (y2 - y1) * arrowPosition;
+
                                     const strokeColor = req.isMet || currentLevel >= requiredLevel ? '#999' : '#333';
                                     const fillColor = req.isMet || currentLevel >= requiredLevel ? '#111' : '#333';
                                     const textColor = req.isMet || currentLevel >= requiredLevel ? '#2dfa50' : '#da8a11';
@@ -150,6 +154,11 @@ const SkillTree = () => {
                                     return (
                                         <g key={`${id}-line-${index}`}>
                                             <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={strokeColor} strokeWidth="2" />
+                                            <polygon
+                                                points="-8,-5 8,0 -8,5"
+                                                transform={`translate(${arrowX}, ${arrowY}) rotate(${Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI})`}
+                                                fill={strokeColor}
+                                            />
                                             <circle cx={midX} cy={midY} r="10" fill={fillColor} stroke="#999" strokeWidth="2" />
                                             <text x={midX} y={midY} textAnchor="middle" alignmentBaseline="middle" fontSize="12" fill={textColor}>
                                                 {`${currentLevel}/${requiredLevel}`}
