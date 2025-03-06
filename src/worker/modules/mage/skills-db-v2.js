@@ -1921,7 +1921,7 @@ export const registerSkillsStage1 = () => {
     gameEntity.registerGameEntity('skill_sorcer', {
         tags: ["skill", "upgrade", "purchaseable"],
         name: 'Sorcer',
-        description: 'Further increase knowledge generation and learn speed',
+        description: 'Increase mana generation and capacity',
         level: 0,
         maxLevel: 10,
         uiPosition: {
