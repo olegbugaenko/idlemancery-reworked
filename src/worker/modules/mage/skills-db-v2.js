@@ -2657,7 +2657,7 @@ export const registerSkillsStage1 = () => {
                 }
             }
         },
-        modifierGroupId: 'mental_learn_rate',
+        modifierGroupId: 'social_learn_rate',
         get_cost: () => ({
             'skill-points': {
                 A: 0,
