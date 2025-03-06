@@ -2333,7 +2333,7 @@ export const registerSkillsStage1 = () => {
         unlockCondition: () => {
             return true;
         },
-        unlockBySkills: [{ id: "skill_intense_training", level: 1 },{ id: "mental_general_training_0", level: 1 }],
+        unlockBySkills: [{ id: "skill_intense_training", level: 1 },{ id: "skill_mental_training_0", level: 1 }],
         attributes: {
             isCollectable: false,
         },
