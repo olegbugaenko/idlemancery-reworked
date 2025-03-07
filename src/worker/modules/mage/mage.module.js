@@ -1,7 +1,8 @@
 import {GameModule} from "../../shared/game-module";
-import {gameResources, gameEntity, gameEffects, gameCore, resourceModifiers} from 'game-framework';
+import {gameResources, gameEntity, gameEffects, gameCore, resourceModifiers, resourceApi} from 'game-framework';
 import {registerSkillsStage1} from "./skills-db-v2";
 import {registerPermanentBonuses} from "./permanent-bonuses-db";
+import {cloneDeep} from "lodash";
 
 export class MageModule extends GameModule {
 
@@ -10,6 +11,8 @@ export class MageModule extends GameModule {
         this.mageLevel = 0;
         this.mageExp = 0;
         this.skillUpgrades = {};
+        this.editModeSkills = null;
+        this.currentEditEffects = null;
         this.tourStatus = null;
         this.shouldSendSkills = false;
         this.bankedTime = {
@@ -17,8 +20,9 @@ export class MageModule extends GameModule {
             max: 3600*24*1000,
             speedUpFactor: 1,
         };
-        this.actualVersion = 3;
+        this.actualVersion = 4;
         this.currentVersion = 2;
+        this.skillsUnlock = {}; // Holds as key id of skill and as value array of skills that are unlocked BY this skill
         /*
         this.eventHandler.registerHandler('feed-dragon', (data) => {
             this.feedDragon();
@@ -29,6 +33,8 @@ export class MageModule extends GameModule {
             gameResources.addResource('meat', 1*rs.multiplier);
         })
          */
+
+        this.skillGroupsCached = {};
 
         this.eventHandler.registerHandler('set_tour_finished', ({ skipStep }) => {
             // console.log('TourFinished: ', skipStep);
@@ -53,7 +59,25 @@ export class MageModule extends GameModule {
         })
 
         this.eventHandler.registerHandler('purchase-skill', ({ id }) => {
-            this.purchaseItem(id);
+            this.addSkillLevel(id);
+            const data = this.getSkillsData();
+            this.eventHandler.sendData('skills-data', data);
+        })
+
+        this.eventHandler.registerHandler('remove-skill', ({ id }) => {
+            this.removeSkillLevel(id);
+            const data = this.getSkillsData();
+            this.eventHandler.sendData('skills-data', data);
+        })
+
+        this.eventHandler.registerHandler('apply-skill-changes', ({ id }) => {
+            this.applySkillChanges();
+            const data = this.getSkillsData();
+            this.eventHandler.sendData('skills-data', data);
+        })
+
+        this.eventHandler.registerHandler('discard-skill-changes', ({ id }) => {
+            this.discardSkillChanges();
             const data = this.getSkillsData();
             this.eventHandler.sendData('skills-data', data);
         })
@@ -70,6 +94,175 @@ export class MageModule extends GameModule {
             const data = this.getStatistics();
             this.eventHandler.sendData('statistics', data);
         })
+
+    }
+
+    getSkillTreeEffects(skillTree) {
+        if(!skillTree) {
+            skillTree = {};
+        }
+        let totalEffects = {};
+        const levelsByGroup = {};
+        for(const skillId in skillTree) {
+            if(this.skillGroupsCached[skillId]) {
+                const groupId = this.skillGroupsCached[skillId];
+                if(!levelsByGroup[groupId]) {
+                    levelsByGroup[groupId] = {
+                        totalLevel: 0,
+                        protoSkillId: skillId,
+                        allSkills: []
+                    }
+                }
+                levelsByGroup[groupId].totalLevel += skillTree[skillId];
+                levelsByGroup[groupId].allSkills.push(skillId);
+                continue;
+            }
+            const entityEffects = gameEntity.getEffectsStructured(skillId, 0, skillTree[skillId]);
+            //console.log('EffectsAsserted: ', entityEffects, totalEffects);
+            let total = resourceApi.mergeEffects(totalEffects, entityEffects);
+            //console.log('Merged: ', total);
+        }
+        //console.log('levelsByGroup', levelsByGroup);
+        for(const groupId in levelsByGroup) {
+            const entityEffects = gameEntity.getEffectsStructured(levelsByGroup[groupId].protoSkillId, 0, levelsByGroup[groupId].totalLevel);
+            //console.log('GroupEffectsAsserted: ', entityEffects, totalEffects);
+            let total = resourceApi.mergeEffects(totalEffects, entityEffects);
+            //console.log('Merged: ', total);
+        }
+        console.log('totalEffects', totalEffects);
+        return totalEffects;
+    }
+
+    getSkillTreeEffectsUnpacked(skillTree) {
+        return resourceApi.unpackEffectsToObject(this.getSkillTreeEffects(skillTree));
+    }
+
+    getFreeSPLeft() {
+        const total = gameResources.getResource('skill-points')?.income;
+        const consume = this.currentEditEffects?.resources?.consumption?.['skill-points']?.value || 0;
+        return total - consume;
+    }
+
+    applySkillChanges() {
+        if (!this.editModeSkills) {
+            return; // Якщо немає змін, виходимо
+        }
+
+        // Копіюємо рівні скілів із редагування в основне дерево
+        this.skillUpgrades = { ...this.editModeSkills };
+        for(const key in this.skillUpgrades) {
+            gameEntity.setEntityLevel(key, this.skillUpgrades[key], true);
+        }
+
+        // Очищаємо режим редагування
+        this.editModeSkills = null;
+        this.currentEditEffects = null;
+
+        // Відправляємо оновлені дані
+        this.shouldSendSkills = true;
+    }
+
+    discardSkillChanges() {
+        if (!this.editModeSkills) {
+            return; // Якщо режим редагування не активний, нічого не робимо
+        }
+
+        // Очищаємо тимчасові дані, залишаючи все як було
+        this.editModeSkills = null;
+        this.currentEditEffects = null;
+
+        // Відправляємо оновлені дані без змін
+        this.shouldSendSkills = true;
+    }
+
+    addSkillLevel(itemId) {
+        const free = this.getFreeSPLeft();
+        console.log('Free: ', free, this.currentEditEffects);
+        if(!free) {
+            return;
+        }
+
+        if(!this.editModeSkills) {
+            this.editModeSkills = cloneDeep(this.skillUpgrades);
+            this.currentEditEffects = this.getSkillTreeEffects(this.editModeSkills);
+        }
+
+        // do check if unlocked and if requirements are met
+        if(!gameEntity.isEntityUnlocked(itemId)) {
+            return;
+        }
+        // check if any of requirements are met
+        const ent = gameEntity.getEntity(itemId);
+        if(ent.unlockBySkills?.length) {
+            const isMatched = ent.unlockBySkills.some(unlock => unlock.level <= this.editModeSkills[unlock.id]);
+            if(!isMatched) {
+                return ;
+            }
+        }
+        if(gameEntity.getEntityMaxLevel(itemId) <= this.editModeSkills[itemId]) {
+            return;
+        }
+
+        this.editModeSkills[itemId] = (this.editModeSkills[itemId] || 0) + 1;
+        console.log('newEdit: ', this.editModeSkills, this.editModeSkills[itemId])
+
+        // once finish edit
+        this.currentEditEffects = this.getSkillTreeEffects(this.editModeSkills);
+
+        console.log('AfterEdit: ', this.getFreeSPLeft(), this.currentEditEffects);
+
+    }
+
+    removeUnavailableSkills(skillId) {
+        const dependents = this.skillsUnlock[skillId] || [];
+        console.log('>>>>>> ', dependents);
+
+        for (const dependent of dependents) {
+            const { id: dependentId, level: requiredLevel } = dependent;
+            const currentDependentLevel = this.editModeSkills[dependentId] || 0;
+
+            // Якщо рівень залежного скіла більше 0, але він більше не відповідає вимогам
+            if (currentDependentLevel > 0) {
+                const unlockBySkills = gameEntity.getEntity(dependentId).unlockBySkills || [];
+
+                // Перевіряємо, чи хоча б один із необхідних скілів більше не відповідає вимогам
+                const isUnlocked = unlockBySkills.some(({ id, level }) => (this.editModeSkills[id] || 0) >= level);
+
+                if (!isUnlocked) {
+                    this.editModeSkills[dependentId] = 0; // Видаляємо скіл
+                    this.removeUnavailableSkills(dependentId); // Рекурсивно перевіряємо наступний рівень залежностей
+                }
+            }
+        }
+    };
+
+    removeSkillLevel(itemId) {
+        if(!this.editModeSkills) {
+            return; // Disable removal in non-edit mode
+        }
+
+        if(!this.editModeSkills[itemId]) {
+            return;
+        }
+
+        if(this.editModeSkills[itemId] <= this.skillUpgrades[itemId]) {
+            return;
+        }
+
+        // do check if unlocked and if requirements are met
+        if(!gameEntity.isEntityUnlocked(itemId)) {
+            return;
+        }
+
+        // Here we should recursively go over items that require this skill and set them to 0 in case not enough current level
+        this.editModeSkills[itemId]--;
+
+        this.removeUnavailableSkills(itemId); // Запускаємо рекурсивну перевірку
+
+        // Після видалень оновлюємо загальні ефекти
+        this.currentEditEffects = this.getSkillTreeEffects(this.editModeSkills);
+
+        console.log('After Edit: ', this.getFreeSPLeft(), this.currentEditEffects);
 
     }
 
@@ -120,6 +313,29 @@ export class MageModule extends GameModule {
         registerSkillsStage1();
 
         registerPermanentBonuses();
+
+        const list = gameEntity.listEntitiesByTags(['skill'], false, [], {
+            bRawData: true,
+        });
+
+        list.forEach((item) => {
+            if(item.unlockBySkills) {
+                item.unlockBySkills.forEach(unlock => {
+                    if(!this.skillsUnlock[unlock.id]) {
+                        this.skillsUnlock[unlock.id] = [];
+                    }
+                    this.skillsUnlock[unlock.id].push({
+                        level: unlock.level,
+                        id: item.id
+                    });
+                })
+            }
+        })
+
+        this.skillGroupsCached = list.filter(one => one.modifierGroupId).reduce((acc, skill) => {
+            acc[skill.id] = skill.modifierGroupId;
+            return acc;
+        })
 
         const entity = gameEntity.registerGameEntity('mage', {
             tags: ["mage", "general"],
@@ -353,6 +569,12 @@ export class MageModule extends GameModule {
             // console.log('loadedBankedTime: ', this.bankedTime, Date.now(), Date.now() - (this.bankedTime.lastSave + 60000))
         }
         this.tourStatus = obj?.tourStatus;
+
+        if(!this.skillUpgrades) {
+            this.skillUpgrades = {};
+        }
+
+        this.getSkillTreeEffects(this.skillUpgrades);
     }
 
     setSkill(skillId, amount, bForce = false) {
@@ -384,7 +606,12 @@ export class MageModule extends GameModule {
     getSkillsData() {
         const skills = gameEntity.listEntitiesByTags(['skill']);
         const skillsRs = gameResources.getResource('skill-points');
-        console.log('rsData: ', skillsRs.balance);
+        console.log('rsData: ', cloneDeep(skillsRs));
+
+        const currentEffects = this.getSkillTreeEffectsUnpacked(this.skillUpgrades);
+
+        let potentialEffects = this.editModeSkills ? this.getSkillTreeEffectsUnpacked(this.editModeSkills) : null;
+
         return {
             available: skills.map(entity => ({
                 isUnlocked: entity.isUnlocked,
@@ -393,16 +620,18 @@ export class MageModule extends GameModule {
                 position: entity.uiPosition,
                 description: entity.description,
                 max: gameEntity.getEntityMaxLevel(entity.id) || 0,
-                level: this.skillUpgrades[entity.id] || 0,
+                level: this.editModeSkills ? (this.editModeSkills[entity.id] || 0) : (this.skillUpgrades[entity.id] || 0),
+                diff: this.editModeSkills ? (this.editModeSkills[entity.id] || 0) - (this.skillUpgrades[entity.id] || 0) : 0,
                 affordable: gameEntity.getAffordable(entity.id),
-                effects: gameEntity.getEffects(entity.id, 1),
-                currentEffects: gameEntity.getEffects(entity.id, 0),
+                effects: gameEntity.getEffects(entity.id, 1, this.editModeSkills ? (this.editModeSkills[entity.id] || 0) : (this.skillUpgrades[entity.id] || 0)),
+                currentEffects: gameEntity.getEffects(entity.id, 0, this.editModeSkills ? (this.editModeSkills[entity.id] || 0) : (this.skillUpgrades[entity.id] || 0)),
                 isLeveled: this.leveledId === entity.id,
                 isCapped: entity.isCapped,
                 icon: entity.icon,
                 unlockBySkills: (entity.unlockBySkills || []).map(unlock => ({
                     ...unlock,
-                    isMet: unlock.level <= this.skillUpgrades[unlock.id],
+                    isMet: unlock.level <= (this.editModeSkills ? (this.editModeSkills[unlock.id] || 0) : (this.skillUpgrades[unlock.id] || 0)),
+                    relevantLevel: (this.editModeSkills ? (this.editModeSkills[unlock.id] || 0) : (this.skillUpgrades[unlock.id] || 0)),
                 })),
             })).reduce((acc, skill) => {
                 skill.isRequirementsMet = !skill.unlockBySkills.length || skill.unlockBySkills.some(one => one.isMet);
@@ -410,9 +639,12 @@ export class MageModule extends GameModule {
                 return acc;
                 }, {}),
             sp: {
-                total: skillsRs.balance,
+                total: this.editModeSkills ? this.getFreeSPLeft() : skillsRs.balance,
                 max: skillsRs.income,
-            }
+            },
+            currentEffects,
+            potentialEffects,
+            isEditMode: !!this.editModeSkills,
         }
     }
 

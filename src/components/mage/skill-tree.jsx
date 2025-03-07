@@ -29,7 +29,8 @@ const SkillTree = () => {
         sp: {
             total: 0,
             max: 0
-        }
+        },
+        currentEffects: []
     });
 
     const [detailsShown, setDetailsShown] = useState(null);
@@ -45,6 +46,7 @@ const SkillTree = () => {
     }, [])
 
     onMessage('skills-data', (skills) => {
+        console.log('skills: ', skills);
         setSkillsData(skills);
     })
 
@@ -63,9 +65,24 @@ const SkillTree = () => {
         sendData('purchase-skill', { id })
     }
 
+    const onDelete = (id) => {
+        // console.log('Purchase: ', id);
+        sendData('remove-skill', { id })
+    }
+
+    const onApply = () => {
+        // console.log('Purchase: ', id);
+        sendData('apply-skill-changes', {  })
+    }
+
+    const onDiscard = () => {
+        // console.log('Purchase: ', id);
+        sendData('discard-skill-changes', {  })
+    }
+
     const onShowDetails = (id) => {
         if(isMobile) {
-            setDetailsShown(skillsData.available.find(one => one.id === id));
+            setDetailsShown(skillsData.available[id]);
         }
         // console.log('onShowDetails: ', id);
     }
@@ -107,75 +124,110 @@ const SkillTree = () => {
     return (
         <div className={'skills-wrap'}>
             <div className={'head'}>
-                Skill points available: {skillsData.sp.total} / {skillsData.sp.max}
+                <div>
+                    Skill points available: {skillsData.sp.total} / {skillsData.sp.max}
+                </div>
+                {skillsData.isEditMode ? (<div className={'buttons'}>
+                    <button onClick={onApply}>Apply</button>
+                    <button onClick={onDiscard}>Discard</button>
+                </div>) : null}
             </div>
-            <div
-                style={{ width: "100%", height: "100%", overflow: "hidden" }}
-                onMouseMove={handleMouseMove}
-                onMouseUp={handleMouseUp}
-                onMouseLeave={handleMouseUp}
-                className={'skills-container'}
-            >
-                <PerfectScrollbar ref={scrollRef} style={{ width: "100%", height: "100%" }}>
-                    <div
-                        ref={contentRef}
-                        onMouseDown={handleMouseDown}
-                        style={{ position: "relative", width: "2500px", height: "2500px", cursor: isDragging ? "grabbing" : "grab" }}
-                    >
-                        <svg width="2500" height="2500" style={{ position: "absolute", top: 0, left: 0 }}>
-                            {Object.entries(skillsData.available).map(([id, skill]) =>
-                                skill.unlockBySkills?.map((req, index) => {
-                                    const from = skillsData.available[req.id];
-                                    if (!from) return null;
-                                    const x1 = center.x + from.position.left * scale;
-                                    const y1 = center.y + from.position.top * scale;
-                                    const x2 = center.x + skill.position.left * scale;
-                                    const y2 = center.y + skill.position.top * scale;
-                                    const midX = (x1 + x2) / 2;
-                                    const midY = (y1 + y2) / 2;
+            <div className={'skill-popup-container'}>
+                <div
+                    style={{ width: "calc(100% - 300px)", height: "100%", overflow: "hidden" }}
+                    onMouseMove={handleMouseMove}
+                    onMouseUp={handleMouseUp}
+                    onMouseLeave={handleMouseUp}
+                    className={'skills-container'}
+                >
+                    <PerfectScrollbar ref={scrollRef} style={{ width: "100%", height: "100%" }}>
+                        <div
+                            ref={contentRef}
+                            onMouseDown={handleMouseDown}
+                            style={{ position: "relative", width: "2500px", height: "2500px", cursor: isDragging ? "grabbing" : "grab" }}
+                        >
+                            <svg width="2500" height="2500" style={{ position: "absolute", top: 0, left: 0 }}>
+                                {Object.entries(skillsData.available).map(([id, skill]) =>
+                                    skill.unlockBySkills?.map((req, index) => {
+                                        const from = skillsData.available[req.id];
+                                        if (!from) return null;
+                                        const x1 = center.x + from.position.left * scale;
+                                        const y1 = center.y + from.position.top * scale;
+                                        const x2 = center.x + skill.position.left * scale;
+                                        const y2 = center.y + skill.position.top * scale;
+                                        const midX = (x1 + x2) / 2;
+                                        const midY = (y1 + y2) / 2;
 
-                                    let currentLevel = skillsData.available[req.id]?.level || 0;
-                                    const requiredLevel = req.level;
+                                        let currentLevel = skillsData.available[req.id]?.level || 0;
+                                        const requiredLevel = req.level;
 
-                                    const mutualSkill = skillsData.available[id]?.unlockBySkills?.find(s => s.id === req.id);
-                                    if (mutualSkill) {
-                                        currentLevel = Math.max(currentLevel, skillsData.available[id]?.level || 0);
-                                    }
+                                        const mutualSkill = skillsData.available[req.id]?.unlockBySkills?.find(s => s.id === skill.id);
+                                        if (mutualSkill) {
+                                            currentLevel = Math.max(currentLevel, skillsData.available[id]?.level || 0);
+                                        }
 
-                                    const arrowPosition = 0.75; // 75% ближче до дочірнього скіла
-                                    const arrowX = x1 + (x2 - x1) * arrowPosition;
-                                    const arrowY = y1 + (y2 - y1) * arrowPosition;
+                                        const arrowPosition = 0.75; // 75% ближче до дочірнього скіла
+                                        const arrowX = x1 + (x2 - x1) * arrowPosition;
+                                        const arrowY = y1 + (y2 - y1) * arrowPosition;
 
-                                    const strokeColor = req.isMet || currentLevel >= requiredLevel ? '#999' : '#333';
-                                    const fillColor = req.isMet || currentLevel >= requiredLevel ? '#111' : '#333';
-                                    const textColor = req.isMet || currentLevel >= requiredLevel ? '#2dfa50' : '#da8a11';
+                                        const strokeColor = req.isMet || currentLevel >= requiredLevel ? '#999' : '#333';
+                                        const fillColor = req.isMet || currentLevel >= requiredLevel ? '#111' : '#333';
+                                        const textColor = req.isMet || currentLevel >= requiredLevel ? '#2dfa50' : '#da8a11';
 
-                                    return (
-                                        <g key={`${id}-line-${index}`}>
-                                            <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={strokeColor} strokeWidth="2" />
-                                            <polygon
-                                                points="-8,-5 8,0 -8,5"
-                                                transform={`translate(${arrowX}, ${arrowY}) rotate(${Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI})`}
-                                                fill={strokeColor}
-                                            />
-                                            <circle cx={midX} cy={midY} r="10" fill={fillColor} stroke="#999" strokeWidth="2" />
-                                            <text x={midX} y={midY} textAnchor="middle" alignmentBaseline="middle" fontSize="12" fill={textColor}>
-                                                {`${currentLevel}/${requiredLevel}`}
-                                            </text>
-                                        </g>
-                                    );
-                                })
-                            )}
-                        </svg>
-                        {Object.entries(skillsData.available).map(([id, skill]) => {
-                            const x = center.x + skill.position.left * scale;
-                            const y = center.y + skill.position.top * scale;
+                                        return (
+                                            <g key={`${id}-line-${index}`}>
+                                                <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={strokeColor} strokeWidth="2" />
+                                                <polygon
+                                                    points="-8,-5 8,0 -8,5"
+                                                    transform={`translate(${arrowX}, ${arrowY}) rotate(${Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI})`}
+                                                    fill={strokeColor}
+                                                />
+                                                <circle cx={midX} cy={midY} r="10" fill={fillColor} stroke="#999" strokeWidth="2" />
+                                                <text x={midX} y={midY} textAnchor="middle" alignmentBaseline="middle" fontSize="12" fill={textColor}>
+                                                    {`${currentLevel}/${requiredLevel}`}
+                                                </text>
+                                            </g>
+                                        );
+                                    })
+                                )}
+                            </svg>
+                            {Object.entries(skillsData.available).map(([id, skill]) => {
+                                const x = center.x + skill.position.left * scale;
+                                const y = center.y + skill.position.top * scale;
 
-                            return (<ItemSkillCard x={x} y={y} key={skill.id} {...skill} onFlash={handleFlash} onPurchase={onPurchase} onShowDetails={onShowDetails} isMobile={isMobile}/>)
-                        })}
+                                return (<>
+                                        <ItemSkillCard x={x} y={y} key={skill.id} {...skill} onFlash={handleFlash} onPurchase={onPurchase} onShowDetails={onShowDetails} isMobile={isMobile}/>
+                                        {skill.diff ? (<div
+                                            className={'delete-diff'}
+                                            style={{
+                                                left: `${x + 30}px`,
+                                                top: `${y - 60}px`,
+                                            }}
+
+                                        >
+                                            <p>+{skill.diff}</p>
+                                            <button onClick={() => onDelete(skill.id)}>-</button>
+                                        </div> ) : null}
+                                    </>)
+                            })}
+                        </div>
+                    </PerfectScrollbar>
+                </div>
+                {!isMobile ? (<div className={'skills-sidebar'}>
+                    <div className={'block'}>
+                        <p>Current skills effects</p>
+                        <PerfectScrollbar>
+                            <div className={'eff-wrap'}>
+                                {skillsData.potentialEffects
+                                    ? (<ResourceComparison effects1={skillsData.currentEffects} effects2={skillsData.potentialEffects} />)
+                                    : (<EffectsSection effects={skillsData.currentEffects} maxDisplay={200}/>)}
+                            </div>
+                        </PerfectScrollbar>
+
                     </div>
-                </PerfectScrollbar>
+                </div> ) : null}
             </div>
+
             {isMobile && detailsShown ? (<div className={'details-wrap'}>
                 <div className={'blade-inner'}>
                     <div className={'block'}>

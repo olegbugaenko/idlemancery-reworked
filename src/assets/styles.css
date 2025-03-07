@@ -2558,6 +2558,44 @@ h4.title span {
     height: 100%;
 }
 
+.skill-popup-container {
+    height: 100%;
+    width: 100%;
+    display: flex;
+}
+
+.skill-popup-container .skills-sidebar {
+    width: 280px;
+    height: 100%;
+    padding: 8px;
+}
+
+.skill-popup-container .delete-diff {
+    position: absolute;
+    background: #171922;
+    border-radius: 3px;
+    padding: 4px;
+    border: 1px solid #777777;
+    font-size: 13px;
+    color: #2dfa50;
+}
+
+.skill-popup-container .delete-diff button {
+    padding: 3px;
+    width: 26px;
+    height: 26px;
+}
+
+.skills-wrap .head {
+    justify-content: space-between;
+    align-items: center;
+    display: flex;
+}
+
+.skills-wrap .head .buttons button {
+    margin-left: 24px;
+}
+
 @media screen and (max-width: 1600px) {
     .map-wrap .head {
         height: 90px;

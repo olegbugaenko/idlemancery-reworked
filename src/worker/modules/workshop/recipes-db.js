@@ -97,7 +97,7 @@ export const registerCraftingRecipes = () => {
         name: 'Craft Paper',
         isAbstract: false,
         allowedImpacts: ['effects'],
-        description: 'Refine wood and use it for your needs, or just sell it',
+        description: 'Make a paper out of your wood',
         level: 1,
         resourceId: 'inventory_paper',
         resourceModifier: {

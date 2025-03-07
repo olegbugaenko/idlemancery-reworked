@@ -1419,7 +1419,7 @@ export const registerSkillsStage1 = () => {
     gameEntity.registerGameEntity('skill_social_discount', {
         tags: ["skill", "upgrade", "purchaseable"],
         name: 'Silver Tongue',
-        description: 'Reduce amount of experiance required for ations with tag "Social"',
+        description: 'Reduce amount of experience required for actions with tag "Social"',
         level: 0,
         unlockCondition: () => {
             // console.log('ACTLVL: ', )
@@ -2137,7 +2137,7 @@ export const registerSkillsStage1 = () => {
             left: 0,
             top: -12,
         },
-        unlockBySkills: [{ id: "skill_mysticism", level: 5 }],
+        unlockBySkills: [{ id: "skill_spell_xp_rate", level: 5 }],
         unlockCondition: () => {
             // console.log('ACTLVL: ', )
             return gameEntity.getLevel('shop_item_spellbook') >= 1
