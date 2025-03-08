@@ -111,7 +111,7 @@ export const Footer = () => {
 
         <div className={'bottom'}>
             <div className={'left-most'}>
-                <ul className={'menu'}>
+                <ul className={'menu bigger'}>
                     {unlocks.actions ? (
                         <li className={openedTab === 'actions' ? 'active' : ''} onClick={() => openTab('actions')}>
                             <NewNotificationWrap isNew={newUnlocks.actions?.hasNew}>
@@ -159,7 +159,7 @@ export const Footer = () => {
                 </ul>
             </div>
             <div className={'right-most'}>
-                <ul className={'menu'}>
+                <ul className={'menu bigger'}>
                     <li className={openedTab === 'settings' ? 'active' : ''} onClick={() => openTab('settings')}>
                         <span>Settings</span>
                     </li>

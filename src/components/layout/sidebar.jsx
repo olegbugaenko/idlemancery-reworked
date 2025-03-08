@@ -15,7 +15,7 @@ export const Sidebar = () => {
 
     return (<div className={'sidebar'}>
         <div className={'upper'}>
-            <ul className={'menu toogleables'}>
+            <ul className={'menu toogleables bigger'}>
                 <li id={'tutorial-res-tab'} className={`${activePanel === 'resources' ? 'active' : ''}`} onClick={() => {
                     unlockNextById(3);
                     setActivePanel('resources')

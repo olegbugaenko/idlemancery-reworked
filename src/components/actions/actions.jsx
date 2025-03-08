@@ -443,6 +443,9 @@ export const Actions = ({}) => {
                                 </NewNotificationWrap>
                             </li> ))}
                             <li className={'add-custom-filter additional'}>
+                                <div className={'icon-content edit-icon interface-icon tiny'} onClick={() => editList(runningList.id)}>
+                                    <img src={"icons/interface/edit-icon.png"}/>
+                                </div>
                                 <span className={'create-custom'} onClick={() => {
                                     setCustomFilterOpened(true);
                                     // setEditingCustomFilter({ rules: [], condition: '', category: 'action', name: ''})

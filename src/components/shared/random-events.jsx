@@ -48,7 +48,8 @@ export const RandomEventSnippet = () => {
     // Close popup if clicking outside of it
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (popupRef.current && !popupRef.current.contains(event.target)) {
+            console.log('handleClickOutside');
+            if (popupRef.current && !popupRef.current.contains(event.target) && event.target.id != 'show-more-events-button') {
                 setShowMore(false); // Hide the popup
             }
         };
@@ -78,8 +79,8 @@ export const RandomEventSnippet = () => {
             ) : null}
             {eventData?.list?.length > 1 ? (
                 <div className="others">
-                    <p className="showMore" onClick={() => setShowMore(true)}>
-                        Show all {eventData?.list?.length} events
+                    <p className="showMore" onClick={() => setShowMore(!showMore)} id={'show-more-events-button'}>
+                        {!showMore ? `Show all ${eventData?.list?.length} events` : `Hide full events list`}
                     </p>
                     <div
                         ref={popupRef} // Attach the reference to the popup

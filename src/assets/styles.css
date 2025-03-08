@@ -79,6 +79,7 @@ p {
 
 .page-wrap * {
     color: #fff;
+    font-size: 15px;
 }
 
 .small-text p,
@@ -697,17 +698,29 @@ ul.menu {
 
 ul.menu li {
     margin: 0;
-    padding: 8px 16px;
+    padding: 4px 12px;
     cursor: pointer;
+}
+
+ul.menu li span {
+    font-size: 15px;
+}
+
+ul.menu.bigger li {
+    padding: 8px 16px;
+}
+
+ul.menu.bigger li span {
+    font-size: 16px;
 }
 
 ul.menu li:hover span {
     text-shadow: 0 0 18px #ffffff;
 }
 
-ul.menu li.additional:hover span {
+/*ul.menu li.additional:hover span {
     text-shadow: none;
-}
+}*/
 
 ul.menu li.active span{
     color: var(--highlight);
@@ -955,7 +968,7 @@ h4 {
     align-items: center;
 }
 
-.card.action .bottom .xp-text * {
+.card.action .bottom .xp-box * {
     font-size: 12px;
 }
 
@@ -2594,6 +2607,28 @@ h4.title span {
 
 .skills-wrap .head .buttons button {
     margin-left: 24px;
+}
+
+ul.menu .add-custom-filter {
+    display: flex;
+    align-items: center;
+    padding-left: 4px;
+}
+
+.add-custom-filter:hover {
+    /*background: #000;*/
+}
+
+ul.menu li.additional.add-custom-filter:hover span {
+    text-shadow: 0 0 18px #ffffff;
+}
+
+.add-custom-filter .icon-content.interface-icon,
+.add-custom-filter .icon-content.interface-icon:hover {
+    background: none;
+    border: none;
+    box-shadow: none;
+    margin-right: 0px;
 }
 
 @media screen and (max-width: 1600px) {

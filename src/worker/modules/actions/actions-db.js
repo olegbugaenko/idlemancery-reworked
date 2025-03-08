@@ -1403,7 +1403,7 @@ export const registerActionsStage1 = () => {
 
 
     registerGameAction('action_read_mages_handbook', {
-        tags: ["action", "magical", "activity", "spiritual", "book"],
+        tags: ["action", "magical", "activity", "book"],
         category: ACTION_CATS.MAGICAL,
         name: 'Read Apprentice Handbook',
         isAbstract: false,
