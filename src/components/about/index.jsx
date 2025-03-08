@@ -6,6 +6,10 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+                <h3>Idle Awakening v0.1.2d</h3>
+                <div className={'features'}>
+                    <p>Hotfix for a critical bug allowing for allocating more skill points than were available</p>
+                </div>
                 <h3>Idle Awakening v0.1.2c</h3>
                 <div className={'features'}>
                     <p>Implemented skills preview.</p>

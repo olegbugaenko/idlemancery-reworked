@@ -20,8 +20,8 @@ export class MageModule extends GameModule {
             max: 3600*24*1000,
             speedUpFactor: 1,
         };
-        this.actualVersion = 4;
-        this.currentVersion = 2;
+        this.actualVersion = 5;
+        this.currentVersion = 5;
         this.skillsUnlock = {}; // Holds as key id of skill and as value array of skills that are unlocked BY this skill
         /*
         this.eventHandler.registerHandler('feed-dragon', (data) => {
@@ -176,7 +176,7 @@ export class MageModule extends GameModule {
     }
 
     addSkillLevel(itemId) {
-        const free = this.getFreeSPLeft();
+        const free = this.editModeSkills ? this.getFreeSPLeft() : gameResources.getResource('skill-points').balance;
         console.log('Free: ', free, this.currentEditEffects);
         if(!free) {
             return;
