@@ -7,38 +7,53 @@ import {ActiveEffects} from "../shared/active-effects.jsx";
 import {RandomEventSnippet} from "../shared/random-events.jsx";
 import {useTutorial} from "../../context/tutorial-context";
 import {RawResource} from "../shared/raw-resource.jsx";
+import {PersonageCircle} from "./personage-circle.jsx";
+import {BankedTimeWrap} from "./banked-time-wrap.jsx";
+import {useAppContext} from "../../context/ui-context";
 
 export const Sidebar = () => {
 
     const [activePanel, setActivePanel] = useState('resources');
     const { unlockNextById } = useTutorial();
+    const { isMobile } = useAppContext();
+    const [isHidden, setHidden] = useState(false);
 
     return (<div className={'sidebar'}>
-        <div className={'upper'}>
-            <ul className={'menu toogleables bigger'}>
-                <li id={'tutorial-res-tab'} className={`${activePanel === 'resources' ? 'active' : ''}`} onClick={() => {
-                    unlockNextById(3);
-                    setActivePanel('resources')
-                }}>
-                    <span>Resources</span>
-                </li>
-                <li id={'tutorial-attr-tab'} className={`${activePanel === 'attributes' ? 'active' : ''}`} onClick={() => {
-                    unlockNextById(1);
-                    setActivePanel('attributes')
-                }}>
-                    <span>Attributes</span>
-                </li>
-            </ul>
-            <div className={'main-bar'}>
-                {activePanel === 'resources' ? <ResourcesBar /> : <AttributesBar />}
+        {isMobile ? (<div className={'show-hide-toggle'}><p className={'highlighted-span'} onClick={() => setHidden(!isHidden)}>{isHidden ? 'Show Resources Panel' : 'Hide Resources Panel'}</p></div> ) : null}
+        {!isMobile || !isHidden ? (<div className={'hideable-content'}>
+            <div className={'upper'}>
+                <div className={'personage-data'}>
+                    <PersonageCircle/>
+                    <BankedTimeWrap/>
+                </div>
+                <ul className={'menu toogleables bigger'}>
+                    <li id={'tutorial-res-tab'} className={`${activePanel === 'resources' ? 'active' : ''}`}
+                        onClick={() => {
+                            unlockNextById(3);
+                            setActivePanel('resources')
+                        }}>
+                        <span>Resources</span>
+                    </li>
+                    <li id={'tutorial-attr-tab'} className={`${activePanel === 'attributes' ? 'active' : ''}`}
+                        onClick={() => {
+                            unlockNextById(1);
+                            setActivePanel('attributes')
+                        }}>
+                        <span>Attributes</span>
+                    </li>
+                </ul>
+                <div className={'main-bar'}>
+                    {activePanel === 'resources' ? <ResourcesBar/> : <AttributesBar/>}
+                </div>
             </div>
-        </div>
-        <div className={'lower'}>
-            <RandomEventSnippet />
-            <div className={'effects-list'}>
-                <ActiveEffects />
+            <div className={'lower'}>
+                <RandomEventSnippet/>
+                <div className={'effects-list'}>
+                    <ActiveEffects/>
+                </div>
             </div>
-        </div>
+        </div>) : null}
+
 
     </div> )
 

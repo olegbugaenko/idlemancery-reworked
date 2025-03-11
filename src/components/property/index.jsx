@@ -8,7 +8,7 @@ import {ResourceCost} from "../shared/resource-cost.jsx";
 import {FurnitureUpgrades} from "./furniture.jsx";
 import {ResourceComparison} from "../shared/resource-comparison.jsx";
 import {AccessoryUpgrades} from "./accessories.jsx";
-import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
+import {NewNotificationWrap} from "../shared/new-notification-wrap.jsx";
 import {useUICache} from "../../general/hooks/local-cache";
 import {AmplifiersUpgrades} from "./amplifiers.jsx";
 import {useAppContext} from "../../context/ui-context";

@@ -9,7 +9,7 @@ import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
 import {FlashOverlay} from "../layout/flash-overlay.jsx";
 import {useFlashOnLevelUp} from "../../general/hooks/flash";
 import {ResourceComparison} from "../shared/resource-comparison.jsx";
-import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
+import {NewNotificationWrap} from "../shared/new-notification-wrap.jsx";
 import {useAppContext} from "../../context/ui-context";
 
 export const Shop = ({}) => {

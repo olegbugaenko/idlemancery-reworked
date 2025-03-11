@@ -3,7 +3,7 @@ import WorkerContext from "../../../context/worker-context";
 import {useWorkerClient} from "../../../general/client";
 import {formatInt, formatValue} from "../../../general/utils/strings";
 import PerfectScrollbar from "react-perfect-scrollbar";
-import {NewNotificationWrap} from "../../layout/new-notification-wrap.jsx";
+import {NewNotificationWrap} from "../../shared/new-notification-wrap.jsx";
 import {RawResource} from "../../shared/raw-resource.jsx";
 import {BreakDown} from "../../layout/sidebar.jsx";
 import {TippyWrapper} from "../../shared/tippy-wrapper.jsx";

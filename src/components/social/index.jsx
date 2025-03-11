@@ -6,7 +6,7 @@ import {EffectsSection} from "../shared/effects-section.jsx";
 import {ResourceCost} from "../shared/resource-cost.jsx";
 import {ResourceComparison} from "../shared/resource-comparison.jsx";
 import {Guilds} from "./guilds.jsx";
-import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
+import {NewNotificationWrap} from "../shared/new-notification-wrap.jsx";
 import {useAppContext} from "../../context/ui-context";
 
 export const Social = () => {

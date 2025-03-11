@@ -5,7 +5,7 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import {formatInt} from "../../general/utils/strings";
 import {FlashOverlay} from "../layout/flash-overlay.jsx";
 import {useFlashOnLevelUp} from "../../general/hooks/flash";
-import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
+import {NewNotificationWrap} from "../shared/new-notification-wrap.jsx";
 import {SearchField} from "../shared/search-field.jsx";
 import CustomFilter from "../shared/custom-filter.jsx";
 import CustomFiltersList from "../shared/custom-filter-list.jsx";

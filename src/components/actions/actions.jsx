@@ -12,7 +12,7 @@ import {ResourceComparison} from "../shared/resource-comparison.jsx";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import {cloneDeep} from "lodash";
 import {ActionXPBreakdown} from "./action-xp-breakdown.jsx";
-import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
+import {NewNotificationWrap} from "../shared/new-notification-wrap.jsx";
 import {SearchField} from "../shared/search-field.jsx";
 import {HowToSign} from "../shared/how-to-sign.jsx";
 import {useTutorial} from "../../context/tutorial-context";

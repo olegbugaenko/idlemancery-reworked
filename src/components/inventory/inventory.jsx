@@ -12,7 +12,7 @@ import RulesList from "../shared/rules-list.jsx";
 import {cloneDeep} from "lodash";
 import {BreakDown} from "../layout/sidebar.jsx";
 import {ResourceComparison} from "../shared/resource-comparison.jsx";
-import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
+import {NewNotificationWrap} from "../shared/new-notification-wrap.jsx";
 import StatRow from "../shared/stat-row.jsx";
 import {SearchField} from "../shared/search-field.jsx";
 import {useAppContext} from "../../context/ui-context";

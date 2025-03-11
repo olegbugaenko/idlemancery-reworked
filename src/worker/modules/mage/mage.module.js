@@ -3,6 +3,7 @@ import {gameResources, gameEntity, gameEffects, gameCore, resourceModifiers, res
 import {registerSkillsStage1} from "./skills-db-v2";
 import {registerPermanentBonuses} from "./permanent-bonuses-db";
 import {cloneDeep} from "lodash";
+// import {initMageRanks} from "./mage-ranks-db";
 
 export class MageModule extends GameModule {
 
@@ -48,9 +49,13 @@ export class MageModule extends GameModule {
             this.eventHandler.sendData('tour_status', this.tourStatus);
         })
 
-        this.eventHandler.registerHandler('query-mage-data', () => {
+        this.eventHandler.registerHandler('query-mage-data', ({ prefix }) => {
             const data = this.getMageData();
-            this.eventHandler.sendData('mage-data', data);
+            let label = 'mage-data';
+            if(prefix) {
+                label = `${label}-${prefix}`;
+            }
+            this.eventHandler.sendData(label, data);
         })
 
         this.eventHandler.registerHandler('query-skills-data', () => {
@@ -314,6 +319,8 @@ export class MageModule extends GameModule {
 
         registerPermanentBonuses();
 
+        // this.mageRanks = initMageRanks()
+
         const list = gameEntity.listEntitiesByTags(['skill'], false, [], {
             bRawData: true,
         });
@@ -438,6 +445,32 @@ export class MageModule extends GameModule {
 
     }
 
+    /*getMageRank(level) {
+        let rank = this.mageRanks[0]; // Default to the lowest rank
+
+        for (const mageRank of this.mageRanks) {
+            if (level >= mageRank.level) {
+                rank = mageRank; // Update rank if level is sufficient
+            } else {
+                break; // Stop checking once we find a higher level rank
+            }
+        }
+
+        console.log('MGR: ', rank, this.mageRanks)
+
+        return rank;
+    }
+
+    reassertMageRank(level) {
+        const rank = this.getMageRank(level);
+        gameEntity.setEntityLevel('mage_rank', rank.rankLevel)
+    }*/
+
+    /*reassertCurrentMageLevel() {
+        const level = gameEntity.getLevel('mage');
+        return this.reassertMageRank(level);
+    }*/
+
     topValues(data) {
         return (data || []).sort((a, b) => b.value - a.value)
             .slice(0, 10);
@@ -477,9 +510,10 @@ export class MageModule extends GameModule {
         if(rs.amount >= rs.cap) {
             const rslt = gameEntity.levelUpEntity('mage');
             // console.log('levelUp: ', rslt);
-            gameResources.addResource('skill-points', 1);
+            // gameResources.addResource('skill-points', 1);
             this.isLeveledUp = true;
             const data = this.getMageData();
+            // this.reassertCurrentMageLevel();
             this.eventHandler.sendData('mage-data', data);
         }
 
@@ -574,6 +608,8 @@ export class MageModule extends GameModule {
             this.skillUpgrades = {};
         }
 
+        // this.reassertCurrentMageLevel();
+
         this.getSkillTreeEffects(this.skillUpgrades);
     }
 
@@ -592,6 +628,11 @@ export class MageModule extends GameModule {
     getMageData() {
         const rs = gameResources.getResource('mage-xp');
         const skills = gameResources.getResource('skill-points');
+        // const rank = gameEntity.getLevel('mage_rank');
+        // const rankData = this.getMageRank(gameEntity.getLevel('mage'));
+
+        // console.log('rank: ', rankData);
+
         return {
             mageLevel: gameEntity.getLevel('mage'),
             mageXP: rs.amount,
@@ -600,6 +641,7 @@ export class MageModule extends GameModule {
             timeSpent: gameCore.globalTime,
             isLeveledUp: this.isLeveledUp,
             bankedTime: this.bankedTime,
+            // rankData,
         }
     }
 
@@ -641,6 +683,9 @@ export class MageModule extends GameModule {
             sp: {
                 total: this.editModeSkills ? this.getFreeSPLeft() : skillsRs.balance,
                 max: skillsRs.income,
+                breakDown: {
+                    income: skillsRs.breakDown?.income
+                }
             },
             currentEffects,
             potentialEffects,

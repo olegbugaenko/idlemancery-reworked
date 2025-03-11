@@ -10,6 +10,7 @@ import {EffectsSection} from "../shared/effects-section.jsx";
 import {ResourceCost} from "../shared/resource-cost.jsx";
 import {useFlashOnLevelUp} from "../../general/hooks/flash";
 import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
+import {BreakDown} from "../layout/sidebar.jsx";
 
 const SkillTree = () => {
     const scale = 80;
@@ -124,9 +125,11 @@ const SkillTree = () => {
     return (
         <div className={'skills-wrap'}>
             <div className={'head'}>
-                <div>
-                    Skill points available: {skillsData.sp.total} / {skillsData.sp.max}
-                </div>
+                <TippyWrapper content={(<div className={'hint-popup'}><BreakDown breakDown={skillsData.sp.breakDown} /> </div> )}>
+                    <div>
+                        Skill points available: {skillsData.sp.total} / {skillsData.sp.max}
+                    </div>
+                </TippyWrapper>
                 {skillsData.isEditMode ? (<div className={'buttons'}>
                     <button onClick={onApply}>Apply</button>
                     <button onClick={onDiscard}>Discard</button>
@@ -134,7 +137,6 @@ const SkillTree = () => {
             </div>
             <div className={'skill-popup-container'}>
                 <div
-                    style={{ width: "calc(100% - 300px)", height: "100%", overflow: "hidden" }}
                     onMouseMove={handleMouseMove}
                     onMouseUp={handleMouseUp}
                     onMouseLeave={handleMouseUp}
@@ -267,7 +269,7 @@ export const ItemSkillCard = ({ id, isUnlocked, x, y, icon, isRequirementsMet, n
 
     return (<div
         ref={elementRef}
-        className={`icon-card absolute item flashable ${((!affordable.isAffordable) || (!isRequirementsMet) || isCapped) ? 'unavailable' : ''} ${icon ? 'rounded semi-color' : ''} ${!isUnlocked ? 'black-out' : ''}`}
+        className={`icon-card absolute item flashable ${((!affordable.isAffordable) || (!isRequirementsMet) || isCapped) ? 'unavailable' : ''} ${isCapped ? ' complete' : ''} ${icon ? 'rounded semi-color' : ''} ${!isUnlocked ? 'black-out' : ''}`}
         onMouseEnter={() => isMobile ? null : onShowDetails(id)}
         onMouseLeave={() => isMobile ? null : onShowDetails(null)}
         onClick={(e) => isMobile ? onShowDetails(id) : onPurchase(id, e.shiftKey ? 1e9 : 1)}

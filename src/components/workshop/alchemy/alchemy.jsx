@@ -5,7 +5,7 @@ import {formatInt, formatValue} from "../../../general/utils/strings";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import {TippyWrapper} from "../../shared/tippy-wrapper.jsx";
 import {BreakDown} from "../../layout/sidebar.jsx";
-import {NewNotificationWrap} from "../../layout/new-notification-wrap.jsx";
+import {NewNotificationWrap} from "../../shared/new-notification-wrap.jsx";
 import {RawResource} from "../../shared/raw-resource.jsx";
 import {Balances} from "../shared.jsx";
 import {useAppContext} from "../../../context/ui-context";

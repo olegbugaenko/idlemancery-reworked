@@ -6,7 +6,7 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
 import {BreakDown} from "../layout/sidebar.jsx";
 import {ResourceComparison} from "../shared/resource-comparison.jsx";
-import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
+import {NewNotificationWrap} from "../shared/new-notification-wrap.jsx";
 
 export const Guilds = ({ setItemDetails, filterId, newUnlocks, isMobile }) => {
 

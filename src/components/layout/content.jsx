@@ -12,6 +12,8 @@ import {About} from "../about/index.jsx";
 import {Workshop} from "../workshop/index.jsx";
 import {Social} from "../social/index.jsx";
 import {World} from "../world/index.jsx";
+import {MainMenu} from "./main-menu.jsx";
+import {SecondaryMenu} from "./secondary-menu.jsx";
 
 export const Content = () => {
 
@@ -21,6 +23,10 @@ export const Content = () => {
     return (<div className={'content-wrap'}>
         <Sidebar />
         <div className={'content'}>
+            <div className={'header'}>
+                <MainMenu />
+                <SecondaryMenu />
+            </div>
             <GetContent tab={openedTab} />
 
             <Popup />

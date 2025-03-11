@@ -1,4 +1,4 @@
-import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
+import {NewNotificationWrap} from "../shared/new-notification-wrap.jsx";
 import React, {useContext, useEffect, useState} from "react";
 import {useWorkerClient} from "../../general/client";
 import WorkerContext from "../../context/worker-context";

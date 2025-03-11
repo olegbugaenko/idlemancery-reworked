@@ -330,7 +330,7 @@ export class ActionsModule extends GameModule {
 
         let discFactor = this.getDiscount(id);
 
-        return discFactor*gameEntity.getAttribute(id, 'baseXPCost', 50)*Math.pow(1.01, lvl-1)*(0.8 + 0.2*lvl);
+        return Math.max(1, discFactor*gameEntity.getAttribute(id, 'baseXPCost', 50)*Math.pow(1.01, lvl-1)*(0.8 + 0.2*lvl));
     }
 
     reassertRunningEfforts(bForce) {

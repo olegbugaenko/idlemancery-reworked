@@ -1,6 +1,5 @@
 import React, {useContext, useEffect} from "react";
 import {Content} from "./layout/content.jsx";
-import {Footer} from "./layout/footer.jsx";
 import {TutorialProvider, useTutorial} from "../context/tutorial-context";
 import WorkerContext from "../context/worker-context";
 import {useWorkerClient} from "../general/client";
@@ -47,6 +46,5 @@ export const LoadedMain = () => {
 
     return (<div className={'page-wrap'}>
         <Content />
-        <Footer />
     </div>)
 }

@@ -11,7 +11,7 @@ import {FlashOverlay} from "../layout/flash-overlay.jsx";
 import {useFlashOnLevelUp} from "../../general/hooks/flash";
 import RulesList from "../shared/rules-list.jsx";
 import {cloneDeep} from "lodash";
-import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
+import {NewNotificationWrap} from "../shared/new-notification-wrap.jsx";
 import {useAppContext} from "../../context/ui-context";
 
 export const Spellbook = ({}) => {

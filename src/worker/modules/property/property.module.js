@@ -297,6 +297,7 @@ export class PropertyModule extends GameModule {
             tags: ['living', 'secondary'],
             name: 'Living Space',
             isService: true,
+            saveBalanceTree: true
         })
 
         registerFurnitureStage1();
@@ -724,6 +725,7 @@ export class PropertyModule extends GameModule {
                 max: spaceRes.income * spaceRes.multiplier,
                 consumption: spaceRes.consumption,
                 total: spaceRes.amount,
+                breakDown: spaceRes.breakDown
             },
             selectedCategory: this.selectedFilterId[payload.filterId],
             searchData: options?.searchData,

@@ -2,7 +2,7 @@ import React, {useContext, useEffect, useRef, useState} from "react";
 import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
 import {useAppContext} from "../../context/ui-context";
-import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
+import {NewNotificationWrap} from "./new-notification-wrap.jsx";
 import {ResourceCost} from "./resource-cost.jsx";
 import {formatInt, secondsToString} from "../../general/utils/strings";
 import {TippyWrapper} from "./tippy-wrapper.jsx";

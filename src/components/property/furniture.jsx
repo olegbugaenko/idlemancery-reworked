@@ -5,12 +5,14 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import {formatInt} from "../../general/utils/strings";
 import {FlashOverlay} from "../layout/flash-overlay.jsx";
 import {useFlashOnLevelUp} from "../../general/hooks/flash";
-import {NewNotificationWrap} from "../layout/new-notification-wrap.jsx";
+import {NewNotificationWrap} from "../shared/new-notification-wrap.jsx";
 import {SearchField} from "../shared/search-field.jsx";
 import {RawResource} from "../shared/raw-resource.jsx";
 import CustomFilter from "../shared/custom-filter.jsx";
 import CustomFiltersList from "../shared/custom-filter-list.jsx";
 import {DragDropContext} from "react-beautiful-dnd";
+import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
+import {BreakDown} from "../layout/sidebar.jsx";
 
 
 const ACTIONS_SEARCH_SCOPES = [{
@@ -138,10 +140,14 @@ export const FurnitureUpgrades = ({ setItemDetails, purchaseItem, deleteItem, ne
 
     return (<DragDropContext onDragEnd={onDragEnd}><div className={'furniture-wrap'}>
         <div className={'head'}>
-            <div className={'space-item'}>
-                <RawResource id={'living_space'} name={'Living Space'} />
-                <span className={`slots-amount ${furnituresData.space.total > 0 ? 'slots-available' : 'slots-unavailable'}`}>{formatInt(Math.floor(furnituresData.space.total))}/{formatInt(furnituresData.space.max)}</span>
-            </div>
+            <TippyWrapper content={<div className={'hint-popup'}>
+                <BreakDown breakDown={furnituresData.space.breakDown} />
+            </div> }>
+                <div className={'space-item'}>
+                    <RawResource id={'living_space'} name={'Living Space'} />
+                    <span className={`slots-amount ${furnituresData.space.total > 0 ? 'slots-available' : 'slots-unavailable'}`}>{formatInt(Math.floor(furnituresData.space.total))}/{formatInt(furnituresData.space.max)}</span>
+                </div>
+            </TippyWrapper>
             <div className={'filters'}>
                 <label>
                     <SearchField
