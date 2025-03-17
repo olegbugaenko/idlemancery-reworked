@@ -69,7 +69,7 @@ export const ResourcesBar = () => {
     useEffect(() => {
         const interval = setInterval(() => {
             sendData('query-resources-data', { includePinned: true });
-        }, 100);
+        }, 200);
         return () => {
             clearInterval(interval);
         }
@@ -173,8 +173,8 @@ export const AttributesBar = () => {
                         {res.description}
                     </div>
 
-                    {res.nextUnlock ? (<div className={'unlock block'}>
-                        <p className={'hint'}>Next unlock at level {formatInt(res.nextUnlock.level)}</p>
+                    {res.nextUnlocks?.length ? (<div className={'unlock block'}>
+                        <p className={'hint'}>Next unlock at level {formatInt(res.nextUnlocks[0].level)}</p>
                     </div> ) : null}
                 </div> }>
                     <span className={'resource-label'}>{res.name}</span>

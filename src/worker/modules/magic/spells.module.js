@@ -3,6 +3,7 @@ import {GameModule} from "../../shared/game-module";
 import {getCostReduction, getMasteryId, getMaxId, initSpellsDB1} from "./spells-db";
 import {checkMatchingRules} from "../../shared/utils/rule-utils";
 import {SMALL_NUMBER} from "game-framework/src/utils/consts";
+import {charismaMod} from "../items/shop-db";
 
 export class SpellModule extends GameModule {
 
@@ -34,11 +35,38 @@ export class SpellModule extends GameModule {
         this.eventHandler.registerHandler('query-all-spells', payload => {
             this.sendAllSpells(payload);
         })
+
+        this.eventHandler.registerHandler('query-general-magic-stats', (payload) => {
+            this.sendGeneralMagicStats(payload)
+        })
     }
 
     initialize() {
 
         initSpellsDB1();
+
+    }
+
+    setMonitored({ type, id }) {
+        console.log('CHMON: ', id, type);
+        if(!id) {
+            this.monitorData = null;
+            return;
+        }
+        this.monitorData = {
+            type,
+            id
+        }
+    }
+
+    getMonitoredData(entity) {
+        if(!this.monitorData || !entity) return null;
+
+        if(this.monitorData.type === 'school_efficiency') {
+            if(entity.effectsDeps?.length && entity.effectsDeps.includes(this.monitorData.id)) {
+                return 'produce';
+            }
+        }
 
     }
 
@@ -352,7 +380,8 @@ export class SpellModule extends GameModule {
                 isActive: this.spells[spell.id]?.duration > 0,
                 isCasted: this.spells[spell.id]?.isCasted,
                 cooldown: this.spells[spell.id]?.cooldown ?? 0,
-                cooldownProg: spell.getUsageCooldown ? (spell.getUsageCooldown() + SMALL_NUMBER - (this.spells[spell.id]?.cooldown ?? 0)) / (spell.getUsageCooldown() + SMALL_NUMBER) : 1
+                cooldownProg: spell.getUsageCooldown ? (spell.getUsageCooldown() + SMALL_NUMBER - (this.spells[spell.id]?.cooldown ?? 0)) / (spell.getUsageCooldown() + SMALL_NUMBER) : 1,
+                monitored: this.getMonitoredData(spell),
             })),
             isSpellLevelingAvailable: this.isSpellLevelingAvailable(),
             automationUnlocked: gameEntity.getLevel('shop_item_planner') > 0,
@@ -439,6 +468,31 @@ export class SpellModule extends GameModule {
     sendAllSpells(payload) {
         const data = this.getAllSpellsData();
         let label = 'all-spells';
+        if(payload?.prefix) {
+            label = `${label}-${payload?.prefix}`
+        }
+        this.eventHandler.sendData(label, data);
+    }
+
+    getGeneralMagicStatsData() {
+        const stats = {
+            'general': [
+                {...gameEffects.getEffect('spell_xp_rate'), isMultiplier: true}
+            ].filter(one => !one.isMultiplier || Math.abs(one.value - 1) > SMALL_NUMBER),
+            'magic_schools': [
+                {...gameEffects.getEffect('restoration_spells_efficiency'), isMultiplier: true},
+                {...gameEffects.getEffect('recovery_spells_efficiency'), isMultiplier: true},
+                {...gameEffects.getEffect('illusion_spells_efficiency'), isMultiplier: true},
+                {...gameEffects.getEffect('conjuration_spells_efficiency'), isMultiplier: true},
+                {...gameEffects.getEffect('elemental_spells_efficiency'), isMultiplier: true},
+            ].filter(one => !one.isMultiplier || Math.abs(one.value - 1) > SMALL_NUMBER)
+        }
+        return stats;
+    }
+
+    sendGeneralMagicStats(payload) {
+        const data = this.getGeneralMagicStatsData();
+        let label = 'general-magic-stats';
         if(payload?.prefix) {
             label = `${label}-${payload?.prefix}`
         }

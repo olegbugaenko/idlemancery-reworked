@@ -5,7 +5,6 @@ import {formatInt, formatValue, secondsToString} from "../../general/utils/strin
 import {ProgressBar} from "../layout/progress-bar.jsx";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import {EffectsSection} from "../shared/effects-section.jsx";
-import {ResourceCost} from "../shared/resource-cost.jsx";
 import CircularProgress from "../shared/circular-progress.jsx";
 import {FlashOverlay} from "../layout/flash-overlay.jsx";
 import {useFlashOnLevelUp} from "../../general/hooks/flash";
@@ -13,6 +12,8 @@ import RulesList from "../shared/rules-list.jsx";
 import {cloneDeep} from "lodash";
 import {NewNotificationWrap} from "../shared/new-notification-wrap.jsx";
 import {useAppContext} from "../../context/ui-context";
+import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
+import StatRow from "../shared/stat-row.jsx";
 
 export const Spellbook = ({}) => {
 
@@ -262,7 +263,7 @@ export const Spellbook = ({}) => {
                                   automationUnlocked={spellData.automationUnlocked}
                                   isMobile={isMobile}
                                   onPurchase={purchaseItem}
-                    />) : null}
+                    />) : (<GeneralStats setDetailVisible={setDetailVisible}/>)}
             </div>) : null}
         </div>
 
@@ -270,7 +271,7 @@ export const Spellbook = ({}) => {
 
 }
 
-export const SpellCard = React.memo(({ id, isChanged, name, isCasted, cooldownProg, isActive, cooldown, onFlash, onPurchase, onShowDetails, onEditConfig, isMobile}) => {
+export const SpellCard = React.memo(({ id, monitored, name, isCasted, cooldownProg, isActive, cooldown, onFlash, onPurchase, onShowDetails, onEditConfig, isMobile}) => {
     const elementRef = useRef(null);
 
     useFlashOnLevelUp(isCasted, onFlash, elementRef);
@@ -291,7 +292,7 @@ export const SpellCard = React.memo(({ id, isChanged, name, isCasted, cooldownPr
     // RERENDERING
     // console.log('Item: ', id, cooldownProg, cooldown);
 
-    return (<div ref={elementRef} className={`icon-card item bigger flashable spell-card  ${isActive ? 'active' : ''}`} onMouseEnter={() => !isMobile ? onShowDetails(id) : null} onMouseLeave={() => !isMobile ? onShowDetails(null) : null} onClick={handleClick} onContextMenu={handleContextMenu}>
+    return (<div ref={elementRef} className={`icon-card item bigger flashable spell-card  ${isActive ? 'active' : ''} ${monitored ?? ''}`} onMouseEnter={() => !isMobile ? onShowDetails(id) : null} onMouseLeave={() => !isMobile ? onShowDetails(null) : null} onClick={handleClick} onContextMenu={handleContextMenu}>
         <div className={'icon-content'}>
             <CircularProgress progress={cooldownProg}>
                 <img src={`icons/spells/${id}.png`} className={'resource'} />
@@ -300,6 +301,10 @@ export const SpellCard = React.memo(({ id, isChanged, name, isCasted, cooldownPr
     </div> )
 }, ((prevProps, currProps) => {
     if(prevProps.id !== currProps.id) {
+        return false;
+    }
+
+    if(prevProps.monitored !== currProps.monitored) {
         return false;
     }
 
@@ -474,3 +479,73 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
 
     return true;
 });
+
+
+export const GeneralStats = ({ setDetailVisible }) => {
+
+    const worker = useContext(WorkerContext);
+
+    const { isMobile } = useAppContext();
+
+    const { onMessage, sendData } = useWorkerClient(worker);
+
+    const [item, setDetailOpened] = useState(null);
+
+    useEffect(() => {
+        sendData('query-general-magic-stats', { });
+        const interval = setInterval(() => {
+            sendData('query-general-magic-stats', { });
+        }, 1000);
+
+        return () => {
+            clearInterval(interval);
+        }
+
+    }, [])
+
+
+    onMessage('general-magic-stats', (items) => {
+        setDetailOpened(items);
+    })
+
+    const highLightMagicSchools = (id) => {
+        sendData('set-monitored', { scope: 'spells', type: 'school_efficiency', id });
+    }
+
+    if(!item) return null;
+
+
+    return (
+        <PerfectScrollbar>
+            <div className={'blade-inner'}>
+                {item.general.length ? (<><div className={'block'}>
+                    <h4>General Stats</h4>
+                </div>
+                    <div className={'block'}>
+                {item.general.map(stat => (<div className={'row flex-row'}>
+                    <TippyWrapper content={<div className={'hint-popup'}><p>{stat.description}</p></div>}>
+                    <p>{stat.name}</p>
+                    </TippyWrapper>
+                    <p>{formatValue(stat.value)}</p>
+                    </div> ))}
+                    </div></>) : null}
+                {item.magic_schools?.length ? (<><div className={'block'}>
+                    <h4>Magic Schools</h4>
+                </div>
+                    <div className={'block'}>
+                {item.magic_schools.map(stat => (
+                    <StatRow onHover={highLightMagicSchools} stat={stat}/>
+                ))}
+                    </div></>) : null}
+                <div className={'block'}>
+                    <p className={'hint'}>
+                        Hover over specific item to see it details
+                    </p>
+                </div>
+                {isMobile ? (<div className={'block buttons'}>
+                    <button onClick={() => setDetailVisible(false)}>Close</button>
+                </div>) : null}
+            </div>
+        </PerfectScrollbar>
+    )
+}

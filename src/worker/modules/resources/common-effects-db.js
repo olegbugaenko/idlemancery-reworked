@@ -326,12 +326,14 @@ export const registerCommomEffects = () => {
 
     gameEffects.registerEffect('spell_xp_rate', {
         name: 'Spell XP Gain',
+        description: 'Increase amount of XP, received by spell per cast. The more spell XP you gain - the faster you\'ll reach next level',
         defaultValue: 1,
         minValue: 1,
     })
 
     gameEffects.registerEffect('restoration_spells_efficiency', {
         name: 'Restoration Magic Efficiency',
+        description: 'Increase output of spells with tag "restoration"',
         defaultValue: 1,
         minValue: 1,
     })
@@ -339,30 +341,35 @@ export const registerCommomEffects = () => {
 
     gameEffects.registerEffect('recovery_spells_efficiency', {
         name: 'Recovery Magic Efficiency',
+        description: 'Increase output of spells with tag "recovery"',
         defaultValue: 1,
         minValue: 1,
     })
 
     gameEffects.registerEffect('illusion_spells_efficiency', {
         name: 'Illusion Magic Efficiency',
+        description: 'Increase output of spells with tag "illusion"',
         defaultValue: 1,
         minValue: 1,
     })
 
     gameEffects.registerEffect('conjuration_spells_efficiency', {
         name: 'Conjuration Magic Efficiency',
+        description: 'Increase output of spells with tag "conjuration"',
         defaultValue: 1,
         minValue: 1,
     })
 
     gameEffects.registerEffect('elemental_spells_efficiency', {
         name: 'Elemental Magic Efficiency',
+        description: 'Increase output of spells with tag "elemental"',
         defaultValue: 1,
         minValue: 1,
     })
 
     gameEffects.registerEffect('plantations_efficiency', {
         name: 'Plantations Efficiency',
+        description: 'Increase plantations yield',
         defaultValue: 1,
         minValue: 1
     })

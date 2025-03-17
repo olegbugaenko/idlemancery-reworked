@@ -3,6 +3,7 @@ import {gameResources, gameEntity, gameEffects, gameCore, resourceModifiers, res
 import {registerSkillsStage1} from "./skills-db-v2";
 import {registerPermanentBonuses} from "./permanent-bonuses-db";
 import {cloneDeep} from "lodash";
+import {unlocksApi} from "game-framework/src/general/unlocks-api";
 // import {initMageRanks} from "./mage-ranks-db";
 
 export class MageModule extends GameModule {
@@ -24,6 +25,8 @@ export class MageModule extends GameModule {
         this.actualVersion = 5;
         this.currentVersion = 5;
         this.skillsUnlock = {}; // Holds as key id of skill and as value array of skills that are unlocked BY this skill
+        this.skillDrafts = {};
+        this.isViewMode = false;
         /*
         this.eventHandler.registerHandler('feed-dragon', (data) => {
             this.feedDragon();
@@ -100,7 +103,189 @@ export class MageModule extends GameModule {
             this.eventHandler.sendData('statistics', data);
         })
 
+        this.eventHandler.registerHandler('save-skill-draft', payload => {
+            this.saveSkillDraft(payload.name);
+            const data = this.getSkillsData();
+            this.eventHandler.sendData('skills-data', data);
+        })
+
+        this.eventHandler.registerHandler('delete-skill-draft', payload => {
+            this.deleteSkillDraft(payload.id);
+            const data = this.getSkillsData();
+            this.eventHandler.sendData('skills-data', data);
+        })
+
+        this.eventHandler.registerHandler('load-skill-draft', payload => {
+            this.loadSkillDraft(payload.id, payload.isViewMode);
+            const data = this.getSkillsData();
+            this.eventHandler.sendData('skills-data', data);
+        })
+
+        this.eventHandler.registerHandler('export-skill-draft', payload => {
+            const blob = this.exportSkillDraft(payload.id);
+            this.eventHandler.sendData('export-skill-draft-blob', blob);
+        })
+
+        this.eventHandler.registerHandler('import-skill-draft', payload => {
+            this.importSkillDraft(payload.content);
+            const data = this.getSkillsData();
+            this.eventHandler.sendData('skills-data', data);
+        })
+
+        this.eventHandler.registerHandler('query-total-unlocks', () => {
+            const data = unlocksApi.getGeneralUnlocksStats();
+            this.eventHandler.sendData('total-unlocks', data);
+        })
     }
+
+    saveSkillDraft(name) {
+        const draftId = `draft-${Date.now()}-${Math.random()}`;
+        this.skillDrafts[draftId] = {
+            id: draftId,
+            name,
+            timestamp: Date.now(),
+            skills: cloneDeep(this.editModeSkills || this.skillUpgrades)
+        };
+        return this.skillDrafts[draftId];
+    }
+
+    /*loadSkillDraft(draftId) {
+        const draft = this.skillDrafts[draftId];
+        if (!draft) return false;
+
+        this.editModeSkills = cloneDeep(draft.skills);
+        this.currentEditEffects = this.getSkillTreeEffects(this.editModeSkills);
+        return true;
+    }*/
+
+    loadSkillDraft(draftId, isViewMode = true) {
+        const draft = this.skillDrafts[draftId];
+        if (!draft) return false;
+
+        this.isViewMode = isViewMode;
+
+        if(!isViewMode) {
+            if (this.canApplySkills(draft.skills)) {
+                // 🎯 Мерджимо скіли, беручи максимальний рівень
+                this.editModeSkills = { ...this.skillUpgrades };
+
+                for (const skillId in draft.skills) {
+                    this.editModeSkills[skillId] = Math.max(
+                        this.editModeSkills[skillId] || 0,
+                        draft.skills[skillId]
+                    );
+                }
+                this.currentEditEffects = this.getSkillTreeEffects(this.editModeSkills);
+            } else {
+                // ❌ Якщо чернетку НЕ можна застосувати, просто показуємо її
+                return false;
+            }
+        } else {
+            this.editModeSkills = cloneDeep(draft.skills);
+            this.currentEditEffects = this.getSkillTreeEffects(this.editModeSkills);
+        }
+
+        this.shouldSendSkills = true;
+
+        return true;
+    }
+
+
+    deleteSkillDraft(draftId) {
+        delete this.skillDrafts[draftId];
+    }
+
+    exportSkillDraft(draftId) {
+        const draft = this.skillDrafts[draftId];
+        if (!draft) return null;
+
+        return draft;
+    }
+
+    importSkillDraft(fileContent) {
+        try {
+            const draft = JSON.parse(fileContent);
+
+            if (!draft.name || !draft.skills) {
+                this.eventHandler.sendData("import-skill-draft-error", {
+                    error: "Invalid file format. Missing name or skills data.",
+                });
+                return null;
+            }
+
+            let isValid = true;
+            let invalidSkills = [];
+
+            for (const skillId in draft.skills) {
+                const draftLevel = draft.skills[skillId];
+
+                // 🔹 Перевіряємо, чи скіл існує у грі
+                if (!gameEntity.entityExists(skillId)) {
+                    isValid = false;
+                    invalidSkills.push({ skillId, reason: "Skill does not exist." });
+                    continue;
+                }
+
+                // 🔹 Перевіряємо, чи рівень не перевищує максимальний
+                const maxLevel = gameEntity.getEntityMaxLevel(skillId);
+                if (draftLevel > maxLevel) {
+                    isValid = false;
+                    invalidSkills.push({ skillId, reason: `Level ${draftLevel} exceeds max (${maxLevel}).` });
+                }
+
+                // 🔹 Перевіряємо, чи цей скіл має залежності (unlockBySkills)
+                const entity = gameEntity.getEntity(skillId);
+                if (draftLevel > 0 && entity.unlockBySkills?.length) {
+                    const isUnlocked = entity.unlockBySkills.some(({ id, level }) => {
+                        return (draft.skills[id] || 0) >= level;
+                    });
+
+                    if (!isUnlocked) {
+                        isValid = false;
+                        invalidSkills.push({ skillId, reason: "Skill has prerequisites that are not met." });
+                    }
+                }
+            }
+
+            if (!isValid) {
+                this.eventHandler.sendData("import-skill-draft-error", {
+                    error: "Some skills in the draft are invalid.",
+                    details: invalidSkills,
+                });
+                return null;
+            }
+
+            // ✅ Якщо все валідно - додаємо чернетку
+            const draftId = `draft-${Date.now()}-${Math.random()}`;
+            this.skillDrafts[draftId] = { ...draft, id: draftId };
+
+            // 🔹 Надсилаємо оновлений список чернеток на фронт
+            this.eventHandler.sendData("skill-draft-updated", Object.values(this.skillDrafts));
+
+            return draftId;
+        } catch (error) {
+            console.error("Invalid draft file:", error);
+            this.eventHandler.sendData("import-skill-draft-error", {
+                error: "Failed to parse JSON file. Please check the file format.",
+            });
+            return null;
+        }
+    }
+
+
+    /*importSkillDraft(fileContent) {
+        try {
+            const draft = JSON.parse(fileContent);
+            if (draft.name && draft.skills) {
+                const draftId = `draft-${Date.now()}-${Math.random()}`;
+                this.skillDrafts[draftId] = {...draft, id: draftId};
+                return draftId;
+            }
+        } catch (error) {
+            console.error("Invalid draft file:", error);
+        }
+        return null;
+    }*/
 
     getSkillTreeEffects(skillTree) {
         if(!skillTree) {
@@ -148,9 +333,31 @@ export class MageModule extends GameModule {
         return total - consume;
     }
 
+    canApplySkills(draftSkills) {
+        if (!draftSkills) return false;
+
+        let availablePoints = gameResources.getResource('skill-points')?.balance || 0;
+        let requiredPoints = 0;
+
+        for (const skillId in draftSkills) {
+            const draftLevel = draftSkills[skillId] || 0;
+            const currentLevel = this.skillUpgrades[skillId] || 0;
+
+            if (draftLevel > currentLevel) {
+                requiredPoints += (draftLevel - currentLevel);
+            }
+        }
+
+        return requiredPoints <= availablePoints;
+    }
+
     applySkillChanges() {
         if (!this.editModeSkills) {
             return; // Якщо немає змін, виходимо
+        }
+
+        if(!this.canApplySkills(this.editModeSkills)) {
+            return;
         }
 
         // Копіюємо рівні скілів із редагування в основне дерево
@@ -168,6 +375,7 @@ export class MageModule extends GameModule {
     }
 
     discardSkillChanges() {
+        this.isViewMode = false;
         if (!this.editModeSkills) {
             return; // Якщо режим редагування не активний, нічого не робимо
         }
@@ -553,6 +761,7 @@ export class MageModule extends GameModule {
                 lastSave: Date.now()
             },
             tourStatus: this.tourStatus,
+            drafts: this.skillDrafts,
         }
     }
 
@@ -606,6 +815,10 @@ export class MageModule extends GameModule {
 
         if(!this.skillUpgrades) {
             this.skillUpgrades = {};
+        }
+
+        if(obj?.drafts) {
+            this.skillDrafts = obj?.drafts;
         }
 
         // this.reassertCurrentMageLevel();
@@ -687,9 +900,19 @@ export class MageModule extends GameModule {
                     income: skillsRs.breakDown?.income
                 }
             },
+            drafts: Object.entries(this.skillDrafts).map(([id, one]) => {
+                const isAppliable = this.canApplySkills(one.skills); // Check if is applicable
+                return {
+                    id,
+                    name: one.name,
+                    timestamp: one.timestamp,
+                    isAppliable,
+                }
+            }),
             currentEffects,
             potentialEffects,
             isEditMode: !!this.editModeSkills,
+            isViewMode: this.isViewMode,
         }
     }
 

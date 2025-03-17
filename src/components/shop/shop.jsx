@@ -134,6 +134,10 @@ export const ShopUpgrades = ({ setItemDetails, purchaseItem, newUnlocks, isMobil
         current: undefined,
         isAutomationUnlocked: false,
         showMaxed: false,
+        unlocked: {
+            total: 0,
+            totalComplete: 0,
+        }
     });
 
     const [overlayPositions, setOverlayPositions] = useState([]);
@@ -168,6 +172,9 @@ export const ShopUpgrades = ({ setItemDetails, purchaseItem, newUnlocks, isMobil
 
     return (<div className={'upgrades-wrap'}>
         <div className={'sub-heading'}>
+            <div className={'complete'}>
+                <p>Upgrades Completed: {itemsData.unlocked.totalComplete} / {itemsData.unlocked.total}</p>
+            </div>
             <label>
                 <input type={'checkbox'} checked={itemsData.showMaxed} onChange={() => toggleShowMaxed(!itemsData.showMaxed)}/>
                 Show purchased

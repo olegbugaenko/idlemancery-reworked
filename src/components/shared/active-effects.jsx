@@ -15,7 +15,7 @@ export const ActiveEffects = () => {
     useEffect(() => {
         const interval = setInterval(() => {
             sendData('query-active-effects', {  });
-        }, 100);
+        }, 200);
         return () => {
             clearInterval(interval);
         }

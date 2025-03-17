@@ -243,6 +243,8 @@ export class ShopModule extends GameModule {
 
     getItemsData() {
         const entities = gameEntity.listEntitiesByTags(['shop']);
+        const total = entities.length;
+        const totalComplete = entities.filter(e => e.isCapped).length;
         return {
             available: entities.filter(one => one.isUnlocked && (!one.isCapped || this.showMaxed)).map(entity => ({
                 id: entity.id,
@@ -256,6 +258,10 @@ export class ShopModule extends GameModule {
                 isAutoPurchase: this.autoPurchase[entity.id] ?? false,
                 isCapped: entity.isCapped,
             })),
+            unlocked: {
+                total,
+                totalComplete,
+            },
             purchaseMultiplier: this.purchaseMultiplier,
             isAutomationUnlocked: gameEntity.getLevel('shop_item_purchase_manager') > 0,
             showMaxed: this.showMaxed,

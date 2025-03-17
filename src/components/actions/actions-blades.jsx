@@ -13,6 +13,7 @@ import StatRow from "../shared/stat-row.jsx";
 import {useTutorial} from "../../context/tutorial-context";
 import {ProgressBar} from "../layout/progress-bar.jsx";
 import {useAppContext} from "../../context/ui-context";
+import {useUICache} from "../../general/hooks/local-cache";
 
 
 export const ActionDetails = ({actionId, onClose, isSelected}) => {
@@ -406,6 +407,8 @@ export const GeneralStats = ({ stats, aspects, setDetailVisible }) => {
 
     const {isMobile} = useAppContext();
 
+    const [isIntensityHidden, setIntensityHidden] = useUICache('actions_intensity_hidden', false)
+
     const setAspectLevel = (id, level) => {
         sendData('set-action-aspect-level', { id, level });
     }
@@ -423,36 +426,48 @@ export const GeneralStats = ({ stats, aspects, setDetailVisible }) => {
         sendData('set-monitored', { scope: 'actions', type: 'learn_modifier', id });
     }
 
+    const highLightDiscountedActions = (id) => {
+        sendData('set-monitored', { scope: 'actions', type: 'discount', id });
+    }
+
 
     return (<PerfectScrollbar>
         {aspects.isUnlocked ? (<div className={'block'}>
-            <p>Actions Intensity</p>
-            <p className={'hint'}>
-                Intensity boosts work speed but increases resource use. Max intensity depends on the attribute. "Keep Max" uses the highest available level. Lower intensity saves resources.
-            </p>
-            {aspects.list.map(one => (<div className={'aspect-wrap'}>
-                <div className={'flex-container aspect-row'}>
-                    <span className={'col title'}>{one.name}</span>
-                    <div className={'col amount'}>
-                        <input type={'number'} value={one.level} onChange={e => setAspectLevel(one.id, +e.target.value)}/>
-                        <span> of {one.maxLevel}</span>
-                        <label>
-                            <input type={'checkbox'} checked={one.keepMaxed} onChange={e => toggleMaxed(one.id, !one.keepMaxed)}/>
-                            Keep Max
-                        </label>
-                    </div>
+            <div className={'block-heading flex-container flex-row'}>
+                <p>Actions Intensity</p>
+                <div className={`interface-icon icon-content small ${!isIntensityHidden ? ' reverted' : ''}`} onClick={() => setIntensityHidden(!isIntensityHidden)}>
+                    <img src={"icons/interface/toggle_hidden.png"} />
                 </div>
-                <div className={'progress-wrap'}>
-                    <div style={{width: `${one.progress*100}%`, backgroundColor: one.color}} className={'prop-bg'}></div>
+            </div>
+
+            {!isIntensityHidden ? (<div className={'intensity-block'}>
+                <p className={'hint'}>
+                    Intensity boosts work speed but increases resource use. Max intensity depends on the attribute. "Keep Max" uses the highest available level. Lower intensity saves resources.
+                </p>
+                {aspects.list.map(one => (<div className={'aspect-wrap'}>
                     <div className={'flex-container aspect-row'}>
-                        <span>{one.attributeData.name}:</span>
-                        <span>{formatValue(one.attributeData.value)}/{formatValue(one.nextPoint)}</span>
-                        <span className={'hint'}>
+                        <span className={'col title'}>{one.name}</span>
+                        <div className={'col amount'}>
+                            <input type={'number'} value={one.level} onChange={e => setAspectLevel(one.id, +e.target.value)}/>
+                            <span> of {one.maxLevel}</span>
+                            <label>
+                                <input type={'checkbox'} checked={one.keepMaxed} onChange={e => toggleMaxed(one.id, !one.keepMaxed)}/>
+                                Keep Max
+                            </label>
+                        </div>
+                    </div>
+                    <div className={'progress-wrap'}>
+                        <div style={{width: `${one.progress*100}%`, backgroundColor: one.color}} className={'prop-bg'}></div>
+                        <div className={'flex-container aspect-row'}>
+                            <span>{one.attributeData.name}:</span>
+                            <span>{formatValue(one.attributeData.value)}/{formatValue(one.nextPoint)}</span>
+                            <span className={'hint'}>
                             {`${formatValue(one.nextPoint - one.attributeData.value)} more ${one.attributeData.name} to unlock next level`}
                         </span>
+                        </div>
                     </div>
-                </div>
-            </div> ))}
+                </div> ))}
+            </div>) : null}
         </div> ) : null}
         <div className={'block'}>
             <p>Learn Speed Multipliers:</p>
@@ -466,7 +481,7 @@ export const GeneralStats = ({ stats, aspects, setDetailVisible }) => {
             <p>Learn XP Discounts:</p>
             <div className={'effects'}>
                 {Object.values(stats?.xpDiscounts || {}).filter(one => hasEffect(one)).map(one => (
-                    <StatRow onHover={highLightAffectedActions} stat={{...one, isMultiplier: true}}/>
+                    <StatRow onHover={highLightDiscountedActions} stat={{...one, isMultiplier: true}}/>
                 ))}
             </div>
         </div>) : null}

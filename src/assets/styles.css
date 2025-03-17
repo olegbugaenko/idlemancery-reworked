@@ -19,6 +19,10 @@
     --active-highlight: #c3e7f5;
 }
 
+.reverted {
+    transform: rotate(180deg);
+}
+
 span.close {
     cursor: pointer;
 }
@@ -477,7 +481,8 @@ p.small-hint, span.small-hint {
     box-shadow: 0px 0px 12px var(--yellow);
 }
 
-.card.produce {
+.card.produce,
+.icon-card.produce {
     border-color: var(--green);
     background: var(--darkbg);
     box-shadow: 0px 0px 12px var(--green);
@@ -704,12 +709,19 @@ ul.menu {
 
 ul.menu li {
     margin: 0;
-    padding: 4px 12px;
     cursor: pointer;
+    min-width: 0px;
+    flex-shrink: 1;
+    /* Гнучкий padding */
+    padding: 4px clamp(4px, 0.75vw, 12px);
 }
 
 ul.menu li span {
     font-size: 15px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
 }
 
 ul.menu.bigger li {
@@ -949,9 +961,9 @@ h4 {
 }
 
 .actions-wrap .categories {
-    height: 40px;
+    height: 70px;
     border-bottom: 1px solid #777777;
-    display: flex;
+    display: block;
     align-items: center;
     justify-content: space-between;
 }
@@ -1540,6 +1552,10 @@ h4 {
 
 .unlocks-map {
     height: 100%;
+}
+
+.unlocks-scrollable {
+    height: calc(100% - 30px);
 }
 
 .unlocks-inner h5 {
@@ -2375,12 +2391,17 @@ span.highlighted-span.yellow {
     font-size: 14px;
 }
 
-.unlocks-inner .unlock-title {
+.unlocks-inner p.unlock-title {
     width: 180px;
     font-size: 15px;
 }
 
-.unlocks-inner .unlock-value {
+.unlocks-inner p.unlock-goal {
+    width: 140px;
+    font-size: 14px;
+}
+
+.unlocks-inner p.unlock-value {
     width: 160px;
     font-size: 15px;
 }
@@ -2456,6 +2477,7 @@ span.highlighted-span.yellow {
     border: 1px solid #777777;
     padding: 12px;
     width: 300px;
+    top: 28px;
 }
 
 .custom-filter-edit-wrap .buttons {
@@ -2525,6 +2547,9 @@ h4.title span {
 
 .items .upgrades-wrap .sub-heading {
     padding: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .prev-unlock p {
@@ -2626,6 +2651,7 @@ ul.menu .add-custom-filter {
     display: flex;
     align-items: center;
     padding-left: 4px;
+    position: relative;
 }
 
 .add-custom-filter:hover {
@@ -2735,6 +2761,33 @@ ul.menu li.additional.add-custom-filter:hover span {
 .banked-time-wrap .time-spent {
     width: 160px;
 }
+
+.draft-item.unavailable {
+    color: #777777;
+}
+
+.skills-sidebar .comparison {
+    height: 60%;
+}
+
+.skills-sidebar .comparison .table {
+    height: calc(100% - 30px);
+}
+
+.skills-sidebar .draft-workarea {
+    height: 40%;
+}
+
+.skills-sidebar .draft-workarea .list {
+    height: calc(100% - 50px);
+}
+
+.draft-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
 
 @media screen and (max-width: 1600px) {
     .map-wrap .head {

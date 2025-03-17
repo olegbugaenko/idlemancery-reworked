@@ -10,10 +10,12 @@ export const MainMenu = () => {
     const { openedTab, setOpenedTab } = useAppContext();
     const [unlocks, setUnlocksData] = useState({});
     const [newUnlocks, setNewUnlocks] = useState({});
+    const [hotkeys, setHotkeys] = useState({});
 
     useEffect(() => {
         sendData('query-unlocks', { prefix: 'main-menu' });
         sendData('query-new-unlocks-notifications', { suffix: 'main-menu', depth: 0 });
+        sendData('query-all-hotkeys', { suffix: 'all', depth: 0 });
 
         const interval = setInterval(() => {
             sendData('query-unlocks', { prefix: 'main-menu' });
@@ -24,6 +26,41 @@ export const MainMenu = () => {
             clearInterval(interval);
         }
     }, []);
+
+    const triggerHotkey = (combination) => {
+        const hotkey = Object.values(hotkeys || {}).find(h => h.combination === combination);
+
+        if(!hotkey) return;
+
+        if(hotkey.action === 'selectTab') {
+            openTab(hotkey.param);
+        }
+    }
+
+    const openTab = (id) => {
+        setOpenedTab(id);
+    }
+
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            const keys = [];
+            if (event.ctrlKey) keys.push("Ctrl");
+            if (event.shiftKey) keys.push("Shift");
+            if (event.altKey) keys.push("Alt");
+            keys.push(event.key.toUpperCase());
+            const combination = keys.join("+");
+
+            triggerHotkey(combination); // Call triggerHotkey when a combination is pressed
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [hotkeys]);
+
+    onMessage('all-hotkeys-all', payload => {
+        console.log('Received AllHotkeys: ', payload);
+        setHotkeys(payload);
+    })
 
     onMessage('unlocks-main-menu', setUnlocksData);
     onMessage('new-unlocks-notifications-main-menu', setNewUnlocks);

@@ -1,7 +1,4 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
-import { MainMenu } from "./main-menu.jsx";
-import { SecondaryMenu } from "./secondary-menu.jsx";
-import { PersonageLevel } from "./personage-level.jsx";
 import { TippyWrapper } from "../shared/tippy-wrapper.jsx";
 import {formatInt, secondsToString} from "../../general/utils/strings";
 import WorkerContext from "../../context/worker-context";

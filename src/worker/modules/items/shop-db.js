@@ -385,6 +385,43 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+    gameEntity.registerGameEntity('shop_item_optimized_storage', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Optimized Storage',
+        description: 'Free some space for more coins storage',
+        level: 0,
+        maxLevel: 10,
+        unlockedBy: [{
+            type: 'entity',
+            id: 'action_home_errands',
+            level: 75,
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            get_rawCap: () => ({
+                resources: {
+                    coins: {
+                        A: 250,
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            })
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1.25,
+                B: 10000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
     gameEntity.registerGameEntity('shop_item_tent', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Tent',

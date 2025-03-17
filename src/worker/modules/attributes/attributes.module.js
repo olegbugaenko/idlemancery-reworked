@@ -3,6 +3,7 @@ import {gameCore, gameEffects, gameEntity} from "game-framework";
 import {registerAttributes} from "./attributes-db";
 import {gameUnlocks} from "game-framework/src/utils/unlocks";
 import {calculateTimeToLevelUp} from "../../shared/utils/math";
+import {getScope} from "../../shared/utils/scopes";
 
 export class AttributesModule extends GameModule {
 
@@ -64,13 +65,32 @@ export class AttributesModule extends GameModule {
 
     getAttributesUnlocks(showUnlocked) {
         const items = gameEffects.listEffectsByTags(['attribute'], false, [], { listPrevious: showUnlocked })
-            .filter(one => one.isUnlocked && (one.nextUnlock || (showUnlocked && one.prevUnlocks?.length)))
+            .filter(one => one.isUnlocked && (one.nextUnlocks?.length || (showUnlocked && one.prevUnlocks?.length)))
             .map(one => {
                 // Here we should somehow get current increment of attribute
                 // first of all we should get current income from list
+                // Try to get additional info
+                if(one.nextUnlocks?.length) {
+                    console.log('Actions: ', one)
+                    one.unlocks = {
+                        level: one.nextUnlocks[0].level,
+                        progress: 100*one.value / one.nextUnlocks[0].level,
+                        items: one.nextUnlocks.map(unlock => {
+                            const ent = gameEntity.getEntity(unlock.unlockId);
+                            return {
+                                ...unlock,
+                                meta: {
+                                    name: ent.name,
+                                    description: ent.description,
+                                    scope: getScope(ent)
+                                }
+                            }
+                        })
+                    }
+                }
+
                 return {
                     ...one,
-                    progress: one.nextUnlock ? 100*one.value / one.nextUnlock.level : 100,
                     prevUnlocks: (one.prevUnlocks ?? []).map(unlock => {
 
                         let data = {};
@@ -97,7 +117,7 @@ export class AttributesModule extends GameModule {
         const effects = gameEffects.listEffectsByTags(['attribute']);
         const list = effects.filter(one => one.isUnlocked).map(effect => ({
             ...effect,
-            nextProgress: effect.nextUnlock ? effect.value / effect.nextUnlock.level : 0,
+            nextProgress: effect.nextUnlocks?.length ? effect.value / effect.nextUnlocks[0].level : 0,
             monitor: this.monitoredData[effect.id] ?? null,
         }))
         // console.log('Attrs: ', list);

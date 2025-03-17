@@ -150,3 +150,10 @@ TODO's:
 26. Add setting for notation
 27. [V] Check if there is way to show/hide crafting breakdowns for higher levels
 28. [V] Show balance trees on crafting/alchemy pages
+
+
+v0.1.4
+1. [V] Test and doublecheck skills exports & drafts
+2. [V] Generate icons
+3. Check if hotkeys are working
+4. Implement v2 of saves (using encoding)

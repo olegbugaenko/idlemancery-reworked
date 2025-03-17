@@ -6,13 +6,19 @@ export class HotkeysModule extends GameModule {
         super();
         this.hotKeys = {};
 
-        this.eventHandler.registerHandler('query-all-hotkeys', () => {
-            this.eventHandler.sendData('all-hotkeys', this.hotKeys);
+        this.eventHandler.registerHandler('query-all-hotkeys', (payload) => {
+            let label = `all-hotkeys`
+            if(payload?.suffix) {
+                label = `${label}-${payload?.suffix}`
+            }
+            this.eventHandler.sendData(label, this.hotKeys);
         })
 
         this.eventHandler.registerHandler('update-hotkey', (payload) => {
             this.hotKeys[payload.id] = payload;
+            console.log('UpdateHotkey: ', payload);
             this.eventHandler.sendData('all-hotkeys', this.hotKeys);
+            this.eventHandler.sendData('all-hotkeys-all', this.hotKeys);
         })
     }
 

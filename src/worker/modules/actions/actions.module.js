@@ -6,6 +6,7 @@ import {calculateTimeToLevelUp, weightedRandomChoice} from "../../shared/utils/m
 import {SMALL_NUMBER} from "game-framework/src/utils/consts";
 import {registerAspects} from "./aspect-db";
 import {cloneDeep} from "lodash";
+import {getScope} from "../../shared/utils/scopes";
 
 const DEFAULT_FILTERS = {
     'all': {
@@ -300,6 +301,12 @@ export class ActionsModule extends GameModule {
 
         if(this.monitorData.type === 'learn_modifier') {
             if((this.monitorData.id === 'learning_rate') || entity.learningEffects?.includes(this.monitorData.id)) {
+                return 'produce'
+            }
+        }
+
+        if(this.monitorData.type === 'discount') {
+            if((this.monitorData.id === 'actions_discount') || entity.discountEffects?.includes(this.monitorData.id)) {
                 return 'produce'
             }
         }
@@ -878,25 +885,47 @@ export class ActionsModule extends GameModule {
     getActionsUnlocks(showUnlocked) {
         const items = gameEntity
             .listEntitiesByTags(['action'], false, [], { listPrevious: showUnlocked })
-            .filter(one => one.isUnlocked && !one.isCapped && (one.nextUnlock || (showUnlocked && one.prevUnlocks?.length)))
-            .map(one => ({
-                ...one,
-                progress: one.nextUnlock ? 100*one.level / one.nextUnlock.level : 100,
-                eta: one.nextUnlock ? calculateTimeToLevelUp(gameEntity.getAttribute(one.id, 'baseXPCost'), 0.2, one.level, one.nextUnlock.level) : 0,
-                prevUnlocks: (one.prevUnlocks ?? []).map(unlock => {
+            .filter(one => one.isUnlocked && !one.isCapped && (one.nextUnlocks?.length || (showUnlocked && one.prevUnlocks?.length)))
+            .map(one => {
 
-                    let data = {};
+                /*console.log('ActionUnlocks: ', one.nextUnlocks);*/
 
-                    if(gameEntity.entityExists(unlock.unlockId)) {
-                        data = gameEntity.getEntity(unlock.unlockId);
+                if(one.nextUnlocks?.length) {
+                    one.unlocks = {
+                        level: one.nextUnlocks[0].level,
+                        progress: 100*one.level / one.nextUnlocks[0].level,
+                        eta: one.nextUnlocks[0] ? calculateTimeToLevelUp(gameEntity.getAttribute(one.id, 'baseXPCost'), 0.2, one.level, one.nextUnlocks[0].level) : 0,
+                        items: one.nextUnlocks.map(unlock => {
+                            const ent = gameEntity.getEntity(unlock.unlockId);
+                            return {
+                                ...unlock,
+                                meta: {
+                                    name: ent.name,
+                                    description: ent.description,
+                                    scope: getScope(ent)
+                                },
+                            }
+                        })
                     }
+                }
 
-                    return {
-                        ...unlock,
-                        data
-                    }
-                }),
-            }));
+                return {
+                    ...one,
+                    prevUnlocks: (one.prevUnlocks ?? []).map(unlock => {
+
+                        let data = {};
+
+                        if (gameEntity.entityExists(unlock.unlockId)) {
+                            data = gameEntity.getEntity(unlock.unlockId);
+                        }
+
+                        return {
+                            ...unlock,
+                            data
+                        }
+                    }),
+                }
+            });
 
         /*console.log('FUNC: ', showUnlocked, items, gameEntity
             .listEntitiesByTags(['action'], false, [], { showUnlocked }).filter(one => one.id === 'action_endurance_training'));

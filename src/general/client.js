@@ -36,7 +36,7 @@ export function useWorkerClient(worker) {
         }
 
         const handler = globalEventHandlers[parsed.event];
-        // console.log('handling '+parsed.event, handler);
+        // console.log('handling '+parsed.event);
         if (handler) {
             handler(parsed.payload);
         }

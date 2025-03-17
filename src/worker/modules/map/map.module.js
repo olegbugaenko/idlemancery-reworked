@@ -40,6 +40,11 @@ export class MapModule extends GameModule {
             this.sendData();
         })
 
+        this.eventHandler.registerHandler('query-map-list-highlighted-tiles', (payload) => {
+            const data = this.getHighlightedTiles();
+            this.eventHandler.sendData('map-list-highlighted-tiles', { tiles: data })
+        })
+
         this.eventHandler.registerHandler('map-highlight-resources', (payload) => {
             // console.log('setHighLight: ', payload);
             this.highlightResources = {};
@@ -406,37 +411,65 @@ export class MapModule extends GameModule {
         this.generateMap(this.mapCreationSettings.level);
     }
 
+    isMapTileHighlighted(iRow, iCol) {
+        const col = this.mapTilesProcessed[iRow][iCol];
+
+        const hasHighlightResources = Object.keys(this.highlightResources).length > 0;
+        const { highlightUnexplored, effortMin, effortMax } = this.highlightFilters;
+
+        const emptyConds = !hasHighlightResources && !highlightUnexplored && !effortMin && !effortMax;
+
+        if (emptyConds) return false;
+
+        let isHighlight = true;
+
+        if (hasHighlightResources) {
+            isHighlight = col.drops.some(drop => this.highlightResources[drop.id] && drop.isRevealed);
+            if (!isHighlight) return false; // Early exit optimization
+        }
+
+        if (highlightUnexplored) {
+            const hasUnexplored = col.drops.some(drop =>
+                gameResources.isResourceUnlocked(drop.id) && !drop.isRevealed
+            );
+            if (!hasUnexplored) return false;
+        }
+
+        if (effortMin) {
+            if (col.cost['gathering_effort'].value < effortMin) return false;
+        }
+
+        if (effortMax) {
+            if (col.cost['gathering_effort'].value > effortMax) return false;
+        }
+
+        return true;
+    }
+
+    getHighlightedTiles() {
+        const highlightedTiles = [];
+
+        for (let iRow = 0; iRow < this.mapTilesProcessed.length; iRow++) {
+            for (let iCol = 0; iCol < this.mapTilesProcessed[iRow].length; iCol++) {
+                if (this.isMapTileHighlighted(iRow, iCol)) {
+                    highlightedTiles.push({ iRow, iCol });
+                }
+            }
+        }
+
+        return highlightedTiles;
+    }
+
+
+
     getData() {
         const filterableLoot = Object.keys(this.filterableLoots).map(one => ({
             ...gameResources.getResource(one),
             isSelected: this.highlightResources[one]
         }));
         return {
-            mapTiles: this.mapTilesProcessed.map(row => row.map(col => {
-                let emptyConds = !Object.keys(this.highlightResources).length
-                    && !this.highlightFilters.highlightUnexplored
-                    && !this.highlightFilters.effortMin
-                    && !this.highlightFilters.effortMax;
-
-                let isHighlight = false;
-
-                if(!emptyConds) {
-                    isHighlight = true;
-                    if(Object.keys(this.highlightResources).length) {
-                        isHighlight = col.drops.some(drop => this.highlightResources[drop.id] && drop.isRevealed);
-                    }
-
-                    if(isHighlight && this.highlightFilters.highlightUnexplored) {
-                        isHighlight = (emptyConds || isHighlight) && col.drops.some(drop => gameResources.isResourceUnlocked(drop.id) && !drop.isRevealed);
-                    }
-                    if((isHighlight) && this.highlightFilters.effortMin) {
-                        isHighlight = this.highlightFilters.effortMin <= col.cost['gathering_effort'].value;
-                    }
-                    if((isHighlight) && this.highlightFilters.effortMax) {
-                        isHighlight = this.highlightFilters.effortMax >= col.cost['gathering_effort'].value;
-                    }
-                }
-
+            mapTiles: this.mapTilesProcessed.map((row, iRow) => row.map((col, iCol) => {
+                const isHighlighted = this.isMapTileHighlighted(iRow, iCol);
 
                 return {
                     ...col,
@@ -444,7 +477,7 @@ export class MapModule extends GameModule {
                         ...drop,
                         resource: gameResources.getResource(drop.id),
                     })),
-                    isHighlight
+                    isHighlight: isHighlighted,
                 }
             })),
             explorationPoints: gameResources.getResource('gathering_effort'),

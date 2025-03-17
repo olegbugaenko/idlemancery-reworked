@@ -253,6 +253,41 @@ export const MapWrap = ({ children }) => {
         }
     }
 
+    const onClearList = () => {
+        const { listData } = listDetails ?? {};
+        if(listData) {
+            const newList = listData;
+            newList.tiles = [];
+            setListDetails({...listDetails, listData: {...newList}});
+            sendData('query-map-tile-list-effects', { listData: newList });
+        }
+    }
+
+    const onAddTiles = () => {
+        sendData('query-map-list-highlighted-tiles', {});
+    }
+
+    onMessage('map-list-highlighted-tiles', (data) => {
+        const { listData } = listDetails ?? {};
+        if(listData) {
+            const newList = listData;
+            data.tiles.map(({ iRow, iCol}) => {
+                const oTP = {
+                    id: `${iRow}:${iCol}`,
+                    name: `Tile ${iRow}:${iCol}`,
+                    i: iRow,
+                    j: iCol,
+                    time: 1,
+                }
+                if(!newList.tiles.find(o => o.id === oTP.id)) {
+                    newList.tiles.push(oTP)
+                }
+            })
+            setListDetails({...listDetails, listData: {...newList}});
+            sendData('query-map-tile-list-effects', { listData: newList });
+        }
+    })
+
     const onUpdateActionFromList = (id, key, value) => {
         const { listData } = listDetails ?? {};
         if(listData) {
@@ -302,6 +337,8 @@ export const MapWrap = ({ children }) => {
                         onUpdateActionFromList={onUpdateActionFromList}
                         onDropActionFromList={onDropActionFromList}
                         onUpdateListValue={onUpdateListValue}
+                        onAddTiles={onAddTiles}
+                        onClearList={onClearList}
                         onAddAutotriggerRule={onAddAutotriggerRule}
                         onSetAutotriggerRuleValue={onSetAutotriggerRuleValue}
                         onDeleteAutotriggerRule={onDeleteAutotriggerRule}
@@ -490,6 +527,8 @@ export const MapTileListDetails = ({
    onUpdateActionFromList,
    onDropActionFromList,
    onUpdateListValue,
+   onAddTiles,
+   onClearList,
    onAddAutotriggerRule,
    onSetAutotriggerRuleValue,
    onDeleteAutotriggerRule,
@@ -605,6 +644,10 @@ export const MapTileListDetails = ({
                         </div>
                     </div>
                 </div>
+                {isEditing ? (<div className={'block editing-bottom buttons'}>
+                    <button onClick={onAddTiles}>Add highlighted tiles</button>
+                    <button onClick={onClearList}>Clear</button>
+                </div>) : null}
                 {editing.drops ? (<div className={'block'}>
                     <p>Drops:</p>
                     {editing.drops.map(drop => (<p className={`drop-row ${drop.rarityTier}`}>

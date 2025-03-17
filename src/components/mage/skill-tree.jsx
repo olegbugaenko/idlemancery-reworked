@@ -31,7 +31,8 @@ const SkillTree = () => {
             total: 0,
             max: 0
         },
-        currentEffects: []
+        currentEffects: [],
+        drafts: []
     });
 
     const [detailsShown, setDetailsShown] = useState(null);
@@ -49,6 +50,11 @@ const SkillTree = () => {
     onMessage('skills-data', (skills) => {
         console.log('skills: ', skills);
         setSkillsData(skills);
+    })
+
+    onMessage('import-skill-draft-error', data => {
+        alert(data.error);
+        console.warn(data.error, data.details);
     })
 
     const [overlayPositions, setOverlayPositions] = useState([]);
@@ -122,6 +128,65 @@ const SkillTree = () => {
         setIsDragging(false);
     };
 
+    const saveDraft = () => {
+        const name = prompt("Enter draft name:");
+        if (name) sendData('save-skill-draft', { name });
+    };
+
+    const loadDraft = (id) => {
+        sendData('load-skill-draft', { id, isViewMode: false });
+    };
+
+    const viewDraft = (id) => {
+        sendData('load-skill-draft', { id, isViewMode: true });
+    };
+
+    const deleteDraft = (id) => {
+        sendData('delete-skill-draft', { id });
+    };
+
+    const exportDraft = (id) => {
+        sendData('export-skill-draft', { id });
+    };
+
+    onMessage('export-skill-draft-blob', (data) => {
+        try {
+            // Якщо `data` ще не є блобом, створюємо його
+            const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
+
+            // Створюємо URL-об'єкт
+            const url = window.URL.createObjectURL(blob);
+
+            // Створюємо приховану кнопку завантаження
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `skill-draft-${data.name.toLowerCase().replaceAll(/[^\w\d]/g, '_')}-${Date.now()}.json`;
+
+            // Автоматично клікаємо для скачування
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            // Звільняємо пам'ять
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error("Error downloading skill draft:", error);
+        }
+    });
+
+
+
+    const importDraft = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                sendData('import-skill-draft', { content: e.target.result });
+            };
+            reader.readAsText(file);
+        }
+    };
+
     return (
         <div className={'skills-wrap'}>
             <div className={'head'}>
@@ -131,8 +196,8 @@ const SkillTree = () => {
                     </div>
                 </TippyWrapper>
                 {skillsData.isEditMode ? (<div className={'buttons'}>
-                    <button onClick={onApply}>Apply</button>
-                    <button onClick={onDiscard}>Discard</button>
+                    {!skillsData.isViewMode ? (<button onClick={onApply}>Apply</button>) : null}
+                    <button onClick={onDiscard}>{!skillsData.isViewMode ? 'Discard' : 'Close'}</button>
                 </div>) : null}
             </div>
             <div className={'skill-popup-container'}>
@@ -216,16 +281,69 @@ const SkillTree = () => {
                     </PerfectScrollbar>
                 </div>
                 {!isMobile ? (<div className={'skills-sidebar'}>
-                    <div className={'block'}>
+                    <div className={'block comparison'}>
                         <p>Current skills effects</p>
-                        <PerfectScrollbar>
-                            <div className={'eff-wrap'}>
-                                {skillsData.potentialEffects
-                                    ? (<ResourceComparison effects1={skillsData.currentEffects} effects2={skillsData.potentialEffects} />)
-                                    : (<EffectsSection effects={skillsData.currentEffects} maxDisplay={200}/>)}
-                            </div>
-                        </PerfectScrollbar>
+                        <div className={'table'}>
+                            <PerfectScrollbar>
+                                <div className={'eff-wrap'}>
+                                    {skillsData.potentialEffects
+                                        ? (<ResourceComparison effects1={skillsData.currentEffects} effects2={skillsData.potentialEffects} />)
+                                        : (<EffectsSection effects={skillsData.currentEffects} maxDisplay={200}/>)}
+                                </div>
+                            </PerfectScrollbar>
+                        </div>
+                    </div>
+                    <div className={'block draft-workarea'}>
+                        <div className="draft-controls">
+                            <button onClick={saveDraft}>Save Draft</button>
+                            <button onClick={() => document.getElementById("import-draft-input").click()}>
+                                Import Draft
+                            </button>
+                            <input
+                                type="file"
+                                id="import-draft-input"
+                                onChange={importDraft}
+                                style={{ display: "none" }} // Приховуємо інпут
+                            />
+                        </div>
+                        <div className={'list'}>
+                            <PerfectScrollbar>
+                                <ul>
+                                    {skillsData.drafts.map((draft) => (
+                                        <li key={draft.id} className={`draft-item ${draft.isAppliable ? ' available' : ' unavailable'}`}>
+                                            {draft.name} ({new Date(draft.timestamp).toLocaleString()})
+                                            <div className={'icons flex-container'}>
+                                                <TippyWrapper content={<div className={'hint-popup'}>View Build</div> }>
+                                                    <div className={'icon-content edit-icon interface-icon small'} onClick={() => viewDraft(draft.id)}>
+                                                        <img src={"icons/interface/icon_show.png"}/>
+                                                    </div>
+                                                </TippyWrapper>
+                                                <TippyWrapper content={<div className={'hint-popup'}>Apply Build</div> }>
+                                                    <div className={`icon-content edit-icon interface-icon small ${!draft.isAppliable ? 'disabled' : ''}`} onClick={() => loadDraft(draft.id)}>
+                                                        <img src={"icons/interface/run.png"}/>
+                                                    </div>
+                                                </TippyWrapper>
+                                                <TippyWrapper content={<div className={'hint-popup'}>Export Build</div> }>
+                                                    <div className={`icon-content edit-icon interface-icon small`} onClick={() => exportDraft(draft.id)}>
+                                                        <img src={"icons/interface/download.png"}/>
+                                                    </div>
+                                                </TippyWrapper>
+                                                <TippyWrapper content={<div className={'hint-popup'}>Delete Build</div> }>
+                                                    <div className={`icon-content edit-icon interface-icon small`} onClick={() => deleteDraft(draft.id)}>
+                                                        <img src={"icons/interface/delete.png"}/>
+                                                    </div>
+                                                </TippyWrapper>
+                                            </div>
 
+                                            {/*<button onClick={() => viewDraft(draft.id)}>View</button>
+                                            <button disabled={!draft.isAppliable} onClick={() => loadDraft(draft.id)}>Load</button>
+                                            <button onClick={() => exportDraft(draft.id)}>Export</button>
+                                            <button onClick={() => deleteDraft(draft.id)}>Delete</button>*/}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </PerfectScrollbar>
+                        </div>
                     </div>
                 </div> ) : null}
             </div>

@@ -12,6 +12,11 @@ export class MonitoringModule extends GameModule {
                 gameCore.getModule('actions').setMonitored({ type, id });
             }
 
+            if(scope === 'spells') {
+                gameCore.getModule('magic').setMonitored({ type, id });
+            }
+
+
             if(scope === 'effects') {
                 // check if type is action. If it is - get action effects and resources
                 // and set them monitored
@@ -68,6 +73,7 @@ export class MonitoringModule extends GameModule {
                         gameCore.getModule('resource-pool').setMonitored([]);
                     }
                 }
+
             }
 
         })

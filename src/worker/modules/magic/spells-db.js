@@ -59,6 +59,11 @@ export const registerSpell = (id, options) => {
         ]
     }
 
+    options.effectsDeps = [
+        ...(options.resourceModifier?.effectDeps || []),
+        ...(options.usageGain?.effectDeps || [])
+    ]
+
     if(options.attributes?.duration) {
         options.attributes.className = 'spell'
     }
