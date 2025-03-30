@@ -1121,6 +1121,14 @@ h4 {
     width: 120px;
 }
 
+.list-editor .recipes-list .actions-list-wrap .action-row .title {
+    width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 13px;
+}
+
 .list-editor .actions-list-wrap .action-row .col.amount.large .editing-amounts {
     display: flex;
     justify-content: space-between;

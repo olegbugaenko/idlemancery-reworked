@@ -11,6 +11,7 @@ import {cloneDeep} from "lodash";
 import RulesList from "../../shared/rules-list.jsx";
 import StatRow from "../../shared/stat-row.jsx";
 import {useAppContext} from "../../../context/ui-context";
+import {TippyWrapper} from "../../shared/tippy-wrapper.jsx";
 
 export const AlchemyWrap = ({ children }) => {
 
@@ -74,7 +75,8 @@ export const AlchemyWrap = ({ children }) => {
                 potentialEffects: payload.potentialEffects,
                 resourcesEffects: payload.resourcesEffects,
                 effectEffects: payload.effectEffects,
-                prevEffects: payload.prevEffects
+                prevEffects: payload.prevEffects,
+                assumedDistribution: payload.assumedDistribution,
             }
         })
     })
@@ -481,10 +483,15 @@ export const AlchemyListDetails = ({
                                     </div>
                                     <div className={'col amount'}>
                                         {isEditing
-                                            ? (<span><input type={'number'} value={recipe.percentage}
+                                            ? (<span>% of slots<input type={'number'} value={recipe.percentage}
                                                             onChange={(e) => onUpdateActionFromList(recipe.id, 'percentage', +e.target.value)}/></span>)
                                             : (<span> {recipe.percentage}%</span>)
                                         }
+                                    </div>
+                                    <div className={'col assumed'}>
+                                        <TippyWrapper placement={'bottom'} content={<div className={'hint-popup'}>Asserted amount of slots that would be assigned to this recipe using current list settings</div> }>
+                                            <span>{editing?.assumedDistribution?.find(one => one.id === recipe.id)?.level || 0}</span>
+                                        </TippyWrapper>
                                     </div>
                                     <div className={'col delete'}>
                                         {isEditing ? (<span className={'close'} onClick={() => onDropActionFromList(recipe.id)}>X</span>) : null}
