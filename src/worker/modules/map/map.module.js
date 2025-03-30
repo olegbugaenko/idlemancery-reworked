@@ -18,7 +18,7 @@ export class MapModule extends GameModule {
             level: 0,
         }
         this.mapTier = 0;
-        this.relevantMapVersion = 2;
+        this.relevantMapVersion = 5;
         this.currentMapVersion = null;
 
         this.lists = new MapTileListsSubmodule();
@@ -202,7 +202,7 @@ export class MapModule extends GameModule {
         const rarityBuckets = {
             low: potentialResources.filter(r => r.rarity <= 1), // rarity 0-1
             mid: potentialResources.filter(r => r.rarity >= 2 && r.rarity <= 3), // rarity 2-3
-            high: potentialResources.filter(r => r.rarity >= 4 && r.rarity <= 5) // rarity 4-5
+            high: potentialResources.filter(r => r.rarity >= 4 && r.rarity <= 10) // rarity 4-5
         };
 
         // console.log('rarityBuckets: ', rarityBuckets, potentialResources);
@@ -221,7 +221,7 @@ export class MapModule extends GameModule {
         }
 
         // Determine how many more resources are needed (at least 3 in total)
-        const remainingDropsCount = 5 - drops.length;
+        const remainingDropsCount = 6 - drops.length;
 
         // Add resources from other rarity levels
         const additionalDrops = [];
@@ -369,7 +369,7 @@ export class MapModule extends GameModule {
             }
             this.processTiles();
         } else {
-            this.generateMap();
+            this.generateMap(obj?.mapTier || 0);
         }
         this.lists.load(obj?.lists || {});
         this.highlightFilters = {};
@@ -537,7 +537,7 @@ export class MapModule extends GameModule {
     }
 
     getDetails(i, j) {
-        console.log('GetDetails: ', i, j, this.mapTilesProcessed[i])
+        console.log('GetDetails: ', i, j, this.mapTilesProcessed[i][j])
         const tile = this.mapTilesProcessed[i][j];
         // console.log('Querying tile.drops: ', i, j, tile.drops, tile.drops.filter((drop, index) => (!tile.r?.includes(index)) && gameResources.isResourceUnlocked(drop.id)));
 

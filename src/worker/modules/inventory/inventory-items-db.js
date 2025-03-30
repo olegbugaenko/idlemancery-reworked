@@ -996,6 +996,28 @@ export const registerInventoryItems = () => {
         sellPrice: 160000,
     })
 
+    registerInventoryItem('inventory_amber', {
+        name: 'Amber',
+        hasCap: false,
+        tags: ['inventory', 'material', 'gatherable'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        attributes: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.getLevel('shop_item_amber_gathering') > 0
+        },
+        sellPrice: 4000000,
+        rarity: 6,
+        allowedTileTypes: ['plain', 'swamp'],
+        lootAmountMult: 0.05,
+    })
+
+
     registerInventoryItem('inventory_small_endurance_flask', {
         name: 'Small Endurance Flask',
         hasCap: false,

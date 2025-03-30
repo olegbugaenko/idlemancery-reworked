@@ -1800,4 +1800,30 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+    gameEntity.registerGameEntity('shop_item_amber_gathering', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Amber Gathering',
+        description: 'Unlock amber gathering on maps. Amber can be used for advanced accessories making.',
+        level: 0,
+        maxLevel: 1,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 150000
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 5.e+13*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
 }

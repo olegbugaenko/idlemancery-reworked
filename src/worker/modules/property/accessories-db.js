@@ -1093,4 +1093,75 @@ export const registerAccessoriesStage1 = () => {
             },
         }),
     })
+
+    registerAccessory('accessory_craft_binder', {
+        tags: ["accessory", "upgrade", "purchaseable", "effect", "maps"],
+        name: 'Craftbinder',
+        description: 'A structured metal core wrapped in organic and forged layers. It channels your inner discipline into parallel creation.',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_amber_gathering') > 0;
+        },
+        resourceModifier: {
+            income: {
+                resources: {
+                    'crafting_slots': {
+                        A: 1,
+                        B: 0,
+                        type: 0,
+                    },
+                    'alchemy_slots': {
+                        A: 1,
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            },
+        },
+        get_cost: () => ({
+            'inventory_amber': {
+                A: 1.1,
+                B: 100,
+                type: 1
+            },
+            'inventory_forged_steel': {
+                A: 1.1,
+                B: 500,
+                type: 1
+            },
+        }),
+    })
+
+    registerAccessory('accessory_focus_crystal', {
+        tags: ["accessory", "upgrade", "purchaseable", "effect", "maps"],
+        name: 'Crystal of Focus',
+        description: 'A glowing crystal formed from ancient amber and volcanic obsidian. It enhances your mental clarity, letting you learn faster and more deeply.',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_amber_gathering') > 0;
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'learning_rate': {
+                        A: 0.02,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+        },
+        get_cost: () => ({
+            'inventory_amber': {
+                A: 1.1,
+                B: 100,
+                type: 1
+            },
+            'inventory_obsidian_shard': {
+                A: 1.1,
+                B: 500,
+                type: 1
+            },
+        }),
+    })
 }
