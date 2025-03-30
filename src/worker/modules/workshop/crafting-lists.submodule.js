@@ -87,7 +87,7 @@ export class CraftingListsSubmodule extends GameModule {
             const data = this.getListEffects(null, listData);
 
             const prevEffects = [];
-            const resourcesEffects = this.packEffects(data.filter(one => one.type === 'resources').map(effect => {
+            const resourcesEffects = this.packEffects(data.effects.filter(one => one.type === 'resources').map(effect => {
                 const prev = resourceCalculators.assertResource(effect.id, false, ['running']);
 
                 if(effect.scope !== 'income' && effect.scope !== 'consumption') return effect;
@@ -118,14 +118,15 @@ export class CraftingListsSubmodule extends GameModule {
                 }
             }));
 
-            console.log('SendingData: ', JSON.stringify(data.prevEffects), JSON.stringify(data.resourcesEffects), data, id);
+            console.log('SendingData: ', JSON.stringify(data.effects.filter(one => one.type === 'effects')), JSON.stringify(resourcesEffects), data.assumedDistribution, id);
 
 
             this.eventHandler.sendData('crafting-list-effects', {
-                potentialEffects: data,
+                potentialEffects: data.effects,
                 resourcesEffects,
                 prevEffects: this.packEffects(prevEffects),
-                effectEffects: data.filter(one => one.type === 'effects')
+                effectEffects: data.effects.filter(one => one.type === 'effects'),
+                assumedDistribution: data.assumedDistribution,
             });
         })
     }
@@ -315,8 +316,9 @@ export class CraftingListsSubmodule extends GameModule {
             isAvailable: gameEntity.isEntityUnlocked(a.id) && !gameEntity.isCapped(a.id)
         }))
 
+        const { effects, assumedDistribution } = this.getListEffects(id);
 
-        data.potentialEffects = this.getListEffects(id);
+        data.potentialEffects = effects;
 
         const resourcesEffects = data.potentialEffects.filter(one => one.type === 'resources');
         data.effectEffects = data.potentialEffects.filter(one => one.type === 'effects');
@@ -359,6 +361,8 @@ export class CraftingListsSubmodule extends GameModule {
         data.prevEffects = this.packEffects(prevEffects);
 
         data.bForceOpen = bForceOpen;
+
+        data.assumedDistribution = assumedDistribution;
 
         // console.log('SendingData: ', JSON.stringify(data.prevEffects), JSON.stringify(data.resourcesEffects));
 
@@ -409,38 +413,58 @@ export class CraftingListsSubmodule extends GameModule {
         }
 
         // Second pass: Allocate slots based on percentage and constraints
-        for (const entry of result) {
-            if (remainingSlots <= 0) break;
+        // Другий прохід: обчислюємо idealTotal і збираємо інформацію для третього
+        const leftovers = [];
 
+        for (const entry of result) {
             const original = validDistribution.find(({ id }) => id === entry.id);
             const { max, percentage } = original;
+
+            const exactIdeal = maxSlots * percentage;
+            const floorIdeal = Math.floor(exactIdeal);
             const currentLevel = entry.level;
-            const additional = Math.min(
-                Math.floor(remainingSlots * percentage),
-                max ? max - currentLevel : 1.e+100,
+            const desiredAdditional = floorIdeal - currentLevel;
+
+            if (remainingSlots <= 0) continue;
+
+            const allowedAdditional = Math.min(
+                desiredAdditional,
+                max ? max - currentLevel : Infinity,
                 remainingSlots
             );
-            entry.level += additional;
-            remainingSlots -= additional;
+
+            entry.level += allowedAdditional;
+            remainingSlots -= allowedAdditional;
+
+            const fraction = exactIdeal - floorIdeal;
+            leftovers.push({
+                entry,
+                fraction,
+                max,
+            });
         }
 
-        // Third pass: Distribute remaining slots to entries that can accept more
-        for (const entry of result) {
-            if (remainingSlots <= 0) break;
 
-            const original = validDistribution.find(({ id }) => id === entry.id);
-            const { max } = original;
-            let additional = remainingSlots;
-            if(max) {
-                additional = Math.min(max - entry.level, remainingSlots);
+        if (remainingSlots > 0) {
+            // Сортуємо від найбільшого дробового залишку до найменшого
+            leftovers.sort((a, b) => b.fraction - a.fraction);
+
+            for (const { entry, max, fraction } of leftovers) {
+                if (remainingSlots <= 0) break;
+
+                const currentLevel = entry.level;
+                const canAdd = max ? max - currentLevel : Infinity;
+
+                if (canAdd <= 0) continue;
+
+                entry.level += 1;
+                remainingSlots -= 1;
             }
-            entry.level += additional;
-            remainingSlots -= additional;
         }
 
         result = result.filter(one => one.level > 0);
 
-        console.log('distributed: ', maxSlots, result);
+        console.log('distributed: ', maxSlots, result, leftovers);
 
 
         return result;
@@ -499,7 +523,10 @@ export class CraftingListsSubmodule extends GameModule {
             })
         })
 
-        return totalEffects.map(eff => eff.scope === 'income' && eff.value < 0 ? {...eff, scope: 'consumption', value: -eff.value} : eff);
+        return {
+            effects: totalEffects.map(eff => eff.scope === 'income' && eff.value < 0 ? {...eff, scope: 'consumption', value: -eff.value} : eff),
+            assumedDistribution: assumedDistribution,
+        };
     }
 
 
