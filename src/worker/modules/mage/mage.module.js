@@ -575,7 +575,7 @@ export class MageModule extends GameModule {
                         'mage-xp': {
                             A: 50,
                             B: 200,
-                            C: 1.1,
+                            C: 1.11,
                             type: 3,
                         },
                         'energy': {
@@ -659,7 +659,7 @@ export class MageModule extends GameModule {
                 'mage-xp': {
                     A: 50,
                     B: 200,
-                    C: 1.1,
+                    C: 1.11,
                     type: 3,
                 },
             })

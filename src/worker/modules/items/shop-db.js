@@ -1762,4 +1762,42 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+    gameEntity.registerGameEntity('shop_item_advanced_negotiations', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Advanced Negotiations',
+        description: 'Further advance your negotiations skills, decreasing land prices.',
+        level: 0,
+        maxLevel: 5,
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    land_purchase_discount: {
+                        A: 0.5,
+                        B: 1,
+                        type: 0
+                    }
+                }
+            }
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 100000
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_cartography') > 0
+            //||  gameEntity.getLevel('shop_item_conjuration_magic') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 2.e+13*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
 }
