@@ -6,6 +6,10 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+                <h3>Idle Awakening v0.1.3a</h3>
+                <div className={'features'}>
+                    <p>Fixed bug when used space indicator in property tab was relying on potential usage rather than actual</p>
+                </div>
                 <h3>Idle Awakening v0.1.3</h3>
                 <div className={'features'}>
                     <p>Significant layout re-work</p>

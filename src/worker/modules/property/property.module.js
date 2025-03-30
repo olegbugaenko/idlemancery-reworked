@@ -724,7 +724,7 @@ export class PropertyModule extends GameModule {
                 isLeveled: this.leveledId === entity.id,
                 isCapped: entity.isCapped,
                 isAutoPurchase: this.autoPurchase[entity.id] ?? false,
-                spaceUsage: gameEntity.getEffects(entity.id, 1).find(one => one.id === 'living_space')?.value / Math.max(1, spaceRes.consumption)
+                spaceUsage: gameEntity.getEffects(entity.id, 0).find(one => one.id === 'living_space')?.value / Math.max(1, spaceRes.consumption)
             })),
             propertyCategories: Object.values(perCats).filter(cat => cat.items.length > 0).sort((a, b) => a.sortIndex - b.sortIndex),
             space: {
