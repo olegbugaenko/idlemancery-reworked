@@ -16,6 +16,7 @@ import {NewNotificationWrap} from "../shared/new-notification-wrap.jsx";
 import StatRow from "../shared/stat-row.jsx";
 import {SearchField} from "../shared/search-field.jsx";
 import {useAppContext} from "../../context/ui-context";
+import {PinResource} from "../shared/pin-resource.jsx";
 
 
 const INVENTORY_SEARCH_SCOPES = [{
@@ -348,7 +349,7 @@ export const Inventory = ({}) => {
 
     const onTogglePinned = (id, flag) => {
         console.log('toggle-pinned: ', id, flag);
-        sendData('set-inventory-pinned', { id, flag });
+        sendData('set-resource-pinned', { id, flag });
     }
 
     return (
@@ -598,7 +599,11 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
         <PerfectScrollbar>
             <div className={'blade-inner'}>
                 <div className={'block'}>
-                    <h4>{item.name} (x{formatInt(item.amount)})</h4>
+                    <div className={'inner-heading flex-container flex-row'}>
+                        <h4>{item.name} (x{formatInt(item.amount)})</h4>
+                        <PinResource id={item.id} isPinned={details?.isPinned} />
+                    </div>
+
                     <div className={'description'}>
                         {item.description}
                     </div>

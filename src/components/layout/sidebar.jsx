@@ -10,6 +10,7 @@ import {RawResource} from "../shared/raw-resource.jsx";
 import {PersonageCircle} from "./personage-circle.jsx";
 import {BankedTimeWrap} from "./banked-time-wrap.jsx";
 import {useAppContext} from "../../context/ui-context";
+import {ActiveActions} from "../shared/active-actions.jsx";
 
 export const Sidebar = () => {
 
@@ -47,6 +48,7 @@ export const Sidebar = () => {
                 </div>
             </div>
             <div className={'lower'}>
+                <ActiveActions />
                 <RandomEventSnippet/>
                 <div className={'effects-list'}>
                     <ActiveEffects/>
@@ -104,7 +106,7 @@ export const ResourcesBar = () => {
                     <RawResource name={res.name} id={res.id} />
                 </div>
                 <TippyWrapper content={<div className={'hint-popup'}><BreakDown category={'cap'} breakDown={res.storageBreakdown}/>{res.eta >= 0 ? `${secondsToString(res.eta)} to full` : `${secondsToString(-res.eta)} to empty`}</div> }>
-                    <span className={`resource-amount ${res.hasCap && res.isCapped ? 'capped' : ''}`}>{formatValue(res.amount || 0)}{res.hasCap ? ` / ${formatValue(res.cap || 0)}` : ''}</span>
+                    <span className={`resource-amount ${res.hasCap && res.isCapped ? 'capped' : ''}`}>{formatValue(res.amount || 0)}{res.hasCap || res.isService ? ` / ${formatValue(res.isService ? (res.total || 0) : (res.cap || 0))}` : ''}</span>
                 </TippyWrapper>
                 <TippyWrapper content={<div className={'hint-popup'}><BreakDown breakDown={res.breakDown}/></div> }>
                     <span className={`resource-balance ${res.isNegative ? 'red' : ''} ${res.isPositive ? 'green' : ''}`}>{formatValue(res.balance || 0)}</span>

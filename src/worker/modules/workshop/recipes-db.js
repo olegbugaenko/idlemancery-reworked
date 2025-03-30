@@ -521,7 +521,7 @@ export const registerCraftingRecipes = () => {
                     }
                 }
             }),
-            consumption: {
+            get_consumption: ()=>({
                 resources: {
                     'inventory_iron_plate': {
                         A: 1.5,
@@ -540,7 +540,7 @@ export const registerCraftingRecipes = () => {
                         ignoreEfficiency: true,
                     },
                 }
-            },
+            }),
             effectDeps: ['crafting_efficiency', 'crafting_materials_discount']
         },
         unlockCondition: () => {

@@ -8,8 +8,8 @@ import {TippyWrapper} from "./tippy-wrapper.jsx";
 const customStyles = {
     control: (provided, state) => ({
         ...provided,
-        minHeight: '22px', // Зменшуємо мінімальну висоту
-        height: '22px',
+        minHeight: '24px', // Зменшуємо мінімальну висоту
+        height: '24px',
         padding: '0', // Видаляємо паддінги
         borderRadius: '1px', // Можливо, зменшимо border-radius
         fontSize: '13px',
@@ -17,7 +17,7 @@ const customStyles = {
     }),
     valueContainer: (provided, state) => ({
         ...provided,
-        height: '22px',
+        height: '24px',
         padding: '0 6px', // Зменшуємо горизонтальні відступи
         fontsize: '13px'
     }),
@@ -52,7 +52,7 @@ const customStyles = {
     multiValue: (provided, state) => ({
         ...provided,
         background: '#112',
-        padding: '1px',
+        padding: '0px',
         borderRadius: '2px',
         marginTop: '-1px'
     }),
@@ -239,7 +239,7 @@ const RulesList = React.memo(
 
         onMessage(`all-resources-${prefix}`, (payload) => {
             setResources(payload);
-            console.log('RecRes: ', payload);
+            // console.log('RecRes: ', payload);
         })
 
         onMessage(`all-actions-${prefix}`, (payload) => {

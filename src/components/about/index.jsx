@@ -6,6 +6,15 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+                <h3>Idle Awakening v0.1.3</h3>
+                <div className={'features'}>
+                    <p>Significant layout re-work</p>
+                    <p>Changed the way how global mage XP is calculated</p>
+                    <p>Minor early game balance adjustments</p>
+                    <p>Upcoming unlocks are now shown</p>
+                    <p>Skills setup's now can be saved to drafts and re-used/shared to other players via import/export feature</p>
+                    <p>Resources like gathering/crafting/alchemy effort now can be pinned to left sidebar</p>
+                </div>
                 <h3>Idle Awakening v0.1.2e</h3>
                 <div className={'features'}>
                     <p>Minor layout change and UI fixes</p>

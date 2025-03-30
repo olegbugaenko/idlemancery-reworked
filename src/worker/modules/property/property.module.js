@@ -5,6 +5,7 @@ import {registerAccessoriesStage1} from "./accessories-db";
 import {SMALL_NUMBER} from "game-framework/src/utils/consts";
 import {cloneDeep} from "lodash";
 import {registerAmplifiersStage1} from "./amplifiers-db";
+import {charismaMod} from "../items/shop-db";
 
 const DEFAULT_PROPERTY_FILTERS = {
     'all': {
@@ -171,6 +172,10 @@ export class PropertyModule extends GameModule {
                 hideMaxed: this.hideMaxed[payload.filterId] || false,
                 selectedFilterId: this.selectedFilterId[payload.filterId],
             })
+        })
+
+        this.eventHandler.registerHandler('query-general-property-stats', (payload) => {
+            this.sendGeneralPropetyStats(payload);
         })
 
         this.eventHandler.registerHandler('save-property-custom-filter', (payload) => {
@@ -577,7 +582,7 @@ export class PropertyModule extends GameModule {
             }
 
         }
-        console.log('CustomFilters: ', this.customFilters);
+        // console.log('CustomFilters: ', this.customFilters);
         for(const key in this.customFilters) {
             this.generateAllFiltersCache(key);
         }
@@ -719,6 +724,7 @@ export class PropertyModule extends GameModule {
                 isLeveled: this.leveledId === entity.id,
                 isCapped: entity.isCapped,
                 isAutoPurchase: this.autoPurchase[entity.id] ?? false,
+                spaceUsage: gameEntity.getEffects(entity.id, 1).find(one => one.id === 'living_space')?.value / Math.max(1, spaceRes.consumption)
             })),
             propertyCategories: Object.values(perCats).filter(cat => cat.items.length > 0).sort((a, b) => a.sortIndex - b.sortIndex),
             space: {
@@ -824,6 +830,45 @@ export class PropertyModule extends GameModule {
     sendAllFurnitureEffects(payload) {
         const data = this.getAllFurnitureEffects(payload.filterId);
         let label = 'all-property-effects';
+        if(payload?.prefix) {
+            label = `${label}-${payload?.prefix}`
+        }
+        this.eventHandler.sendData(label, data);
+    }
+
+    getGeneraPropertyStatsData() {
+
+        const shopStats = [];
+        if(Math.abs(gameEffects.getEffectValue('prices_discount') - 1) > SMALL_NUMBER) {
+            shopStats.push({...gameEffects.getEffect('prices_discount'), isMultiplier: true});
+        }
+        if(Math.abs(charismaMod(gameEffects.getEffectValue('attribute_charisma')) - 1) > SMALL_NUMBER) {
+            shopStats.push({
+                name: 'Charisma Price Discount',
+                description: 'Upgrades and items purchase discount based on your charisma attribute (1./(1 + 0.02*log2(charisma)^2))',
+                value: charismaMod(gameEffects.getEffectValue('attribute_charisma'))
+            })
+        }
+
+        const stats = {
+            'property': [
+                ...shopStats,
+            ].filter(one => !one.isMultiplier || Math.abs(one.value - 1) > SMALL_NUMBER),
+            'accessories': [],
+            'amplifiers': [
+                /*{...gameEffects.getEffect('restoration_spells_efficiency'), isMultiplier: true},
+                {...gameEffects.getEffect('recovery_spells_efficiency'), isMultiplier: true},
+                {...gameEffects.getEffect('illusion_spells_efficiency'), isMultiplier: true},
+                {...gameEffects.getEffect('conjuration_spells_efficiency'), isMultiplier: true},
+                {...gameEffects.getEffect('elemental_spells_efficiency'), isMultiplier: true},*/
+            ].filter(one => !one.isMultiplier || Math.abs(one.value - 1) > SMALL_NUMBER)
+        }
+        return stats;
+    }
+
+    sendGeneralPropetyStats(payload) {
+        const data = this.getGeneraPropertyStatsData();
+        let label = 'general-property-stats';
         if(payload?.prefix) {
             label = `${label}-${payload?.prefix}`
         }

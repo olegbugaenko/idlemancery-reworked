@@ -7,7 +7,7 @@ export class MonitoringModule extends GameModule {
         super();
 
         this.eventHandler.registerHandler('set-monitored', ({ scope, type, id}) => {
-            console.log('set-monitored: ', scope, type, id);
+            // console.log('set-monitored: ', scope, type, id);
             if(scope === 'actions') {
                 gameCore.getModule('actions').setMonitored({ type, id });
             }

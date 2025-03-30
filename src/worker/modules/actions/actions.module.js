@@ -64,6 +64,11 @@ export class ActionsModule extends GameModule {
         this.customFilters = cloneDeep(DEFAULT_FILTERS);
         this.customFiltersOrder = Object.keys(this.customFilters);
 
+        this.eventHandler.registerHandler('query-actions-running', payload => {
+            const rn = this.getRunningActionsInfo();
+            this.eventHandler.sendData('actions-running', rn);
+        })
+
         this.eventHandler.registerHandler('actions-change-custom-filters-order', payload => {
             //payload.sortIndex, payload.destinationIndex. Reorder this.customFiltersOrder
             const { sourceIndex, destinationIndex } = payload;
@@ -536,7 +541,7 @@ export class ActionsModule extends GameModule {
                     }
                 }
                 // console.log('Attempt to level up: ', act.originalId, this.actions, this.getActionXPMax(act.originalId))
-                gameResources.addResource('mage-xp', dxp);
+                gameResources.addResource('mage-xp', delta * this.getPlayerXPFromAction(act.originalId));
                 if(this.actions[act.originalId].xp >= this.getActionXPMax(act.originalId)) {
                     this.actions[act.originalId].level++;
                     this.actions[act.originalId].xp = 0;
@@ -781,7 +786,7 @@ export class ActionsModule extends GameModule {
             };
         }
 
-        const total = (gameEffects.getEffectValue('plain_learn_rate') + baseXPRate * primaryEffect * gameEffects.getEffectValue('learning_rate')*focusBonus) * eff*effortMult;
+        const total = (gameEffects.getEffectValue('plain_learn_rate') + baseXPRate * primaryEffect * gameEffects.getEffectValue('learning_rate')*focusBonus) * eff*effortMult*intensityEffect;
 
         if(bGetBreakdowns) {
             console.log('EffMult: ', id, baseXPRate, primaryEffect, eff, gameEffects.getEffectValue('learning_rate'), focusBonus, effortMult, total);
@@ -795,6 +800,40 @@ export class ActionsModule extends GameModule {
         }
 
         return total;
+    }
+
+    getPlayerXPFromAction(id) {
+        const entEff = gameEntity.getEntityEfficiency(id);
+        let focusBonus = 1.;
+        let effortMult = 1.;
+        let breakDowns = {};
+        if(gameEffects.getEffectValue('plain_learn_rate')) {
+            breakDowns['raw'] = {
+                title: 'Plain Learn Bonus',
+                value: gameEffects.getEffectValue('plain_learn_rate'),
+                isPlain: true,
+            }
+        }
+        const isRunning = this.isRunningAction(id);
+        if(!isRunning) return 0;
+
+        let eff = entEff;
+
+
+        let baseXPRate = 1.;
+
+
+        const total = (baseXPRate * gameEffects.getEffectValue('learning_rate')) * eff*isRunning.effort;
+
+        return total;
+    }
+
+    getTotalPlayerXPGains() {
+        return gameEntity.listEntitiesByTags(['runningActions']).map(ent => ({
+            id: ent.id,
+            name: ent.name,
+            dxp: this.getPlayerXPFromAction(ent.id)
+        }))
     }
 
     isRunningAction(id) {
@@ -880,6 +919,18 @@ export class ActionsModule extends GameModule {
         console.log('Running: ', id)
         this.stopRunningActions();
         this.addRunningAction(id, 1);
+    }
+
+    getRunningActionsInfo() {
+        if(this.lists.runningList) {
+            return {
+                title: this.lists.runningList?.name,
+            }
+        }
+
+        return {
+            title: this.activeActions.map(one => gameEntity.getEntity(one.id).name).join(';'),
+        }
     }
 
     getActionsUnlocks(showUnlocked) {

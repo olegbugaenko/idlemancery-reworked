@@ -374,7 +374,7 @@ export const ItemDetails = ({itemId, category, setItemDetails}) => {
                     <div className={'effects'}>
                         {item.currentEffects ?
                             (<ResourceComparison effects1={item.currentEffects} effects2={item.potentialEffects}/>)
-                            : (<EffectsSection effects={item.effects} maxDisplay={10}/>)
+                            : (<EffectsSection effects={item.effects} maxDisplay={10} isShowBalance={true}/>)
                         }
                     </div>
                 </div>

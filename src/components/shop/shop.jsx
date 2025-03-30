@@ -347,6 +347,8 @@ export const ItemCard = ({ id, name, level, max, affordable, isLeveled, isCapped
 
                 <button
                     disabled={!affordable.isAffordable || isCapped}
+                    className={`purchase-button ${isCapped ? 'capped' : ''}`}
+                    style={{ '--progress': `${affordable.percentage*100}%` }}
                     onClick={(e) => {e.stopPropagation(); e.preventDefault(); onPurchase(id)}}
                 >Purchase</button>
                 {isAutomationUnlocked && !isCapped ? (<label

@@ -72,14 +72,14 @@ export const Statistics = () => {
                         fmt={(entry) => `${entry.name}: ${secondsToString(entry.value)}`}
                     /></p>
                 </div>) : null}
-                {stats.actionXP ? (<div className={'flex-row stats'}>
+                {/*{stats.actionXP ? (<div className={'flex-row stats'}>
                     <p className={'stat-title'}>Actions XP Earned:</p>
                     <p className={'stat-value'}><MyPieChart
                         key={'xp-earned'}
                         data={stats.actionXP}
                         fmt={(entry) => `${entry.name}: ${formatValue(entry.value)}`}
                     /></p>
-                </div>) : null}
+                </div>) : null}*/}
             </div>
         </PerfectScrollbar>
     </div> )

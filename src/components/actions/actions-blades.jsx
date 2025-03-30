@@ -408,6 +408,8 @@ export const GeneralStats = ({ stats, aspects, setDetailVisible }) => {
     const {isMobile} = useAppContext();
 
     const [isIntensityHidden, setIntensityHidden] = useUICache('actions_intensity_hidden', false)
+    const [isLearningRatesHidden, setLearningRatesHidden] = useUICache('learning_rates_hidden', false)
+    const [isDiscountsHidden, setDiscountsHidden] = useUICache('discounts_hidden', false)
 
     const setAspectLevel = (id, level) => {
         sendData('set-action-aspect-level', { id, level });
@@ -470,20 +472,36 @@ export const GeneralStats = ({ stats, aspects, setDetailVisible }) => {
             </div>) : null}
         </div> ) : null}
         <div className={'block'}>
-            <p>Learn Speed Multipliers:</p>
-            <div className={'effects'}>
-                {Object.values(stats?.learnMults || {}).filter(one => hasEffect(one)).map(one => (
-                    <StatRow onHover={highLightAffectedActions} stat={{...one, isMultiplier: true}} />
-                ))}
+            <div className={'block-heading flex-container flex-row'}>
+                <p>Learn Speed Multipliers:</p>
+                <div className={`interface-icon icon-content small ${!isLearningRatesHidden ? ' reverted' : ''}`} onClick={() => setLearningRatesHidden(!isLearningRatesHidden)}>
+                    <img src={"icons/interface/toggle_hidden.png"} />
+                </div>
             </div>
+
+            {!isLearningRatesHidden ? (<div className={'learning-block'}>
+                <div className={'effects'}>
+                    {Object.values(stats?.learnMults || {}).filter(one => hasEffect(one)).map(one => (
+                        <StatRow onHover={highLightAffectedActions} stat={{...one, isMultiplier: true}} />
+                    ))}
+                </div>
+            </div>) : null}
         </div>
         {Object.values(stats?.xpDiscounts || {}).filter(one => hasEffect(one)).length ? (<div className={'block'}>
-            <p>Learn XP Discounts:</p>
-            <div className={'effects'}>
-                {Object.values(stats?.xpDiscounts || {}).filter(one => hasEffect(one)).map(one => (
-                    <StatRow onHover={highLightDiscountedActions} stat={{...one, isMultiplier: true}}/>
-                ))}
+            <div className={'block-heading flex-container flex-row'}>
+                <p>Learn XP Discounts:</p>
+                <div className={`interface-icon icon-content small ${!isDiscountsHidden ? ' reverted' : ''}`} onClick={() => setDiscountsHidden(!isDiscountsHidden)}>
+                    <img src={"icons/interface/toggle_hidden.png"} />
+                </div>
             </div>
+
+            {!isDiscountsHidden ? (<div className={'learning-block'}>
+                <div className={'effects'}>
+                    {Object.values(stats?.xpDiscounts || {}).filter(one => hasEffect(one)).map(one => (
+                        <StatRow onHover={highLightDiscountedActions} stat={{...one, isMultiplier: true}}/>
+                    ))}
+                </div>
+            </div>) : null}
         </div>) : null}
         {isMobile ? (<div className={'block'}>
             <button onClick={() => setDetailVisible(false)}>Close</button>

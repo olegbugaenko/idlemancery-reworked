@@ -104,8 +104,13 @@ export class MainModule extends GameModule {
         })
 
         this.eventHandler.registerHandler('get-save-string', ({ type }) => {
+
+            function toBase64Unicode(str) {
+                return btoa(unescape(encodeURIComponent(str)));
+            }
+
             const saveObj = gameCore.save();
-            this.eventHandler.sendData('saved-string', { string: JSON.stringify(saveObj), type });
+            this.eventHandler.sendData('saved-string', { string: toBase64Unicode(JSON.stringify(saveObj)), type });
         })
 
         MainModule.instance = this;

@@ -2,6 +2,10 @@ import React, { useContext, useState } from "react";
 import WorkerContext from "../../context/worker-context";
 import { useWorkerClient } from "../../general/client";
 
+function fromBase64Unicode(str) {
+    return decodeURIComponent(escape(atob(str)));
+}
+
 export const SaveSettings = () => {
     const worker = useContext(WorkerContext);
     const { onMessage, sendData } = useWorkerClient(worker);
@@ -22,7 +26,23 @@ export const SaveSettings = () => {
     };
 
     const importSaveText = () => {
-        sendData("load-game", importString);
+        let parsed;
+        try {
+            // Спроба розкодувати з base64
+            const decoded = fromBase64Unicode(importString);
+            parsed = JSON.parse(decoded);
+            console.log("Decoded from base64");
+        } catch (err) {
+            try {
+                // Якщо не вдалось, пробуємо старий формат
+                parsed = JSON.parse(importString);
+                console.log("Used plain JSON");
+            } catch (err2) {
+                console.error("Invalid save text format");
+                return;
+            }
+        }
+        sendData("load-game", parsed);
     };
 
     const importSaveFile = (event) => {
@@ -32,7 +52,23 @@ export const SaveSettings = () => {
             reader.onload = (e) => {
                 const importedData = e.target.result;
                 console.log("IMPORTING: ", importedData);
-                sendData("load-game", JSON.parse(importedData));
+                let parsed;
+                try {
+                    // Спроба розкодувати з base64
+                    const decoded = fromBase64Unicode(importedData);
+                    parsed = JSON.parse(decoded);
+                    console.log("Decoded from base64");
+                } catch (err) {
+                    try {
+                        // Якщо не вдалось, пробуємо старий формат
+                        parsed = JSON.parse(importedData);
+                        console.log("Used plain JSON");
+                    } catch (err2) {
+                        console.error("Invalid save file format");
+                        return;
+                    }
+                }
+                sendData("load-game", parsed);
             };
             reader.readAsText(file);
         }

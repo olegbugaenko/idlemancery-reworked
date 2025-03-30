@@ -29,7 +29,7 @@ export const SecondaryMenu = () => {
                     </span>
                 </li>
                 <li className={openedTab === 'about' ? 'active' : ''} onClick={() => setOpenedTab('about')}>
-                    <span>v0.1.2e</span>
+                    <span>v0.1.3</span>
                 </li>
             </ul>
         </div>

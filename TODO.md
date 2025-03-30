@@ -152,8 +152,11 @@ TODO's:
 28. [V] Show balance trees on crafting/alchemy pages
 
 
-v0.1.4
+v0.1.3
 1. [V] Test and doublecheck skills exports & drafts
 2. [V] Generate icons
-3. Check if hotkeys are working
-4. Implement v2 of saves (using encoding)
+3. [V] Check if hotkeys are working
+4. [V] Implement v2 of saves (using encoding) !!! Motherfucker, it's important!!!
+5. [V] Toggle shown/hidden for learn multipliers and discounts
+6. Implement custom prompt for saving Draft
+7. [V] DO add "running action" block to sidebar

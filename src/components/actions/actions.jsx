@@ -650,7 +650,7 @@ export const DetailBlade = ({
     return (<GeneralStats stats={stats} aspects={aspects} setDetailVisible={setDetailVisible}/>);
 }
 
-export const ActionCard = ({ id, category, monitored, entityEfficiency, isEditingList, index, name, level, max, xp, maxXP, xpRate, isActive, isLeveled, focused, isTraining, actionEffect, currentEffects, potentialEffects, isHidden, onFlash, onSelect, onActivate, onShowDetails, toggleHiddenAction, missingResourceId, isSelected, ...props}) => {
+export const ActionCard = ({ id, category, monitored, entityEfficiency, isEditingList, index, name, level, max, xp, maxXP, xpRate, isActive, effort, isLeveled, focused, isTraining, actionEffect, currentEffects, potentialEffects, isHidden, onFlash, onSelect, onActivate, onShowDetails, toggleHiddenAction, missingResourceId, isSelected, ...props}) => {
     const elementRef = useRef(null);
 
     const { stepIndex, unlockNextById, jumpOver } = useTutorial();
@@ -775,6 +775,11 @@ export const ActionCard = ({ id, category, monitored, entityEfficiency, isEditin
                             ) : null}
                         </div>
                     </div>
+                    {isActive ? (<div className={'bottom-bar'}>
+                        <div className={'progress-bg'}>
+                            <div className={'progress-bar'} style={{width: `${100 * isActive.effort}%`}}></div>
+                        </div>
+                    </div>) : null}
                 </div>
                 )}
         </Draggable>

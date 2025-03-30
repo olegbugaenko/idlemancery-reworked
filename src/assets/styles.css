@@ -192,6 +192,12 @@ p.small-hint, span.small-hint {
     position: relative;
 }
 
+.content-wrap .sidebar .resource-item .name-wrap {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .content-wrap .sidebar .holder:hover {
     background-color: #222222;
 }
@@ -242,6 +248,7 @@ p.small-hint, span.small-hint {
 
 .content-wrap .sidebar .resource-item .resource-amount {
     width: 120px;
+    padding-left: 4px;
 }
 
 .content-wrap .sidebar .resource-item .resource-amount.capped {
@@ -250,6 +257,7 @@ p.small-hint, span.small-hint {
 
 .content-wrap .sidebar .resource-item .resource-balance {
     width: 60px;
+    padding-left: 4px;
 }
 
 .content-wrap .sidebar .resource-item .resource-balance.red {
@@ -344,6 +352,35 @@ p.small-hint, span.small-hint {
     margin: 8px;
     background: var(--darkbg);
     transition: box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.card .bottom-bar {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    height: 3px;
+    width: 100%;
+}
+
+.card .bottom-bar .progress-bg {
+    background-color: #333;
+}
+
+.card.active .bottom-bar .progress-bar {
+    background-color: var(--active-highlight);
+    height: 4px;
+}
+
+.card.active.efficiency-dropped .bottom-bar .progress-bar {
+    background-color: var(--yellow);
+    height: 4px;
+}
+
+.card .bottom-bar.property .progress-bar {
+    background-color: #aaaabb;
+    height: 4px;
 }
 
 .card.physical {
@@ -795,6 +832,10 @@ h4 {
 
 .effects-table.comparison .effect-line .title {
     width: 120px;
+}
+
+.effect-line .secondary-value {
+    font-size: 13px;
 }
 
 .res-cost {
@@ -1343,6 +1384,10 @@ h4 {
 .sidebar .effects-list {
     position: absolute;
     bottom: 12px;
+}
+
+.sidebar .active-actions-wrap {
+    padding: 4px 0;
 }
 
 .custom-file-upload {
@@ -2122,6 +2167,8 @@ span.highlighted-span.yellow {
 .actions-wrap .additional-filters {
     display: flex;
     align-items: center;
+    flex-grow: 1;
+    justify-content: space-between;
 }
 
 .actions-wrap .additional-filters > label {
@@ -2420,6 +2467,10 @@ span.highlighted-span.yellow {
 .resource-wrap {
     display: flex;
     align-items: center;
+}
+
+.resource-wrap.fixed-width-sidebar {
+    width: 120px;
 }
 
 .resource-wrap .icon-wrap {
@@ -2786,6 +2837,33 @@ ul.menu li.additional.add-custom-filter:hover span {
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+
+.purchase-button {
+    position: relative;
+    overflow: hidden;
+    z-index: 0;
+}
+
+.purchase-button::before {
+
+}
+
+.purchase-button:disabled::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: calc(100% - 1px);
+    width: var(--progress);
+    background: rgba(10, 10, 20, 0.5); /* або інший колір */
+    z-index: -1;
+    transition: width 0.3s ease;
+    border-bottom: 1px solid #fff;
+}
+
+.purchase-button.capped:disabled::before {
+    border-bottom: 1px solid #333;
 }
 
 

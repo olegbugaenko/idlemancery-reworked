@@ -429,6 +429,9 @@ export const GeneralStats = ({ setDetailVisible }) => {
                     <div className={'costs-wrap'}>
                         {Object.values(data.mapGeneration.affordable.affordabilities || {}).map(aff => <ResourceCost key={aff.id ?? aff.name} affordabilities={aff}/>)}
                     </div>
+                    <div className={'efforts'}>
+                        <p>Gathering Effort: {formatValue(data.mapGeneration.explorationBoundaries.min)} - {formatValue(data.mapGeneration.explorationBoundaries.max)}</p>
+                    </div>
                     <div className={'buttons'}>
                         <button disabled={!data.mapGeneration.affordable.isAffordable} onClick={purchaseMap}>Generate Map</button>
                     </div>

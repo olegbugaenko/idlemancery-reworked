@@ -57,7 +57,10 @@ export const registerAttributes = () => {
         defaultValue: 1,
         hasCap: false,
         saveBalanceTree: true,
-        tags: ['attribute', 'mental']
+        tags: ['attribute', 'mental'],
+        unlockCondition: () => {
+            return gameEntity.isEntityUnlocked('action_yoga_practices')
+        }
     })
 
     gameEffects.registerEffect('attribute_recovery', {
@@ -66,7 +69,8 @@ export const registerAttributes = () => {
         minValue: 1,
         defaultValue: 1,
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_anatomy_book') > 0 || gameEntity.getLevel('action_endurance_training') > 0
+            // console.log('ACTLVL: ', )
+            return gameEntity.getLevel('action_pushup') > 1
         },
         hasCap: false,
         saveBalanceTree: true,

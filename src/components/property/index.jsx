@@ -12,6 +12,8 @@ import {NewNotificationWrap} from "../shared/new-notification-wrap.jsx";
 import {useUICache} from "../../general/hooks/local-cache";
 import {AmplifiersUpgrades} from "./amplifiers.jsx";
 import {useAppContext} from "../../context/ui-context";
+import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
+import StatRow from "../shared/stat-row.jsx";
 
 export const Property = ({}) => {
     const [detailOpened, setDetailOpened] = useState(null)
@@ -109,7 +111,7 @@ export const Property = ({}) => {
             </div>
 
             {(!isMobile || detailOpened) ? (<div className={'item-detail ingame-box detail-blade'}>
-                {detailOpened ? (<ItemDetails itemId={detailOpened} category={selectedTab} setItemDetails={setItemDetails} purchaseItem={purchaseItem}/>) : null}
+                {detailOpened ? (<ItemDetails itemId={detailOpened} category={selectedTab} setItemDetails={setItemDetails} purchaseItem={purchaseItem}/>) : (<GeneralStats setDetailVisible={setDetailOpened} />)}
             </div>) : null}
         </div>
 
@@ -122,16 +124,16 @@ export const ItemDetails = ({itemId, category, setItemDetails, purchaseItem}) =>
 
     const worker = useContext(WorkerContext);
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const {onMessage, sendData} = useWorkerClient(worker);
 
     const [item, setDetailOpened] = useState(null);
 
-    const { isMobile } = useAppContext();
+    const {isMobile} = useAppContext();
 
     useEffect(() => {
-        if(category === 'furniture' || category === 'accessory' || category === 'amplifier') {
+        if (category === 'furniture' || category === 'accessory' || category === 'amplifier') {
             const interval = setInterval(() => {
-                sendData('query-furniture-details', { id: itemId });
+                sendData('query-furniture-details', {id: itemId});
             }, 100);
 
             return () => {
@@ -146,7 +148,7 @@ export const ItemDetails = ({itemId, category, setItemDetails, purchaseItem}) =>
         setDetailOpened(items);
     })
 
-    if(!itemId || !item) return null;
+    if (!itemId || !item) return null;
 
 
     return (
@@ -160,21 +162,22 @@ export const ItemDetails = ({itemId, category, setItemDetails, purchaseItem}) =>
                 </div>
                 <div className={'block'}>
                     <div className={'tags-container'}>
-                        {item.tags.map(tag => (<div key={tag} className={'tag'}>{tag}</div> ))}
+                        {item.tags.map(tag => (<div key={tag} className={'tag'}>{tag}</div>))}
                     </div>
                 </div>
                 <div className={'block'}>
                     <p>Cost:</p>
                     <div className={'costs-wrap'}>
-                        {Object.values(item.affordable.affordabilities || {}).map(aff => <ResourceCost key={aff.id ?? aff.name} affordabilities={aff}/>)}
+                        {Object.values(item.affordable.affordabilities || {}).map(aff => <ResourceCost
+                            key={aff.id ?? aff.name} affordabilities={aff}/>)}
                     </div>
                 </div>
                 <div className={'block'}>
                     <p>Effects:</p>
                     <div className={'effects'}>
                         {item.currentEffects ?
-                            (<ResourceComparison effects1={item.currentEffects} effects2={item.potentialEffects} /> )
-                            : (<EffectsSection effects={item.potentialEffects} />)
+                            (<ResourceComparison effects1={item.currentEffects} effects2={item.potentialEffects}/>)
+                            : (<EffectsSection effects={item.potentialEffects}/>)
                         }
                     </div>
                 </div>
@@ -190,8 +193,92 @@ export const ItemDetails = ({itemId, category, setItemDetails, purchaseItem}) =>
                     >
                         Close
                     </button>
-                </div> ) : null}
+                </div>) : null}
             </div>
         </PerfectScrollbar>
     )
+}
+
+
+export const GeneralStats = ({ setDetailVisible }) => {
+
+        const worker = useContext(WorkerContext);
+
+        const {isMobile} = useAppContext();
+
+        const {onMessage, sendData} = useWorkerClient(worker);
+
+        const [item, setDetailOpened] = useState(null);
+
+        useEffect(() => {
+            sendData('query-general-property-stats', {});
+            const interval = setInterval(() => {
+                sendData('query-general-property-stats', {});
+            }, 1000);
+
+            return () => {
+                clearInterval(interval);
+            }
+
+        }, [])
+
+
+        onMessage('general-property-stats', (items) => {
+            setDetailOpened(items);
+        })
+
+        const highLightMagicSchools = (id) => {
+            //sendData('set-monitored', { scope: 'spells', type: 'school_efficiency', id });
+        }
+
+        if (!item) return null;
+
+
+        return (
+            <PerfectScrollbar>
+                <div className={'blade-inner'}>
+                    {item.property.length ? (<>
+                        <div className={'block'}>
+                            <h4>Property Stats</h4>
+                        </div>
+                        <div className={'block'}>
+                            {item.property.map(stat => (<div className={'row flex-row'}>
+                                <TippyWrapper content={<div className={'hint-popup'}><p>{stat.description}</p></div>}>
+                                    <p>{stat.name}</p>
+                                </TippyWrapper>
+                                <p>{formatValue(stat.value)}</p>
+                            </div>))}
+                        </div>
+                    </>) : null}
+                    {item.accessories?.length ? (<>
+                        <div className={'block'}>
+                            <h4>Accessories</h4>
+                        </div>
+                        <div className={'block'}>
+                            {item.accessories.map(stat => (
+                                <StatRow onHover={highLightMagicSchools} stat={stat}/>
+                            ))}
+                        </div>
+                    </>) : null}
+                    {item.amplifiers?.length ? (<>
+                        <div className={'block'}>
+                            <h4>Amplifiers</h4>
+                        </div>
+                        <div className={'block'}>
+                            {item.amplifiers.map(stat => (
+                                <StatRow onHover={highLightMagicSchools} stat={stat}/>
+                            ))}
+                        </div>
+                    </>) : null}
+                    <div className={'block'}>
+                        <p className={'hint'}>
+                            Hover over specific item to see it details
+                        </p>
+                    </div>
+                    {isMobile ? (<div className={'block buttons'}>
+                        <button onClick={() => setDetailVisible(false)}>Close</button>
+                    </div>) : null}
+                </div>
+            </PerfectScrollbar>
+        )
 }

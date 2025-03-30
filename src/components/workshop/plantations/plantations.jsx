@@ -53,6 +53,10 @@ export const Plantations = ({ setItemDetails, newUnlocks }) => {
         sendData(`set-plantation-watering`, { id, level })
     })
 
+    const toggleAutopurchase = useCallback((id, flag) => {
+        sendData('set-plantation-autopurchase', { id, flag })
+    })
+
     return (<div className={'crafting-wrap'}>
         <div className={'head'}>
             <div className={'space-item'}>
@@ -74,7 +78,7 @@ export const Plantations = ({ setItemDetails, newUnlocks }) => {
             <PerfectScrollbar>
                 <div className={'flex-container'}>
                     {plantationsData.available.map(plantable => <NewNotificationWrap id={`plantation_${plantable.id}`} className={'narrow-wrapper'} isNew={newUnlocks?.all?.items?.[`plantation_${plantable.id}`]?.hasNew}>
-                        <ItemCard key={plantable.id} {...plantable} onPurchase={purchaseItem} onShowDetails={setItemDetails} onDemolish={onDemolish} isWateringUnlocked={plantationsData.isWateringUnlocked} setWateringLevel={setWateringLevel} isMobile={isMobile}/>
+                        <ItemCard key={plantable.id} {...plantable} onPurchase={purchaseItem} onShowDetails={setItemDetails} onDemolish={onDemolish} isWateringUnlocked={plantationsData.isWateringUnlocked} setWateringLevel={setWateringLevel} isMobile={isMobile} toggleAutopurchase={toggleAutopurchase} isAutomationUnlocked={plantationsData.isAutomationUnlocked}/>
                     </NewNotificationWrap>)}
                 </div>
             </PerfectScrollbar>
@@ -82,7 +86,7 @@ export const Plantations = ({ setItemDetails, newUnlocks }) => {
     </div>)
 }
 
-export const ItemCard = ({ id, icon_id, resourceAmount, resourceBalance, breakDown, name, level, maxLevel, affordable, onPurchase, onDemolish, onShowDetails, wateringLevel, isWateringUnlocked, setWateringLevel, isMobile}) => {
+export const ItemCard = ({ id, icon_id, resourceAmount, resourceBalance, breakDown, name, level, maxLevel, affordable, isAutoPurchase, onPurchase, onDemolish, onShowDetails, wateringLevel, isWateringUnlocked, setWateringLevel, toggleAutopurchase, isAutomationUnlocked, isMobile}) => {
 
     return (<div
         className={`card craftable plantable`}
@@ -112,11 +116,26 @@ export const ItemCard = ({ id, icon_id, resourceAmount, resourceBalance, breakDo
                 </div> ) : null}
                 <div className={'bottom'}>
                     <div className={'buttons'}>
-                        <button disabled={!affordable.isAffordable} onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            onPurchase(id)
-                        }}>{level > 0 ? 'Upgrade' : 'Purchase'}</button>
+                        <button
+                            disabled={!affordable.isAffordable}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                onPurchase(id)
+                            }}
+                            className={'purchase-button'}
+                            style={{ '--progress': `${affordable.percentage*100}%` }}
+                        >{level > 0 ? 'Upgrade' : 'Purchase'}</button>
+                        {isAutomationUnlocked ? (<label
+                            className={'autobuy-label'}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                            }}
+                        >
+                            <input type={'checkbox'} checked={isAutoPurchase}
+                                   onChange={(e) => {e.stopPropagation(); e.preventDefault(); toggleAutopurchase(id, !isAutoPurchase)}}/>
+                            Autobuy
+                        </label>) : null}
                         <button disabled={level <= 0} onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();

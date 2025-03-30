@@ -423,7 +423,7 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
                     <div className={'block'}>
                         <p>Spell duration: {formatInt(item.duration)}</p>
                         <p>Effects during cast:</p>
-                        <EffectsSection effects={item.potentialEffects} maxDisplay={10} />
+                        <EffectsSection effects={item.potentialEffects} maxDisplay={10}/>
                     </div>
                 ): null}
                 {isMobile ? (<div className={'cast-block block'}>

@@ -172,6 +172,8 @@ export class CraftingModule extends GameModule {
         const rrs = filterId === 'crafting' ? gameResources.getResource('crafting_slots') : gameResources.getResource('alchemy_slots')
         const efrs = filterId === 'crafting' ? gameResources.getResource('crafting_ability') : gameResources.getResource('alchemy_ability')
 
+        const eff_key =  filterId === 'crafting' ? 'crafting_ability' : 'alchemy_ability';
+
         const available = entities.map(recipe => ({
             ...recipe,
             icon_id: recipe.resourceId,
@@ -192,7 +194,10 @@ export class CraftingModule extends GameModule {
         return {
             available,
             slots,
-            efforts: efrs,
+            efforts: {
+                ...efrs,
+                isPinned: !!gameCore.getModule('resource-pool').pinnedResources?.[eff_key]
+            },
             craftingLists: this.lists.getLists({ category: filterId })
         }
     }

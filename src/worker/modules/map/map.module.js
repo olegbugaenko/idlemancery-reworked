@@ -1,6 +1,6 @@
 import {GameModule} from "../../shared/game-module";
 import {registerTileTypesDB} from "./tile-db";
-import {gameEffects, gameEntity, gameResources, resourceApi, resourceCalculators} from "game-framework";
+import {gameCore, gameEffects, gameEntity, gameResources, resourceApi, resourceCalculators} from "game-framework";
 import {MapTileListsSubmodule} from "./map-tile-lists.submodule";
 import {SMALL_NUMBER} from "game-framework/src/utils/consts";
 
@@ -17,6 +17,7 @@ export class MapModule extends GameModule {
         this.mapCreationSettings = {
             level: 0,
         }
+        this.mapTier = 0;
         this.relevantMapVersion = 2;
         this.currentMapVersion = null;
 
@@ -111,6 +112,7 @@ export class MapModule extends GameModule {
             }
         }
         this.currentMapVersion = this.relevantMapVersion;
+        this.mapTier = tier;
         this.processTiles();
     }
 
@@ -345,6 +347,7 @@ export class MapModule extends GameModule {
             mapCreationSettings: this.mapCreationSettings,
             currentMapVersion: this.currentMapVersion,
             highlightFilters: this.highlightFilters,
+            mapTier: this.mapTier,
         }
     }
 
@@ -373,6 +376,7 @@ export class MapModule extends GameModule {
         if(obj?.highlightFilters) {
             this.highlightFilters = obj.highlightFilters;
         }
+        this.mapTier = obj?.mapTier;
     }
 
     mapGenerationCost() {
@@ -388,6 +392,18 @@ export class MapModule extends GameModule {
             result.isAffordable = false;
         }
 
+        return result;
+    }
+
+    mapGenerationEffortBounds() {
+        const level = this.mapCreationSettings.level ?? 0;
+        const maxDist = 7*Math.sqrt(2);
+        const maxComplexity = Math.max(1, (maxDist-2) + (1 + 0.75*(level**0.5))*(maxDist-2 + 3*(level**0.5)))*Math.pow(1.3, level)
+        const minComplexity = Math.max(1, (-1 + 0.75*(level**0.5))*(-1 + 3*(level**0.5)))*Math.pow(1.3, level)
+        let result = {
+            min: 0.25 * minComplexity ** 1.75,
+            max: maxComplexity ** 1.75,
+        }
         return result;
     }
 
@@ -480,7 +496,10 @@ export class MapModule extends GameModule {
                     isHighlight: isHighlighted,
                 }
             })),
-            explorationPoints: gameResources.getResource('gathering_effort'),
+            explorationPoints: {
+                ...gameResources.getResource('gathering_effort'),
+                isPinned: !!gameCore.getModule('resource-pool').pinnedResources?.['gathering_effort']
+            },
             mapLists: this.lists.getLists(),
             highlightFilters: this.highlightFilters,
             filterableLoot,
@@ -493,11 +512,13 @@ export class MapModule extends GameModule {
                 isUnlocked: gameResources.isResourceUnlocked('inventory_map_fragment'),
                 level: this.mapCreationSettings.level,
                 affordable: resourceCalculators.isAffordable(this.mapGenerationCost().consume),
-                maxLevel: gameEffects.getEffectValue('max_map_level')
+                maxLevel: gameEffects.getEffectValue('max_map_level'),
+                explorationBoundaries: this.mapGenerationEffortBounds()
             },
             isProducingGathering: gameResources.getResource('gathering_effort').income > SMALL_NUMBER,
             stats: {
                 effects: [
+                    {id: 'map_level', name: 'Map Level', value: this.mapTier},
                     {...gameEffects.getEffect('gathering_low_chance'), isMultiplier: true},
                     {...gameEffects.getEffect('gathering_herbs_amount'), isMultiplier: true},
                     {...gameResources.getResource('gathering_perception'), isMultiplier: false, value: gameResources.getResource('gathering_perception').amount},
@@ -555,7 +576,7 @@ export class MapModule extends GameModule {
                     }
                     const roll = Math.random();
                     if(roll < 2*drop.probability*ent.effectFactor) {
-                        const amt = Math.round(drop.amountMin + Math.random()*drop.amountMax);
+                        const amt = Math.round(drop.amountMin + Math.random()*(drop.amountMax - drop.amountMin));
                         gameResources.addResource(drop.id, amt);
                         if(!this.mapTiles[ent.attributes.i][ent.attributes.j].r) {
                             this.mapTiles[ent.attributes.i][ent.attributes.j].r = []

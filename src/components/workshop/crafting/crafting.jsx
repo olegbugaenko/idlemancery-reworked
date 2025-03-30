@@ -9,6 +9,7 @@ import {NewNotificationWrap} from "../../shared/new-notification-wrap.jsx";
 import {RawResource} from "../../shared/raw-resource.jsx";
 import {Balances} from "../shared.jsx";
 import {useAppContext} from "../../../context/ui-context";
+import {PinResource} from "../../shared/pin-resource.jsx";
 
 export const Crafting = ({ setItemDetails, setItemLevel, filterId, newUnlocks, openListDetails, addItemToList, isEditList }) => {
 
@@ -26,7 +27,8 @@ export const Crafting = ({ setItemDetails, setItemLevel, filterId, newUnlocks, o
         efforts: {
             consumption: 0,
             balance: 0,
-            breakDown: null
+            breakDown: null,
+            isPinned: false,
         },
         craftingLists: {
             lists: [],
@@ -65,16 +67,20 @@ export const Crafting = ({ setItemDetails, setItemLevel, filterId, newUnlocks, o
                 <RawResource id={'crafting_slots'} name={'Crafting Slots'} />
                 <span className={`slots-amount ${craftingData.slots.total > 0 ? 'slots-available' : 'slots-unavailable'}`}>{formatInt(craftingData.slots.total)}/{formatInt(craftingData.slots.max)}</span>
             </div>
-            <TippyWrapper content={<div className={'hint-popup'}>
-                <p className={'hint'}>Shows the amount of available effort you can use for crafting.</p>
-                <p className={'hint'}>If your crafting effort is insufficient, your crafting efficiency will decrease.</p>
-                <BreakDown breakDown={craftingData.efforts.breakDown} />
-            </div> }>
-                <div className={'space-item'}>
-                    <span>Crafting Efforts:</span>
-                    <span>{formatValue(craftingData.efforts.balance)}/{formatValue(craftingData.efforts.balance + craftingData.efforts.consumption)}</span>
-                </div>
-            </TippyWrapper>
+            <div className={'flex-container'}>
+                <TippyWrapper content={<div className={'hint-popup'}>
+                    <p className={'hint'}>Shows the amount of available effort you can use for crafting.</p>
+                    <p className={'hint'}>If your crafting effort is insufficient, your crafting efficiency will decrease.</p>
+                    <BreakDown breakDown={craftingData.efforts.breakDown} />
+                </div> }>
+                    <div className={'space-item'}>
+                        <span>Crafting Efforts:</span>
+                        <span>{formatValue(craftingData.efforts.balance)}/{formatValue(craftingData.efforts.balance + craftingData.efforts.consumption)}</span>
+                    </div>
+                </TippyWrapper>
+                <PinResource isPinned={craftingData.efforts.isPinned} id={'crafting_ability'} />
+            </div>
+
         </div>
         <div className={'craftables-cat'}>
             <PerfectScrollbar>

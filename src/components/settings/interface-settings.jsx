@@ -68,10 +68,12 @@ export const InterfaceSettings = () => {
     const [hotkeys, setHotkeys] = useState({});
     const [editingTab, setEditingTab] = useState(null); // Tracks the tab being edited
     const [currentCombination, setCurrentCombination] = useState(""); // Tracks the active combination being edited
+    const [settings, setSettings] = useState({});
 
     useEffect(() => {
         sendData("query-unlocks", {});
         sendData("query-all-hotkeys", {});
+        sendData("query-settings", {})
     }, []);
 
     useEffect(() => {
@@ -95,10 +97,18 @@ export const InterfaceSettings = () => {
         setUnlocksData(unlocks);
     });
 
+    onMessage("settings", settings => {
+        console.log('Settings: ', settings);
+        setSettings(settings);
+    })
+
     onMessage("all-hotkeys", (payload) => {
-        console.log('AllHotkeys: ', payload);
         setHotkeys(payload);
     });
+
+    const setSettingChanged = (key, value) => {
+        sendData('set-setting', { key, value });
+    }
 
     const clearAllNotifications = () => {
         sendData("set-all-new-notification-viewed", {});
@@ -141,6 +151,17 @@ export const InterfaceSettings = () => {
                             <button onClick={clearAllNotifications}>
                                 Clear all notifications
                             </button>
+                        </div>
+                    </div>
+                    <div className={"row flex-container"}>
+                        <div className={'col'}>
+                            <p>Notation</p>
+                        </div>
+                        <div className={'col'}>
+                            <select value={settings?.notation} onChange={(e) => setSettingChanged('notation', e.target.value)}>
+                                <option value={''}>Regular</option>
+                                <option value={'scientific'}>Scientific</option>
+                            </select>
                         </div>
                     </div>
                     {/*<div className={"row flex-container"}>

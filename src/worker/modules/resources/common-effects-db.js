@@ -171,7 +171,7 @@ export const registerCommomEffects = () => {
         defaultValue: 1.,
         minValue: 1,
         saveBalanceTree: true,
-        description: 'Increase amount of XP per second obtained by all actions'
+        description: 'Increase amount of XP per second obtained by all actions. Also increase mage XP gains from actions.'
     })
 
     gameEffects.registerEffect('walking_learning_rate', {

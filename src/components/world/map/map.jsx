@@ -6,6 +6,7 @@ import {formatInt, formatValue} from "../../../general/utils/strings";
 import {BreakDown} from "../../layout/sidebar.jsx";
 import {TippyWrapper} from "../../shared/tippy-wrapper.jsx";
 import Select from "react-select";
+import {PinResource} from "../../shared/pin-resource.jsx";
 
 const customStyles = {
     control: (provided, state) => ({
@@ -76,7 +77,8 @@ export const Map = ({ setItemDetails, openListDetails, isEditList }) => {
         explorationPoints: {
             balance: 0,
             consumption: 0,
-            breakDown: {}
+            breakDown: {},
+            isPinned: false,
         },
         mapLists: {
             runningList: null,
@@ -145,16 +147,20 @@ export const Map = ({ setItemDetails, openListDetails, isEditList }) => {
 
     return (<div className={'map-wrap'}>
         <div className={'head'}>
-            <TippyWrapper content={<div className={'hint-popup'}>
-                <p className={'hint'}>Shows the amount of available effort you can use for gathering resources.</p>
-                <p className={'hint'}>If your gathering effort is insufficient, loot chances and quantities will decrease.</p>
-                <BreakDown breakDown={mapData.explorationPoints.breakDown} />
-            </div> }>
-                <div className={'space-item'}>
-                    <span className={'gather-label'}>Gathering Efforts:</span>
-                    <span className={`gather-value ${mapData.explorationPoints.balance > 1.e-7 ? 'green' : 'yellow'}`}>{formatValue(mapData.explorationPoints.balance)}/{formatValue(mapData.explorationPoints.balance + mapData.explorationPoints.consumption)}</span>
-                </div>
-            </TippyWrapper>
+            <div className={'flex-container'}>
+                <TippyWrapper content={<div className={'hint-popup'}>
+                    <p className={'hint'}>Shows the amount of available effort you can use for gathering resources.</p>
+                    <p className={'hint'}>If your gathering effort is insufficient, loot chances and quantities will decrease.</p>
+                    <BreakDown breakDown={mapData.explorationPoints.breakDown} />
+                </div> }>
+                    <div className={'space-item'}>
+                        <span className={'gather-label'}>Gathering Efforts:</span>
+                        <span className={`gather-value ${mapData.explorationPoints.balance > 1.e-7 ? 'green' : 'yellow'}`}>{formatValue(mapData.explorationPoints.balance)}/{formatValue(mapData.explorationPoints.balance + mapData.explorationPoints.consumption)}</span>
+                    </div>
+                </TippyWrapper>
+                <PinResource isPinned={mapData.explorationPoints.isPinned} id={'gathering_effort'} />
+            </div>
+
             {mapData.filterableLoot?.length ? (<div className={'resources-filter'}>
                 <span>Search resources</span>
                 <Select

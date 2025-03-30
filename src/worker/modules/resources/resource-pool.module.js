@@ -10,10 +10,17 @@ export class ResourcePoolModule extends GameModule {
         this.dragonLevel = 0;
         this.dragonPower = 0;
         this.monitoredData = {};
+        this.pinnedResources = {};
+
+        this.eventHandler.registerHandler('set-resource-pinned', (payload) => {
+            this.pinnedResources[payload.id] = payload.flag;
+        })
+
         this.eventHandler.registerHandler('query-resources-data', (pl) => {
             const data = this.getResourcesData(pl).map(one => ({
                 ...one,
-                capProgress: one.hasCap ? one.amount / Math.max(1.e-8, one.cap) : 0,
+                capProgress: one.isService ? Math.min(one.targetEfficiency || 0, 1) : (one.hasCap ? one.amount / Math.max(1.e-8, one.cap) : 0),
+                total: one.isService ? one.balance + one.consumption : one.cap,
             }));
             this.eventHandler.sendData('resources-data', data);
         })
@@ -189,12 +196,12 @@ export class ResourcePoolModule extends GameModule {
 
     save() {
         return {
-
+            pinnedResources: this.pinnedResources,
         }
     }
 
     load(obj) {
-
+        this.pinnedResources = obj?.pinnedResources ?? {};
     }
 
     setMonitored(data) {
@@ -227,8 +234,8 @@ export class ResourcePoolModule extends GameModule {
         const rs = gameResources.listResourcesByTags(['resource', 'population'], true);
         // console.log('RS: ', JSON.stringify(gameResources.getResource('coins')));
         if(pl.includePinned) {
-            const inventory = gameResources.listResourcesByTags(['inventory']);
-            const pinned = inventory.filter(one => gameCore.getModule('inventory').inventoryItems?.[one.id]?.isPinned);
+            const inventory = gameResources.listAllResources(['resource']);
+            const pinned = inventory.filter(one => this.pinnedResources?.[one.id]);
             rs.push(...pinned);
         }
         return rs.filter(one => one.isUnlocked).map(resource => ({

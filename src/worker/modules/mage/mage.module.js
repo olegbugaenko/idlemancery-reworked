@@ -27,6 +27,7 @@ export class MageModule extends GameModule {
         this.skillsUnlock = {}; // Holds as key id of skill and as value array of skills that are unlocked BY this skill
         this.skillDrafts = {};
         this.isViewMode = false;
+        this.settings = {};
         /*
         this.eventHandler.registerHandler('feed-dragon', (data) => {
             this.feedDragon();
@@ -39,6 +40,18 @@ export class MageModule extends GameModule {
          */
 
         this.skillGroupsCached = {};
+
+        this.eventHandler.registerHandler('query-settings', () => {
+            this.eventHandler.sendData('settings', this.settings);
+        })
+
+        this.eventHandler.registerHandler('set-setting', (payload) => {
+            if(!this.settings) {
+                this.settings = {};
+            }
+            this.settings[payload.key] = payload.value;
+            this.eventHandler.sendData('settings', this.settings);
+        })
 
         this.eventHandler.registerHandler('set_tour_finished', ({ skipStep }) => {
             // console.log('TourFinished: ', skipStep);
@@ -560,9 +573,10 @@ export class MageModule extends GameModule {
                 get_rawCap: () => ({
                     resources: {
                         'mage-xp': {
-                            A: 1.3,
+                            A: 50,
                             B: 200,
-                            type: 1,
+                            C: 1.1,
+                            type: 3,
                         },
                         'energy': {
                             A: 1,
@@ -643,10 +657,11 @@ export class MageModule extends GameModule {
             },
             get_cost: () => ({
                 'mage-xp': {
-                    A: 1.3,
+                    A: 50,
                     B: 200,
-                    type: 1,
-                }
+                    C: 1.1,
+                    type: 3,
+                },
             })
         });
 
@@ -762,6 +777,7 @@ export class MageModule extends GameModule {
             },
             tourStatus: this.tourStatus,
             drafts: this.skillDrafts,
+            settings: this.settings
         }
     }
 
@@ -824,6 +840,8 @@ export class MageModule extends GameModule {
         // this.reassertCurrentMageLevel();
 
         this.getSkillTreeEffects(this.skillUpgrades);
+
+        this.settings = obj?.settings || {};
     }
 
     setSkill(skillId, amount, bForce = false) {
@@ -854,6 +872,10 @@ export class MageModule extends GameModule {
             timeSpent: gameCore.globalTime,
             isLeveledUp: this.isLeveledUp,
             bankedTime: this.bankedTime,
+            settings: this.settings,
+            xpBalance: {
+                actions: gameCore.getModule('actions').getTotalPlayerXPGains(),
+            }
             // rankData,
         }
     }

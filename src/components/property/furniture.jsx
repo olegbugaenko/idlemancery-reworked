@@ -225,7 +225,7 @@ export const FurnitureUpgrades = ({ setItemDetails, purchaseItem, deleteItem, ne
     </div></DragDropContext>)
 }
 
-export const ItemCard = ({ id, name, level, max, affordable, isLeveled, isCapped, onFlash, onPurchase, onShowDetails, onDelete, isAutoPurchase, toggleAutopurchase, isAutomationUnlocked, isMobile}) => {
+export const ItemCard = ({ id, name, level, max, affordable, isLeveled, isCapped, spaceUsage, onFlash, onPurchase, onShowDetails, onDelete, isAutoPurchase, toggleAutopurchase, isAutomationUnlocked, isMobile}) => {
     const elementRef = useRef(null);
 
     useFlashOnLevelUp(isLeveled, onFlash, elementRef);
@@ -243,11 +243,16 @@ export const ItemCard = ({ id, name, level, max, affordable, isLeveled, isCapped
         </div>
         <div className={'bottom'}>
             <div className={'buttons'}>
-                <button disabled={!affordable.isAffordable || isCapped} onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    onPurchase(id)
-                }}>Purchase</button>
+                <button
+                    disabled={!affordable.isAffordable || isCapped}
+                    onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        onPurchase(id)
+                    }}
+                    className={`purchase-button ${isCapped ? 'capped' : ''}`}
+                    style={{ '--progress': `${affordable.percentage*100}%` }}
+                >Purchase</button>
                 {isAutomationUnlocked ? (<label className={'autobuy-label'} onClick={(e) => {
                     e.stopPropagation();
                 }}>
@@ -264,6 +269,11 @@ export const ItemCard = ({ id, name, level, max, affordable, isLeveled, isCapped
                     e.stopPropagation();
                     onDelete(id)
                 }}>Remove</button>
+            </div>
+        </div>
+        <div className={'bottom-bar property'}>
+            <div className={'progress-bg'}>
+                <div className={'progress-bar'} style={{width: `${100 * spaceUsage}%`}}></div>
             </div>
         </div>
     </div> )

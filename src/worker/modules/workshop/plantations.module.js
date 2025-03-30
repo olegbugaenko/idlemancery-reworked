@@ -9,6 +9,17 @@ export class PlantationsModule extends GameModule {
         this.purchasedItems = {};
         this.isUnlocked = false;
         this.leveledId = null;
+        this.autoPurchase = {};
+
+        this.eventHandler.registerHandler('set-plantation-autopurchase', ({ id, flag }) => {
+            const entities = gameEntity.listEntitiesByTags(['plantation']).filter(one => one.isUnlocked && !one.isCapped);
+            entities.forEach(e => {
+                if(!id || id === e.id) {
+                    this.autoPurchase[e.id] = flag;
+                }
+            })
+            this.sendItemsData();
+        })
 
         this.eventHandler.registerHandler('purchase-plantation', (payload) => {
             this.purchaseItem(payload.id);
@@ -160,11 +171,13 @@ export class PlantationsModule extends GameModule {
                 resourceAmount: gameResources.getResource(gameEntity.getAttribute(entity.id, 'inventoryResource'))?.amount,
                 resourceBalance: gameResources.getResource(gameEntity.getAttribute(entity.id, 'inventoryResource'))?.balance,
                 breakDown: gameResources.getResource(gameEntity.getAttribute(entity.id, 'inventoryResource'))?.breakDown,
+                isAutoPurchase: this.autoPurchase[entity.id] ?? false,
             })),
             slots,
             isWateringUnlocked: gameResources.isResourceUnlocked('inventory_water'),
             maxWatering: gameEffects.getEffect('plantations_max_watering'),
-            waterResource: gameResources.getResource('inventory_water')
+            waterResource: gameResources.getResource('inventory_water'),
+            isAutomationUnlocked: gameEntity.getLevel('shop_item_purchase_manager') > 0,
         }
     }
 
@@ -193,7 +206,7 @@ export class PlantationsModule extends GameModule {
             maxWatering: gameEffects.getEffect('plantations_max_watering'),
             waterResource: gameResources.getResource('inventory_water'),
             wateringEffects: gameEntity.getEffects(`${id}_watering_bonus`),
-            nextWateringEffects: gameEntity.getEffects(`${id}_watering_bonus`, 1)
+            nextWateringEffects: gameEntity.getEffects(`${id}_watering_bonus`, 1),
         }
     }
 

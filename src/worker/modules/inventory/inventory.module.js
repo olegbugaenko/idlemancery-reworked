@@ -48,16 +48,6 @@ export class InventoryModule extends GameModule {
 
         })
 
-        this.eventHandler.registerHandler('set-inventory-pinned', (payload) => {
-            if(!this.inventoryItems[payload.id]) {
-                this.inventoryItems[payload.id] = {
-                    stockCapacity: gameEffects.getEffectValue('shop_max_stock')
-                };
-            }
-            this.inventoryItems[payload.id].isPinned = payload.flag;
-
-        })
-
         this.eventHandler.registerHandler('set-inventory-search', ({searchData}) => {
             this.searchData = searchData;
         })
@@ -454,7 +444,7 @@ export class InventoryModule extends GameModule {
                 cooldown: this.inventoryItems[resource.id]?.cooldown ?? 0,
                 cooldownProg: resource.getUsageCooldown ? (resource.getUsageCooldown() + SMALL_NUMBER - (this.inventoryItems[resource.id]?.cooldown ?? 0)) / (resource.getUsageCooldown() + SMALL_NUMBER) : 1,
                 allowMultiConsume: resource.attributes?.allowMultiConsume,
-                isPinned: this.inventoryItems[resource.id]?.isPinned,
+                isPinned: !!gameCore.getModule('resource-pool').pinnedResources?.[resource.id],
             })),
             itemCategories: Object.values(perCats).filter(cat => cat.items.length > 0),
             payload: pl,
@@ -544,7 +534,7 @@ export class InventoryModule extends GameModule {
             coinsEarned: this.inventoryItems[resource.id]?.coinsEarned || 0,
             currentCooldown: this.inventoryItems[id]?.cooldown || 0,
             currentDuration: this.inventoryItems[id]?.duration || 0,
-            isPinned: this.inventoryItems[resource.id]?.isPinned,
+            isPinned: !!gameCore.getModule('resource-pool').pinnedResources?.[resource.id],
         }
     }
 
