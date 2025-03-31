@@ -10,6 +10,7 @@ export class PlantationsModule extends GameModule {
         this.isUnlocked = false;
         this.leveledId = null;
         this.autoPurchase = {};
+        this.autoPurchaseCd = 10;
 
         this.eventHandler.registerHandler('set-plantation-autopurchase', ({ id, flag }) => {
             const entities = gameEntity.listEntitiesByTags(['plantation']).filter(one => one.isUnlocked && !one.isCapped);
@@ -52,11 +53,34 @@ export class PlantationsModule extends GameModule {
 
     tick(game, delta) {
         this.leveledId = null;
+
+        if(gameEntity.getLevel('shop_item_purchase_manager') > 0) {
+            if(!this.autoPurchaseCd) {
+                this.autoPurchaseCd = 10;
+            }
+            this.autoPurchaseCd -= delta;
+            if(this.autoPurchaseCd <= 0) {
+                this.autoPurchaseCd = 10;
+                for(const key in this.autoPurchase) {
+                    if(this.autoPurchase[key]) {
+                        if(!gameEntity.isEntityUnlocked(key)) {
+                            this.autoPurchase[key] = false;
+                            console.log('Planter '+key+' is locked. Toggling autopurchase');
+                            continue;
+                        }
+
+                        const newEntSucc = this.purchaseItem(key);
+                        
+                    }
+                }
+            }
+        }
     }
 
     save() {
         return {
             items: this.purchasedItems,
+            autoPurchase: this.autoPurchase,
         }
     }
 
@@ -87,6 +111,7 @@ export class PlantationsModule extends GameModule {
                 }
             }
         }
+        this.autoPurchase = saveObject?.autoPurchase || {};
         this.sendItemsData();
     }
 

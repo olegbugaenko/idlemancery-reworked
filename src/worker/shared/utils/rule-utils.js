@@ -1,4 +1,4 @@
-import {gameResources, gameCore, gameEntity} from "game-framework";
+import {gameResources, gameCore, gameEntity, gameEffects} from "game-framework";
 
 export const checkMatchingResourceRule = (rule, key) => {
     const resource = gameResources.getResource(rule.resource_id);
@@ -120,6 +120,29 @@ export const checkMatchingActionLevelRule = (rule, key) => {
     return false;
 }
 
+export const checkMatchingAttributeValueRule = (rule) => {
+    const attr = gameEffects.getEffect(rule.attribute_id);
+
+    if(!attr) return false;
+
+    let compare = attr.value;
+
+    switch (rule.condition) {
+        case 'less':
+            return compare < +rule.value;
+        case 'less_or_eq':
+            return  compare <= +rule.value;
+        case 'eq':
+            return compare == +rule.value;
+        case 'grt_or_eq':
+            return compare >= +rule.value;
+        case 'grt':
+            return compare > +rule.value;
+    }
+
+    return false;
+}
+
 
 export const checkMatchingRule = (rule) => {
     if(rule.compare_type === 'resource_amount') {
@@ -145,6 +168,9 @@ export const checkMatchingRule = (rule) => {
     }
     if(rule.compare_type === 'crafting_list_running') {
         return checkMatchingCraftingListRule(rule);
+    }
+    if(rule.compare_type === 'attribute_value') {
+        return checkMatchingAttributeValueRule(rule);
     }
 }
 

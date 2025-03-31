@@ -70,7 +70,7 @@ export class ActionListsSubmodule extends GameModule {
 
             const prevEffects = [];
             const resourcesEffects = this.packEffects(data.filter(one => one.type === 'resources').map(effect => {
-                const prev = resourceCalculators.assertResource(effect.id, false, ['running']);
+                const prev = resourceCalculators.assertResource(effect.id, false, ['runningActions']);
 
                 if(effect.scope !== 'income' && effect.scope !== 'consumption') return effect;
 
@@ -445,7 +445,7 @@ export class ActionListsSubmodule extends GameModule {
 
         const prevEffects = [];
         data.resourcesEffects = this.packEffects(resourcesEffects.map(effect => {
-            const prev = resourceCalculators.assertResource(effect.id, false, ['running']);
+            const prev = resourceCalculators.assertResource(effect.id, false, ['runningActions']);
 
             if(effect.scope !== 'income' && effect.scope !== 'consumption') return effect;
 

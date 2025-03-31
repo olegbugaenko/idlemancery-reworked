@@ -121,6 +121,20 @@ const mapCompareType = {
             'percentage',
         ],
     },
+    'attribute_value': {
+        label: 'Attribute Value',
+        subject: 'attribute_id',
+        availableConditions: [
+            'less',
+            'less_or_eq',
+            'eq',
+            'grt_or_eq',
+            'grt',
+        ],
+        availableValueTypes: [
+            'exact'
+        ],
+    },
     'running_action': {
         label: 'Running Action',
         subject: 'action_id',
@@ -196,6 +210,7 @@ const RulesList = React.memo(
         const { onMessage, sendData } = useWorkerClient(worker);
         const [resources, setResources] = useState([]);
         const [actions, setActions] = useState([]);
+        const [attributes, setAttributes] = useState([]);
         const [actionsLists, setActionsLists] = useState([]);
         const [tags, setTags] = useState([]);
         const [spells, setSpells] = useState([]);
@@ -206,6 +221,7 @@ const RulesList = React.memo(
         useEffect(() => {
             sendData('query-all-resources', { prefix });
             sendData('query-all-actions', { prefix });
+            sendData('query-all-attributes', { prefix });
             sendData('query-all-action-tags', { prefix });
             sendData('query-actions-lists', { prefix });
             sendData('query-all-spells', { prefix });
@@ -240,6 +256,11 @@ const RulesList = React.memo(
         onMessage(`all-resources-${prefix}`, (payload) => {
             setResources(payload);
             // console.log('RecRes: ', payload);
+        })
+
+        onMessage(`all-attributes-${prefix}`, (payload) => {
+            setAttributes(payload);
+            console.log('AllAttrs: ', payload);
         })
 
         onMessage(`all-actions-${prefix}`, (payload) => {
@@ -301,6 +322,8 @@ const RulesList = React.memo(
                             subjectArray = resources;
                         } else if (subject === 'action_id') {
                             subjectArray = actions;
+                        } else if (subject === 'attribute_id') {
+                            subjectArray = attributes;
                         } else if (subject === 'tag') {
                             subjectArray = tags;
                         } else if (subject === 'action_list_id') {

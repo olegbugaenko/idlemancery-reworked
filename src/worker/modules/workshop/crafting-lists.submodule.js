@@ -88,7 +88,7 @@ export class CraftingListsSubmodule extends GameModule {
 
             const prevEffects = [];
             const resourcesEffects = this.packEffects(data.effects.filter(one => one.type === 'resources').map(effect => {
-                const prev = resourceCalculators.assertResource(effect.id, false, ['running']);
+                const prev = resourceCalculators.assertResource(effect.id, false, ['runningCrafting']);
 
                 if(effect.scope !== 'income' && effect.scope !== 'consumption') return effect;
 
@@ -325,7 +325,7 @@ export class CraftingListsSubmodule extends GameModule {
 
         const prevEffects = [];
         data.resourcesEffects = this.packEffects(resourcesEffects.map(effect => {
-            const prev = resourceCalculators.assertResource(effect.id, false, ['running']);
+            const prev = resourceCalculators.assertResource(effect.id, false, ['runningCrafting']);
 
             if(effect.scope !== 'income' && effect.scope !== 'consumption') return effect;
 
