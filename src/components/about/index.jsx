@@ -10,6 +10,7 @@ export const About = () => {
                 <div className={'features'}>
                     <p>Fixed bug preventing some action list effects to show properly</p>
                     <p>Add attribute limitation rule to automations</p>
+                    <p>Fixed plantations automation</p>
                     <p>Tiny UI fixes</p>
                 </div>
                 <h3>Idle Awakening v0.1.3b</h3>
