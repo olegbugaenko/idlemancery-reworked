@@ -451,8 +451,8 @@ export const AlchemyListDetails = ({
     return (
         <PerfectScrollbar>
             <div className={'blade-inner list-editor'}>
-                <div className={'block'}>
-                    <div className={'main-row main-wrap'}>
+                <div className={'block main-wrap'}>
+                    <div className={'main-row'}>
                         <span>Name</span>
                         {isEditing ? (<input type={'text'} value={editing.name} onChange={(e) => onUpdateListValue('name', e.target.value)}/>) : (<span>{editing.name}</span>)}
                     </div>
