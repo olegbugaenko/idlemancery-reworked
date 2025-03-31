@@ -1120,12 +1120,12 @@ export const registerAccessoriesStage1 = () => {
         },
         get_cost: () => ({
             'inventory_amber': {
-                A: 1.1,
+                A: 1.25,
                 B: 100,
                 type: 1
             },
             'inventory_forged_steel': {
-                A: 1.1,
+                A: 1.25,
                 B: 500,
                 type: 1
             },
