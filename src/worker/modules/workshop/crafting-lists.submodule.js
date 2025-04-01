@@ -407,10 +407,12 @@ export class CraftingListsSubmodule extends GameModule {
         // First pass: Allocate minimum slots
         for (const entry of validDistribution) {
             const { id, min } = entry;
-            const allocated = Math.min(min, remainingSlots);
+            const allocated = Math.min(min ?? 0, remainingSlots);
             result.push({ id, level: allocated });
             remainingSlots -= allocated;
         }
+
+        console.log(`AfterFisrt (${remainingSlots} of ${maxSlots})`, result);
 
         // Second pass: Allocate slots based on percentage and constraints
         // Другий прохід: обчислюємо idealTotal і збираємо інформацію для третього
@@ -427,11 +429,11 @@ export class CraftingListsSubmodule extends GameModule {
 
             if (remainingSlots <= 0) continue;
 
-            const allowedAdditional = Math.min(
+            const allowedAdditional = Math.max(0, Math.min(
                 desiredAdditional,
                 max ? max - currentLevel : Infinity,
                 remainingSlots
-            );
+            ));
 
             entry.level += allowedAdditional;
             remainingSlots -= allowedAdditional;
@@ -444,6 +446,7 @@ export class CraftingListsSubmodule extends GameModule {
             });
         }
 
+        console.log(`AfterSecond (${remainingSlots} of ${maxSlots})`, result);
 
         if (remainingSlots > 0) {
             // Сортуємо від найбільшого дробового залишку до найменшого
@@ -461,6 +464,8 @@ export class CraftingListsSubmodule extends GameModule {
                 remainingSlots -= 1;
             }
         }
+
+        console.log(`AfterThird (${remainingSlots} of ${maxSlots})`, result);
 
         result = result.filter(one => one.level > 0);
 
