@@ -939,14 +939,14 @@ export const initSpellsDB1 = () => {
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_magic_ability',
-            level: 120000
+            level: 100000
         }],
         resourceModifier: {
             get_income: () => ({
                 resources: {
                     inventory_light: {
                         A: 1.2,
-                        B: 0.005*gameEffects.getEffectValue('conjuration_spells_efficiency')*gameEffects.getEffectValue('elemental_spells_efficiency'),
+                        B: 0.00125*gameEffects.getEffectValue('conjuration_spells_efficiency')*gameEffects.getEffectValue('elemental_spells_efficiency'),
                         type: 1,
                     }
                 }
@@ -1008,7 +1008,7 @@ export const initSpellsDB1 = () => {
                 resources: {
                     inventory_fire: {
                         A: 1.2,
-                        B: 0.005*gameEffects.getEffectValue('conjuration_spells_efficiency')*gameEffects.getEffectValue('elemental_spells_efficiency'),
+                        B: 0.00025*gameEffects.getEffectValue('conjuration_spells_efficiency')*gameEffects.getEffectValue('elemental_spells_efficiency'),
                         type: 1,
                     }
                 }

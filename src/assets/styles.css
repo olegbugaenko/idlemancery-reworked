@@ -243,12 +243,19 @@ p.small-hint, span.small-hint {
 }
 
 .content-wrap .sidebar .resource-item .resource-label {
-    width: 120px;
+    width: 115px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.content-wrap .sidebar .resource-item .resource-label .name-wrap {
+    font-size: 13px;
 }
 
 .content-wrap .sidebar .resource-item .resource-amount {
-    width: 120px;
+    width: 125px;
     padding-left: 4px;
+    font-size: 13px;
 }
 
 .content-wrap .sidebar .resource-item .resource-amount.capped {
@@ -256,8 +263,14 @@ p.small-hint, span.small-hint {
 }
 
 .content-wrap .sidebar .resource-item .resource-balance {
-    width: 60px;
+    width: 55px;
     padding-left: 4px;
+    font-size: 13px;
+}
+
+.content-wrap .sidebar .missing-blocker .resource-item .resource-balance,
+.content-wrap .sidebar .missing-blocker .resource-item .resource-amount {
+    color: var(--red);
 }
 
 .content-wrap .sidebar .resource-item .resource-balance.red {

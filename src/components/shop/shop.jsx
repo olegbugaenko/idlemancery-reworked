@@ -417,7 +417,7 @@ export const CourseCard = ({ toNext, id, efficiency, isRunning, name, level, pro
             if(isMobile) {
                 onShowDetails(id)
             } else {
-                onPurchase(id, e.shiftKey ? 1e9 : purchaseMultiplier)
+                onPurchase(id, 1)
             }
         }}>
         <div className={'progress-bg'} style={{ width: `${100*Math.min(1., progress/maxProgress)}%`}}></div>

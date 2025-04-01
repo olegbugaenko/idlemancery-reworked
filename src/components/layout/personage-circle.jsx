@@ -42,8 +42,11 @@ export const PersonageCircle = () => {
             <TippyWrapper placement={"top"} content={<div className={'hint-popup'}>
                 <p>Level: {formatInt(mageData.mageLevel)}</p>
                 <p>XP: {formatInt(mageData.mageXP)} / {formatInt(mageData.mageMaxXP)}</p>
+                <p>XP/sec: {formatValue(mageData.xpTotalIncome)}</p>
+                <p>Next level in: {secondsToString(mageData.eta)}</p>
                 {mageData?.xpBalance ? (<div className={'balances block'}>
-                    {mageData.xpBalance.actions?.map(balance => (<p className={'small-hint'}>Running action - {balance.name}: {formatValue(balance.dxp)}</p>))}
+                    {mageData.xpBalance.actions?.splice(0, 5).map(balance => (<p className={'small-hint'}>Running action - {balance.name}: {formatValue(balance.dxp)}</p>))}
+                    {mageData.xpBalance.actions?.length ? (<p className={'small-hint'}>And {formatInt(mageData.xpBalance.actions?.length)} more</p>) : null}
                 </div> ) : null}
             </div>}>
                 <div className={'outer-xp-circle'}>

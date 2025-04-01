@@ -4,6 +4,7 @@ import {registerSkillsStage1} from "./skills-db-v2";
 import {registerPermanentBonuses} from "./permanent-bonuses-db";
 import {cloneDeep} from "lodash";
 import {unlocksApi} from "game-framework/src/general/unlocks-api";
+import {SMALL_NUMBER} from "game-framework/src/utils/consts";
 // import {initMageRanks} from "./mage-ranks-db";
 
 export class MageModule extends GameModule {
@@ -864,6 +865,8 @@ export class MageModule extends GameModule {
 
         // console.log('rank: ', rankData);
 
+        const actions = gameCore.getModule('actions').getTotalPlayerXPGains();
+        const xpTotalIncome = actions.reduce((acc, a) => acc += a.dxp, 0);
         return {
             mageLevel: gameEntity.getLevel('mage'),
             mageXP: rs.amount,
@@ -874,8 +877,10 @@ export class MageModule extends GameModule {
             bankedTime: this.bankedTime,
             settings: this.settings,
             xpBalance: {
-                actions: gameCore.getModule('actions').getTotalPlayerXPGains(),
-            }
+                actions,
+            },
+            xpTotalIncome,
+            eta: (rs.cap - rs.amount) / Math.max(xpTotalIncome, SMALL_NUMBER)
             // rankData,
         }
     }

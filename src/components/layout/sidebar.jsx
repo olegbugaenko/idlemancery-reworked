@@ -101,6 +101,10 @@ export const ResourcesBar = () => {
                 addClass = isAffected < 0 ? ' negative' : ' positive';
             }
 
+            if(res.targetEfficiency < 1) {
+                addClass += ' missing-blocker';
+            }
+
             return (<div key={res.id} className={`holder ${aff ? 'monitored' : ''} ${addClass}`} onMouseOver={() => setMonitoredAttribute(res.id)} onMouseOut={() => setMonitoredAttribute(null)}><p className={`resource-item ${affClassData}`}>
                 <div className={'resource-label'}>
                     <RawResource name={res.name} id={res.id} />

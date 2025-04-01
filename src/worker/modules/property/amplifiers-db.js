@@ -365,7 +365,65 @@ export const registerAmplifiersStage1 = () => {
             get_multiplier: ()=>({
                 effects: {
                     'physical_training_learn_speed': {
-                        A: 0.1,
+                        A: 0.02,
+                        B: 1,
+                        C: 1.01,
+                        type: 3,
+                    }
+                }
+            }),
+        },
+        get_cost: () => ({
+            'inventory_fire': {
+                A: 1.2,
+                B: 100,
+                type: 1
+            }
+        }),
+    })
+
+    registerAmplifier('amplifier_mind_sharpener', {
+        tags: ["amplifier", "upgrade", "purchaseable", "spark", "actions"],
+        name: 'Mind Sharpener Amplifier',
+        description: 'Increase mental training learning rate',
+        level: 0,
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_fire');
+        },
+        resourceModifier: {
+            get_multiplier: ()=>({
+                effects: {
+                    'mental_training_learning_rate': {
+                        A: 0.02,
+                        B: 1,
+                        C: 1.01,
+                        type: 3,
+                    }
+                }
+            }),
+        },
+        get_cost: () => ({
+            'inventory_fire': {
+                A: 1.2,
+                B: 100,
+                type: 1
+            }
+        }),
+    })
+
+    registerAmplifier('amplifier_charisma_flames', {
+        tags: ["amplifier", "upgrade", "purchaseable", "spark", "actions"],
+        name: 'Charisma Flames Amplifier',
+        description: 'Increase social training learning rate',
+        level: 0,
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_fire');
+        },
+        resourceModifier: {
+            get_multiplier: ()=>({
+                effects: {
+                    'social_training_learning_rate': {
+                        A: 0.02,
                         B: 1,
                         C: 1.01,
                         type: 3,

@@ -317,7 +317,10 @@ export class MapModule extends GameModule {
                         if(isRare && prob > 0.05) {
                             prob = 0.05 + (prob - 0.05) ** 2;
                             if(prob > 0.1) {
-                                prob = 0.1;
+                                prob = 0.1 + (prob - 0.1) ** 2;
+                                if(prob > 0.2) {
+                                    return 0.2
+                                }
                             }
                         }
                         return {

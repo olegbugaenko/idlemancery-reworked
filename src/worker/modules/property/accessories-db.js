@@ -1016,7 +1016,7 @@ export const registerAccessoriesStage1 = () => {
     })
 
     registerAccessory('accessory_masters_pendant', {
-        tags: ["accessory", "upgrade", "purchaseable", "resource"],
+        tags: ["accessory", "upgrade", "purchaseable", "crafting"],
         name: 'Masters Forge Pendant',
         description: 'Increase amount of available crafting slots',
         level: 0,
@@ -1095,7 +1095,7 @@ export const registerAccessoriesStage1 = () => {
     })
 
     registerAccessory('accessory_craft_binder', {
-        tags: ["accessory", "upgrade", "purchaseable", "effect", "maps"],
+        tags: ["accessory", "upgrade", "purchaseable", "crafting"],
         name: 'Craftbinder',
         description: 'A structured metal core wrapped in organic and forged layers. It channels your inner discipline into parallel creation.',
         level: 0,
@@ -1162,6 +1162,53 @@ export const registerAccessoriesStage1 = () => {
                 B: 500,
                 type: 1
             },
+        }),
+    })
+
+
+    registerAccessory('accessory_metallurgist_hammer', {
+        tags: ["accessory", "upgrade", "purchaseable", "resource"],
+        name: 'Metallurgist Hammer',
+        description: 'Increase metals forging and refinement efficiency',
+        level: 0,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 80000
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0
+                && gameResources.isResourceUnlocked('inventory_forged_steel');
+        },
+        resourceModifier: {
+            multiplier: {
+                resources: {
+                    'inventory_iron_plate': {
+                        A: 0.02,
+                        B: 1,
+                        C: 1.01,
+                        type: 3,
+                    },
+                    'inventory_forged_steel': {
+                        A: 0.02,
+                        B: 1,
+                        C: 1.01,
+                        type: 3,
+                    },
+                }
+            },
+        },
+        get_cost: () => ({
+            'inventory_obsidian_shard': {
+                A: 1.1,
+                B: 5,
+                type: 1
+            },
+            'inventory_ruby': {
+                A: 1.1,
+                B: 500,
+                type: 1
+            }
         }),
     })
 }
