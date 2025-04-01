@@ -295,4 +295,91 @@ export const registerAmplifiersStage1 = () => {
         }),
     })
 
+    registerAmplifier('amplifier_elemental', {
+        tags: ["amplifier", "upgrade", "purchaseable", "spark", "actions"],
+        name: 'Elemental Amplifier',
+        description: 'Increase courses learn speed',
+        level: 0,
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_light');
+        },
+        resourceModifier: {
+            get_multiplier: ()=>({
+                effects: {
+                    'elemental_spells_efficiency': {
+                        A: 0.05,
+                        B: 1,
+                        C: 1.01,
+                        type: 3,
+                    }
+                }
+            }),
+        },
+        get_cost: () => ({
+            'inventory_light': {
+                A: 1.2,
+                B: 100,
+                type: 1
+            }
+        }),
+    })
+
+    registerAmplifier('amplifier_discovery_beacon', {
+        tags: ["amplifier", "upgrade", "purchaseable", "spark", "actions"],
+        name: 'Beacon of Discovery Amplifier',
+        description: 'Increase gathering perception',
+        level: 0,
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_light');
+        },
+        resourceModifier: {
+            get_multiplier: ()=>({
+                effects: {
+                    'gathering_perception': {
+                        A: 0.1,
+                        B: 1,
+                        C: 1.01,
+                        type: 3,
+                    }
+                }
+            }),
+        },
+        get_cost: () => ({
+            'inventory_light': {
+                A: 1.2,
+                B: 100,
+                type: 1
+            }
+        }),
+    })
+
+    registerAmplifier('amplifier_body_ignition', {
+        tags: ["amplifier", "upgrade", "purchaseable", "spark", "actions"],
+        name: 'Body Ignition Amplifier',
+        description: 'Increase physical training learning rate',
+        level: 0,
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_fire');
+        },
+        resourceModifier: {
+            get_multiplier: ()=>({
+                effects: {
+                    'physical_training_learn_speed': {
+                        A: 0.1,
+                        B: 1,
+                        C: 1.01,
+                        type: 3,
+                    }
+                }
+            }),
+        },
+        get_cost: () => ({
+            'inventory_fire': {
+                A: 1.2,
+                B: 100,
+                type: 1
+            }
+        }),
+    })
+
 }

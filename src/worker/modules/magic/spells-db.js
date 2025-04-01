@@ -922,4 +922,126 @@ export const initSpellsDB1 = () => {
     })
 
 
+    registerSpell('spell_conjure_light', {
+        name: 'Conjure Light',
+        description: 'Create a light',
+        hasCap: false,
+        tags: ['spell', 'magic', 'mental', 'conjuration_magic','elemental'],
+        defaultCap: 0,
+        isAbstract: true,
+        level: 1,
+        onUse: (amount) => {
+
+        },
+        getUsageCooldown: () => {
+            return 0;
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_magic_ability',
+            level: 120000
+        }],
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    inventory_light: {
+                        A: 1.2,
+                        B: 0.005*gameEffects.getEffectValue('conjuration_spells_efficiency')*gameEffects.getEffectValue('elemental_spells_efficiency'),
+                        type: 1,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    mana: {
+                        A: 1.5,
+                        B: 180.0*getCostReduction('spell_conjure_light')/1.5,
+                        type: 1,
+                    }
+                }
+            }),
+            effectDeps: ['conjuration_spells_efficiency','elemental_spells_efficiency']
+        },
+        usageGain: {
+            get_consumption: () => ({
+                resources: {
+                    mana: {
+                        A: 1.5,
+                        B: 540.*getCostReduction('spell_conjure_light')/1.5,
+                        type: 1,
+                    }
+                }
+            })
+        },
+        attributes: {
+            duration: 20,
+            xpOnCast: 50,
+            baseXPCost: 2.e+8,
+        },
+        unlockCondition: () => {
+            return true
+        },
+    })
+
+
+    registerSpell('spell_conjure_fire', {
+        name: 'Conjure Fire',
+        description: 'Create a fire',
+        hasCap: false,
+        tags: ['spell', 'magic', 'mental', 'conjuration_magic','elemental'],
+        defaultCap: 0,
+        isAbstract: true,
+        level: 1,
+        onUse: (amount) => {
+
+        },
+        getUsageCooldown: () => {
+            return 0;
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_magic_ability',
+            level: 150000
+        }],
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    inventory_fire: {
+                        A: 1.2,
+                        B: 0.005*gameEffects.getEffectValue('conjuration_spells_efficiency')*gameEffects.getEffectValue('elemental_spells_efficiency'),
+                        type: 1,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    mana: {
+                        A: 1.5,
+                        B: 360.0*getCostReduction('spell_conjure_fire')/1.5,
+                        type: 1,
+                    }
+                }
+            }),
+            effectDeps: ['conjuration_spells_efficiency','elemental_spells_efficiency']
+        },
+        usageGain: {
+            get_consumption: () => ({
+                resources: {
+                    mana: {
+                        A: 1.5,
+                        B: 1080.*getCostReduction('spell_conjure_fire')/1.5,
+                        type: 1,
+                    }
+                }
+            })
+        },
+        attributes: {
+            duration: 20,
+            xpOnCast: 50,
+            baseXPCost: 4.e+8,
+        },
+        unlockCondition: () => {
+            return true
+        },
+    })
 }

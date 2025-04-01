@@ -667,6 +667,42 @@ export const registerInventoryItems = () => {
         sellPrice: 25000,
     })
 
+    registerInventoryItem('inventory_light', {
+        name: 'Light Element',
+        hasCap: false,
+        tags: ['inventory', 'elemental'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        attributes: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.isEntityUnlocked('spell_conjure_light')
+        },
+        sellPrice: 25000,
+    })
+
+    registerInventoryItem('inventory_fire', {
+        name: 'Fire Element',
+        hasCap: false,
+        tags: ['inventory', 'elemental'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        attributes: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.isEntityUnlocked('spell_conjure_fire')
+        },
+        sellPrice: 25000,
+    })
+
     registerInventoryItem('inventory_refined_wood', {
         name: 'Refined Wood',
         hasCap: false,
