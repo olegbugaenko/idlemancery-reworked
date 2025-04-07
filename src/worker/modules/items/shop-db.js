@@ -729,6 +729,48 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+    gameEntity.registerGameEntity('shop_item_harvest_gloves', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Harvest Gloves',
+        description: 'Purchase equipment improving your herbs harvesting efficiency',
+        level: 0,
+        maxLevel: 1,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 125,
+        }],
+        unlockCondition: () => {
+            return true
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'gathering_perception': {
+                        A: 0.25,
+                        B: 1,
+                        type: 0
+                    },
+                    'gathering_herbs_amount': {
+                        A: 0.25,
+                        B: 1,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 150000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        }),
+    })
+
 
     gameEntity.registerGameEntity('shop_item_spellbook', {
         tags: ["shop", "upgrade", "purchaseable"],
@@ -1826,4 +1868,106 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+
+    gameEntity.registerGameEntity('shop_item_contemplation_circlet', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Circlet of Contemplation',
+        description: 'A simple band worn by those who walk the long path of thought. Each moment spent in stillness sharpens the mind, easing future efforts.',
+        level: 0,
+        maxLevel: 6,
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    mental_actions_discount: {
+                        A: 0.5,
+                        B: 1,
+                        type: 0
+                    }
+                }
+            }
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 125000
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0
+            //||  gameEntity.getLevel('shop_item_conjuration_magic') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1.25,
+                B: 5.e+13*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_mystic_cap', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Mystical Cap',
+        description: 'A subtle enchantment rests within this cap, easing the mental strain of casting. Slightly reduces the effort required for magical actions.',
+        level: 0,
+        maxLevel: 6,
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    magical_actions_discount: {
+                        A: 0.5,
+                        B: 1,
+                        type: 0
+                    }
+                }
+            }
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 125000
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0
+            //||  gameEntity.getLevel('shop_item_conjuration_magic') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1.25,
+                B: 5.e+13*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_hunting', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Hunting',
+        description: 'Allows you hunting for magic creatures, and get unique loot.',
+        level: 0,
+        maxLevel: 1,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 100000
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 1.e+14*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
 }

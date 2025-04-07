@@ -160,3 +160,10 @@ v0.1.3
 5. [V] Toggle shown/hidden for learn multipliers and discounts
 6. Implement custom prompt for saving Draft
 7. [V] DO add "running action" block to sidebar
+
+v0.1.4
+1. [V] More unique hunting resources
+2. [V] Property improving hunting loot amount (req. 125K strength)
+3. [V] Quick import current to craft list
+4. [V] Fast "Spell Cast" button
+5. Rituals

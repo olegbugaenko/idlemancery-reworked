@@ -29,7 +29,7 @@ export const Plantations = ({ setItemDetails, newUnlocks }) => {
     useEffect(() => {
         const interval = setInterval(() => {
             sendData('query-plantation-data', {  });
-        }, 100);
+        }, 200);
         return () => {
             clearInterval(interval);
         }

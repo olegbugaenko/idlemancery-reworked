@@ -1445,7 +1445,7 @@ export const registerFurnitureStage1 = () => {
 
 
     registerFurniture('furniture_drying_rack', {
-        tags: ["furniture", "upgrade", "purchaseable", "resource"],
+        tags: ["furniture", "upgrade", "purchaseable", "resource", "gathering"],
         name: 'Herbalist\'s Drying Rack\n',
         description: 'This rustic wooden rack is woven with strands of enchanted twine, used by skilled herbalists to preserve the potency of rare plants. Hanging bunches of herbs and roots sway gently, their fragrance filling the room and infusing the air with traces of ancient magic. With this rack, even common plants yield their highest quality, providing you a greater chance to find potent herbs in the wild.',
         level: 0,
@@ -1816,5 +1816,50 @@ export const registerFurnitureStage1 = () => {
         }),
     })
 
-
+    registerFurniture('furniture_preservation_rack', {
+        tags: ["furniture", "upgrade", "purchaseable", "resource", "hunting"],
+        name: 'Preservation Rack',
+        description: 'Cured meats, drying herbs, and trophies hang neatly, allowing you to save and store more from each hunt.',
+        level: 0,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 125000,
+        }],
+        unlockCondition: () => {
+            return true;
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'hunting_amount_multiplier': {
+                        A: 0.1,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 2,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1.5,
+                B: 8.e+10*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 2,
+                type: 0
+            }
+        }),
+    })
 }

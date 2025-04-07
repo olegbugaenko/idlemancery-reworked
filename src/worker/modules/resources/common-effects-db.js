@@ -48,6 +48,13 @@ export const registerCommomEffects = () => {
         description: 'Multiplier to amount of herbs that can be found'
     })
 
+    gameEffects.registerEffect('hunting_amount_multiplier', {
+        name: 'Hunt Resources Mult',
+        defaultValue: 1.,
+        minValue: 1,
+        description: 'Multiplier to amount of resources that can be received from hunt'
+    })
+
     gameEffects.registerEffect('read_books_efficiency', {
         name: 'Read Books Efficiency',
         defaultValue: 1.,

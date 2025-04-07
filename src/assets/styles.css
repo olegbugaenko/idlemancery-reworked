@@ -551,7 +551,7 @@ p.small-hint, span.small-hint {
 }
 
 .card.action {
-    width: 220px;
+    width: 240px;
 }
 .card.action.selected {
     border-width: 3px;
@@ -851,12 +851,21 @@ h4 {
     font-size: 13px;
 }
 
+/*.costs-wrap .res-cost .resource-wrap{
+    width: 100px;
+}*/
+
 .res-cost {
     margin: 0;
     padding: 4px;
     font-size: 13px;
     display: flex;
     justify-content: space-between;
+    align-items: center;
+}
+
+.res-cost .resource-name-wrap {
+    width: 120px;
 }
 
 .res-cost.yellow * {
@@ -1068,9 +1077,13 @@ h4 {
 
 .action-lists-panel .flex-container .panel-col.current-list {
     display: flex;
-    justify-content: space-between;
+    /*justify-content: space-between;*/
     align-items: center;
     width: 300px;
+    margin-right: 12px;
+}
+
+.action-lists-panel .flex-container .panel-col.current-list .current-list-label {
     margin-right: 12px;
 }
 
@@ -2378,7 +2391,7 @@ span.highlighted-span.yellow {
 
 .course-card.card.item {
     position: relative;
-    width: 240px;
+    width: 260px;
     height: 110px;
 }
 
@@ -2887,6 +2900,41 @@ ul.menu li.additional.add-custom-filter:hover span {
     border-bottom: 1px solid #333;
 }
 
+.droppable-highlight {
+    box-shadow: 0 0 8px var(--highlight);
+    filter: brightness(1.4); /* робить фон світлішим */
+    transition: filter 0.2s ease;
+}
+
+.insert-indicator {
+    position: absolute;
+    height: 4px;
+    background-color: #4ac9ff;
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+.custom-popover {
+    position: absolute;
+    background: #222;
+    color: white;
+    font-size: 13px;
+    z-index: 9999;
+    pointer-events: auto;
+    max-width: 300px;
+    white-space: normal;
+}
+
+@media screen and (max-width: 1700px) {
+    .action-lists-panel {
+        height: 70px;
+    }
+
+    .actions-wrap .actions .list-wrap {
+        height: calc(100% - 150px);
+    }
+}
 
 @media screen and (max-width: 1600px) {
     .map-wrap .head {

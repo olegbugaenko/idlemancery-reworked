@@ -364,7 +364,7 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_1') > 0
         },
-        sellPrice: 120,
+        sellPrice: 90,
         rarity: 1,
         allowedTileTypes: ['plain', 'savanna']
     })
@@ -410,7 +410,7 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_1') > 0
         },
-        sellPrice: 150,
+        sellPrice: 90,
         rarity: 1,
         allowedTileTypes: ['plain', 'mountain', 'hills']
     })
@@ -1053,6 +1053,92 @@ export const registerInventoryItems = () => {
         lootAmountMult: 0.05,
     })
 
+    registerInventoryItem('inventory_hunting_net', {
+        name: 'Hunting Net',
+        hasCap: false,
+        tags: ['inventory', 'material', 'craftable'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        attributes: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.getLevel('shop_item_hunting') > 0
+        },
+        sellPrice: 4000000,
+        rarity: 6,
+        allowedTileTypes: ['plain', 'swamp'],
+        lootAmountMult: 0.05,
+    })
+
+
+    registerInventoryItem('inventory_duck_meat', {
+        name: 'Duck Meat',
+        hasCap: false,
+        tags: ['inventory', 'consumable', 'hunting'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        attributes: {
+            duration: 300,
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                resources: {
+                    energy: {
+                        A: 0.25*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            })
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameResources.isResourceUnlocked('inventory_hunting_net') > 0
+        },
+        sellPrice: 8400000,
+        rarity: 5,
+        allowedTileTypes: ['plain', 'swamp'],
+        lootAmountMult: 0.1,
+    })
+
+
+    registerInventoryItem('inventory_caw_meat', {
+        name: 'Caw Meat',
+        hasCap: false,
+        tags: ['inventory', 'consumable', 'hunting'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        attributes: {
+            duration: 300,
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                resources: {
+                    health: {
+                        A: 0.25*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            })
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameResources.isResourceUnlocked('inventory_hunting_net') > 0
+        },
+        sellPrice: 8400000,
+        rarity: 5,
+        allowedTileTypes: ['plain', 'swamp'],
+        lootAmountMult: 0.1,
+    })
 
     registerInventoryItem('inventory_small_endurance_flask', {
         name: 'Small Endurance Flask',
@@ -1651,6 +1737,71 @@ export const registerInventoryItems = () => {
         },
         sellPrice: 15000,
         rarity: 5,
+    })
+
+    registerInventoryItem('inventory_rare_stormbird_heart', {
+        name: 'Stormbird Heart',
+        hasCap: false,
+        tags: ['inventory', 'consumable', 'rare', 'hunting'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+            updateLevelBy('rare_stormbird_heart_effect', amount)
+        },
+        getUsageCooldown: () => {
+            return 0.1;
+        },
+        attributes: {
+            baseChanceMult: 1,
+            entityEffect: 'rare_stormbird_heart_effect',
+            isRare: true,
+            allowMultiConsume: true,
+        },
+        usageGain: {
+
+        },
+        resourceModifier: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameResources.isResourceUnlocked('inventory_hunting_net') > 0
+        },
+        sellPrice: 150000000,
+        rarity: 8,
+        lootAmountMult: 0.1,
+    })
+
+
+    registerInventoryItem('inventory_rare_greyhorn_brain', {
+        name: 'Greyhorn Brain',
+        hasCap: false,
+        tags: ['inventory', 'consumable', 'rare', 'hunting'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+            updateLevelBy('rare_greyhorn_brain_effect', amount)
+        },
+        getUsageCooldown: () => {
+            return 0.1;
+        },
+        attributes: {
+            baseChanceMult: 1,
+            entityEffect: 'rare_greyhorn_brain_effect',
+            isRare: true,
+            allowMultiConsume: true,
+        },
+        usageGain: {
+
+        },
+        resourceModifier: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameResources.isResourceUnlocked('inventory_hunting_net') > 0
+        },
+        sellPrice: 150000000,
+        rarity: 8,
+        lootAmountMult: 0.1,
     })
 
 }

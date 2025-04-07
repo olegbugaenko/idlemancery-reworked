@@ -6,7 +6,8 @@ import 'react-tippy/dist/tippy.css'
 import WorkerContext from "./context/worker-context";
 import './assets/styles.css';
 import 'react-perfect-scrollbar/dist/css/styles.css';
-import {useAppContext} from "./context/ui-context";
+import {AppProvider, useAppContext} from "./context/ui-context";
+import {DndProvider} from "./custom-libs/dnd";
 
 function App() {
     const worker = window.worker || new Worker();
@@ -79,4 +80,16 @@ function App() {
     );
 }
 
-export default App;
+export function AppProvided() {
+
+
+    return (
+        <DndProvider>
+            <AppProvider>
+                <App />
+            </AppProvider>
+        </DndProvider>
+    )
+}
+
+export default AppProvided;

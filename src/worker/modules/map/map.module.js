@@ -18,7 +18,7 @@ export class MapModule extends GameModule {
             level: 0,
         }
         this.mapTier = 0;
-        this.relevantMapVersion = 5;
+        this.relevantMapVersion = 11;
         this.currentMapVersion = null;
 
         this.lists = new MapTileListsSubmodule();
@@ -121,13 +121,14 @@ export class MapModule extends GameModule {
         const distance = Math.sqrt((i-7)**2 + (j-7)**2);
         const metaData = this.tileTypes[expectType];
         const resources = gameResources.listResourcesByTags(['gatherable']);
+        const huntables = gameResources.listResourcesByTags(['hunting']);
         const complexity = Math.max(1, (distance-2) + (Math.random() + 0.75*(tier**0.5))*(distance-2 + 3*(tier**0.5)))*Math.pow(1.3, tier);
         return {
             distance,
             i,
             j,
             metaData,
-            drops: this.generateRandomDrop(distance, complexity, metaData.id, resources),
+            drops: this.generateRandomDrop(distance, complexity, metaData.id, resources, huntables),
             costMult: complexity ** 1.75,
         }
     }
@@ -187,14 +188,18 @@ export class MapModule extends GameModule {
         this.sendData();
     }
 
-    generateRandomDrop(distance, complexity, expectType, resources) {
+    generateRandomDrop(distance, complexity, expectType, resources, huntables) {
         // Filter resources to match the expected tile type
         const potentialResources = resources.filter(one =>
             !one.allowedTileTypes || one.allowedTileTypes.includes(expectType)
         );
 
+        const potentialHuntables = huntables.filter(one =>
+            !one.allowedTileTypes || one.allowedTileTypes.includes(expectType)
+        );
+
         // If no matching resources, return an empty array
-        if (potentialResources.length === 0) {
+        if (potentialResources.length === 0 && potentialHuntables.length === 0) {
             return [];
         }
 
@@ -203,6 +208,13 @@ export class MapModule extends GameModule {
             low: potentialResources.filter(r => r.rarity <= 1), // rarity 0-1
             mid: potentialResources.filter(r => r.rarity >= 2 && r.rarity <= 3), // rarity 2-3
             high: potentialResources.filter(r => r.rarity >= 4 && r.rarity <= 10) // rarity 4-5
+        };
+
+        // Separate hunting resources by rarity
+        const huntingRarityBuckets = {
+            low: potentialHuntables.filter(r => r.rarity <= 5), // rarity 0-1
+            mid: potentialHuntables.filter(r => r.rarity >= 6 && r.rarity <= 10), // rarity 2-3
+            high: potentialHuntables.filter(r => r.rarity >= 11 && r.rarity <= 15) // rarity 4-5
         };
 
         // console.log('rarityBuckets: ', rarityBuckets, potentialResources);
@@ -250,14 +262,43 @@ export class MapModule extends GameModule {
             }
         }
 
+        const huntingDrops = [];
+        // Generate hunting drops in parallel (up to 3)
+        for (let i = 0; i < 3; i++) {
+            const roll = Math.random();
+            let bucket = null;
+
+            if (roll < 0.75 && huntingRarityBuckets.mid.length > 0) {
+                bucket = huntingRarityBuckets.mid;
+            } else if (roll < 0.95 && huntingRarityBuckets.high.length > 0) {
+                bucket = huntingRarityBuckets.high;
+            } else if (huntingRarityBuckets.low.length > 0) {
+                bucket = huntingRarityBuckets.low;
+            }
+
+            if (bucket && bucket.length > 0) {
+                const hunt = bucket[Math.floor(Math.random() * bucket.length)];
+                huntingDrops.push({
+                    id: hunt.id,
+                    amountMult: complexity / ((1 + hunt.rarity) * (hunt.sellPrice ** 0.05)),
+                    probabilityMult: (complexity ** 0.5) / ((1 + (hunt.rarity ** 0.5)) * (hunt.sellPrice ** 0.25)),
+                    isHunt: true,
+                });
+            }
+        }
+
+        console.log('AddHunting: ', huntingDrops);
+
+
         // Combine the guaranteed low rarity drop and additional drops
         drops.push(...additionalDrops);
+        drops.push(...huntingDrops);
 
         // Ensure unique drops (remove duplicates by ID)
         const uniqueDrops = Array.from(new Map(drops.map(r => [r.id, r])).values());
 
         // Trim to exactly 3 drops
-        return uniqueDrops.slice(0, 5);
+        return uniqueDrops.slice(0, 15);
     }
 
     getGatheringPerceptionEffect() {
@@ -289,12 +330,16 @@ export class MapModule extends GameModule {
                         const rs = gameResources.getResource(d.id);
                         const isHerb = rs.tags.includes('herb');
                         const isRare = rs.tags.includes('rare');
+                        const isHunt = rs.tags.includes('hunting');
                         let amtHerbsMult = 1.;
                         if(isHerb) {
                             amtHerbsMult = gameEffects.getEffectValue('gathering_herbs_amount');
-                            if(isRare) {
-                                amtHerbsMult = 0.25*amtHerbsMult ** 0.5;
-                            }
+                        }
+                        if(isHunt) {
+                            amtHerbsMult = gameEffects.getEffectValue('hunting_amount_multiplier');
+                        }
+                        if(isRare) {
+                            amtHerbsMult = 0.25*amtHerbsMult ** 0.5;
                         }
                         let rarityProbMult = 1.;
                         if(rs.rarity <= 2) {
@@ -310,7 +355,10 @@ export class MapModule extends GameModule {
                             })
                         }
                         const gatheringPerceptionEffect = this.getGatheringPerceptionEffect();
-                        let prob = 0.09*d.probabilityMult*rarityProbMult*effEff*gatheringPerceptionEffect;
+                        let prob = 0.12*d.probabilityMult*rarityProbMult*effEff*gatheringPerceptionEffect;
+                        if(d.isHunt) {
+                            prob *= 1.e-2*(gameResources.getResource('hunting_effort')?.balance || 0) + 1.e-3;
+                        }
                         if(prob > 0.2) {
                             prob = Math.min(0.5, 0.2 + (prob - 0.2) ** 1.5)
                         }
@@ -526,6 +574,8 @@ export class MapModule extends GameModule {
                     {...gameEffects.getEffect('gathering_herbs_amount'), isMultiplier: true},
                     {...gameResources.getResource('gathering_perception'), isMultiplier: false, value: gameResources.getResource('gathering_perception').amount},
                     {id: 'perception_effect', name: 'Gathering Perception Effect', value: this.getGatheringPerceptionEffect(), description: 'Multiplier to find probabilities provided by Gathering Perception', isMultiplier: true},
+                    {...gameResources.getResource('hunting_effort'), isMultiplier: false, value: gameResources.getResource('hunting_effort').amount},
+                    {...gameEffects.getEffect('hunting_amount_multiplier'), isMultiplier: true},
                     {...gameEffects.getEffect('map_generation_discount'), isMultiplier: true}
                 ].filter(one => ((!one.isMultiplier && (one.value > SMALL_NUMBER)) || (one.isMultiplier && (Math.abs(one.value - 1) > SMALL_NUMBER))))
             }

@@ -55,7 +55,6 @@ export const CraftingWrap = ({ children }) => {
     })
 
     onMessage('crafting-list-data', (payload) => {
-        // console.log(`currViewing LIST: `, payload, listDetails);
         if(!listDetails) return;
 
         setListDetails({
@@ -268,6 +267,19 @@ export const CraftingWrap = ({ children }) => {
         }
     }
 
+    const onApplyCurrent = () => {
+        sendData('query-running-craft-for-list', { category: 'crafting' });
+    }
+
+    onMessage('running-craft-for-list', recipes => {
+        console.log('runningRecipes: ', recipes);
+        const { listData } = listDetails ?? {};
+        const newList = listData;
+        listData.recipes = recipes;
+        setListDetails({...listDetails, listData: {...newList}});
+        sendData('query-crafting-list-effects', { listData: newList });
+    })
+
     const onCloseList = () => {
         setListDetails(null);
     }
@@ -298,6 +310,7 @@ export const CraftingWrap = ({ children }) => {
                 onSetAutotriggerPattern={onSetAutotriggerPattern}
                 onCloseList={onCloseList}
                 onToggleAutotrigger={onToggleAutotrigger}
+                onApplyCurrent={onApplyCurrent}
             />) : null}
             {detailOpened && !listDetails?.isEdit ? (<ItemDetails itemId={detailOpened} category={'crafting'} setItemDetails={setItemDetails}/>) : null}
             {!detailOpened && !listDetails?.listData ? (<GeneralStats setDetailVisible={setDetailVisible}/>) : null}
@@ -451,7 +464,8 @@ export const CraftingListDetails = ({
    setAutotriggerPriority,
    onSetAutotriggerPattern,
    onCloseList,
-   onToggleAutotrigger
+   onToggleAutotrigger,
+   onApplyCurrent
 }) => {
 
     const worker = useContext(WorkerContext);
@@ -495,6 +509,10 @@ export const CraftingListDetails = ({
 
     const toggleAutotrigger = () => {
         onToggleAutotrigger()
+    }
+
+    const applyCurrent = () => {
+        onApplyCurrent();
     }
 
     if(!listDetails) return ;
@@ -550,6 +568,9 @@ export const CraftingListDetails = ({
                                 </div>
                             )) : <p className={'hint'}>No map recipes added yet</p>}
                         </div>
+                        {isEditing ? (<div className={'apply-current block'}>
+                            <button onClick={applyCurrent}>Apply Running Recipes</button>
+                        </div> ) : null}
                     </div>
                 </div>
                 <div className={'effects-wrap'}>

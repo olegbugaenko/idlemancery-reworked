@@ -137,17 +137,17 @@ export function registerPlantations () {
         description: 'Grow core duckweed.'
     })
 
-    registerPlant('aloe_vera_plantation', 'inventory_aloe_vera', 0.02, 400, {
+    registerPlant('aloe_vera_plantation', 'inventory_aloe_vera', 0.02, 300, {
         name: 'Grow Aloe Vera',
         description: 'Grow some aloe vera'
     })
 
-    registerPlant('ginseng_plantation', 'inventory_ginseng', 0.02, 400, {
+    registerPlant('ginseng_plantation', 'inventory_ginseng', 0.02, 300, {
         name: 'Grow Ginseng',
         description: 'Grow some ginseng'
     })
 
-    registerPlant('nightshade_plantation', 'inventory_nightshade', 0.01, 300, {
+    registerPlant('nightshade_plantation', 'inventory_nightshade', 0.01, 250, {
         name: 'Grow Nightshade',
         description: 'Grow some nightshade'
     })

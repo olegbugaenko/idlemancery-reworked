@@ -105,7 +105,7 @@ export const ResourcesBar = () => {
                 addClass += ' missing-blocker';
             }
 
-            return (<div key={res.id} className={`holder ${aff ? 'monitored' : ''} ${addClass}`} onMouseOver={() => setMonitoredAttribute(res.id)} onMouseOut={() => setMonitoredAttribute(null)}><p className={`resource-item ${affClassData}`}>
+            return (<div key={res.id} className={`holder ${aff ? 'monitored' : ''} ${addClass}`} onMouseEnter={() => setMonitoredAttribute(res.id)} /*onMouseOut={() => setMonitoredAttribute(null)}*/ onMouseLeave={() => setMonitoredAttribute(null)}><p className={`resource-item ${affClassData}`}>
                 <div className={'resource-label'}>
                     <RawResource name={res.name} id={res.id} />
                 </div>
@@ -148,7 +148,8 @@ export const AttributesBar = () => {
         setAttributesData(attributes);
     })
 
-    const setMonitoredAttribute = useCallback((id) => {
+    const setMonitoredAttribute = useCallback((id, target) => {
+        console.log('SettMonitored: ', id, target);
         sendData('set-monitored', { scope: 'actions', type: 'attribute', id });
     }, []);
 
@@ -170,7 +171,13 @@ export const AttributesBar = () => {
             }
 
 
-            return (<div key={res.id} className={`holder ${aff ? 'monitored' : ''} ${addClass}`} onMouseOver={() => setMonitoredAttribute(res.id)} onMouseOut={() => setMonitoredAttribute(null)}><p className={`resource-item ${affClassData}`}>
+            return (<div key={res.id} className={`holder ${aff ? 'monitored' : ''} ${addClass}`}
+                         onMouseEnter={(e) => {
+                            setMonitoredAttribute(res.id, e.target)
+                        }}
+                         /*onMouseOut={() => setMonitoredAttribute(null)}*/
+                         onMouseLeave={(e) => setMonitoredAttribute(null, e.target)}
+            ><p className={`resource-item ${affClassData}`}>
                 <TippyWrapper content={<div className={'hint-popup'}>
                     <div className={'block'}>
                         <h4>{res.name}: {formatValue(res.value, 3)}</h4>

@@ -1313,6 +1313,65 @@ export const registerActionsStage1 = () => {
         }
     })
 
+
+    registerGameAction('action_hunt_carefully', {
+        tags: ["action", "activity", "routine", "gathering"],
+        name: 'Carefull Hunt',
+        category: ACTION_CATS.ROUTINE,
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Spend some time hunting to get more loot. This requires map exploration, so its best to combine with "gathering" activities',
+        level: 1,
+        getLearnRate: () => {
+            return 1.
+        },
+        discountEffects: ["routine_actions_discount"],
+        learningEffects: ['routine_learning_speed'],
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'gathering_effort': {
+                        A: 0.001*gameEffects.getEffectValue('gathering_efficiency'),
+                        B: 0.039*gameEffects.getEffectValue('gathering_efficiency'),
+                        type: 0,
+                    },
+                    'hunting_effort': {
+                        A: 0.0001,
+                        B: 0.00039,
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0,
+                        B: 250,
+                        type: 0,
+                    },
+                    'health': {
+                        A: 0,
+                        B: 150,
+                        type: 0,
+                    },
+                    'inventory_hunting_net': {
+                        A: 0,
+                        B: 0.01,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['gathering_efficiency']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_hunting') > 0
+        },
+        attributes: {
+            baseXPCost: 500000000,
+            primaryAttribute: 'attribute_patience'
+        }
+    })
+
     registerGameAction('action_gather_berries', {
         tags: ["action", "gathering", "routine"],
         name: 'Gather Berries',

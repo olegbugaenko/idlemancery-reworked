@@ -5,7 +5,6 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import {HowToSign} from "../shared/how-to-sign.jsx";
 import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
 import {formatInt, formatValue, secondsToString} from "../../general/utils/strings";
-import {Draggable, Droppable} from "react-beautiful-dnd";
 import {ResourceComparison} from "../shared/resource-comparison.jsx";
 import {EffectsSection} from "../shared/effects-section.jsx";
 import RulesList from "../shared/rules-list.jsx";
@@ -14,6 +13,7 @@ import {useTutorial} from "../../context/tutorial-context";
 import {ProgressBar} from "../layout/progress-bar.jsx";
 import {useAppContext} from "../../context/ui-context";
 import {useUICache} from "../../general/hooks/local-cache";
+import {useDrag, useDrop} from "../../custom-libs/dnd";
 
 
 export const ActionDetails = ({actionId, onClose, isSelected}) => {
@@ -210,24 +210,35 @@ export const ActionDetailsComponent = React.memo(({onClose, isSelected, ...actio
     return true;
 })
 
+const DraggableActionItem = ({ id, index, children }) => {
+
+    const {ref, props: dragProps} = useDrag({ type: 'action', id: `action_in_editor_${id}`, sourceId: 'action-list-editor', data: { id } });
+
+    return (
+        <div ref={ref} {...dragProps}>
+            {children}
+        </div>
+    );
+};
 
 export const ListEditor = React.memo(({
-                                          editListId,
-                                          listData,
-                                          onUpdateActionFromList,
-                                          onDropActionFromList,
-                                          onUpdateListValue,
-                                          onCloseList,
-                                          isEditing,
-                                          onAddAutotriggerRule,
-                                          onSetAutotriggerRuleValue,
-                                          onDeleteAutotriggerRule,
-                                          setAutotriggerPriority,
-                                          onSetAutotriggerPattern,
-                                          onToggleAutotrigger,
-                                          resources,
-                                          automationUnlocked
-                                      }) => {
+      editListId,
+      listData,
+      onUpdateActionFromList,
+      onDropActionFromList,
+      onUpdateListValue,
+      onCloseList,
+      isEditing,
+      onAddAutotriggerRule,
+      onSetAutotriggerRuleValue,
+      onDeleteAutotriggerRule,
+      setAutotriggerPriority,
+      onSetAutotriggerPattern,
+      onToggleAutotrigger,
+      resources,
+      automationUnlocked,
+      onDragEnd,
+  }) => {
 
     const worker = useContext(WorkerContext);
 
@@ -270,6 +281,8 @@ export const ListEditor = React.memo(({
         onToggleAutotrigger()
     }
 
+    useDrop('action-editor-wrap', { accept: 'action', onDrop: onDragEnd });
+
     if(!editing) return ;
 
     return (<PerfectScrollbar><div className={'list-editor'}>
@@ -299,9 +312,7 @@ export const ListEditor = React.memo(({
                 </div> ) : null}
             </div>
         </div>
-        <Droppable droppableId="action-list-editor">
-            {(provided) => (
-                <div ref={provided.innerRef} {...provided.droppableProps} className="actions-list-wrap">
+                <div className="actions-list-wrap">
                     <div className={`action-row flex-container header`}
                     >
                         <div className={'col title'}>
@@ -314,14 +325,10 @@ export const ListEditor = React.memo(({
                             {isEditing ? (<span>Delete</span>) : null}
                         </div>
                     </div>
-                    {editing.actions.length ? editing.actions.map((action, index) => (
-                        <Draggable key={`list-${action.id}-${index}`} draggableId={`list-${action.id}-${index}`} index={index}>
-                            {(provided) => (
-                                <div className={`action-row flex-container ${!action.isAvailable ? 'unavailable' : ''}`}
-                                     ref={provided.innerRef}
-                                     {...provided.draggableProps}
-                                     {...provided.dragHandleProps}
-                                >
+                    <div id={'action-editor-wrap'} className={'action-items-list'}>
+                        {editing.actions.length ? editing.actions.map((action, index) => (
+                            <DraggableActionItem key={`list-${action.id}-${index}`} id={action.id} index={index}>
+                                <div className={`action-row flex-container ${!action.isAvailable ? 'unavailable' : ''}`}>
                                     {editing.proportionsBar ? (<div style={{width: editing.proportionsBar?.[index]?.displayPercentage, backgroundColor: editing.proportionsBar[index]?.color}} className={'prop-bg'}></div> ) : null}
                                     <div className={'col title'}>
                                         <span>{action.name}</span>
@@ -341,13 +348,10 @@ export const ListEditor = React.memo(({
                                         {isEditing ? (<span className={'close'} onClick={() => onDropActionFromList(action.id)}>X</span>) : null}
                                     </div>
                                 </div>
-                            )}
-                        </Draggable>
-                    )) : <p className={'hint'}>Click on actions or drag & drop them to add</p>}
-                    {provided.placeholder}
+                            </DraggableActionItem>
+                        )) : <p className={'hint'}>Click on actions or drag & drop them to add</p>}
+                    </div>
                 </div>
-            )}
-        </Droppable>
         <div className={'effects-wrap'}>
             {Object.keys(editing?.resourcesEffects || {}).length ? (<div className={'block'}>
                 <p>Average Resources per second</p>

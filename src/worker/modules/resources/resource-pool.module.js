@@ -135,6 +135,15 @@ export class ResourcePoolModule extends GameModule {
             isService: true,
         })
 
+        gameResources.registerResource('hunting_effort', {
+            tags: ['exploration', 'secondary'],
+            name: 'Hunting Effort',
+            isService: true,
+            unlockCondition: () => {
+                return gameEntity.getLevel('shop_item_hunting') > 0
+            }
+        })
+
         gameResources.registerResource('gathering_perception', {
             tags: ['exploration', 'secondary'],
             name: 'Gathering Perception',

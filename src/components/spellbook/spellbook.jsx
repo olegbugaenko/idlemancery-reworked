@@ -64,6 +64,7 @@ export const Spellbook = ({}) => {
         }, 1000)
         return () => {
             clearInterval(interval);
+            clearInterval(interval2);
         }
     }, [])
 
@@ -426,11 +427,11 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
                         <EffectsSection effects={item.potentialEffects} maxDisplay={10}/>
                     </div>
                 ): null}
-                {isMobile ? (<div className={'cast-block block'}>
+                <div className={'cast-block block'}>
                     <button disabled={!spellDetails || !spellDetails.affordable?.isAffordable || spellDetails.currentDuration > 0 || spellDetails.currentCooldown > 0} onClick={() => onPurchase(item.id)}>Cast Spell</button>
                     {spellDetails?.currentDuration ? (<p className={'small'}>Running: {secondsToString(spellDetails?.currentDuration)}</p>) : null}
                     {spellDetails?.currentCooldown ? (<p className={'small'}>Cooldown: {secondsToString(spellDetails?.currentCooldown)}</p>) : null}
-                </div>) : null}
+                </div>
                 {automationUnlocked ? (<div className={'autoconsume-setting'}>
                     <div className={'rules-header flex-container'}>
                         <p>Autospell rules: </p>

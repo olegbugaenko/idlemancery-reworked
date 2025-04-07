@@ -397,7 +397,7 @@ export const MapListsPanel = ({ automationUnlocked, runningList, editListToDetai
     return (<div className={'action-lists-panel'}>
         <div className={'flex-container'}>
             <div className={'current-list panel-col'}>
-                Current list: {runningList ? (<div className={'flex-container'}>
+                <span className={'current-list-label'}>Current list:</span> {runningList ? (<div className={'flex-container'}>
                 <span>{runningList.name}</span>
                 <div className={'icon-content stop-icon interface-icon'} onClick={() => runList(null)}>
                     <img src={"icons/interface/pause.png"}/>

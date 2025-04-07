@@ -38,7 +38,7 @@ export const ActionListsPanel = ({ automationUnlocked, runningList, editListToDe
     return (<div className={'action-lists-panel'}>
         <div className={'flex-container'}>
             <div className={'current-list panel-col'}>
-                Current list: {runningList ? (<div className={'flex-container'}>
+                <span className={'current-list-label'}>Current list:</span> {runningList ? (<div className={'flex-container'}>
                 <span>{runningList.name}</span>
                 <div className={'icon-content stop-icon interface-icon'} onClick={() => runList(null)}>
                     <img src={"icons/interface/pause.png"}/>
@@ -169,6 +169,7 @@ export const ActionListsPopup = ({ lists, isOpened, setOpenedFor, onSelect, onHo
                                                         {...provided.dragHandleProps}
                                                         onMouseEnter={() => onHover(list.id)}
                                                         onMouseLeave={() => onHover(null)}
+                                                        /*onMouseOut={() => onHover(null)}*/
                                                     >
                                                         <div className={"list-item-row flex-container"}>
                                                             <span className={"list-name"}>{list.name}</span>

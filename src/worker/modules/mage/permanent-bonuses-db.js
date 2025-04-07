@@ -1,4 +1,4 @@
-import { gameEntity, gameCore, gameEffects } from "game-framework"
+import {gameEntity, gameCore, gameEffects, gameResources} from "game-framework"
 
 export const registerPermanentBonuses = () => {
 
@@ -299,6 +299,57 @@ export const registerPermanentBonuses = () => {
                 effects: {
                     'routine_learning_speed': {
                         A: 0.005,
+                        B: 50,
+                        C: 1,
+                        diminish: 0.33,
+                        type: 4,
+                    }
+                }
+            }
+        }
+    })
+
+    gameEntity.registerGameEntity('rare_stormbird_heart_effect', {
+        tags: ["bonus", "permanent", "nutrition"],
+        name: 'Stormbird Heart',
+        level: 0,
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_hunting_net');
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'elemental_spells_efficiency': {
+                        A: 0.005,
+                        B: 50,
+                        C: 1,
+                        diminish: 0.33,
+                        type: 4,
+                    }
+                }
+            }
+        }
+    })
+
+
+    gameEntity.registerGameEntity('rare_greyhorn_brain_effect', {
+        tags: ["bonus", "permanent", "nutrition"],
+        name: 'Greyhorn Brain',
+        level: 0,
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_hunting_net');
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'learning_rate': {
+                        A: 0.002,
                         B: 50,
                         C: 1,
                         diminish: 0.33,

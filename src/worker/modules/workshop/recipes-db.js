@@ -231,12 +231,12 @@ export const registerCraftingRecipes = () => {
                 resources: {
                     'inventory_ginseng': {
                         A: 1.5,
-                        B: 0.5/gameEffects.getEffectValue('crafting_materials_discount'),
+                        B: 0.25/gameEffects.getEffectValue('crafting_materials_discount'),
                         type: 1
                     },
                     'inventory_aloe_vera': {
                         A: 1.5,
-                        B: 0.5/gameEffects.getEffectValue('crafting_materials_discount'),
+                        B: 0.25/gameEffects.getEffectValue('crafting_materials_discount'),
                         type: 1
                     },
                     'crafting_ability': {
@@ -726,6 +726,67 @@ export const registerCraftingRecipes = () => {
         },
         unlockCondition: () => {
             return gameResources.isResourceUnlocked('inventory_map_fragment')
+        },
+        attributes: {
+            baseXPCost: 10,
+        },
+        get_cost: () => ({
+            'crafting_slots': {
+                A: 1,
+                B: 0,
+                type: 0
+            }
+        }),
+    })
+
+
+    registerCraftingRecipe('craft_hunting_net', {
+        tags: ["recipe", "crafting", "material", "physical"],
+        name: 'Hunting Net',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Create map fragments and turn them into reality with your magic',
+        level: 1,
+        resourceId: 'inventory_hunting_net',
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'inventory_hunting_net': {
+                        A: 1.3,
+                        B: 0.005*gameEffects.getEffectValue('crafting_efficiency'),
+                        type: 1,
+                    }
+                }
+            }),
+            get_consumption: ()=>({
+                resources: {
+                    'inventory_herbal_fibers': {
+                        A: 1.5,
+                        B: 100/gameEffects.getEffectValue('crafting_materials_discount'),
+                        type: 1
+                    },
+                    'inventory_green_ink': {
+                        A: 1.5,
+                        B: (10/1.5)/gameEffects.getEffectValue('crafting_materials_discount'),
+                        type: 1
+                    },
+                    'crafting_ability': {
+                        A: 1.5,
+                        B: 10,
+                        type: 1,
+                    },
+                    'crafting_slots': {
+                        A: 1,
+                        B: 0,
+                        type: 0,
+                        ignoreEfficiency: true,
+                    },
+                }
+            }),
+            effectDeps: ['crafting_efficiency', 'crafting_materials_discount']
+        },
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_hunting_net')
         },
         attributes: {
             baseXPCost: 10,

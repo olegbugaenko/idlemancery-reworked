@@ -268,6 +268,19 @@ export const AlchemyWrap = ({ children }) => {
         }
     }
 
+    const onApplyCurrent = () => {
+        sendData('query-running-craft-for-list', { category: 'alchemy' });
+    }
+
+    onMessage('running-craft-for-list', recipes => {
+        console.log('runningRecipes: ', recipes);
+        const { listData } = listDetails ?? {};
+        const newList = listData;
+        listData.recipes = recipes;
+        setListDetails({...listDetails, listData: {...newList}});
+        sendData('query-crafting-list-effects', { listData: newList });
+    })
+
     const onCloseList = () => {
         setListDetails(null);
     }
@@ -298,6 +311,7 @@ export const AlchemyWrap = ({ children }) => {
                 onSetAutotriggerPattern={onSetAutotriggerPattern}
                 onToggleAutotrigger={onToggleAutotrigger}
                 onCloseList={onCloseList}
+                onApplyCurrent={onApplyCurrent}
             />) : null}
             {(detailOpened && !listDetails?.isEdit) ? (<ItemDetails itemId={detailOpened} category={'alchemy'} setItemDetails={setItemDetails}/>) : null}
             {!detailOpened && !listDetails?.listData ? (<GeneralStats setDetailVisible={setDetailVisible}/>) : null}
@@ -400,7 +414,8 @@ export const AlchemyListDetails = ({
     setAutotriggerPriority,
     onSetAutotriggerPattern,
     onCloseList,
-    onToggleAutotrigger
+    onToggleAutotrigger,
+    onApplyCurrent
 }) => {
 
     const worker = useContext(WorkerContext);
@@ -444,6 +459,10 @@ export const AlchemyListDetails = ({
 
     const toggleAutotrigger = () => {
         onToggleAutotrigger()
+    }
+
+    const applyCurrent = () => {
+        onApplyCurrent()
     }
 
     if(!listDetails) return ;
@@ -500,6 +519,9 @@ export const AlchemyListDetails = ({
                             )) : <p className={'hint'}>No map recipes added yet</p>}
                         </div>
                     </div>
+                    {isEditing ? (<div className={'apply-current block'}>
+                        <button onClick={applyCurrent}>Apply Running Recipes</button>
+                    </div> ) : null}
                 </div>
                 <div className={'effects-wrap'}>
                     {Object.keys(editing?.resourcesEffects || {}).length ? (<div className={'block'}>

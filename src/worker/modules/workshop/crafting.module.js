@@ -41,6 +41,34 @@ export class CraftingModule extends GameModule {
             this.setCraftingLevel(payload);
             this.sendCraftingData(payload);
         })
+
+        this.eventHandler.registerHandler('query-running-craft-for-list', (payload) => {
+            const tagToCat = {
+                'crafting': 'material',
+                alchemy: 'alchemy'
+            }
+            const hypotheticValues = [];
+            if(this.craftingSlots) {
+                const rrs = (payload.category === 'crafting') ? gameResources.getResource('crafting_slots') : gameResources.getResource('alchemy_slots');
+                for(const id in this.craftingSlots) {
+                    const ent = gameEntity.getEntity(id);
+                    const isIgnore = payload.category && !ent.tags.includes(tagToCat[payload.category]);
+                    // console.log('Stop Craft: ', category, id, isIgnore, gameEntity.getEntity(id).tags)
+                    if(!isIgnore && this.craftingSlots[id]?.level) {
+                        hypotheticValues.push({
+                            id,
+                            name: ent.name,
+                            min: this.craftingSlots[id]?.level,
+                            max: this.craftingSlots[id]?.level,
+                            percentage: this.craftingSlots[id]?.level*100 / rrs.income
+                        })
+                    }
+                }
+            }
+
+            this.eventHandler.sendData('running-craft-for-list', hypotheticValues);
+
+        })
     }
 
     initialize() {
