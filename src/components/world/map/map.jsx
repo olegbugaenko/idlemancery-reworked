@@ -7,6 +7,7 @@ import {BreakDown} from "../../layout/sidebar.jsx";
 import {TippyWrapper} from "../../shared/tippy-wrapper.jsx";
 import Select from "react-select";
 import {PinResource} from "../../shared/pin-resource.jsx";
+import {useTutorial} from "../../../context/tutorial-context";
 
 const customStyles = {
     control: (provided, state) => ({
@@ -70,6 +71,7 @@ const customStyles = {
 export const Map = ({ setItemDetails, openListDetails, isEditList }) => {
 
     const worker = useContext(WorkerContext);
+    const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
 
     const { onMessage, sendData } = useWorkerClient(worker);
     const [mapData, setMapTiles] = useState({
@@ -107,6 +109,12 @@ export const Map = ({ setItemDetails, openListDetails, isEditList }) => {
 
     onMessage('map-data', (mapData) => {
         setMapTiles(mapData);
+        if(currentTourId === 'map' && stepIndex === 7) {
+            console.log('Check to jump over: ', mapData.explorationPoints);
+            if(mapData.explorationPoints.balance > 0 || mapData.explorationPoints.consumption > 0) {
+                jumpOver(7, 4);
+            }
+        }
         // console.log('mapData: ', mapData);
     })
 
@@ -145,6 +153,10 @@ export const Map = ({ setItemDetails, openListDetails, isEditList }) => {
         sendData('map-highlight-filter', { effortMax: val});
     })
 
+    if(currentTourId === 'map') {
+        unlockNextById(10)
+    }
+
     return (<div className={'map-wrap'}>
         <div className={'head'}>
             <div className={'flex-container'}>
@@ -153,7 +165,7 @@ export const Map = ({ setItemDetails, openListDetails, isEditList }) => {
                     <p className={'hint'}>If your gathering effort is insufficient, loot chances and quantities will decrease.</p>
                     <BreakDown breakDown={mapData.explorationPoints.breakDown} />
                 </div> }>
-                    <div className={'space-item'}>
+                    <div className={'space-item gather-efforts-indicator'}>
                         <span className={'gather-label'}>Gathering Efforts:</span>
                         <span className={`gather-value ${mapData.explorationPoints.balance > 1.e-7 ? 'green' : 'yellow'}`}>{formatValue(mapData.explorationPoints.balance)}/{formatValue(mapData.explorationPoints.balance + mapData.explorationPoints.consumption)}</span>
                     </div>
@@ -243,6 +255,7 @@ export const MapTile = React.memo(
                 className={`map-tile ${isExploring ? "running" : ""} ${isSelected ? "selected" : ""} ${
                     isHighlight ? "highlight" : ""
                 }`}
+                id={`map-tile-${i}-${j}`}
                 style={{ backgroundImage: `url(icons/terrain/${icon}.png)` }}
                 onClick={() => isSelected ? setItemDetails(null) : setItemDetails({ i, j })}
             ></div>
@@ -394,7 +407,7 @@ export const MapListsPanel = ({ automationUnlocked, runningList, editListToDetai
         setOpenedFor('edit');
     }
 
-    return (<div className={'action-lists-panel'}>
+    return (<div className={'action-lists-panel map-lists-panel'}>
         <div className={'flex-container'}>
             <div className={'current-list panel-col'}>
                 <span className={'current-list-label'}>Current list:</span> {runningList ? (<div className={'flex-container'}>

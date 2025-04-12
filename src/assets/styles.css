@@ -1483,7 +1483,8 @@ h4 {
     border-bottom: 1px solid #777777;
 }
 
-.items .menu-wrap.map {
+.items .menu-wrap.map,
+.items .menu-wrap.workshop {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -2733,10 +2734,14 @@ h4.title span {
 }
 
 ul.menu .add-custom-filter {
-    display: flex;
-    align-items: center;
+
     padding-left: 4px;
     position: relative;
+}
+
+ul.menu .add-custom-filter .add-wrap {
+    display: flex;
+    align-items: center;
 }
 
 .add-custom-filter:hover {

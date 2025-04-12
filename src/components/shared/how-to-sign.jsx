@@ -1,24 +1,24 @@
 import React from "react";
-import {useAppContext} from "../../context/ui-context";
 import {TippyWrapper} from "./tippy-wrapper.jsx";
+import {useTutorial} from "../../context/tutorial-context";
+
 
 export const HowToSign = ({ scope }) => {
-
-    const { setPopupMeta, setActivePopup } = useAppContext();
+    const { startTutorialById, run } = useTutorial();
 
     const showHowTo = () => {
-        setActivePopup('howto');
-        setPopupMeta({
-            howToScope: scope,
-        })
-    }
+        if (!run) { // не дозволяємо запуск нового туру, якщо вже якийсь йде
+            startTutorialById(scope);
+        }
+    };
 
-    return (<TippyWrapper content={<div className={'hint-popup'}>How it works?</div> }>
-        <div className={'how-to'}>
-            <span className={'how-to-sign'} onClick={showHowTo}>
-                ?
-            </span>
-        </div>
-    </TippyWrapper> )
-
-}
+    return (
+        <TippyWrapper content={<div className="hint-popup">How it works?</div>}>
+            <div className="how-to">
+                <span className="how-to-sign" onClick={showHowTo}>
+                    ?
+                </span>
+            </div>
+        </TippyWrapper>
+    );
+};

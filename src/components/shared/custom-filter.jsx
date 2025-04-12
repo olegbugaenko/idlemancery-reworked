@@ -2,6 +2,7 @@ import React, {useState, useEffect, useContext} from 'react';
 import Select from 'react-select';
 import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
+import {useTutorial} from "../../context/tutorial-context";
 
 
 const customStyles = {
@@ -41,11 +42,16 @@ const customStyles = {
         ...provided,
         marginTop: '0', // Видаляємо відступ між селектом і меню
         width: '240px',
+        zIndex: 10103,
     }),
     option: (provided, state) => ({
         ...provided,
         padding: '2px 10px', // Зменшуємо відступи опцій
         color: '#000'
+    }),
+    menuPortal: (base) => ({
+        ...base,
+        zIndex: 10110,
     }),
 };
 
@@ -60,10 +66,18 @@ const CustomFilter = React.memo(({
   onCancel
 }) => {
     const worker = useContext(WorkerContext);
+    const { stepIndex, unlockNextById, jumpOver, currentTourId, setNextAllowedById } = useTutorial();
 
     const { onMessage, sendData } = useWorkerClient(worker);
     const [rules, setRules] = useState(initialRules);
     const [condition, setCondition] = useState(initialCondition);
+
+    const saveCondition = (cond) => {
+        if(currentTourId === 'actions' && cond.toLowerCase() === '1 or 2') {
+            unlockNextById(20)
+        }
+        setCondition(cond);
+    }
 
     // Lists loaded from server
     const [tags, setTags] = useState([]);
@@ -119,11 +133,21 @@ const CustomFilter = React.memo(({
 
     // Add a new, empty rule
     const addRule = () => {
+        if(currentTourId === 'actions') {
+            unlockNextById(16)
+            unlockNextById(18)
+        }
         setRules((prev) => [...prev, { type: '', object: '' }]);
     };
 
     // Update an existing rule
     const updateRule = (index, newRule) => {
+        if(currentTourId === 'actions' && newRule.type === 'attribute' && newRule.object === 'attribute_stamina') {
+            setNextAllowedById(17)
+        }
+        if(currentTourId === 'actions' && newRule.type === 'attribute' && newRule.object === 'attribute_charisma') {
+            setNextAllowedById(19)
+        }
         setRules((prev) =>
             prev.map((rule, i) => (i === index ? newRule : rule))
         );
@@ -135,11 +159,17 @@ const CustomFilter = React.memo(({
     };
 
     const updateName = (name) => {
+        if(currentTourId === 'actions') {
+            setNextAllowedById(15)
+        }
         setFilterName(name);
     }
 
     // Handle save
     const handleSave = () => {
+        if(currentTourId === 'actions') {
+            unlockNextById(21)
+        }
         onSave({ id, name: filterName, rules, condition });
     };
 
@@ -174,11 +204,11 @@ const CustomFilter = React.memo(({
             <div className={'block name-wrap'}>
                 <label>
                     Filter Name
-                    <input type={'text'} value={filterName} onChange={(e) => setFilterName(e.target.value)}/>
+                    <input className={'filter-name-input'} type={'text'} value={filterName} onChange={(e) => updateName(e.target.value)}/>
                 </label>
             </div>
             {/* List of rules */}
-            <div>
+            <div className={'filter-rules'}>
                 <h4>Rules:</h4>
                 {rules.map((rule, index) => {
                     // Current type option
@@ -205,13 +235,14 @@ const CustomFilter = React.memo(({
                                 alignItems: 'center',
                                 marginBottom: '8px'
                             }}
-                            className={'flex-container filter-row'}
+                            className={'flex-container filter-row custom-filter-rule'}
                         >
                             {/* Rule type select (react-select) */}
                             <div style={{ width: '120px', marginRight: '8px' }}>
                                 <Select
                                     value={selectedType}
                                     styles={customStyles}
+                                    menuPortalTarget={document.body}
                                     onChange={(selected) =>
                                         updateRule(index, {
                                             ...rule,
@@ -230,6 +261,7 @@ const CustomFilter = React.memo(({
                                     <Select
                                         value={selectedObject}
                                         styles={customStyles}
+                                        menuPortalTarget={document.body}
                                         onChange={(selected) =>
                                             updateRule(index, { ...rule, object: selected.value })
                                         }
@@ -244,7 +276,7 @@ const CustomFilter = React.memo(({
                     );
                 })}
 
-                <button onClick={addRule}>Add Rule</button>
+                <button onClick={addRule} className={'add-rule'}>Add Rule</button>
             </div>
 
             {/* Condition string area */}
@@ -252,7 +284,8 @@ const CustomFilter = React.memo(({
                 <label>Condition:</label>
                 <textarea
                     value={condition}
-                    onChange={(e) => setCondition(e.target.value)}
+                    className={'custom-filter-condition'}
+                    onChange={(e) => saveCondition(e.target.value)}
                     rows={2}
                     style={{ width: '100%', marginTop: '8px' }}
                 />
@@ -260,7 +293,7 @@ const CustomFilter = React.memo(({
 
             {/* Save / Cancel buttons */}
             <div style={{ marginTop: '16px' }}>
-                <button onClick={handleSave} style={{ marginRight: '8px' }}>
+                <button className={'save-custom-filter'} onClick={handleSave} style={{ marginRight: '8px' }}>
                     Save
                 </button>
                 <button onClick={handleCancel}>Cancel</button>

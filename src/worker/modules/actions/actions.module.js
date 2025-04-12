@@ -65,8 +65,12 @@ export class ActionsModule extends GameModule {
         this.customFiltersOrder = Object.keys(this.customFilters);
 
         this.eventHandler.registerHandler('query-actions-running', payload => {
-            const rn = this.getRunningActionsInfo();
-            this.eventHandler.sendData('actions-running', rn);
+            const rn = this.getRunningActionsInfo(payload);
+            let label = 'actions-running';
+            if(payload.prefix) {
+                label = `${label}-${payload.prefix}`;
+            }
+            this.eventHandler.sendData(label, rn);
         })
 
         this.eventHandler.registerHandler('actions-change-custom-filters-order', payload => {
@@ -516,15 +520,15 @@ export class ActionsModule extends GameModule {
                     this.actions[act.originalId].level = 1;
                 }
 
-                if(this.actions[act.originalId].focus.time < this.getFocusCapTime(act.originalId)) {
+                /*if(this.actions[act.originalId].focus.time < this.getFocusCapTime(act.originalId)) {
                     this.actions[act.originalId].focus.time += delta*act.effort;
                 } else {
                     this.actions[act.originalId].focus.time = this.getFocusCapTime(act.originalId);
-                }
+                }*/
 
                 this.actions[act.originalId].timeInvested = (this.actions[act.originalId].timeInvested || 0) + delta*act.effort;
 
-                this.actions[act.originalId].focus.bonus = this.getFocusBonus(this.actions[act.originalId].focus.time);
+                // this.actions[act.originalId].focus.bonus = this.getFocusBonus(this.actions[act.originalId].focus.time);
                 const dxp = delta*this.getLearningRate(act.id);
                 // console.log('------------: ', act.id, dxp, delta, this.getLearningRate(act.id, undefined, true));
                 this.actions[act.originalId].xp += dxp;
@@ -704,13 +708,13 @@ export class ActionsModule extends GameModule {
         const isRunning = this.isRunningAction(id);
         if(isRunning) {
             // console.log('EffMult: ', id, eff, entEff, eff == null);
-            focusBonus = this.actions[gameEntity.getEntity(id).copyFromId]?.focus?.bonus || this.actions[id]?.focus?.bonus || 1.;
+            /*focusBonus = this.actions[gameEntity.getEntity(id).copyFromId]?.focus?.bonus || this.actions[id]?.focus?.bonus || 1.;
             if(Math.abs(1 - focusBonus) > SMALL_NUMBER) {
                 breakDowns['focus'] = {
                     title: 'Focus',
                     value: focusBonus,
                 }
-            }
+            }*/
             if(Math.abs(1 - isRunning.effort) > SMALL_NUMBER) {
                 breakDowns['effort'] = {
                     title: 'Effort',
@@ -857,11 +861,11 @@ export class ActionsModule extends GameModule {
     }
 
     stopRunningActions() {
-        for(const act of this.activeActions) {
+        /*for(const act of this.activeActions) {
             if(this.actions[act.originalId]) {
                 this.actions[act.originalId].focus = null;
             }
-        }
+        }*/
         this.activeActions = [];
         const runningEntities = gameEntity.listEntitiesByTags(['runningActions']);
         runningEntities.forEach(e => {
@@ -908,9 +912,9 @@ export class ActionsModule extends GameModule {
         if(index < 0) {
             throw new Error(`Woops! Can't find action by originalId ${id}`)
         }
-        if(this.actions[id]?.focus) {
+        /*if(this.actions[id]?.focus) {
             this.actions[id].focus = null;
-        }
+        }*/
         this.activeActions.splice(index, 1);
         gameEntity.unsetEntity(`runningAction_${id}`);
     }
@@ -921,15 +925,21 @@ export class ActionsModule extends GameModule {
         this.addRunningAction(id, 1);
     }
 
-    getRunningActionsInfo() {
+    getRunningActionsInfo({ withEffects = false}) {
+        let effects = undefined;
+        if(withEffects) {
+            effects = this.getAllEffectFromRunningAction();
+        }
         if(this.lists.runningList) {
             return {
                 title: this.lists.runningList?.name,
+                effects,
             }
         }
 
         return {
             title: this.activeActions.map(one => gameEntity.getEntity(one.id).name).join(';'),
+            effects,
         }
     }
 
@@ -1131,13 +1141,13 @@ export class ActionsModule extends GameModule {
             xpRate: this.isRunningAction(entity.id) ? this.getLearningRate(`runningAction_${entity.id}`) : this.getLearningRate(entity.id, 1),
             isLeveled: this.actions[entity.id]?.isLeveled,
             tags: entity.tags,
-            focused: this.isRunningAction(entity.id) && this.actions[entity.id]?.focus?.bonus > 1 ? {
+            /*focused: this.isRunningAction(entity.id) && this.actions[entity.id]?.focus?.bonus > 1 ? {
                 isFocused: true,
                 focusTime: this.actions[entity.id].focus.time,
                 focusBonus: this.actions[entity.id].focus.bonus,
                 isCapped: this.actions[entity.id].focus.time >= this.getFocusCapTime(entity.id),
                 cap: this.getFocusCapTime(entity.id),
-            } : null,
+            } : null,*/
             actionEffect: gameEntity.getEffects(entity.id, 0, this.actions[entity.id]?.level || 1, true).filter(eff => eff.type === 'resources'),
             potentialEffects: this.packEffects(
                 gameEntity.getEffects(entity.id, 1, this.actions[entity.id]?.level || 1, true),
@@ -1289,6 +1299,16 @@ export class ActionsModule extends GameModule {
             // now that we have suitable action added - need to understand it inputs (effort, xpRate and so on...)
 
             results.push(suitable);
+        })
+        return results;
+    }
+
+    getAllEffectFromRunningAction() {
+        const runningActions = gameEntity.listEntitiesByTags(['runningActions']);
+        const results = [];
+        runningActions.forEach(entity => {
+            const effts = gameEntity.getEffects(entity.id);
+            results.push(...effts);
         })
         return results;
     }

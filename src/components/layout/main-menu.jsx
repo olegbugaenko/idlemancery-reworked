@@ -3,6 +3,7 @@ import WorkerContext from "../../context/worker-context";
 import { useWorkerClient } from "../../general/client";
 import { useAppContext } from "../../context/ui-context";
 import { NewNotificationWrap } from "../shared/new-notification-wrap.jsx";
+import {useTutorial} from "../../context/tutorial-context";
 
 export const MainMenu = () => {
     const worker = useContext(WorkerContext);
@@ -11,6 +12,7 @@ export const MainMenu = () => {
     const [unlocks, setUnlocksData] = useState({});
     const [newUnlocks, setNewUnlocks] = useState({});
     const [hotkeys, setHotkeys] = useState({});
+    const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
 
     useEffect(() => {
         sendData('query-unlocks', { prefix: 'main-menu' });
@@ -69,7 +71,9 @@ export const MainMenu = () => {
         <div className={'left-most'}>
             <ul className={'menu bigger'}>
                 {unlocks.actions && (
-                    <li className={openedTab === 'actions' ? 'active' : ''} onClick={() => setOpenedTab('actions')}>
+                    <li id={'main-menu-actions'} className={openedTab === 'actions' ? 'active' : ''} onClick={() => {
+                        setOpenedTab('actions')
+                    }}>
                         <NewNotificationWrap isNew={newUnlocks.actions?.hasNew}>
                             <span>Actions</span>
                         </NewNotificationWrap>
@@ -87,42 +91,42 @@ export const MainMenu = () => {
                     </li>
                 )}
                 {unlocks.inventory && (
-                    <li className={openedTab === 'inventory' ? 'active' : ''} onClick={() => setOpenedTab('inventory')}>
+                    <li id={'main-menu-inventory'} className={openedTab === 'inventory' ? 'active' : ''} onClick={() => setOpenedTab('inventory')}>
                         <NewNotificationWrap isNew={newUnlocks.inventory?.hasNew}>
                             <span>Inventory</span>
                         </NewNotificationWrap>
                     </li>
                 )}
                 {unlocks.property && (
-                    <li className={openedTab === 'property' ? 'active' : ''} onClick={() => setOpenedTab('property')}>
+                    <li id={'main-menu-property'} className={openedTab === 'property' ? 'active' : ''} onClick={() => setOpenedTab('property')}>
                         <NewNotificationWrap isNew={newUnlocks.property?.hasNew}>
                             <span>Property</span>
                         </NewNotificationWrap>
                     </li>
                 )}
                 {unlocks.world && (
-                    <li className={openedTab === 'world' ? 'active' : ''} onClick={() => setOpenedTab('world')}>
+                    <li id={'main-menu-world'} className={openedTab === 'world' ? 'active' : ''} onClick={() => setOpenedTab('world')}>
                         <NewNotificationWrap isNew={newUnlocks.world?.hasNew}>
                             <span>World</span>
                         </NewNotificationWrap>
                     </li>
                 )}
                 {unlocks.workshop && (
-                    <li className={openedTab === 'workshop' ? 'active' : ''} onClick={() => setOpenedTab('workshop')}>
+                    <li id={'main-menu-workshop'} className={openedTab === 'workshop' ? 'active' : ''} onClick={() => setOpenedTab('workshop')}>
                         <NewNotificationWrap isNew={newUnlocks.workshop?.hasNew}>
                             <span>Workshop</span>
                         </NewNotificationWrap>
                     </li>
                 )}
                 {unlocks.social && (
-                    <li className={openedTab === 'social' ? 'active' : ''} onClick={() => setOpenedTab('social')}>
+                    <li id={'main-menu-social'} className={openedTab === 'social' ? 'active' : ''} onClick={() => setOpenedTab('social')}>
                         <NewNotificationWrap isNew={newUnlocks.social?.hasNew}>
                             <span>Social</span>
                         </NewNotificationWrap>
                     </li>
                 )}
                 {unlocks.spellbook && (
-                    <li className={openedTab === 'spellbook' ? 'active' : ''} onClick={() => setOpenedTab('spellbook')}>
+                    <li id={'main-menu-spellbook'} className={openedTab === 'spellbook' ? 'active' : ''} onClick={() => setOpenedTab('spellbook')}>
                         <NewNotificationWrap isNew={newUnlocks.spellbook?.hasNew}>
                             <span>Spellbook</span>
                         </NewNotificationWrap>

@@ -28,7 +28,7 @@ export const LoadedMain = () => {
     const worker = useContext(WorkerContext);
 
     const { onMessage, sendData } = useWorkerClient(worker);
-    const { startTutorial, stopTutorial, setStepIndex } = useTutorial();
+    const { startTutorialById, stopTutorial, setStepIndex } = useTutorial();
 
     useEffect(() => {
         sendData('query_tour_status', {})
@@ -37,7 +37,7 @@ export const LoadedMain = () => {
 
     onMessage('tour_status', payload => {
         if(!payload?.isComplete) {
-            startTutorial();
+            startTutorialById('initial');
             if(payload?.skipStep) {
                 setStepIndex(payload.skipStep);
             }

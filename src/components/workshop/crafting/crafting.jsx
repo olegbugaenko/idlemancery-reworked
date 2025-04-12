@@ -10,12 +10,15 @@ import {RawResource} from "../../shared/raw-resource.jsx";
 import {Balances} from "../shared.jsx";
 import {useAppContext} from "../../../context/ui-context";
 import {PinResource} from "../../shared/pin-resource.jsx";
+import {useTutorial} from "../../../context/tutorial-context";
 
 export const Crafting = ({ setItemDetails, setItemLevel, filterId, newUnlocks, openListDetails, addItemToList, isEditList }) => {
 
     const worker = useContext(WorkerContext);
 
     const { isMobile } = useAppContext();
+
+    const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
 
     const { onMessage, sendData } = useWorkerClient(worker);
     const [craftingData, setItemsData] = useState({
@@ -61,9 +64,16 @@ export const Crafting = ({ setItemDetails, setItemLevel, filterId, newUnlocks, o
         openListDetails({ listData });
     }, []);
 
+
+    if(currentTourId === 'crafting') {
+        if(craftingData.available?.length) {
+            unlockNextById(9);
+        }
+    }
+
     return (<div className={'crafting-wrap'}>
         <div className={'head'}>
-            <div className={'space-item'}>
+            <div className={'space-item crafting-slots'}>
                 <RawResource id={'crafting_slots'} name={'Crafting Slots'} />
                 <span className={`slots-amount ${craftingData.slots.total > 0 ? 'slots-available' : 'slots-unavailable'}`}>{formatInt(craftingData.slots.total)}/{formatInt(craftingData.slots.max)}</span>
             </div>
@@ -73,7 +83,7 @@ export const Crafting = ({ setItemDetails, setItemLevel, filterId, newUnlocks, o
                     <p className={'hint'}>If your crafting effort is insufficient, your crafting efficiency will decrease.</p>
                     <BreakDown breakDown={craftingData.efforts.breakDown} />
                 </div> }>
-                    <div className={'space-item'}>
+                    <div className={'space-item crafting-efforts'}>
                         <span>Crafting Efforts:</span>
                         <span>{formatValue(craftingData.efforts.balance)}/{formatValue(craftingData.efforts.balance + craftingData.efforts.consumption)}</span>
                     </div>
@@ -85,7 +95,7 @@ export const Crafting = ({ setItemDetails, setItemLevel, filterId, newUnlocks, o
         <div className={'craftables-cat'}>
             <PerfectScrollbar>
                 <div className={'flex-container'}>
-                    {craftingData.available.map(craftable => <NewNotificationWrap id={`crafting_${craftable.id}`} className={'narrow-wrapper'} isNew={newUnlocks?.all?.items?.[`crafting_${craftable.id}`]?.hasNew}>
+                    {craftingData.available.map(craftable => <NewNotificationWrap id={`crafting_${craftable.id}`} key={`crafting_${craftable.id}`} className={'narrow-wrapper'} isNew={newUnlocks?.all?.items?.[`crafting_${craftable.id}`]?.hasNew}>
                         <ItemCard addItemToList={addItemToList} key={craftable.id} {...craftable} onSetLevel={setItemLevel} onShowDetails={setItemDetails} isMobile={isMobile} isEditList={isEditList}/>
                     </NewNotificationWrap>)}
                 </div>
@@ -142,7 +152,7 @@ export const ItemCard = ({ id, icon_id, isRunning, isLowerEfficiency, name, leve
                                 }}>
                                     <img src={"icons/interface/minimize.png"}/>
                                 </div>
-                                <input type={'number'} min={0} max={maxLevel} value={level} onChange={e => {
+                                <input className={'level-set'} type={'number'} min={0} max={maxLevel} value={level} onChange={e => {
                                     e.stopPropagation();
                                     e.preventDefault();
                                     onSetLevel(id, Math.round(+e.target.value))

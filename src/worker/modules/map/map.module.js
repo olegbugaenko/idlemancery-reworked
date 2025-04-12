@@ -18,7 +18,7 @@ export class MapModule extends GameModule {
             level: 0,
         }
         this.mapTier = 0;
-        this.relevantMapVersion = 11;
+        this.relevantMapVersion = 13;
         this.currentMapVersion = null;
 
         this.lists = new MapTileListsSubmodule();
@@ -222,7 +222,7 @@ export class MapModule extends GameModule {
         // Ensure we have at least 1 resource with rarity 0-1
         const drops = [];
         if (rarityBuckets.low.length > 0) {
-            for(let i = 0; i < Math.min(2, rarityBuckets.low.length); i++) {
+            for(let i = 0; i < Math.min(3, rarityBuckets.low.length); i++) {
                 const lowRarityResource = rarityBuckets.low[Math.floor(Math.random() * rarityBuckets.low.length)];
                 drops.push({
                     id: lowRarityResource.id,

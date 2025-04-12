@@ -43,6 +43,7 @@ const ACTIONS_SEARCH_SCOPES = [{
 export const Actions = ({}) => {
 
     const worker = useContext(WorkerContext);
+    const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
 
     const { onMessage, sendData } = useWorkerClient(worker);
     const { isMobile } = useAppContext();
@@ -61,7 +62,7 @@ export const Actions = ({}) => {
         stats: {},
         aspects: {
             isUnlocked: false,
-            list: []
+            list: [],
         },
         customFilters: {},
         customFiltersOrder: [],
@@ -122,6 +123,7 @@ export const Actions = ({}) => {
                 setEditingList(payload.id);
                 // console.log('Set Editing to: ', payload);
             }
+            console.log('Attempt setting payload: ', payload);
             setListData(payload);
             setViewedData(null);
         }
@@ -141,7 +143,14 @@ export const Actions = ({}) => {
         }
     })
 
+    useEffect(() => {
+        console.log('listData set to: ', listData);
+    }, [listData])
+
     const activateAction = (id) => {
+        if(currentTourId === 'map' && ['action_gather_carefully', 'action_gather_normal', 'action_hunt_carefully', 'action_hunt_normal'].includes(id)) {
+            unlockNextById(9);
+        }
         sendData('run-action', { id, isForce: true })
     }
 
@@ -182,16 +191,19 @@ export const Actions = ({}) => {
     }
 
     const onSelectAction = ({id, name, level}) => {
+        console.log('UpdatingAct: ', id, name, listData);
         if(listData) {
-            const newList = listData;
-            newList.actions.push({
-                id,
-                name,
-                time: 1,
-                isAvailable: true,
-            })
-            setListData({...newList});
-            sendData('query-action-list-effects', { listData: newList });
+            setListData(prev => {
+                const newList = cloneDeep(prev);
+                newList.actions.push({
+                    id,
+                    name,
+                    time: 1,
+                    isAvailable: true,
+                });
+                sendData('query-action-list-effects', { listData: newList });
+                return newList;
+            });
         } else {
             if(selectedAction === id) {
                 setSelectedAction(null)
@@ -203,7 +215,7 @@ export const Actions = ({}) => {
 
     const onDropActionFromList = (id) => {
         if(listData) {
-            const newList = listData;
+            const newList = cloneDeep(listData);
             newList.actions = newList.actions.filter(a => a.id !== id);
             setListData({...newList});
             sendData('query-action-list-effects', { listData: newList });
@@ -212,7 +224,7 @@ export const Actions = ({}) => {
 
     const onUpdateActionFromList = (id, key, value) => {
         if(listData) {
-            const newList = listData;
+            const newList = cloneDeep(listData);
             newList.actions = newList.actions.map(a => a.id !== id ? a : {...a, [key]: value});
             setListData({...newList});
             sendData('query-action-list-effects', { listData: newList });
@@ -222,7 +234,7 @@ export const Actions = ({}) => {
     const onUpdateListValue = (key, value) => {
         console.log('Updating: ', key, value, listData, viewedData);
         if(listData) {
-            const newList = listData;
+            const newList = cloneDeep(listData);
             newList[key] = value;
             setListData({...newList});
             // sendData('query-action-list-effects', { id });
@@ -244,7 +256,7 @@ export const Actions = ({}) => {
         }, 1000);
     };
 
-/*    const onDragEnd = (result) => {
+    const onDragEndDnD = (result) => {
         const { source, destination, draggableId } = result;
 
         if (!destination) return;
@@ -261,33 +273,7 @@ export const Actions = ({}) => {
             }
         }
 
-        if (sourceDroppableId === 'available-actions' && destinationDroppableId === 'action-list-editor') {
-            const action = actionsData.available.find(a => a.id.toString() === actionId);
-            if (action) {
-                const newListData = { ...listData };
-                newListData.actions = Array.from(newListData.actions);
-                newListData.actions.splice(destination.index, 0, {
-                    id: action.id,
-                    name: action.name,
-                    time: 2,
-                    isAvailable: true,
-                });
-                setListData(newListData);
-                sendData('query-action-list-effects', { listData: newListData });
-            }
-        } else if (
-            sourceDroppableId === 'action-list-editor' &&
-            destinationDroppableId === 'action-list-editor'
-        ) {
-            const newActions = Array.from(listData.actions);
-            const [movedAction] = newActions.splice(source.index, 1);
-            newActions.splice(destination.index, 0, movedAction);
-
-            const newListData = { ...listData, actions: newActions };
-            setListData(newListData);
-            sendData('query-action-list-effects', { listData: newListData });
-        }
-    };*/
+    };
 
     const onDragEnd = (dragData, dropData) => {
         console.log('EventData: ', dragData, dropData);
@@ -465,32 +451,129 @@ export const Actions = ({}) => {
     };
 
     const handleAddFilter = () => {
+        if(currentTourId === 'actions') {
+            unlockNextById(14);
+        }
         setEditingCustomFilter({ rules: [], condition: '', category: 'action', name: '' });
     };
 
     const handleClose = () => {
+        if(currentTourId === 'actions') {
+            unlockNextById(23);
+        }
         setCustomFilterOpened(false);
     };
+
+    if(currentTourId === 'actions') {
+        console.log('TourDets: ', currentTourId, actionsData.actionCategories.find(one => one.isSelected), stepIndex)
+        if(actionsData.actionCategories.find(one => one.isSelected).id === 'all' && stepIndex === 1) {
+            jumpOver(2);
+        }
+
+        if(stepIndex === 1 && listData) {
+            onCloseList(); // close list once tour is running
+        }
+
+        /*if(id === 'action_beggar') {
+            if(stepIndex < 13) {
+                unlockNextById(12);
+            }
+            unlockNextById(13);
+        }
+
+        if(id === 'action_walk' && level > 1 && stepIndex === 8) {
+            console.log('JUMP! ');
+            jumpOver(11)
+        }*/
+    }
+
+    if(currentTourId === 'map') {
+        unlockNextById(8)
+    }
+
+    if(currentTourId === 'crafting') {
+        unlockNextById(7);
+    }
+
+    if(currentTourId === 'alchemy') {
+        unlockNextById(7);
+    }
+
+    useEffect(() => {
+        console.log('settInterval: ', currentTourId, stepIndex, actionsData?.runningList?.id);
+        const interval = setInterval(() => {
+            console.log('Querying current list effects if needed', currentTourId, stepIndex, actionsData?.runningList?.id);
+            if(currentTourId === 'crafting' && (stepIndex === 8 || stepIndex === 7)) {
+                sendData('query-actions-running', { prefix: 'for-craft-tour', withEffects: true })
+            }
+            if(currentTourId === 'alchemy' && (stepIndex === 8 || stepIndex === 7)) {
+                sendData('query-actions-running', { prefix: 'for-alchemy-tour', withEffects: true })
+            }
+        }, 1000)
+
+        return () => {
+            clearInterval(interval);
+        }
+
+    }, [currentTourId, stepIndex, actionsData?.runningList?.id])
+
+    onMessage('actions-running-for-craft-tour', (data) => {
+        console.log('Received data from current list: ', data, currentTourId, stepIndex);
+        if(data.effects.some(one => one.id === 'inventory_wood') && data.effects.some(one => one.id === 'crafting_ability')) {
+            if(stepIndex === 7) {
+                jumpOver(7, 2);
+                return;
+            }
+            unlockNextById(8);
+        }
+        // unlockNextById(8);
+    })
+
+    onMessage('actions-running-for-alchemy-tour', (data) => {
+        console.log('Received data from current list: ', data, currentTourId, stepIndex);
+        if(data.effects.some(one => one.id === 'alchemy_ability')) {
+            if(stepIndex === 7) {
+                jumpOver(7, 2);
+                return;
+            }
+            unlockNextById(8);
+        }
+        // unlockNextById(8);
+    })
 
     return (
                 <div className={'actions-wrap'}>
                     <div className={'ingame-box actions'}>
 
                         <div className={'categories flex-container'}>
-                            <ul className={'menu'}>
-                                {actionsData.actionCategories.filter(one => one.isPinned || one.isSelected).map(category => (<li key={category.id} className={`category ${category.isSelected ? 'active' : ''}`} onClick={() => setActionsFilter(category.id)}>
+                            <ul className={'menu actions-menu'}>
+                                {actionsData.actionCategories.filter(one => one.isPinned || one.isSelected).map(category => (<li key={category.id} id={`actions-menu-${category.id}`} className={`category ${category.isSelected ? 'active' : ''}`} onClick={
+                                    () => {
+                                        setActionsFilter(category.id);
+                                        if(currentTourId === 'actions') {
+                                            unlockNextById(1);
+                                        }
+                                    }
+                                }>
                                     <NewNotificationWrap isNew={newUnlocks.actions?.items?.all?.items?.[category.id]?.hasNew}>
                                         <span>{category.name}({category.items.length})</span>
                                     </NewNotificationWrap>
                                 </li> ))}
                                 <li className={'add-custom-filter additional'}>
-                                    <div className={'icon-content edit-icon interface-icon tiny'} onClick={() => editList(runningList.id)}>
-                                        <img src={"icons/interface/edit-icon.png"}/>
-                                    </div>
-                                    <span className={'create-custom'} onClick={() => {
+                                    <div className={'add-wrap'} onClick={(e) => {
                                         setCustomFilterOpened(true);
+                                        console.log('Opening...')
+                                        if(currentTourId === 'actions') {
+                                            unlockNextById(12);
+                                        }
                                         // setEditingCustomFilter({ rules: [], condition: '', category: 'action', name: ''})
-                                    }}>Edit Filters</span>
+                                    }}>
+                                        <div className={'icon-content edit-icon interface-icon tiny'}>
+                                            <img src={"icons/interface/edit-icon.png"}/>
+                                        </div>
+                                        <span className={'create-custom'} >Edit Filters</span>
+                                    </div>
+
                                     {isCustomFilterOpened ? (<div className={'custom-filter-edit-wrap'}>
                                         {editingCustomFilter ? (
                                             <CustomFilter
@@ -520,6 +603,7 @@ export const Actions = ({}) => {
                                             onAdd={handleAddFilter}
                                             showCloseButton
                                             onClose={handleClose}
+                                            onDragEnd={onDragEndDnD}
                                         />)}
                                     </div> ) : null}
 
@@ -712,38 +796,47 @@ const DraggableActionCard = ({ id, index, ...props }) => {
     );
 };
 
-export const ActionCard = React.memo(({ id, category, monitored, entityEfficiency, isEditingList, index, name, level, max, xp, maxXP, xpRate, isActive, effort, isLeveled, focused, isTraining, actionEffect, currentEffects, potentialEffects, isHidden, onFlash, onSelect, onActivate, onShowDetails, toggleHiddenAction, missingResourceId, isSelected, ...props}) => {
+export const ActionCard = React.memo(({ id, category, monitored, entityEfficiency, isEditingList, index, name, level, max, xp, maxXP, xpRate, isActive, effort, isLeveled, focused, isTraining, actionEffect, currentEffects, potentialEffects, isHidden, onFlash, onSelect, onActivate, onShowDetails, toggleHiddenAction, missingResourceId, isSelected, tags, ...props}) => {
     const elementRef = useRef(null);
 
-    const { stepIndex, unlockNextById, jumpOver } = useTutorial();
+    const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
 
     useFlashOnLevelUp(isLeveled, onFlash, elementRef);
 
     const [isXpVisible, setIsXpVisible] = useState(false);
 
-    if(id === 'action_visit_city') {
-        if(level < 2) {
-            console.log('AVC: ', stepIndex)
-            unlockNextById(12);
+    if(currentTourId === 'initial') {
+        if(id === 'action_visit_city') {
+            if(level < 2) {
+                console.log('AVC: ', stepIndex)
+                unlockNextById(12);
+            }
+        }
+
+        if(id === 'action_beggar') {
+            if(stepIndex < 13) {
+                unlockNextById(12);
+            }
+            unlockNextById(13);
+        }
+
+        if(id === 'action_walk' && level > 1 && stepIndex === 8) {
+            console.log('JUMP! ');
+            jumpOver(11)
         }
     }
 
-    if(id === 'action_beggar') {
-        if(stepIndex < 13) {
-            unlockNextById(12);
+    if(currentTourId === 'actions') {
+        if(stepIndex === 1 && isSelected) {
+            onSelect({ id, name, level })
         }
-        unlockNextById(13);
     }
 
-    if(id === 'action_walk' && level > 1 && stepIndex === 8) {
-        console.log('JUMP! ');
-        jumpOver(11)
-    }
 
     const comp = (
                 <div
                     id={`item_${id}`}
-                    className={`card ${category} action ${isSelected ? 'selected' : ''} ${isActive ? 'active' : ''} ${entityEfficiency < 1 ? ' efficiency-dropped' : ''} flashable ${monitored ?? ''}`}
+                    className={`card ${category} ${tags.includes('training') ? 'training' : ''} action ${isSelected ? 'selected' : ''} ${isActive ? 'active' : ''} ${entityEfficiency < 1 ? ' efficiency-dropped' : ''} flashable ${monitored ?? ''}`}
                     onMouseEnter={() => {
                         onShowDetails(id)
                     }}
@@ -751,15 +844,20 @@ export const ActionCard = React.memo(({ id, category, monitored, entityEfficienc
                         onShowDetails(id)
                     }}
                     onMouseLeave={() => {
-                        if(stepIndex !== 6) {
+                        if((stepIndex !== 6) || currentTourId !== 'initial') {
                             onShowDetails(null)
                         }
                     }}
-                    onClick={() => onSelect({
-                    id,
-                    name,
-                    level
-                })}>
+                    onClick={() => {
+                        onSelect({
+                            id,
+                            name,
+                            level
+                        })
+                        if(currentTourId === 'actions' && stepIndex === 2) {
+                            unlockNextById(2);
+                        }
+                    }}>
                     <div className={'head'}>
                         <p className={'title'}>{name}</p>
                         <span className={'level'}>{formatInt(level)}{max ? `/${formatInt(max)}` : ''}</span>
@@ -801,7 +899,12 @@ export const ActionCard = React.memo(({ id, category, monitored, entityEfficienc
                                         <div id={`activate_${id}`} className={'icon-content interface-icon small'} onClick={(e) => {
                                             e.preventDefault();
                                             e.stopPropagation();
-                                            unlockNextById(8);
+                                            if(currentTourId === 'initial') {
+                                                unlockNextById(8);
+                                            }
+                                            if(currentTourId === 'actions') {
+                                                unlockNextById(7);
+                                            }
                                             onActivate(id)
                                         }}>
                                             <img src={"icons/interface/run.png"}/>

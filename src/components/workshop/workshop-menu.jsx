@@ -32,23 +32,23 @@ export const WorkshopMenu = ({ selectedTab, setSelectedTab }) => {
         setNewUnlocks(payload);
     })
 
-    return (<div className={'menu-wrap'}>
-        <ul className={'menu'}>
-            {unlocks.crafting ? (<li className={`${selectedTab === 'crafting' ? 'active' : ''}`} onClick={() => {setSelectedTab('crafting');}}>
-                <NewNotificationWrap isNew={newUnlocks.workshop?.items?.crafting?.hasNew}>
-                    <span>Crafting</span>
-                </NewNotificationWrap>
-            </li>) : null}
-            {unlocks.alchemy ? (<li className={`${selectedTab === 'alchemy' ? 'active' : ''}`} onClick={() => {setSelectedTab('alchemy');}}>
-                <NewNotificationWrap isNew={newUnlocks.workshop?.items?.alchemy?.hasNew}>
-                    <span>Alchemy</span>
-                </NewNotificationWrap>
-            </li>) : null}
-            {unlocks.plantation ? (<li className={`${selectedTab === 'plantation' ? 'active' : ''}`} onClick={() => {setSelectedTab('plantation');}}>
-                <NewNotificationWrap isNew={newUnlocks.workshop?.items?.plantations?.hasNew}>
-                    <span>Plantations</span>
-                </NewNotificationWrap>
-            </li>) : null}
-        </ul>
-    </div>)
+    return (
+            <ul className={'menu'}>
+                {unlocks.crafting ? (<li id={'workshop-menu-crafting'} className={`${selectedTab === 'crafting' ? 'active' : ''}`} onClick={() => {setSelectedTab('crafting');}}>
+                    <NewNotificationWrap isNew={newUnlocks.workshop?.items?.crafting?.hasNew}>
+                        <span>Crafting</span>
+                    </NewNotificationWrap>
+                </li>) : null}
+                {unlocks.alchemy ? (<li id={'workshop-menu-alchemy'} className={`${selectedTab === 'alchemy' ? 'active' : ''}`} onClick={() => {setSelectedTab('alchemy');}}>
+                    <NewNotificationWrap isNew={newUnlocks.workshop?.items?.alchemy?.hasNew}>
+                        <span>Alchemy</span>
+                    </NewNotificationWrap>
+                </li>) : null}
+                {unlocks.plantation ? (<li id={'workshop-menu-plantation'} className={`${selectedTab === 'plantation' ? 'active' : ''}`} onClick={() => {setSelectedTab('plantation');}}>
+                    <NewNotificationWrap isNew={newUnlocks.workshop?.items?.plantations?.hasNew}>
+                        <span>Plantations</span>
+                    </NewNotificationWrap>
+                </li>) : null}
+            </ul>
+        )
 }

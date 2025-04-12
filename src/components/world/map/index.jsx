@@ -10,6 +10,7 @@ import {HowToSign} from "../../shared/how-to-sign.jsx";
 import {ResourceCost} from "../../shared/resource-cost.jsx";
 import StatRow from "../../shared/stat-row.jsx";
 import {useAppContext} from "../../../context/ui-context";
+import {useTutorial} from "../../../context/tutorial-context";
 
 export const MapWrap = ({ children }) => {
 
@@ -455,6 +456,8 @@ export const ItemDetails = ({itemId, setItemDetails}) => {
 
     const [item, setDetailOpened] = useState(null);
 
+    const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
+
 
     useEffect(() => {
         sendData('query-map-tile-details', itemId);
@@ -480,22 +483,28 @@ export const ItemDetails = ({itemId, setItemDetails}) => {
 
     if(!itemId || !item) return null;
 
+    if(currentTourId === 'map') {
+        console.log('MapTile Step: ', stepIndex);
+        unlockNextById(3);
+        unlockNextById(12);
+    }
+
 
     return (
         <PerfectScrollbar>
-            <div className={'blade-inner'}>
+            <div className={'blade-inner map-tile-details'}>
                 <div className={'block'}>
                     <h4>{item.name}[{item.i}:{item.j}]</h4>
                     <div className={'description'}>
                         {item.description}
                     </div>
                 </div>
-                {item.isRunning ? (<div className={'block'}>
+                {item.isRunning ? (<div className={'block map-tile-efficiency'}>
                     <p>Efficiency: {formatValue(100*item.efficiency)}%</p>
                     <p>Chance and amount effect: {formatValue(100*item.effEff)}%</p>
                 </div> ) : null}
 
-                {item.drops ? (<div className={'block'}>
+                {item.drops ? (<div className={'block map-exploration-loot'}>
                     <p>Drops:</p>
                     {item.unlockedUnrevealedAmount > 0 ? (<p className={'hint'}>Discoverable as you explore</p> ) : null}
                     {item.drops.map(drop => (<p className={`drop-row ${drop.rarityTier}`}>
@@ -505,7 +514,7 @@ export const ItemDetails = ({itemId, setItemDetails}) => {
                     </p> ))}
                     {item.unlockedUnrevealedAmount > 0 ? (<p className={'hint pot-finds'}>{formatInt(item.unlockedUnrevealedAmount)} more items can be found</p> ) : null}
                 </div> ) : null}
-                <div className={'block'}>
+                <div className={'block map-exploration-upkeep'}>
                     <p>Costs:</p>
                     <div className={'stats-block costs'}>
                         {Object.values(item.cost || {}).map(cost => (
@@ -515,7 +524,12 @@ export const ItemDetails = ({itemId, setItemDetails}) => {
                 </div>
                 <div className={'block'}>
                     <div className={'buttons flex-container'}>
-                        <button onClick={() => toggleRunning(item.i, item.j, !item.isRunning)}>{item.isRunning ? 'Stop' : 'Explore'}</button>
+                        <button id={'run-map-tile'} onClick={() => {
+                            if(!item.isRunning && currentTourId === 'map') {
+                                unlockNextById(13);
+                            }
+                            toggleRunning(item.i, item.j, !item.isRunning)
+                        }}>{item.isRunning ? 'Stop' : 'Explore'}</button>
                         <button onClick={() => setItemDetails(null)}>Close</button>
                     </div>
                 </div>

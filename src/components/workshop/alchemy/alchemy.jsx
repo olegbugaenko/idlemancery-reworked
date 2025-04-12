@@ -10,11 +10,14 @@ import {RawResource} from "../../shared/raw-resource.jsx";
 import {Balances} from "../shared.jsx";
 import {useAppContext} from "../../../context/ui-context";
 import {PinResource} from "../../shared/pin-resource.jsx";
+import {useTutorial} from "../../../context/tutorial-context";
 
 export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, openListDetails, addItemToList, isEditList }) => {
 
     const worker = useContext(WorkerContext);
     const { isMobile } = useAppContext();
+
+    const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
 
     const { onMessage, sendData } = useWorkerClient(worker);
     const [craftingData, setItemsData] = useState({
@@ -60,9 +63,15 @@ export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, op
         openListDetails({ listData });
     }, []);
 
+    if(currentTourId === 'alchemy') {
+        if(craftingData.available?.length) {
+            unlockNextById(9);
+        }
+    }
+
     return (<div className={'crafting-wrap'}>
         <div className={'head'}>
-            <div className={'space-item'}>
+            <div className={'space-item alchemy-slots'}>
                 <RawResource id={'alchemy_slots'} name={'Alchemy Slots'} />
                 <span className={`slots-amount ${craftingData.slots.total > 0 ? 'slots-available' : 'slots-unavailable'}`}>{formatInt(craftingData.slots.total)}/{formatInt(craftingData.slots.max)}</span>
             </div>
@@ -72,7 +81,7 @@ export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, op
                     <p className={'hint'}>If your alchemy effort is insufficient, your alchemy efficiency will decrease.</p>
                     <BreakDown breakDown={craftingData.efforts.breakDown} />
                 </div> }>
-                    <div className={'space-item'}>
+                    <div className={'space-item alchemy-efforts'}>
                         <span>Alchemy Efforts:</span>
                         <span>{formatValue(craftingData.efforts.balance)}/{formatValue(craftingData.efforts.balance + craftingData.efforts.consumption)}</span>
                     </div>
@@ -141,7 +150,7 @@ export const ItemCard = ({ id, icon_id, isRunning, resourceAmount, resourceBalan
                                 }}>
                                     <img src={"icons/interface/minimize.png"}/>
                                 </div>
-                                <input type={'number'} min={0} max={maxLevel} value={level} onChange={e => {
+                                <input className={'level-set'} type={'number'} min={0} max={maxLevel} value={level} onChange={e => {
                                     e.stopPropagation();
                                     e.preventDefault();
                                     onSetLevel(id, Math.round(+e.target.value))

@@ -82,7 +82,7 @@ export const ActionDetailsComponent = React.memo(({onClose, isSelected, ...actio
                 <p className={'hint'}>Next unlock at level {formatInt(action.nextUnlock.level)}</p>
             </div> ) : null}
             <div className={'block'}>
-                <div className={'tags-container'}>
+                <div className={'tags-container'} id={'action-tags'}>
                     {action.tags.map(tag => (<div className={'tag'}>{tag}</div> ))}
                 </div>
             </div>
@@ -103,7 +103,7 @@ export const ActionDetailsComponent = React.memo(({onClose, isSelected, ...actio
                     </div>
                 </div>
             </div>
-            {action.rankData ? (<div className={'block'}>
+            {action.rankData ? (<div className={'block'} id={'action-rank-data'}>
                 <TippyWrapper content={<div className={'hint-popup'}>
                     <p>Every 100 level this action will receive new rank, providing you more benefits per level</p>
                 </div> }>
@@ -246,8 +246,16 @@ export const ListEditor = React.memo(({
 
     const [editing, setEditing] = useState({ actions: [] })
 
+    const { stepIndex, unlockNextById, jumpOver, currentTourId, setNextAllowedById } = useTutorial();
+
     useEffect(() => {
         setEditing(listData);
+        if(currentTourId === 'action-lists') {
+            console.log('CheckTour: ', stepIndex);
+            if(listData.actions.find(one => one.id === 'action_walk') && listData.actions.find(one => one.id === 'action_beggar')) {
+                unlockNextById(4)
+            }
+        }
     }, [listData])
 
     const saveAndClose = (isClose) => {
@@ -289,7 +297,13 @@ export const ListEditor = React.memo(({
         <div className={'main-wrap'}>
             <div className={'main-row'}>
                 <span>Name</span>
-                {isEditing ? (<input type={'text'} value={editing.name ?? ''} onChange={(e) => onUpdateListValue('name', e.target.value)}/>) : (<span>{editing.name}</span>)}
+                {isEditing ? (<input className={'action-list-name-input'} type={'text'} value={editing.name ?? ''} onChange={(e) => {
+                    if(currentTourId === 'action-lists') {
+                        setNextAllowedById(2)
+                    }
+                    console.log('updateListValue: ', 'name', e.target.value);
+                    onUpdateListValue('name', e.target.value)
+                }}/>) : (<span>{editing.name}</span>)}
                 <HowToSign scope={'action-lists'} />
             </div>
         </div>
@@ -312,7 +326,7 @@ export const ListEditor = React.memo(({
                 </div> ) : null}
             </div>
         </div>
-                <div className="actions-list-wrap">
+                <div className="actions-list-wrap" id={'actions-in-list'}>
                     <div className={`action-row flex-container header`}
                     >
                         <div className={'col title'}>
@@ -335,9 +349,14 @@ export const ListEditor = React.memo(({
                                     </div>
                                     <div className={`col amount ${isEditing ? 'large' : ''}`}>
                                         {isEditing
-                                            ? (<div className={'editing-amounts'}>
+                                            ? (<div className={`editing-amounts amount-for-${action.id}`}>
                                                     <input type={'number'} value={action.time}
-                                                           onChange={(e) => onUpdateActionFromList(action.id, 'time', +e.target.value)}/>
+                                                           onChange={(e) => {
+                                                               if(currentTourId === 'action-lists' && +e.target.value > 1) {
+                                                                   unlockNextById(9)
+                                                               }
+                                                               onUpdateActionFromList(action.id, 'time', +e.target.value)
+                                                           }}/>
                                                     <span>{formatValue(editing.proportionsBar?.[index]?.percentage*100 || 0)} %</span>
                                                 </div>
                                             )
@@ -353,10 +372,10 @@ export const ListEditor = React.memo(({
                     </div>
                 </div>
         <div className={'effects-wrap'}>
-            {Object.keys(editing?.resourcesEffects || {}).length ? (<div className={'block'}>
+            {Object.keys(editing?.resourcesEffects || {}).length ? (<div className={'block'} id={'list-resources-gain'}>
                 <p>Average Resources per second</p>
                 <ResourceComparison effects1={editing?.prevEffects} effects2={editing?.resourcesEffects} maxDisplay={10}/></div>) : null}
-            {editing?.effectEffects?.length ? (<div className={'block'}>
+            {editing?.effectEffects?.length ? (<div className={'block'} id={'list-effects-gain'}>
                 <p>Average Effects per second</p>
                 <EffectsSection effects={editing?.effectEffects || []} maxDisplay={10}/></div>) : null}
         </div>
@@ -388,7 +407,12 @@ export const ListEditor = React.memo(({
         </div>) : null}
         {isEditing ? (<div className={'buttons'}>
             <button onClick={() => saveAndClose(false)}>{listData?.id ? 'Save' : 'Create'}</button>
-            <button onClick={() => saveAndClose(true)}>{listData?.id ? 'Save & Close' : 'Create & Close'}</button>
+            <button className={'save-and-close'} onClick={() => {
+                if(currentTourId === 'action-lists') {
+                    unlockNextById(10)
+                }
+                saveAndClose(true)
+            }}>{listData?.id ? 'Save & Close' : 'Create & Close'}</button>
             <button onClick={onCloseList}>Cancel</button>
         </div>) : null}
     </div></PerfectScrollbar> )

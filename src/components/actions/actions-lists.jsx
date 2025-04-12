@@ -5,6 +5,7 @@ import {HowToSign} from "../shared/how-to-sign.jsx";
 import {DragDropContext, Draggable, Droppable} from "react-beautiful-dnd";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
+import {useTutorial} from "../../context/tutorial-context";
 
 export const ActionListsPanel = ({ automationUnlocked, runningList, editListToDetails, lists, viewListToDetails, automationEnabled, toggleAutomation, autotriggerIntervalSetting, changeAutomationInterval }) => {
 
@@ -13,6 +14,8 @@ export const ActionListsPanel = ({ automationUnlocked, runningList, editListToDe
     const { onMessage, sendData } = useWorkerClient(worker);
 
     const [openedFor, setOpenedFor] = useState(null);
+
+    const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
 
 
     const editList = (id) => {
@@ -49,10 +52,21 @@ export const ActionListsPanel = ({ automationUnlocked, runningList, editListToDe
             </div>) : 'None'}
             </div>
             <div className={'lists-editor panel-col'}>
-                <button onClick={() => editListToDetails()}>Create New</button>
+                <button id={'create-action-list'} onClick={() => {
+                    if(currentTourId === 'action-lists') {
+                        unlockNextById(1);
+                    }
+                    editListToDetails();
+                }}>Create New</button>
             </div>
             <div className={'lists-editor panel-col'}>
-                <button onClick={(e) => { e.stopPropagation(); setOpenedFor('edit')}}>Pick list</button>
+                <button id={'pick-action-list'} onClick={(e) => {
+                    e.stopPropagation();
+                    setOpenedFor('edit');
+                    if(currentTourId === 'action-lists') {
+                        unlockNextById(11)
+                    }
+                }}>Pick list</button>
                 <ActionListsPopup lists={lists} isOpened={openedFor === 'edit'} setOpenedFor={setOpenedFor} onSelect={editList} onRun={runList} onHover={viewListToDetails} onDelete={onDelete} setActionListOrder={setActionListOrder}/>
             </div>
             {automationUnlocked ? (<>

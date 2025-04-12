@@ -12,6 +12,8 @@ import {cloneDeep} from "lodash";
 import StatRow from "../../shared/stat-row.jsx";
 import {useAppContext} from "../../../context/ui-context";
 import {TippyWrapper} from "../../shared/tippy-wrapper.jsx";
+import {HowToSign} from "../../shared/how-to-sign.jsx";
+import {useTutorial} from "../../../context/tutorial-context";
 
 export const CraftingWrap = ({ children }) => {
 
@@ -28,6 +30,8 @@ export const CraftingWrap = ({ children }) => {
 
     const [listDetails, setListDetails] = useState(null)
 
+    const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
+
 
     useEffect(() => {
         const interval2 = setInterval(() => {
@@ -43,6 +47,9 @@ export const CraftingWrap = ({ children }) => {
     })
 
     const setItemDetails = (id) => {
+        if(currentTourId === 'crafting' && [3,14].includes(stepIndex)) {
+            return;
+        }
         if(!id) {
             setDetailOpened(null);
         } else {
@@ -51,6 +58,9 @@ export const CraftingWrap = ({ children }) => {
     }
 
     const setItemLevel = useCallback((id, level) => {
+        if(currentTourId === 'crafting' && level > 0) {
+            unlockNextById(10);
+        }
         sendData('set-crafting-level', { id, level, filterId: 'crafting' });
     })
 
@@ -284,14 +294,19 @@ export const CraftingWrap = ({ children }) => {
         setListDetails(null);
     }
 
-    return (<div className={'items-wrap'}>
+    return (<div className={'items-wrap crafting-workshop-wrap'}>
 
         <div className={'items ingame-box'}>
-            <div className={'head workshop'}>
-                {children}
-                {isMobile ? (<div>
-                    <span className={'highlighted-span'} onClick={() => setDetailVisible(true)}>Info</span>
-                </div>) : null}
+            <div className={'menu-wrap workshop'}>
+                <div className={'head'}>
+                    {children}
+                </div>
+                <div className={'flex-container additional-filters'}>
+                    {isMobile ? (<div>
+                        <span className={'highlighted-span'} onClick={() => setDetailVisible(true)}>Info</span>
+                    </div>) : null}
+                    <HowToSign scope={'crafting'} />
+                </div>
             </div>
             <Crafting filterId={'crafting'} setItemDetails={setItemDetails} setItemLevel={setItemLevel} newUnlocks={newUnlocks.workshop?.items?.crafting?.items} openListDetails={openListDetails} addItemToList={addItemToList} isEditList={listDetails?.isEdit}/>
         </div>
@@ -388,6 +403,8 @@ export const ItemDetails = ({itemId, category, setItemDetails}) => {
 
     const [item, setDetailOpened] = useState(null);
 
+    const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
+
     useEffect(() => {
         // console.log('Details: ', itemId, category);
         if(category === 'crafting') {
@@ -415,19 +432,24 @@ export const ItemDetails = ({itemId, category, setItemDetails}) => {
 
     if(!itemId || !item) return null;
 
+    if(currentTourId === 'crafting') {
+        unlockNextById(2);
+        unlockNextById(13);
+    }
+
 
     return (
         <PerfectScrollbar>
-            <div className={'blade-inner'}>
+            <div className={'blade-inner recipe-details'}>
                 <div className={'block'}>
                     <h4>{item.name} (x{formatInt(item.level)})</h4>
                     <div className={'description'}>
                         {item.description}
                     </div>
                 </div>
-                {item.bottleNeck && item.efficiency < (1. - 1.e-7) ? (<div className={'block'}>
-                    <p className={'hint'}>This activity running at {formatValue(item.efficiency*100)}% due to missing {item.bottleNeck.name}</p>
-                </div> ) : null}
+                <div className={'block efficiency-block'}>
+                    {item.bottleNeck ? (<p className={'hint yellow'}>This activity running at {formatValue(item.efficiency*100)}% due to missing {item.bottleNeck.name}</p> ) : (<p className={'hint'}>Running 100% Efficient</p>)}
+                </div>
                 <div className={'block'}>
                     <p>Cost:</p>
                     <div className={'costs-wrap'}>

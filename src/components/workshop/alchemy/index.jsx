@@ -12,12 +12,17 @@ import RulesList from "../../shared/rules-list.jsx";
 import StatRow from "../../shared/stat-row.jsx";
 import {useAppContext} from "../../../context/ui-context";
 import {TippyWrapper} from "../../shared/tippy-wrapper.jsx";
+import {HowToSign} from "../../shared/how-to-sign.jsx";
+import {useTutorial} from "../../../context/tutorial-context";
 
 export const AlchemyWrap = ({ children }) => {
 
     const worker = useContext(WorkerContext);
 
     const { isMobile } = useAppContext();
+
+    const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
+
     const [isDetailVisible, setDetailVisible] = useState(!isMobile);
 
     const { onMessage, sendData } = useWorkerClient(worker);
@@ -43,6 +48,9 @@ export const AlchemyWrap = ({ children }) => {
     })
 
     const setItemDetails = (id) => {
+        if(currentTourId === 'alchemy' && [3,14].includes(stepIndex)) {
+            return;
+        }
         if(!id) {
             setDetailOpened(null);
         } else {
@@ -51,6 +59,9 @@ export const AlchemyWrap = ({ children }) => {
     }
 
     const setItemLevel = useCallback((id, level) => {
+        if(currentTourId === 'alchemy' && level > 0) {
+            unlockNextById(10);
+        }
         sendData('set-crafting-level', { id, level, filterId: 'alchemy' });
     })
 
@@ -285,14 +296,19 @@ export const AlchemyWrap = ({ children }) => {
         setListDetails(null);
     }
 
-    return (<div className={'items-wrap'}>
+    return (<div className={'items-wrap alchemy-workshop-wrap'}>
 
         <div className={'items ingame-box'}>
-            <div className={'head workshop'}>
-                {children}
-                {isMobile ? (<div>
-                    <span className={'highlighted-span'} onClick={() => setDetailVisible(true)}>Info</span>
-                </div>) : null}
+            <div className={'menu-wrap workshop'}>
+                <div className={'head'}>
+                    {children}
+                </div>
+                <div className={'flex-container additional-filters'}>
+                    {isMobile ? (<div>
+                        <span className={'highlighted-span'} onClick={() => setDetailVisible(true)}>Info</span>
+                    </div>) : null}
+                    <HowToSign scope={'alchemy'} />
+                </div>
             </div>
             <Alchemy filterId={'alchemy'} setItemDetails={setItemDetails} setItemLevel={setItemLevel} newUnlocks={newUnlocks.workshop?.items?.alchemy?.items} openListDetails={openListDetails} addItemToList={addItemToList} isEditList={listDetails?.isEdit}/>
         </div>
@@ -327,6 +343,8 @@ export const ItemDetails = ({itemId, category, setItemDetails}) => {
 
     const { isMobile } = useAppContext()
     const { onMessage, sendData } = useWorkerClient(worker);
+
+    const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
 
     const [item, setDetailOpened] = useState(null);
 
@@ -366,19 +384,24 @@ export const ItemDetails = ({itemId, category, setItemDetails}) => {
 
     if(!itemId || !item) return null;
 
+    if(currentTourId === 'alchemy') {
+        unlockNextById(2);
+        unlockNextById(13);
+    }
+
 
     return (
         <PerfectScrollbar>
-            <div className={'blade-inner'}>
+            <div className={'blade-inner recipe-details'}>
                 <div className={'block'}>
                     <h4>{item.name} (x{formatInt(item.level)})</h4>
                     <div className={'description'}>
                         {item.description}
                     </div>
                 </div>
-                {item.bottleNeck ? (<div className={'block'}>
-                    <p className={'hint'}>This activity running at {formatValue(item.efficiency*100)}% due to missing {item.bottleNeck.name}</p>
-                </div> ) : null}
+                <div className={'block efficiency-block'}>
+                    {item.bottleNeck ? (<p className={'hint yellow'}>This activity running at {formatValue(item.efficiency*100)}% due to missing {item.bottleNeck.name}</p> ) : (<p className={'hint'}>Running 100% Efficient</p>)}
+                </div>
                 <div className={'block'}>
                     <p>Cost:</p>
                     <div className={'costs-wrap'}>

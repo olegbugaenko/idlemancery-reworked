@@ -324,7 +324,7 @@ export const registerInventoryItems = () => {
             get_multiplier: () => ({
                 effects: {
                     physical_training_learn_speed: {
-                        A: 0.25*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
+                        A: 0.4*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
                         B: 1,
                         type: 0,
                     }
@@ -334,9 +334,79 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0
         },
-        sellPrice: 350,
+        sellPrice: 250,
         rarity: 0.2,
         allowedTileTypes: ['lakes', 'swamp', 'savanna']
+    })
+
+
+    registerInventoryItem('inventory_thinkroot', {
+        name: 'Thinkroot',
+        hasCap: false,
+        tags: ['inventory', 'consumable', 'gatherable', 'herb'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        getUsageCooldown: () => {
+            return 0;
+        },
+        attributes: {
+            duration: 30,
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    mental_training_learning_rate: {
+                        A: 0.4*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            })
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0
+        },
+        sellPrice: 250,
+        rarity: 0.2,
+        allowedTileTypes: ['mountain', 'plains', 'savanna']
+    })
+
+
+    registerInventoryItem('inventory_focusberry', {
+        name: 'Focusberry',
+        hasCap: false,
+        tags: ['inventory', 'consumable', 'gatherable', 'herb'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        getUsageCooldown: () => {
+            return 0;
+        },
+        attributes: {
+            duration: 30,
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    routine_learning_speed: {
+                        A: 0.4*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            })
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0
+        },
+        sellPrice: 250,
+        rarity: 0.2,
+        allowedTileTypes: ['lakes', 'forest', 'swamp']
     })
 
     registerInventoryItem('inventory_aloe_vera', {

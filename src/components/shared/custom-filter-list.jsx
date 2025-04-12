@@ -1,5 +1,5 @@
 import React from 'react';
-import { Droppable, Draggable } from 'react-beautiful-dnd';
+import {Droppable, Draggable, DragDropContext} from 'react-beautiful-dnd';
 import {TippyWrapper} from './tippy-wrapper.jsx';
 
 /**
@@ -30,99 +30,102 @@ function CustomFiltersList({
                                onClose = () => {},
                                noFiltersHint = 'No custom filters were added yet',
                                droppableId = 'custom-filters',
+                               onDragEnd
                            }) {
     return (
-        <div className="list-wrap">
-            <Droppable droppableId={droppableId}>
-                {(provided) => (
-                    <div
-                        className="list-items"
-                        ref={provided.innerRef}
-                        {...provided.droppableProps}
-                    >
-                        {filterOrder.length > 0 ? (
-                            filterOrder.map((id, index) => {
-                                const one = filters[id];
-                                if (!one) return null; // про всяк випадок
+        <DragDropContext onDragEnd={onDragEnd}>
+            <div className="list-wrap" id={"custom-filters-list"}>
+                <Droppable droppableId={droppableId}>
+                    {(provided) => (
+                        <div
+                            className="list-items"
+                            ref={provided.innerRef}
+                            {...provided.droppableProps}
+                        >
+                            {filterOrder.length > 0 ? (
+                                filterOrder.map((id, index) => {
+                                    const one = filters[id];
+                                    if (!one) return null; // про всяк випадок
 
-                                return (
-                                    <Draggable key={id} draggableId={String(id)} index={index}>
-                                        {(draggableProvided) => (
-                                            <div
-                                                className="flex-container filter-row"
-                                                ref={draggableProvided.innerRef}
-                                                {...draggableProvided.draggableProps}
-                                                {...draggableProvided.dragHandleProps}
-                                            >
-                                                <span className="filter-name">{one.name}</span>
+                                    return (
+                                        <Draggable key={id} draggableId={String(id)} index={index}>
+                                            {(draggableProvided) => (
+                                                <div
+                                                    className="flex-container filter-row"
+                                                    ref={draggableProvided.innerRef}
+                                                    {...draggableProvided.draggableProps}
+                                                    {...draggableProvided.dragHandleProps}
+                                                >
+                                                    <span className="filter-name">{one.name}</span>
 
-                                                <label>
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={!!one.isPinned}
-                                                        onChange={() => onPinToggle(one.id, !one.isPinned)}
-                                                    />
-                                                </label>
+                                                    <label>
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={!!one.isPinned}
+                                                            onChange={() => onPinToggle(one.id, !one.isPinned)}
+                                                        />
+                                                    </label>
 
-                                                <TippyWrapper content={<div className="hint-popup">Apply Filter</div>}>
-                                                    <div
-                                                        className="icon-content run-icon interface-icon small"
-                                                        onClick={() => onApply(one.id)}
-                                                    >
-                                                        <img src="icons/interface/filter.png" alt="Apply Filter" />
-                                                    </div>
-                                                </TippyWrapper>
+                                                    <TippyWrapper content={<div className="hint-popup">Apply Filter</div>}>
+                                                        <div
+                                                            className="icon-content run-icon interface-icon small"
+                                                            onClick={() => onApply(one.id)}
+                                                        >
+                                                            <img src="icons/interface/filter.png" alt="Apply Filter" />
+                                                        </div>
+                                                    </TippyWrapper>
 
-                                                {!one.isRequired ? (
-                                                    <>
-                                                        <TippyWrapper content={<div className="hint-popup">Edit Filter</div>}>
-                                                            <div
-                                                                className="icon-content edit-icon interface-icon small"
-                                                                onClick={() => onEdit(one.id)}
-                                                            >
-                                                                <img src="icons/interface/edit-icon.png" alt="Edit Filter" />
-                                                            </div>
-                                                        </TippyWrapper>
+                                                    {!one.isRequired ? (
+                                                        <>
+                                                            <TippyWrapper content={<div className="hint-popup">Edit Filter</div>}>
+                                                                <div
+                                                                    className="icon-content edit-icon interface-icon small"
+                                                                    onClick={() => onEdit(one.id)}
+                                                                >
+                                                                    <img src="icons/interface/edit-icon.png" alt="Edit Filter" />
+                                                                </div>
+                                                            </TippyWrapper>
 
-                                                        <TippyWrapper content={<div className="hint-popup">Delete Filter</div>}>
-                                                            <div
-                                                                className="icon-content edit-icon interface-icon small"
-                                                                onClick={() => onDelete(one.id)}
-                                                            >
-                                                                <img src="icons/interface/delete.png" alt="Delete Filter" />
-                                                            </div>
-                                                        </TippyWrapper>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <span />
-                                                        <span className="hint yellow">Required</span>
-                                                    </>
-                                                )}
-                                            </div>
-                                        )}
-                                    </Draggable>
-                                );
-                            })
-                        ) : (
-                            <p className="hint">{noFiltersHint}</p>
+                                                            <TippyWrapper content={<div className="hint-popup">Delete Filter</div>}>
+                                                                <div
+                                                                    className="icon-content edit-icon interface-icon small"
+                                                                    onClick={() => onDelete(one.id)}
+                                                                >
+                                                                    <img src="icons/interface/delete.png" alt="Delete Filter" />
+                                                                </div>
+                                                            </TippyWrapper>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <span />
+                                                            <span className="hint yellow">Required</span>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </Draggable>
+                                    );
+                                })
+                            ) : (
+                                <p className="hint">{noFiltersHint}</p>
+                            )}
+                            {provided.placeholder}
+                        </div>
+                    )}
+                </Droppable>
+
+                {(showAddButton || showCloseButton) && (
+                    <div className="buttons">
+                        {showAddButton && (
+                            <button id={'add-custom-filter'} onClick={onAdd}>Add</button>
                         )}
-                        {provided.placeholder}
+                        {showCloseButton && (
+                            <button id={'close-custom-filters-list'} onClick={onClose}>Close</button>
+                        )}
                     </div>
                 )}
-            </Droppable>
-
-            {(showAddButton || showCloseButton) && (
-                <div className="buttons">
-                    {showAddButton && (
-                        <button onClick={onAdd}>Add</button>
-                    )}
-                    {showCloseButton && (
-                        <button onClick={onClose}>Close</button>
-                    )}
-                </div>
-            )}
-        </div>
+            </div>
+        </DragDropContext>
     );
 }
 
