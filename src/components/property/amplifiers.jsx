@@ -10,6 +10,9 @@ import {SearchField} from "../shared/search-field.jsx";
 import CustomFilter from "../shared/custom-filter.jsx";
 import CustomFiltersList from "../shared/custom-filter-list.jsx";
 import {DragDropContext} from "react-beautiful-dnd";
+import {CustomButton} from "../shared/buttons/custom-button.jsx";
+import {AutomationIcon} from "../shared/buttons/automation-checkbox.jsx";
+import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
 
 
 const ACTIONS_SEARCH_SCOPES = [{
@@ -44,6 +47,7 @@ export const AmplifiersUpgrades = ({ setItemDetails, purchaseItem, newUnlocks, i
             search: '',
         },
         hideMaxed: false,
+        showHidden: false,
         propertyCategories: [],
         selectedCategory: 'all',
         customFilters: {},
@@ -88,6 +92,10 @@ export const AmplifiersUpgrades = ({ setItemDetails, purchaseItem, newUnlocks, i
         sendData('set-furniture-autopurchase', { id, flag, filterId: 'amplifier' })
     })
 
+    const toggleHiddenItem = useCallback((id, flag) => {
+        sendData('toggle-furniture-hidden', { filterId: 'amplifier', id, flag });
+    })
+
     const setActionsFilter = (filterId) => {
         sendData('apply-property-custom-filter', { id: filterId, filterId: 'amplifier' })
     }
@@ -110,6 +118,10 @@ export const AmplifiersUpgrades = ({ setItemDetails, purchaseItem, newUnlocks, i
     const handleClose = () => {
         setCustomFilterOpened(false);
     };
+
+    const setShowHidden = (showHidden) => {
+        sendData('set-furniture-show-hidden', { filterId: 'amplifier', showHidden })
+    }
 
     const onDragEnd = (result) => {
         const {source, destination, draggableId} = result;
@@ -140,10 +152,10 @@ export const AmplifiersUpgrades = ({ setItemDetails, purchaseItem, newUnlocks, i
                         scopes={ACTIONS_SEARCH_SCOPES}
                     />
                 </label>
-                {/*<label>
-                    Hide maxed
-                    <input type={'checkbox'} checked={furnituresData.hideMaxed} onChange={e => setHideMaxed(!furnituresData.hideMaxed)}/>
-                </label>*/}
+                <label>
+                    Show Hidden
+                    <input type={'checkbox'} checked={furnituresData.showHidden} onChange={e => setShowHidden(!furnituresData.showHidden)}/>
+                </label>
             </div>
         </div>
         <div className={'categories flex-container sub-heading'}>
@@ -197,7 +209,7 @@ export const AmplifiersUpgrades = ({ setItemDetails, purchaseItem, newUnlocks, i
             <PerfectScrollbar>
                 <div className={'flex-container'}>
                     {furnituresData.available.map(furniture => <NewNotificationWrap key={furniture.id} id={furniture.id} className={'narrow-wrapper'} isNew={newUnlocks?.[furnituresData.selectedCategory]?.items?.[furniture.id]?.hasNew}>
-                        <ItemCard key={furniture.id} {...furniture} onFlash={handleFlash} onPurchase={purchaseItem} onShowDetails={setItemDetails}  toggleAutopurchase={toggleAutopurchase} isAutomationUnlocked={furnituresData.isAutomationUnlocked} isMobile={isMobile}/>
+                        <ItemCard key={furniture.id} {...furniture} onFlash={handleFlash} onPurchase={purchaseItem} onShowDetails={setItemDetails}  toggleAutopurchase={toggleAutopurchase} isAutomationUnlocked={furnituresData.isAutomationUnlocked} isMobile={isMobile} toggleHiddenItem={toggleHiddenItem}/>
                     </NewNotificationWrap>)}
                     {overlayPositions.map((position, index) => (
                         <FlashOverlay key={index} position={position} />
@@ -208,7 +220,7 @@ export const AmplifiersUpgrades = ({ setItemDetails, purchaseItem, newUnlocks, i
     </div></DragDropContext>)
 }
 
-export const ItemCard = ({ id, name, level, max, affordable, isLeveled, isCapped, onFlash, onPurchase, onShowDetails, isAutoPurchase, onDelete, toggleAutopurchase, isAutomationUnlocked, isMobile}) => {
+export const ItemCard = ({ id, name, level, max, affordable, isLeveled, isCapped, isHidden, onFlash, onPurchase, onShowDetails, isAutoPurchase, onDelete, toggleAutopurchase, isAutomationUnlocked, isMobile, toggleHiddenItem}) => {
     const elementRef = useRef(null);
 
     useFlashOnLevelUp(isLeveled, onFlash, elementRef);
@@ -226,28 +238,33 @@ export const ItemCard = ({ id, name, level, max, affordable, isLeveled, isCapped
         </div>
         <div className={'bottom'}>
             <div className={'buttons'}>
-                <button
-                    disabled={!affordable.isAffordable || isCapped}
-                    onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        onPurchase(id)
-                    }}
-                    className={`purchase-button ${isCapped ? 'capped' : ''}`}
-                    style={{ '--progress': `${affordable.percentage*100}%` }}
-                >Purchase</button>
-                {isAutomationUnlocked ? (<label className={'autobuy-label'} onClick={(e) => {
-                    e.stopPropagation();
-                }}>
-                    <input type={'checkbox'} checked={isAutoPurchase}
-                           onChange={(e) => {
-                               e.preventDefault();
-                               e.stopPropagation();
-                               toggleAutopurchase(id, !isAutoPurchase)
-                           }}/>
-                    Autobuy
-                </label>) : null}
-                {/*<button disabled={level <= 0} onClick={() => onDelete(id)}>Remove</button>*/}
+                <div className={'leftwise'}>
+                    <CustomButton
+                        iconId={'icon_upgrade_v2'}
+                        disabled={!affordable.isAffordable || isCapped}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            onPurchase(id)
+                        }}
+                        className={`purchase-button medium-sm ${isCapped ? 'capped' : ''}`}
+                        style={{ '--progress': `${affordable.percentage*100}%` }}
+                    >Purchase</CustomButton>
+                    {isAutomationUnlocked ? (<AutomationIcon
+                        value={isAutoPurchase}
+                        className={`medium-sm`}
+                        onClick={(e) => {e.stopPropagation(); e.preventDefault(); toggleAutopurchase(id, !isAutoPurchase)}}
+                    >{isAutoPurchase ? 'Autopurchase is turned on. Click to turn it off' : 'Autopurchase is turned off. Click to turn it on'}</AutomationIcon>) : null}
+                    <TippyWrapper content={<div className={'hint-popup'}>{isHidden ? 'Show Furniture' : 'Hide Furniture'}</div> }>
+                        <div className={'icon-content interface-icon medium-sm'} onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            toggleHiddenItem(id, !isHidden)
+                        }}>
+                            {isHidden ? (<img src={"icons/interface/icon_show.png"}/>) : (<img src={"icons/interface/icon_hide.png"}/>)}
+                        </div>
+                    </TippyWrapper>
+                </div>
             </div>
         </div>
     </div> )

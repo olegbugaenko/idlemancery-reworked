@@ -24,6 +24,12 @@ export const ActionListsPanel = ({ automationUnlocked, runningList, editListToDe
         setOpenedFor(null);
     }
 
+    const cloneList = (id) => {
+        console.log('Set to clone: ', id);
+        editListToDetails(id, { clone: true });
+        setOpenedFor(null);
+    }
+
     const runList = (id) => {
         sendData('run-list', { id });
         setOpenedFor(null);
@@ -67,7 +73,7 @@ export const ActionListsPanel = ({ automationUnlocked, runningList, editListToDe
                         unlockNextById(11)
                     }
                 }}>Pick list</button>
-                <ActionListsPopup lists={lists} isOpened={openedFor === 'edit'} setOpenedFor={setOpenedFor} onSelect={editList} onRun={runList} onHover={viewListToDetails} onDelete={onDelete} setActionListOrder={setActionListOrder}/>
+                <ActionListsPopup lists={lists} isOpened={openedFor === 'edit'} setOpenedFor={setOpenedFor} onSelect={editList} onClone={cloneList} onRun={runList} onHover={viewListToDetails} onDelete={onDelete} setActionListOrder={setActionListOrder}/>
             </div>
             {automationUnlocked ? (<>
                     <div className={'automation-enabled panel-col'}>
@@ -98,7 +104,7 @@ export const ActionListsPanel = ({ automationUnlocked, runningList, editListToDe
     </div>)
 }
 
-export const ActionListsPopup = ({ lists, isOpened, setOpenedFor, onSelect, onHover, onRun, onDelete, setActionListOrder }) => {
+export const ActionListsPopup = ({ lists, isOpened, setOpenedFor, onSelect, onHover, onRun, onDelete, setActionListOrder, onClone }) => {
 
 
     const popupRef = useRef(null);
@@ -201,6 +207,14 @@ export const ActionListsPopup = ({ lists, isOpened, setOpenedFor, onSelect, onHo
                                                                     onClick={() => onSelect(list.id)}
                                                                 >
                                                                     <img src={"icons/interface/edit-icon.png"} />
+                                                                </div>
+                                                            </TippyWrapper>
+                                                            <TippyWrapper content={<div className={"hint-popup"}>Clone List (Create new list based on this)</div>}>
+                                                                <div
+                                                                    className={"icon-content edit-icon interface-icon small"}
+                                                                    onClick={() => onClone(list.id)}
+                                                                >
+                                                                    <img src={"icons/interface/icon_copy.png"} />
                                                                 </div>
                                                             </TippyWrapper>
                                                             <TippyWrapper content={<div className={"hint-popup"}>Delete List</div>}>

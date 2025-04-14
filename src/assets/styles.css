@@ -658,6 +658,11 @@ p.small-hint, span.small-hint {
     font-size: 36px;
 }
 
+.icon-card .icon-content.skill-map {
+    width: calc(40px * var(--size-mult));
+    height: calc(40px * var(--size-mult));
+}
+
 .icon-card.bigger .icon-content {
     width: 48px;
     height: 48px;
@@ -674,7 +679,7 @@ p.small-hint, span.small-hint {
     height: 32px;
     position: relative;
     border-radius: 5px;
-    border: 1px solid #999;
+    border: 1px solid #aaa;
     overflow: hidden;
     display: inline-block;
     margin-right: 8px;
@@ -683,23 +688,41 @@ p.small-hint, span.small-hint {
 .interface-icon.disabled {
     cursor: auto;
     pointer-events: none;
+   border-color: #555;
+}
+
+.interface-icon.highlighted {
+    box-shadow: 0 0 12px var(--highlight);
+    border-color: var(--highlight);
 }
 
 .interface-icon.disabled:after {
     content: '';
     width: 100%;
     height: 100%;
-    background: rgba(100,100,100, 0.25);
+    background: rgba(100,100,100, 0.4);
+    background: linear-gradient(
+            to right,
+            rgba(100,100,100, 0.1) 0%,
+            rgba(100,100,100, 0.1) var(--progress, 0%),
+            rgba(150,140,100, 0.4) var(--progress, 0%),
+            rgba(150,140,100, 0.4) 100%
+    );
     display: block;
     position: absolute;
     top: 0;
     left: 0;
 }
 
-.interface-icon.small {
+.interface-icon.medium-sm {
     width: 28px;
     height: 28px;
 }
+
+/*.interface-icon.small {
+    width: 28px;
+    height: 28px;
+}*/
 
 .interface-icon.tiny {
     width: 24px;
@@ -1064,6 +1087,8 @@ h4 {
 
 .action-lists-panel {
     height: 50px;
+    padding-top: 4px;
+    border-top: 1px solid #777777;
 }
 
 .action-lists-panel .flex-container {
@@ -1131,7 +1156,7 @@ h4 {
     z-index: 1;
 }
 
-.list-editor .actions-list-wrap .action-row input {
+.list-editor .actions-list-wrap .action-row input[type="number"] {
     width: 50px;
 }
 
@@ -1144,7 +1169,7 @@ h4 {
 }
 
 .list-editor .actions-list-wrap .action-row .col.amount.large {
-    width: 120px;
+    width: 210px;
 }
 
 .list-editor .recipes-list .actions-list-wrap .action-row .title {
@@ -1159,6 +1184,15 @@ h4 {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.list-editor .actions-list-wrap .action-row .col.amount.large .editing-amounts label {
+    width: 50px;
+}
+
+.list-editor .actions-list-wrap .action-row .col.amount.large .editing-amounts .percentage {
+    width: 50px;
+    display: inline-block;
 }
 
 .list-editor .main-wrap .main-row {
@@ -1223,7 +1257,8 @@ h4 {
 
 .rules .rule input,
 .rules .rule select {
-    width: 60px;
+    min-width: 60px;
+    width: 100%;
 }
 
 .rules.autocheck.matched .pattern-wrap .pattern-label {
@@ -1252,8 +1287,43 @@ h4 {
     box-shadow: 0 0px 4px var(--yellow);
 }
 
+.rules .rule-row-wrap {
+    position: relative;
+}
+
+.rules .rule-row-wrap.editing {
+    margin-bottom: 8px;
+}
+
 .autoconsume-setting .rules .rule .col {
     margin: 4px;
+    flex: 1;
+}
+
+.rules .rule-row-wrap.editing .rule {
+    padding-right: 16px;
+}
+
+.autoconsume-setting .rules .rule-row-wrap .col .display-rule-value {
+    display: block;
+    min-width: 60px;
+    white-space: nowrap;
+    margin: 4px;
+}
+
+.autoconsume-setting .rules .rule-row-wrap .col.delete-rule {
+    width: 28px;
+    flex-grow: 0;
+    height: 28px;
+    position: absolute;
+    background: #211;
+    right: -8px;
+    top: -8px;
+    border-radius: 50%;
+    border: 1px solid #777777;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .rules-header.flex-container {
@@ -2213,6 +2283,10 @@ span.highlighted-span.yellow {
 .furniture-wrap .filters {
     display: flex;
     align-items: center;
+}
+
+.furniture-wrap .filters label {
+    margin-left: 8px;
 }
 
 .hotkey-row {

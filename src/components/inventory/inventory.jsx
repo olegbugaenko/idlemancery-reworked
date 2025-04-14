@@ -400,7 +400,7 @@ export const Inventory = ({}) => {
                     </PerfectScrollbar>
                 </div>
             </div>
-            {(!isMobile || isDetailVisible || editData || viewedData) ? (<div className={'item-detail ingame-box detail-blade'}>
+            {(!isMobile || isDetailVisible || editData || viewedData) ? (<div className={`item-detail ingame-box detail-blade ${editData ? 'wide-blade' : ''}`}>
                 {editData || viewedData ? (<InventoryDetails
                     isChanged={isChanged}
                     editData={editData}

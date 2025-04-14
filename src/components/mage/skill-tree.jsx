@@ -13,7 +13,7 @@ import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
 import {BreakDown} from "../layout/sidebar.jsx";
 
 const SkillTree = () => {
-    const scale = 80;
+    const [scale, setScale] = useState(80);
     const center = { x: 1250, y: 1250 };
     const scrollRef = useRef(null);
     const contentRef = useRef(null);
@@ -58,6 +58,35 @@ const SkillTree = () => {
     })
 
     const [overlayPositions, setOverlayPositions] = useState([]);
+
+    useEffect(() => {
+        const container = scrollRef.current?._container;
+        if (!container) return;
+
+        const handleWheel = (e) => {
+            if (!e.ctrlKey && !e.metaKey) {
+                e.preventDefault();
+
+                const delta = e.deltaY < 0 ? 10 : -10;
+                setScale(prev => Math.min(160, Math.max(40, prev + delta)));
+
+                // 🧨 Блокуємо скрол:
+                const originalScrollTop = container.scrollTop;
+                const originalScrollLeft = container.scrollLeft;
+
+                setTimeout(() => {
+                    container.scrollTop = originalScrollTop;
+                    container.scrollLeft = originalScrollLeft;
+                }, 0); // Повертає назад одразу після події
+            }
+        };
+
+        container.addEventListener('wheel', handleWheel, { passive: false });
+
+        return () => container.removeEventListener('wheel', handleWheel);
+    }, []);
+
+
 
     const handleFlash = (position) => {
         // console.log('Adding flash: ', position);
@@ -126,6 +155,15 @@ const SkillTree = () => {
 
     const handleMouseUp = () => {
         setIsDragging(false);
+    };
+
+    const handleWheel = (e) => {
+        console.log('Wheeling...', e.deltaY)
+        if (!e.ctrlKey && !e.metaKey) {
+            e.preventDefault();
+            const delta = e.deltaY < 0 ? 10 : -10;
+            setScale(prev => Math.min(160, Math.max(40, prev + delta)));
+        }
     };
 
     const saveDraft = () => {
@@ -205,9 +243,10 @@ const SkillTree = () => {
                     onMouseMove={handleMouseMove}
                     onMouseUp={handleMouseUp}
                     onMouseLeave={handleMouseUp}
+                    onWheel={handleWheel}
                     className={'skills-container'}
                 >
-                    <PerfectScrollbar ref={scrollRef} style={{ width: "100%", height: "100%" }}>
+                    <PerfectScrollbar ref={scrollRef} style={{ width: "100%", height: "100%" }} options={{ wheelSpeed: 0 }}>
                         <div
                             ref={contentRef}
                             onMouseDown={handleMouseDown}
@@ -263,7 +302,7 @@ const SkillTree = () => {
                                 const y = center.y + skill.position.top * scale;
 
                                 return (<>
-                                        <ItemSkillCard x={x} y={y} key={skill.id} {...skill} onFlash={handleFlash} onPurchase={onPurchase} onShowDetails={onShowDetails} isMobile={isMobile}/>
+                                        <ItemSkillCard x={x} y={y} key={skill.id} {...skill} onFlash={handleFlash} onPurchase={onPurchase} onShowDetails={onShowDetails} isMobile={isMobile} scale={scale}/>
                                         {skill.diff ? (<div
                                             className={'delete-diff'}
                                             style={{
@@ -379,11 +418,13 @@ const SkillTree = () => {
         </div>);
 };
 
-export const ItemSkillCard = ({ id, isUnlocked, x, y, icon, isRequirementsMet, name, description, level, max, isCapped, effects, currentEffects, affordable, isLeveled, onFlash, onPurchase, onShowDetails, isMobile}) => {
+export const ItemSkillCard = ({ id, isUnlocked, x, y, icon, isRequirementsMet, name, description, level, max, isCapped, effects, currentEffects, affordable, isLeveled, onFlash, onPurchase, onShowDetails, isMobile, scale}) => {
 
     const elementRef = useRef(null);
 
     useFlashOnLevelUp(isLeveled, onFlash, elementRef);
+
+    const sizeMult = Math.sqrt(scale/80);
 
     return (<div
         ref={elementRef}
@@ -392,8 +433,8 @@ export const ItemSkillCard = ({ id, isUnlocked, x, y, icon, isRequirementsMet, n
         onMouseLeave={() => isMobile ? null : onShowDetails(null)}
         onClick={(e) => isMobile ? onShowDetails(id) : onPurchase(id, e.shiftKey ? 1e9 : 1)}
         style={{
-            left: `${x - 25}px`,
-            top: `${y - 25}px`,
+            left: `${x - 25*sizeMult}px`,
+            top: `${y - 25*sizeMult}px`,
         }}
     >
         {isUnlocked ? (<TippyWrapper
@@ -425,7 +466,7 @@ export const ItemSkillCard = ({ id, isUnlocked, x, y, icon, isRequirementsMet, n
                 </div>
 
             </div>}>
-            <div className={`icon-content`}>
+            <div className={`icon-content skill-map`} style={{ '--size-mult': sizeMult }}>
                 {icon ? (<div className={'semi-color'} style={{backgroundColor: icon.color}}>+</div>) : (
                     <img src={`icons/skills/${id}.png`} className={'resource'}/>)}
                 <span className={'level'}>{formatInt(level)}{max ? `/${formatInt(max)}` : ''}</span>

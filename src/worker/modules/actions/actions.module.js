@@ -903,7 +903,7 @@ export class ActionsModule extends GameModule {
             effort
         })
 
-        console.log('CLL: ', this.activeActions, rn);
+        // console.log('CLL: ', this.activeActions, rn);
     }
 
     dropRunningAction(id) {

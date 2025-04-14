@@ -259,7 +259,7 @@ export const ListEditor = React.memo(({
     }, [listData])
 
     const saveAndClose = (isClose) => {
-        // console.log('Saving: ', editing);
+        console.log('Saving: ', editing);
         if(!isClose) {
             editing.isReopenEdit = true;
         }
@@ -357,7 +357,13 @@ export const ListEditor = React.memo(({
                                                                }
                                                                onUpdateActionFromList(action.id, 'time', +e.target.value)
                                                            }}/>
-                                                    <span>{formatValue(editing.proportionsBar?.[index]?.percentage*100 || 0)} %</span>
+                                                    <label>
+                                                        <input type={'checkbox'} checked={action.isDynamicTime} disabled={!action.isAutoTimeEnabled} onChange={(e) => {
+                                                            onUpdateActionFromList(action.id, 'isDynamicTime', !action.isDynamicTime)
+                                                        }}/>
+                                                        Auto
+                                                    </label>
+                                                    <span className={'percentage'}>{formatValue(editing.proportionsBar?.[index]?.percentage*100 || 0)} %</span>
                                                 </div>
                                             )
                                             : (<span>{formatValue(editing.proportionsBar[index].percentage*100)} %</span>)

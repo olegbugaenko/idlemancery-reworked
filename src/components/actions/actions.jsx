@@ -126,12 +126,17 @@ export const Actions = ({}) => {
             console.log('Attempt setting payload: ', payload);
             setListData(payload);
             setViewedData(null);
+        } else if(listData?.copyId) {
+            setEditingList(null);
+            setViewingList(null);
+            setListData(payload);
         }
 
     })
 
     onMessage('action-list-effects', (payload) => {
         if(listData) {
+            const actions = payload.newTimes ?? listData.actions;
             setListData({
                 ...listData,
                 potentialEffects: payload.potentialEffects,
@@ -139,6 +144,7 @@ export const Actions = ({}) => {
                 effectEffects: payload.effectEffects,
                 prevEffects: payload.prevEffects,
                 proportionsBar: payload.proportionsBar,
+                actions,
             })
         }
     })
@@ -146,6 +152,13 @@ export const Actions = ({}) => {
     useEffect(() => {
         console.log('listData set to: ', listData);
     }, [listData])
+
+    useEffect(() => {
+        console.log('copying from: ', listData?.copyId);
+        if(listData?.copyId) {
+            sendData('query-actions-list-for-copy', { id: listData?.copyId });
+        }
+    }, [listData?.copyId])
 
     const activateAction = (id) => {
         if(currentTourId === 'map' && ['action_gather_carefully', 'action_gather_normal', 'action_hunt_carefully', 'action_hunt_normal'].includes(id)) {
@@ -170,10 +183,16 @@ export const Actions = ({}) => {
         }
     }
 
-    const editListToDetails = (id) => {
+    const editListToDetails = (id, options = {}) => {
         if(id) {
             setViewingList(null);
-            setEditingList(id);
+            if(!options?.clone) {
+                setEditingList(id);
+            } else {
+                setViewingList(null);
+                setEditingList(null);
+                setListData({ copyId: id, name: '', actions: []})
+            }
         } else {
             // console.log('Create new list. Setting listData')
             setViewingList(null);
@@ -295,6 +314,7 @@ export const Actions = ({}) => {
                 name: action.name,
                 time: 1,
                 isAvailable: true,
+                isDynamicTime: false,
             });
             setListData(newList);
             sendData('query-action-list-effects', { listData: newList });
@@ -502,7 +522,7 @@ export const Actions = ({}) => {
     useEffect(() => {
         console.log('settInterval: ', currentTourId, stepIndex, actionsData?.runningList?.id);
         const interval = setInterval(() => {
-            console.log('Querying current list effects if needed', currentTourId, stepIndex, actionsData?.runningList?.id);
+            // console.log('Querying current list effects if needed', currentTourId, stepIndex, actionsData?.runningList?.id);
             if(currentTourId === 'crafting' && (stepIndex === 8 || stepIndex === 7)) {
                 sendData('query-actions-running', { prefix: 'for-craft-tour', withEffects: true })
             }

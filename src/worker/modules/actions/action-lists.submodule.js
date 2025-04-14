@@ -23,6 +23,8 @@ export class ActionListsSubmodule extends GameModule {
 
         this.autotriggerIntervalSetting = 10;
 
+        this.autoApplyCD = 0;
+
         this.eventHandler.registerHandler('save-action-list', (payload) => {
             this.saveActionList(payload);
         })
@@ -33,6 +35,10 @@ export class ActionListsSubmodule extends GameModule {
 
         this.eventHandler.registerHandler('load-action-list', ({ id }) => {
             this.sendListData(id);
+        })
+
+        this.eventHandler.registerHandler('query-actions-list-for-copy', ({ id }) => {
+            this.sendListData(id, false, { isCopy: true });
         })
 
         this.eventHandler.registerHandler('query-actions-lists', (pl) => {
@@ -66,6 +72,8 @@ export class ActionListsSubmodule extends GameModule {
 
 
         this.eventHandler.registerHandler('query-action-list-effects', ({ id, listData }) => {
+            listData = this.applyDynamicValuesToList(listData);
+
             const data = this.getListEffects(null, listData);
 
             const prevEffects = [];
@@ -109,10 +117,266 @@ export class ActionListsSubmodule extends GameModule {
                 resourcesEffects,
                 prevEffects: this.packEffects(prevEffects),
                 effectEffects: data.filter(one => one.type === 'effects'),
-                proportionsBar
+                proportionsBar,
+                newTimes: listData.actions,
             });
         })
     }
+
+    getListDynamicValues(listData) {
+        const MAX_ITER = 10;
+        const TOLERANCE = 0.001;
+        const SMALL_NUMBER = 1e-6;
+
+        const baseActions = listData.actions || [];
+        const dynamicActions = baseActions.filter(a => a.isDynamicTime);
+        const fixedActions = baseActions.filter(a => !a.isDynamicTime);
+        const fixedTotal = fixedActions.reduce((acc, one) => acc + one.time, 0);
+        if (dynamicActions.length === 0) return {};
+
+        const fallbackTimes = {};
+        const skipDynamicActions = new Set();
+        const resourceToActions = {};
+        const actionContributions = {};
+        const keysToTrack = [];
+
+        // 1. Ініціалізація дефіцитів для виявлення ключових ресурсів
+        const actions0 = baseActions.map(one =>
+            one.isDynamicTime ? { ...one, time: SMALL_NUMBER*Math.max(1, fixedTotal) } : one
+        );
+        const effects0 = this.getListEffects(null, { ...listData, actions: actions0 });
+
+        const initialResourceBalance = {};
+        effects0.forEach(effect => {
+            if (effect.type !== 'resources') return;
+            const base = resourceCalculators.assertResource(effect.id, false, ['runningActions'], {
+                targetEfficiency: 1,
+            });
+            const currentIncome = base.balance;
+
+            if (!initialResourceBalance[effect.id]) {
+                initialResourceBalance[effect.id] = { income: 0, consumption: 0, current: currentIncome };
+            }
+
+            const group = initialResourceBalance[effect.id];
+            if (effect.scope === 'income') group.income += effect.value;
+            else if (effect.scope === 'consumption') group.consumption += effect.value;
+        });
+        console.log('Pre Iter: eff0 ', effects0, actions0, initialResourceBalance);
+
+
+        const potentialConsumption = new Set();
+
+        for (const act of dynamicActions) {
+            const oneActionEffects = this.getListEffects(null, { actions: [act] });
+            for (const effect of oneActionEffects) {
+                if (effect.type === 'resources' && effect.scope === 'consumption') {
+                    potentialConsumption.add(effect.id);
+                }
+            }
+        }
+
+        for (const [id, val] of Object.entries(initialResourceBalance)) {
+            const net = val.current + val.income - val.consumption;
+            console.log('Pre Iter: check for push '+id+ ' :', net, val, potentialConsumption.has(id));
+            if (net < 0 || potentialConsumption.has(id)) {
+                keysToTrack.push(id);
+            }
+        }
+
+        // 2. Аналіз кожної динамічної дії — чи вона впливає на ключові ресурси
+        for (const act of dynamicActions) {
+            fallbackTimes[act.id] = act.time ?? 0.01;
+
+            const oneActionEffects = this.getListEffects(null, { actions: [act] });
+            const incomeEffects = oneActionEffects.filter(e => e.type === 'resources' && e.scope === 'income');
+            actionContributions[act.id] = incomeEffects.map(e => ({ id: e.id, value: e.value }));
+
+            let contributesToDeficit = false;
+            for (const { id } of incomeEffects) {
+                if (!resourceToActions[id]) resourceToActions[id] = new Set();
+                resourceToActions[id].add(act.id);
+                if (keysToTrack.includes(id)) contributesToDeficit = true;
+            }
+
+            if (!contributesToDeficit) {
+                skipDynamicActions.add(act.id);
+            }
+        }
+
+        console.log('Pre Iter: ', skipDynamicActions.values(), keysToTrack, potentialConsumption.values());
+
+        let dynamicValues = Object.fromEntries(dynamicActions.filter(one => !skipDynamicActions.has(one.id)).map(a => [a.id, 0.01]));
+        let previousDeficits = {};
+
+        for (let iter = 0; iter < MAX_ITER; iter++) {
+            const actions = baseActions.map(one =>
+                one.isDynamicTime && !skipDynamicActions.has(one.id)
+                    ? { ...one, time: dynamicValues[one.id] || 0.01 }
+                    : one
+            );
+
+            const dynamicTotal = dynamicActions.reduce((acc, one) =>
+                    skipDynamicActions.has(one.id)
+                        ? acc + (fallbackTimes[one.id] || 0.01)
+                        : acc + (dynamicValues[one.id] || 0.01)
+                , 0);
+
+            const totalListTime = fixedTotal + dynamicTotal;
+
+            const allEffects = this.getListEffects(null, { ...listData, actions });
+            console.log(`[Iter ${iter}] all-list-effects`, allEffects);
+
+            const resourceBalanceMap = {};
+            allEffects.forEach(effect => {
+                if (effect.type !== 'resources') return;
+
+                const base = resourceCalculators.assertResource(effect.id, false, ['runningActions'], {
+                    targetEfficiency: 1,
+                });
+                const currentIncome = base.balance;
+
+                if (!resourceBalanceMap[effect.id]) {
+                    resourceBalanceMap[effect.id] = { income: 0, consumption: 0, current: currentIncome };
+                }
+
+                const group = resourceBalanceMap[effect.id];
+                if (effect.scope === 'income') group.income += effect.value;
+                else if (effect.scope === 'consumption') group.consumption += effect.value;
+            });
+
+            const currentDeficits = {};
+            const currentProficits = {};
+            for (const [id, val] of Object.entries(resourceBalanceMap)) {
+                if(!keysToTrack.includes(id)) {
+                    continue;
+                }
+                const net = val.current + val.income - val.consumption;
+                if (net < 0) {
+                    currentDeficits[id] = Math.abs(net);
+                } else if (net > 0 && keysToTrack.includes(id)) {
+                    currentProficits[id] = net;
+                }
+            }
+
+            console.log(`[Iter ${iter}] deficits`, currentDeficits, currentProficits);
+
+            if (iter === 0) {
+                for (const [resourceId, deficit] of Object.entries(currentDeficits)) {
+                    const actionsThatContribute = resourceToActions[resourceId];
+                    if (!actionsThatContribute) continue;
+
+                    const totalValuePerSec = Array.from(actionsThatContribute).reduce((sum, actionId) => {
+                        const contrib = actionContributions[actionId].find(c => c.id === resourceId);
+                        return sum + (contrib?.value || 0);
+                    }, 0);
+
+                    if (totalValuePerSec <= 0) continue;
+
+                    const totalNeededTime = deficit * totalListTime / totalValuePerSec;
+
+                    for (const actionId of actionsThatContribute) {
+                        const contrib = actionContributions[actionId].find(c => c.id === resourceId);
+                        const portion = (contrib?.value || 0) / totalValuePerSec;
+                        const timeToAdd = totalNeededTime * portion;
+                        dynamicValues[actionId] = (dynamicValues[actionId] || 0) + timeToAdd;
+                        console.log(`[Init] +${timeToAdd.toFixed(4)} сек до ${actionId} для ресурсу ${resourceId}`);
+                    }
+                }
+            } else {
+                for (const [resourceId, prevDeficit] of Object.entries(previousDeficits)) {
+                    const current = currentDeficits[resourceId] || -currentProficits[resourceId] || 0;
+                    const delta = current;
+
+                    const actionsThatContribute = resourceToActions[resourceId];
+                    if (!actionsThatContribute) continue;
+
+                    const totalValuePerSec = Array.from(actionsThatContribute).reduce((sum, actionId) => {
+                        const contrib = actionContributions[actionId].find(c => c.id === resourceId);
+                        return sum + (contrib?.value || 0);
+                    }, 0);
+
+                    if (totalValuePerSec <= 0) continue;
+
+                    const timeCorrection = delta * totalListTime / totalValuePerSec;
+
+                    for (const actionId of actionsThatContribute) {
+                        const contrib = actionContributions[actionId].find(c => c.id === resourceId);
+                        const portion = (contrib?.value || 0) / totalValuePerSec;
+                        const deltaTime = timeCorrection * portion;
+                        const newTime = Math.max(0, (dynamicValues[actionId] || 0) + deltaTime);
+                        console.log(`[Iter ${iter}] ${deltaTime > 0 ? '+' : ''}${deltaTime.toFixed(4)} сек до ${actionId} для ресурсу ${resourceId}: ${dynamicValues[actionId]?.toFixed(4)} → ${newTime?.toFixed(4)}`);
+                        console.log(`[Iter ${iter}] reasoning: totalListTime = ${totalListTime}; timeCorrection = ${timeCorrection}; portion = ${portion}; totalValuePerSec=${totalValuePerSec}`);
+                        dynamicValues[actionId] = newTime;
+                    }
+                }
+            }
+
+            let stable = true;
+            for (const [resId, def] of Object.entries(currentDeficits)) {
+                const prev = previousDeficits[resId] ?? 0;
+                console.log(`[Iter ${iter}]: ${resId} CHECK: ${prev} VS ${def}`);
+                if (Math.abs(prev - def) > TOLERANCE || (def > TOLERANCE)) {
+                    console.log(`[Iter ${iter}]: ${resId} UNSTABLE: ${prev} VS ${def}`);
+
+                    stable = false;
+                    break;
+                }
+            }
+
+            previousDeficits = { ...currentDeficits };
+
+            if (stable) {
+                console.log(`[Iter ${iter}] stable → break`);
+                break;
+            }
+        }
+
+        console.log(`[Final] dynamicValues`, dynamicValues);
+        return dynamicValues;
+    }
+
+    canAutoSetTime(action) {
+        const effects = this.getListEffects(null, { actions: [action] });
+        return effects.some(e => e.type === 'resources' && e.scope === 'income' && e.value > 0);
+    }
+
+
+    applyDynamicValuesToList(listData) {
+        if (!listData?.actions?.length) return listData;
+
+        // Примусово вимикаємо dynamicTime для дій без дозволу
+        const preparedActions = listData.actions.map(action => {
+            const isAutoTimeEnabled = this.canAutoSetTime(action);
+            return {
+                ...action,
+                isAutoTimeEnabled,
+                isDynamicTime: isAutoTimeEnabled ? action.isDynamicTime : false
+            };
+        });
+
+        const preparedList = { ...listData, actions: preparedActions };
+
+        const dynamicActions = preparedActions.filter(a => a.isDynamicTime);
+        if (!dynamicActions.length) return preparedList;
+
+        const dynamic = this.getListDynamicValues(preparedList);
+
+        return {
+            ...listData,
+            actions: preparedActions.map(action => {
+                const updated = action.isDynamicTime && dynamic[action.id]
+                    ? { ...action, time: dynamic[action.id] }
+                    : action;
+                return {
+                    ...updated,
+                    isAutoTimeEnabled: action.isAutoTimeEnabled // завжди повертати явно
+                };
+            })
+        };
+    }
+
+
 
     runList(id) {
         if(!id) {
@@ -266,6 +530,7 @@ export class ActionListsSubmodule extends GameModule {
         if(this.actionsLists) {
             for(const key in this.actionsLists) {
                 this.actionsLists[key].actions = (this.actionsLists[key].actions || []).filter(one => one.time > 0);
+                this.actionsLists[key].id = key;
             }
         }
         this.sortLists();
@@ -390,6 +655,17 @@ export class ActionListsSubmodule extends GameModule {
             }
         }
 
+        if(this.runningList?.id) {
+            this.autoApplyCD -= delta;
+            if(this.autoApplyCD < 0) {
+                this.autoApplyCD = 10;
+                const runningList = this.actionsLists[this.runningList.id];
+                this.actionsLists[this.runningList.id] = this.applyDynamicValuesToList(runningList);
+                console.log('Re-run after automations: ', this.runningList.id);
+                this.runList(this.runningList?.id);
+            }
+        }
+
     }
 
     packEffects(effects, filter = (item) => true) {
@@ -429,8 +705,19 @@ export class ActionListsSubmodule extends GameModule {
         })
     }
 
-    sendListData(id, bForceOpen = false) {
-        const data = this.actionsLists[id];
+    sendListData(id, bForceOpen = false, options = {}) {
+        let data = this.applyDynamicValuesToList(this.actionsLists[id]);
+
+        // listData = this.applyDynamicValuesToList(listData);
+
+        if(options.isCopy) {
+            if(!data) {
+                console.error('Reffering to listId: ', id, this.actionsLists, options);
+            }
+            data = {...data};
+            data.name = data.name + ' (Copy)';
+            data.id = undefined;
+        }
 
         data.actions = (data.actions || []).map(a => ({
             ...a,
@@ -486,7 +773,7 @@ export class ActionListsSubmodule extends GameModule {
 
         data.bForceOpen = bForceOpen;
 
-        // console.log('SendingData: ', JSON.stringify(data.prevEffects), JSON.stringify(data.resourcesEffects));
+        console.log('SendingData: ', data);
 
         this.eventHandler.sendData('action-list-data', data);
     }
@@ -549,6 +836,7 @@ export class ActionListsSubmodule extends GameModule {
             const isEffectChanneling = gameEntity.getAttribute(action.id, 'isEffectChanneling', false);
             const effects = gameEntity.getEffects(action.id, gameEntity.getAttribute(action.id, 'isTraining') ? 1 : 0, gameEntity.getAttribute(action.id, 'isTraining') ? 1 : gameEntity.getLevel(action.id), true, action.time / totalTime);
 
+            // console.log('Temp P Iter: ', action.id, effects, action.time, totalTime);
             let learnRateFactor = gameCore.getModule('actions').getLearningRate(action.id) / gameCore.getModule('actions').getActionXPMax(action.id);
 
             effects.forEach(effToAdd => {

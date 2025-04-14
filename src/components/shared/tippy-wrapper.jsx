@@ -113,6 +113,7 @@ export const TippyWrapper = ({
         <div
             ref={popoverRef}
             className="custom-popover"
+            onMouseEnter={() => setVisible(false)}
         >
             {lazy ? content : content}
         </div>

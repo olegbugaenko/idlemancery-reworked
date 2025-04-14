@@ -11,6 +11,8 @@ import {useFlashOnLevelUp} from "../../general/hooks/flash";
 import {ResourceComparison} from "../shared/resource-comparison.jsx";
 import {NewNotificationWrap} from "../shared/new-notification-wrap.jsx";
 import {useAppContext} from "../../context/ui-context";
+import {CustomButton} from "../shared/buttons/custom-button.jsx";
+import {AutomationIcon} from "../shared/buttons/automation-checkbox.jsx";
 
 export const Shop = ({}) => {
     const [detailOpened, setDetailOpened] = useState(null)
@@ -338,29 +340,20 @@ export const ItemCard = ({ id, name, level, max, affordable, isLeveled, isCapped
         </div>
         <div className={'bottom'}>
             <div className={'buttons'}>
-                {/*<TippyWrapper content={<div className={'hint-popup'}>Purchase</div> }>
-                    <div className={`icon-content interface-icon ${(!affordable.isAffordable || isCapped) ? 'disabled' : ''}`}
-                         onClick={(e) => {e.stopPropagation(); e.preventDefault(); onPurchase(id)}}>
-                        <img src={"icons/interface/icon_purchase.png"}/>
-                    </div>
-                </TippyWrapper>*/}
-
-                <button
+                <div className={'leftwise'}>
+                <CustomButton
+                    iconId={'icon_upgrade_v2'}
                     disabled={!affordable.isAffordable || isCapped}
-                    className={`purchase-button ${isCapped ? 'capped' : ''}`}
+                    className={`purchase-button medium-sm ${isCapped ? 'capped' : ''}`}
                     style={{ '--progress': `${affordable.percentage*100}%` }}
                     onClick={(e) => {e.stopPropagation(); e.preventDefault(); onPurchase(id)}}
-                >Purchase</button>
-                {isAutomationUnlocked && !isCapped ? (<label
-                    className={'autobuy-label'}
-                    onClick={(e) => {
-                        e.stopPropagation();
-                    }}
-                >
-                    <input type={'checkbox'} checked={isAutoPurchase}
-                           onChange={(e) => {e.stopPropagation(); e.preventDefault(); toggleAutopurchase(id, !isAutoPurchase)}}/>
-                    Autobuy
-                </label>) : null}
+                >Purchase</CustomButton>
+                {isAutomationUnlocked && !isCapped ? (<AutomationIcon
+                    value={isAutoPurchase}
+                    className={'medium-sm'}
+                    onClick={(e) => {e.stopPropagation(); e.preventDefault(); toggleAutopurchase(id, !isAutoPurchase)}}
+                >{isAutoPurchase ? 'Autopurchase is turned on. Click to turn it off' : 'Autopurchase is turned off. Click to turn it on'}</AutomationIcon>) : null}
+                </div>
             </div>
         </div>
     </div> )

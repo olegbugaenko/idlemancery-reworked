@@ -13,7 +13,8 @@ const customStyles = {
         padding: '0', // Видаляємо паддінги
         borderRadius: '1px', // Можливо, зменшимо border-radius
         fontSize: '13px',
-        width: state.selectProps?.isMulti ? '280px' : '200px',
+        minWidth: state.selectProps?.isMulti ? '280px' : '200px',
+        width: '100%'
     }),
     valueContainer: (provided, state) => ({
         ...provided,
@@ -403,133 +404,136 @@ const RulesList = React.memo(
                         : false;
 
                     return (
-                        <div className={`rule row add-row ${rulesMatched?.ruleResults?.[index] ? 'matched' : 'unmatched'}`} key={index}>
-                            {/* Селект для compare_type */}
-                            <div className="col compare-type">
-                                {isEditing ? (
-                                    <Select
-                                        name="compare_type"
-                                        options={compareTypeOptions}
-                                        value={compareTypeOptions.find(
-                                            (option) => option.value === rule.compare_type
-                                        )}
-                                        onChange={(selectedOption) => {
-                                            setRuleValue(index, 'compare_type', selectedOption.value);
-                                        }
-                                        }
-                                        className="react-select-container"
-                                        classNamePrefix="react-select"
-                                        styles={customStyles}
-                                    />
-                                ) : (
-                                    <span>
-                    {mapCompareType[rule.compare_type]?.label || 'Invalid'}
-                  </span>
-                                )}
-                            </div>
-
-                            {/* Селект для subject */}
-                            {selectedCompareType && (
-                                <div className="col subject">
+                        <div className={`rule-row-wrap ${isEditing ? 'editing' : ''}`}>
+                            {isEditing && (
+                                <div className="col delete-rule">
+                                  <span className="close" onClick={() => deleteRule(index)}>
+                                    X
+                                  </span>
+                                </div>
+                            )}
+                            <div className={`rule row add-row ${rulesMatched?.ruleResults?.[index] ? 'matched' : 'unmatched'}`} key={index}>
+                                {/* Селект для compare_type */}
+                                <div className="col compare-type">
                                     {isEditing ? (
                                         <Select
-                                            name={subjectName}
-                                            options={subjectOptions}
-                                            value={subjectValue}
-                                            isMulti={mapCompareType[rule.compare_type]?.allowMultiSubject}
+                                            name="compare_type"
+                                            options={compareTypeOptions}
+                                            value={compareTypeOptions.find(
+                                                (option) => option.value === rule.compare_type
+                                            )}
                                             onChange={(selectedOption) => {
-                                                setRuleValue(
-                                                    index,
-                                                    subjectName,
-                                                    mapCompareType[rule.compare_type]?.allowMultiSubject
-                                                        ? selectedOption.map(option => option.value)
-                                                        : selectedOption.value
-                                                )
-                                            }}
-                                            className={`react-select-container ${mapCompareType[rule.compare_type]?.allowMultiSubject ? 'multi' : ''}`}
+                                                setRuleValue(index, 'compare_type', selectedOption.value);
+                                            }
+                                            }
+                                            className="react-select-container"
                                             classNamePrefix="react-select"
                                             styles={customStyles}
                                         />
                                     ) : (
-                                        <span>{Array.isArray(subjectValue) ? subjectValue.map(one => `${one?.label}`).join(',') : (subjectValue?.label || 'Invalid')}</span>
+                                        <span className={'display-rule-value'}>
+                                            {mapCompareType[rule.compare_type]?.label || 'Invalid'}
+                                          </span>
                                     )}
                                 </div>
-                            )}
 
-                            {/* Селект для condition */}
-                            {selectedCompareType && (
-                                <div className="col condition">
-                                    {isEditing ? (
-                                        <select
-                                            name="condition"
-                                            onChange={(e) =>
-                                                setRuleValue(index, 'condition', e.target.value)
-                                            }
-                                            value={selectedCondition}
-                                        >
-                                            {conditionOptions.map((option) => (
-                                                <option key={option.value} value={option.value}>
-                                                    {option.label}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    ) : (
-                                        <span>{mapRuleCond(rule.condition)}</span>
-                                    )}
-                                </div>
-                            )}
+                                {/* Селект для subject */}
+                                {selectedCompareType && (
+                                    <div className="col subject">
+                                        {isEditing ? (
+                                            <Select
+                                                name={subjectName}
+                                                options={subjectOptions}
+                                                value={subjectValue}
+                                                isMulti={mapCompareType[rule.compare_type]?.allowMultiSubject}
+                                                onChange={(selectedOption) => {
+                                                    setRuleValue(
+                                                        index,
+                                                        subjectName,
+                                                        mapCompareType[rule.compare_type]?.allowMultiSubject
+                                                            ? selectedOption.map(option => option.value)
+                                                            : selectedOption.value
+                                                    )
+                                                }}
+                                                className={`react-select-container ${mapCompareType[rule.compare_type]?.allowMultiSubject ? 'multi' : ''}`}
+                                                classNamePrefix="react-select"
+                                                styles={customStyles}
+                                            />
+                                        ) : (
+                                            <span className={'display-rule-value'}>{Array.isArray(subjectValue) ? subjectValue.map(one => `${one?.label}`).join(',') : (subjectValue?.label || 'Invalid')}</span>
+                                        )}
+                                    </div>
+                                )}
 
-                            {/* Селект для value_type */}
-                            {selectedCompareType && !isHideValue && (
-                                <div className="col value_type">
-                                    {isEditing ? (
-                                        <select
-                                            name="value_type"
-                                            onChange={(e) =>
-                                                setRuleValue(index, 'value_type', e.target.value)
-                                            }
-                                            value={rule.value_type}
-                                        >
-                                            {valueTypeOptions.map((option) => (
-                                                <option key={option.value} value={option.value}>
-                                                    {option.label}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    ) : (
-                                        <span>{rule.value_type}</span>
-                                    )}
-                                </div>
-                            )}
+                                {/* Селект для condition */}
+                                {selectedCompareType && (
+                                    <div className="col condition">
+                                        {isEditing ? (
+                                            <select
+                                                name="condition"
+                                                onChange={(e) =>
+                                                    setRuleValue(index, 'condition', e.target.value)
+                                                }
+                                                value={selectedCondition}
+                                            >
+                                                {conditionOptions.map((option) => (
+                                                    <option key={option.value} value={option.value}>
+                                                        {option.label}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        ) : (
+                                            <span className={'display-rule-value'}>{mapRuleCond(rule.condition)}</span>
+                                        )}
+                                    </div>
+                                )}
 
-                            {/* Інпут для value */}
-                            {selectedCompareType && !isHideValue && (
-                                <div className="col value">
-                                    {isEditing ? (
-                                        <input
-                                            type="number"
-                                            onChange={(e) =>
-                                                setRuleValue(index, 'value', e.target.value)
-                                            }
-                                            value={rule.value}
-                                            max={
-                                                rule.value_type === 'percentage' ? 100 : undefined
-                                            }
-                                            min="0"
-                                            step={rule.value_type === 'percentage' ? 5 : 1}
-                                        />
-                                    ) : (
-                                        <span>{rule.value}</span>
-                                    )}
-                                </div>
-                            )}
-                            {isEditing && (
-                                <div className="col delete-rule">
-                  <span className="close" onClick={() => deleteRule(index)}>
-                    X
-                  </span>
-                                </div>
-                            )}
+                                {/* Селект для value_type */}
+                                {selectedCompareType && !isHideValue && (
+                                    <div className="col value_type">
+                                        {isEditing ? (
+                                            <select
+                                                name="value_type"
+                                                onChange={(e) =>
+                                                    setRuleValue(index, 'value_type', e.target.value)
+                                                }
+                                                value={rule.value_type}
+                                            >
+                                                {valueTypeOptions.map((option) => (
+                                                    <option key={option.value} value={option.value}>
+                                                        {option.label}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        ) : (
+                                            <span className={'display-rule-value'}>{rule.value_type}</span>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* Інпут для value */}
+                                {selectedCompareType && !isHideValue && (
+                                    <div className="col value">
+                                        {isEditing ? (
+                                            <input
+                                                type="number"
+                                                onChange={(e) =>
+                                                    setRuleValue(index, 'value', e.target.value)
+                                                }
+                                                value={rule.value}
+                                                max={
+                                                    rule.value_type === 'percentage' ? 100 : undefined
+                                                }
+                                                min="0"
+                                                step={rule.value_type === 'percentage' ? 5 : 1}
+                                            />
+                                        ) : (
+                                            <span>{rule.value}</span>
+                                        )}
+                                    </div>
+                                )}
+
+                            </div>
                         </div>
                     );
                 })}

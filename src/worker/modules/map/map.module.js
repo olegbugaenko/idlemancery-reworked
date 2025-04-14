@@ -18,7 +18,7 @@ export class MapModule extends GameModule {
             level: 0,
         }
         this.mapTier = 0;
-        this.relevantMapVersion = 13;
+        this.relevantMapVersion = 14;
         this.currentMapVersion = null;
 
         this.lists = new MapTileListsSubmodule();
@@ -257,7 +257,7 @@ export class MapModule extends GameModule {
                 additionalDrops.push({
                     id: selectedResource.id,
                     amountMult: complexity / ((1 + selectedResource.rarity)*(selectedResource.sellPrice ** 0.05)),
-                    probabilityMult: (complexity ** 0.5) / (((1 + (selectedResource.rarity ** 0.5)))*(selectedResource.sellPrice ** 0.25))
+                    probabilityMult: (complexity ** 0.5) / (((1 + (selectedResource.rarity ** 0.5)))*(selectedResource.sellPrice ** 0.15))
                 });
             }
         }
@@ -281,14 +281,11 @@ export class MapModule extends GameModule {
                 huntingDrops.push({
                     id: hunt.id,
                     amountMult: complexity / ((1 + hunt.rarity) * (hunt.sellPrice ** 0.05)),
-                    probabilityMult: (complexity ** 0.5) / ((1 + (hunt.rarity ** 0.5)) * (hunt.sellPrice ** 0.25)),
+                    probabilityMult: (complexity ** 0.5) / ((1 + (hunt.rarity ** 0.5)) * (hunt.sellPrice ** 0.15)),
                     isHunt: true,
                 });
             }
         }
-
-        console.log('AddHunting: ', huntingDrops);
-
 
         // Combine the guaranteed low rarity drop and additional drops
         drops.push(...additionalDrops);

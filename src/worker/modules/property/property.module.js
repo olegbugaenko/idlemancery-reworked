@@ -117,6 +117,7 @@ export class PropertyModule extends GameModule {
         this.isUnlocked = false;
         this.leveledId = null;
         this.hideMaxed = {};
+        this.showHidden = {};
         this.searchData = {
             furniture: {
                 search: '',
@@ -129,6 +130,14 @@ export class PropertyModule extends GameModule {
             amplifier: {
                 search: '',
                 selectedScopes: ['name']
+            }
+        };
+        this.hiddenItems = {
+            furniture: {
+            },
+            accessory: {
+            },
+            amplifier: {
             }
         };
         this.autoPurchase = {};
@@ -170,6 +179,7 @@ export class PropertyModule extends GameModule {
             this.sendFurnituresData({filterId}, {
                 searchData: this.searchData[filterId],
                 hideMaxed: this.hideMaxed[payload.filterId] || false,
+                showHidden: this.showHidden[payload.filterId] || false,
                 selectedFilterId: this.selectedFilterId[payload.filterId],
             })
         })
@@ -204,6 +214,7 @@ export class PropertyModule extends GameModule {
             })
             this.sendFurnituresData({ filterId }, filterId ? {
                 hideMaxed: this.hideMaxed[filterId] || false,
+                showHidden: this.showHidden[filterId] || false,
                 searchData: this.searchData[filterId]  || {
                     search: '',
                     selectedScopes: ['name']
@@ -214,11 +225,30 @@ export class PropertyModule extends GameModule {
         this.eventHandler.registerHandler('purchase-furniture', (payload) => {
             this.purchaseFurniture(payload.id, payload.filterId, payload.filterId ? {
                 hideMaxed: this.hideMaxed[payload.filterId] || false,
+                showHidden: this.showHidden[payload.filterId] || false,
                 searchData: this.searchData[payload.filterId] || {
                     search: '',
                     selectedScopes: ['name']
                 }
             } : undefined);
+        })
+        this.eventHandler.registerHandler('toggle-furniture-hidden', (payload) => {
+            if(!this.hiddenItems[payload.filterId]) {
+                this.hiddenItems[payload.filterId] = {}
+            }
+            if(!this.hiddenItems[payload.filterId][payload.id]) {
+                this.hiddenItems[payload.filterId][payload.id] = false;
+            }
+            this.hiddenItems[payload.filterId][payload.id] = !this.hiddenItems[payload.filterId][payload.id];
+            this.sendFurnituresData({ filterId: payload.filterId }, payload.filterId ? {
+                hideMaxed: this.hideMaxed[payload.filterId] || false,
+                showHidden: this.showHidden[payload.filterId] || false,
+                searchData: this.searchData[payload.filterId]  || {
+                    search: '',
+                    selectedScopes: ['name']
+                },
+                selectedFilterId: this.selectedFilterId[payload.filterId],
+            } : undefined)
         })
 
         this.eventHandler.registerHandler('set-furniture-hide-maxed', (payload) => {
@@ -228,6 +258,23 @@ export class PropertyModule extends GameModule {
             }
             this.sendFurnituresData(payload, payload.filterId ? {
                 hideMaxed: this.hideMaxed[payload.filterId] || false,
+                showHidden: this.showHidden[payload.filterId] || false,
+                selectedFilterId: this.selectedFilterId[payload.filterId],
+                searchData: this.searchData[payload.filterId]  || {
+                    search: '',
+                    selectedScopes: ['name']
+                }
+            } : undefined)
+        })
+
+        this.eventHandler.registerHandler('set-furniture-show-hidden', (payload) => {
+            // console.log('Set Hide Maxed: ', payload);
+            if(payload.filterId) {
+                this.showHidden[payload.filterId] = payload.showHidden;
+            }
+            this.sendFurnituresData(payload, payload.filterId ? {
+                hideMaxed: this.hideMaxed[payload.filterId] || false,
+                showHidden: this.showHidden[payload.filterId] || false,
                 selectedFilterId: this.selectedFilterId[payload.filterId],
                 searchData: this.searchData[payload.filterId]  || {
                     search: '',
@@ -243,6 +290,7 @@ export class PropertyModule extends GameModule {
             // console.log('sendFurniture: ', payload, this.searchData);
             this.sendFurnituresData(payload, payload.filterId ? {
                 hideMaxed: this.hideMaxed[payload.filterId] || false,
+                showHidden: this.showHidden[payload.filterId] || false,
                 selectedFilterId: this.selectedFilterId[payload.filterId],
                 searchData: this.searchData[payload.filterId]  || {
                     search: '',
@@ -254,6 +302,7 @@ export class PropertyModule extends GameModule {
         this.eventHandler.registerHandler('delete-furniture', (payload) => {
             this.deleteFurniture(payload.id, payload.filterId, payload.filterId ? {
                 hideMaxed: this.hideMaxed[payload.filterId] || false,
+                showHidden: this.showHidden[payload.filterId] || false,
                 searchData: this.searchData[payload.filterId]  || {
                     search: '',
                     selectedScopes: ['name']
@@ -265,6 +314,7 @@ export class PropertyModule extends GameModule {
 
             this.sendFurnituresData(payload, payload.filterId ? {
                 hideMaxed: this.hideMaxed[payload.filterId] || false,
+                showHidden: this.showHidden[payload.filterId] || false,
                 selectedFilterId: this.selectedFilterId[payload.filterId],
                 searchData: this.searchData[payload.filterId]  || {
                     search: '',
@@ -410,6 +460,7 @@ export class PropertyModule extends GameModule {
         //TODO: Re-index filters
         this.sendFurnituresData({ filterId: payload.filterId }, {
             hideMaxed: this.hideMaxed[payload.filterId] || false,
+            showHidden: this.showHidden[payload.filterId] || false,
             searchData: this.searchData[payload.filterId]  || {
                 search: '',
                 selectedScopes: ['name']
@@ -425,6 +476,7 @@ export class PropertyModule extends GameModule {
             this.customFiltersOrder[filterId] = this.customFiltersOrder[filterId].filter(fid => fid !== id);
             this.sendFurnituresData({ filterId }, {
                 hideMaxed: this.hideMaxed[filterId] || false,
+                showHidden: this.showHidden[filterId] || false,
                 searchData: this.searchData[filterId]  || {
                     search: '',
                     selectedScopes: ['name']
@@ -440,6 +492,7 @@ export class PropertyModule extends GameModule {
         console.log('AppliedFilter: ', this.selectedFilterId);
         this.sendFurnituresData({ filterId }, {
             hideMaxed: this.hideMaxed[filterId] || false,
+            showHidden: this.showHidden[filterId] || false,
             searchData: this.searchData[filterId]  || {
                 search: '',
                 selectedScopes: ['name']
@@ -493,11 +546,13 @@ export class PropertyModule extends GameModule {
         return {
             furnitures: this.purchasedFurnitures,
             hideMaxed: this.hideMaxed,
+            showHidden: this.showHidden,
             searchData: this.searchData,
             autoPurchase: this.autoPurchase,
             customFilters: this.customFilters,
             customFiltersOrder: this.customFiltersOrder,
             selectedFilterId: this.selectedFilterId,
+            hiddenItems: this.hiddenItems,
         }
     }
 
@@ -513,6 +568,15 @@ export class PropertyModule extends GameModule {
         }
         this.isUnlocked = saveObject?.isUnlocked || false;
         this.hideMaxed = saveObject?.hideMaxed || {};
+        this.showHidden = saveObject?.showHidden || {};
+        this.hiddenItems = saveObject?.hiddenItems || {
+            furniture: {
+            },
+            accessory: {
+            },
+            amplifier: {
+            }
+        };
         this.searchData = saveObject?.searchData || {
             furniture: {
                 search: '',
@@ -695,6 +759,7 @@ export class PropertyModule extends GameModule {
                 items: gameEntity.listEntitiesByTags([payload.filterId])
                     .filter(one => this.filtersCache[payload.filterId][filter.id][one.id] && one.isUnlocked
                         && (!options?.hideMaxed || !one.isCapped)
+                        && (options?.showHidden || !this.hiddenItems[payload.filterId]?.[one.id])
                         && !one.isUnpurchaseable
                         && this.matchSearch(one, options.searchData)
                     ),
@@ -709,9 +774,12 @@ export class PropertyModule extends GameModule {
 
         const spaceRes = gameResources.getResource('living_space');
 
+        console.log('showHidden: ', this.showHidden, options.showHidden);
+
         return {
             available: entities.filter(one => one.isUnlocked
                 && (!options?.hideMaxed || !one.isCapped)
+                && (options?.showHidden || !this.hiddenItems[payload.filterId]?.[one.id])
                 && this.matchSearch(one, options?.searchData)
             ).map(entity => ({
                 id: entity.id,
@@ -723,6 +791,7 @@ export class PropertyModule extends GameModule {
                 potentialEffects: gameEntity.getEffects(entity.id, 1),
                 isLeveled: this.leveledId === entity.id,
                 isCapped: entity.isCapped,
+                isHidden: this.hiddenItems[payload.filterId]?.[entity.id],
                 isAutoPurchase: this.autoPurchase[entity.id] ?? false,
                 spaceUsage: gameEntity.getEffects(entity.id, 0).find(one => one.id === 'living_space')?.value / Math.max(1, spaceRes.consumption)
             })),
@@ -736,6 +805,7 @@ export class PropertyModule extends GameModule {
             selectedCategory: this.selectedFilterId[payload.filterId],
             searchData: options?.searchData,
             hideMaxed: options?.hideMaxed,
+            showHidden: this.showHidden?.[payload.filterId],
             isAutomationUnlocked: gameEntity.getLevel('shop_item_purchase_manager') > 0,
             customFilters: this.customFilters[payload.filterId],
             customFiltersOrder: this.customFiltersOrder[payload.filterId],

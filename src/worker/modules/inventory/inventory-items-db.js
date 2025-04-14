@@ -267,7 +267,7 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0
         },
-        sellPrice: 80,
+        sellPrice: 180,
         rarity: 0.2,
     })
 
@@ -334,8 +334,8 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0
         },
-        sellPrice: 250,
-        rarity: 0.2,
+        sellPrice: 350,
+        rarity: 0.25,
         allowedTileTypes: ['lakes', 'swamp', 'savanna']
     })
 
@@ -369,8 +369,8 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0
         },
-        sellPrice: 250,
-        rarity: 0.2,
+        sellPrice: 350,
+        rarity: 0.25,
         allowedTileTypes: ['mountain', 'plains', 'savanna']
     })
 
@@ -404,8 +404,8 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0
         },
-        sellPrice: 250,
-        rarity: 0.2,
+        sellPrice: 350,
+        rarity: 0.25,
         allowedTileTypes: ['lakes', 'forest', 'swamp']
     })
 
@@ -434,8 +434,8 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_1') > 0
         },
-        sellPrice: 90,
-        rarity: 1,
+        sellPrice: 390,
+        rarity: 0.75,
         allowedTileTypes: ['plain', 'savanna']
     })
 
@@ -480,8 +480,8 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_1') > 0
         },
-        sellPrice: 90,
-        rarity: 1,
+        sellPrice: 390,
+        rarity: 0.75,
         allowedTileTypes: ['plain', 'mountain', 'hills']
     })
 
