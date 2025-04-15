@@ -856,6 +856,7 @@ export const ActionCard = React.memo(({ id, category, monitored, entityEfficienc
     const comp = (
                 <div
                     id={`item_${id}`}
+                    ref={elementRef}
                     className={`card ${category} ${tags.includes('training') ? 'training' : ''} action ${isSelected ? 'selected' : ''} ${isActive ? 'active' : ''} ${entityEfficiency < 1 ? ' efficiency-dropped' : ''} flashable ${monitored ?? ''}`}
                     onMouseEnter={() => {
                         onShowDetails(id)

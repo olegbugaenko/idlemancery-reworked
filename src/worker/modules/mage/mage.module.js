@@ -828,6 +828,9 @@ export class MageModule extends GameModule {
             }
             // console.log('loadedBankedTime: ', this.bankedTime, Date.now(), Date.now() - (this.bankedTime.lastSave + 60000))
         }
+        if(!this.bankedTime?.current) {
+            this.bankedTime.current = 3600*5.72*1000;
+        }
         this.tourStatus = obj?.tourStatus;
 
         if(!this.skillUpgrades) {
