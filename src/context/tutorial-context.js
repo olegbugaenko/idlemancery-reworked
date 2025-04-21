@@ -899,6 +899,131 @@ export function TutorialProvider({ children }) {
         }
     ]
 
+    const stepsInventory = [
+        {
+            target: '.inventory-wrap',
+            content: 'In inventory you can see and manage list of items that you currently have. It can be materials, flasks, herbs and other stuff',
+            disableBeacon: true,
+            disableOverlayClose: true,
+        },
+        {
+            target: '.inventory-items-wrap',
+            content: 'Here you can see list and quantities of items you own. There are different ways to get different items, that will be unlocked as you progress. But some of them can be simply purchased in the shop',
+            disableBeacon: true,
+            disableOverlayClose: true,
+        },
+        {
+            target: '#shop',
+            content: 'Lets navigate to the shop',
+            disableBeacon: true,
+            disableOverlayClose: true,
+            spotlightClicks: true,
+            actionRequired: true
+        },
+        {
+            target: '#shop-items-tab',
+            content: 'Switch to "Items" section in the shop',
+            disableBeacon: true,
+            disableOverlayClose: true,
+            spotlightClicks: true,
+            actionRequired: true
+        },
+        {
+            target: '.items-cat',
+            content: 'You can see here items that you can purchase. As you progress you will unlock new items',
+            disableBeacon: true,
+            disableOverlayClose: true,
+        },
+        {
+            target: '#shop-item-resource-inventory_brightleaf',
+            content: 'Lets hover over Brightleaf to see what is it',
+            disableBeacon: true,
+            disableOverlayClose: true,
+            spotlightClicks: true,
+            actionRequired: true
+        },
+        {
+            target: '.price-section',
+            content: 'Here you can see the cost of the item',
+            disableBeacon: true,
+            disableOverlayClose: true,
+        },
+        {
+            target: '.lasting-effects-section',
+            content: 'Here you can see effects provided by item',
+            disableBeacon: true,
+            disableOverlayClose: true,
+        },
+        {
+            target: '#shop-item-resource-inventory_brightleaf',
+            content: 'Left clicking on item will purchase it. Make sure you have enough coins to buy it, and purchase one. If you dont - just earn coins, and restart the tutorial.',
+            disableBeacon: true,
+            disableOverlayClose: true,
+            spotlightClicks: true,
+            actionRequired: true
+        },
+        {
+            target: '#main-menu-inventory',
+            content: 'Lets go back to inventory tab now',
+            disableBeacon: true,
+            disableOverlayClose: true,
+            spotlightClicks: true,
+            actionRequired: true
+        },
+        {
+            target: '.inventory-items-wrap',
+            content: 'Now you can see your purchased Brightleaf in list of items you own',
+            disableBeacon: true,
+            disableOverlayClose: true,
+        },
+        {
+            target: '#inventory-item-card-inventory_brightleaf',
+            content: 'Click your "Brightleaf"',
+            disableBeacon: true,
+            disableOverlayClose: true,
+            spotlightClicks: true,
+            actionRequired: true
+        },
+        {
+            target: '.inventory-items-blade',
+            content: 'As for most items in game, hovering over item shows it details. However, there are few items that are worth to discuss them separately.',
+            disableBeacon: true,
+            disableOverlayClose: true,
+        },
+        {
+            target: '.pin-resource-button',
+            content: 'You can pin or unpin your resources to left sidebar to be able to access them easier',
+            disableBeacon: true,
+            disableOverlayClose: true,
+        },
+        {
+            target: '.consume-button',
+            content: 'Click on the button to consume it. By the way, you can also consume items without opening their details by right-clicking item icon',
+            disableBeacon: true,
+            disableOverlayClose: true,
+            spotlightClicks: true,
+            actionRequired: true
+        },
+        {
+            target: '.active-effects-wrap',
+            content: 'Since consumed Brightleaf has lasting effects, it will be shown along with other buffs/debuffs here',
+            disableBeacon: true,
+            disableOverlayClose: true,
+        },
+        {
+            target: '.toggle-effect-monitor',
+            content: 'However, this can be turned off here. If you put it off - item effect wont appear in left sidebar. It might be useful if you running item permanently and dont want it to distract you.',
+            disableBeacon: true,
+            disableOverlayClose: true,
+        },
+        {
+            target: '.inventory-wrap',
+            content: 'Thats all about inventory. Good luck and be careful with toxic mushrooms ;)',
+            disableBeacon: true,
+            disableOverlayClose: true,
+        },
+    ]
+
 
     const tutorials = {
         initial: stepsInitial,
@@ -907,6 +1032,7 @@ export function TutorialProvider({ children }) {
         map: stepsMap,
         crafting: stepsCrafting,
         alchemy: stepsAlchemy,
+        inventory: stepsInventory,
     }
 
     // Допоміжні функції

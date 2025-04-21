@@ -341,6 +341,8 @@ export class ShopModule extends GameModule {
             level: this.purchasedItems[entity.id] || 0,
             affordable: resourceCalculators.isAffordable(entity.get_cost(potPurchase)),
             potentialEffects: resourceApi.unpackEffects(entity.usageGain || {}, 1),
+            potentialLastingEffects: entity.resourceModifier ? resourceApi.unpackEffects(entity.resourceModifier, 1) : [],
+            duration: entity.attributes?.duration || 0,
             tags: entity.tags,
             purchaseMultiplier: Math.max(1, Math.min(this.purchaseMultiplier, affordable.max, (this.sellStocks[entity.id] ?? 0))),
         }

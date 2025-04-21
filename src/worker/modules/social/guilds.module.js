@@ -142,20 +142,22 @@ export class GuildsModule extends GameModule {
             gameEntity.setEntityLevel(this.selectedGuild, 0, true);
         }
 
-        this.selectedGuild = obj?.selectedGuild;
+        this.selectedGuild = null;
+
+        /*this.selectedGuild = obj?.selectedGuild;
         if(this.selectedGuild) {
             gameEntity.setEntityLevel(this.selectedGuild, obj?.guildLevel);
-        }
+        }*/
 
         for(const key in this.purchasedUpgrades) {
             this.setItem(key, 0, true);
         }
         this.purchasedUpgrades = {};
-        if(obj?.purchasedUpgrades) {
+        /*if(obj?.purchasedUpgrades) {
             for(const id in obj.purchasedUpgrades) {
                 this.setItem(id, obj.purchasedUpgrades[id], true);
             }
-        }
+        }*/
 
         if(this.guildsStats) {
             for(const key in this.guildsStats) {
@@ -164,12 +166,12 @@ export class GuildsModule extends GameModule {
             }
         }
 
-        if(obj?.guildsStats) {
+        /*if(obj?.guildsStats) {
             this.guildsStats = obj?.guildsStats;
             for(const key in this.guildsStats) {
                 this.setPermaBonus(key, this.getCurrentPermaLevel(key), true)
             }
-        }
+        }*/
 
         this.sendItemsData();
     }

@@ -14,7 +14,7 @@ export const PinResource = ({ id, isPinned }) => {
     }
 
     return (<TippyWrapper content={<div className={'hint-popup'}>{isPinned ? 'Unpin item to hide it from resources sidebar' : 'Pin item to make it visible at resources sidebar'}</div> }>
-        <div className={'icon-content small interface-icon'} onClick={togglePinned}>
+        <div className={'icon-content small interface-icon pin-resource-button'} onClick={togglePinned}>
             <img src={isPinned ? 'icons/interface/unpin.png' : 'icons/interface/pin.png'}/>
         </div>
     </TippyWrapper>)

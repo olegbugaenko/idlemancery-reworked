@@ -29,6 +29,7 @@ export class MageModule extends GameModule {
         this.skillDrafts = {};
         this.isViewMode = false;
         this.settings = {};
+        this.activeEffectsFiltered = {};
         /*
         this.eventHandler.registerHandler('feed-dragon', (data) => {
             this.feedDragon();
@@ -41,6 +42,11 @@ export class MageModule extends GameModule {
          */
 
         this.skillGroupsCached = {};
+
+        this.eventHandler.registerHandler('set-lasting-pinned', ({id, flag}) => {
+            this.activeEffectsFiltered[id] = !flag;
+            console.log('LAE: ', this.activeEffectsFiltered);
+        })
 
         this.eventHandler.registerHandler('query-settings', () => {
             this.eventHandler.sendData('settings', this.settings);
@@ -778,7 +784,8 @@ export class MageModule extends GameModule {
             },
             tourStatus: this.tourStatus,
             drafts: this.skillDrafts,
-            settings: this.settings
+            settings: this.settings,
+            activeEffectsFiltered: this.activeEffectsFiltered,
         }
     }
 
@@ -828,9 +835,9 @@ export class MageModule extends GameModule {
             }
             // console.log('loadedBankedTime: ', this.bankedTime, Date.now(), Date.now() - (this.bankedTime.lastSave + 60000))
         }
-        if(!this.bankedTime?.current) {
+        /*if(!this.bankedTime?.current) {
             this.bankedTime.current = 3600*5.72*1000;
-        }
+        }*/
         this.tourStatus = obj?.tourStatus;
 
         if(!this.skillUpgrades) {
@@ -839,6 +846,10 @@ export class MageModule extends GameModule {
 
         if(obj?.drafts) {
             this.skillDrafts = obj?.drafts;
+        }
+
+        if(obj?.activeEffectsFiltered) {
+            this.activeEffectsFiltered = obj?.activeEffectsFiltered;
         }
 
         // this.reassertCurrentMageLevel();
@@ -952,7 +963,7 @@ export class MageModule extends GameModule {
         // console.log('[debug-error] activeEvents: ', items);
 
         return {
-            list: items.map(item => ({
+            list: items.filter(item => !this.activeEffectsFiltered[item.originalId] && !this.activeEffectsFiltered[item.copyFromId]).map(item => ({
                 ...item,
                 originalId: item.originalId ?? item.copyFromId,
                 effects: gameEntity.getEffects(item.id, item.level, 0, false, 1, item.modifier.efficiency),

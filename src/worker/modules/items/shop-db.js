@@ -104,7 +104,7 @@ export const registerShopItemsStage1 = () => {
         name: 'Repair Slippers',
         description: 'Your slippers are old, but better than nothing. If you repair it, it could make you feel more comfortable and warm',
         level: 0,
-        maxLevel: 6,
+        maxLevel: 8,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_hat') > 0
         },
@@ -270,6 +270,79 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+
+    gameEntity.registerGameEntity('shop_item_warm_gloves', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Warm Gloves',
+        description: 'With these gloves, even chilly mornings can’t stop your dedication. Makes routine work feel a little easier.',
+        level: 0,
+        maxLevel: 5,
+        unlockedBy: [{
+           type: 'entity',
+           id: 'action_home_errands',
+           level: 5
+        }],
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'routine_actions_discount': {
+                        A: 0.2,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 500*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1,
+            }
+        }),
+    })
+
+
+    gameEntity.registerGameEntity('shop_item_introductory_textbook', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Introductory Textbook',
+        description: 'A well-structured textbook that makes it easier to grasp the basics and learn faster during training.',
+        level: 0,
+        maxLevel: 5,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_memory',
+            level: 10
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_notebook') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 1000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1,
+            }
+        }),
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'learning_rate': {
+                        A: 0.1,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }
+        },
+    })
+
     gameEntity.registerGameEntity('shop_item_shovel', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Shovel',
@@ -368,7 +441,7 @@ export const registerShopItemsStage1 = () => {
         unlockedBy: [{
            type: 'effect',
            id: 'attribute_patience',
-           level: 5,
+           level: 50,
         }],
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0
@@ -830,7 +903,7 @@ export const registerShopItemsStage1 = () => {
         get_cost: () => ({
             'coins': {
                 A: 2,
-                B: 750*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 5000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 0
             }
         }),
@@ -862,7 +935,7 @@ export const registerShopItemsStage1 = () => {
         get_cost: () => ({
             'coins': {
                 A: 2,
-                B: 1250*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 7500*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 1
             }
         }),

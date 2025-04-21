@@ -507,6 +507,7 @@ export class InventoryModule extends GameModule {
             potentialPermanentEffects = packEffects(gameEntity.getEffects(resource.attributes?.entityEffect, 1));
         }
 
+
         // console.log('EEFF: ', resource.attributes?.entityEffect, permanentEffects, potentialPermanentEffects);
         return {
             id: resource.id,
@@ -535,6 +536,8 @@ export class InventoryModule extends GameModule {
             currentCooldown: this.inventoryItems[id]?.cooldown || 0,
             currentDuration: this.inventoryItems[id]?.duration || 0,
             isPinned: !!gameCore.getModule('resource-pool').pinnedResources?.[resource.id],
+            canShowLasting: !!resource.resourceModifier,
+            show_lasting: !gameCore.getModule('mage').activeEffectsFiltered?.[resource.id]
         }
     }
 

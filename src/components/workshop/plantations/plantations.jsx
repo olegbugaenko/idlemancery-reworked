@@ -9,6 +9,8 @@ import {BreakDown} from "../../layout/sidebar.jsx";
 import {TippyWrapper} from "../../shared/tippy-wrapper.jsx";
 import {Balances} from "../shared.jsx";
 import {useAppContext} from "../../../context/ui-context";
+import {CustomButton} from "../../shared/buttons/custom-button.jsx";
+import {AutomationIcon} from "../../shared/buttons/automation-checkbox.jsx";
 
 export const Plantations = ({ setItemDetails, newUnlocks }) => {
 
@@ -116,31 +118,28 @@ export const ItemCard = ({ id, icon_id, resourceAmount, resourceBalance, breakDo
                 </div> ) : null}
                 <div className={'bottom'}>
                     <div className={'buttons'}>
-                        <button
-                            disabled={!affordable.isAffordable}
-                            onClick={(e) => {
+                        <div className={'left-wise'}>
+                            <CustomButton
+                                iconId={'icon_upgrade_v2'}
+                                disabled={!affordable.isAffordable}
+                                className={`purchase-button medium-sm`}
+                                style={{ '--progress': `${affordable.percentage*100}%` }}
+                                onClick={(e) => {e.stopPropagation(); e.preventDefault(); onPurchase(id)}}
+                            >{level > 0 ? 'Upgrade' : 'Purchase'}</CustomButton>
+                            {isAutomationUnlocked ? (<AutomationIcon
+                                value={isAutoPurchase}
+                                className={'medium-sm'}
+                                onClick={(e) => {e.stopPropagation(); e.preventDefault(); toggleAutopurchase(id, !isAutoPurchase)}}
+                            >{isAutoPurchase ? 'Autopurchase is turned on. Click to turn it off' : 'Autopurchase is turned off. Click to turn it on'}</AutomationIcon>) : null}
+
+                        </div>
+                        <div className={'right-wise'}>
+                            <CustomButton disabled={level <= 0} iconId={'icon_downgrade_v2'} className={'medium-sm'} onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                onPurchase(id)
-                            }}
-                            className={'purchase-button'}
-                            style={{ '--progress': `${affordable.percentage*100}%` }}
-                        >{level > 0 ? 'Upgrade' : 'Purchase'}</button>
-                        {isAutomationUnlocked ? (<label
-                            className={'autobuy-label'}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                            }}
-                        >
-                            <input type={'checkbox'} checked={isAutoPurchase}
-                                   onChange={(e) => {e.stopPropagation(); e.preventDefault(); toggleAutopurchase(id, !isAutoPurchase)}}/>
-                            Autobuy
-                        </label>) : null}
-                        <button disabled={level <= 0} onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            onDemolish(id)
-                        }}>Demolish</button>
+                                onDemolish(id)
+                            }}>Demolish and free plantation slot</CustomButton>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -32,6 +32,7 @@ export const ActionListsPanel = ({ automationUnlocked, runningList, editListToDe
 
     const runList = (id) => {
         sendData('run-list', { id });
+        viewListToDetails(null);
         setOpenedFor(null);
     }
 

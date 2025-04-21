@@ -1,21 +1,23 @@
 import React, {useCallback, useContext, useEffect, useRef, useState} from "react";
-import WorkerContext from "../../context/worker-context";
-import {useWorkerClient} from "../../general/client";
-import {formatInt, formatValue, secondsToString} from "../../general/utils/strings";
-import {ProgressBar} from "../layout/progress-bar.jsx";
+import WorkerContext from "../../../context/worker-context";
+import {useWorkerClient} from "../../../general/client";
+import {formatInt, formatValue, secondsToString} from "../../../general/utils/strings";
+import {ProgressBar} from "../../layout/progress-bar.jsx";
 import PerfectScrollbar from "react-perfect-scrollbar";
-import {EffectsSection} from "../shared/effects-section.jsx";
-import CircularProgress from "../shared/circular-progress.jsx";
-import {FlashOverlay} from "../layout/flash-overlay.jsx";
-import {useFlashOnLevelUp} from "../../general/hooks/flash";
-import RulesList from "../shared/rules-list.jsx";
+import {EffectsSection} from "../../shared/effects-section.jsx";
+import CircularProgress from "../../shared/circular-progress.jsx";
+import {FlashOverlay} from "../../layout/flash-overlay.jsx";
+import {useFlashOnLevelUp} from "../../../general/hooks/flash";
+import RulesList from "../../shared/rules-list.jsx";
 import {cloneDeep} from "lodash";
-import {NewNotificationWrap} from "../shared/new-notification-wrap.jsx";
-import {useAppContext} from "../../context/ui-context";
-import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
-import StatRow from "../shared/stat-row.jsx";
+import {NewNotificationWrap} from "../../shared/new-notification-wrap.jsx";
+import {useAppContext} from "../../../context/ui-context";
+import {TippyWrapper} from "../../shared/tippy-wrapper.jsx";
+import StatRow from "../../shared/stat-row.jsx";
+import {CustomButton} from "../../shared/buttons/custom-button.jsx";
+import {HowToSign} from "../../shared/how-to-sign.jsx";
 
-export const Spellbook = ({}) => {
+export const SpellbookWrap = ({ children }) => {
 
     const worker = useContext(WorkerContext);
 
@@ -35,6 +37,12 @@ export const Spellbook = ({}) => {
     const [resources, setResources] = useState([]);
     const [isChanged, setChanged] = useState(false);
     const [newUnlocks, setNewUnlocks] = useState({});
+
+
+    const onToggleViewLasting = (id, flag) => {
+        console.log('toggle-view-lasting: ', id, flag);
+        sendData('set-lasting-pinned', { id, flag });
+    }
 
     useEffect(() => {
         const id = viewedOpenedId ?? detailOpenedId?.id;
@@ -241,17 +249,30 @@ export const Spellbook = ({}) => {
     return (
         <div className={'spell-wrap'}>
             <div className={'ingame-box spell'}>
-                <PerfectScrollbar>
-                    <div className={'flex-container'}>
-                        {spellData.available.map(item => <NewNotificationWrap id={`spell_${item.id}`} className={'narrow-wrapper'} isNew={newUnlocks.spellbook?.items?.spellbook?.items?.all?.items?.[`spell_${item.id}`]?.hasNew}>
-                                <SpellCard isChanged={isChanged} key={item.id} {...item} onPurchase={purchaseItem} onFlash={handleFlash} onShowDetails={setSpellDetailsView} onEditConfig={setSpellDetailsEdit} isMobile={isMobile}/>
-                            </NewNotificationWrap>
-                            )}
-                        {overlayPositions.map((position, index) => (
-                            <FlashOverlay key={index} position={position} />
-                        ))}
+                <div className={'menu-wrap magic'}>
+                    <div className={'head'}>
+                        {children}
                     </div>
-                </PerfectScrollbar>
+                    <div className={'flex-container additional-filters'}>
+                        {isMobile ? (<div>
+                            <span className={'highlighted-span'} onClick={() => setDetailVisible(true)}>Info</span>
+                        </div>) : null}
+                        <HowToSign scope={'spellbook'} />
+                    </div>
+                </div>
+                <div className={'magic-cat'}>
+                    <PerfectScrollbar>
+                        <div className={'flex-container'}>
+                            {spellData.available.map(item => <NewNotificationWrap id={`spell_${item.id}`} className={'narrow-wrapper'} isNew={newUnlocks.spellbook?.items?.spellbook?.items?.all?.items?.[`spell_${item.id}`]?.hasNew}>
+                                    <SpellCard isChanged={isChanged} key={item.id} {...item} onPurchase={purchaseItem} onFlash={handleFlash} onShowDetails={setSpellDetailsView} onEditConfig={setSpellDetailsEdit} isMobile={isMobile}/>
+                                </NewNotificationWrap>
+                            )}
+                            {overlayPositions.map((position, index) => (
+                                <FlashOverlay key={index} position={position} />
+                            ))}
+                        </div>
+                    </PerfectScrollbar>
+                </div>
             </div>
             {(!isMobile || editData || viewedData) ? (<div className={'item-detail ingame-box detail-blade'}>
                 {editData || viewedData ? (
@@ -264,6 +285,7 @@ export const Spellbook = ({}) => {
                                   automationUnlocked={spellData.automationUnlocked}
                                   isMobile={isMobile}
                                   onPurchase={purchaseItem}
+                                  onToggleViewLasting={onToggleViewLasting}
                     />) : (<GeneralStats setDetailVisible={setDetailVisible}/>)}
             </div>) : null}
         </div>
@@ -328,7 +350,7 @@ export const SpellCard = React.memo(({ id, monitored, name, isCasted, cooldownPr
     return true;
 }))
 
-export const SpellDetails = React.memo(({isChanged, editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onSetAutocastPattern, onChangeLevel, onSave, onCancel, onToggleAutotrigger, automationUnlocked, isMobile, onPurchase}) => {
+export const SpellDetails = React.memo(({isChanged, editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onSetAutocastPattern, onChangeLevel, onSave, onCancel, onToggleAutotrigger, automationUnlocked, isMobile, onPurchase, onToggleViewLasting}) => {
 
     const item = cloneDeep(viewedData ? viewedData : editData);
 
@@ -339,6 +361,11 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
     const worker = useContext(WorkerContext);
 
     const { onMessage, sendData } = useWorkerClient(worker);
+
+
+    const toggleViewLasting = () => {
+        onToggleViewLasting(item.id, !(spellDetails || item).show_lasting);
+    }
 
     useEffect(() => {
         if(!item) return ;
@@ -419,11 +446,17 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
                     <div className={'effects'}>
                         <EffectsSection effects={item.effects} />
                     </div>
+                    {item.canShowLasting ? (<div className={'show-lasting'}>
+                        <CustomButton
+                            iconId={'icon_view_lasting'}
+                            className={`toggle-effect-monitor medium-sm ${spellDetails?.show_lasting ? 'highlighted' : ''}`}
+                            onClick={(e) => {toggleViewLasting()}}
+                        >{item.show_lasting ? 'Stop showing active effects in left sidebar' : 'Show when active in left sidebar'}</CustomButton>
+                    </div> ) : null}
                 </div>
                 {item.duration ? (
                     <div className={'block'}>
-                        <p>Spell duration: {formatInt(item.duration)}</p>
-                        <p>Effects during cast:</p>
+                        <p>Effects Lasting: {formatInt(item.duration)}</p>
                         <EffectsSection effects={item.potentialEffects} maxDisplay={10}/>
                     </div>
                 ): null}

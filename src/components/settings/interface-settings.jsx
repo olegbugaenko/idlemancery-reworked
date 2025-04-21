@@ -2,6 +2,7 @@ import React, { useCallback, useContext, useEffect, useState } from "react";
 import WorkerContext from "../../context/worker-context";
 import { useWorkerClient } from "../../general/client";
 import PerfectScrollbar from "react-perfect-scrollbar";
+import {isElectron} from "../../general/utils/electron-checks";
 
 const automatedList = [{
     id: 'select_action_tab',
@@ -69,8 +70,14 @@ export const InterfaceSettings = () => {
     const [editingTab, setEditingTab] = useState(null); // Tracks the tab being edited
     const [currentCombination, setCurrentCombination] = useState(""); // Tracks the active combination being edited
     const [settings, setSettings] = useState({});
+    const [isFullScreen, setFullScreen] = useState();
 
     useEffect(() => {
+        if (isElectron && window.electron?.isFullscreen) {
+            window.electron.isFullscreen().then(isFull => {
+                setFullScreen(isFull);
+            });
+        }
         sendData("query-unlocks", {});
         sendData("query-all-hotkeys", {});
         sendData("query-settings", {})
@@ -141,11 +148,36 @@ export const InterfaceSettings = () => {
         setCurrentCombination("");
     };
 
+    const toggleFullscreen = () => {
+        if (window.electron?.toggleFullscreen) {
+            window.electron.toggleFullscreen();
+            // Після затримки оновлюємо стан (бо setFullScreen миттєво не спрацює)
+            setTimeout(async () => {
+                const isFull = await window.electron.isFullscreen();
+                setFullScreen(isFull);
+            }, 300); // або більша затримка, якщо треба
+        }
+    };
+
+    const isElectronMode = isElectron();
+
     return (
         <div className={"inner-settings-wrap interface-wrap"}>
             <PerfectScrollbar>
                 <div className={'block'}>
                     <h4>General UI</h4>
+                    {isElectronMode ? (<div className={"row flex-container"}>
+                        <div className={"col"}>
+                            <label>
+                                <input
+                                    type={'checkbox'}
+                                    checked={isFullScreen}
+                                    onChange={toggleFullscreen}
+                                />
+                                Fullscreen mode
+                            </label>
+                        </div>
+                    </div>) : null}
                     <div className={"row flex-container"}>
                         <div className={"col"}>
                             <button onClick={clearAllNotifications}>

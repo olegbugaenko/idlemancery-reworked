@@ -9,8 +9,13 @@ const StatRow = ({ stat, onHover = () => {} }) => {
     return (
         <div className={'row flex-row'}
              // onMouseEnter={() => onHover(stat.id)}
-             onMouseOver={() => onHover(stat.id)}
-             onMouseLeave={() => onHover()}
+             onMouseOver={(e) => {
+
+                     onHover(stat.id)
+             }}
+             onMouseOut={(e) => {
+                     onHover()
+             }}
              // onMouseOut={() => onHover()}
         >
             <TippyWrapper

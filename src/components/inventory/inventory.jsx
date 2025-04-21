@@ -7,7 +7,7 @@ import {EffectsSection} from "../shared/effects-section.jsx";
 import CircularProgress from "../shared/circular-progress.jsx";
 import {FlashOverlay} from "../layout/flash-overlay.jsx";
 import {useFlashOnLevelUp} from "../../general/hooks/flash";
-import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
+import {isOverTippyEvent, TippyWrapper} from "../shared/tippy-wrapper.jsx";
 import RulesList from "../shared/rules-list.jsx";
 import {cloneDeep} from "lodash";
 import {BreakDown} from "../layout/sidebar.jsx";
@@ -17,6 +17,9 @@ import StatRow from "../shared/stat-row.jsx";
 import {SearchField} from "../shared/search-field.jsx";
 import {useAppContext} from "../../context/ui-context";
 import {PinResource} from "../shared/pin-resource.jsx";
+import {CustomButton} from "../shared/buttons/custom-button.jsx";
+import {HowToSign} from "../shared/how-to-sign.jsx";
+import {useTutorial} from "../../context/tutorial-context";
 
 
 const INVENTORY_SEARCH_SCOPES = [{
@@ -38,6 +41,7 @@ export const Inventory = ({}) => {
     const worker = useContext(WorkerContext);
     const { isMobile } = useAppContext();
     const [isDetailVisible, setDetailVisible] = useState(!isMobile);
+    const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
 
     const { onMessage, sendData } = useWorkerClient(worker);
     const [inventoryData, setItemsData] = useState({
@@ -61,6 +65,7 @@ export const Inventory = ({}) => {
 
     useEffect(() => {
         const id = viewedOpenedId ?? detailOpenedId?.id;
+        // console.log('MouseTrack: viewedOpenedId changes to '+viewedOpenedId, id)
         if(id !== null) {
             if(!viewedOpenedId && isChanged) {
                 return;
@@ -92,11 +97,15 @@ export const Inventory = ({}) => {
     })
 
     onMessage('inventory-details', (payload) => {
+        // console.log('MouseTrack inventory-details received: viewedOpenedId = '+viewedOpenedId);
         if(viewedOpenedId) {
             setViewedData(payload);
         } else if(detailOpenedId) {
             setEditData(payload);
             setViewedData(null);
+        } else {
+            setViewedData(null);
+            setEditData(null);
         }
 
     })
@@ -152,12 +161,16 @@ export const Inventory = ({}) => {
     }, [isChanged, detailOpenedId])
 
     const setInventoryDetailsView = useCallback((id) => {
-        if(!id) {
-            setViewedOpenedId(null);
-            setViewedData(null);
-            return;
-        }
-        setViewedOpenedId(id)
+        setViewedOpenedId(prev => {
+            // console.log('MouseTrack setInventoryDetailsView: '+id, prev, viewedData);
+
+            if(!id) {
+                setViewedData(null);
+                return null;
+            }
+
+            return id;
+        })
 
     })
 
@@ -352,6 +365,18 @@ export const Inventory = ({}) => {
         sendData('set-resource-pinned', { id, flag });
     }
 
+    const onToggleViewLasting = (id, flag) => {
+        console.log('toggle-view-lasting: ', id, flag);
+        sendData('set-lasting-pinned', { id, flag });
+    }
+
+    if(currentTourId === 'inventory') {
+        unlockNextById(9);
+    }
+
+    // console.log('MouseTrack Inventory Render: ', editData, viewedData);
+
+
     return (
         <div className={'inventory-wrap'}>
             <div className={'ingame-box inventory'}>
@@ -376,6 +401,7 @@ export const Inventory = ({}) => {
                         {isMobile ? (<div>
                             <span className={'highlighted-span'} onClick={() => setDetailVisible(true)}>Info</span>
                         </div>) : null}
+                        <HowToSign scope={'inventory'} />
                     </div>
                 </div>
                 <div className={'inventory-items-wrap'}>
@@ -383,15 +409,15 @@ export const Inventory = ({}) => {
                         <div className={'flex-container'}>
                             {inventoryData.available.map(item => <NewNotificationWrap key={`inventory_${item.id}`} id={`inventory_${item.id}`} className={'narrow-wrapper'} isNew={newUnlocks.inventory?.items?.all?.items?.[inventoryData.selectedFilterId]?.items?.[`inventory_${item.id}`]?.hasNew}>
                                 <InventoryCard
-                                key={item.id}
-                                isSelected={item.id === detailOpenedId?.id}
-                                isChanged={isChanged}
-                                {...item}
-                                onPurchase={purchaseItem}
-                                onFlash={handleFlash}
-                                onShowDetails={setInventoryDetailsView}
-                                onEditConfig={setInventoryDetailsEdit}
-                                isMobile={isMobile}
+                                    key={item.id}
+                                    isSelected={item.id === detailOpenedId?.id}
+                                    isChanged={isChanged}
+                                    {...item}
+                                    onPurchase={purchaseItem}
+                                    onFlash={handleFlash}
+                                    onShowDetails={setInventoryDetailsView}
+                                    onEditConfig={setInventoryDetailsEdit}
+                                    isMobile={isMobile}
                                 /></NewNotificationWrap>)}
                             {overlayPositions.map((position, index) => (
                                 <FlashOverlay key={index} position={position} />
@@ -423,6 +449,7 @@ export const Inventory = ({}) => {
                     automationUnlocked={inventoryData.automationUnlocked}
                     onConsume={purchaseItem}
                     onTogglePinned={onTogglePinned}
+                    onToggleViewLasting={onToggleViewLasting}
                 />) : (<InventoryStats details={inventoryData.details} setDetailVisible={setDetailVisible}/>)}
             </div>) : null}
         </div>
@@ -459,10 +486,27 @@ export const InventoryCard = React.memo(({ isChanged, allowMultiConsume, isConsu
     // console.log('Item: ', id, cooldownProg, cooldown);
 
     return (<div
+        id={`inventory-item-card-${id}`}
         ref={elementRef}
         className={`icon-card item bigger flashable ${isSelected ? 'selected' : ''} ${isRare ? 'bluish' : ''}`}
-        onMouseEnter={() => !isMobile ? onShowDetails(id) : null}
-        onMouseLeave={() => !isMobile ? onShowDetails(null) : null}
+        /*onMouseEnter={() => {
+            console.log('MouseTrack Enter: '+id);
+            return !isMobile ? onShowDetails(id) : null;
+        }}
+        onMouseLeave={() => {
+            console.log('MouseTrack Leave')
+            return !isMobile ? onShowDetails(null) : null
+        }}*/
+        onMouseOverCapture={(e) => {
+            if (!isMobile) {
+                onShowDetails(id);
+            }
+        }}
+        onMouseOut={(e) => {
+            if (!e.currentTarget.contains(e.relatedTarget)) {
+                if (!isMobile) onShowDetails(null);
+            }
+        }}
         onClick={handleClick}
         onContextMenu={handleContextMenu}
     >
@@ -512,17 +556,21 @@ export const InventoryCard = React.memo(({ isChanged, allowMultiConsume, isConsu
     return true;
 }))
 
-export const InventoryDetails = React.memo(({isChanged, editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onAddAutosellRule, onSetAutosellRuleValue, onDeleteAutosellRule, onSave, onCancel, onSell, onSetAutosellPattern, onSetAutoconsumePattern, onSetAutosellReserved, onToggleAutoconsume, onToggleAutosell, automationUnlocked, onConsume, onTogglePinned}) => {
+export const InventoryDetails = React.memo(({isChanged, editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onAddAutosellRule, onSetAutosellRuleValue, onDeleteAutosellRule, onSave, onCancel, onSell, onSetAutosellPattern, onSetAutoconsumePattern, onSetAutosellReserved, onToggleAutoconsume, onToggleAutosell, automationUnlocked, onConsume, onTogglePinned, onToggleViewLasting}) => {
 
     const worker = useContext(WorkerContext);
 
     const { sendData, onMessage } = useWorkerClient(worker);
+
+    const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
 
     const [details, setDetails] = useState(null);
 
     const item = viewedData ? viewedData : editData;
 
     let isEditing = !!editData && !viewedData;
+
+    // console.log('MouseTrack data opened: ', item);
 
 
     if(!item) return null;
@@ -533,6 +581,13 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
             sendData('query-inventory-details', { id: item.id, prefix: 'detail-blade' })
         }
     }, [item]);
+
+    useEffect(() => {
+        // console.log('NumConsumed changed: ', details?.id, details?.numConsumed, stepIndex, currentTourId);
+        if(currentTourId === 'inventory' && details?.id === 'inventory_brightleaf') {
+            unlockNextById(14);
+        }
+    }, [details?.numConsumed, details?.currentDuration]);
 
     // console.log('ItemReceived: ', item);
 
@@ -586,6 +641,9 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
     }
 
     const consumeItem = () => {
+        if(currentTourId === 'inventory' && item.id === 'inventory_brightleaf') {
+            unlockNextById(14);
+        }
         onConsume(item.id);
     }
 
@@ -593,11 +651,21 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
         onTogglePinned(item.id, !(details || item).isPinned);
     }
 
+    const toggleViewLasting = () => {
+        onToggleViewLasting(item.id, !(details || item).show_lasting);
+    }
+
+    if(currentTourId === 'inventory' && item.id === 'inventory_brightleaf' && isEditing) {
+        unlockNextById(11);
+    }
+
+
+
     //console.log('item?.autoconsume: ', item?.autoconsume);
 
     return (
         <PerfectScrollbar>
-            <div className={'blade-inner'}>
+            <div className={'blade-inner inventory-items-blade'}>
                 <div className={'block'}>
                     <div className={'inner-heading flex-container flex-row'}>
                         <h4>{item.name} (x{formatInt(item.amount)})</h4>
@@ -630,16 +698,23 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
                     <div className={'effects'}>
                         <EffectsSection effects={item.potentialEffects} />
                     </div>
+                    {item.canShowLasting ? (<div className={'show-lasting'}>
+                        <CustomButton
+                            iconId={'icon_view_lasting'}
+                            className={`toggle-effect-monitor medium-sm ${details?.show_lasting ? 'highlighted' : ''}`}
+                            onClick={(e) => {toggleViewLasting()}}
+                        >{item.show_lasting ? 'Stop showing active effects in left sidebar' : 'Show when active in left sidebar'}</CustomButton>
+                    </div> ) : null}
                 </div>) : null}
 
                 <div className={'block'}>
-                    {item.consumptionCooldown ? (<div className={'flex-container consumption-block'}>
+                    {item.duration ? (<div className={'flex-container consumption-block'}>
                         <div className={'stats'}>
                             <p>Consumption Cooldown: {secondsToString(item.consumptionCooldown)}</p>
                             <p>Consumed amount: {formatInt(item.numConsumed)}</p>
                         </div>
                         <div className={'consume-block'}>
-                            <button onClick={consumeItem} disabled={details?.currentCooldown > 0 || details?.currentDuration > 0}>Consume</button>
+                            <button className={'consume-button'} onClick={consumeItem} disabled={details?.currentCooldown > 0 || details?.currentDuration > 0}>Consume</button>
                             {details?.currentDuration ? (<p className={'small'}>Running: {secondsToString(details?.currentDuration)}</p>) : null}
                             {details?.currentCooldown ? (<p className={'small'}>Cooldown: {secondsToString(details?.currentCooldown)}</p>) : null}
                         </div>
@@ -724,6 +799,11 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
         //console.log('isChanged: ', prevProps.isChanged, currentProps.isChanged)
         return false;
     }
+
+    /*if(prevProps.isConsumed !== currentProps.isConsumed) {
+        //console.log('isChanged: ', prevProps.isChanged, currentProps.isChanged)
+        return false;
+    }*/
 
     if(prevProps.editData !== currentProps.editData) {
         return false;

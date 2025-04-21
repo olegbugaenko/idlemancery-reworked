@@ -6,7 +6,7 @@ import {Actions} from "../actions/actions.jsx";
 import {Shop} from "../shop/shop.jsx";
 import {Inventory} from "../inventory/inventory.jsx";
 import {Property} from "../property/index.jsx";
-import {Spellbook} from "../spellbook/spellbook.jsx";
+import {Magic} from "../magic/index.jsx";
 import {Settings} from "../settings/index.jsx";
 import {About} from "../about/index.jsx";
 import {Workshop} from "../workshop/index.jsx";
@@ -62,7 +62,7 @@ export const GetContent = ({ tab }) => {
     }
 
     if(tab === 'spellbook') {
-        return <Spellbook />
+        return <Magic />
     }
 
     if(tab === 'social') {

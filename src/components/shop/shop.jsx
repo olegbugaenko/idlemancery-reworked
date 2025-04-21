@@ -13,6 +13,7 @@ import {NewNotificationWrap} from "../shared/new-notification-wrap.jsx";
 import {useAppContext} from "../../context/ui-context";
 import {CustomButton} from "../shared/buttons/custom-button.jsx";
 import {AutomationIcon} from "../shared/buttons/automation-checkbox.jsx";
+import {useTutorial} from "../../context/tutorial-context";
 
 export const Shop = ({}) => {
     const [detailOpened, setDetailOpened] = useState(null)
@@ -21,6 +22,7 @@ export const Shop = ({}) => {
 
     const { isMobile } = useAppContext();
     const [isDetailVisible, setDetailVisible] = useState(!isMobile);
+    const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
 
     const { onMessage, sendData } = useWorkerClient(worker);
 
@@ -33,6 +35,9 @@ export const Shop = ({}) => {
     }
 
     const purchaseResource = (id, amount) => {
+        if(currentTourId === 'inventory' && id == 'inventory_brightleaf') {
+            unlockNextById(8);
+        }
         sendData('purchase-resource', { id, amount })
     }
 
@@ -45,6 +50,10 @@ export const Shop = ({}) => {
     }
 
     const setItemDetails = (id) => {
+        if(currentTourId === 'inventory' && [6,7].includes(stepIndex) && id !== 'inventory_brightleaf') {
+            setDetailOpened('inventory_brightleaf');
+            return;
+        }
         if(!id) {
             setDetailOpened(null);
         } else {
@@ -79,6 +88,13 @@ export const Shop = ({}) => {
         setItemDetails(null)
     }, []);
 
+    if(currentTourId === 'inventory') {
+        unlockNextById(2);
+        if(selectedTab === 'items') {
+            unlockNextById(3);
+        }
+    }
+
     return (
         <div className={'items-wrap'}>
             <div className={'items ingame-box'}>
@@ -91,7 +107,7 @@ export const Shop = ({}) => {
                         </li>
                         <li className={`${selectedTab === 'items' ? 'active' : ''}`} onClick={() => {setSelectedTab('items');setDetailOpened(null);}}>
                             <NewNotificationWrap isNew={newUnlocks?.['shop']?.items?.['inventory']?.hasNew}>
-                                <span>Items</span>
+                                <span id={'shop-items-tab'}>Items</span>
                             </NewNotificationWrap>
                         </li>
                         {unlocks?.courses ? (<li className={`${selectedTab === 'courses' ? 'active' : ''}`} onClick={() => {
@@ -366,6 +382,7 @@ export const ItemResourceCard = ({ id, name, purchaseMultiplier, stock, level, m
     useFlashOnLevelUp(isLeveled, onFlash, elementRef);
 
     return (<div
+        id={`shop-item-resource-${id}`}
         ref={elementRef}
         className={`icon-card item flashable ${affordable.hardLocked ? 'hard-locked' : ''}  ${!affordable.isAffordable ? 'unavailable' : ''}`}
         onMouseEnter={() => isMobile ? null : onShowDetails(id)}
@@ -458,6 +475,8 @@ export const ItemDetails = ({itemId, category, onClose, onPurchase}) => {
 
     const [item, setDetailOpened] = useState(null);
 
+    const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
+
     useEffect(() => {
         if(category === 'upgrades') {
             const interval = setInterval(() => {
@@ -494,6 +513,11 @@ export const ItemDetails = ({itemId, category, onClose, onPurchase}) => {
 
     if(!itemId || !item) return null;
 
+    if(currentTourId === 'inventory' && itemId === 'inventory_brightleaf') {
+        console.log('CurrStep: ', stepIndex, item);
+        unlockNextById(5);
+    }
+
 
     return (
         <PerfectScrollbar>
@@ -518,20 +542,26 @@ export const ItemDetails = ({itemId, category, onClose, onPurchase}) => {
                         This course is running {formatValue(100*item.entityEfficiency)}% efficiency due to missing {item?.missingResource?.name}
                     </p>
                 </div> ) : null}
-                {Object.values(item.affordable.affordabilities || {}).length ? (<div className={'block'}>
+                {Object.values(item.affordable.affordabilities || {}).length ? (<div className={'block price-section'}>
                     <p>Cost: (x{formatInt(item.purchaseMultiplier)})</p>
                     <div className={'costs-wrap'}>
                         {Object.values(item.affordable.affordabilities || {}).map(aff => <ResourceCost
                             key={aff.id ?? aff.name} affordabilities={aff}/>)}
                     </div>
                 </div>) : null}
-                {(item.potentialEffects?.length || item.currentEffects) ? (<div className={'block'}>
+                {(item.potentialEffects?.length || item.currentEffects) ? (<div className={'block effects-section'}>
                     <p>Effects:</p>
                     <div className={'effects'}>
                         {item.currentEffects ?
                             (<ResourceComparison effects1={item.currentEffects} effects2={item.potentialEffects}/>)
                             : (<EffectsSection effects={item.potentialEffects} maxDisplay={10}/>)
                         }
+                    </div>
+                </div>) : null}
+                {(item.potentialLastingEffects?.length) ? (<div className={'block lasting-effects-section'}>
+                    <p>Lasting Effects: {secondsToString(item.duration)}</p>
+                    <div className={'effects'}>
+                        <EffectsSection effects={item.potentialLastingEffects} maxDisplay={10}/>
                     </div>
                 </div>) : null}
                 {(item.learningEffects?.length) ? (<div className={'block'}>

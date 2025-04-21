@@ -166,13 +166,13 @@ v0.1.4
 2. [V] Property improving hunting loot amount (req. 125K strength)
 3. [V] Quick import current to craft list
 4. [V] Fast "Spell Cast" button
-5. Configurable effects running
+5. [V] Configurable effects running
 6. Add interactive courses instead of static "How to"s popups.
    6.a) [V] Actions
    6.b) [V] Map
    6.c) [V] Craft
    6.d) [V] Lists
-   6.e) Inventory
+   6.e) [V] Inventory
    6.g) Spells
    6.h) Automations
 7. Rituals

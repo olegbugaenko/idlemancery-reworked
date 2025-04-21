@@ -1,6 +1,7 @@
 import React, { useContext, useState } from "react";
 import WorkerContext from "../../context/worker-context";
 import { useWorkerClient } from "../../general/client";
+import {isElectron, quitApp} from "../../general/utils/electron-checks";
 
 function fromBase64Unicode(str) {
     return decodeURIComponent(escape(atob(str)));
@@ -110,6 +111,12 @@ export const SaveSettings = () => {
         }
     }
 
+    const closeGame = () => {
+        quitApp()
+    }
+
+    const isElectronMode = isElectron();
+
     return (
         <div className={"save-settings-wrap inner-settings-wrap"}>
             <div className={"row flex-container"}>
@@ -153,6 +160,14 @@ export const SaveSettings = () => {
 
                 </div>
             </div>
+            {isElectronMode ? (<div className={"row flex-container"}>
+                <div className={"col"}>
+                    <button onClick={closeGame}>Exit Game</button>
+                </div>
+                <div className={'col'}>
+
+                </div>
+            </div>) : null}
         </div>
     );
 };

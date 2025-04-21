@@ -443,6 +443,8 @@ export class SpellModule extends GameModule {
             isSpellLevelingAvailable: this.isSpellLevelingAvailable(),
             cooldown: spell.getUsageCooldown(),
             currentCooldown: this.spells[id]?.cooldown,
+            canShowLasting: !!spell.resourceModifier,
+            show_lasting: !gameCore.getModule('mage').activeEffectsFiltered?.[spell.id]
         }
     }
 

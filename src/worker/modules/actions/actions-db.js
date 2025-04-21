@@ -1169,7 +1169,7 @@ export const registerActionsStage1 = () => {
             return gameEntity.getLevel('shop_item_book_of_motivation') > 0
         },
         attributes: {
-            baseXPCost: 50,
+            baseXPCost: 20,
             isTraining: true,
         }
     })
@@ -1236,6 +1236,11 @@ export const registerActionsStage1 = () => {
                         A: 0.002*gameEffects.getEffectValue('gathering_efficiency'),
                         B: 0.048*gameEffects.getEffectValue('gathering_efficiency'),
                         type: 0,
+                    },
+                    'gathering_perception': {
+                        A: 0,
+                        B: 0.1,
+                        type: 0,
                     }
                 }
             }),
@@ -1258,6 +1263,119 @@ export const registerActionsStage1 = () => {
             primaryAttribute: 'attribute_patience'
         }
     })
+
+
+    registerGameAction('action_scouting_training', {
+        tags: ["action", "training", "physical"],
+        category: ACTION_CATS.PHYSICAL,
+        name: 'Rough Terrain Training',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Pushes your body and mind through demanding exploration drills, enhancing gathering efficiency in challenging environments and improving energy regeneration.',
+        level: 1,
+        maxLevel: 25,
+        discountEffects: ['physical_actions_discount'],
+        unlockedBy: [{
+            type: 'entity',
+            id: 'action_gather_carefully',
+            level: 25,
+        }],
+        learningEffects: ['physical_training_learn_speed'],
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'gathering_efficiency': {
+                        A: 0.02,
+                        B: 1.0,
+                        type: 0,
+                    },
+                    'attribute_stamina': {
+                        A: 0.005,
+                        B: 1.0,
+                        type: 0,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'health': {
+                        A: 0,
+                        B: 1,
+                        type: 0
+                    },
+                    'knowledge': {
+                        A: 0,
+                        B: 5,
+                        type: 0
+                    }
+                }
+            },
+            effectDeps: []
+        },
+        unlockCondition: () => {
+            // console.log('Beggar level: ', gameEntity.getLevel('action_beggar'));
+            return true
+        },
+        attributes: {
+            baseXPCost: 50,
+            isTraining: true,
+        }
+    })
+
+
+
+    registerGameAction('action_repetitive_discipline', {
+        tags: ["action", "training", "physical"],
+        category: ACTION_CATS.PHYSICAL,
+        name: 'Repetitive Discipline',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Trains your endurance through repetitive effort, reducing experience required for routine tasks.',
+        level: 1,
+        maxLevel: 25,
+        discountEffects: ['physical_actions_discount'],
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 10,
+        }],
+        learningEffects: ['physical_training_learn_speed'],
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'routine_actions_discount': {
+                        A: 0.04,
+                        B: 1.0,
+                        type: 0,
+                    },
+                }
+            },
+            consumption: {
+                resources: {
+                    'health': {
+                        A: 0,
+                        B: 2,
+                        type: 0
+                    },
+                    'energy': {
+                        A: 0,
+                        B: 5,
+                        type: 0
+                    }
+                }
+            },
+            effectDeps: []
+        },
+        unlockCondition: () => {
+            // console.log('Beggar level: ', gameEntity.getLevel('action_beggar'));
+            return true
+        },
+        attributes: {
+            baseXPCost: 50,
+            isTraining: true,
+        }
+    })
+
 
 
     registerGameAction('action_gather_normal', {
@@ -1651,7 +1769,7 @@ export const registerActionsStage1 = () => {
             level: 225,
         }],
         attributes: {
-            baseXPCost: 500,
+            baseXPCost: 1500,
             isTraining: true,
             primaryAttribute: 'attribute_patience',
             isRankAvailable: true,
@@ -2414,6 +2532,62 @@ export const registerActionsStage1 = () => {
         }
     })
 
+    registerGameAction('action_mental_realignment', {
+        tags: ["action", "activity", "mental"],
+        category: ACTION_CATS.MENTAL,
+        name: 'Mental Realignment',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Refocuses your mental and spiritual pathways, reducing experience required for related trainings.',
+        level: 1,
+        maxLevel: 40,
+        discountEffects: ['mental_actions_discount'],
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_magic_ability',
+            level: 25,
+        }],
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'mental_actions_discount': {
+                        A: 0.025,
+                        B: 1.0,
+                        type: 0,
+                    },
+                    'magical_actions_discount': {
+                        A: 0.025,
+                        B: 1.0,
+                        type: 0,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'mana': {
+                        A: 0,
+                        B: 0.4,
+                        type: 0
+                    },
+                    'knowledge': {
+                        A: 0,
+                        B: 2.5,
+                        type: 0
+                    }
+                }
+            },
+            effectDeps: []
+        },
+        unlockCondition: () => {
+            // console.log('Beggar level: ', gameEntity.getLevel('action_beggar'));
+            return true
+        },
+        attributes: {
+            baseXPCost: 50,
+            isTraining: true,
+        }
+    })
+
 
     registerGameAction('action_illusory_urn', {
         tags: ["action", "illusion", "magical", "storage", "channeling"],
@@ -2532,8 +2706,8 @@ export const registerActionsStage1 = () => {
             get_multiplier: () => ({
                 effects: {
                     'spiritual_learning_rate': {
-                        A: 0.05*gameEffects.getEffectValue(getRankId('action_spiritual_alignment')),
-                        B: 0.95,
+                        A: 0.02*gameEffects.getEffectValue(getRankId('action_spiritual_alignment')),
+                        B: 0.98,
                         type: 0,
                     }
                 }
@@ -3212,7 +3386,7 @@ export const registerActionsStage1 = () => {
             effectDeps: []
         },
         unlockCondition: () => {
-            return gameCore.getModule('guilds').selectedGuild != null
+            return gameCore.getModule('guilds').selectedGuild != null && false
         },
         attributes: {
             baseXPCost: 20000,
@@ -3259,7 +3433,7 @@ export const registerActionsStage1 = () => {
             effectDeps: []
         },
         unlockCondition: () => {
-            return gameCore.getModule('guilds').selectedGuild != null
+            return gameCore.getModule('guilds').selectedGuild != null && false
         },
         attributes: {
             baseXPCost: 20000,
@@ -3310,7 +3484,7 @@ export const registerActionsStage1 = () => {
             level: 1250
         }],
         unlockCondition: () => {
-            return gameCore.getModule('guilds').selectedGuild != null
+            return gameCore.getModule('guilds').selectedGuild != null && false
         },
         attributes: {
             baseXPCost: 20000,

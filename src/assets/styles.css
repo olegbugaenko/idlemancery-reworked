@@ -1042,6 +1042,14 @@ h4 {
     justify-content: space-between;
 }
 
+.inventory-wrap .additional-filters {
+    display: flex;
+}
+
+.inventory-wrap .additional-filters .how-to {
+    margin-left: 5px;
+}
+
 .actions-wrap .actions .list-wrap {
     height: calc(100% - 130px);
 }
@@ -3000,9 +3008,18 @@ ul.menu li.additional.add-custom-filter:hover span {
     color: white;
     font-size: 13px;
     z-index: 9999;
-    pointer-events: auto;
     max-width: 300px;
     white-space: normal;
+    pointer-events: none;
+}
+
+.spell-wrap .menu-wrap.magic {
+    display: flex;
+    justify-content: space-between;
+}
+
+.spell-wrap .magic-cat {
+    height: calc(100% - 40px);
 }
 
 @media screen and (max-width: 1700px) {
@@ -3166,4 +3183,8 @@ ul.menu li.additional.add-custom-filter:hover span {
     .skills-wrap .skills-container {
         width: 100%;
     }
+}
+
+.show-lasting {
+    padding: 5px;
 }

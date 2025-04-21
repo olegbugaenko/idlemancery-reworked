@@ -137,6 +137,16 @@ export function registerPlantations () {
         description: 'Grow core duckweed.'
     })
 
+    registerPlant('thinkroot_plantation', 'inventory_thinkroot', 0.04, 2000, {
+        name: 'Grow Thinkroot',
+        description: 'Grow Thinkroot.'
+    })
+
+    registerPlant('focusberry_plantation', 'inventory_focusberry', 0.04, 2000, {
+        name: 'Grow Focusberry',
+        description: 'Grow Focusberry.'
+    })
+
     registerPlant('aloe_vera_plantation', 'inventory_aloe_vera', 0.02, 300, {
         name: 'Grow Aloe Vera',
         description: 'Grow some aloe vera'
