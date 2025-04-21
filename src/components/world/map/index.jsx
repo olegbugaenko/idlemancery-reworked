@@ -601,116 +601,121 @@ export const MapTileListDetails = ({
     if(!listDetails) return ;
 
     return (
-        <PerfectScrollbar>
-            <div className={'blade-inner list-editor'}>
-                <div className={'block'}>
-                    <div className={'main-row main-wrap map'}>
-                        <span>Name</span>
-                        {isEditing ? (<input type={'text'} value={editing.name} onChange={(e) => onUpdateListValue('name', e.target.value)}/>) : (<span>{editing.name}</span>)}
-                    </div>
-                </div>
-                <div className={'block'}>
-                    <p className={'hint'}>
-                        All tiles in the list are gathered simultaneously with corresponding weights.
-                    </p>
-                    <div className={'show-bar'}>
-                        {editing?.proportionsBar ? (<div className={'proportions-bar'}>
-                            {editing?.proportionsBar.map(one => (<div style={{width: one.displayPercentage, backgroundColor: one.color}} className={'proportion-bar'}>
-                            </div> ))}
-                        </div> ) : null}
-                    </div>
-                </div>
-                <div className={'block'}>
-                    <p>Click on tiles to add/remove them from the list</p>
-                    <div className={'tiles-list'}>
-                        <div className="actions-list-wrap">
-                            <div className={`action-row flex-container header`}
-                            >
-                                <div className={'col title'}>
-                                    <span>Tile</span>
-                                </div>
-                                <div className={'col amount'}>
-                                    <span>Effort</span>
-                                </div>
-                                <div className={'col delete'}>
-                                    {isEditing ? (<span>Delete</span>) : null}
+        <>
+            <div className={'blade-outer'}>
+                <PerfectScrollbar>
+                    <div className={'blade-inner list-editor'}>
+                        <div className={'block'}>
+                            <div className={'main-row main-wrap map'}>
+                                <span>Name</span>
+                                {isEditing ? (<input type={'text'} value={editing.name} onChange={(e) => onUpdateListValue('name', e.target.value)}/>) : (<span>{editing.name}</span>)}
+                            </div>
+                        </div>
+                        <div className={'block'}>
+                            <p className={'hint'}>
+                                All tiles in the list are gathered simultaneously with corresponding weights.
+                            </p>
+                            <div className={'show-bar'}>
+                                {editing?.proportionsBar ? (<div className={'proportions-bar'}>
+                                    {editing?.proportionsBar.map(one => (<div style={{width: one.displayPercentage, backgroundColor: one.color}} className={'proportion-bar'}>
+                                    </div> ))}
+                                </div> ) : null}
+                            </div>
+                        </div>
+                        <div className={'block'}>
+                            <p>Click on tiles to add/remove them from the list</p>
+                            <div className={'tiles-list'}>
+                                <div className="actions-list-wrap">
+                                    <div className={`action-row flex-container header`}
+                                    >
+                                        <div className={'col title'}>
+                                            <span>Tile</span>
+                                        </div>
+                                        <div className={'col amount'}>
+                                            <span>Effort</span>
+                                        </div>
+                                        <div className={'col delete'}>
+                                            {isEditing ? (<span>Delete</span>) : null}
+                                        </div>
+                                    </div>
+                                    {editing.tiles.length ? editing.tiles.map((tile, index) => (
+                                                <div className={`action-row flex-container ${!tile.isAvailable ? 'unavailable-tile' : ''}`}
+                                                >
+                                                    {editing.proportionsBar ? (<div style={{width: editing.proportionsBar?.[index]?.displayPercentage, backgroundColor: editing.proportionsBar[index]?.color}} className={'prop-bg'}></div> ) : null}
+                                                    <div className={'col title'}>
+                                                        <span>{tile.name}</span>
+                                                    </div>
+                                                    <div className={`col amount ${isEditing ? 'large' : ''}`}>
+                                                        {isEditing
+                                                            ? (<div className={'editing-amounts'}>
+                                                                <input type={'number'} value={tile.time}
+                                                                      onChange={(e) => onUpdateActionFromList(tile.id, 'time', +e.target.value)}/>
+                                                                <span>{formatValue(editing.proportionsBar?.[index]?.percentage*100 || 0)} %</span>
+                                                            </div>)
+                                                            : (<span>{formatValue(editing.proportionsBar[index].percentage*100)} %</span>)
+                                                        }
+                                                    </div>
+                                                    <div className={'col delete'}>
+                                                        {isEditing ? (<span className={'close'} onClick={() => onDropActionFromList(tile.id)}>X</span>) : null}
+                                                    </div>
+                                                </div>
+                                    )) : <p className={'hint yellow'}>No map tiles added yet. Click on map tiles to add them into the map exploration list</p>}
                                 </div>
                             </div>
-                            {editing.tiles.length ? editing.tiles.map((tile, index) => (
-                                        <div className={`action-row flex-container ${!tile.isAvailable ? 'unavailable-tile' : ''}`}
-                                        >
-                                            {editing.proportionsBar ? (<div style={{width: editing.proportionsBar?.[index]?.displayPercentage, backgroundColor: editing.proportionsBar[index]?.color}} className={'prop-bg'}></div> ) : null}
-                                            <div className={'col title'}>
-                                                <span>{tile.name}</span>
-                                            </div>
-                                            <div className={`col amount ${isEditing ? 'large' : ''}`}>
-                                                {isEditing
-                                                    ? (<div className={'editing-amounts'}>
-                                                        <input type={'number'} value={tile.time}
-                                                              onChange={(e) => onUpdateActionFromList(tile.id, 'time', +e.target.value)}/>
-                                                        <span>{formatValue(editing.proportionsBar?.[index]?.percentage*100 || 0)} %</span>
-                                                    </div>)
-                                                    : (<span>{formatValue(editing.proportionsBar[index].percentage*100)} %</span>)
-                                                }
-                                            </div>
-                                            <div className={'col delete'}>
-                                                {isEditing ? (<span className={'close'} onClick={() => onDropActionFromList(tile.id)}>X</span>) : null}
-                                            </div>
-                                        </div>
-                            )) : <p className={'hint yellow'}>No map tiles added yet. Click on map tiles to add them into the map exploration list</p>}
                         </div>
+                        {isEditing ? (<div className={'block editing-bottom buttons'}>
+                            <button onClick={onAddTiles}>Add highlighted tiles</button>
+                            <button onClick={onClearList}>Clear</button>
+                        </div>) : null}
+                        {editing.drops ? (<div className={'block'}>
+                            <p>Drops:</p>
+                            {editing.drops.map(drop => (<p className={`drop-row ${drop.rarityTier}`}>
+                                <span className={'name'}>{drop.resource.name}</span>
+                                <span className={'probability'}>{formatValue(drop.probability*100)}%</span>
+                                <span className={'amounts'}>{formatInt(drop.amountMin)} - {formatInt(drop.amountMax)}</span>
+                            </p> ))}
+                            {editing.unlockedUnrevealedAmount > 0 ? (<p className={'hint pot-finds'}>{formatInt(editing.unlockedUnrevealedAmount)} more items can be found</p> ) : null}
+                        </div> ) : null}
+                        {editing.costs ? (<div className={'block'}>
+                            <p>Costs:</p>
+                            {editing.costs.map(cost => (
+                                <p><span>{cost.name}:</span> <span>{formatValue(cost.cost)}</span></p>
+                             ))}
+                        </div> ) : null}
+                        {automationUnlocked ? (<div className={'autotrigger-settings autoconsume-setting block'}>
+                            <div className={'rules-header flex-container'}>
+                                <p>Autotrigger rules: {editing?.autotrigger?.rules?.length ? null : 'None'}</p>
+                                <label>
+                                    <input type={'checkbox'} checked={editing.autotrigger?.isEnabled}
+                                           onChange={toggleAutotrigger}/>
+                                    {editing.autotrigger?.isEnabled ? ' ON' : ' OFF'}
+                                </label>
+                                {isEditing ? (<button onClick={addAutotriggerRule}>Add rule (AND)</button>) : null}
+                            </div>
+                            <div className={'priority-line flex-container'}>
+                                <p>Priority: </p>
+                                <input type={'number'} value={editing.autotrigger?.priority || 0}
+                                       onChange={e => setAutotriggerPriority(+(e.target.value || 0))}/>
+                            </div>
+                            <RulesList
+                                isEditing={isEditing}
+                                rules={editing.autotrigger?.rules || []}
+                                deleteRule={deleteAutotriggerRule}
+                                setRuleValue={setAutotriggerRuleValue}
+                                setPattern={setAutotriggerPattern}
+                                pattern={editing.autotrigger?.pattern || ''}
+                                isAutoCheck={editing.autotrigger?.isEnabled}
+                            />
+                        </div>) : null}
+
                     </div>
-                </div>
-                {isEditing ? (<div className={'block editing-bottom buttons'}>
-                    <button onClick={onAddTiles}>Add highlighted tiles</button>
-                    <button onClick={onClearList}>Clear</button>
-                </div>) : null}
-                {editing.drops ? (<div className={'block'}>
-                    <p>Drops:</p>
-                    {editing.drops.map(drop => (<p className={`drop-row ${drop.rarityTier}`}>
-                        <span className={'name'}>{drop.resource.name}</span>
-                        <span className={'probability'}>{formatValue(drop.probability*100)}%</span>
-                        <span className={'amounts'}>{formatInt(drop.amountMin)} - {formatInt(drop.amountMax)}</span>
-                    </p> ))}
-                    {editing.unlockedUnrevealedAmount > 0 ? (<p className={'hint pot-finds'}>{formatInt(editing.unlockedUnrevealedAmount)} more items can be found</p> ) : null}
-                </div> ) : null}
-                {editing.costs ? (<div className={'block'}>
-                    <p>Costs:</p>
-                    {editing.costs.map(cost => (
-                        <p><span>{cost.name}:</span> <span>{formatValue(cost.cost)}</span></p>
-                     ))}
-                </div> ) : null}
-                {automationUnlocked ? (<div className={'autotrigger-settings autoconsume-setting block'}>
-                    <div className={'rules-header flex-container'}>
-                        <p>Autotrigger rules: {editing?.autotrigger?.rules?.length ? null : 'None'}</p>
-                        <label>
-                            <input type={'checkbox'} checked={editing.autotrigger?.isEnabled}
-                                   onChange={toggleAutotrigger}/>
-                            {editing.autotrigger?.isEnabled ? ' ON' : ' OFF'}
-                        </label>
-                        {isEditing ? (<button onClick={addAutotriggerRule}>Add rule (AND)</button>) : null}
-                    </div>
-                    <div className={'priority-line flex-container'}>
-                        <p>Priority: </p>
-                        <input type={'number'} value={editing.autotrigger?.priority || 0}
-                               onChange={e => setAutotriggerPriority(+(e.target.value || 0))}/>
-                    </div>
-                    <RulesList
-                        isEditing={isEditing}
-                        rules={editing.autotrigger?.rules || []}
-                        deleteRule={deleteAutotriggerRule}
-                        setRuleValue={setAutotriggerRuleValue}
-                        setPattern={setAutotriggerPattern}
-                        pattern={editing.autotrigger?.pattern || ''}
-                        isAutoCheck={editing.autotrigger?.isEnabled}
-                    />
-                </div>) : null}
-                {isEditing ? (<div className={'buttons'}>
-                    <button onClick={() => saveAndClose(false)}>{editing?.id ? 'Save' : 'Create'}</button>
-                    <button onClick={() => saveAndClose(true)}>{editing?.id ? 'Save & Close' : 'Create & Close'}</button>
-                    <button onClick={onCloseList}>Cancel</button>
-                </div>) : null}
+                </PerfectScrollbar>
             </div>
-        </PerfectScrollbar>
+            {isEditing ? (<div className={'buttons main-buttons flex-container'}>
+                <button onClick={() => saveAndClose(false)}>{editing?.id ? 'Save' : 'Create'}</button>
+                <button onClick={() => saveAndClose(true)}>{editing?.id ? 'Save & Close' : 'Create & Close'}</button>
+                <button onClick={onCloseList}>Cancel</button>
+            </div>) : null}
+        </>
     )
 }

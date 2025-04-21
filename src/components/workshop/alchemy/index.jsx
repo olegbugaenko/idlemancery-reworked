@@ -491,113 +491,117 @@ export const AlchemyListDetails = ({
     if(!listDetails) return ;
 
     return (
-        <PerfectScrollbar>
-            <div className={'blade-inner list-editor'}>
-                <div className={'block main-wrap'}>
-                    <div className={'main-row'}>
-                        <span>Name</span>
-                        {isEditing ? (<input type={'text'} value={editing.name} onChange={(e) => onUpdateListValue('name', e.target.value)}/>) : (<span>{editing.name}</span>)}
-                    </div>
-                </div>
-                <div className={'block'}>
-                    <p>Click on craft recipes to add/remove them from the list</p>
-                    <div className={'recipes-list'}>
-                        <div className="actions-list-wrap">
-                            {editing.recipes.length ? editing.recipes.map((recipe, index) => (
-                                <div className={`action-row flex-container ${!recipe.isAvailable ? 'unavailable-recipe' : ''}`}
-                                >
-                                    <div className={'col title'}>
-                                        <span>{recipe.name}</span>
-                                    </div>
-                                    <div className={'col amount'}>
-                                        {isEditing
-                                            ? (<span>Min: <input type={'number'} value={recipe.min}
-                                                                 onChange={(e) => onUpdateActionFromList(recipe.id, 'min', +e.target.value)}/></span>)
-                                            : (<span>Min: {recipe.min}</span>)
-                                        }
-                                    </div>
-                                    <div className={'col amount'}>
-                                        {isEditing
-                                            ? (<span>Max: <input type={'number'} value={recipe.max}
-                                                                 onChange={(e) => onUpdateActionFromList(recipe.id, 'max', +e.target.value)}/></span>)
-                                            : (<span>Max: {recipe.max}</span>)
-                                        }
-                                    </div>
-                                    <div className={'col amount'}>
-                                        {isEditing
-                                            ? (<span>% of slots<input type={'number'} value={recipe.percentage}
-                                                            onChange={(e) => onUpdateActionFromList(recipe.id, 'percentage', +e.target.value)}/></span>)
-                                            : (<span> {recipe.percentage}%</span>)
-                                        }
-                                    </div>
-                                    <div className={'col assumed'}>
-                                        <TippyWrapper placement={'bottom'} content={<div className={'hint-popup'}>Asserted amount of slots that would be assigned to this recipe using current list settings</div> }>
-                                            <span>{editing?.assumedDistribution?.find(one => one.id === recipe.id)?.level || 0}</span>
-                                        </TippyWrapper>
-                                    </div>
-                                    <div className={'col delete'}>
-                                        {isEditing ? (<span className={'close'} onClick={() => onDropActionFromList(recipe.id)}>X</span>) : null}
-                                    </div>
+        <>
+            <div className={'blade-outer'}>
+                <PerfectScrollbar>
+                    <div className={'blade-inner list-editor'}>
+                        <div className={'block main-wrap'}>
+                            <div className={'main-row'}>
+                                <span>Name</span>
+                                {isEditing ? (<input type={'text'} value={editing.name} onChange={(e) => onUpdateListValue('name', e.target.value)}/>) : (<span>{editing.name}</span>)}
+                            </div>
+                        </div>
+                        <div className={'block'}>
+                            <p>Click on craft recipes to add/remove them from the list</p>
+                            <div className={'recipes-list'}>
+                                <div className="actions-list-wrap">
+                                    {editing.recipes.length ? editing.recipes.map((recipe, index) => (
+                                        <div className={`action-row flex-container ${!recipe.isAvailable ? 'unavailable-recipe' : ''}`}
+                                        >
+                                            <div className={'col title'}>
+                                                <span>{recipe.name}</span>
+                                            </div>
+                                            <div className={'col amount'}>
+                                                {isEditing
+                                                    ? (<span>Min: <input type={'number'} value={recipe.min}
+                                                                         onChange={(e) => onUpdateActionFromList(recipe.id, 'min', +e.target.value)}/></span>)
+                                                    : (<span>Min: {recipe.min}</span>)
+                                                }
+                                            </div>
+                                            <div className={'col amount'}>
+                                                {isEditing
+                                                    ? (<span>Max: <input type={'number'} value={recipe.max}
+                                                                         onChange={(e) => onUpdateActionFromList(recipe.id, 'max', +e.target.value)}/></span>)
+                                                    : (<span>Max: {recipe.max}</span>)
+                                                }
+                                            </div>
+                                            <div className={'col amount'}>
+                                                {isEditing
+                                                    ? (<span>% of slots<input type={'number'} value={recipe.percentage}
+                                                                    onChange={(e) => onUpdateActionFromList(recipe.id, 'percentage', +e.target.value)}/></span>)
+                                                    : (<span> {recipe.percentage}%</span>)
+                                                }
+                                            </div>
+                                            <div className={'col assumed'}>
+                                                <TippyWrapper placement={'bottom'} content={<div className={'hint-popup'}>Asserted amount of slots that would be assigned to this recipe using current list settings</div> }>
+                                                    <span>{editing?.assumedDistribution?.find(one => one.id === recipe.id)?.level || 0}</span>
+                                                </TippyWrapper>
+                                            </div>
+                                            <div className={'col delete'}>
+                                                {isEditing ? (<span className={'close'} onClick={() => onDropActionFromList(recipe.id)}>X</span>) : null}
+                                            </div>
+                                        </div>
+                                    )) : <p className={'hint'}>No map recipes added yet</p>}
                                 </div>
-                            )) : <p className={'hint'}>No map recipes added yet</p>}
+                            </div>
+                            {isEditing ? (<div className={'apply-current block'}>
+                                <button onClick={applyCurrent}>Apply Running Recipes</button>
+                            </div> ) : null}
+                        </div>
+                        <div className={'effects-wrap'}>
+                            {Object.keys(editing?.resourcesEffects || {}).length ? (<div className={'block'}>
+                                <p>Average Resources per second</p>
+                                <ResourceComparison effects1={editing?.prevEffects} effects2={editing?.resourcesEffects} maxDisplay={10}/></div>) : null}
+                            {editing?.effectEffects?.length ? (<div className={'block'}>
+                                <p>Average Effects per second</p>
+                                <EffectsSection effects={editing?.effectEffects || []} maxDisplay={10}/></div>) : null}
+                        </div>
+                        {/*{editing.drops ? (<div className={'block'}>
+                            <p>Drops:</p>
+                            {editing.drops.map(drop => (<p className={'drop-row'}>
+                                <span className={'name'}>{drop.resource.name}</span>
+                                <span className={'probability'}>{formatValue(drop.probability*100)}%</span>
+                                <span className={'amounts'}>{formatInt(drop.amountMin)} - {formatInt(drop.amountMax)}</span>
+                            </p> ))}
+                        </div> ) : null}
+                        {editing.costs ? (<div className={'block'}>
+                            <p>Costs:</p>
+                            {editing.costs.map(cost => (
+                                <p><span>{cost.name}:</span> <span>{formatValue(cost.cost)}</span></p>
+                            ))}
+                        </div> ) : null}*/}
+                        <div className={'autotrigger-settings autoconsume-setting block'}>
+                            <div className={'rules-header flex-container'}>
+                                <p>Autotrigger rules: {editing?.autotrigger?.rules?.length ? null : 'None'}</p>
+                                <label>
+                                    <input type={'checkbox'} checked={editing.autotrigger?.isEnabled} onChange={toggleAutotrigger}/>
+                                    {editing.autotrigger?.isEnabled ? ' ON' : ' OFF'}
+                                </label>
+                                {isEditing ? (<button onClick={addAutotriggerRule}>Add rule (AND)</button>) : null}
+                            </div>
+                            <div className={'priority-line flex-container'}>
+                                <p>Priority: </p>
+                                <input type={'number'} value={editing.autotrigger?.priority || 0} onChange={e => setAutotriggerPriority(+(e.target.value || 0))}/>
+                            </div>
+                            <RulesList
+                                isEditing={isEditing}
+                                rules={editing.autotrigger?.rules || []}
+                                deleteRule={deleteAutotriggerRule}
+                                setRuleValue={setAutotriggerRuleValue}
+                                setPattern={setAutotriggerPattern}
+                                pattern={editing.autotrigger?.pattern || ''}
+                                isAutoCheck={editing.autotrigger?.isEnabled}
+                            />
                         </div>
                     </div>
-                    {isEditing ? (<div className={'apply-current block'}>
-                        <button onClick={applyCurrent}>Apply Running Recipes</button>
-                    </div> ) : null}
-                </div>
-                <div className={'effects-wrap'}>
-                    {Object.keys(editing?.resourcesEffects || {}).length ? (<div className={'block'}>
-                        <p>Average Resources per second</p>
-                        <ResourceComparison effects1={editing?.prevEffects} effects2={editing?.resourcesEffects} maxDisplay={10}/></div>) : null}
-                    {editing?.effectEffects?.length ? (<div className={'block'}>
-                        <p>Average Effects per second</p>
-                        <EffectsSection effects={editing?.effectEffects || []} maxDisplay={10}/></div>) : null}
-                </div>
-                {/*{editing.drops ? (<div className={'block'}>
-                    <p>Drops:</p>
-                    {editing.drops.map(drop => (<p className={'drop-row'}>
-                        <span className={'name'}>{drop.resource.name}</span>
-                        <span className={'probability'}>{formatValue(drop.probability*100)}%</span>
-                        <span className={'amounts'}>{formatInt(drop.amountMin)} - {formatInt(drop.amountMax)}</span>
-                    </p> ))}
-                </div> ) : null}
-                {editing.costs ? (<div className={'block'}>
-                    <p>Costs:</p>
-                    {editing.costs.map(cost => (
-                        <p><span>{cost.name}:</span> <span>{formatValue(cost.cost)}</span></p>
-                    ))}
-                </div> ) : null}*/}
-                <div className={'autotrigger-settings autoconsume-setting block'}>
-                    <div className={'rules-header flex-container'}>
-                        <p>Autotrigger rules: {editing?.autotrigger?.rules?.length ? null : 'None'}</p>
-                        <label>
-                            <input type={'checkbox'} checked={editing.autotrigger?.isEnabled} onChange={toggleAutotrigger}/>
-                            {editing.autotrigger?.isEnabled ? ' ON' : ' OFF'}
-                        </label>
-                        {isEditing ? (<button onClick={addAutotriggerRule}>Add rule (AND)</button>) : null}
-                    </div>
-                    <div className={'priority-line flex-container'}>
-                        <p>Priority: </p>
-                        <input type={'number'} value={editing.autotrigger?.priority || 0} onChange={e => setAutotriggerPriority(+(e.target.value || 0))}/>
-                    </div>
-                    <RulesList
-                        isEditing={isEditing}
-                        rules={editing.autotrigger?.rules || []}
-                        deleteRule={deleteAutotriggerRule}
-                        setRuleValue={setAutotriggerRuleValue}
-                        setPattern={setAutotriggerPattern}
-                        pattern={editing.autotrigger?.pattern || ''}
-                        isAutoCheck={editing.autotrigger?.isEnabled}
-                    />
-                </div>
-                {isEditing ? (<div className={'buttons'}>
-                    <button onClick={() => saveAndClose(false)}>{editing?.id ? 'Save' : 'Create'}</button>
-                    <button onClick={() => saveAndClose(true)}>{editing?.id ? 'Save & Close' : 'Create & Close'}</button>
-                    <button onClick={onCloseList}>Cancel</button>
-                </div>) : null}
+                </PerfectScrollbar>
             </div>
-        </PerfectScrollbar>
+            {isEditing ? (<div className={'buttons'}>
+                <button onClick={() => saveAndClose(false)}>{editing?.id ? 'Save' : 'Create'}</button>
+                <button onClick={() => saveAndClose(true)}>{editing?.id ? 'Save & Close' : 'Create & Close'}</button>
+                <button onClick={onCloseList}>Cancel</button>
+            </div>) : null}
+        </>
     )
 }
 
