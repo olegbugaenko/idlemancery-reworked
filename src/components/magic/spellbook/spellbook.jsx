@@ -16,6 +16,7 @@ import {TippyWrapper} from "../../shared/tippy-wrapper.jsx";
 import StatRow from "../../shared/stat-row.jsx";
 import {CustomButton} from "../../shared/buttons/custom-button.jsx";
 import {HowToSign} from "../../shared/how-to-sign.jsx";
+import {useTutorial} from "../../../context/tutorial-context";
 
 export const SpellbookWrap = ({ children }) => {
 
@@ -260,7 +261,7 @@ export const SpellbookWrap = ({ children }) => {
                         <HowToSign scope={'spellbook'} />
                     </div>
                 </div>
-                <div className={'magic-cat'}>
+                <div className={'magic-cat spells-list'}>
                     <PerfectScrollbar>
                         <div className={'flex-container'}>
                             {spellData.available.map(item => <NewNotificationWrap id={`spell_${item.id}`} className={'narrow-wrapper'} isNew={newUnlocks.spellbook?.items?.spellbook?.items?.all?.items?.[`spell_${item.id}`]?.hasNew}>
@@ -315,7 +316,7 @@ export const SpellCard = React.memo(({ id, monitored, name, isCasted, cooldownPr
     // RERENDERING
     // console.log('Item: ', id, cooldownProg, cooldown);
 
-    return (<div ref={elementRef} className={`icon-card item bigger flashable spell-card  ${isActive ? 'active' : ''} ${monitored ?? ''}`} onMouseEnter={() => !isMobile ? onShowDetails(id) : null} onMouseLeave={() => !isMobile ? onShowDetails(null) : null} onClick={handleClick} onContextMenu={handleContextMenu}>
+    return (<div ref={elementRef} id={`spell_card_${id}`} className={`icon-card item bigger flashable spell-card  ${isActive ? 'active' : ''} ${monitored ?? ''}`} onMouseEnter={() => !isMobile ? onShowDetails(id) : null} onMouseLeave={() => !isMobile ? onShowDetails(null) : null} onClick={handleClick} onContextMenu={handleContextMenu}>
         <div className={'icon-content'}>
             <CircularProgress progress={cooldownProg}>
                 <img src={`icons/spells/${id}.png`} className={'resource'} />
@@ -358,6 +359,8 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
 
     const [spellDetails, setSpellDetails] = useState(null);
 
+    const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
+
     const worker = useContext(WorkerContext);
 
     const { onMessage, sendData } = useWorkerClient(worker);
@@ -378,6 +381,15 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
             clearInterval(timeout);
         }
     }, [item?.id]);
+
+    useEffect(() => {
+        if(currentTourId === 'spellbook' && item.id === 'spell_magic_insight') {
+            unlockNextById(5)
+        }
+        if(currentTourId === 'spellbook' && item.id === 'spell_focus') {
+            unlockNextById(9)
+        }
+    }, [spellDetails?.numCasted])
 
     onMessage('detail-spell-details', (data) => {
         setSpellDetails(data);
@@ -406,93 +418,132 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
         onToggleAutotrigger();
     }
 
+    const changeLevel = (level) => {
+        if(currentTourId === 'spellLevels') {
+            unlockNextById(5);
+        }
+        onChangeLevel(level);
+    }
+
+    const saveChanges = () => {
+        if(currentTourId === 'spellLevels') {
+            unlockNextById(7);
+        }
+        onSave();
+    }
+
+    if(currentTourId === 'spellbook' && isEditing) {
+        if(item.id === 'spell_magic_insight') {
+            unlockNextById(1);
+        }
+        if(item.id === 'spell_focus') {
+            unlockNextById(6);
+        }
+
+    }
+
+    if(currentTourId === 'spellLevels' && isEditing) {
+        if(item.maxLevel >= 2) {
+            unlockNextById(4);
+        }
+    }
+
     return (
-        <PerfectScrollbar>
-            <div className={'blade-inner'}>
-                <div className={'block'}>
-                    <h4>{item.name}{item.currentDuration && item.currentDuration > 0 ? `  ${secondsToString(item.currentDuration)}` : ''}</h4>
-                    <div className={'description'}>
-                        {item.description}
-                    </div>
-                </div>
-                <div className={'block'}>
-                    <div className={'tags-container'}>
-                        {item.tags.map(tag => (<div className={'tag'}>{tag}</div> ))}
-                    </div>
-                </div>
-                {item.isSpellLevelingAvailable ? (<div className={'block'}>
-                    <div className={'bottom'}>
-                        <div className={'xp-box'}>
-                            <span className={'xp-text'}>XP: {formatInt(item.xp)}/{formatInt(item.maxXP)}</span>
-                            <span className={'xp-income'}>+{formatValue(item.xpRate)} / Cast</span>
+        <>
+            <div className={'blade-outer'}>
+                <PerfectScrollbar>
+                    <div className={'blade-inner'}>
+                        <div className={'block'}>
+                            <h4>{item.name}{(spellDetails || item)?.currentDuration && (spellDetails || item)?.currentDuration > 0 ? `  ${secondsToString((spellDetails || item).currentDuration)}` : ''}</h4>
+                            <div className={'description'}>
+                                {item.description}
+                            </div>
                         </div>
-                        <div>
-                            <ProgressBar className={'action-progress'} percentage={item.xp/item.maxXP}></ProgressBar>
+                        <div className={'block'}>
+                            <div className={'tags-container'}>
+                                {item.tags.map(tag => (<div className={'tag'}>{tag}</div> ))}
+                            </div>
                         </div>
-                    </div>
-                    <div className={'set-level'}>
-                        <span>Set level to </span>
-                        <input type={'number'} value={item.actualLevel} min={1} max={item.maxLevel} onChange={e => onChangeLevel(Math.floor(+e.target.value))}/>
-                        <span>of {item.maxLevel}</span>
-                    </div>
-                    <p className={'hint'}>Increasing level will increase spells cost and consumption but also increase their output</p>
-                </div> ) : null}
-                <div className={'block'}>
-                    <p>Cooldown: {formatValue(item.cooldown)} seconds</p>
-                    <p>Price reduction <span className={'hint'}>(Based on max level)</span>: x{formatValue(item.maxLevelCostReduction)}</p>
-                </div>
-                <div className={'block'}>
-                    <p>Effects on usage:</p>
-                    <div className={'effects'}>
-                        <EffectsSection effects={item.effects} />
-                    </div>
-                    {item.canShowLasting ? (<div className={'show-lasting'}>
-                        <CustomButton
-                            iconId={'icon_view_lasting'}
-                            className={`toggle-effect-monitor medium-sm ${spellDetails?.show_lasting ? 'highlighted' : ''}`}
-                            onClick={(e) => {toggleViewLasting()}}
-                        >{item.show_lasting ? 'Stop showing active effects in left sidebar' : 'Show when active in left sidebar'}</CustomButton>
-                    </div> ) : null}
-                </div>
-                {item.duration ? (
-                    <div className={'block'}>
-                        <p>Effects Lasting: {formatInt(item.duration)}</p>
-                        <EffectsSection effects={item.potentialEffects} maxDisplay={10}/>
-                    </div>
-                ): null}
-                <div className={'cast-block block'}>
-                    <button disabled={!spellDetails || !spellDetails.affordable?.isAffordable || spellDetails.currentDuration > 0 || spellDetails.currentCooldown > 0} onClick={() => onPurchase(item.id)}>Cast Spell</button>
-                    {spellDetails?.currentDuration ? (<p className={'small'}>Running: {secondsToString(spellDetails?.currentDuration)}</p>) : null}
-                    {spellDetails?.currentCooldown ? (<p className={'small'}>Cooldown: {secondsToString(spellDetails?.currentCooldown)}</p>) : null}
-                </div>
-                {automationUnlocked ? (<div className={'autoconsume-setting'}>
-                    <div className={'rules-header flex-container'}>
-                        <p>Autospell rules: </p>
-                        <label>
-                            <input type={'checkbox'} checked={item.autocast?.isEnabled} onChange={toggleAutotrigger}/>
-                            {item.autocast?.isEnabled ? ' ON' : ' OFF'}
-                        </label>
-                        {isEditing ? (<button onClick={addAutoconsumeRule}>Add rule (AND)</button>) : null}
-                    </div>
+                        {item.isSpellLevelingAvailable ? (<div className={'block spell-xp-container'}>
+                            <div className={'bottom'}>
+                                <div className={'xp-box'}>
+                                    <span className={'xp-text'}>XP: {formatInt(item.xp)}/{formatInt(item.maxXP)}</span>
+                                    <span className={'xp-income'}>+{formatValue(item.xpRate)} / Cast</span>
+                                </div>
+                                <div className={'progress-bar'}>
+                                    <ProgressBar className={'action-progress'} percentage={item.xp/item.maxXP}></ProgressBar>
+                                </div>
+                            </div>
+                            <div className={'set-level flex-container flex-row'}>
+                                <div className={'setter'}>
+                                    <span>Set level to </span>
+                                    <input type={'number'} value={item.actualLevel} min={1} max={item.maxLevel} onChange={e => changeLevel(Math.floor(+e.target.value))}/>
+                                    <span>of {item.maxLevel}</span>
+                                </div>
+                                <div>
+                                    <HowToSign scope={'spellLevels'}/>
+                                </div>
+                            </div>
+                            <p className={'hint'}>Increasing level will increase spells cost and consumption but also increase their output</p>
+                        </div> ) : null}
+                        <div className={'block'}>
+                            <p className={'spell-cooldown-block'}>Cooldown: {formatValue(item.cooldown)} seconds</p>
+                            <p>Price reduction <span className={'hint'}>(Based on max level)</span>: x{formatValue(item.maxLevelCostReduction)}</p>
+                        </div>
+                        <div className={'block spell-effects-on-usage-block'}>
+                            <p>Effects on usage:</p>
+                            <div className={'effects'}>
+                                <EffectsSection effects={item.effects} />
+                            </div>
+                        </div>
+                        {item.duration ? (
+                            <div className={'block spell-effects-lasting-block'}>
+                                <p>Effects Lasting: {formatInt(item.duration)}</p>
+                                <EffectsSection effects={item.potentialEffects} maxDisplay={10}/>
+                                {item.canShowLasting ? (<div className={'show-lasting'}>
+                                    <CustomButton
+                                        iconId={'icon_view_lasting'}
+                                        className={`toggle-effect-monitor medium-sm ${spellDetails?.show_lasting ? 'highlighted' : ''}`}
+                                        onClick={(e) => {toggleViewLasting()}}
+                                    >{item.show_lasting ? 'Stop showing active effects in left sidebar' : 'Show when active in left sidebar'}</CustomButton>
+                                </div> ) : null}
+                            </div>
+                        ): null}
+                        <div className={'cast-block block'}>
+                            <button id={'cast-spell-btn'} disabled={!spellDetails || !spellDetails.affordable?.isAffordable || spellDetails.currentDuration > 0 || spellDetails.currentCooldown > 0} onClick={() => onPurchase(item.id)}>Cast Spell</button>
+                            {spellDetails?.currentDuration ? (<p className={'small'}>Running: {secondsToString(spellDetails?.currentDuration)}</p>) : null}
+                            {spellDetails?.currentCooldown ? (<p className={'small'}>Cooldown: {secondsToString(spellDetails?.currentCooldown)}</p>) : null}
+                        </div>
+                        {automationUnlocked ? (<div className={'autoconsume-setting'}>
+                            <div className={'rules-header flex-container'}>
+                                <p>Autospell rules: </p>
+                                <label>
+                                    <input type={'checkbox'} checked={item.autocast?.isEnabled} onChange={toggleAutotrigger}/>
+                                    {item.autocast?.isEnabled ? ' ON' : ' OFF'}
+                                </label>
+                                {isEditing ? (<button onClick={addAutoconsumeRule}>Add rule (AND)</button>) : null}
+                            </div>
 
-                    <RulesList
-                        isEditing={isEditing}
-                        rules={item.autocast?.rules || []}
-                        resources={resources}
-                        pattern={item.autocast?.pattern}
-                        deleteRule={deleteAutoconsumeRule}
-                        setRuleValue={setAutoconsumeRuleValue}
-                        setPattern={setAutocastPattern}
-                        isAutoCheck={item.autocast?.isEnabled}
-                    />
+                            <RulesList
+                                isEditing={isEditing}
+                                rules={item.autocast?.rules || []}
+                                resources={resources}
+                                pattern={item.autocast?.pattern}
+                                deleteRule={deleteAutoconsumeRule}
+                                setRuleValue={setAutoconsumeRuleValue}
+                                setPattern={setAutocastPattern}
+                                isAutoCheck={item.autocast?.isEnabled}
+                            />
 
-                </div>) : null}
-                {isEditing ? (<div className={'buttons flex-container'}>
-                    <button disabled={!isChanged} onClick={onSave}>Save</button>
-                    <button disabled={!isChanged && !isMobile} onClick={onCancel}>Cancel</button>
-                </div>) : null}
+                        </div>) : null}
+                    </div>
+                </PerfectScrollbar>
             </div>
-        </PerfectScrollbar>
+            {isEditing ? (<div className={'main-buttons buttons flex-container'}>
+                <button id={'save-spell-button'} disabled={!isChanged} onClick={saveChanges}>Save</button>
+                <button disabled={!isChanged && !isMobile} onClick={onCancel}>Cancel</button>
+            </div>) : null}
+        </>
     )
 }, (prevProps, currentProps) => {
 

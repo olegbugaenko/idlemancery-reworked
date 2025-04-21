@@ -435,6 +435,7 @@ export class SpellModule extends GameModule {
             autocast: this.spells[id]?.autocast ?? { rules: [] },
             isCasted: this.spells[id]?.isCasted,
             maxLevel: this.spells[id]?.level || 1,
+            numCasted: this.spells[id]?.numCasted || 1,
             maxLevelCostReduction: getCostReduction(id),
             maxXP: this.getMaxXP(id),
             xp: this.spells[id]?.xp || 0,

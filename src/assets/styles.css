@@ -2736,6 +2736,14 @@ h4.title span {
     font-size: 13px;
 }
 
+.detail-blade .blade-outer {
+    height: calc(100% - 40px);
+}
+
+.detail-blade .main-buttons {
+    height: 40px;
+}
+
 .hint-popup .etas-milestones .flex-row {
     padding-left: 16px;
 }

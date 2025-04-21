@@ -1024,6 +1024,158 @@ export function TutorialProvider({ children }) {
         },
     ]
 
+    const stepsSpellbook = [
+        {
+            target: '.spells-list',
+            content: 'Spells can be used to receive various temporary bonuses at cost of mana. Different spells can be useful in different situations.',
+            disableBeacon: true,
+            disableOverlayClose: true,
+        },
+        {
+            target: '#spell_card_spell_magic_insight',
+            content: 'Clicking on specific spell will show you its details. Lets click on "Magic Insight"',
+            disableBeacon: true,
+            disableOverlayClose: true,
+            spotlightClicks: true,
+            actionRequired: true
+        },
+        {
+            target: '.tags-container',
+            content: 'Here you can see tags of this spell. Most of bonuses that applied to spells are applied by their tags, so its important to check tags before doing important decisions regarding corresponding upgrades prioritization',
+            disableBeacon: true,
+            disableOverlayClose: true,
+        },
+        {
+            target: '.spell-effects-on-usage-block',
+            content: 'In this block you can see effects this spell gives immediately after you cast it. As you can see, it using mana but gives knowledge',
+            disableBeacon: true,
+            disableOverlayClose: true,
+        },
+        {
+            target: '.spell-cooldown-block',
+            content: 'Some spells have cooldowns, meaning that you can cast them once in some brief period of time',
+            disableBeacon: true,
+            disableOverlayClose: true,
+        },
+        {
+            target: '#cast-spell-btn',
+            content: 'Lets cast this spell',
+            disableBeacon: true,
+            disableOverlayClose: true,
+            spotlightClicks: true,
+            actionRequired: true
+        },
+        {
+            target: '#spell_card_spell_focus',
+            content: 'Now, lets select "Focus" spell',
+            disableBeacon: true,
+            disableOverlayClose: true,
+            spotlightClicks: true,
+            actionRequired: true
+        },
+        {
+            target: '.spell-effects-on-usage-block',
+            content: 'This spell also takes mana to cast',
+            disableBeacon: true,
+            disableOverlayClose: true,
+        },
+        {
+            target: '.spell-effects-lasting-block',
+            content: 'But, unlikely to Magic Insight, this one providing some modifiers during some limited time, while its active. Here you can see spell duration and its effects',
+            disableBeacon: true,
+            disableOverlayClose: true,
+        },
+        {
+            target: '#cast-spell-btn',
+            content: 'Lets cast Focus. Keep in mind - you cant cast spell if its already running',
+            disableBeacon: true,
+            disableOverlayClose: true,
+            spotlightClicks: true,
+            actionRequired: true
+        },
+        {
+            target: '.active-effects-wrap',
+            content: 'Lasting effects from spells can be also seen here. However, you can configure this as well',
+            disableBeacon: true,
+            disableOverlayClose: true,
+        },
+        {
+            target: '.toggle-effect-monitor',
+            content: 'If you put it off - item effect wont appear in left sidebar. It might be useful if you running item permanently and dont want it to distract you.',
+            disableBeacon: true,
+            disableOverlayClose: true,
+        },
+        {
+            target: '.spells-list',
+            content: 'Thats all about spells.',
+            disableBeacon: true,
+            disableOverlayClose: true,
+        },
+    ]
+
+    const stepsSpellLevels = [
+        {
+            target: '.spell-xp-container',
+            content: 'Congrats on unlocking spells leveling! Its important aspect of making your magic even more powerful',
+            disableBeacon: true,
+            disableOverlayClose: true,
+        },
+        {
+            target: '.spell-xp-container .xp-box',
+            content: 'When you cast spells they receive XP.',
+            disableBeacon: true,
+            disableOverlayClose: true,
+        },
+        {
+            target: '.spell-xp-container .progress-bar',
+            content: 'When this progress bar fills, spell maximum level is increased.',
+            disableBeacon: true,
+            disableOverlayClose: true,
+        },
+        {
+            target: '.spell-xp-container .set-level',
+            content: 'When increasing spell level its cost and power are increased. But, costs are scaling faster than bonuses. So, it worth rising level only in case you have enough mana',
+            disableBeacon: true,
+            disableOverlayClose: true,
+        },
+        {
+            target: '.spell-wrap',
+            content: 'Select any spell that has maximum level 2 or greater (Or run Magic Insight several times to level up it, it would be the easiest spell to level)',
+            disableBeacon: true,
+            disableOverlayClose: true,
+            spotlightClicks: true,
+            actionRequired: true
+        },
+        {
+            target: '.spell-xp-container .set-level .setter',
+            content: 'Change spell level.',
+            disableBeacon: true,
+            disableOverlayClose: true,
+            spotlightClicks: true,
+            actionRequired: true
+        },
+        {
+            target: '.spell-effects-on-usage-block',
+            content: 'As you can see, the spell costs and outputs were changed. Dont forget that most efficient way to manage your spell level is to set the highest possible that will keep your mana positive',
+            disableBeacon: true,
+            disableOverlayClose: true,
+        },
+        {
+            target: '#save-spell-button',
+            content: 'Hit "Save" to make your level changes applied',
+            disableBeacon: true,
+            disableOverlayClose: true,
+            spotlightClicks: true,
+            actionRequired: true
+        },
+        {
+            target: '.spells-list',
+            content: 'Now that you know about spell levels, you can use your magic even more efficiently. That\'s it!',
+            disableBeacon: true,
+            disableOverlayClose: true,
+        },
+    ]
+
 
     const tutorials = {
         initial: stepsInitial,
@@ -1033,6 +1185,8 @@ export function TutorialProvider({ children }) {
         crafting: stepsCrafting,
         alchemy: stepsAlchemy,
         inventory: stepsInventory,
+        spellbook: stepsSpellbook,
+        spellLevels: stepsSpellLevels
     }
 
     // Допоміжні функції

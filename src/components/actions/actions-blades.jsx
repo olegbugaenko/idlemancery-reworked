@@ -293,125 +293,131 @@ export const ListEditor = React.memo(({
 
     if(!editing) return ;
 
-    return (<PerfectScrollbar><div className={'list-editor'}>
-        <div className={'main-wrap'}>
-            <div className={'main-row'}>
-                <span>Name</span>
-                {isEditing ? (<input className={'action-list-name-input'} type={'text'} value={editing.name ?? ''} onChange={(e) => {
-                    if(currentTourId === 'action-lists') {
-                        setNextAllowedById(2)
-                    }
-                    console.log('updateListValue: ', 'name', e.target.value);
-                    onUpdateListValue('name', e.target.value)
-                }}/>) : (<span>{editing.name}</span>)}
-                <HowToSign scope={'action-lists'} />
-            </div>
-        </div>
-        <div className={'block'}>
-            <p className={'hint'}>
-                All actions in the list are performed simultaneously.
-            </p>
-            <div className={'show-bar'}>
-                {editing?.proportionsBar ? (<div className={'proportions-bar'}>
-                    {editing?.proportionsBar.map(one => (
-                        <TippyWrapper content={
-                            <div className={'hint-popup'}>
-                                <p>{one.name}</p>
-                                <p>Effort: {formatValue(one.percentage*100)}%</p>
-                            </div> }>
-                            <div style={{width: one.displayPercentage, backgroundColor: one.color}} className={'proportion-bar'}>
+    return (<>
+        <div className={'blade-outer'}>
+            <PerfectScrollbar>
+                <div className={'list-editor'}>
+                    <div className={'main-wrap'}>
+                        <div className={'main-row'}>
+                            <span>Name</span>
+                            {isEditing ? (<input className={'action-list-name-input'} type={'text'} value={editing.name ?? ''} onChange={(e) => {
+                                if(currentTourId === 'action-lists') {
+                                    setNextAllowedById(2)
+                                }
+                                console.log('updateListValue: ', 'name', e.target.value);
+                                onUpdateListValue('name', e.target.value)
+                            }}/>) : (<span>{editing.name}</span>)}
+                            <HowToSign scope={'action-lists'} />
+                        </div>
+                    </div>
+                    <div className={'block'}>
+                        <p className={'hint'}>
+                            All actions in the list are performed simultaneously.
+                        </p>
+                        <div className={'show-bar'}>
+                            {editing?.proportionsBar ? (<div className={'proportions-bar'}>
+                                {editing?.proportionsBar.map(one => (
+                                    <TippyWrapper content={
+                                        <div className={'hint-popup'}>
+                                            <p>{one.name}</p>
+                                            <p>Effort: {formatValue(one.percentage*100)}%</p>
+                                        </div> }>
+                                        <div style={{width: one.displayPercentage, backgroundColor: one.color}} className={'proportion-bar'}>
+                                        </div>
+                                    </TippyWrapper>
+                                ))}
+                            </div> ) : null}
+                        </div>
+                    </div>
+                    <div className="actions-list-wrap" id={'actions-in-list'}>
+                        <div className={`action-row flex-container header`}
+                        >
+                            <div className={'col title'}>
+                                <span>Action</span>
                             </div>
-                        </TippyWrapper>
-                    ))}
-                </div> ) : null}
-            </div>
-        </div>
-                <div className="actions-list-wrap" id={'actions-in-list'}>
-                    <div className={`action-row flex-container header`}
-                    >
-                        <div className={'col title'}>
-                            <span>Action</span>
+                            <div className={'col amount'}>
+                                <span>Effort</span>
+                            </div>
+                            <div className={'col delete'}>
+                                {isEditing ? (<span>Delete</span>) : null}
+                            </div>
                         </div>
-                        <div className={'col amount'}>
-                            <span>Effort</span>
-                        </div>
-                        <div className={'col delete'}>
-                            {isEditing ? (<span>Delete</span>) : null}
+                        <div id={'action-editor-wrap'} className={'action-items-list'}>
+                            {editing.actions.length ? editing.actions.map((action, index) => (
+                                <DraggableActionItem key={`list-${action.id}-${index}`} id={action.id} index={index}>
+                                    <div className={`action-row flex-container ${!action.isAvailable ? 'unavailable' : ''}`}>
+                                        {editing.proportionsBar ? (<div style={{width: editing.proportionsBar?.[index]?.displayPercentage, backgroundColor: editing.proportionsBar[index]?.color}} className={'prop-bg'}></div> ) : null}
+                                        <div className={'col title'}>
+                                            <span>{action.name}</span>
+                                        </div>
+                                        <div className={`col amount ${isEditing ? 'large' : ''}`}>
+                                            {isEditing
+                                                ? (<div className={`editing-amounts amount-for-${action.id}`}>
+                                                        <input type={'number'} value={action.time}
+                                                               onChange={(e) => {
+                                                                   if(currentTourId === 'action-lists' && +e.target.value > 1) {
+                                                                       unlockNextById(9)
+                                                                   }
+                                                                   onUpdateActionFromList(action.id, 'time', +e.target.value)
+                                                               }}/>
+                                                        <label>
+                                                            <input type={'checkbox'} checked={action.isDynamicTime} disabled={!action.isAutoTimeEnabled} onChange={(e) => {
+                                                                onUpdateActionFromList(action.id, 'isDynamicTime', !action.isDynamicTime)
+                                                            }}/>
+                                                            Auto
+                                                        </label>
+                                                        <span className={'percentage'}>{formatValue(editing.proportionsBar?.[index]?.percentage*100 || 0)} %</span>
+                                                    </div>
+                                                )
+                                                : (<span>{formatValue(editing.proportionsBar[index].percentage*100)} %</span>)
+                                            }
+                                        </div>
+                                        <div className={'col delete'}>
+                                            {isEditing ? (<span className={'close'} onClick={() => onDropActionFromList(action.id)}>X</span>) : null}
+                                        </div>
+                                    </div>
+                                </DraggableActionItem>
+                            )) : <p className={'hint'}>Click on actions or drag & drop them to add</p>}
                         </div>
                     </div>
-                    <div id={'action-editor-wrap'} className={'action-items-list'}>
-                        {editing.actions.length ? editing.actions.map((action, index) => (
-                            <DraggableActionItem key={`list-${action.id}-${index}`} id={action.id} index={index}>
-                                <div className={`action-row flex-container ${!action.isAvailable ? 'unavailable' : ''}`}>
-                                    {editing.proportionsBar ? (<div style={{width: editing.proportionsBar?.[index]?.displayPercentage, backgroundColor: editing.proportionsBar[index]?.color}} className={'prop-bg'}></div> ) : null}
-                                    <div className={'col title'}>
-                                        <span>{action.name}</span>
-                                    </div>
-                                    <div className={`col amount ${isEditing ? 'large' : ''}`}>
-                                        {isEditing
-                                            ? (<div className={`editing-amounts amount-for-${action.id}`}>
-                                                    <input type={'number'} value={action.time}
-                                                           onChange={(e) => {
-                                                               if(currentTourId === 'action-lists' && +e.target.value > 1) {
-                                                                   unlockNextById(9)
-                                                               }
-                                                               onUpdateActionFromList(action.id, 'time', +e.target.value)
-                                                           }}/>
-                                                    <label>
-                                                        <input type={'checkbox'} checked={action.isDynamicTime} disabled={!action.isAutoTimeEnabled} onChange={(e) => {
-                                                            onUpdateActionFromList(action.id, 'isDynamicTime', !action.isDynamicTime)
-                                                        }}/>
-                                                        Auto
-                                                    </label>
-                                                    <span className={'percentage'}>{formatValue(editing.proportionsBar?.[index]?.percentage*100 || 0)} %</span>
-                                                </div>
-                                            )
-                                            : (<span>{formatValue(editing.proportionsBar[index].percentage*100)} %</span>)
-                                        }
-                                    </div>
-                                    <div className={'col delete'}>
-                                        {isEditing ? (<span className={'close'} onClick={() => onDropActionFromList(action.id)}>X</span>) : null}
-                                    </div>
-                                </div>
-                            </DraggableActionItem>
-                        )) : <p className={'hint'}>Click on actions or drag & drop them to add</p>}
+                    <div className={'effects-wrap'}>
+                        {Object.keys(editing?.resourcesEffects || {}).length ? (<div className={'block'} id={'list-resources-gain'}>
+                            <p>Average Resources per second</p>
+                            <ResourceComparison effects1={editing?.prevEffects} effects2={editing?.resourcesEffects} maxDisplay={10}/></div>) : null}
+                        {editing?.effectEffects?.length ? (<div className={'block'} id={'list-effects-gain'}>
+                            <p>Average Effects per second</p>
+                            <EffectsSection effects={editing?.effectEffects || []} maxDisplay={10}/></div>) : null}
                     </div>
+                    {automationUnlocked ? (<div className={'autotrigger-settings autoconsume-setting block'}>
+                        <div className={'rules-header flex-container'}>
+                            <p>Autotrigger rules: {editing?.autotrigger?.rules?.length ? null : 'None'}</p>
+                            <label>
+                                <input type={'checkbox'} checked={editing.autotrigger?.isEnabled} onChange={toggleAutotrigger}/>
+                                {editing.autotrigger?.isEnabled ? ' ON' : ' OFF'}
+                            </label>
+                            {isEditing ? (<button onClick={addAutotriggerRule}>Add rule (AND)</button>) : null}
+                            <HowToSign scope={'lists-automation'}/>
+                        </div>
+                        <div className={'priority-line flex-container'}>
+                            <p>Priority: </p>
+                            <input type={'number'} value={editing.autotrigger?.priority || 0}
+                                   onChange={e => setAutotriggerPriority(+(e.target.value || 0))}/>
+                        </div>
+                        <RulesList
+                            isEditing={isEditing}
+                            rules={editing.autotrigger?.rules || []}
+                            resources={resources}
+                            deleteRule={deleteAutotriggerRule}
+                            setRuleValue={setAutotriggerRuleValue}
+                            setPattern={setAutotriggerPattern}
+                            pattern={editing.autotrigger?.pattern || ''}
+                            isAutoCheck={editing.autotrigger?.isEnabled}
+                        />
+                    </div>) : null}
                 </div>
-        <div className={'effects-wrap'}>
-            {Object.keys(editing?.resourcesEffects || {}).length ? (<div className={'block'} id={'list-resources-gain'}>
-                <p>Average Resources per second</p>
-                <ResourceComparison effects1={editing?.prevEffects} effects2={editing?.resourcesEffects} maxDisplay={10}/></div>) : null}
-            {editing?.effectEffects?.length ? (<div className={'block'} id={'list-effects-gain'}>
-                <p>Average Effects per second</p>
-                <EffectsSection effects={editing?.effectEffects || []} maxDisplay={10}/></div>) : null}
+            </PerfectScrollbar>
         </div>
-        {automationUnlocked ? (<div className={'autotrigger-settings autoconsume-setting block'}>
-            <div className={'rules-header flex-container'}>
-                <p>Autotrigger rules: {editing?.autotrigger?.rules?.length ? null : 'None'}</p>
-                <label>
-                    <input type={'checkbox'} checked={editing.autotrigger?.isEnabled} onChange={toggleAutotrigger}/>
-                    {editing.autotrigger?.isEnabled ? ' ON' : ' OFF'}
-                </label>
-                {isEditing ? (<button onClick={addAutotriggerRule}>Add rule (AND)</button>) : null}
-                <HowToSign scope={'lists-automation'}/>
-            </div>
-            <div className={'priority-line flex-container'}>
-                <p>Priority: </p>
-                <input type={'number'} value={editing.autotrigger?.priority || 0}
-                       onChange={e => setAutotriggerPriority(+(e.target.value || 0))}/>
-            </div>
-            <RulesList
-                isEditing={isEditing}
-                rules={editing.autotrigger?.rules || []}
-                resources={resources}
-                deleteRule={deleteAutotriggerRule}
-                setRuleValue={setAutotriggerRuleValue}
-                setPattern={setAutotriggerPattern}
-                pattern={editing.autotrigger?.pattern || ''}
-                isAutoCheck={editing.autotrigger?.isEnabled}
-            />
-        </div>) : null}
-        {isEditing ? (<div className={'buttons'}>
+        {isEditing ? (<div className={'buttons main-buttons flex-container'}>
             <button onClick={() => saveAndClose(false)}>{listData?.id ? 'Save' : 'Create'}</button>
             <button className={'save-and-close'} onClick={() => {
                 if(currentTourId === 'action-lists') {
@@ -421,7 +427,7 @@ export const ListEditor = React.memo(({
             }}>{listData?.id ? 'Save & Close' : 'Create & Close'}</button>
             <button onClick={onCloseList}>Cancel</button>
         </div>) : null}
-    </div></PerfectScrollbar> )
+    </> )
 }, ((prevProps, currentProps) => {
 
     if(prevProps.isEditing !== currentProps.isEditing) return false;
