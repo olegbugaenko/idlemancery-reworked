@@ -8,7 +8,7 @@ export const registerGuilds = () => {
         description: '',
         level: 0,
         unlockCondition: () => {
-            return true;
+            return false;
         },
         attributes: {
             isCollectable: false,
@@ -41,13 +41,8 @@ export const registerGuilds = () => {
         description: 'Enter merchants guild to become better in understanding how to earn and invest your coins.',
         level: 0,
         unlockCondition: () => {
-            return true;
+            return false;
         },
-        unlockedBy: [{
-            type: 'effect',
-            id: 'attribute_charisma',
-            level: 500
-        }],
         attributes: {
             isCollectable: false,
             icon_id: 'merchants_guild',
@@ -110,7 +105,7 @@ export const registerGuilds = () => {
         description: '',
         level: 0,
         unlockCondition: () => {
-            return true;
+            return false;
         },
         attributes: {
             isCollectable: false,
@@ -143,13 +138,8 @@ export const registerGuilds = () => {
         description: 'Become member of young scientists community.',
         level: 0,
         unlockCondition: () => {
-            return true;
+            return false;
         },
-        unlockedBy: [{
-            type: 'effect',
-            id: 'attribute_charisma',
-            level: 500
-        }],
         attributes: {
             isCollectable: false,
             icon_id: 'scholars_guild',
@@ -213,7 +203,7 @@ export const registerGuilds = () => {
         description: '',
         level: 0,
         unlockCondition: () => {
-            return true;
+            return false;
         },
         attributes: {
             isCollectable: false,
@@ -246,13 +236,8 @@ export const registerGuilds = () => {
         description: 'Become member of young scientists community.',
         level: 0,
         unlockCondition: () => {
-            return true;
+            return false;
         },
-        unlockedBy: [{
-            type: 'effect',
-            id: 'attribute_charisma',
-            level: 500
-        }],
         attributes: {
             isCollectable: false,
             icon_id: 'mages_guild',
@@ -315,7 +300,7 @@ export const registerGuilds = () => {
         description: '',
         level: 0,
         unlockCondition: () => {
-            return true;
+            return false;
         },
         attributes: {
             isCollectable: false,
@@ -346,13 +331,8 @@ export const registerGuilds = () => {
         description: 'Reveal new alchemy opportunities by entering cauldron masters community.',
         level: 0,
         unlockCondition: () => {
-            return true;
+            return false;
         },
-        unlockedBy: [{
-            type: 'effect',
-            id: 'attribute_charisma',
-            level: 500
-        }],
         attributes: {
             isCollectable: false,
             icon_id: 'herbalists_guild',
@@ -413,7 +393,7 @@ export const registerGuilds = () => {
         description: '',
         level: 0,
         unlockCondition: () => {
-            return true;
+            return false;
         },
         attributes: {
             isCollectable: false,
@@ -444,13 +424,8 @@ export const registerGuilds = () => {
         description: 'The Artisans Guild is a sanctuary of creativity and innovation, where members craft exquisite items and enhance their own bodies through artful modifications and enchanted designs. From intricate jewelry to empowered prosthetics, they blend beauty and functionality in everything they create. This guild embodies the pursuit of perfection in both craft and self-expression.',
         level: 0,
         unlockCondition: () => {
-            return true;
+            return false;
         },
-        unlockedBy: [{
-            type: 'effect',
-            id: 'attribute_charisma',
-            level: 500
-        }],
         attributes: {
             isCollectable: false,
             icon_id: 'artisans_guild',

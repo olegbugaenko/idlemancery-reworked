@@ -44,6 +44,7 @@ const customStyles = {
         ...provided,
         marginTop: '0', // Видаляємо відступ між селектом і меню
         width: '240px',
+        zIndex: 10103,
     }),
     option: (provided, state) => ({
         ...provided,
@@ -429,6 +430,7 @@ const RulesList = React.memo(
                                             className="react-select-container"
                                             classNamePrefix="react-select"
                                             styles={customStyles}
+                                            menuPortalTarget={document.body}
                                         />
                                     ) : (
                                         <span className={'display-rule-value'}>
@@ -458,6 +460,7 @@ const RulesList = React.memo(
                                                 className={`react-select-container ${mapCompareType[rule.compare_type]?.allowMultiSubject ? 'multi' : ''}`}
                                                 classNamePrefix="react-select"
                                                 styles={customStyles}
+                                                menuPortalTarget={document.body}
                                             />
                                         ) : (
                                             <span className={'display-rule-value'}>{Array.isArray(subjectValue) ? subjectValue.map(one => `${one?.label}`).join(',') : (subjectValue?.label || 'Invalid')}</span>

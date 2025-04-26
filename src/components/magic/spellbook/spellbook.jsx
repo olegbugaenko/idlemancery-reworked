@@ -540,8 +540,8 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
                 </PerfectScrollbar>
             </div>
             {isEditing ? (<div className={'main-buttons buttons flex-container'}>
-                <button id={'save-spell-button'} disabled={!isChanged} onClick={saveChanges}>Save</button>
-                <button disabled={!isChanged && !isMobile} onClick={onCancel}>Cancel</button>
+                <button className={'primary-action'} id={'save-spell-button'} disabled={!isChanged} onClick={saveChanges}>Save</button>
+                <button className={'warning-action'} disabled={!isChanged && !isMobile} onClick={onCancel}>Cancel</button>
             </div>) : null}
         </>
     )

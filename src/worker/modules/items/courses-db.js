@@ -362,7 +362,7 @@ export const registerCourseItemsStage1 = () => {
             get_multiplier: () => ({
                 effects: {
                     'social_actions_discount': {
-                        A: 0.2*gameEffects.getEffectValue('reductive_courses_power'),
+                        A: 0.1*gameEffects.getEffectValue('reductive_courses_power'),
                         B: 1,
                         C: 1.01,
                         type: 3,
@@ -405,7 +405,7 @@ export const registerCourseItemsStage1 = () => {
             get_multiplier: () => ({
                 effects: {
                     'physical_actions_discount': {
-                        A: 0.2*gameEffects.getEffectValue('reductive_courses_power'),
+                        A: 0.1*gameEffects.getEffectValue('reductive_courses_power'),
                         B: 1,
                         C: 1.01,
                         type: 3,
@@ -448,7 +448,7 @@ export const registerCourseItemsStage1 = () => {
             get_multiplier: () =>({
                 effects: {
                     'mental_actions_discount': {
-                        A: 0.2*gameEffects.getEffectValue('reductive_courses_power'),
+                        A: 0.1*gameEffects.getEffectValue('reductive_courses_power'),
                         B: 1,
                         C: 1.01,
                         type: 3,
@@ -496,7 +496,7 @@ export const registerCourseItemsStage1 = () => {
             get_multiplier: () =>({
                 effects: {
                     'magical_actions_discount': {
-                        A: 0.2*gameEffects.getEffectValue('reductive_courses_power'),
+                        A: 0.1*gameEffects.getEffectValue('reductive_courses_power'),
                         B: 1,
                         C: 1.01,
                         type: 3,

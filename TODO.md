@@ -173,8 +173,9 @@ v0.1.4
    6.c) [V] Craft
    6.d) [V] Lists
    6.e) [V] Inventory
-   6.g) Spells
-   6.h) Automations
-7. Rituals
-8. Refine UI
-9. Confirmation for using dangerous flasks
+   6.g) [V] Spells
+   6.h) Action Intensities
+   6.e) Automations
+7. Refine UI
+8. Confirmation for using dangerous flasks
+9. Rituals

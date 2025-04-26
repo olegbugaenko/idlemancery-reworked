@@ -646,9 +646,9 @@ export const CraftingListDetails = ({
                 </PerfectScrollbar>
             </div>
             {isEditing ? (<div className={'buttons main-buttons flex-container'}>
-                <button onClick={() => saveAndClose(false)}>{editing?.id ? 'Save' : 'Create'}</button>
-                <button onClick={() => saveAndClose(true)}>{editing?.id ? 'Save & Close' : 'Create & Close'}</button>
-                <button onClick={onCloseList}>Cancel</button>
+                <button className={'primary-action'} onClick={() => saveAndClose(false)}>{editing?.id ? 'Save' : 'Create'}</button>
+                <button className={'primary-action'} onClick={() => saveAndClose(true)}>{editing?.id ? 'Save & Close' : 'Create & Close'}</button>
+                <button className={'warning-action'} onClick={onCloseList}>Cancel</button>
             </div>) : null}
         </>
     )

@@ -425,6 +425,56 @@ export const registerActionsStage1 = () => {
     })
 
 
+    registerGameAction('action_senior_builder', {
+        tags: ["action", "job", "physical"],
+        name: 'Senior Builder',
+        isAbstract: false,
+        category: ACTION_CATS.COINS,
+        allowedImpacts: ['effects'],
+        description: 'Work as senior builder. Its harder, but better paid',
+        level: 1,
+        discountEffects: ['physical_actions_discount'],
+        getLearnRate: () => {
+            return 1;
+        },
+        learningEffects: ['job_learning_rate'],
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'coins': {
+                        A: 3*gameEffects.getEffectValue('coins_earned_bonus'),
+                        B: 27*gameEffects.getEffectValue('coins_earned_bonus'),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 32,
+                        type: 0,
+                    },
+                    'health': {
+                        A: 0.0,
+                        B: 16,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['coins_earned_bonus']
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 1750,
+        }],
+        attributes: {
+            baseXPCost: 20,
+            primaryAttribute: 'attribute_strength'
+        }
+    })
+
 
     registerGameAction('action_foreman', {
         tags: ["action", "job", "physical"],
@@ -443,8 +493,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'coins': {
-                        A: 3*gameEffects.getEffectValue('coins_earned_bonus'),
-                        B: 27*gameEffects.getEffectValue('coins_earned_bonus'),
+                        A: 6*gameEffects.getEffectValue('coins_earned_bonus'),
+                        B: 54*gameEffects.getEffectValue('coins_earned_bonus'),
                         type: 0,
                     }
                 }
@@ -871,7 +921,7 @@ export const registerActionsStage1 = () => {
         category: ACTION_CATS.SOCIAL,
         isAbstract: false,
         allowedImpacts: ['effects'],
-        description: 'Spent time walking through local market and talking to local merchants.',
+        description: 'Spent time walking through local market and talking to local merchants. This will improve your Bargaining attribute.',
         level: 1,
         getLearnRate: () => {
             return 2.
@@ -954,6 +1004,62 @@ export const registerActionsStage1 = () => {
             type: 'effect',
             id: 'attribute_charisma',
             level: 300,
+        }],
+        unlockCondition: () => {
+            return true
+        },
+        attributes: {
+            baseXPCost: 1000,
+            isTraining: true,
+            isRankAvailable: true,
+        }
+    })
+
+
+    registerGameAction('action_negotiation_mastery', {
+        tags: ["action", "social", "training"],
+        name: 'Negotiation Mastery',
+        category: ACTION_CATS.SOCIAL,
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Improve your negotiation mastery, decreasing land cost.',
+        level: 1,
+        maxLevel: 100,
+        getLearnRate: () => {
+            return 1.
+        },
+        learningEffects: ['mental_activities_learn_rate'],
+        discountEffects: ['social_actions_discount'],
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'land_purchase_discount': {
+                        A: 0.02*gameEffects.getEffectValue(getRankId('action_negotiation_mastery')),
+                        B: 0.98*gameEffects.getEffectValue(getRankId('action_negotiation_mastery')),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 300,
+                        type: 0,
+                    },
+                    'knowledge': {
+                        A: 0.0,
+                        B: 30,
+                        type: 0,
+                    },
+                }
+            }),
+            effectDeps: []
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_charisma',
+            level: 500,
         }],
         unlockCondition: () => {
             return true
@@ -1117,7 +1223,7 @@ export const registerActionsStage1 = () => {
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_strength',
-            level: 3500,
+            level: 4000,
         }],
         getLearnRate: () => {
             return 1.
@@ -3179,7 +3285,7 @@ export const registerActionsStage1 = () => {
         allowedImpacts: ['effects'],
         description: 'Engage in lively debates to sharpen your wits and increase your Charisma.',
         level: 1,
-        discountEffects: ['mental_actions_discount'],
+        discountEffects: ['social_actions_discount'],
         getLearnRate: () => {
             return 5.
         },
@@ -3478,11 +3584,6 @@ export const registerActionsStage1 = () => {
             }),
             effectDeps: []
         },
-        unlockedBy: [{
-            type: 'effect',
-            id: 'attribute_charisma',
-            level: 1250
-        }],
         unlockCondition: () => {
             return gameCore.getModule('guilds').selectedGuild != null && false
         },
@@ -3594,7 +3695,7 @@ export const registerActionsStage1 = () => {
             return true
         },
         attributes: {
-            baseXPCost: 2500000,
+            baseXPCost: 7500000,
             isTraining: true,
             isRankAvailable: true,
         }

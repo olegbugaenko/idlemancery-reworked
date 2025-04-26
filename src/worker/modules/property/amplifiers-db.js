@@ -222,11 +222,11 @@ export const registerAmplifiersStage1 = () => {
         name: 'Arcane Conduit Amplifier',
         description: 'Increase mana cap and regeneration.',
         level: 0,
-        unlockedBy: [{
+        /*unlockedBy: [{
             type: 'effect',
             id: 'attribute_magic_ability',
             level: 60000,
-        }],
+        }],*/
         unlockCondition: () => {
             return gameResources.isResourceUnlocked('inventory_spark');
         },
@@ -266,11 +266,11 @@ export const registerAmplifiersStage1 = () => {
         name: 'Scholars Ignition Amplifier',
         description: 'Increase courses learn speed',
         level: 0,
-        unlockedBy: [{
+        /*unlockedBy: [{
             type: 'effect',
             id: 'attribute_magic_ability',
             level: 60000,
-        }],
+        }],*/
         unlockCondition: () => {
             return gameResources.isResourceUnlocked('inventory_spark');
         },

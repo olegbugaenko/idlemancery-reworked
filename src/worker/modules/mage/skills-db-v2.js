@@ -282,7 +282,7 @@ export const registerSkillsStage1 = () => {
         name: 'Adaptive Conditioning',
         description: 'Reduce experience required for leveling physical actions',
         level: 0,
-        maxLevel: 8,
+        maxLevel: 10,
         uiPosition: {
             left: -6,
             top: 2,

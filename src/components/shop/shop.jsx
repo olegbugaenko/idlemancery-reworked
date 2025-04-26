@@ -349,7 +349,7 @@ export const ItemCard = ({ id, name, level, max, affordable, isLeveled, isCapped
     useFlashOnLevelUp(isLeveled, onFlash, elementRef);
 
 
-    return (<div ref={elementRef} className={`shop-card card item flashable ${affordable.hardLocked ? 'hard-locked' : ''}  ${!affordable.isAffordable ? 'unavailable' : ''} ${isCapped ? 'capped' : ''}`} onMouseEnter={() => {if(!isMobile) onShowDetails(id)}} onMouseLeave={() => {if(!isMobile) onShowDetails(null)}} onClick={() => {if(isMobile) onShowDetails(id)}}>
+    return (<div ref={elementRef} className={`shop-card shop-upgrade card item flashable ${affordable.hardLocked ? 'hard-locked' : ''}  ${!affordable.isAffordable ? 'unavailable' : ''} ${isCapped ? 'capped' : ''}`} onMouseEnter={() => {if(!isMobile) onShowDetails(id)}} onMouseLeave={() => {if(!isMobile) onShowDetails(null)}} onClick={() => {if(isMobile) onShowDetails(id)}}>
         <div className={'head'}>
             <p className={'title'}>{name}</p>
             <span className={'level'}>{formatInt(level)}{max ? `/${formatInt(max)}` : ''}</span>
@@ -384,7 +384,7 @@ export const ItemResourceCard = ({ id, name, purchaseMultiplier, stock, level, m
     return (<div
         id={`shop-item-resource-${id}`}
         ref={elementRef}
-        className={`icon-card item flashable ${affordable.hardLocked ? 'hard-locked' : ''}  ${!affordable.isAffordable ? 'unavailable' : ''}`}
+        className={`icon-card purchaseable-resource item flashable ${affordable.hardLocked ? 'hard-locked' : ''}  ${!affordable.isAffordable ? 'unavailable' : ''}`}
         onMouseEnter={() => isMobile ? null : onShowDetails(id)}
         onMouseLeave={() => isMobile ? null : onShowDetails(null)}
         onClick={(e) => {
@@ -419,7 +419,7 @@ export const CourseCard = ({ toNext, id, efficiency, isRunning, name, level, pro
 
     return (<div
         ref={elementRef}
-        className={`course-card card item flashable ${isRunning ? ' running' : ''} ${efficiency < 1 ? ' efficiency-dropped lower-eff' : ''}  ${affordable.hardLocked ? 'hard-locked' : ''}  ${!affordable.isAffordable ? 'unavailable' : ''}`}
+        className={`course-card card shop-course item flashable ${isRunning ? ' running' : ''} ${efficiency < 1 ? ' efficiency-dropped lower-eff' : ''}  ${affordable.hardLocked ? 'hard-locked' : ''}  ${!affordable.isAffordable ? 'unavailable' : ''}`}
         onMouseEnter={() => isMobile ? null : onShowDetails(id)}
         onMouseLeave={() => isMobile ? null : onShowDetails(null)}
         onClick={(e) => {

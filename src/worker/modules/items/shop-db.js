@@ -1805,7 +1805,7 @@ export const registerShopItemsStage1 = () => {
         get_cost: () => ({
             'coins': {
                 A: 2,
-                B: 1.e+11*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 4.e+10*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 0
             }
         })

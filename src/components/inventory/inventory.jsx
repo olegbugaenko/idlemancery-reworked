@@ -458,7 +458,7 @@ export const Inventory = ({}) => {
 
 }
 
-export const InventoryCard = React.memo(({ isChanged, allowMultiConsume, isConsumable, isRare, isSelected, id, name, amount, balance, breakDown, isConsumed, cooldownProg, cooldown, onFlash, onPurchase, onShowDetails, onEditConfig, isMobile}) => {
+export const InventoryCard = React.memo(({ isChanged, eta, allowMultiConsume, isConsumable, isRare, isSelected, id, name, amount, balance, breakDown, isConsumed, cooldownProg, cooldown, onFlash, onPurchase, onShowDetails, onEditConfig, isMobile}) => {
     const elementRef = useRef(null);
 
     useFlashOnLevelUp(isConsumed, onFlash, elementRef);
@@ -513,7 +513,10 @@ export const InventoryCard = React.memo(({ isChanged, allowMultiConsume, isConsu
         <TippyWrapper content={<div className={'hint-popup'}>
             <p>{name}({formatInt(amount)})</p>
             {breakDown ? (<BreakDown breakDown={breakDown}/>) : null}
-            <p>Balance: {formatValue(balance)}</p>
+            <div className={'block'}>
+                <p>Balance: {formatValue(balance)}</p>
+                {balance < 0 ? (<p>{`${secondsToString(-eta)} to empty`}</p>) : null}
+            </div>
             <p>Left click to select</p>
             {isConsumable ? (<p>Right click to consume</p>) : null}
             {isConsumable && allowMultiConsume && amount > 10 ? (<p>Right click + CTRL to consume {formatInt(0.1*amount)}</p>) : null}
@@ -534,6 +537,10 @@ export const InventoryCard = React.memo(({ isChanged, allowMultiConsume, isConsu
     }
 
     if(prevProps.amount !== currProps.amount) {
+        return false;
+    }
+
+    if(prevProps.eta !== currProps.eta && (currProps.eta < 0 || prevProps.eta < 0)) {
         return false;
     }
 
@@ -710,7 +717,7 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
                         </div>) : null}
 
                         <div className={'block'}>
-                            {item.duration ? (<div className={'flex-container consumption-block'}>
+                            {item.isConsumable ? (<div className={'flex-container consumption-block'}>
                                 <div className={'stats'}>
                                     <p>Consumption Cooldown: {secondsToString(item.consumptionCooldown)}</p>
                                     <p>Consumed amount: {formatInt(item.numConsumed)}</p>
@@ -790,11 +797,11 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
                 </PerfectScrollbar>
             </div>
             {isEditing ? (<div className={'buttons flex-container main-buttons'}>
-                <button disabled={!isChanged} onClick={onSave}>Save</button>
-                <TippyWrapper content={<div className={'hint-popup'}>Pinning item will make it visible at resources panel</div> }>
+                <button className={'primary-action'} disabled={!isChanged} onClick={onSave}>Save</button>
+                {/*<TippyWrapper content={<div className={'hint-popup'}>Pinning item will make it visible at resources panel</div> }>
                     <button onClick={togglePinned}>{details?.isPinned ? 'Unpin' : 'Pin'}</button>
-                </TippyWrapper>
-                <button onClick={onCancel}>Cancel</button>
+                </TippyWrapper>*/}
+                <button className={'warning-action'} onClick={onCancel}>Cancel</button>
             </div>) : null}
         </>
     )

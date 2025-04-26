@@ -179,7 +179,7 @@ export class ActionListsSubmodule extends GameModule {
         for (const [id, val] of Object.entries(initialResourceBalance)) {
             const net = val.current + val.income - val.consumption;
             console.log('Pre Iter: check for push '+id+ ' :', net, val, potentialConsumption.has(id));
-            if (net < 0 || potentialConsumption.has(id)) {
+            if (net < 0 || potentialConsumption.has(id) || val.current < 0) {
                 keysToTrack.push(id);
             }
         }

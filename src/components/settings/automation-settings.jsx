@@ -688,8 +688,8 @@ export const AutomatedItem = ({
         </div>
         <div className={'col auto-actions-wrap'}>
             {isEditing ? (<div className={'buttons'}>
-                <button disabled={!isChanged} onClick={saveData}>Save</button>
-                <button onClick={cancelEditing}>Cancel</button>
+                <button className={'primary-action'} disabled={!isChanged} onClick={saveData}>Save</button>
+                <button className={'warning-action'} onClick={cancelEditing}>Cancel</button>
             </div> ) : (<div className={'buttons'}>
                 <button onClick={() => {setEditing(true)}}>Edit</button>
             </div> )}

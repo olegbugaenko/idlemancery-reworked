@@ -22,6 +22,7 @@ import CustomFiltersList from "../shared/custom-filter-list.jsx";
 import {useAppContext} from "../../context/ui-context";
 
 import {useDrag} from "../../custom-libs/dnd";
+import {CustomButton} from "../shared/buttons/custom-button.jsx";
 
 const ACTIONS_SEARCH_SCOPES = [{
     id: 'name',
@@ -819,6 +820,12 @@ const DraggableActionCard = ({ id, index, ...props }) => {
 export const ActionCard = React.memo(({ id, category, monitored, entityEfficiency, isEditingList, index, name, level, max, xp, maxXP, xpRate, isActive, effort, isLeveled, focused, isTraining, actionEffect, currentEffects, potentialEffects, isHidden, onFlash, onSelect, onActivate, onShowDetails, toggleHiddenAction, missingResourceId, isSelected, tags, ...props}) => {
     const elementRef = useRef(null);
 
+    useEffect(() => {
+        return () => {
+            elementRef.current = null;
+        };
+    }, []);
+
     const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
 
     useFlashOnLevelUp(isLeveled, onFlash, elementRef);
@@ -908,38 +915,46 @@ export const ActionCard = React.memo(({ id, category, monitored, entityEfficienc
                         </div>
                         <div className={'buttons'}>
                             <div className={'buttons-inner-wrap'}>
-                                {isActive ? <TippyWrapper content={<div className={'hint-popup'}>Stop Action</div> }>
-                                        <div className={'icon-content interface-icon small'} onClick={(e) => {
-                                            e.preventDefault();
-                                            e.stopPropagation();
-                                            onActivate()
-                                        }}>
-                                            <img src={"icons/interface/pause.png"}/>
-                                        </div>
-                                    </TippyWrapper> : <TippyWrapper content={<div className={'hint-popup'}>Start Action</div> }>
-                                        <div id={`activate_${id}`} className={'icon-content interface-icon small'} onClick={(e) => {
-                                            e.preventDefault();
-                                            e.stopPropagation();
-                                            if(currentTourId === 'initial') {
-                                                unlockNextById(8);
-                                            }
-                                            if(currentTourId === 'actions') {
-                                                unlockNextById(7);
-                                            }
-                                            onActivate(id)
-                                        }}>
-                                            <img src={"icons/interface/run.png"}/>
-                                        </div>
-                                    </TippyWrapper> }
-                                <TippyWrapper content={<div className={'hint-popup'}>{isHidden ? 'Show Action' : 'Hide Action'}</div> }>
-                                    <div className={'icon-content interface-icon small'} onClick={(e) => {
+                                {isActive ?
+                                        <CustomButton
+                                            className={'icon-content interface-icon small clickable-icon'}
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                onActivate()
+                                            }}
+                                            iconId={'pause'}
+                                        >
+                                            Stop Action
+                                        </CustomButton> :
+                                        <CustomButton
+                                            id={`activate_${id}`}
+                                            className={'icon-content interface-icon small clickable-icon'}
+                                            iconId={'run'}
+                                            onClick={(e) => {
+                                              e.preventDefault();
+                                              e.stopPropagation();
+                                              if(currentTourId === 'initial') {
+                                                  unlockNextById(8);
+                                              }
+                                              if(currentTourId === 'actions') {
+                                                  unlockNextById(7);
+                                              }
+                                              onActivate(id)
+                                            }} >
+                                            Run Action
+                                        </CustomButton>}
+                                <CustomButton
+                                    className={'icon-content interface-icon small clickable-icon'}
+                                    onClick={(e) => {
                                         e.preventDefault();
                                         e.stopPropagation();
                                         toggleHiddenAction(id, !isHidden)
-                                    }}>
-                                        {isHidden ? (<img src={"icons/interface/icon_show.png"}/>) : (<img src={"icons/interface/icon_hide.png"}/>)}
-                                    </div>
-                                </TippyWrapper>
+                                    }}
+                                    iconId={isHidden ? 'icon_show' : 'icon_hide'}
+                                >
+                                    {isHidden ? 'Show Action' : 'Hide Action'}
+                                </CustomButton>
                             </div>
                             {focused && focused.isFocused ? (
                                 <TippyWrapper content={<div className={'hint-popup'}>

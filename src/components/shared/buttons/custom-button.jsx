@@ -1,31 +1,52 @@
-import React from "react";
-import {TippyWrapper} from "../tippy-wrapper.jsx";
+import React, { useEffect, useRef } from "react";
+import { TippyWrapper } from "../tippy-wrapper.jsx";
 
-export const CustomButton = ({ children, iconId, ...props }) => {
+export const CustomButton = ({ children, iconId, onClick, ...props }) => {
+    const iconRef = useRef(null);
 
-    if(!iconId) {
-        return (<button
-            {...props}
-        >{children}</button>)
+    const handleClick = (e) => {
+        if (iconRef.current) {
+            void iconRef.current.offsetWidth;
+            iconRef.current.classList.add('glow-anim');
+            setTimeout(() => {
+                if (iconRef.current) {
+                    iconRef.current.classList.remove('glow-anim');
+                }
+            }, 1000);
+        }
+
+        // Викликаємо оригінальний onClick, якщо він переданий
+        if (typeof onClick === 'function') {
+            onClick(e);
+        }
+    };
+
+    if (!iconId) {
+        return (
+            <button {...props} onClick={handleClick}>
+                {children}
+            </button>
+        );
     }
 
-    const iconProps = {
-        ...props,
-        className: `icon-content interface-icon ${props.className ?? ''} ${props.disabled ? ' disabled' : ''}`
-    }
+    const btnIcon = (
+        <div className="icon-shadow-wrapper">
+            <div
+                {...props}
+                onClick={handleClick}
+                className={`icon-content interface-icon ${props.className ?? ''} ${props.disabled ? 'disabled' : ''}`}
+                ref={iconRef}
+            >
+                <img src={`icons/interface/${iconId}.png`} />
+            </div>
+        </div>
+    );
 
-    const btnIcon = (<div
-        {...iconProps}
-    >
-        <img src={`icons/interface/${iconId}.png`}/>
-    </div> );
+    if (!children) return btnIcon;
 
-    if(!children) return btnIcon;
-
-
-
-    return (<TippyWrapper content={<div className={'hint-popup'}>{children}</div>}>
-        {btnIcon}
-    </TippyWrapper> )
-
-}
+    return (
+        <TippyWrapper content={<div className={'hint-popup'}>{children}</div>}>
+            {btnIcon}
+        </TippyWrapper>
+    );
+};

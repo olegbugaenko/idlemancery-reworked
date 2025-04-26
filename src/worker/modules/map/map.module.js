@@ -18,7 +18,7 @@ export class MapModule extends GameModule {
             level: 0,
         }
         this.mapTier = 0;
-        this.relevantMapVersion = 14;
+        this.relevantMapVersion = 17;
         this.currentMapVersion = null;
 
         this.lists = new MapTileListsSubmodule();
@@ -100,7 +100,8 @@ export class MapModule extends GameModule {
                         metaData: {
                             id: 'settlement',
                             name: 'Settlement',
-                            color: '#666'
+                            color: '#666',
+                            icon: 'city'
                         },
                         drops: [],
                         costMult: 0,
@@ -122,7 +123,7 @@ export class MapModule extends GameModule {
         const metaData = this.tileTypes[expectType];
         const resources = gameResources.listResourcesByTags(['gatherable']);
         const huntables = gameResources.listResourcesByTags(['hunting']);
-        const complexity = Math.max(1, (distance-2) + (Math.random() + 0.75*(tier**0.5))*(distance-2 + 3*(tier**0.5)))*Math.pow(1.3, tier);
+        const complexity = Math.max(1, (distance-2) + 5*tier + (Math.random() + 0.75*(tier**0.5))*(distance-2 + 3*(tier**0.5)))*Math.pow(1.3, tier);
         return {
             distance,
             i,
@@ -446,8 +447,8 @@ export class MapModule extends GameModule {
     mapGenerationEffortBounds() {
         const level = this.mapCreationSettings.level ?? 0;
         const maxDist = 7*Math.sqrt(2);
-        const maxComplexity = Math.max(1, (maxDist-2) + (1 + 0.75*(level**0.5))*(maxDist-2 + 3*(level**0.5)))*Math.pow(1.3, level)
-        const minComplexity = Math.max(1, (-1 + 0.75*(level**0.5))*(-1 + 3*(level**0.5)))*Math.pow(1.3, level)
+        const maxComplexity = Math.max(1, (maxDist-2) + 5*level + (1 + 0.75*(level**0.5))*(maxDist-2 + 3*(level**0.5)))*Math.pow(1.3, level)
+        const minComplexity = Math.max(1, (-1 + 5*level + 0.75*(level**0.5))*(-1 + 3*(level**0.5)))*Math.pow(1.3, level)
         let result = {
             min: 0.25 * minComplexity ** 1.75,
             max: maxComplexity ** 1.75,

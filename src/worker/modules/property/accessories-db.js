@@ -899,7 +899,7 @@ export const registerAccessoriesStage1 = () => {
             multiplier: {
                 effects: {
                     'routine_learning_speed': {
-                        A: 0.1,
+                        A: 0.05,
                         B: 1,
                         C: 1.01,
                         type: 3,

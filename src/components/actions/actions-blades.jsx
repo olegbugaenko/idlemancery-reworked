@@ -270,10 +270,26 @@ export const ListEditor = React.memo(({
     }
 
     const addAutotriggerRule = () => {
+        if(currentTourId === 'lists-automation') {
+            unlockNextById(4);
+        }
         onAddAutotriggerRule()
     }
 
     const setAutotriggerRuleValue = (index, key, value) => {
+        if(currentTourId === 'lists-automation') {
+            let isRulesValid = false;
+            if(editing.autotrigger.rules?.length >= 2) {
+                if(editing.autotrigger.rules[0].compare_type !== editing.autotrigger.rules[1].compare_type
+                    && editing.autotrigger.rules.every(one => one.condition) && editing.autotrigger.rules.every(one => one.compare_type)) {
+                    isRulesValid = true;
+                }
+            }
+            console.log('Rules: ', editing?.autotrigger.rules, isRulesValid);
+            if(isRulesValid) {
+                unlockNextById(6)
+            }
+        }
         onSetAutotriggerRuleValue(index, key, value)
     }
 
@@ -282,6 +298,12 @@ export const ListEditor = React.memo(({
     }
 
     const setAutotriggerPattern = (pattern) => {
+        if(currentTourId === 'lists-automation') {
+            const trimmedPattern = pattern.toLowerCase().trim();
+            if(trimmedPattern === '1 or 2' || trimmedPattern === '1 and 2') {
+                unlockNextById(8);
+            }
+        }
         onSetAutotriggerPattern(pattern)
     }
 
@@ -391,11 +413,11 @@ export const ListEditor = React.memo(({
                     {automationUnlocked ? (<div className={'autotrigger-settings autoconsume-setting block'}>
                         <div className={'rules-header flex-container'}>
                             <p>Autotrigger rules: {editing?.autotrigger?.rules?.length ? null : 'None'}</p>
-                            <label>
+                            <label className={'autotrigger-on-off'}>
                                 <input type={'checkbox'} checked={editing.autotrigger?.isEnabled} onChange={toggleAutotrigger}/>
                                 {editing.autotrigger?.isEnabled ? ' ON' : ' OFF'}
                             </label>
-                            {isEditing ? (<button onClick={addAutotriggerRule}>Add rule (AND)</button>) : null}
+                            {isEditing ? (<button id={'add-rule-button'} onClick={addAutotriggerRule}>Add rule (AND)</button>) : null}
                             <HowToSign scope={'lists-automation'}/>
                         </div>
                         <div className={'priority-line flex-container'}>
@@ -418,14 +440,17 @@ export const ListEditor = React.memo(({
             </PerfectScrollbar>
         </div>
         {isEditing ? (<div className={'buttons main-buttons flex-container'}>
-            <button onClick={() => saveAndClose(false)}>{listData?.id ? 'Save' : 'Create'}</button>
-            <button className={'save-and-close'} onClick={() => {
+            <button className={'primary-action'} onClick={() => saveAndClose(false)}>{listData?.id ? 'Save' : 'Create'}</button>
+            <button className={'primary-action save-and-close'} onClick={() => {
                 if(currentTourId === 'action-lists') {
+                    unlockNextById(10)
+                }
+                if(currentTourId === 'lists-automation') {
                     unlockNextById(10)
                 }
                 saveAndClose(true)
             }}>{listData?.id ? 'Save & Close' : 'Create & Close'}</button>
-            <button onClick={onCloseList}>Cancel</button>
+            <button className={'warning-action'} onClick={onCloseList}>Cancel</button>
         </div>) : null}
     </> )
 }, ((prevProps, currentProps) => {

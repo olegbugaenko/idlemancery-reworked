@@ -33,11 +33,93 @@ span.close:hover {
 
 
 button {
-    background-color: #111;
+    background: linear-gradient(
+            to bottom,
+            rgb(30, 30, 40) 0%,
+            rgb(25, 25, 32) 15%,
+            rgb(10, 10, 10) 40%,
+            rgb(10, 10, 10) 60%,
+            rgb(25, 25, 32) 85%,
+            rgb(30, 30, 40) 100%
+    );
+    border: 1px solid rgb(50, 60, 60);
     padding: 8px 16px;
     box-shadow: none;
-    border: 1px solid #222233;
     cursor: pointer;
+    border-radius: 3px;
+    position: relative;
+}
+
+
+button:hover {
+    background: linear-gradient(
+            to bottom,
+            rgb(40, 40, 50) 0%,
+            rgb(35, 35, 42) 15%,
+            rgb(20, 20, 20) 40%,
+            rgb(20, 20, 20) 60%,
+            rgb(35, 35, 42) 85%,
+            rgb(40, 40, 50) 100%
+    );
+    border: 1px solid rgb(90, 100, 100);
+    padding: 8px 16px;
+    box-shadow: 0 0 14px rgb(90, 90, 105);
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+button.primary-action {
+    background: linear-gradient(
+            to bottom,
+            rgb(35, 40, 50) 0%,
+            rgb(25, 30, 40) 20%,
+            rgb(15, 15, 15) 40%,
+            rgb(15, 15, 15) 60%,
+            rgb(25, 30, 40) 80%,
+            rgb(35, 40, 50) 100%
+    );
+    border-color: rgb(40, 80, 110);
+}
+
+button.primary-action:hover {
+    background: linear-gradient(
+            to bottom,
+            rgb(40, 50, 72) 0%,
+            rgb(30, 37, 60) 20%,
+            rgb(15, 20, 25) 40%,
+            rgb(15, 20, 25) 60%,
+            rgb(30, 37, 60) 80%,
+            rgb(40, 50, 72) 100%
+    );
+    border-color: rgb(45, 94, 130);
+    box-shadow: 0 0 14px rgb(40, 50, 72);
+}
+
+button.warning-action {
+    background: linear-gradient(
+            to bottom,
+            #502110 0%,
+            #322211 12%,
+            #1f1111 40%,
+            #1f1111 60%,
+            #322211 88%,
+            #502110 100%
+    );
+    border-color: #731;
+}
+
+button.warning-action:hover {
+    background: linear-gradient(
+            to bottom,
+            #631 0%,
+            #423211 12%,
+            #271b11 40%,
+            #271b11 60%,
+            #422211 88%,
+            #631 100%
+    );
+    border-color: #831;
+    box-shadow: 0 0 14px #623211;
 }
 
 button.icon-button {
@@ -58,6 +140,31 @@ button:hover {
 
 button:disabled {
     background-color: #333333;
+}
+
+@keyframes glow-burst {
+    0%   { box-shadow: 0 0 0px rgba(255,255,250,0.5); }
+    50%  { box-shadow: 0 0 18px rgba(255,255,250,1); }
+    100% { box-shadow: 0 0 0px rgba(255,255,250,0.0); }
+}
+
+@keyframes glow-burst-icon {
+    0%   { box-shadow: 0 0 8px rgba(255,255,255,1); }
+    50%  { box-shadow: 0 0 24px rgba(255,255,255,1); }
+    100% { box-shadow: 0 0 8px rgba(255,255,255,1); }
+}
+
+button:active {
+    animation: glow-burst 0.5s ease-out;
+}
+
+.icon-shadow-wrapper {
+    display: inline-block;
+}
+
+.interface-icon.glow-anim {
+    animation: glow-burst-icon 0.5s ease-out;
+    /*box-shadow: 0 0 15px rgba(255,100,250,0.9);*/
 }
 
 body {
@@ -171,7 +278,7 @@ p.small-hint, span.small-hint {
 
 
 .content-wrap .sidebar {
-    width: 320px;
+    width: 330px;
     height: calc(100% - 10px);
     background: var(--boxbg);
     overflow-x: visible;
@@ -253,7 +360,7 @@ p.small-hint, span.small-hint {
 }
 
 .content-wrap .sidebar .resource-item .resource-amount {
-    width: 125px;
+    width: 145px;
     padding-left: 4px;
     font-size: 13px;
 }
@@ -263,7 +370,7 @@ p.small-hint, span.small-hint {
 }
 
 .content-wrap .sidebar .resource-item .resource-balance {
-    width: 55px;
+    width: 60px;
     padding-left: 4px;
     font-size: 13px;
 }
@@ -844,6 +951,12 @@ h4 {
     border-bottom: 1px solid #777777;
 }
 
+.hint-popup .block {
+    padding-top: 4px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #333333;
+}
+
 .tags-container {
     display: flex;
     flex-wrap: wrap;
@@ -1236,6 +1349,13 @@ h4 {
 
 .card.item.shop-card {
     width: 220px;
+}
+
+.card.item.shop-card.shop-upgrade .title {
+    width: 180px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .card.item.shop-card .autobuy-label {
@@ -2152,6 +2272,16 @@ span.highlighted-span.yellow {
     background: rgba(159, 230, 255, 0.2);
 }
 
+.map-container .map-row .map-tile.running:after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba(100, 255, 100, 0.4);
+}
+
 .block .drop-row {
     display: flex;
     justify-content: space-between;
@@ -2737,11 +2867,13 @@ h4.title span {
 }
 
 .detail-blade .blade-outer {
-    height: calc(100% - 40px);
+    height: calc(100% - 50px);
 }
 
 .detail-blade .main-buttons {
-    height: 40px;
+    border-top: 1px solid #777777;
+    padding-top: 8px;
+    height: 50px;
 }
 
 .hint-popup .etas-milestones .flex-row {
@@ -3032,11 +3164,11 @@ ul.menu li.additional.add-custom-filter:hover span {
 
 @media screen and (max-width: 1700px) {
     .action-lists-panel {
-        height: 70px;
+        height: 80px;
     }
 
     .actions-wrap .actions .list-wrap {
-        height: calc(100% - 150px);
+        height: calc(100% - 160px);
     }
 }
 

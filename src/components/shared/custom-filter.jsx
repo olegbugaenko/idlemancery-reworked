@@ -293,10 +293,10 @@ const CustomFilter = React.memo(({
 
             {/* Save / Cancel buttons */}
             <div style={{ marginTop: '16px' }}>
-                <button className={'save-custom-filter'} onClick={handleSave} style={{ marginRight: '8px' }}>
+                <button className={'save-custom-filter primary-action'} onClick={handleSave} style={{ marginRight: '8px' }}>
                     Save
                 </button>
-                <button onClick={handleCancel}>Cancel</button>
+                <button className={'warning-action'} onClick={handleCancel}>Cancel</button>
             </div>
         </div>
     );

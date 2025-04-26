@@ -370,7 +370,7 @@ export const initSpellsDB1 = () => {
                 resources: {
                     mana: {
                         A: 1.5,
-                        B: 15*getCostReduction('spell_perfection_illusion'),
+                        B: 15*getCostReduction('spell_body_catalyst'),
                         type: 1,
                     }
                 }
