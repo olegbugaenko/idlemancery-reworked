@@ -178,4 +178,7 @@ v0.1.4
    6.e) Automations
 7. Refine UI
 8. Confirmation for using dangerous flasks
-9. Rituals
+
+NEW CONTENT
+1. Machinery (automates part of crafting)
+2. Rituals

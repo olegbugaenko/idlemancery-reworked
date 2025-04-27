@@ -47,8 +47,8 @@ export class MainModule extends GameModule {
 
 
         this.eventHandler.registerHandler('initialize-game', (data) => {
-            // console.log('gameCoreBeforeInited', GameCore.instance);
-            gameCore.initialize();
+            console.log('gameCoreBeforeInited', data);
+            gameCore.initialize({ is_demo: data.is_demo });
             // console.log('gameCoreInited', GameCore.instance);
             this.eventHandler.sendData('initialized', {...data, received: true});
             // console.log('sent initialized')
@@ -66,7 +66,7 @@ export class MainModule extends GameModule {
         })
 
         this.eventHandler.registerHandler('start-ticking', () => {
-            const cheat = 4;
+            const cheat = 1;
             // const speedUpMode = gameCore.getModule('mage').bankedTime?.speedUpFactor ?? 1;
             // console.log('gameCore', GameCore.instance, speedUpMode);
             gameCore.startTicking(100, () => 0.1*cheat*(gameCore.getModule('mage').bankedTime?.speedUpFactor ?? 1), () => {

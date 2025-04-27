@@ -518,7 +518,7 @@ export const registerActionsStage1 = () => {
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_strength',
-            level: 20000,
+            level: 200000,
         }],
         attributes: {
             baseXPCost: 100,
@@ -578,6 +578,7 @@ export const registerActionsStage1 = () => {
         name: 'Quarrying',
         category: ACTION_CATS.OTHER,
         isAbstract: false,
+        minDemoVersion: 2,
         allowedImpacts: ['effects'],
         description: 'Work hard in quarry trying to find some rocks containing precious minerals',
         level: 1,
@@ -624,6 +625,7 @@ export const registerActionsStage1 = () => {
         tags: ["action", "activity", "physical", "manual-labor"],
         name: 'Mining',
         isAbstract: false,
+        minDemoVersion: 2,
         category: ACTION_CATS.OTHER,
         allowedImpacts: ['effects'],
         description: 'Go to mine and get some iron ore',

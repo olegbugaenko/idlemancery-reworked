@@ -1,6 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const webpack = require("webpack");
 
 module.exports = {
     entry: './src/index.js',
@@ -53,6 +54,9 @@ module.exports = {
             patterns: [
                 { from: 'public', to: '.' } // Копіюємо вміст папки 'public' до кореня 'dist'
             ],
+        }),
+        new webpack.DefinePlugin({
+            'IS_DEMO': JSON.stringify(process.env.IS_DEMO || '0'),
         }),
     ],
     devServer: {

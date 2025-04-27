@@ -22,6 +22,7 @@ function App() {
     const { setOpenedTab } = useAppContext();
 
     useEffect(() => {
+        console.warn('ENV: ', window.IS_DEMO);
         sendData('initialize-game', { a: 1 });
 
         // Cleanup

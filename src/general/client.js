@@ -18,7 +18,7 @@ export function useWorkerClient(worker) {
     // Function to send data to the worker
     const sendData = useCallback((event, payload) => {
         if (worker) {
-            worker.postMessage(JSON.stringify({ event, payload }));
+            worker.postMessage(JSON.stringify({ event, payload: {...(payload || {}), is_demo: window.IS_DEMO } }));
         }
     }, [worker]);
 

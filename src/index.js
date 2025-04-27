@@ -27,6 +27,8 @@ import AppProvided from "./App";
 
 // *** HACK-END *** //
 
+window.IS_DEMO = IS_DEMO;
+
 const container = document.getElementById('root');
 const root = ReactDOM.createRoot(container);
 
