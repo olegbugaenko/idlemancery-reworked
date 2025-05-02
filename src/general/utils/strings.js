@@ -86,3 +86,23 @@ export function secondsToString(seconds) {
 
     return result;
 }
+
+export const dateToString = (d) => {
+    const date = new Date(d); // або new Date()
+
+    const parts = new Intl.DateTimeFormat('en-US', {
+        weekday: 'short',    // Mon
+        month: 'long',       // April
+        day: 'numeric',      // 27
+        year: 'numeric',     // 2025
+        hour: '2-digit',     // 02
+        minute: '2-digit',   // 35
+        second: '2-digit',   // 07
+        hour12: false        // 24-годинний формат
+    }).formatToParts(date);
+
+
+    const map = Object.fromEntries(parts.map(p => [p.type, p.value]));
+    const formatted = `${map.weekday} ${map.month} ${map.day}, ${map.year} ${map.hour}:${map.minute}:${map.second}`;
+    return formatted;
+}

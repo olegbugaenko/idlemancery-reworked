@@ -9,7 +9,7 @@ import { formatInt, secondsToString } from "../../general/utils/strings";
 export const PersonageLevel = () => {
     const worker = useContext(WorkerContext);
     const { onMessage, sendData } = useWorkerClient(worker);
-    const { setActivePopup } = useAppContext();
+    const { togglePopup } = useAppContext();
     const [mageData, setMageData] = useState({});
     const elementRef = useRef(null);
 
@@ -22,7 +22,7 @@ export const PersonageLevel = () => {
     return mageData ? (
         <div className={'mage-wrap flex-container'} ref={elementRef}>
             <div className={'level'} id={'level'}>
-                <span className={`skills-button ${mageData.skillPoints > 0 ? 'highlight' : ''}`} onClick={() => setActivePopup('skills')}>
+                <span className={`skills-button ${mageData.skillPoints > 0 ? 'highlight' : ''}`} onClick={() => togglePopup('skills')}>
                     <img src={'icons/ui/sp.png'} />
                     <span>{mageData.skillPoints}</span>
                 </span>

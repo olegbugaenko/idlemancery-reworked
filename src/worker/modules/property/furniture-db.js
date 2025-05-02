@@ -394,6 +394,49 @@ export const registerFurnitureStage1 = () => {
         }),
     })
 
+    registerFurniture('furniture_scholar_lump', {
+        tags: ["furniture", "upgrade", "purchaseable", "actions"],
+        name: 'Scholar Lamp',
+        description: 'A special lamp that creates an atmosphere ideal for learning and mental training.',
+        level: 0,
+        maxLevel: 4,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_vocabulary') > 0 && gameEntity.getLevel('furniture_table') > 0;
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'mental_training_learning_rate': {
+                        A: 0.25,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 1,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 400*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 1,
+                type: 0
+            }
+        }),
+    })
+
     registerFurniture('furniture_cot', {
         tags: ["furniture", "upgrade", "purchaseable", "actions"],
         name: 'Cot',
@@ -528,7 +571,7 @@ export const registerFurnitureStage1 = () => {
         name: 'Yoga Carpet',
         description: 'Use it for your daily yoga practices, increasing yoga XP rate',
         level: 0,
-        maxLevel: 6,
+        maxLevel: 2,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_yoga_manual') > 0;
         },
@@ -572,6 +615,7 @@ export const registerFurnitureStage1 = () => {
         description: 'A wide and comfortable sofa designed for prolonged periods of deep thought and reflection. Its soft cushions and ergonomic design allow you to stay focused and relaxed during extended mental training sessions.',
         level: 0,
         maxLevel: 4,
+        minDemoVersion: 2,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_patience',
@@ -621,6 +665,7 @@ export const registerFurnitureStage1 = () => {
         description: 'A minimalist desk designed to foster focus and tranquility, enhancing the regeneration of your mental energy.',
         level: 0,
         maxLevel: 6,
+        minDemoVersion: 2,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_patience',
@@ -669,6 +714,7 @@ export const registerFurnitureStage1 = () => {
         description: 'A carefully curated bookshelf that inspires learning and accelerates the completion of courses.',
         level: 0,
         maxLevel: 6,
+        minDemoVersion: 2,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_patience',
@@ -722,6 +768,7 @@ export const registerFurnitureStage1 = () => {
             id: 'attribute_strength',
             level: 3000,
         }],
+        minDemoVersion: 2,
         unlockCondition: () => {
             return true;
         },
@@ -809,6 +856,7 @@ export const registerFurnitureStage1 = () => {
         description: 'Provide better inventory to improve physical training efficiency',
         level: 0,
         maxLevel: 10,
+        minDemoVersion: 2,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_strength',
@@ -1077,6 +1125,7 @@ export const registerFurnitureStage1 = () => {
         description: 'Improves your conjuration magic efficiency',
         level: 0,
         maxLevel: 4,
+        minDemoVersion: 2,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_magic_ability',
@@ -1264,6 +1313,7 @@ export const registerFurnitureStage1 = () => {
         name: 'Masterwork Bench',
         description: 'A massive and meticulously crafted workbench that requires both strength and skill to wield effectively. In the hands of a true master, it turns raw materials into works of perfection, pushing the limits of craftsmanship beyond the ordinary.',
         level: 0,
+        minDemoVersion: 2,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_crafting_courses') > 0;
         },
@@ -1674,6 +1724,7 @@ export const registerFurnitureStage1 = () => {
         description: 'A dedicated workspace for crafting inks, equipped with a herb press and precise mixing tools. Increases ink crafting efficiency',
         level: 0,
         maxLevel: 4,
+        minDemoVersion: 2,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_ink_crafting') > 0;
         },
@@ -1719,6 +1770,7 @@ export const registerFurnitureStage1 = () => {
     registerFurniture('furniture_waterPump', {
         tags: ["furniture", "upgrade", "purchaseable", "other", "planting"],
         name: 'Water Pump',
+        minDemoVersion: 2,
         description: 'A powerful machine that allows to supply water to your plantations',
         level: 0,
         unlockCondition: () => {
@@ -1769,6 +1821,7 @@ export const registerFurnitureStage1 = () => {
     registerFurniture('furniture_papercutting_station', {
         tags: ["furniture", "upgrade", "purchaseable", "resource", "crafting"],
         name: 'Paper Cutting Station',
+        minDemoVersion: 2,
         description: 'A small but complicated mechanism for cutting papers',
         level: 0,
         getMaxLevel: () => {
@@ -1819,6 +1872,7 @@ export const registerFurnitureStage1 = () => {
     registerFurniture('furniture_preservation_rack', {
         tags: ["furniture", "upgrade", "purchaseable", "resource", "hunting"],
         name: 'Preservation Rack',
+        minDemoVersion: 2,
         description: 'Cured meats, drying herbs, and trophies hang neatly, allowing you to save and store more from each hunt.',
         level: 0,
         unlockedBy: [{

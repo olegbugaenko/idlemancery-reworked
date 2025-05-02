@@ -136,9 +136,16 @@ const stepsInitial = [
     },
     {
         target: '#statistics',
-        content: 'You can also click here to view some neat stats about your game. That’s all for now—good luck!',
+        content: 'You can also click here to view some neat stats about your game.',
         disableOverlayClose: true, // не даємо закрити кліком поза
         spotlightClicks: true
+    },
+    {
+        target: '.how-to',
+        content: 'If you feel you not sure how something works - click question mark. It will show you quick interactive tutorial that can be skipped and resumed whenever you want. That’s all for now—good luck!',
+        disableBeacon: true,
+        disableOverlayClose: true,
+        spotlightClicks: true,
     }
 ];
 

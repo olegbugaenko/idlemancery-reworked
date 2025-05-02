@@ -187,6 +187,17 @@ export const InterfaceSettings = () => {
                     </div>
                     <div className={"row flex-container"}>
                         <div className={'col'}>
+                            <label>
+                                <input type={'checkbox'} checked={!settings?.hideStoryPopup} onChange={(e) => setSettingChanged('hideStoryPopup', !settings?.hideStoryPopup)}/>
+                                Show mini-stories popup
+                            </label>
+                        </div>
+                        <div className={'col'}>
+                            <p className={'hint'}>You will still be able to access it through "Story" window</p>
+                        </div>
+                    </div>
+                    <div className={"row flex-container"}>
+                        <div className={'col'}>
                             <p>Notation</p>
                         </div>
                         <div className={'col'}>

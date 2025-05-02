@@ -33,6 +33,7 @@ export const registerCourseItemsStage1 = () => {
     registerCourse('course_body_capability', {
         name: 'Body Capability',
         tags: ['physical', 'enchancement'],
+        minDemoVersion: 2,
         attributes: {
             basicDuration: 60,
         },
@@ -75,6 +76,7 @@ export const registerCourseItemsStage1 = () => {
     registerCourse('course_mind_improvement', {
         name: 'Improved Mind',
         tags: ['mental', 'enchancement'],
+        minDemoVersion: 2,
         attributes: {
             basicDuration: 60,
         },
@@ -113,6 +115,7 @@ export const registerCourseItemsStage1 = () => {
     registerCourse('course_coins_improvement', {
         name: 'Work Ethic',
         tags: ['social', 'enchancement'],
+        minDemoVersion: 2,
         attributes: {
             basicDuration: 60,
         },
@@ -151,6 +154,7 @@ export const registerCourseItemsStage1 = () => {
     registerCourse('course_navigation', {
         name: 'Improved Navigation',
         tags: ['mental', 'enchancement'],
+        minDemoVersion: 2,
         attributes: {
             basicDuration: 60,
         },
@@ -189,6 +193,7 @@ export const registerCourseItemsStage1 = () => {
     registerCourse('course_strength_intensity', {
         name: 'Physical Practices',
         tags: ['physical', 'enchancement'],
+        minDemoVersion: 2,
         attributes: {
             basicDuration: 120,
         },
@@ -227,6 +232,7 @@ export const registerCourseItemsStage1 = () => {
     registerCourse('course_patience_intensity', {
         name: 'Concentration',
         tags: ['mental', 'enchancement'],
+        minDemoVersion: 2,
         attributes: {
             basicDuration: 120,
         },
@@ -265,6 +271,7 @@ export const registerCourseItemsStage1 = () => {
     registerCourse('course_charisma_intensity', {
         name: 'Influence Training',
         tags: ['social', 'enchancement'],
+        minDemoVersion: 2,
         attributes: {
             basicDuration: 120,
         },
@@ -304,6 +311,7 @@ export const registerCourseItemsStage1 = () => {
     registerCourse('course_mental_focus_training', {
         name: 'Mental Focus Training',
         tags: ['mental', 'reductive'],
+        minDemoVersion: 2,
         attributes: {
             basicDuration: 120,
         },
@@ -348,6 +356,7 @@ export const registerCourseItemsStage1 = () => {
     registerCourse('course_art_of_persuasion', {
         name: 'Art of Persuasion',
         tags: ['social', 'reductive'],
+        minDemoVersion: 2,
         attributes: {
             basicDuration: 120,
         },
@@ -391,6 +400,7 @@ export const registerCourseItemsStage1 = () => {
     registerCourse('course_physical_efficiency', {
         name: 'Physical Efficiency',
         tags: ['physical', 'reductive'],
+        minDemoVersion: 2,
         attributes: {
             basicDuration: 120,
         },
@@ -434,6 +444,7 @@ export const registerCourseItemsStage1 = () => {
     registerCourse('course_cognitive_focus', {
         name: 'Cognitive Focus',
         tags: ['mental', 'reductive'],
+        minDemoVersion: 2,
         attributes: {
             basicDuration: 130,
         },
@@ -478,6 +489,7 @@ export const registerCourseItemsStage1 = () => {
     registerCourse('course_magical_focus', {
         name: 'Magical Focus',
         tags: ['magical', 'reductive'],
+        minDemoVersion: 2,
         attributes: {
             basicDuration: 130,
         },
@@ -526,6 +538,7 @@ export const registerCourseItemsStage1 = () => {
     registerCourse('course_crafting_economy', {
         name: 'Crafting Optimization',
         tags: ['magical', 'reductive'],
+        minDemoVersion: 2,
         description: 'Mastering the art of resource management, this course teaches how to minimize material waste and maximize output, making every crafted piece more cost-effective.',
         attributes: {
             basicDuration: 240,
@@ -565,6 +578,7 @@ export const registerCourseItemsStage1 = () => {
     registerCourse('course_alchemy_economy', {
         name: 'Alchemy Optimization',
         tags: ['magical', 'reductive'],
+        minDemoVersion: 2,
         description: 'A deep dive into the refined techniques of potion-making, allowing alchemists to extract the full potential of ingredients while reducing unnecessary expenditure.',
         attributes: {
             basicDuration: 240,

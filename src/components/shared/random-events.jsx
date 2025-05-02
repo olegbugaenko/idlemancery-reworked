@@ -10,7 +10,7 @@ import {TippyWrapper} from "./tippy-wrapper.jsx";
 export const RandomEventSnippet = () => {
     const worker = useContext(WorkerContext);
     const { onMessage, sendData } = useWorkerClient(worker);
-    const { setActivePopup, setOnClosePopupCb } = useAppContext();
+    const { togglePopup } = useAppContext();
 
     const [eventData, setEventData] = useState({});
     const [showMore, setShowMore] = useState(false);
@@ -22,14 +22,21 @@ export const RandomEventSnippet = () => {
     });
 
     const openEvent = (eventId) => {
-        setActivePopup('event');
+        togglePopup('event', (a) => {
+            /*if(!a) {
+                throw new Error('Invalid trigger of close');
+            }*/
+            console.log('OP');
+            sendData('set-event-data-opened', { eventId, isOpened: false });
+        });
         sendData('set-event-data-opened', { eventId, isOpened: true });
-        setOnClosePopupCb(() => (a) => {
+        /*setOnClosePopupCb(() => (a) => {
             if(!a) {
                 throw new Error('Invalid trigger of close');
             }
+            console.log('OP');
             sendData('set-event-data-opened', { eventId, isOpened: false });
-        })
+        })*/
     };
 
     const buttonData = eventData?.openedEventData ?? eventData.list?.[0];

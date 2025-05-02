@@ -22,7 +22,7 @@ export const registerSkillsStage1 = () => {
             multiplier: {
                 effects: {
                     'learning_rate': {
-                        A: 0.1,
+                        A: 0.05,
                         B: 1,
                         type: 0,
                     }
@@ -68,7 +68,7 @@ export const registerSkillsStage1 = () => {
             multiplier: {
                 effects: {
                     'mental_training_learning_rate': {
-                        A: 0.1,
+                        A: 0.05,
                         B: 1,
                         type: 0,
                     }
@@ -114,7 +114,7 @@ export const registerSkillsStage1 = () => {
             multiplier: {
                 effects: {
                     'routine_learning_speed': {
-                        A: 0.1,
+                        A: 0.05,
                         B: 1,
                         type: 0,
                     }
@@ -160,7 +160,7 @@ export const registerSkillsStage1 = () => {
             multiplier: {
                 effects: {
                     'physical_training_learn_speed': {
-                        A: 0.1,
+                        A: 0.05,
                         B: 1,
                         type: 0,
                     }
@@ -206,7 +206,7 @@ export const registerSkillsStage1 = () => {
             multiplier: {
                 effects: {
                     'mental_actions_discount': {
-                        A: 0.2,
+                        A: 0.1,
                         B: 1,
                         type: 0,
                     }
@@ -252,7 +252,7 @@ export const registerSkillsStage1 = () => {
             multiplier: {
                 effects: {
                     'routine_actions_discount': {
-                        A: 0.2,
+                        A: 0.1,
                         B: 1,
                         type: 0,
                     }
@@ -298,7 +298,7 @@ export const registerSkillsStage1 = () => {
             multiplier: {
                 effects: {
                     'physical_actions_discount': {
-                        A: 0.2,
+                        A: 0.1,
                         B: 1,
                         type: 0,
                     }
@@ -671,6 +671,13 @@ export const registerSkillsStage1 = () => {
                         B: 1,
                         type: 0,
                     }
+                },
+                effects: {
+                    physical_training_learn_speed: {
+                        A: 0.08,
+                        B: 1,
+                        type: 0,
+                    }
                 }
             },
             consumption: {
@@ -738,6 +745,54 @@ export const registerSkillsStage1 = () => {
         }),
     })
 
+
+    gameEntity.registerGameEntity('skill_physical_discount_1', {
+        tags: ["skill", "upgrade", "purchaseable"],
+        name: 'Physical Lightness',
+        description: 'Decrease effort required for doing physical activities',
+        level: 0,
+        maxLevel: 10,
+        uiPosition: {
+            left: -2,
+            top: 6,
+        },
+        iconId: 'skill_physical_discount',
+        unlockBySkills: [{ id: "skill_energy_regen_1", level: 4 }],
+        unlockCondition: () => {
+            return true;
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'physical_actions_discount': {
+                        A: 0.1,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'skill-points': {
+                        A: 1,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'skill-points': {
+                A: 0,
+                B: 1,
+                type: 0
+            }
+        }),
+    })
+
     gameEntity.registerGameEntity('skill_oak_heart', {
         tags: ["skill", "upgrade", "purchaseable"],
         name: 'Oak Heart',
@@ -760,6 +815,53 @@ export const registerSkillsStage1 = () => {
                 resources: {
                     'health': {
                         A: 0.05,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'skill-points': {
+                        A: 1,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'skill-points': {
+                A: 0,
+                B: 1,
+                type: 0
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('skill_physical_learning_1', {
+        tags: ["skill", "upgrade", "purchaseable"],
+        name: 'Physical Efficiency',
+        description: 'Increase physical training learning rate',
+        level: 0,
+        maxLevel: 10,
+        uiPosition: {
+            left: 2,
+            top: 6,
+        },
+        iconId: 'skill_physical_learn_rate',
+        unlockBySkills: [{ id: "skill_oak_heart", level: 4 }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('action_pushup') > 1;
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'physical_training_learn_speed': {
+                        A: 0.1,
                         B: 1,
                         type: 0,
                     }
@@ -845,7 +947,7 @@ export const registerSkillsStage1 = () => {
             left: 0,
             top: 8,
         },
-        unlockBySkills: [{id: 'skill_resilience', level: 4},{ id: "skill_oak_heart", level: 8 },{ id: "skill_energy_regen_1", level: 8 },{ id: "skill_oak_heart", level: 8 },{ id: "skill_general_training_9", level: 1 },{ id: "skill_general_training_8", level: 1 }],
+        unlockBySkills: [{id: 'skill_resilience', level: 4},{ id: "skill_physical_learning_1", level: 4 },{ id: "skill_physical_discount_1", level: 4 },{ id: "skill_general_training_9", level: 1 },{ id: "skill_general_training_8", level: 1 }],
         unlockCondition: () => {
             return true;
         },
@@ -1140,12 +1242,10 @@ export const registerSkillsStage1 = () => {
                         B: 1,
                         type: 0,
                     }
-                }
-            },
-            capMult: {
-                resources: {
-                    'coins': {
-                        A: 0.1,
+                },
+                effects: {
+                    routine_learning_speed: {
+                        A: 0.08,
                         B: 1,
                         type: 0,
                     }
@@ -1231,7 +1331,7 @@ export const registerSkillsStage1 = () => {
             // console.log('ACTLVL: ', )
             return gameEntity.getLevel('shop_item_backpack') >= 1
         },
-        unlockBySkills: [{ id: "skill_treasurer", level: 3 }],
+        unlockBySkills: [{ id: "skill_treasurer", level: 2 }],
         attributes: {
             isCollectable: false,
         },
@@ -1278,7 +1378,7 @@ export const registerSkillsStage1 = () => {
             // console.log('ACTLVL: ', )
             return gameEntity.getLevel('shop_item_backpack') >= 1
         },
-        unlockBySkills: [{ id: "skill_treasurer", level: 3 }],
+        unlockBySkills: [{ id: "skill_treasurer", level: 2 }],
         attributes: {
             isCollectable: false,
         },
@@ -1291,7 +1391,7 @@ export const registerSkillsStage1 = () => {
             multiplier: {
                 effects: {
                     'social_training_learning_rate': {
-                        A: 0.1,
+                        A: 0.05,
                         B: 1,
                         type: 0,
                     }
@@ -1319,8 +1419,8 @@ export const registerSkillsStage1 = () => {
 
     gameEntity.registerGameEntity('skill_trade_efficiency', {
         tags: ["skill", "upgrade", "purchaseable"],
-        name: 'Trade Efficiency',
-        description: 'Further increase amount of items you can sell',
+        name: 'Perseverance',
+        description: 'Increase your efficiency in studying routine tasks',
         level: 0,
         unlockCondition: () => {
             // console.log('ACTLVL: ', )
@@ -1335,19 +1435,15 @@ export const registerSkillsStage1 = () => {
             left: 6,
             top: 0,
         },
+        iconId: 'skill_routine_scholar',
         resourceModifier: {
             multiplier: {
                 effects: {
-                    'shop_max_stock': {
-                        A: 0.25,
+                    'routine_learning_speed': {
+                        A: 0.1,
                         B: 1,
                         type: 0,
                     },
-                    'shop_stock_renew_rate': {
-                        A: 0.2,
-                        B: 1,
-                        type: 0,
-                    }
                 }
             },
             consumption: {
@@ -1438,7 +1534,7 @@ export const registerSkillsStage1 = () => {
             multiplier: {
                 effects: {
                     'social_actions_discount': {
-                        A: 0.2,
+                        A: 0.1,
                         B: 1,
                         type: 0,
                     }
@@ -1833,12 +1929,10 @@ export const registerSkillsStage1 = () => {
                         B: 1,
                         type: 0,
                     }
-                }
-            },
-            capMult: {
-                resources: {
-                    'knowledge': {
-                        A: 0.05,
+                },
+                effects: {
+                    mental_training_learning_rate: {
+                        A: 0.08,
                         B: 1,
                         type: 0,
                     }
@@ -1874,7 +1968,7 @@ export const registerSkillsStage1 = () => {
             left: 2,
             top: -4,
         },
-        unlockBySkills: [{ id: "skill_highbrow", level: 3 }],
+        unlockBySkills: [{ id: "skill_highbrow", level: 2 }],
         unlockCondition: () => {
             // console.log('ACTLVL: ', )
             return gameEntity.getLevel('shop_item_library_entrance') >= 1
@@ -1918,6 +2012,55 @@ export const registerSkillsStage1 = () => {
         }),
     })
 
+    gameEntity.registerGameEntity('skill_mental_efficiency', {
+        tags: ["skill", "upgrade", "purchaseable"],
+        name: 'Cognitive Efficiency ',
+        description: 'Increase mental training learn rate',
+        level: 0,
+        maxLevel: 10,
+        uiPosition: {
+            left: 2,
+            top: -6,
+        },
+        iconId: 'skill_mental_learn_rate',
+        unlockBySkills: [{ id: "skill_knowledge_generation2", level: 4 }],
+        unlockCondition: () => {
+            // console.log('ACTLVL: ', )
+            return gameEntity.getLevel('shop_item_library_entrance') >= 1
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'mental_training_learning_rate': {
+                        A: 0.1,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'skill-points': {
+                        A: 1,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'skill-points': {
+                A: 0,
+                B: 1,
+                type: 0
+            }
+        }),
+    })
+
+
     gameEntity.registerGameEntity('skill_sorcer', {
         tags: ["skill", "upgrade", "purchaseable"],
         name: 'Sorcer',
@@ -1928,7 +2071,7 @@ export const registerSkillsStage1 = () => {
             left: -2,
             top: -4,
         },
-        unlockBySkills: [{ id: "skill_highbrow", level: 3 }],
+        unlockBySkills: [{ id: "skill_highbrow", level: 2 }],
         unlockCondition: () => {
             // console.log('ACTLVL: ', )
             return gameEntity.getLevel('shop_item_spellbook') >= 1
@@ -1941,6 +2084,64 @@ export const registerSkillsStage1 = () => {
                 resources: {
                     'mana': {
                         A: 0.05,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+            capMult: {
+                resources: {
+                    'mana': {
+                        A: 0.05,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'skill-points': {
+                        A: 1,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'skill-points': {
+                A: 0,
+                B: 1,
+                type: 0
+            }
+        }),
+    })
+
+
+    gameEntity.registerGameEntity('skill_mental_mastery', {
+        tags: ["skill", "upgrade", "purchaseable"],
+        name: 'Mental Mastery',
+        description: 'Decrease XP required for mental actions',
+        level: 0,
+        maxLevel: 10,
+        uiPosition: {
+            left: -2,
+            top: -6,
+        },
+        iconId: 'skill_mental_discount',
+        unlockBySkills: [{ id: "skill_sorcer", level: 4 }],
+        unlockCondition: () => {
+            // console.log('ACTLVL: ', )
+            return gameEntity.getLevel('shop_item_spellbook') >= 1
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'mental_actions_discount': {
+                        A: 0.1,
                         B: 1,
                         type: 0,
                     }
@@ -2036,7 +2237,7 @@ export const registerSkillsStage1 = () => {
             left: 0,
             top: -8,
         },
-        unlockBySkills: [{ id: "skill_arcane_mind", level: 4 },{id: "skill_sorcer", level: 8},{id: "skill_knowledge_generation2", level: 8},{id: "skill_general_training_1", level: 1},{id: "skill_general_training_3", level: 1}],
+        unlockBySkills: [{ id: "skill_arcane_mind", level: 4 },{id: "skill_mental_mastery", level: 4},{id: "skill_mental_efficiency", level: 4},{id: "skill_general_training_1", level: 1},{id: "skill_general_training_3", level: 1}],
         unlockCondition: () => {
             // console.log('ACTLVL: ', )
             return gameEntity.getLevel('shop_item_spellbook') >= 1

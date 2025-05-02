@@ -61,6 +61,18 @@ export const Statistics = () => {
                     <p className={'stat-value'}>{formatInt(stats.mageLevel)}</p>
                 </div>
                 <div className={'flex-row stats'}>
+                    <p className={'stat-title'}>All Time XP Earned:</p>
+                    <p className={'stat-value'}>{formatInt(stats.xpEarned)}</p>
+                </div>
+                <div className={'flex-row stats'}>
+                    <p className={'stat-title'}>All Time Coins Earned:</p>
+                    <p className={'stat-value'}>{formatInt(stats.coinsEarned)}</p>
+                </div>
+                <div className={'flex-row stats'}>
+                    <p className={'stat-title'}>All Time Coins Spent:</p>
+                    <p className={'stat-value'}>{formatInt(stats.coinsSpent)}</p>
+                </div>
+                <div className={'flex-row stats'}>
                     <p className={'stat-title'}>Actions Unlocked:</p>
                     <p className={'stat-value'}>{formatInt(stats.actionsUnlocked)}</p>
                 </div>

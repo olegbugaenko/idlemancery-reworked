@@ -19,6 +19,7 @@ import {HotkeysModule} from "./shared/modules/hotkeys.module";
 import {MonitoringModule} from "./shared/modules/monitoring.module";
 import {RulesModule} from "./shared/modules/rules.module";
 import {CoursesModule} from "./modules/items/courses.module";
+import {AchievementsModule} from "./modules/mage/achievements.module";
 
 
 export class MainModule extends GameModule {
@@ -39,16 +40,17 @@ export class MainModule extends GameModule {
         gameCore.registerModule('plantations', PlantationsModule);
         gameCore.registerModule('guilds', GuildsModule);
         gameCore.registerModule('unlock-notifications', UnlockNotificationsModule);
-        gameCore.registerModule('random-events', RandomEventsModule);
+        //gameCore.registerModule('random-events', RandomEventsModule);
         gameCore.registerModule('map', MapModule);
         gameCore.registerModule('hotkeys', HotkeysModule);
         gameCore.registerModule('monitoring', MonitoringModule);
         gameCore.registerModule('rules', RulesModule);
+        gameCore.registerModule('achievements', AchievementsModule);
 
 
         this.eventHandler.registerHandler('initialize-game', (data) => {
             console.log('gameCoreBeforeInited', data);
-            gameCore.initialize({ is_demo: data.is_demo });
+            gameCore.initialize({ is_demo: data.is_demo ? +data.is_demo : 0 });
             // console.log('gameCoreInited', GameCore.instance);
             this.eventHandler.sendData('initialized', {...data, received: true});
             // console.log('sent initialized')

@@ -10,6 +10,16 @@ export const AppProvider = ({ children }) => {
     const [popupMeta, setPopupMeta] = useState({});
     const [onClosePopupCb, setOnClosePopupCb] = useState(null);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 1300);
+    const togglePopup = (id, onClosePopupCb, popupMeta) => {
+        if(!id) {
+            setActivePopup(null);
+            setPopupMeta(null);
+            setOnClosePopupCb(null);
+        }
+        setActivePopup(id);
+        setOnClosePopupCb(onClosePopupCb);
+        setPopupMeta(popupMeta);
+    }
 
     window.addEventListener('resize', (e) => {
         setIsMobile(window.innerWidth < 1300)
@@ -19,12 +29,15 @@ export const AppProvider = ({ children }) => {
         setIsMobile(window.innerWidth < 1300)
     })
 
-    useEffect(() => {
-        setOnClosePopupCb(null);
-    }, [activePopup])
+/*    useEffect(() => {
+        if(!activePopup) {
+            console.log('set onClosePopup CB to null', activePopup);
+            setOnClosePopupCb(null);
+        }
+    }, [activePopup])*/
 
     return (
-        <AppContext.Provider value={{ openedTab, setOpenedTab, activePopup, setActivePopup, popupMeta, setPopupMeta, onClosePopupCb, setOnClosePopupCb, isMobile }}>
+        <AppContext.Provider value={{ openedTab, setOpenedTab, activePopup, setActivePopup, popupMeta, setPopupMeta, onClosePopupCb, setOnClosePopupCb, isMobile, togglePopup }}>
             {children}
         </AppContext.Provider>
     );

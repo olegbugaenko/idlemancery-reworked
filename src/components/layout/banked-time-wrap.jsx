@@ -9,7 +9,7 @@ export const BankedTimeWrap = () => {
 
     const worker = useContext(WorkerContext);
     const { onMessage, sendData } = useWorkerClient(worker);
-    const { setActivePopup } = useAppContext();
+    const { togglePopup } = useAppContext();
     const [mageData, setMageData] = useState({});
 
     useEffect(() => {
@@ -55,15 +55,22 @@ export const BankedTimeWrap = () => {
             <ul className={'menu small'}>
                 <li>
                     <TippyWrapper content={<div className={'hint-popup'}>View unlocks</div> }>
-                        <div id={'goals'} className={'icon-content edit-icon interface-icon'} onClick={() => setActivePopup('unlocks')}>
+                        <div id={'goals'} className={'icon-content edit-icon interface-icon'} onClick={() => togglePopup('unlocks')}>
                             <img src={"icons/interface/icon_unlocks.png"}/>
                         </div>
                     </TippyWrapper>
                 </li>
                 <li>
                     <TippyWrapper content={<div className={'hint-popup'}>View statistics</div> }>
-                        <div id={'statistics'} className={'icon-content edit-icon interface-icon'} onClick={() => setActivePopup('statistics')}>
+                        <div id={'statistics'} className={'icon-content edit-icon interface-icon'} onClick={() => togglePopup('statistics')}>
                             <img src={"icons/interface/icon_statistics.png"}/>
+                        </div>
+                    </TippyWrapper>
+                </li>
+                <li>
+                    <TippyWrapper content={<div className={'hint-popup'}>View story</div> }>
+                        <div id={'story'} className={'icon-content edit-icon interface-icon'} onClick={() => togglePopup('achievements')}>
+                            <img src={"icons/interface/icon_story.png"}/>
                         </div>
                     </TippyWrapper>
                 </li>

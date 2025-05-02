@@ -418,7 +418,7 @@ const SkillTree = () => {
         </div>);
 };
 
-export const ItemSkillCard = ({ id, isUnlocked, x, y, icon, isRequirementsMet, name, description, level, max, isCapped, effects, currentEffects, affordable, isLeveled, onFlash, onPurchase, onShowDetails, isMobile, scale}) => {
+export const ItemSkillCard = ({ id, iconId, isUnlocked, x, y, icon, isRequirementsMet, name, description, level, max, isCapped, effects, currentEffects, affordable, isLeveled, onFlash, onPurchase, onShowDetails, isMobile, scale}) => {
 
     const elementRef = useRef(null);
 
@@ -468,7 +468,7 @@ export const ItemSkillCard = ({ id, isUnlocked, x, y, icon, isRequirementsMet, n
             </div>}>
             <div className={`icon-content skill-map`} style={{ '--size-mult': sizeMult }}>
                 {icon ? (<div className={'semi-color'} style={{backgroundColor: icon.color}}>+</div>) : (
-                    <img src={`icons/skills/${id}.png`} className={'resource'}/>)}
+                    <img src={`icons/skills/${iconId ?? id}.png`} className={'resource'}/>)}
                 <span className={'level'}>{formatInt(level)}{max ? `/${formatInt(max)}` : ''}</span>
             </div>
         </TippyWrapper>) : (<div className={`icon-content black`}></div>)}

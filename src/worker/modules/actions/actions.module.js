@@ -1202,7 +1202,7 @@ export class ActionsModule extends GameModule {
             },
             aspects: {
                 isUnlocked: gameEntity.getLevel('shop_item_aspects_focus') > 0, // temporary
-                list: gameEntity.listEntitiesByTags(['aspect']).map(one => ({
+                list: gameEntity.listEntitiesByTags(['aspect']).filter(one => one.isUnlocked).map(one => ({
                     id: one.id,
                     name: one.name,
                     level: one.level,
@@ -1257,14 +1257,14 @@ export class ActionsModule extends GameModule {
             xpRate: this.isRunningAction(entity.id) ? this.getLearningRate(`runningAction_${entity.id}`)*this.isRunningAction(entity.id).effort : this.getLearningRate(entity.id, 1),
             isLeveled: this.actions[entity.id]?.isLeveled,
             tags: entity.tags,
-            primaryAttribute: entity.attributes?.primaryAttribute ? gameEffects.getEffect(entity.attributes.primaryAttribute) : null,
-            primaryAttributeEffect: entity.attributes?.primaryAttribute ? entity.getPrimaryEffect() : 1,
+            primaryAttribute: entity.attributes?.primaryAttribute && gameEffects.isEffectUnlocked(entity.attributes?.primaryAttribute) ? gameEffects.getEffect(entity.attributes.primaryAttribute) : null,
+            primaryAttributeEffect: entity.attributes?.primaryAttribute && gameEffects.isEffectUnlocked(entity.attributes?.primaryAttribute) ? entity.getPrimaryEffect() : 1,
             isTraining: gameEntity.getAttribute(entity.id, 'isTraining'),
             nextUnlock: entity.nextUnlock,
             timeInvested: this.actions[entity.id]?.timeInvested || 0,
             xpEarned: this.actions[entity.id]?.xpEarned || 0,
             etas: this.getEtas(entity.id),
-            aspect: entity.attributes?.primaryAttribute && gameEntity.getLevel('shop_item_aspects_focus') > 0 ? {
+            aspect: entity.attributes?.primaryAttribute && gameEffects.isEffectUnlocked(entity.attributes?.primaryAttribute) && gameEntity.getLevel('shop_item_aspects_focus') > 0 ? {
                 intensity: entity.getIntensityAspect(),
                 aspect: gameEntity.getEntity(`${entity.attributes?.primaryAttribute}_aspect`),
             } : null,

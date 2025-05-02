@@ -9,7 +9,7 @@ import {formatInt, formatValue, secondsToString} from "../../general/utils/strin
 export const PersonageCircle = () => {
     const worker = useContext(WorkerContext);
     const { onMessage, sendData } = useWorkerClient(worker);
-    const { setActivePopup } = useAppContext();
+    const { togglePopup } = useAppContext();
     const [mageData, setMageData] = useState({});
     const [settings, setSettings] = useState({});
     const elementRef = useRef(null);
@@ -58,7 +58,7 @@ export const PersonageCircle = () => {
                     >
                         <div className={'holder-circle'}>
                             <div className={'level'} id={'level'}>
-                                <span className={`skills-button ${mageData.skillPoints > 0 ? 'highlight' : ''}`} onClick={() => setActivePopup('skills')}>
+                                <span className={`skills-button ${mageData.skillPoints > 0 ? 'highlight' : ''}`} onClick={() => togglePopup('skills')}>
                                     <img src={'icons/ui/sp.png'} />
                                     <span>{mageData.skillPoints}</span>
                                 </span>

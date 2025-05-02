@@ -712,7 +712,7 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
                                     iconId={'icon_view_lasting'}
                                     className={`toggle-effect-monitor medium-sm ${details?.show_lasting ? 'highlighted' : ''}`}
                                     onClick={(e) => {toggleViewLasting()}}
-                                >{item.show_lasting ? 'Stop showing active effects in left sidebar' : 'Show when active in left sidebar'}</CustomButton>
+                                >{details?.show_lasting ? 'Stop showing active effects in left sidebar' : 'Show when active in left sidebar'}</CustomButton>
                             </div> ) : null}
                         </div>) : null}
 

@@ -42,6 +42,7 @@ export const registerAmplifiersStage1 = () => {
         name: 'Dimensional Amplifier',
         description: 'Harness the power of the Earth element to reshape and expand spatial properties, increasing available living space.',
         level: 0,
+        minDemoVersion: 2,
         unlockCondition: () => {
             return gameResources.isResourceUnlocked('inventory_earth');
         },
@@ -70,6 +71,7 @@ export const registerAmplifiersStage1 = () => {
         name: 'Blacksmiths Amplifier',
         description: 'Infuse your crafting with Earth’s stability, amplifying crafting efficiency and precision.',
         level: 0,
+        minDemoVersion: 2,
         unlockCondition: () => {
             return gameResources.isResourceUnlocked('inventory_earth');
         },
@@ -99,6 +101,7 @@ export const registerAmplifiersStage1 = () => {
         name: 'Physical Flow Amplifier',
         description: 'Channel the Air element to enhance bodily coordination, reducing the XP requirements for physical actions.',
         level: 0,
+        minDemoVersion: 2,
         unlockCondition: () => {
             return gameResources.isResourceUnlocked('inventory_air');
         },
@@ -128,6 +131,7 @@ export const registerAmplifiersStage1 = () => {
         name: 'Mental Clarity Amplifier',
         description: 'Attune your mind to the flow of Air, decreasing the XP cost for mental actions through enhanced cognitive ease.',
         level: 0,
+        minDemoVersion: 2,
         unlockCondition: () => {
             return gameResources.isResourceUnlocked('inventory_air');
         },
@@ -157,6 +161,7 @@ export const registerAmplifiersStage1 = () => {
         name: 'Social Insight Amplifier',
         description: 'Utilize the Air element to sharpen your understanding of social interactions, reducing the XP requirements for social actions.',
         level: 0,
+        minDemoVersion: 2,
         unlockCondition: () => {
             return gameResources.isResourceUnlocked('inventory_air');
         },
@@ -187,6 +192,7 @@ export const registerAmplifiersStage1 = () => {
         name: 'Magical Insight Amplifier',
         description: 'Utilize the Air element to improve your inner magical reserves, reducing the XP requirements for magical actions.',
         level: 0,
+        minDemoVersion: 2,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_patience',
@@ -222,6 +228,7 @@ export const registerAmplifiersStage1 = () => {
         name: 'Arcane Conduit Amplifier',
         description: 'Increase mana cap and regeneration.',
         level: 0,
+        minDemoVersion: 2,
         /*unlockedBy: [{
             type: 'effect',
             id: 'attribute_magic_ability',
@@ -264,6 +271,7 @@ export const registerAmplifiersStage1 = () => {
     registerAmplifier('amplifier_scolars_ignition', {
         tags: ["amplifier", "upgrade", "purchaseable", "spark", "actions"],
         name: 'Scholars Ignition Amplifier',
+        minDemoVersion: 2,
         description: 'Increase courses learn speed',
         level: 0,
         /*unlockedBy: [{
@@ -300,6 +308,7 @@ export const registerAmplifiersStage1 = () => {
         name: 'Elemental Amplifier',
         description: 'Increase courses learn speed',
         level: 0,
+        minDemoVersion: 2,
         unlockCondition: () => {
             return gameResources.isResourceUnlocked('inventory_light');
         },
@@ -358,6 +367,7 @@ export const registerAmplifiersStage1 = () => {
         name: 'Body Ignition Amplifier',
         description: 'Increase physical training learning rate',
         level: 0,
+        minDemoVersion: 2,
         unlockCondition: () => {
             return gameResources.isResourceUnlocked('inventory_fire');
         },
@@ -387,6 +397,7 @@ export const registerAmplifiersStage1 = () => {
         name: 'Mind Sharpener Amplifier',
         description: 'Increase mental training learning rate',
         level: 0,
+        minDemoVersion: 2,
         unlockCondition: () => {
             return gameResources.isResourceUnlocked('inventory_fire');
         },
@@ -416,6 +427,7 @@ export const registerAmplifiersStage1 = () => {
         name: 'Charisma Flames Amplifier',
         description: 'Increase social training learning rate',
         level: 0,
+        minDemoVersion: 2,
         unlockCondition: () => {
             return gameResources.isResourceUnlocked('inventory_fire');
         },
@@ -445,6 +457,7 @@ export const registerAmplifiersStage1 = () => {
         name: 'Burning Spirit Amplifier',
         description: 'Increase spiritual learning rate',
         level: 0,
+        minDemoVersion: 2,
         unlockCondition: () => {
             return gameResources.isResourceUnlocked('inventory_fire');
         },

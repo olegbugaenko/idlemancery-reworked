@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useRef} from "react";
 import { useAppContext } from '../../context/ui-context';
 import {PopupComponent} from "./popup-component.jsx";
 import {Skills} from "../mage/skills.jsx";
@@ -7,10 +7,18 @@ import {Statistics} from "../mage/statistics.jsx";
 import {RandomEventPopup} from "../shared/random-events.jsx";
 import {HowTo} from "../how-to/index.jsx";
 import SkillTree from "../mage/skill-tree.jsx";
+import {AchievementsCompleted, CurrentAchievement} from "../shared/achievements.jsx";
 
 export const Popup = () => {
 
-    const { activePopup, setActivePopup, popupMeta, onClosePopupCb } = useAppContext();
+    const { activePopup, togglePopup, popupMeta, onClosePopupCb } = useAppContext();
+
+    const onClosePopupRef = useRef(onClosePopupCb);
+
+    useEffect(() => {
+        onClosePopupRef.current = onClosePopupCb;
+        console.log('onClosePopup: ', onClosePopupCb);
+    }, [onClosePopupCb]);
 
     const HOWTO_TITLES = {
         actions: {
@@ -31,7 +39,8 @@ export const Popup = () => {
 
         const listener = (e) => {
             if(e.key === "Escape") {
-                setActivePopup(null);
+                onClosePopupRef.current?.(true);
+                togglePopup(null);
             }
         }
         window.addEventListener('keydown', listener)
@@ -78,6 +87,21 @@ export const Popup = () => {
 
         return (<PopupComponent title={title} onClose={onClosePopupCb}>
             <HowTo scope={popupMeta.howToScope} />
+        </PopupComponent> )
+    }
+
+    if(activePopup === 'achievement') {
+
+        return (<PopupComponent title={popupMeta?.customTitle} onClose={onClosePopupCb}>
+            <CurrentAchievement onClose={onClosePopupCb}>
+                {popupMeta?.customContent}
+            </CurrentAchievement>
+        </PopupComponent> )
+    }
+
+    if(activePopup === 'achievements') {
+        return (<PopupComponent title={'Story'} onClose={onClosePopupCb}>
+            <AchievementsCompleted />
         </PopupComponent> )
     }
 

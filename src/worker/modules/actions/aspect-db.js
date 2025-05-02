@@ -1,4 +1,4 @@
-import {gameEntity} from "game-framework";
+import {gameEffects, gameEntity} from "game-framework";
 
 export const registerAspects = () => {
 
@@ -69,6 +69,29 @@ export const registerAspects = () => {
             color: '#5da3f9'
         },
         unlockCondition: () => true,
+    })
+
+    gameEntity.registerGameEntity('attribute_magic_capability_aspect', {
+        name: 'Magical Intensity',
+        description: 'Increase magical-based actions intensity (meaning speed up both consumption and income)',
+        tags: ['aspect', 'magical'],
+        level: 0,
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'aspect_attribute_magic_capability': {
+                        A: 0.25,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+        },
+        attributes: {
+            keyAttribute: 'attribute_magic_capability',
+            color: '#5da3f9'
+        },
+        unlockCondition: () => gameEffects.isEffectUnlocked('attribute_magic_capability'),
     })
 
 }

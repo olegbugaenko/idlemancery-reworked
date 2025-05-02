@@ -154,7 +154,7 @@ export const SaveSettings = () => {
             </div>
             <div className={"row flex-container"}>
                 <div className={"col"}>
-                    <button onClick={resetGame}>Hard Reset Game</button>
+                    <button className={'warning-action'} onClick={resetGame}>Hard Reset Game</button>
                 </div>
                 <div className={'col'}>
 

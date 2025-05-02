@@ -247,6 +247,7 @@ export const registerAccessoriesStage1 = () => {
         name: 'Scroll of Persuasion',
         description: 'This enchanted parchment enhances your ability to connect with others, significantly boosting the efficiency of social training.',
         level: 0,
+        minDemoVersion: 2,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_paper_working') > 0;
         },
@@ -286,6 +287,7 @@ export const registerAccessoriesStage1 = () => {
         name: 'Diplomatic Weave',
         description: 'Crafted from the finest herbal fibers, this intricate weave symbolizes trust and cooperation, easing negotiations.',
         level: 0,
+        minDemoVersion: 2,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_charisma',
@@ -331,6 +333,7 @@ export const registerAccessoriesStage1 = () => {
         name: 'Mentalist\'s Tome',
         description: 'Magic book containing a lot of mental power',
         level: 0,
+        minDemoVersion: 2,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_paper_enhance') > 0;
         },
@@ -371,6 +374,7 @@ export const registerAccessoriesStage1 = () => {
         name: 'Occultist\'s Tome',
         description: 'Small glowing tome. You feel inspiration every time you touch it',
         level: 0,
+        minDemoVersion: 2,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_paper_enhance') > 0;
         },
@@ -537,6 +541,7 @@ export const registerAccessoriesStage1 = () => {
         name: 'Iron Stash',
         description: 'Craft better and more reliable iron containers for storing coins',
         level: 0,
+        minDemoVersion: 2,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.isEntityUnlocked('action_mining');
         },
@@ -606,6 +611,7 @@ export const registerAccessoriesStage1 = () => {
         name: 'Sage\'s Notes',
         description: 'Increase your knowledge generation',
         level: 0,
+        minDemoVersion: 2,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.isEntityUnlocked('craft_green_ink');
         },
@@ -645,6 +651,7 @@ export const registerAccessoriesStage1 = () => {
         name: 'Mage\'s Notes',
         description: 'Increase your mana generation',
         level: 0,
+        minDemoVersion: 2,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.isEntityUnlocked('craft_green_ink');
         },
@@ -683,6 +690,7 @@ export const registerAccessoriesStage1 = () => {
         name: 'Accelerated Study Scroll',
         description: 'A meticulously crafted scroll, inscribed with red ink, that reduces the time required for studying and mastering courses.',
         level: 0,
+        minDemoVersion: 2,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_crafting_courses') > 0
                 && gameEntity.isEntityUnlocked('craft_red_ink');
@@ -728,6 +736,7 @@ export const registerAccessoriesStage1 = () => {
                 && gameEntity.isEntityUnlocked('craft_red_ink')
                 && gameResources.isResourceUnlocked('mental_energy');
         },
+        minDemoVersion: 2,
         resourceModifier: {
             multiplier: {
                 effects: {
@@ -807,6 +816,7 @@ export const registerAccessoriesStage1 = () => {
         name: 'Red Seal Scroll',
         description: 'A magically sealed scroll that boosts mental energy income, encouraging heightened focus and clarity.',
         level: 0,
+        minDemoVersion: 2,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_crafting_courses') > 0
                 && gameEntity.isEntityUnlocked('craft_red_ink')
@@ -849,6 +859,7 @@ export const registerAccessoriesStage1 = () => {
         name: 'Obsidian Pendant',
         description: 'A sleek pendant forged from obsidian shards, it channels the stone\'s raw power to amplify your vitality, increasing your energy income.',
         level: 0,
+        minDemoVersion: 2,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_crafting_courses') > 0
                 && gameResources.isResourceUnlocked('inventory_obsidian_shard')
@@ -891,6 +902,7 @@ export const registerAccessoriesStage1 = () => {
         name: 'Obsidian Amulet',
         description: 'An intricately crafted amulet of polished obsidian, its dark surface seems to absorb distraction, sharpening your focus and accelerating the mastery of routine tasks.',
         level: 0,
+        minDemoVersion: 2,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_crafting_courses') > 0
                 && gameResources.isResourceUnlocked('inventory_obsidian_shard');
@@ -937,6 +949,7 @@ export const registerAccessoriesStage1 = () => {
                 && gameResources.isResourceUnlocked('inventory_forged_steel')
                 && gameResources.isResourceUnlocked('inventory_red_ink');
         },
+        minDemoVersion: 2,
         resourceModifier: {
             multiplier: {
                 resources: {
@@ -973,6 +986,7 @@ export const registerAccessoriesStage1 = () => {
         name: 'Steel Hammer',
         description: 'Increase stone refinement efficiency',
         level: 0,
+        minDemoVersion: 2,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_crafting_courses') > 0
                 && gameResources.isResourceUnlocked('inventory_forged_steel');
@@ -1025,6 +1039,7 @@ export const registerAccessoriesStage1 = () => {
             id: 'attribute_strength',
             level: 15000,
         }],
+        minDemoVersion: 2,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_crafting_courses') > 0
                 && gameResources.isResourceUnlocked('inventory_forged_steel');
@@ -1065,6 +1080,7 @@ export const registerAccessoriesStage1 = () => {
             id: 'attribute_patience',
             level: 60000
         }],
+        minDemoVersion: 2,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_paper_working') > 0;
         },
@@ -1099,6 +1115,7 @@ export const registerAccessoriesStage1 = () => {
         name: 'Craftbinder',
         description: 'A structured metal core wrapped in organic and forged layers. It channels your inner discipline into parallel creation.',
         level: 0,
+        minDemoVersion: 2,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_amber_gathering') > 0;
         },
@@ -1137,6 +1154,7 @@ export const registerAccessoriesStage1 = () => {
         name: 'Crystal of Focus',
         description: 'A glowing crystal formed from ancient amber and volcanic obsidian. It enhances your mental clarity, letting you learn faster and more deeply.',
         level: 0,
+        minDemoVersion: 2,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_amber_gathering') > 0;
         },
@@ -1180,6 +1198,7 @@ export const registerAccessoriesStage1 = () => {
             return gameEntity.getLevel('shop_item_crafting_courses') > 0
                 && gameResources.isResourceUnlocked('inventory_forged_steel');
         },
+        minDemoVersion: 2,
         resourceModifier: {
             multiplier: {
                 resources: {

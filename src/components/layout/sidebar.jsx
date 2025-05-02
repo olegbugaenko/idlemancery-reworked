@@ -11,6 +11,7 @@ import {PersonageCircle} from "./personage-circle.jsx";
 import {BankedTimeWrap} from "./banked-time-wrap.jsx";
 import {useAppContext} from "../../context/ui-context";
 import {ActiveActions} from "../shared/active-actions.jsx";
+import {ActiveAchievement} from "../shared/achievements.jsx";
 
 export const Sidebar = () => {
 
@@ -49,7 +50,8 @@ export const Sidebar = () => {
             </div>
             <div className={'lower'}>
                 <ActiveActions />
-                <RandomEventSnippet/>
+                {/*<RandomEventSnippet/>*/}
+                <ActiveAchievement />
                 <div className={'effects-list'}>
                     <ActiveEffects/>
                 </div>

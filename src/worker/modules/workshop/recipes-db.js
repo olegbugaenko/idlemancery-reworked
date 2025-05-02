@@ -394,6 +394,7 @@ export const registerCraftingRecipes = () => {
             id: 'attribute_strength',
             level: 5000,
         }],
+        minDemoVersion: 2,
         resourceId: 'inventory_obsidian_shard',
         resourceModifier: {
             get_income: () => ({
@@ -510,6 +511,7 @@ export const registerCraftingRecipes = () => {
             id: 'attribute_strength',
             level: 7500,
         }],
+        minDemoVersion: 2,
         resourceId: 'inventory_forged_steel',
         resourceModifier: {
             get_income: () => ({

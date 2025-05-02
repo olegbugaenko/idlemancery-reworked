@@ -1,4 +1,4 @@
-import {gameEffects} from "game-framework";
+import {gameEffects, gameEntity} from "game-framework";
 
 export const registerCommomEffects = () => {
 
@@ -125,7 +125,10 @@ export const registerCommomEffects = () => {
         defaultValue: 1.,
         minValue: 1.,
         saveBalanceTree: true,
-        description: 'Increase amount of XP per second obtained by all actions with tag "routine"'
+        description: 'Increase amount of XP per second obtained by all actions with tag "routine"',
+        unlockCondition: () => {
+            return gameEntity.isEntityUnlocked('action_home_errands')
+        }
     })
 
     gameEffects.registerEffect('yoga_learn_speed', {
@@ -236,6 +239,12 @@ export const registerCommomEffects = () => {
         minValue: 1.,
     })
 
+    gameEffects.registerEffect('aspect_attribute_magic_capability', {
+        name: 'Magical Intensity',
+        defaultValue: 1.,
+        minValue: 1.,
+    })
+
     // Intensity Price Reductions
     gameEffects.registerEffect('aspect_attribute_strength_reduction', {
         name: 'Physical Intensity Mult.',
@@ -251,6 +260,12 @@ export const registerCommomEffects = () => {
 
     gameEffects.registerEffect('aspect_attribute_patience_reduction', {
         name: 'Patience Intensity Mult.',
+        defaultValue: 1.,
+        minValue: 1.,
+    })
+
+    gameEffects.registerEffect('aspect_attribute_magic_capability_reduction', {
+        name: 'Magic Intensity Mult.',
         defaultValue: 1.,
         minValue: 1.,
     })

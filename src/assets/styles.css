@@ -3328,3 +3328,61 @@ ul.menu li.additional.add-custom-filter:hover span {
 .show-lasting {
     padding: 5px;
 }
+
+.achievement-list-wrap {
+    height: 100%;
+}
+
+.achievement-list-wrap .achievement-wrap {
+    padding: 8px 16px 8px 8px;
+    border-bottom: 1px solid #333333;
+    cursor: pointer;
+}
+
+.achievement-list-wrap .achievement-wrap:hover {
+    background-color: #1a1a2a;
+}
+
+.achievement-list-wrap .achievement-wrap.selected {
+    background-color: #222233;
+}
+
+.achievements-wrap {
+    height: 100%;
+}
+
+.achievements-wrap .blade-outer {
+    flex: 1;
+    padding: 8px 16px;
+    border-left: 1px solid #333;
+}
+
+.achievement-text p {
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+.current-wrap {
+    height: 100%;
+}
+
+.current-wrap .achievement-text {
+    height: calc(100% - 40px);
+}
+
+.current-wrap .buttons {
+    padding: 12px;
+}
+
+.achievement-list .achievement-title {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.inner-settings-wrap .row {
+    padding: 8px 0;
+}
+
+.inner-settings-wrap .row .col {
+    min-width: 25%;
+}

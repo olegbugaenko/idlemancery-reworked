@@ -729,6 +729,9 @@ export class MageModule extends GameModule {
                 value: spell.numCasted
             }
         }))
+        result.xpEarned = gameResources.getResource('mage-xp').earned;
+        result.coinsEarned = gameResources.getResource('coins').earned;
+        result.coinsSpent = gameResources.getResource('coins').spent;
         // console.log('RS: ', result);
         return result;
     }
@@ -925,6 +928,7 @@ export class MageModule extends GameModule {
                 isLeveled: this.leveledId === entity.id,
                 isCapped: entity.isCapped,
                 icon: entity.icon,
+                iconId: entity.iconId,
                 unlockBySkills: (entity.unlockBySkills || []).map(unlock => ({
                     ...unlock,
                     isMet: unlock.level <= (this.editModeSkills ? (this.editModeSkills[unlock.id] || 0) : (this.skillUpgrades[unlock.id] || 0)),

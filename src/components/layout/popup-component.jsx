@@ -3,7 +3,7 @@ import {useAppContext} from "../../context/ui-context";
 
 export const PopupComponent = ({ children, onClose, title }) => {
 
-    const { setActivePopup } = useAppContext();
+    const { togglePopup, activePopup } = useAppContext();
 
     const popupRef = useRef(null);
 
@@ -11,8 +11,8 @@ export const PopupComponent = ({ children, onClose, title }) => {
         if (onClose) {
             onClose(true);
         }
-        setActivePopup(null);
-    }, [onClose, setActivePopup]);
+        togglePopup(null);
+    }, [onClose, activePopup]);
 
     const handleClickOutside = useCallback((event) => {
         if (popupRef.current) {
