@@ -1253,7 +1253,7 @@ export const registerActionsStage1 = () => {
         allowedImpacts: ['effects'],
         description: 'Toughens your body, making physical tasks easier.',
         level: 1,
-        maxLevel: 50,
+        maxLevel: 20,
         discountEffects: ['physical_actions_discount'],
         resourceModifier: {
             get_multiplier: () => ({

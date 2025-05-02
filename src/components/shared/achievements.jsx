@@ -24,14 +24,13 @@ export const ActiveAchievement = () => {
     }, [])
 
     onMessage('achievement-to-view', (data) => {
-        console.log('Setting to view: ', data);
         setViewedAchievement(data);
     })
 
     useEffect(() => {
         if(activePopup) return; // dont show
         if(viewedAchievement) {
-            console.log('Setting onClosePopup for achievements', activePopup);
+            // console.log('Setting onClosePopup for achievements', activePopup);
             togglePopup(
                 'achievement',
                 () => {

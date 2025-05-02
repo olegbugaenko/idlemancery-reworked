@@ -14,14 +14,11 @@ export const achievementsDb = [{
     completeCondition: () => {
         if(!gameCore.demoVersion) return false; // Available only for a demo
         // Check shop upgrades
-        console.log('ChckIsDemoPassed: ', gameCore.demoVersion);
         const shopUpgrades = gameEntity.listEntitiesByTags(['shop']);
         const incompleteUpgrades = shopUpgrades.filter(one => !one.isUnlocked || (gameEntity.getEntityMaxLevel(one.id) && !one.isCapped));
-        console.log('incompleteUpgrades: ', incompleteUpgrades.length);
         if(incompleteUpgrades.length) return false;
         // Check unlocks
         const data = unlocksApi.getGeneralUnlocksStats();
-        console.log('incompleteUnlocks: ', data, data.total > data.totalCompleted);
         if(data.total > data.totalCompleted) return false;
 
         return true;
@@ -33,7 +30,6 @@ export const achievementsDb = [{
         'You’re still out of breath, but at least a trip to the nearby store no longer feels like a near-death experience.'
     ],
     completeCondition: () => {
-        console.log('CHECK: ', gameEntity.getLevel('action_walk'));
         return gameEntity.getLevel('action_walk') >= 10
     }
 },{
@@ -55,6 +51,18 @@ export const achievementsDb = [{
     ],
     completeCondition: () => gameEntity.getLevel('action_walk') >= 100
 },{
+    id: 'action_walking_4',
+    title: 'The Long March',
+    text: [
+        "You've walked so much, some villagers now refer to you as 'The Wanderer'.",
+        "You've memorized every cobblestone, named every bush along your route, and developed strong opinions about which hill has the most scenic view.",
+        "Yesterday, you walked so far you forgot why you even left in the first place.",
+        "And everything would’ve been fine - if only you hadn’t forgotten the way back.",
+        "On your return, you fought through nettle fields, survived a mosquito ambush, and crossed a river riding a floating log, nearly drowning three times in the process.",
+        "Soaked, exhausted, but proud of your journey as a budding conqueror of distances, you finally went to sleep."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_walk') >= 250
+},{
     id: 'action_gossip_1',
     title: 'The Dragon and the Drifters',
     text: [
@@ -64,6 +72,26 @@ export const achievementsDb = [{
     ],
     completeCondition: () => gameEntity.getLevel('action_gossip') >= 10
 },{
+    id: 'action_gossip_2',
+    title: 'The Art of Empathy',
+    text: [
+        "After days of consistent gossiping, you've become a trusted listener at the market.",
+        "Today, someone told you a long, emotional story involving three cousins, two goats, and something about a cursed sock.",
+        "You didn't fully understand what happened—but you gasped at all the right moments and nodded with convincing concern.",
+        "By the end, they were crying, you were emotionally drained, and no one questioned your social expertise."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_gossip') >= 25
+},{
+    id: 'action_gossip_3',
+    title: 'Echoes of the Truth (Sort Of)',
+    text: [
+        "You've reached the highest circles of local gossip. Some even lower their voices when you walk by—not out of fear, but to make sure you don’t miss anything.",
+        "Today, someone shared a juicy secret with you about a mysterious mage who once dated a duchess, tamed a wyvern, and accidentally turned a whole tavern into frogs.",
+        "You smiled politely, recognizing it as the exact story you invented last month to amuse a bored baker.",
+        "It's grown in scale, detail, and prestige—and frankly, you’re proud of how far it’s come without you."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_gossip') >= 100
+},{
     id: 'resource_coins_1',
     title: 'The First Clink',
     text: [
@@ -71,7 +99,7 @@ export const achievementsDb = [{
         "The few coins rattling in your pouch still aren’t enough to buy a loaf of bread.",
         "But somehow, you’re starting to look at that pouch with hope."
     ],
-    completeCondition: () => gameResources.getResource('coins').amount >= 10
+    completeCondition: () => gameResources.getResource('coins').amount >= 20
 },{
     id: 'resource_coins_2',
     title: 'Scraping By, Gracefully',
@@ -100,6 +128,17 @@ export const achievementsDb = [{
     ],
     completeCondition: () => gameResources.getResource('coins').amount >= 1000000
 },{
+    id: 'shop_item_hat',
+    title: 'Your First Investment',
+    text: [
+        "After scraping together a few coins, you rushed to the nearest shop with a heart full of joy.",
+        "That joy quickly gave way to disappointment. The shopkeeper glanced at your ragged clothes and trembling handful of coins, sighed, and disappeared into the basement.",
+        "He returned a minute later with an old, dusty hat. Smiling faintly, he handed it to you: 'Here, at least your ears won’t freeze.'",
+        "Realizing your wealth wasn’t exactly respected here, you accepted the hat and wandered off toward the town square.",
+        "Well, at least now you're on par with the local drifters—who also have somewhere to collect spare change."
+    ],
+    completeCondition: () => gameEntity.getLevel('shop_item_hat') >= 1
+},{
     id: 'shop_tent_1',
     title: 'A Place to Call Slightly Yours',
     text: [
@@ -109,6 +148,28 @@ export const achievementsDb = [{
     ],
     completeCondition: () => gameEntity.getLevel('shop_item_tent') >= 1
 },{
+    id: 'furniture_urn_1',
+    title: 'The Rodent-Proof Bank',
+    text: [
+        "Your vast fortune is growing rapidly—and no longer fits in your hole-ridden sock.",
+        "Today, in a desperate attempt at financial organization, you tried hiding your coins under your tent... only to watch them vanish into a mole hole.",
+        "That was the last straw. You marched to the shop to buy your very first coin storage.",
+        "As usual, the shopkeeper wasn’t impressed by your wealth, and all they offered was a rusty old urn.",
+        "Still, it’s better than your leaky pockets, or feeding gold to moles, who are now objectively richer than you."
+    ],
+    completeCondition: () => gameEntity.getLevel('furniture_urn') >= 1
+},{
+    id: 'furniture_bookcase_1',
+    title: 'Shelf of Enlightenment',
+    text: [
+        "You’ve officially begun your career as an intellectual.",
+        "Inspired by your recent victory in an argument with a local wanderer—where you definitively proved that apples fall from trees rather than grow from the ground—you resolved to pursue your potential.",
+        "With your remaining coins, you purchased a small, broken bookcase, then repaired it yourself so your three books could rest in comfort.",
+        "Unfortunately, the bookcase now occupies the spot where you usually tossed apple cores. You'll have to start getting up at night to take them outside.",
+        "But that’s the price of a meaningful, enlightened life. And you’re willing to pay it."
+    ],
+    completeCondition: () => gameEntity.getLevel('furniture_book_case') >= 1
+},{
     id: 'shop_library_entrance_1',
     title: 'The Stubborn Scholar',
     text: [
@@ -117,6 +178,17 @@ export const achievementsDb = [{
         "Still, with sheer persistence and a few well-placed curses, you not only secured your pass—but even got a discount."
     ],
     completeCondition: () => gameEntity.getLevel('shop_item_library_entrance') >= 1
+},{
+    id: 'action_read_motivation_book_1',
+    title: 'Chapter One: Self-Delusion',
+    text: [
+        "Today at the shop, they handed you a book—at a discount, of course—for being a loyal buyer of cheap random junk.",
+        "Judging by the cover, it had been on that shelf since the dawn of time.",
+        "Still, this is your first real investment in personal growth.",
+        "Filled with determination, you opened the small book and dove in. By page two, you realized you understood absolutely nothing—but somehow, that only motivated you more.",
+        "After proudly finishing a whole three pages before bed, you drifted off inspired, certain that tonight you’ll dream of being an academic genius."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_read_motivation_book') >= 2
 },{
     id: 'action_learn_anatomy',
     title: 'Basic Anatomy, Big Revelations',
@@ -168,6 +240,15 @@ export const achievementsDb = [{
         "Plus, you've memorized the color of the book’s cover—so now it's easier to pretend you know what you're reading."
     ],
     completeCondition: () => gameEntity.getLevel('action_learn_languages') >= 25
+},{
+    id: 'action_learn_languages_2_5',
+    title: 'The First Translation',
+    text: [
+        "After weeks of study, your efforts have finally paid off: you've completed your first full translation.",
+        "With great pride, you carefully deciphered an ancient text—only to realize it’s a long and overly poetic recipe for cabbage stew.",
+        "Still, every great journey begins with a humble vegetable."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_learn_languages') >= 50
 },{
     id: 'action_learn_languages_3',
     title: 'Eloquent and Evicted',
@@ -235,7 +316,7 @@ export const achievementsDb = [{
     title: 'Breathless Enlightenment',
     text: [
         "Just yesterday, you read about yoga—and one evening was enough to discover a typo in the guide.",
-        "Turns out you were supposed to hold your breath for five **seconds**, not **minutes**.",
+        "Turns out you were supposed to hold your breath for five <strong>seconds</strong>, not <strong>minutes</strong>.",
         "Thankfully, you were practicing outside, and a passing local doctor ensured your swift delivery to the hospital instead of the cemetery."
     ],
     completeCondition: () => gameEntity.getLevel('action_yoga_practices') >= 5
@@ -262,7 +343,7 @@ export const achievementsDb = [{
     title: 'The Magic Meditated Back',
     text: [
         "You've firmly decided to pursue magical practices.",
-        "Though after today's vision during meditation, you're starting to suspect the magic is the one practicing on *you*.",
+        "Though after today's vision during meditation, you're starting to suspect the magic is the one practicing on <strong>you</strong>.",
         "Following a brief conversation with two elves, you were prescribed a hefty dose of sedatives and ordered to visit a doctor daily for the next week."
     ],
     completeCondition: () => gameEntity.getLevel('action_meditate') >= 5
@@ -275,6 +356,20 @@ export const achievementsDb = [{
         "Unfortunately, the lesson had to be cut short by the local patrol—who woke you up from a deep, accidental nap halfway through."
     ],
     completeCondition: () => gameEntity.getLevel('action_meditate') >= 25
+},{
+    id: 'action_meditate_25',
+    title: 'Elevated Perspective',
+    text: [
+        "Your meditation skills have reached a level where sitting on a mat just feels... uninspired.",
+        "So you decided to seek a more meaningful location. Recalling the apple tree on the nearby hill with a stunning view of the river, you climbed up without hesitation.",
+        "You munched on a few sour, unripe apples and settled on a branch, surrounded by nature’s beauty.",
+        "The sound of the river flowed like the most serene melody you’ve ever heard.",
+        "Then you woke up mid-air, realizing you were falling.",
+        "You hit the ground, brushed off the dust, muttered a few choice words… and then noticed you had landed directly on an anthill.",
+        "You sprinted to the river, fleeing the swarm of furious ants defending their honor with dozens of stinging bites.",
+        "Still, alongside spiritual growth and inner strength, you gained a bruised shoulder and a brand new phobia. Not a bad bonus."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_meditate') >= 50
 },{
     id: 'action_meditate_3',
     title: 'Hot Thoughts, Fast Reactions',
@@ -291,7 +386,7 @@ export const achievementsDb = [{
         "While carefully tidying the area around your tents, you discovered a strange wooden object with a shiny golden tip.",
         "Overjoyed, you rushed to the local expert on magical relics and ancient artifacts.",
         "The man gave the item—and you—a puzzled look, then asked why you'd brought him the leg of an old chair.",
-        "You left his hut, deeply disappointed. He didn’t even *look* properly. As always, you'll just have to figure it out yourself."
+        "You left his hut, deeply disappointed. He didn’t even <strong>look</strong> properly. As always, you'll just have to figure it out yourself."
     ],
     completeCondition: () => gameEntity.getLevel('action_home_errands') >= 10
 },{
@@ -304,6 +399,18 @@ export const achievementsDb = [{
         "But don’t worry—his bruises are long gone. And really, a bit of preventive justice never hurt anyone."
     ],
     completeCondition: () => gameEntity.getLevel('action_home_errands') >= 25
+},{
+    id: 'action_home_errands_2_5',
+    title: 'Domestic Ambitions vs. Weather Gods',
+    text: [
+        "You woke up today with a firm conviction: it's time for serious change. And serious change begins with reorganizing your living space.",
+        "You carefully rearranged your belongings, set up a dedicated dining area, moved your reading supplies into a separate tent—your very own study hall!",
+        "You even created a special place for trash collection. Things were finally coming together.",
+        "Then the rain started. Heavy rain. Turns out placing your trash zone on a hill was a bad idea.",
+        "Rushing water elegantly redistributed your waste across the entire camp.",
+        "Nature clearly had its own ideas about landscaping. At least now you know: it's time to find higher ground for your tents."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_home_errands') >= 50
 },{
     id: 'action_home_errands_3',
     title: 'Order… or Something Like It',
@@ -337,7 +444,7 @@ export const achievementsDb = [{
     id: 'shop_item_spellbook',
     title: 'The Power of Abracadabra',
     text: [
-        "The day has come! You convinced the old archmage in the shop that you’re finally knowledgeable enough to try magic without burning down the village.",
+        "The day has come! You convinced the old archmage in the shop that you’re finally knowledgeable enough to try magic without burning down the town.",
         "Grabbing your scroll, you sprint straight to the tavern.",
         "You lock eyes with the burly man who still refuses to repay his debt, point the scroll at him, and boldly shout: 'Abracadabra!'",
         "The room erupts in laughter. The man, thoroughly amused, claps you on the back and tosses you a few coins for the entertainment.",
@@ -378,7 +485,7 @@ export const achievementsDb = [{
     id: 'shop_item_land',
     title: 'Landowner Dreams',
     text: [
-        "It may only be a modest patch of dirt, but it’s *your* patch of dirt.",
+        "It may only be a modest patch of dirt, but it’s <strong>your</strong> patch of dirt.",
         "You stand proudly on your new property, envisioning a majestic estate, magical gardens, perhaps even a tower.",
         "Right now it’s just rocks, weeds, and a suspiciously aggressive squirrel—but the future is bright!"
     ],
@@ -393,12 +500,12 @@ export const achievementsDb = [{
     ],
     completeCondition: () => gameEntity.getLevel('shop_item_land') >= 5
 },{
-    id: 'action_walking_4',
+    id: 'action_walking_433',
     title: '',
     text: [
         ''
     ],
     completeCondition: () => {
-        return gameEntity.getLevel('action_walking') >= 1000
+        return gameEntity.getLevel('action_walking') >= 100000
     }
 }]

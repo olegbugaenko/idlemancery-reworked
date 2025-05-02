@@ -3362,6 +3362,11 @@ ul.menu li.additional.add-custom-filter:hover span {
     font-size: 16px;
 }
 
+.achievement-text p strong {
+    font-size: 16px;
+    font-weight: bold;
+}
+
 .current-wrap {
     height: 100%;
 }
