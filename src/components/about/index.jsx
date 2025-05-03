@@ -6,6 +6,10 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+                <h3>Idle Awakening v0.1.4a</h3>
+                <div className={'features'}>
+                    <p>Fixed issue with display action lists tour incompletely in some cases</p>
+                </div>
                 <h3>Idle Awakening v0.1.4: Demo</h3>
                 <div className={'features'}>
                     <p>Added auto-assign effort to action lists</p>
