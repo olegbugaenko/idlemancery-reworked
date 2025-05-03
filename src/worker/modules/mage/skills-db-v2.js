@@ -2147,15 +2147,6 @@ export const registerSkillsStage1 = () => {
                     }
                 }
             },
-            capMult: {
-                resources: {
-                    'mana': {
-                        A: 0.05,
-                        B: 1,
-                        type: 0,
-                    }
-                }
-            },
             consumption: {
                 resources: {
                     'skill-points': {

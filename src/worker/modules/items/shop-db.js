@@ -334,7 +334,7 @@ export const registerShopItemsStage1 = () => {
         get_cost: () => ({
             'coins': {
                 A: 2,
-                B: 1000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 600*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 1,
             }
         }),
@@ -880,7 +880,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Purchase equipment improving your herbs harvesting efficiency',
         level: 0,
         maxLevel: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_patience',
@@ -1041,7 +1041,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Learn more sophisticated and rare herbs',
         level: 0,
         maxLevel: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_herbs_handbook_1') > 0
                 && gameEntity.getLevel('shop_item_alchemy_courses') > 0
@@ -1065,7 +1065,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Learn even better recipes based on more rare plants',
         level: 0,
         maxLevel: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
                 && gameEntity.getLevel('shop_item_alchemy_courses') > 0
@@ -1256,7 +1256,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Unlocks way to improve your spiritual activities by consuming magic knowledge. Also, unlocks new furniture',
         level: 0,
         maxLevel: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_spellcraft') > 0
         },
@@ -1289,7 +1289,7 @@ export const registerShopItemsStage1 = () => {
             id: 'attribute_magic_ability',
             level: 120
         }],
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_spiritualism') > 0
         },
@@ -1322,7 +1322,7 @@ export const registerShopItemsStage1 = () => {
             id: 'attribute_patience',
             level: 250
         }],
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return true
         },
@@ -1350,7 +1350,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Learn more about soil types that might be suitable for your plants. Increase plantations efficiency and unlock new furniture',
         level: 0,
         maxLevel: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_herbalists_handbook') > 0
         },
@@ -1534,7 +1534,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Unlocks new resource',
         level: 0,
         maxLevel: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_crafting_courses') > 0
             //||  gameEntity.getLevel('shop_item_conjuration_magic') > 0
@@ -1558,7 +1558,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Learn new ways of boosting your mental stats using improved meditative practices',
         level: 0,
         maxLevel: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_magic_ability',
@@ -1591,7 +1591,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Learn new ways of doing cool stuff from your papers',
         level: 0,
         maxLevel: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_paper_working') > 0
             //||  gameEntity.getLevel('shop_item_conjuration_magic') > 0
@@ -1614,7 +1614,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Invent much more complicated but efficient mechanisms of making paper and paper goods',
         level: 0,
         maxLevel: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_paper_enhance') > 0
             //||  gameEntity.getLevel('shop_item_conjuration_magic') > 0
@@ -1638,7 +1638,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Learn some better illusion spells.',
         level: 0,
         maxLevel: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_less_illusion') > 0
         },
@@ -1666,7 +1666,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Learn some better restoration spells.',
         level: 0,
         maxLevel: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_less_restoration') > 0
         },
@@ -1694,7 +1694,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Learn basic geography course for better understanding where to search for resources',
         level: 0,
         maxLevel: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_patience',
@@ -1721,7 +1721,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Now you know about secret shop, containing a lot of knowledge',
         level: 0,
         maxLevel: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_patience',
@@ -1748,7 +1748,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Learn how to use maximum of your body and soul. Unlock new intensity courses',
         level: 0,
         maxLevel: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_training_room') > 0
         },
@@ -1770,7 +1770,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Learn to craft inks from herbs and algae to create useful accessories like enchanted scrolls and notes.',
         level: 0,
         maxLevel: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_paper_working') > 0
             //||  gameEntity.getLevel('shop_item_conjuration_magic') > 0
@@ -1793,7 +1793,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Learn how to create new and better maps using magical map fragments.',
         level: 0,
         maxLevel: 5,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         resourceModifier: {
             income: {
                 effects: {
@@ -1827,7 +1827,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Learn recipe of new ink and ways to use it.',
         level: 0,
         maxLevel: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_ink_crafting') > 0
             //||  gameEntity.getLevel('shop_item_conjuration_magic') > 0
@@ -1850,7 +1850,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Use your water pumps to get better quality of water. Every Water pump level will increase maximum Well level',
         level: 0,
         maxLevel: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return gameEntity.getLevel('furniture_waterPump') > 0
         },
@@ -1883,7 +1883,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Learn secrets of growing herbs by combining science and magic',
         level: 0,
         maxLevel: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_patience',
@@ -1911,7 +1911,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Learn best practices from best masters. Unlocks new reductive courses',
         level: 0,
         maxLevel: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_patience',
@@ -1939,7 +1939,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Further advance your understanding of maps and far expeditions.',
         level: 0,
         maxLevel: 10,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         resourceModifier: {
             income: {
                 effects: {
@@ -1978,7 +1978,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Further advance your negotiations skills, decreasing land prices.',
         level: 0,
         maxLevel: 5,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         resourceModifier: {
             multiplier: {
                 effects: {
@@ -2017,7 +2017,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Unlock amber gathering on maps. Amber can be used for advanced accessories making.',
         level: 0,
         maxLevel: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_patience',
@@ -2045,7 +2045,7 @@ export const registerShopItemsStage1 = () => {
         description: 'A simple band worn by those who walk the long path of thought. Each moment spent in stillness sharpens the mind, easing future efforts.',
         level: 0,
         maxLevel: 6,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         resourceModifier: {
             multiplier: {
                 effects: {
@@ -2084,7 +2084,7 @@ export const registerShopItemsStage1 = () => {
         description: 'A subtle enchantment rests within this cap, easing the mental strain of casting. Slightly reduces the effort required for magical actions.',
         level: 0,
         maxLevel: 6,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         resourceModifier: {
             multiplier: {
                 effects: {
@@ -2122,7 +2122,7 @@ export const registerShopItemsStage1 = () => {
         name: 'Hunting',
         description: 'Allows you hunting for magic creatures, and get unique loot.',
         level: 0,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         maxLevel: 1,
         unlockedBy: [{
             type: 'effect',

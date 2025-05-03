@@ -336,7 +336,7 @@ export const initSpellsDB1 = () => {
         hasCap: false,
         tags: ['spell', 'magic', 'enhance', 'restoration_magic'],
         defaultCap: 0,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         isAbstract: true,
         level: 1,
         onUse: (amount) => {
@@ -508,7 +508,7 @@ export const initSpellsDB1 = () => {
         defaultCap: 0,
         isAbstract: true,
         level: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         onUse: (amount) => {
 
         },
@@ -566,7 +566,7 @@ export const initSpellsDB1 = () => {
         defaultCap: 0,
         isAbstract: true,
         level: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         onUse: (amount) => {
 
         },
@@ -623,7 +623,7 @@ export const initSpellsDB1 = () => {
         defaultCap: 0,
         isAbstract: true,
         level: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         onUse: (amount) => {
 
         },
@@ -686,7 +686,7 @@ export const initSpellsDB1 = () => {
         defaultCap: 0,
         isAbstract: true,
         level: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         onUse: (amount) => {
 
         },
@@ -745,7 +745,7 @@ export const initSpellsDB1 = () => {
         name: 'Conjure Earth',
         description: 'Create a bunch of earth',
         hasCap: false,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         tags: ['spell', 'magic', 'mental', 'conjuration_magic','elemental'],
         defaultCap: 0,
         isAbstract: true,
@@ -808,7 +808,7 @@ export const initSpellsDB1 = () => {
         name: 'Conjure Air',
         description: 'Create an air',
         hasCap: false,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         tags: ['spell', 'magic', 'mental', 'conjuration_magic','elemental'],
         defaultCap: 0,
         isAbstract: true,
@@ -875,7 +875,7 @@ export const initSpellsDB1 = () => {
         defaultCap: 0,
         isAbstract: true,
         level: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         onUse: (amount) => {
 
         },
@@ -938,7 +938,7 @@ export const initSpellsDB1 = () => {
         defaultCap: 0,
         isAbstract: true,
         level: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         onUse: (amount) => {
 
         },
@@ -999,7 +999,7 @@ export const initSpellsDB1 = () => {
         hasCap: false,
         tags: ['spell', 'magic', 'mental', 'conjuration_magic','elemental'],
         defaultCap: 0,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         isAbstract: true,
         level: 1,
         onUse: (amount) => {

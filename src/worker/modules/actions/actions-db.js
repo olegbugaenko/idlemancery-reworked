@@ -327,7 +327,7 @@ export const registerActionsStage1 = () => {
         name: 'Patrol',
         isAbstract: false,
         category: ACTION_CATS.COINS,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         allowedImpacts: ['effects'],
         description: 'Protect streets from hooligans and robbers. Its risky and hard job, but its well paid',
         level: 1,
@@ -383,7 +383,7 @@ export const registerActionsStage1 = () => {
         allowedImpacts: ['effects'],
         description: 'Work as builder. Its hard job, but well paid',
         level: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         discountEffects: ['physical_actions_discount'],
         getLearnRate: () => {
             return 1;
@@ -431,7 +431,7 @@ export const registerActionsStage1 = () => {
         tags: ["action", "job", "physical"],
         name: 'Senior Builder',
         isAbstract: false,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         category: ACTION_CATS.COINS,
         allowedImpacts: ['effects'],
         description: 'Work as senior builder. Its harder, but better paid',
@@ -483,7 +483,7 @@ export const registerActionsStage1 = () => {
         tags: ["action", "job", "physical"],
         name: 'Foreman',
         isAbstract: false,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         category: ACTION_CATS.COINS,
         allowedImpacts: ['effects'],
         description: 'Get harder but better paid job as foreman',
@@ -632,7 +632,7 @@ export const registerActionsStage1 = () => {
         name: 'Quarrying',
         category: ACTION_CATS.OTHER,
         isAbstract: false,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         allowedImpacts: ['effects'],
         description: 'Work hard in quarry trying to find some rocks containing precious minerals',
         level: 1,
@@ -679,7 +679,7 @@ export const registerActionsStage1 = () => {
         tags: ["action", "activity", "physical", "manual-labor"],
         name: 'Mining',
         isAbstract: false,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         category: ACTION_CATS.OTHER,
         allowedImpacts: ['effects'],
         description: 'Go to mine and get some iron ore',
@@ -925,7 +925,7 @@ export const registerActionsStage1 = () => {
         allowedImpacts: ['effects'],
         description: 'Learn more about trading and local economy. Increase amount of goods that can be sold',
         level: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         getLearnRate: () => {
             return 2.
         },
@@ -980,7 +980,7 @@ export const registerActionsStage1 = () => {
         allowedImpacts: ['effects'],
         description: 'Spent time walking through local market and talking to local merchants. This will improve your Bargaining attribute.',
         level: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         getLearnRate: () => {
             return 2.
         },
@@ -1032,7 +1032,7 @@ export const registerActionsStage1 = () => {
         allowedImpacts: ['effects'],
         description: 'Engage with the public through speeches, events, and social interactions to inspire others and strengthen your influence. This action enhances the effectiveness of all social actions, making your efforts more impactful.',
         level: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         getLearnRate: () => {
             return 4.
         },
@@ -1084,7 +1084,7 @@ export const registerActionsStage1 = () => {
         description: 'Improve your negotiation mastery, decreasing land cost.',
         level: 1,
         maxLevel: 100,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         getLearnRate: () => {
             return 1.
         },
@@ -1140,7 +1140,7 @@ export const registerActionsStage1 = () => {
         allowedImpacts: ['effects'],
         description: 'Participate in thought-provoking academic discussions and debates to broaden your knowledge and understanding.',
         level: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         getLearnRate: () => {
             return 1.
         },
@@ -1332,7 +1332,7 @@ export const registerActionsStage1 = () => {
             effectDeps: [],
             reourcesToReassert: ['health']
         },
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_strength',
@@ -1542,7 +1542,7 @@ export const registerActionsStage1 = () => {
     })*/
 
 
-
+/*
     registerGameAction('action_repetitive_discipline', {
         tags: ["action", "training", "physical"],
         category: ACTION_CATS.PHYSICAL,
@@ -1551,7 +1551,7 @@ export const registerActionsStage1 = () => {
         allowedImpacts: ['effects'],
         description: 'Trains your endurance through repetitive effort, reducing experience required for routine tasks.',
         level: 1,
-        maxLevel: 25,
+        maxLevel: 10,
         discountEffects: ['physical_actions_discount'],
         unlockedBy: [{
             type: 'effect',
@@ -1593,7 +1593,7 @@ export const registerActionsStage1 = () => {
             baseXPCost: 50,
             isTraining: true,
         }
-    })
+    })*/
 
 
 
@@ -1601,7 +1601,7 @@ export const registerActionsStage1 = () => {
         tags: ["action", "activity", "routine", "gathering"],
         name: 'Gathering',
         category: ACTION_CATS.ROUTINE,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         isAbstract: false,
         allowedImpacts: ['effects'],
         description: 'Spend more energy and efforts on looking for items for better rewards. You\'ll be able to cover smaller areas, but have better chance to find something',
@@ -1655,7 +1655,7 @@ export const registerActionsStage1 = () => {
     registerGameAction('action_hunt_carefully', {
         tags: ["action", "activity", "routine", "gathering"],
         name: 'Carefull Hunt',
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         category: ACTION_CATS.ROUTINE,
         isAbstract: false,
         allowedImpacts: ['effects'],
@@ -1942,7 +1942,7 @@ export const registerActionsStage1 = () => {
             return gameEntity.getLevel('shop_item_tent') > 3
         },
         attributes: {
-            baseXPCost: 50,
+            baseXPCost: 40,
             isTraining: true,
             primaryAttribute: 'attribute_patience',
             isRankAvailable: true,
@@ -1959,7 +1959,7 @@ export const registerActionsStage1 = () => {
         discountEffects: ["routine_actions_discount"],
         description: 'Dig underground vaults to store your coins. Its energy consuming action, but can pay off',
         level: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         getLearnRate: () => {
             return 2.
         },
@@ -2068,7 +2068,7 @@ export const registerActionsStage1 = () => {
         getLearnRate: () => {
             return 1.
         },
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         learningEffects: ['books_learning_rate'],
         resourceModifier: {
             get_multiplier: () => ({
@@ -2117,7 +2117,7 @@ export const registerActionsStage1 = () => {
         allowedImpacts: ['effects'],
         description: 'Learn secrets of growing plants',
         level: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         discountEffects: ['mental_actions_discount'],
         getLearnRate: () => {
             return 1.
@@ -2268,7 +2268,7 @@ export const registerActionsStage1 = () => {
         discountEffects: ['physical_actions_discount'],
         isAbstract: false,
         allowedImpacts: ['effects'],
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         description: 'Your improved endurance has unlocked a harder but much more efficient way to train your stamina',
         level: 1,
         getLearnRate: () => {
@@ -2320,7 +2320,7 @@ export const registerActionsStage1 = () => {
         name: 'Cardio Training',
         discountEffects: ['physical_actions_discount'],
         isAbstract: false,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         allowedImpacts: ['effects'],
         description: 'Finally, you feel the power in your hands. But still, you feel like you need to train more',
         level: 1,
@@ -2766,7 +2766,7 @@ export const registerActionsStage1 = () => {
         allowedImpacts: ['effects'],
         description: 'Refocuses your mental and spiritual pathways, reducing experience required for related trainings.',
         level: 1,
-        maxLevel: 40,
+        maxLevel: 25,
         discountEffects: ['mental_actions_discount'],
         unlockedBy: [{
             type: 'effect',
@@ -2777,13 +2777,13 @@ export const registerActionsStage1 = () => {
             multiplier: {
                 effects: {
                     'mental_actions_discount': {
-                        A: 0.025,
-                        B: 0.975,
+                        A: 0.04,
+                        B: 0.96,
                         type: 0,
                     },
                     'magical_actions_discount': {
-                        A: 0.025,
-                        B: 0.975,
+                        A: 0.04,
+                        B: 0.96,
                         type: 0,
                     }
                 }
@@ -2920,7 +2920,7 @@ export const registerActionsStage1 = () => {
         name: 'Spiritual Alignment',
         category: ACTION_CATS.MAGICAL,
         isAbstract: false,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         allowedImpacts: ['effects'],
         description: 'Spend some time trying to hear the magic inside you. Improve your feeling of yourself',
         level: 1,
@@ -3018,7 +3018,7 @@ export const registerActionsStage1 = () => {
         name: 'Advanced Craft',
         category: ACTION_CATS.OTHER,
         isAbstract: false,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         allowedImpacts: ['effects'],
         description: 'Spend more time and efforts on crafting advanced things',
         level: 1,
@@ -3074,7 +3074,7 @@ export const registerActionsStage1 = () => {
         allowedImpacts: ['effects'],
         description: 'A test of endurance, skill, and precision—Masterwork Crafting pushes the limits of craftsmanship, demanding immense physical and mental effort.',
         level: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         getLearnRate: () => {
             return 2
         },
@@ -3171,7 +3171,7 @@ export const registerActionsStage1 = () => {
         name: 'Meditative Insight',
         category: ACTION_CATS.MAGICAL,
         isAbstract: false,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         allowedImpacts: ['effects'],
         discountEffects: ['magical_actions_discount'],
         description: 'Engage in a deep meditative practice with the Metaphysics Book, sharpening memory and enhancing mana regeneration by channeling profound knowledge and magical focus.',
@@ -3235,7 +3235,7 @@ export const registerActionsStage1 = () => {
         allowedImpacts: ['effects'],
         description: 'This practice demands immense concentration and endurance as you stand on a board embedded with nails. Through this rigorous discipline, you strengthen both mind and body, enhancing your efficiency in routine tasks.',
         level: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         discountEffects: ['mental_actions_discount'],
         getLearnRate: () => {
             return 5.
@@ -3303,7 +3303,7 @@ export const registerActionsStage1 = () => {
         getLearnRate: () => {
             return 5.
         },
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         learningEffects: ['mental_training_learning_rate'],
         resourceModifier: {
             get_multiplier: () => ({
@@ -3392,7 +3392,7 @@ export const registerActionsStage1 = () => {
             id: 'attribute_patience',
             level: 4000,
         }],
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return true
         },
@@ -3412,7 +3412,7 @@ export const registerActionsStage1 = () => {
         allowedImpacts: ['effects'],
         description: 'Engage in lively debates to sharpen your wits and increase your Charisma.',
         level: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         discountEffects: ['social_actions_discount'],
         getLearnRate: () => {
             return 5.
@@ -3468,7 +3468,7 @@ export const registerActionsStage1 = () => {
         allowedImpacts: ['effects'],
         description: 'Dedicate yourself to helping others selflessly, sacrificing energy and health, but gaining patience and a boost to your charisma in return.',
         level: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         getLearnRate: () => {
             return 5.
         },
@@ -3531,7 +3531,7 @@ export const registerActionsStage1 = () => {
         discountEffects: ['magical_actions_discount'],
         description: 'Finally you achieved that point where your brain allows you to understand the nature of magic. Analyze magic, mana and how its used by spells. Its hard and exhausting task, but totally worth it',
         level: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         resourceModifier: {
             get_income: () => ({
                 effects: {
@@ -3595,7 +3595,7 @@ export const registerActionsStage1 = () => {
         getLearnRate: () => {
             return 5
         },
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         resourceModifier: {
             get_multiplier: () => ({
                 effects: {
@@ -3647,7 +3647,7 @@ export const registerActionsStage1 = () => {
         discountEffects: ['mental_actions_discount'],
         description: 'Clear your thoughts with calming practices like deep breathing and quiet contemplation. Enhances Clarity, improving the regeneration of your mental energy.',
         level: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         getLearnRate: () => {
             return 5
         },
@@ -3703,7 +3703,7 @@ export const registerActionsStage1 = () => {
         discountEffects: ['mental_actions_discount'],
         description: 'Push your limits with challenging mental exercises that build resilience and patience. Gradually increases your Willpower, allowing for greater mental energy capacity.',
         level: 1,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         getLearnRate: () => {
             return 5
         },
@@ -3766,7 +3766,7 @@ export const registerActionsStage1 = () => {
         getLearnRate: () => {
             return 5
         },
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         learningEffects: [],
         resourceModifier: {
             get_multiplier: () => ({

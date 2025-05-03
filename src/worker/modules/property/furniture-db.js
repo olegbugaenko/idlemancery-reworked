@@ -566,7 +566,7 @@ export const registerFurnitureStage1 = () => {
         }),
     })
 
-    registerFurniture('furniture_yoga_carpet', {
+    /*registerFurniture('furniture_yoga_carpet', {
         tags: ["furniture", "upgrade", "purchaseable", "actions"],
         name: 'Yoga Carpet',
         description: 'Use it for your daily yoga practices, increasing yoga XP rate',
@@ -607,7 +607,7 @@ export const registerFurnitureStage1 = () => {
                 type: 0
             }
         }),
-    })
+    })*/
 
     registerFurniture('furniture_contemplation_sofa', {
         tags: ["furniture", "upgrade", "purchaseable", "actions"],
@@ -615,7 +615,7 @@ export const registerFurnitureStage1 = () => {
         description: 'A wide and comfortable sofa designed for prolonged periods of deep thought and reflection. Its soft cushions and ergonomic design allow you to stay focused and relaxed during extended mental training sessions.',
         level: 0,
         maxLevel: 4,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_patience',
@@ -665,7 +665,7 @@ export const registerFurnitureStage1 = () => {
         description: 'A minimalist desk designed to foster focus and tranquility, enhancing the regeneration of your mental energy.',
         level: 0,
         maxLevel: 6,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_patience',
@@ -714,7 +714,7 @@ export const registerFurnitureStage1 = () => {
         description: 'A carefully curated bookshelf that inspires learning and accelerates the completion of courses.',
         level: 0,
         maxLevel: 6,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_patience',
@@ -768,7 +768,7 @@ export const registerFurnitureStage1 = () => {
             id: 'attribute_strength',
             level: 3000,
         }],
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return true;
         },
@@ -856,7 +856,7 @@ export const registerFurnitureStage1 = () => {
         description: 'Provide better inventory to improve physical training efficiency',
         level: 0,
         maxLevel: 10,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_strength',
@@ -1125,7 +1125,7 @@ export const registerFurnitureStage1 = () => {
         description: 'Improves your conjuration magic efficiency',
         level: 0,
         maxLevel: 4,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_magic_ability',
@@ -1313,7 +1313,7 @@ export const registerFurnitureStage1 = () => {
         name: 'Masterwork Bench',
         description: 'A massive and meticulously crafted workbench that requires both strength and skill to wield effectively. In the hands of a true master, it turns raw materials into works of perfection, pushing the limits of craftsmanship beyond the ordinary.',
         level: 0,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_crafting_courses') > 0;
         },
@@ -1724,7 +1724,7 @@ export const registerFurnitureStage1 = () => {
         description: 'A dedicated workspace for crafting inks, equipped with a herb press and precise mixing tools. Increases ink crafting efficiency',
         level: 0,
         maxLevel: 4,
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_ink_crafting') > 0;
         },
@@ -1770,7 +1770,7 @@ export const registerFurnitureStage1 = () => {
     registerFurniture('furniture_waterPump', {
         tags: ["furniture", "upgrade", "purchaseable", "other", "planting"],
         name: 'Water Pump',
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         description: 'A powerful machine that allows to supply water to your plantations',
         level: 0,
         unlockCondition: () => {
@@ -1821,7 +1821,7 @@ export const registerFurnitureStage1 = () => {
     registerFurniture('furniture_papercutting_station', {
         tags: ["furniture", "upgrade", "purchaseable", "resource", "crafting"],
         name: 'Paper Cutting Station',
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         description: 'A small but complicated mechanism for cutting papers',
         level: 0,
         getMaxLevel: () => {
@@ -1872,7 +1872,7 @@ export const registerFurnitureStage1 = () => {
     registerFurniture('furniture_preservation_rack', {
         tags: ["furniture", "upgrade", "purchaseable", "resource", "hunting"],
         name: 'Preservation Rack',
-        minDemoVersion: 2,
+        minDemoVersion: 20,
         description: 'Cured meats, drying herbs, and trophies hang neatly, allowing you to save and store more from each hunt.',
         level: 0,
         unlockedBy: [{
