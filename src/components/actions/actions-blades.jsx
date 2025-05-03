@@ -378,11 +378,12 @@ export const ListEditor = React.memo(({
                                                         <input type={'number'} value={action.time}
                                                                onChange={(e) => {
                                                                    if(currentTourId === 'action-lists' && +e.target.value > 1) {
+                                                                       console.log('cT: ', currentTourId, stepIndex);
                                                                        unlockNextById(9)
                                                                    }
                                                                    onUpdateActionFromList(action.id, 'time', +e.target.value)
                                                                }}/>
-                                                        <label>
+                                                        <label className={`effort-auto-${action.id}`}>
                                                             <input type={'checkbox'} checked={action.isDynamicTime} disabled={!action.isAutoTimeEnabled} onChange={(e) => {
                                                                 onUpdateActionFromList(action.id, 'isDynamicTime', !action.isDynamicTime)
                                                             }}/>
@@ -443,7 +444,7 @@ export const ListEditor = React.memo(({
             <button className={'primary-action'} onClick={() => saveAndClose(false)}>{listData?.id ? 'Save' : 'Create'}</button>
             <button className={'primary-action save-and-close'} onClick={() => {
                 if(currentTourId === 'action-lists') {
-                    unlockNextById(10)
+                    unlockNextById(11)
                 }
                 if(currentTourId === 'lists-automation') {
                     unlockNextById(10)

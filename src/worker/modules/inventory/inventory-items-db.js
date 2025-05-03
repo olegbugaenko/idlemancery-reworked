@@ -435,7 +435,7 @@ export const registerInventoryItems = () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_1') > 0
         },
         sellPrice: 390,
-        rarity: 0.75,
+        rarity: 0.5,
         allowedTileTypes: ['plain', 'savanna']
     })
 
@@ -481,7 +481,7 @@ export const registerInventoryItems = () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_1') > 0
         },
         sellPrice: 390,
-        rarity: 0.75,
+        rarity: 0.5,
         allowedTileTypes: ['plain', 'mountain', 'hills']
     })
 
@@ -528,7 +528,7 @@ export const registerInventoryItems = () => {
             && gameEntity.getLevel('shop_item_spellbook') > 0
         },
         sellPrice: 200,
-        rarity: 2,
+        rarity: 1,
         allowedTileTypes: ['mountain', 'savanna']
     })
 

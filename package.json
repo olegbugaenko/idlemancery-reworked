@@ -7,7 +7,7 @@
     "start": "webpack serve --config webpack.config.js",
     "start:demo": "set IS_DEMO=1 && webpack serve --config webpack.config.js",
     "build": "npm update & webpack --config webpack.config.js",
-    "build:demo": "set REACT_APP_IS_DEMO=1 && npm update & webpack --config webpack.config.js",
+    "build:demo": "set IS_DEMO=1 & webpack --config webpack.config.js",
     "electron:dev": "electron electron/main.js",
     "electron:build": "npm update & webpack --config webpack.config.js & electron-builder"
   },
