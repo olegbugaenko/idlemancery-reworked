@@ -14,6 +14,7 @@ import {AmplifiersUpgrades} from "./amplifiers.jsx";
 import {useAppContext} from "../../context/ui-context";
 import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
 import StatRow from "../shared/stat-row.jsx";
+import {playSound} from "../../context/sounds/sound-manager";
 
 export const Property = ({}) => {
     const [detailOpened, setDetailOpened] = useState(null)
@@ -79,6 +80,7 @@ export const Property = ({}) => {
         if(!id) {
             setDetailOpened(null);
         } else {
+            playSound('selection');
             setDetailOpened(id);
         }
     }

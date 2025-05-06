@@ -45,7 +45,7 @@ export const PersonageCircle = () => {
                 <p>XP/sec: {formatValue(mageData.xpTotalIncome)}</p>
                 <p>Next level in: {secondsToString(mageData.eta)}</p>
                 {mageData?.xpBalance ? (<div className={'balances block'}>
-                    {mageData.xpBalance.actions?.splice(0, 5).map(balance => (<p className={'small-hint'}>Running action - {balance.name}: {formatValue(balance.dxp)}</p>))}
+                    {mageData.xpBalance.actions?.splice(0, 5).map((balance, index) => (<p key={index} className={'small-hint'}>Running action - {balance.name}: {formatValue(balance.dxp)}</p>))}
                     {mageData.xpBalance.actions?.length ? (<p className={'small-hint'}>And {formatInt(mageData.xpBalance.actions?.length)} more</p>) : null}
                 </div> ) : null}
             </div>}>

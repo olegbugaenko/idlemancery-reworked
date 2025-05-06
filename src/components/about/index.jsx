@@ -6,6 +6,13 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+                <h3>Idle Awakening v0.1.4b</h3>
+                <div className={'features'}>
+                    <p>Added sounds and music</p>
+                    <p>Added some intro story</p>
+                    <p>Fixed bug when some tutorials could crash the game</p>
+                    <p>Fixed some statistics display issues</p>
+                </div>
                 <h3>Idle Awakening v0.1.4a</h3>
                 <div className={'features'}>
                     <p>Fixed issue with display action lists tour incompletely in some cases</p>

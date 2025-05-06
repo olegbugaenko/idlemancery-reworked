@@ -169,6 +169,7 @@ export class ShopModule extends GameModule {
             this.leveledId = itemId;
             gameCore.getModule('unlock-notifications').generateNotifications();
             this.sendItemsData();
+            this.eventHandler.playSound('purchase');
         }
         return newEnt.success;
     }

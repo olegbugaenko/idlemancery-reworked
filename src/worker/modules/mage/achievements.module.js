@@ -7,11 +7,16 @@ export class AchievementsModule extends GameModule {
     constructor() {
         super();
         this.achievementsDone = {}
-        this.checkTimeout = 10;
+        this.checkTimeout = 0;
 
         this.eventHandler.registerHandler('mark-achievement-viewed', (payload => {
             if(this.achievementsDone[payload.id]?.s === 1) {
                 this.achievementsDone[payload.id].s = 2; // viewed
+                if(payload.id === 'intro') {
+                    console.log('Mark intro as viewed');
+                    this.eventHandler.sendData('tour_status', {...gameCore.getModule('mage').tourStatus, isAllowed: true});
+                }
+                this.eventHandler.sendData('achievement-to-view', undefined);
             }
         }))
 
@@ -41,6 +46,7 @@ export class AchievementsModule extends GameModule {
 
     load(obj) {
         this.achievementsDone = obj?.done ?? {};
+        this.checkTimeout = 0;
     }
 
     reset() {

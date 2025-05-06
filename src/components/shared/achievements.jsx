@@ -28,12 +28,17 @@ export const ActiveAchievement = () => {
     })
 
     useEffect(() => {
-        if(activePopup) return; // dont show
+        console.log('SetCurrAch: ', viewedAchievement, activePopup);
+        if(activePopup && activePopup !== 'achievement') return; // dont show
+        if(activePopup === 'achievement') {
+            togglePopup(null);
+        }
         if(viewedAchievement) {
             // console.log('Setting onClosePopup for achievements', activePopup);
             togglePopup(
                 'achievement',
                 () => {
+                    console.log('markingAsViewedCB Called: ', viewedAchievement);
                     sendData('mark-achievement-viewed', { id: viewedAchievement.id });
                 },
                 {
@@ -44,7 +49,7 @@ export const ActiveAchievement = () => {
                 }
             )
         }
-    }, [viewedAchievement, activePopup])
+    }, [viewedAchievement?.id, activePopup])
 
 }
 
@@ -85,16 +90,18 @@ export const CurrentAchievement = ({ onClose, children }) => {
 
     const { togglePopup } = useAppContext();
 
+    console.log('onClosePassedInComp: ', onClose);
+
     return (<div className={'current-wrap'}>
         <div className={'achievement-text'}>
             {children}
         </div>
         <div className={'buttons'}>
             <button className={'warning-action'} onClick={() => {
-                togglePopup(null);
                 if(onClose) {
                     onClose();
                 }
+                togglePopup(null);
             }}>Close</button>
         </div>
     </div> )

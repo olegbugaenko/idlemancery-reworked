@@ -83,7 +83,7 @@ export const ActionDetailsComponent = React.memo(({onClose, isSelected, ...actio
             </div> ) : null}
             <div className={'block'}>
                 <div className={'tags-container'} id={'action-tags'}>
-                    {action.tags.map(tag => (<div className={'tag'}>{tag}</div> ))}
+                    {action.tags.map(tag => (<div key={tag} className={'tag'}>{tag}</div> ))}
                 </div>
             </div>
             {action.entityEfficiency < 1 ? (<div className={'block'}>
@@ -512,7 +512,7 @@ export const GeneralStats = ({ stats, aspects, setDetailVisible }) => {
                 <p className={'hint'}>
                     Intensity boosts work speed but increases resource use. Max intensity depends on the attribute. "Keep Max" uses the highest available level. Lower intensity saves resources.
                 </p>
-                {aspects.list.map(one => (<div className={'aspect-wrap'}>
+                {aspects.list.map(one => (<div className={'aspect-wrap'} key={`aspect_${one.id}`}>
                     <div className={'flex-container aspect-row'}>
                         <span className={'col title'}>{one.name}</span>
                         <div className={'col amount'}>
@@ -548,7 +548,7 @@ export const GeneralStats = ({ stats, aspects, setDetailVisible }) => {
             {!isLearningRatesHidden ? (<div className={'learning-block'}>
                 <div className={'effects'}>
                     {Object.values(stats?.learnMults || {}).filter(one => hasEffect(one)).map(one => (
-                        <StatRow onHover={highLightAffectedActions} stat={{...one, isMultiplier: true}} />
+                        <StatRow key={`stat_${one.id}`} onHover={highLightAffectedActions} stat={{...one, isMultiplier: true}} />
                     ))}
                 </div>
             </div>) : null}
@@ -564,7 +564,7 @@ export const GeneralStats = ({ stats, aspects, setDetailVisible }) => {
             {!isDiscountsHidden ? (<div className={'learning-block'}>
                 <div className={'effects'}>
                     {Object.values(stats?.xpDiscounts || {}).filter(one => hasEffect(one)).map(one => (
-                        <StatRow onHover={highLightDiscountedActions} stat={{...one, isMultiplier: true}}/>
+                        <StatRow key={`disc_${one.id}`} onHover={highLightDiscountedActions} stat={{...one, isMultiplier: true}}/>
                     ))}
                 </div>
             </div>) : null}

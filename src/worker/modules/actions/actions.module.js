@@ -378,9 +378,10 @@ export class ActionsModule extends GameModule {
         if(!this.customFilters[id]) {
             delete this.filtersCache[id];
         }
+        this.customFilters[id].rules = this.customFilters[id].rules?.filter(r => !!r.type);
         // now apply filters and find ids
         if(!this.customFilters[id].rules) {
-            this.filtersCache[id] = {'all': true};
+            this.filtersCache[id].rules = [];
             return;
         }
         const entities = gameEntity.listEntitiesByTags(['action']);
@@ -394,7 +395,9 @@ export class ActionsModule extends GameModule {
                     || Object.keys(entity.modifier?.multiplier?.resources || {}).includes(rule.object);
                 if(rule.type === 'attribute') return Object.keys(entity.modifier?.income?.effects || {}).includes(rule.object)
                     || Object.keys(entity.modifier?.multiplier?.effects || {}).includes(rule.object);
-                throw new Error('Invalid filter condition: '+rule.type);
+                console.error('Invalid rule: ', rule, id, this.customFilters[id]);
+                return false;
+                //throw new Error('Invalid filter condition: '+rule.type);
             })
 
             let conditionExpression = this.customFilters[id].condition;
@@ -419,7 +422,7 @@ export class ActionsModule extends GameModule {
                     this.filtersCache[id][entity.id] = true;
                 }
             } catch (error) {
-                console.error("Invalid condition string", error);
+                console.warn("Invalid condition string: "+conditionExpression, error);
                 return false;
             }
 
@@ -432,7 +435,7 @@ export class ActionsModule extends GameModule {
         for(const filterId in this.customFilters) {
             this.generateFilterCache(filterId);
         }
-        // console.log('Caches: ', this.filtersCache);
+        //console.log('Caches: ', this.filtersCache);
     }
 
     setCustomFilterPinned({ id, flag }) {
@@ -563,6 +566,7 @@ export class ActionsModule extends GameModule {
                     this.sendActionsData(this.selectedFilterId, {
                         searchData: this.searchData,
                     });
+                    this.eventHandler.playSound('action_levelup');
                 }
             })
 

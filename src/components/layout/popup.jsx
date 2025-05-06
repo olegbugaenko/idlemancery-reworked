@@ -17,7 +17,7 @@ export const Popup = () => {
 
     useEffect(() => {
         onClosePopupRef.current = onClosePopupCb;
-        console.log('onClosePopup: ', onClosePopupCb);
+        console.log('onClosePopup: ', onClosePopupCb, activePopup);
     }, [onClosePopupCb]);
 
     const HOWTO_TITLES = {
@@ -100,7 +100,7 @@ export const Popup = () => {
     }
 
     if(activePopup === 'achievements') {
-        return (<PopupComponent title={'Story'} onClose={onClosePopupCb}>
+        return (<PopupComponent title={'Story'} onClose={onClosePopupRef.current}>
             <AchievementsCompleted />
         </PopupComponent> )
     }

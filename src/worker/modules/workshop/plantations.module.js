@@ -147,6 +147,7 @@ export class PlantationsModule extends GameModule {
             this.purchasedItems[itemId].level = gameEntity.getLevel(itemId);
             this.leveledId = itemId;
             this.sendItemsData();
+            this.eventHandler.playSound('purchase');
         }
         return newEnt.success;
     }

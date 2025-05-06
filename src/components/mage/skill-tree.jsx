@@ -387,33 +387,40 @@ const SkillTree = () => {
                 </div> ) : null}
             </div>
 
-            {isMobile && detailsShown ? (<div className={'details-wrap'}>
-                <div className={'blade-inner'}>
-                    <div className={'block'}>
-                        <h4>{detailsShown.name} ({formatInt(detailsShown.level)})</h4>
-                        <div className={'description'}>
-                            {detailsShown.description}
+            {isMobile && detailsShown ? (<div className={'details-wrap skill-details-mobile'}>
+                <PerfectScrollbar>
+                    <div className={'blade-inner'}>
+                        <div className={'block'}>
+                            <div className={'flex-container flex-row'}>
+                                <h4>{detailsShown.name} ({formatInt(detailsShown.level)})</h4>
+                                <button disabled={!detailsShown.affordable?.isAffordable || !detailsShown.isRequirementsMet} onClick={() => onPurchase(detailsShown.id)}>Purchase</button>
+                            </div>
+
+                            <div className={'description'}>
+                                {detailsShown.description}
+                            </div>
+                        </div>
+                        <div className={'block'}>
+                            <p>Effects:</p>
+                            <div className={'effects'}>
+                                {detailsShown.currentEffects ?
+                                    (<ResourceComparison effects1={detailsShown.currentEffects} effects2={detailsShown.effects} /> )
+                                    : (<EffectsSection effects={detailsShown.effects} />)
+                                }
+                            </div>
+                        </div>
+                        <div className={'block'}>
+                            <p>Cost:</p>
+                            <div className={'costs-wrap'}>
+                                {Object.values(detailsShown.affordable.affordabilities || {}).map(aff => <ResourceCost affordabilities={aff}/>)}
+                            </div>
+                        </div>
+                        <div className={'block'}>
+                            <button disabled={!detailsShown.affordable?.isAffordable || !detailsShown.isRequirementsMet} onClick={() => onPurchase(detailsShown.id)}>Purchase</button>
                         </div>
                     </div>
-                    <div className={'block'}>
-                        <p>Effects:</p>
-                        <div className={'effects'}>
-                            {detailsShown.currentEffects ?
-                                (<ResourceComparison effects1={detailsShown.currentEffects} effects2={detailsShown.effects} /> )
-                                : (<EffectsSection effects={detailsShown.effects} />)
-                            }
-                        </div>
-                    </div>
-                    <div className={'block'}>
-                        <p>Cost:</p>
-                        <div className={'costs-wrap'}>
-                            {Object.values(detailsShown.affordable.affordabilities || {}).map(aff => <ResourceCost affordabilities={aff}/>)}
-                        </div>
-                    </div>
-                    <div className={'block'}>
-                        <button disabled={!detailsShown.affordable?.isAffordable || !detailsShown.isRequirementsMet} onClick={() => onPurchase(detailsShown.id)}>Purchase</button>
-                    </div>
-                </div>
+                </PerfectScrollbar>
+
             </div> ) : null}
         </div>);
 };

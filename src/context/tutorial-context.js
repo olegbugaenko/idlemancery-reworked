@@ -146,7 +146,7 @@ export function TutorialProvider({ children }) {
                             // Тур завершено нормально
                             sendData('set_tour_finished', { tutorial: currentTourId });
                         }
-                        setRun(false);
+                        stopTutorial();
                     }
 
                     if (type === 'step:after' && action === 'next') {
@@ -158,7 +158,7 @@ export function TutorialProvider({ children }) {
                     }
                     if (type === 'step:after' && action === 'close') {
                         sendData('set_tour_finished', { skipStep: stepIndex, tutorial: currentTourId });
-                        setRun(false);
+                        stopTutorial();
                     }
 
 

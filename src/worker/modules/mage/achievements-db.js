@@ -2,6 +2,17 @@ import {gameCore, gameEntity, gameResources} from "game-framework";
 import {unlocksApi} from "game-framework/src/general/unlocks-api";
 
 export const achievementsDb = [{
+    id: 'intro',
+    title: 'Awakening',
+    text: [
+        "You open your eyes and find nothing but trees around you.",
+        "Birds are singing, but the loudest sound is the growl of your empty stomach.",
+        "Your muscles ache as you struggle to sit up. You glance around—seems safe enough. But the moment you move, the world spins.",
+        "A few more minutes pass. No memories return. No answers come.",
+        "One thing is clear: sitting on cold, damp ground forever isn't a great plan."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_walk') < 2,
+},{
     id: 'finished_demo',
     title: 'Congratulations',
     text: [

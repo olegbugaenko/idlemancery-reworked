@@ -689,6 +689,7 @@ export class PropertyModule extends GameModule {
                 // console.log('newEntFurnNEW: ', this.purchasedFurnitures)
                 gameCore.getModule('unlock-notifications').generateNotifications();
                 this.sendFurnituresData({ filterId }, options);
+                this.eventHandler.playSound('purchase');
             }
         }
         return newEnt.success;

@@ -107,7 +107,7 @@ export const ResourcesBar = () => {
                 addClass += ' missing-blocker';
             }
 
-            return (<div key={res.id} className={`holder ${aff ? 'monitored' : ''} ${addClass}`} onMouseEnter={() => setMonitoredAttribute(res.id)} /*onMouseOut={() => setMonitoredAttribute(null)}*/ onMouseLeave={() => setMonitoredAttribute(null)}><p className={`resource-item ${affClassData}`}>
+            return (<div key={res.id} className={`holder ${aff ? 'monitored' : ''} ${addClass}`} onMouseEnter={() => setMonitoredAttribute(res.id)} /*onMouseOut={() => setMonitoredAttribute(null)}*/ onMouseLeave={() => setMonitoredAttribute(null)}><div className={`resource-item ${affClassData}`}>
                 <div className={'resource-label'}>
                     <RawResource name={res.name} id={res.id} />
                 </div>
@@ -123,7 +123,7 @@ export const ResourcesBar = () => {
                 {aff ? (<div className={'appendix'}>
                     {aff.isAffordable ? (<span>{formatValue(aff.requirement)}</span>) : (<span>{formatValue(aff.actual - aff.requirement)}({secondsToString(aff.eta)})</span>)}
                 </div> ) : null}
-            </p></div>)
+            </div></div>)
         })}
     </div> )
 }
@@ -179,7 +179,7 @@ export const AttributesBar = () => {
                         }}
                          /*onMouseOut={() => setMonitoredAttribute(null)}*/
                          onMouseLeave={(e) => setMonitoredAttribute(null, e.target)}
-            ><p className={`resource-item ${affClassData}`}>
+            ><div className={`resource-item ${affClassData}`}>
                 <TippyWrapper content={<div className={'hint-popup'}>
                     <div className={'block'}>
                         <h4>{res.name}: {formatValue(res.value, 3)}</h4>
@@ -203,7 +203,7 @@ export const AttributesBar = () => {
                 {aff ? (<div className={'appendix'}>
                     {aff.isAffordable ? (<span>{formatValue(aff.requirement)}</span>) : (<span>{formatValue(aff.actual - aff.requirement)}({secondsToString(aff.eta)})</span>)}
                 </div> ) : null}
-            </p></div>)
+            </div></div>)
         })}
     </div> )
 }

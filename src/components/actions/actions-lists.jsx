@@ -97,10 +97,9 @@ export const ActionListsPanel = ({ automationUnlocked, runningList, editListToDe
                             </select>
                         </label>
                     </div>
-                    <HowToSign scope={'action-lists'} />
                 </>
             ) : null}
-
+            <HowToSign scope={'action-lists'} />
         </div>
     </div>)
 }

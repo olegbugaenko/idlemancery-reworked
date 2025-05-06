@@ -20,6 +20,7 @@ import {PinResource} from "../shared/pin-resource.jsx";
 import {CustomButton} from "../shared/buttons/custom-button.jsx";
 import {HowToSign} from "../shared/how-to-sign.jsx";
 import {useTutorial} from "../../context/tutorial-context";
+import {playSound} from "../../context/sounds/sound-manager";
 
 
 const INVENTORY_SEARCH_SCOPES = [{
@@ -157,6 +158,9 @@ export const Inventory = ({}) => {
             setViewedOpenedId(null);
             setDetailOpenedId({id, name});
             setChanged(false);
+            if(detailOpenedId !== id) {
+                playSound('click');
+            }
         }
     }, [isChanged, detailOpenedId])
 
@@ -168,7 +172,9 @@ export const Inventory = ({}) => {
                 setViewedData(null);
                 return null;
             }
-
+            if(id && (id !== viewedOpenedId)) {
+                playSound('selection');
+            }
             return id;
         })
 
@@ -426,7 +432,7 @@ export const Inventory = ({}) => {
                     </PerfectScrollbar>
                 </div>
             </div>
-            {(!isMobile || isDetailVisible || editData || viewedData) ? (<div className={`item-detail ingame-box detail-blade ${editData ? 'wide-blade' : ''}`}>
+            {(!isMobile || isDetailVisible || editData || viewedData) ? (<div className={`item-detail ingame-box detail-blade ${editData ? 'wide-blade2' : 'wide-blade2'}`}>
                 {editData || viewedData ? (<InventoryDetails
                     isChanged={isChanged}
                     editData={editData}

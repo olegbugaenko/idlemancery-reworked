@@ -8,6 +8,7 @@ import './assets/styles.css';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 import {AppProvider, useAppContext} from "./context/ui-context";
 import {DndProvider} from "./custom-libs/dnd";
+import {SoundProvider} from "./context/sounds/sound-context.jsx";
 
 function App() {
     const worker = window.worker || new Worker();
@@ -49,7 +50,7 @@ function App() {
     });
 
     onMessage('loaded', (pl) => {
-        // console.log('Loaded received: ', pl);
+        // Request and apply sound valumes here
         setReadyToGo(true);
         if(pl.isReset) {
             // console.log('Resetted: ', pl);
@@ -74,9 +75,11 @@ function App() {
 
     return (
         <WorkerContext.Provider value={worker}>
-            <div className="App">
-                <Main readyToGo={readyToGo} isLoading={isLoading}/>
-            </div>
+            <SoundProvider>
+                <div className="App">
+                    <Main readyToGo={readyToGo} isLoading={isLoading}/>
+                </div>
+            </SoundProvider>
         </WorkerContext.Provider>
     );
 }

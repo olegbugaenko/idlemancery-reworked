@@ -3,7 +3,7 @@ import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
 import { debounce } from 'lodash';
 
-export const NewNotificationWrap = ({ isNew, id, className, children, key }) => {
+export const NewNotificationWrap = ({ isNew, id, className, children }) => {
     const worker = useContext(WorkerContext);
     const { sendData } = useWorkerClient(worker);
 
@@ -17,7 +17,6 @@ export const NewNotificationWrap = ({ isNew, id, className, children, key }) => 
         <div
             className={`${className} new-notification-wrapper ${isNew ? 'is-new' : ''}`}
             onMouseOver={setViewed}
-            key={key}
         >
             {children}
         </div>

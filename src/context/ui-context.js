@@ -17,7 +17,7 @@ export const AppProvider = ({ children }) => {
             setOnClosePopupCb(null);
         }
         setActivePopup(id);
-        setOnClosePopupCb(onClosePopupCb);
+        setOnClosePopupCb(() => onClosePopupCb);
         setPopupMeta(popupMeta);
     }
 

@@ -315,7 +315,7 @@ export class SpellModule extends GameModule {
             }
             this.spells[id].isCasted = true;
             this.spells[id].numCasted = (this.spells[id].numCasted || 0) + 1;
-
+            this.eventHandler.playSound('cast_spell');
         }
         this.sendSpellData();
     }

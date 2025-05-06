@@ -48,14 +48,20 @@ export class MageModule extends GameModule {
             console.log('LAE: ', this.activeEffectsFiltered);
         })
 
-        this.eventHandler.registerHandler('query-settings', () => {
-            this.eventHandler.sendData('settings', this.settings);
+        this.eventHandler.registerHandler('query-settings', (payload) => {
+            let label = 'settings';
+            if(payload?.prefix) {
+                label = `settings-${payload.prefix}`;
+            }
+            console.log('Sent settings: ', label, this.settings);
+            this.eventHandler.sendData(label, this.settings);
         })
 
         this.eventHandler.registerHandler('set-setting', (payload) => {
             if(!this.settings) {
                 this.settings = {};
             }
+            console.log('setSetting: ', payload);
             this.settings[payload.key] = payload.value;
             this.eventHandler.sendData('settings', this.settings);
         })
@@ -69,7 +75,7 @@ export class MageModule extends GameModule {
         })
 
         this.eventHandler.registerHandler('query_tour_status', () => {
-            this.eventHandler.sendData('tour_status', this.tourStatus);
+            this.eventHandler.sendData('tour_status', {...this.tourStatus, isAllowed: gameCore.getModule('achievements').achievementsDone?.intro?.s === 2});
         })
 
         this.eventHandler.registerHandler('query-mage-data', ({ prefix }) => {
@@ -709,7 +715,7 @@ export class MageModule extends GameModule {
     getStatistics() {
         const result = {};
         result.totalTimePlayed = gameCore.globalTime;
-        result.mageLevel = this.mageLevel;
+        result.mageLevel = gameEntity.getLevel('mage');
         result.actionsUnlocked = gameEntity.listEntitiesByTags(['action']).filter(one => gameEntity.isEntityUnlocked(one.id)).length;
         result.actionTimes = this.topValues(Object.entries(gameCore.getModule('actions').actions).map(([id, action]) => {
             return {
@@ -748,6 +754,7 @@ export class MageModule extends GameModule {
             const data = this.getMageData();
             // this.reassertCurrentMageLevel();
             this.eventHandler.sendData('mage-data', data);
+            this.eventHandler.playSound('hero_levelup');
         }
 
         // console.log('B_TICK: ', this.bankedTime)

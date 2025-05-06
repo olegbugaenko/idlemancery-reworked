@@ -14,6 +14,7 @@ import {useAppContext} from "../../context/ui-context";
 import {CustomButton} from "../shared/buttons/custom-button.jsx";
 import {AutomationIcon} from "../shared/buttons/automation-checkbox.jsx";
 import {useTutorial} from "../../context/tutorial-context";
+import {playSound} from "../../context/sounds/sound-manager";
 
 export const Shop = ({}) => {
     const [detailOpened, setDetailOpened] = useState(null)
@@ -58,6 +59,7 @@ export const Shop = ({}) => {
             setDetailOpened(null);
         } else {
             setDetailOpened(id);
+            playSound('selection');
         }
     }
 
@@ -621,7 +623,7 @@ export const GeneralStats = ({ category, setDetailVisible }) => {
                     <h4>General Stats</h4>
                 </div>
                 <div className={'block'}>
-                    {item.stats.map(stat => (<div className={'row flex-row'}>
+                    {item.stats.map(stat => (<div className={'row flex-row'} key={stat.name}>
                         <TippyWrapper content={<div className={'hint-popup'}><p>{stat.description}</p></div> }>
                             <p>{stat.name}</p>
                         </TippyWrapper>

@@ -3,6 +3,8 @@ import {Content} from "./layout/content.jsx";
 import {TutorialProvider, useTutorial} from "../context/tutorial-context";
 import WorkerContext from "../context/worker-context";
 import {useWorkerClient} from "../general/client";
+import {resumeAudioContext} from "../context/sounds/sound-manager";
+import {useSound} from "../context/sounds/sound-context.jsx";
 
 export const Main = ({ readyToGo, isLoading }) => {
 
@@ -29,6 +31,18 @@ export const LoadedMain = () => {
 
     const { onMessage, sendData } = useWorkerClient(worker);
     const { startTutorialById, stopTutorial, setStepIndex } = useTutorial();
+    const { initializeVolumes } = useSound();
+
+    useEffect(() => {
+        const handleFirstInput = () => {
+            resumeAudioContext();
+            initializeVolumes();
+            window.removeEventListener('pointerdown', handleFirstInput);
+        };
+
+        window.addEventListener('pointerdown', handleFirstInput);
+        return () => window.removeEventListener('pointerdown', handleFirstInput);
+    }, []);
 
     useEffect(() => {
         sendData('query_tour_status', {})
@@ -36,7 +50,8 @@ export const LoadedMain = () => {
     }, [])
 
     onMessage('tour_status', payload => {
-        if(!payload?.isComplete) {
+        console.log('Check tour: ', payload);
+        if(!payload?.isComplete && payload.isAllowed) {
             startTutorialById('initial');
             if(payload?.skipStep) {
                 setStepIndex(payload.skipStep);

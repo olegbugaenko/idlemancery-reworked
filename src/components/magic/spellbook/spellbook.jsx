@@ -17,6 +17,7 @@ import StatRow from "../../shared/stat-row.jsx";
 import {CustomButton} from "../../shared/buttons/custom-button.jsx";
 import {HowToSign} from "../../shared/how-to-sign.jsx";
 import {useTutorial} from "../../../context/tutorial-context";
+import {playSound} from "../../../context/sounds/sound-manager";
 
 export const SpellbookWrap = ({ children }) => {
 
@@ -128,6 +129,9 @@ export const SpellbookWrap = ({ children }) => {
             setViewedOpenedId(null);
             setDetailOpenedId({id, name});
             setChanged(false);
+            if(id !== detailOpenedId) {
+                playSound('click');
+            }
         }
     }, [isChanged, detailOpenedId])
 
@@ -138,7 +142,10 @@ export const SpellbookWrap = ({ children }) => {
             setViewedData(null);
             return;
         }
-        setViewedOpenedId(id)
+        setViewedOpenedId(id);
+        if(id !== viewedOpenedId) {
+            playSound('selection');
+        }
 
     })
 

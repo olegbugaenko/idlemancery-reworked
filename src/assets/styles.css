@@ -3391,3 +3391,9 @@ ul.menu li.additional.add-custom-filter:hover span {
 .inner-settings-wrap .row .col {
     min-width: 25%;
 }
+
+.skill-details-mobile {
+    height: 50%;
+    padding-top: 4px;
+    border-top: 1px solid #333333;
+}

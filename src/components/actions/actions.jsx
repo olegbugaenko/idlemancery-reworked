@@ -23,6 +23,7 @@ import {useAppContext} from "../../context/ui-context";
 
 import {useDrag} from "../../custom-libs/dnd";
 import {CustomButton} from "../shared/buttons/custom-button.jsx";
+import {playSound} from "../../context/sounds/sound-manager";
 
 const ACTIONS_SEARCH_SCOPES = [{
     id: 'name',
@@ -176,10 +177,12 @@ export const Actions = ({}) => {
         // console.log('SettingOpened: ', id);
         // Additionally send signal to highlight action
         sendData('set-monitored', { scope: 'effects', type: 'action', id });
-
         if(!id) {
             setDetailOpened(null);
         } else {
+            if(id !== detailOpened) {
+                playSound('selection');
+            }
             setDetailOpened(id);
         }
     }
@@ -212,6 +215,7 @@ export const Actions = ({}) => {
 
     const onSelectAction = ({id, name, level}) => {
         console.log('UpdatingAct: ', id, name, listData);
+        playSound('click');
         if(listData) {
             setListData(prev => {
                 const newList = cloneDeep(prev);
@@ -264,6 +268,7 @@ export const Actions = ({}) => {
     const onCloseList = () => {
         setEditingList(null);
         setListData(null);
+        playSound('click');
     }
 
     const [overlayPositions, setOverlayPositions] = useState([]);
@@ -487,7 +492,7 @@ export const Actions = ({}) => {
 
     if(currentTourId === 'actions') {
         console.log('TourDets: ', currentTourId, actionsData.actionCategories.find(one => one.isSelected), stepIndex)
-        if(actionsData.actionCategories.find(one => one.isSelected).id === 'all' && stepIndex === 1) {
+        if(actionsData.actionCategories.find(one => one.isSelected)?.id === 'all' && stepIndex === 1) {
             jumpOver(2);
         }
 
@@ -830,6 +835,12 @@ export const ActionCard = React.memo(({ id, category, monitored, entityEfficienc
 
     useFlashOnLevelUp(isLeveled, onFlash, elementRef);
 
+/*    useEffect(() => {
+        if(isLeveled) {
+            playSound('action_levelup');
+        }
+    }, [isLeveled]);*/
+
     const [isXpVisible, setIsXpVisible] = useState(false);
 
     if(currentTourId === 'initial') {
@@ -921,7 +932,8 @@ export const ActionCard = React.memo(({ id, category, monitored, entityEfficienc
                                             onClick={(e) => {
                                                 e.preventDefault();
                                                 e.stopPropagation();
-                                                onActivate()
+                                                onActivate();
+                                                playSound('click');
                                             }}
                                             iconId={'pause'}
                                         >
@@ -940,7 +952,8 @@ export const ActionCard = React.memo(({ id, category, monitored, entityEfficienc
                                               if(currentTourId === 'actions') {
                                                   unlockNextById(7);
                                               }
-                                              onActivate(id)
+                                              onActivate(id);
+                                              playSound('click');
                                             }} >
                                             Run Action
                                         </CustomButton>}
@@ -949,7 +962,8 @@ export const ActionCard = React.memo(({ id, category, monitored, entityEfficienc
                                     onClick={(e) => {
                                         e.preventDefault();
                                         e.stopPropagation();
-                                        toggleHiddenAction(id, !isHidden)
+                                        toggleHiddenAction(id, !isHidden);
+                                        playSound('click');
                                     }}
                                     iconId={isHidden ? 'icon_show' : 'icon_hide'}
                                 >

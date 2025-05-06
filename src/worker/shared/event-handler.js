@@ -32,4 +32,9 @@ export class EventHandler {
         postMessage(JSON.stringify({ event, payload }))
     }
 
+    // some generic keys
+    playSound(key) {
+        this.sendData('play-sound', { key });
+    }
+
 }
