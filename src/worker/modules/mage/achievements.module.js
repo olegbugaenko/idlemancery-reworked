@@ -36,7 +36,7 @@ export class AchievementsModule extends GameModule {
     initialize() {
         this.achievementsDB = achievementsDb.filter(one => {
             if(!gameCore.demoVersion) return true;
-            return gameCore.demoVersion >= one.minDemoVersion;
+            return !one.minDemoVersion || (gameCore.demoVersion >= one.minDemoVersion);
         });
     }
 
