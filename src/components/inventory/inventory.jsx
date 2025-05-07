@@ -66,7 +66,6 @@ export const Inventory = ({}) => {
 
     useEffect(() => {
         const id = viewedOpenedId ?? detailOpenedId?.id;
-        // console.log('MouseTrack: viewedOpenedId changes to '+viewedOpenedId, id)
         if(id !== null) {
             if(!viewedOpenedId && isChanged) {
                 return;
@@ -98,7 +97,6 @@ export const Inventory = ({}) => {
     })
 
     onMessage('inventory-details', (payload) => {
-        // console.log('MouseTrack inventory-details received: viewedOpenedId = '+viewedOpenedId);
         if(viewedOpenedId) {
             setViewedData(payload);
         } else if(detailOpenedId) {
@@ -166,7 +164,6 @@ export const Inventory = ({}) => {
 
     const setInventoryDetailsView = useCallback((id) => {
         setViewedOpenedId(prev => {
-            // console.log('MouseTrack setInventoryDetailsView: '+id, prev, viewedData);
 
             if(!id) {
                 setViewedData(null);
@@ -211,7 +208,6 @@ export const Inventory = ({}) => {
 
     const onSetAutoconsumeRuleValue = useCallback((index, key, value) => {
         if(editData) {
-            console.log('Changing: ', index, key, value);
             const newEdit = cloneDeep(editData);
             newEdit.autoconsume.rules[index] = {
                 ...newEdit.autoconsume.rules[index],
@@ -327,9 +323,7 @@ export const Inventory = ({}) => {
     }, [editData])
 
     const onSave = useCallback(() => {
-        // console.log('saving: ', editData);
         sendData('save-inventory-settings', editData);
-        console.log('setDet changed to false onSave!')
         setChanged(false);
     })
 
@@ -339,7 +333,6 @@ export const Inventory = ({}) => {
         setEditData(null);
         setViewedData(null);
         setChanged(false);
-        console.log('setDet changed to false onCancel!')
     })
 
     const onSell = useCallback((id, amount) => {
@@ -349,7 +342,6 @@ export const Inventory = ({}) => {
     const [overlayPositions, setOverlayPositions] = useState([]);
 
     const handleFlash = (position) => {
-        console.log('Adding flash: ', position);
         setOverlayPositions((prev) => [...prev, position]);
         setTimeout(() => {
             setOverlayPositions((prev) => prev.filter((p) => p !== position));
@@ -362,26 +354,20 @@ export const Inventory = ({}) => {
     }
 
     const setSearch = (searchData) => {
-        console.log('SetSearch: ', searchData);
         sendData('set-inventory-search', { searchData });
     }
 
     const onTogglePinned = (id, flag) => {
-        console.log('toggle-pinned: ', id, flag);
         sendData('set-resource-pinned', { id, flag });
     }
 
     const onToggleViewLasting = (id, flag) => {
-        console.log('toggle-view-lasting: ', id, flag);
         sendData('set-lasting-pinned', { id, flag });
     }
 
     if(currentTourId === 'inventory') {
         unlockNextById(9);
     }
-
-    // console.log('MouseTrack Inventory Render: ', editData, viewedData);
-
 
     return (
         <div className={'inventory-wrap'}>
@@ -478,7 +464,6 @@ export const InventoryCard = React.memo(({ isChanged, eta, allowMultiConsume, is
 
     const handleContextMenu = (e) => {
         e.preventDefault(); // Prevents the default context menu
-        console.log('Triger onpurchase: ', id);
         if(!isConsumable) return;
         let amt = 1;
         if(allowMultiConsume) {
@@ -488,21 +473,10 @@ export const InventoryCard = React.memo(({ isChanged, eta, allowMultiConsume, is
         onPurchase(id, amt); // Your custom right-click action
     };
 
-    // RERENDERING
-    // console.log('Item: ', id, cooldownProg, cooldown);
-
     return (<div
         id={`inventory-item-card-${id}`}
         ref={elementRef}
         className={`icon-card item bigger flashable ${isSelected ? 'selected' : ''} ${isRare ? 'bluish' : ''}`}
-        /*onMouseEnter={() => {
-            console.log('MouseTrack Enter: '+id);
-            return !isMobile ? onShowDetails(id) : null;
-        }}
-        onMouseLeave={() => {
-            console.log('MouseTrack Leave')
-            return !isMobile ? onShowDetails(null) : null
-        }}*/
         onMouseOverCapture={(e) => {
             if (!isMobile) {
                 onShowDetails(id);
@@ -565,7 +539,6 @@ export const InventoryCard = React.memo(({ isChanged, eta, allowMultiConsume, is
     if(prevProps.isSelected !== currProps.isSelected) {
         return false;
     }
-    // console.log('Rerender: ', prevProps, curr);
     return true;
 }))
 
@@ -583,9 +556,6 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
 
     let isEditing = !!editData && !viewedData;
 
-    // console.log('MouseTrack data opened: ', item);
-
-
     if(!item) return null;
 
     useEffect(() => {
@@ -596,13 +566,10 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
     }, [item]);
 
     useEffect(() => {
-        // console.log('NumConsumed changed: ', details?.id, details?.numConsumed, stepIndex, currentTourId);
         if(currentTourId === 'inventory' && details?.id === 'inventory_brightleaf') {
             unlockNextById(14);
         }
     }, [details?.numConsumed, details?.currentDuration]);
-
-    // console.log('ItemReceived: ', item);
 
     onMessage('detail-blade-inventory-details', (data) => {
         setDetails(data);
@@ -617,7 +584,6 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
     }
 
     const setAutoconsumeRuleValue = (index, key, value) => {
-        console.log('Setting: ', key, value)
         onSetAutoconsumeRuleValue(index, key, value)
     }
 
@@ -672,9 +638,6 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
         unlockNextById(11);
     }
 
-
-
-    //console.log('item?.autoconsume: ', item?.autoconsume);
 
     return (
         <>
@@ -814,21 +777,14 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
 }, (prevProps, currentProps) => {
 
     if(prevProps.isChanged !== currentProps.isChanged) {
-        //console.log('isChanged: ', prevProps.isChanged, currentProps.isChanged)
         return false;
     }
-
-    /*if(prevProps.isConsumed !== currentProps.isConsumed) {
-        //console.log('isChanged: ', prevProps.isChanged, currentProps.isChanged)
-        return false;
-    }*/
 
     if(prevProps.editData !== currentProps.editData) {
         return false;
     }
 
     if(prevProps.viewedData !== currentProps.viewedData) {
-        //console.log('viewedChng: ', prevProps.viewedData, currentProps.viewedData)
         return false;
     }
 

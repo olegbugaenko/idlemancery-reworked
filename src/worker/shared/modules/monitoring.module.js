@@ -45,7 +45,7 @@ export class MonitoringModule extends GameModule {
                             effects = resourceApi.unpackEffects(spell.usageGain, spell.level)
                         }
 
-                        console.log('Effs: ', effDurable, effects);
+                        // console.log('Effs: ', effDurable, effects);
 
                         const data = [...effDurable, ...effects];
                         const attrs = data.filter(one => one.type === 'effects');

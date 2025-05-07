@@ -26,7 +26,7 @@ export const RandomEventSnippet = () => {
             /*if(!a) {
                 throw new Error('Invalid trigger of close');
             }*/
-            console.log('OP');
+            // console.log('OP');
             sendData('set-event-data-opened', { eventId, isOpened: false });
         });
         sendData('set-event-data-opened', { eventId, isOpened: true });
@@ -55,7 +55,6 @@ export const RandomEventSnippet = () => {
     // Close popup if clicking outside of it
     useEffect(() => {
         const handleClickOutside = (event) => {
-            console.log('handleClickOutside');
             if (popupRef.current && !popupRef.current.contains(event.target) && event.target.id != 'show-more-events-button') {
                 setShowMore(false); // Hide the popup
             }

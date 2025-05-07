@@ -13,7 +13,6 @@ export class AchievementsModule extends GameModule {
             if(this.achievementsDone[payload.id]?.s === 1) {
                 this.achievementsDone[payload.id].s = 2; // viewed
                 if(payload.id === 'intro') {
-                    console.log('Mark intro as viewed');
                     this.eventHandler.sendData('tour_status', {...gameCore.getModule('mage').tourStatus, isAllowed: true});
                 }
                 this.eventHandler.sendData('achievement-to-view', undefined);
@@ -35,7 +34,10 @@ export class AchievementsModule extends GameModule {
     }
 
     initialize() {
-        this.achievementsDB = achievementsDb;
+        this.achievementsDB = achievementsDb.filter(one => {
+            if(!gameCore.demoVersion) return true;
+            return gameCore.demoVersion >= one.minDemoVersion;
+        });
     }
 
     save() {
@@ -64,7 +66,6 @@ export class AchievementsModule extends GameModule {
                         s: 1,
                         d: (new Date()).toString(),
                     }; // Done not viewed
-                    console.log('markAsDone: ', this.achievementsDone);
                 }
             })
         }

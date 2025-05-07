@@ -79,7 +79,6 @@ export const ActionsAutomations = ({ resources }) => {
                 isEnabled: saveData.isEnabled
             }
         }
-        console.log('Saving data: ', toSave);
         sendData('save-action-list', toSave);
     })
 
@@ -130,7 +129,6 @@ export const ConsumeAutomations = ({ resources }) => {
     }, []);
 
     onMessage('inventory-data-autoconsume', (data) => {
-        console.log('Received Cons: ', data);
         if(data.payload.filterAutomatedConsume) {
             setAutomations(data.available);
         }
@@ -146,7 +144,6 @@ export const ConsumeAutomations = ({ resources }) => {
                 isEnabled: saveData.isEnabled
             }
         }
-        console.log('Saving consume: ', toSave);
         sendData('save-inventory-settings', toSave);
     })
 
@@ -198,7 +195,6 @@ export const SellAutomations = ({ resources }) => {
     }, []);
 
     onMessage('inventory-data-autosell', (data) => {
-        console.log('SELL))): ', data);
         if(data.payload.filterAutomatedSell) {
             setAutomations(data.available);
         }
@@ -213,7 +209,6 @@ export const SellAutomations = ({ resources }) => {
                 isEnabled: saveData.isEnabled
             }
         }
-        console.log('Saving sell: ', toSave);
         sendData('save-inventory-settings', toSave);
     })
 
@@ -265,7 +260,6 @@ export const MapTilesAutomations = ({ resources }) => {
     }, []);
 
     onMessage('map-tile-lists', (data) => {
-        console.log('automated-lists: ', data);
         setAutomations(data.lists);
     })
 
@@ -284,7 +278,6 @@ export const MapTilesAutomations = ({ resources }) => {
                 isEnabled: saveData.isEnabled
             }
         }
-        console.log('Saving data: ', toSave);
         sendData('save-map-tile-list', toSave);
     })
 
@@ -337,7 +330,6 @@ export const CraftingAutomations = ({ resources }) => {
     }, []);
 
     onMessage('crafting-lists-crafting', (data) => {
-        console.log('automated-crafting: ', data);
         setAutomations(data.lists);
     })
 
@@ -356,7 +348,6 @@ export const CraftingAutomations = ({ resources }) => {
                 isEnabled: saveData.isEnabled
             }
         }
-        console.log('Saving data: ', toSave);
         sendData('save-crafting-list', toSave);
     })
 

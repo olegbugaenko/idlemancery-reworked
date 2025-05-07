@@ -71,7 +71,6 @@ export class AttributesModule extends GameModule {
                 // first of all we should get current income from list
                 // Try to get additional info
                 if(one.nextUnlocks?.length) {
-                    console.log('Actions: ', one)
                     one.unlocks = {
                         level: one.nextUnlocks[0].level,
                         progress: 100*one.value / one.nextUnlocks[0].level,
@@ -120,7 +119,6 @@ export class AttributesModule extends GameModule {
             nextProgress: effect.nextUnlocks?.length ? effect.value / effect.nextUnlocks[0].level : 0,
             monitor: this.monitoredData[effect.id] ?? null,
         }))
-        // console.log('Attrs: ', list);
         return {
             list,
         }

@@ -175,9 +175,12 @@ v0.1.4
    6.e) [V] Inventory
    6.g) [V] Spells
    6.h) Action Intensities
-   6.e) Automations
+   6.e) [V] Automations
 7. Refine UI
 8. Confirmation for using dangerous flasks
+
+IDEAS ON RE-WORK:
+1. Remove all rare herbs that provide permanent bonuses to stats. Instead, use alchemy for this
 
 NEW CONTENT
 1. Machinery (automates part of crafting)

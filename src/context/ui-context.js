@@ -29,12 +29,6 @@ export const AppProvider = ({ children }) => {
         setIsMobile(window.innerWidth < 1300)
     })
 
-/*    useEffect(() => {
-        if(!activePopup) {
-            console.log('set onClosePopup CB to null', activePopup);
-            setOnClosePopupCb(null);
-        }
-    }, [activePopup])*/
 
     return (
         <AppContext.Provider value={{ openedTab, setOpenedTab, activePopup, setActivePopup, popupMeta, setPopupMeta, onClosePopupCb, setOnClosePopupCb, isMobile, togglePopup }}>

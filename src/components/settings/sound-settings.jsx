@@ -20,7 +20,6 @@ export const SoundSettings = () => {
     }, []);
 
     onMessage("settings-sound-settings", (newSettings) => {
-        console.log("Settings: ", newSettings);
         setSettings((prev) => ({ ...prev, ...newSettings }));
     });
 

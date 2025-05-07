@@ -26,7 +26,6 @@ export const SoundProvider = ({ children }) => {
 
 
     useEffect(() => {
-        console.log('soundsLoaded: ', soundsLoaded);
         if (!tracks.length || !soundsLoaded) return;
 
         const startTrack = (index) => {
@@ -43,7 +42,6 @@ export const SoundProvider = ({ children }) => {
 
         startTrack(currentMusicIndexRef.current);
 
-        console.log('Starting: ', currentMusicIndexRef.current, currentSourceRef.current);
 
         return () => {
             if (currentSourceRef.current) {
@@ -54,7 +52,6 @@ export const SoundProvider = ({ children }) => {
     }, [soundsLoaded]);
 
     useEffect(() => {
-        // console.log('Vols: ', volumes);
         applyToAudioContext(volumes); // оновлює всі volumeNodes, в т.ч. music
     }, [volumes.music, volumes.master, volumes.sounds]);
 
@@ -75,7 +72,6 @@ export const SoundProvider = ({ children }) => {
     }, []);
 
     const initializeVolumes = () => {
-        console.log('INITIALIZING SOUNDS VOLUMES');
         sendData('query-settings', { prefix: 'sounds' });
     };
 
@@ -91,7 +87,6 @@ export const SoundProvider = ({ children }) => {
             }
         });
 
-        console.log('soundsWhereSetTo: ', sounds);
 
         setVolumes((prev) => {
             const newState = { ...prev, ...sounds };
@@ -110,7 +105,6 @@ export const SoundProvider = ({ children }) => {
             applyToAudioContext(newState);
             return newState;
         });
-        console.log('Send: ', { key: `${type}Volume`, value })
         sendData('set-setting', { key: `${type}Volume`, value });
         // localStorage.setItem(`${type}Volume`, value);
     };

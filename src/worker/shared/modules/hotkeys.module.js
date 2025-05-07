@@ -16,7 +16,6 @@ export class HotkeysModule extends GameModule {
 
         this.eventHandler.registerHandler('update-hotkey', (payload) => {
             this.hotKeys[payload.id] = payload;
-            console.log('UpdateHotkey: ', payload);
             this.eventHandler.sendData('all-hotkeys', this.hotKeys);
             this.eventHandler.sendData('all-hotkeys-all', this.hotKeys);
         })

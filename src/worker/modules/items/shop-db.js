@@ -1313,7 +1313,7 @@ export const registerShopItemsStage1 = () => {
 
     gameEntity.registerGameEntity('shop_item_herbalists_handbook', {
         tags: ["shop", "upgrade", "purchaseable"],
-        name: 'Herbalists Handbook',
+        name: 'Herbs Growing Handbook',
         description: 'Learn how to gather seeds and plant different kind of flora near your home. Now you\'ll be able to purchase new furniture for it!',
         level: 0,
         maxLevel: 1,
@@ -1337,7 +1337,7 @@ export const registerShopItemsStage1 = () => {
             },
             'coins': {
                 A: 1.5,
-                B: 2000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 1000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 1
             }
         }),
@@ -1376,7 +1376,7 @@ export const registerShopItemsStage1 = () => {
             },
             'coins': {
                 A: 1.5,
-                B: 8000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 2000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 1
             }
         }),
@@ -1487,7 +1487,112 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+    gameEntity.registerGameEntity('shop_item_weird_painting', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Weird Painting',
+        description: 'You not sure what is painted here, but it makes you feeling more motivated',
+        level: 0,
+        maxLevel: 1,
+        minDemoVersion: 20,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_memory',
+            level: 50,
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0;
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'learning_rate': {
+                        A: 0.25,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2.25,
+                B: 200000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
 
+    gameEntity.registerGameEntity('shop_item_stone_hammer', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Stone Hammer',
+        description: 'Cheap, but still useful tool to improve your crafting efficiency',
+        level: 0,
+        maxLevel: 1,
+        minDemoVersion: 10,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0
+            //||  gameEntity.getLevel('shop_item_conjuration_magic') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'crafting_efficiency': {
+                        A: 0.25,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2.25,
+                B: 150000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+
+    gameEntity.registerGameEntity('shop_item_rusty_axe', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Rusty Axe',
+        description: 'Old, rusty and heavy axe.',
+        level: 0,
+        maxLevel: 1,
+        minDemoVersion: 10,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0
+            //||  gameEntity.getLevel('shop_item_conjuration_magic') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'manual_labor_efficiency': {
+                        A: 0.25,
+                        B: 1,
+                        type: 0,
+                    }
+                },
+            },
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2.25,
+                B: 150000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
 
     gameEntity.registerGameEntity('shop_item_alchemy_courses', {
         tags: ["shop", "upgrade", "purchaseable"],

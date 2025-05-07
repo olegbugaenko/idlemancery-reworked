@@ -117,7 +117,6 @@ export class UnlockNotificationsModule extends GameModule {
      * Якщо передано subcategory – використовується 4 рівень.
      */
     setViewed(scope, category, subcategory, id, isViewed = true) {
-        console.log('Setting viewed: ', scope, category, subcategory, id);
         this.registerPath(scope, category, subcategory, id);
         this.viewedById[id].isViewed = isViewed;
         this.syncNotificationCats(id);

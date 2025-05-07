@@ -30,7 +30,6 @@ export const WorldMenu = () => {
     })
 
     onMessage('new-unlocks-notifications-world', payload => {
-        // console.log('Received unlocks: ', payload);
         setNewUnlocks(payload);
     })
 

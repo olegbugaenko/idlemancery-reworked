@@ -117,32 +117,32 @@ export function registerPlantations () {
         description: 'Just plant some berries... OK?'
     })
 
-    registerPlant('fly_mushroom_plantation', 'inventory_fly_mushroom', 0.05, 2000, {
+    registerPlant('fly_mushroom_plantation', 'inventory_fly_mushroom', 0.02, 500, {
         name: 'Grow Fly Mushroom',
         description: 'They say you are druggie, but never mind — you are a mage.'
     })
 
-    registerPlant('golden_algae_plantation', 'inventory_golden_algae', 0.04, 2000, {
+    registerPlant('golden_algae_plantation', 'inventory_golden_algae', 0.02, 1000, {
         name: 'Grow Golden Algae',
         description: 'Grow Golden Algae.'
     })
 
-    registerPlant('knowledge_moss_plantation', 'inventory_knowledge_moss', 0.04, 2000, {
+    registerPlant('knowledge_moss_plantation', 'inventory_knowledge_moss', 0.02, 500, {
         name: 'Grow Knowledge Moss',
         description: 'Grow Knowledge Moss.'
     })
 
-    registerPlant('core_duckweed_plantation', 'inventory_core_duckweed', 0.04, 2000, {
+    registerPlant('core_duckweed_plantation', 'inventory_core_duckweed', 0.02, 500, {
         name: 'Grow Duckweed',
         description: 'Grow core duckweed.'
     })
 
-    registerPlant('thinkroot_plantation', 'inventory_thinkroot', 0.04, 2000, {
+    registerPlant('thinkroot_plantation', 'inventory_thinkroot', 0.02, 500, {
         name: 'Grow Thinkroot',
         description: 'Grow Thinkroot.'
     })
 
-    registerPlant('focusberry_plantation', 'inventory_focusberry', 0.04, 2000, {
+    registerPlant('focusberry_plantation', 'inventory_focusberry', 0.02, 500, {
         name: 'Grow Focusberry',
         description: 'Grow Focusberry.'
     })

@@ -151,7 +151,6 @@ export const AttributesBar = () => {
     })
 
     const setMonitoredAttribute = useCallback((id, target) => {
-        console.log('SettMonitored: ', id, target);
         sendData('set-monitored', { scope: 'actions', type: 'attribute', id });
     }, []);
 

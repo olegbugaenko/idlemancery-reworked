@@ -44,7 +44,6 @@ export const Skills = () => {
     const [overlayPositions, setOverlayPositions] = useState([]);
 
     const handleFlash = (position) => {
-        // console.log('Adding flash: ', position);
         setOverlayPositions((prev) => [...prev, position]);
         setTimeout(() => {
             setOverlayPositions((prev) => prev.filter((p) => p !== position));
@@ -52,7 +51,6 @@ export const Skills = () => {
     };
 
     const onPurchase = (id) => {
-        // console.log('Purchase: ', id);
         sendData('purchase-skill', { id })
     }
 
@@ -60,7 +58,6 @@ export const Skills = () => {
         if(isMobile) {
             setDetailsShown(skillsData.available.find(one => one.id === id));
         }
-        // console.log('onShowDetails: ', id);
     }
 
 

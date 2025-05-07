@@ -50,7 +50,6 @@ export const LoadedMain = () => {
     }, [])
 
     onMessage('tour_status', payload => {
-        console.log('Check tour: ', payload);
         if(!payload?.isComplete && payload.isAllowed) {
             startTutorialById('initial');
             if(payload?.skipStep) {

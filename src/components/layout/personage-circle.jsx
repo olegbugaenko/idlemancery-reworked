@@ -28,7 +28,6 @@ export const PersonageCircle = () => {
 
     useEffect(() => {
         window.notation = settings.notation;
-        console.log('Settings: ', settings);
     }, [settings?.notation]);
 
     onMessage('mage-data-xpbar', (data) => {

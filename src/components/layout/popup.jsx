@@ -17,7 +17,6 @@ export const Popup = () => {
 
     useEffect(() => {
         onClosePopupRef.current = onClosePopupCb;
-        console.log('onClosePopup: ', onClosePopupCb, activePopup);
     }, [onClosePopupCb]);
 
     const HOWTO_TITLES = {

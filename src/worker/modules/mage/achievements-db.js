@@ -227,13 +227,25 @@ export const achievementsDb = [{
     completeCondition: () => gameEntity.getLevel('action_learn_anatomy') >= 100
 },{
     id: 'action_learn_anatomy_4',
+    title: 'A Painful Revelation',
+    text: [
+        "Your habit of opening the anatomy manual every time your side hurts or your arm itches is finally paying off.",
+        "However, today — while climbing a hill — you felt more out of breath than usual, and your trusty book was nowhere nearby.",
+        "For a brief moment, you thought you were dying. You clutched your side...",
+        "And then remembered the side effect of that herbal remedy the local healer gave you yesterday to treat your hiccups.",
+        "You suddenly realized that remembering herb names and their effects on the body has become second nature to you.",
+        "A deep sense of pride washed over you."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_learn_anatomy') >= 250
+},{
+    id: 'action_learn_anatomy_5',
     title: 'Spleen Supremacy',
     text: [
         "You've read enough anatomy to confidently identify organs most people don't even know exist.",
         "You now quietly judge anyone who can't point to their spleen.",
         "Not out loud, of course. You're educated, not rude."
     ],
-    completeCondition: () => gameEntity.getLevel('action_learn_anatomy') >= 500
+    completeCondition: () => gameEntity.getLevel('action_learn_anatomy') >= 1000
 },{
     id: 'action_learn_languages',
     title: 'Alphabetical Aggression',
@@ -269,6 +281,19 @@ export const achievementsDb = [{
         "But who are they to judge? Uneducated peasants! You owe them no explanations."
     ],
     completeCondition: () => gameEntity.getLevel('action_learn_languages') >= 100
+},{
+    id: 'action_learn_languages_4',
+    title: 'Language Skills… and Stomach Pills',
+    text: [
+        "Today at the market, you were chatting with a friendly man who gathers berries and herbs in the forest and sells them.",
+        "You've bought berries from him before, so once again you asked for your favorite – blueberries.",
+        "However, mid-conversation, you accidentally switched to another language. The vendor, pretending to understand, nodded thoughtfully…",
+        "And returned the next day with ten leaves of something that looked suspiciously like aloe vera.",
+        "Not wanting to waste a perfectly good plant, you brewed a \"healing potion.\"",
+        "You then spent the next half-day sitting in a meditative pose — not in pursuit of enlightenment, but because your stomach refused to cooperate.",
+        "Still, you’ve learned a valuable lesson: not only have your language skills improved, but you now choose your words much more carefully — especially when it comes to food."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_learn_languages') >= 250
 },{
     id: 'action_pushup_1',
     title: 'Pushup Prodigy (Sort of)',
@@ -518,5 +543,64 @@ export const achievementsDb = [{
     ],
     completeCondition: () => {
         return gameEntity.getLevel('action_walking') >= 100000
+    }
+},{
+    id: 'action_craft_1',
+    title: 'Stick Perfection',
+    minDemoVersion: 20,
+    text: [
+        "Lately, you've taken a keen interest in woodworking and handmade crafts.",
+        "Today, inspiration struck—why not try selling handmade wooden souvenirs?",
+        "You picked up a promising log and dragged it home. Or at least tried to. After 50 meters of struggling and seeing stars, you realized your spine was losing the duel.",
+        "Switching to a lighter branch, you spent hours working on it with care and determination.",
+        "Now, as you gaze at your finished piece — a smooth stick with the bark peeled off — you feel a bit of pride. It may not be a masterpiece, but it's huge stick, and, sure, it looks... presentable."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_craft') >= 2
+    }
+},{
+    id: 'action_craft_2',
+    title: 'A Chair Worthy of Legends (Almost)',
+    minDemoVersion: 20,
+    text: [
+        "Encouraged by your recent success, you decided to create something more advanced — a proper wooden stool.",
+        "After hours of sawing, drilling, and nailing, the masterpiece was ready. You placed it in the middle of your tent and proudly sat on it.",
+        "The stool lasted just long enough for you to think, “I'm actually pretty good at this.”",
+        "Then it cracked, folded in half, and threw you to the ground along with your fragile sense of achievement.",
+        "A bruised hip and a splinter in your back — not quite the fame you hoped for. But hey, even great craftsmen have to start with deadly prototypes."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_craft') >= 50
+    }
+},{
+    id: 'action_craft_3',
+    title: 'The Shelf of Trust',
+    minDemoVersion: 20,
+    text: [
+        'Two days ago, when you walked into the shop, you stumbled upon an unusual scene — tools scattered all over the floor and the shopkeeper sitting in the middle of the chaos, eyes filled with frustration and despair. Turns out, the shelf where he stored his goods had collapsed completely.',
+
+        'He promised you a nice discount in exchange for repairs, so you eagerly got to work. A few planks, some nails, and a healthy dose of swearing — and voilà, a new shelf stood proud and steady. Or so it seemed.',
+
+        'This morning, just as the sun peeked over the horizon, you were already at the shop’s door, dreaming of cheap mana and discounts on tools and sausage. But instead of the familiar shopkeeper, a younger man greeted you with a puzzled look.',
+
+        '“Ah, you must be the ‘carpenter’? Well... my colleague’s in the hospital. Said the shelf collapsed on him when he tried to grab a hatchet from the top.”',
+
+        'You freeze, offering an awkward smile. Looks like those discounts won’t be happening after all. Still, in your defense — those weren’t exactly premium nails he gave you to work with...'
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_craft') >= 100
+    }
+},{
+    id: 'shop_item_weird_painting_1',
+    title: 'Weird Memories',
+    minDemoVersion: 20,
+    text: [
+        'An odd, blurry painting you found tossed between dusty jars and oily rags at the back of a store. The artistic quality is… debatable. You’re not quite sure whether it’s a lake with reeds or a forest under a blue sky.',
+        'And yet, as you stared at it, a strange feeling washed over you — a sense of warmth, nostalgia, maybe even joy.',
+        'A flicker of memory surfaced: running as a child near a lake, whacking tall reeds with a stick like they were fierce monsters. That’s all you could recall.',
+        'But somehow, that was enough. The painting now hangs proudly in your tent, quietly inspiring you whenever you glance at it.'
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('shop_item_weird_painting') >= 1
     }
 }]

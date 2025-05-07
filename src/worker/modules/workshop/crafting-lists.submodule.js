@@ -66,7 +66,6 @@ export class CraftingListsSubmodule extends GameModule {
         })
 
         this.eventHandler.registerHandler('run-crafting-list', ({ id }) => {
-            console.log('Running List: ', id);
             this.runList(id);
         })
 
@@ -117,9 +116,6 @@ export class CraftingListsSubmodule extends GameModule {
                     scope: nScope
                 }
             }));
-
-            console.log('SendingData: ', JSON.stringify(data.effects.filter(one => one.type === 'effects')), JSON.stringify(resourcesEffects), data.assumedDistribution, id);
-
 
             this.eventHandler.sendData('crafting-list-effects', {
                 potentialEffects: data.effects,
@@ -182,8 +178,6 @@ export class CraftingListsSubmodule extends GameModule {
         if(isReopenEdit) {
             this.sendListData(list.id, true);
         }
-
-        console.log('SavingList: ', list, this.craftingLists);
 
         this.regenerateListsPriorityMap();
 
@@ -287,7 +281,6 @@ export class CraftingListsSubmodule extends GameModule {
                 const autotrigger = this.getAutotriggerList(cat);
 
                 if(autotrigger && this.runningList[cat]?.id !== autotrigger) {
-                    console.log('Run list autotrigger: ', autotrigger, this.runningList[cat]?.id, this.listsAutotrigger);
                     this.runList(autotrigger, cat);
                 }
             }
@@ -342,9 +335,6 @@ export class CraftingListsSubmodule extends GameModule {
                 nPrv.scope = 'consumption';
             }
 
-            console.log('Prv2: ', prev, effect, nPrv);
-
-
             prevEffects.push(nPrv);
 
             const newVal = (effect.scope === 'income' ? effect.value : -effect.value) + prev.balance;
@@ -363,8 +353,6 @@ export class CraftingListsSubmodule extends GameModule {
         data.bForceOpen = bForceOpen;
 
         data.assumedDistribution = assumedDistribution;
-
-        // console.log('SendingData: ', JSON.stringify(data.prevEffects), JSON.stringify(data.resourcesEffects));
 
         this.eventHandler.sendData('crafting-list-data', data);
     }
@@ -412,8 +400,6 @@ export class CraftingListsSubmodule extends GameModule {
             remainingSlots -= allocated;
         }
 
-        console.log(`AfterFisrt (${remainingSlots} of ${maxSlots})`, result);
-
         // Second pass: Allocate slots based on percentage and constraints
         // Другий прохід: обчислюємо idealTotal і збираємо інформацію для третього
         const leftovers = [];
@@ -446,7 +432,6 @@ export class CraftingListsSubmodule extends GameModule {
             });
         }
 
-        console.log(`AfterSecond (${remainingSlots} of ${maxSlots})`, result);
 
         if (remainingSlots > 0) {
             // Сортуємо від найбільшого дробового залишку до найменшого
@@ -465,11 +450,7 @@ export class CraftingListsSubmodule extends GameModule {
             }
         }
 
-        console.log(`AfterThird (${remainingSlots} of ${maxSlots})`, result);
-
         result = result.filter(one => one.level > 0);
-
-        console.log('distributed: ', maxSlots, result, leftovers);
 
 
         return result;

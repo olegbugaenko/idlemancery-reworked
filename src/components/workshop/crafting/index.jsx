@@ -190,15 +190,13 @@ export const CraftingWrap = ({ children }) => {
         }
     }, [listDetails])
 
-    useEffect(() => {
+    /*useEffect(() => {
         // console.log('Called select list', listDetails);
-    }, [listDetails])
+    }, [listDetails])*/
 
     const addItemToList = useCallback(({id, name}) => {
-        // console.log('Add recipe to list', id, listDetails);
         if(listDetails?.listData && listDetails?.isEdit) {
             if(id) {
-                // console.log('Insert recipe to list: ', id, listDetails);
                 if(!listDetails.listData.recipes.find(one => one.id === id)) {
                     const newList = cloneDeep(listDetails.listData);
                     newList.recipes.push({
@@ -217,7 +215,6 @@ export const CraftingWrap = ({ children }) => {
 
     const openListDetails = (list) => {
         if(list.listData?.id) {
-            // console.log('loading list: ', list);
             setListDetails({
                 isEdit: list.isEdit,
                 isLoading: true,
@@ -282,7 +279,6 @@ export const CraftingWrap = ({ children }) => {
     }
 
     onMessage('running-craft-for-list', recipes => {
-        console.log('runningRecipes: ', recipes);
         const { listData } = listDetails ?? {};
         const newList = listData;
         listData.recipes = recipes;
@@ -406,7 +402,6 @@ export const ItemDetails = ({itemId, category, setItemDetails}) => {
     const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
 
     useEffect(() => {
-        // console.log('Details: ', itemId, category);
         if(category === 'crafting') {
             const interval = setInterval(() => {
                 sendData('query-crafting-details', { id: itemId });
@@ -421,7 +416,6 @@ export const ItemDetails = ({itemId, category, setItemDetails}) => {
 
 
     onMessage('crafting-details', (items) => {
-        // console.log('CraftDetails: ', items)
         setDetailOpened(items);
     })
 

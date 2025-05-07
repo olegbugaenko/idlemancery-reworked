@@ -48,7 +48,6 @@ export class SpellModule extends GameModule {
     }
 
     setMonitored({ type, id }) {
-        console.log('CHMON: ', id, type);
         if(!id) {
             this.monitorData = null;
             return;
@@ -100,7 +99,6 @@ export class SpellModule extends GameModule {
             this.spells[itemId].isCasted = false;
 
             if(this.spells[itemId].duration > 0) {
-                // console.log('SPELL: ', itemId, this.spells[itemId].duration);
                 this.spells[itemId].duration -= delta;
                 if(gameEntity.entityExists(`active_${itemId}`)) {
                     gameEntity.setAttribute(`active_${itemId}`, 'current_duration', this.spells[itemId].duration);
@@ -110,7 +108,6 @@ export class SpellModule extends GameModule {
                 this.spells[itemId].duration = 0;
                 this.spells[itemId].isRunning = false;
                 this.spells[itemId].cooldown = gameEntity.getEntity(itemId).getUsageCooldown() ?? 0;
-                // console.log('Set cooldown of '+itemId, this.spells[itemId].cooldown);
                 if(gameEntity.entityExists(`active_${itemId}`)) {
                     gameEntity.unsetEntity(`active_${itemId}`);
                 }
@@ -132,7 +129,6 @@ export class SpellModule extends GameModule {
             // check if matching rules
             const isMatching = checkMatchingRules(this.spells[itemId]?.autocast?.rules, this.spells[itemId]?.autocast?.pattern);
 
-            // console.log('RULES MATCHED: ', isMatching);
             if(isMatching && (this.spells[itemId]?.cooldown || 0) <= 0) {
                 this.useSpell(itemId, 1);
             }
@@ -315,7 +311,7 @@ export class SpellModule extends GameModule {
             }
             this.spells[id].isCasted = true;
             this.spells[id].numCasted = (this.spells[id].numCasted || 0) + 1;
-            this.eventHandler.playSound('cast_spell');
+            // this.eventHandler.playSound('cast_spell');
         }
         this.sendSpellData();
     }

@@ -124,7 +124,6 @@ export class InventoryModule extends GameModule {
                 // check if matching rules
                 const isMatching = checkMatchingRules(this.inventoryItems[itemId]?.autoconsume?.rules, this.inventoryItems[itemId]?.autoconsume?.pattern);
 
-                // console.log('RULES MATCHED: ', isMatching);
                 if(isMatching) {
                     let amount = 1;
                     const reserved = this.inventoryItems[itemId]?.autosell?.reserved || 0;
@@ -160,7 +159,6 @@ export class InventoryModule extends GameModule {
                 );
 
                 const realSell = Math.min(sellAmount, reserveLimit);
-                // console.log('INVDEBUG Reserved: ', itemId, reserved, reserveLimit, sellAmount, realSell, gameResources.getResource(itemId).amount, this.inventoryItems[itemId]);
 
                 if(isMatching) {
                     this.sellItem(itemId, Math.min(sellAmount, reserveLimit));
@@ -205,7 +203,6 @@ export class InventoryModule extends GameModule {
                 this.inventoryItems[key].stockCapacity = gameEffects.getEffectValue('shop_max_stock');
             }
             if(this.inventoryItems[key].duration && this.inventoryItems[key].duration > 0) {
-                // console.log('INVDEBUG REGISTER ITEM '+key+':', this.inventoryItems[key]);
                 gameEntity.registerGameEntity(`active_${key}`, {
                     originalId: key,
                     name: gameResources.getResource(key).name,
@@ -238,8 +235,6 @@ export class InventoryModule extends GameModule {
             if(effects.length) {
                 const rsToRemove = effects.filter(eff => eff.scope === 'consumption' && eff.type === 'resources');
 
-                // console.log('IIII: ', effects, rsToRemove, realCons);
-
                 rsToRemove.forEach(rs => {
                     result.consume[rs.id] = rs.value;
                     if(result.consume[rs.id] > gameResources.getResource(rs.id).amount) {
@@ -266,8 +261,6 @@ export class InventoryModule extends GameModule {
             const effects = resourceApi.unpackEffects(resource.usageGain || {}, realCons);
             if(effects.length) {
                 const rsToAdd = effects.filter(eff => eff.scope === 'income' && eff.type === 'resources');
-
-                // console.log('consAddR: ', effects, rsToAdd, realCons);
 
                 rsToAdd.forEach(rs => {
                     gameResources.addResource(rs.id, rs.value);
@@ -508,8 +501,6 @@ export class InventoryModule extends GameModule {
             potentialPermanentEffects = packEffects(gameEntity.getEffects(resource.attributes?.entityEffect, 1));
         }
 
-
-        // console.log('EEFF: ', resource.attributes?.entityEffect, permanentEffects, potentialPermanentEffects);
         return {
             id: resource.id,
             name: resource.name,

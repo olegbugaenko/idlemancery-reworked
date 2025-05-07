@@ -1569,7 +1569,7 @@ export const registerFurnitureStage1 = () => {
         get_cost: () => ({
             'coins': {
                 A: 1.5,
-                B: 1000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 200000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 1
             },
             'living_space': {
@@ -1617,7 +1617,7 @@ export const registerFurnitureStage1 = () => {
         get_cost: () => ({
             'coins': {
                 A: 1.5,
-                B: 1000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 500000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 1
             },
             'living_space': {

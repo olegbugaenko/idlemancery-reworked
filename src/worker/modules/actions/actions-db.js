@@ -56,8 +56,6 @@ const getResourceModifierDataSearchable = (rs) => {
 
 const registerGameAction = (id, options) => {
 
-    // console.log('RegAct: ', id);
-    
     const primaryAttribute = options.attributes.primaryAttribute;
     
     if(!options.resourceModifier) {
@@ -72,8 +70,6 @@ const registerGameAction = (id, options) => {
             minValue: 1,
             defaultValue: 1,
         })
-
-        // console.log('Registered effect: ', getRankId(id));
 
         if(!options.resourceModifier.effectDeps) {
             options.resourceModifier.effectDeps = []
@@ -1988,7 +1984,7 @@ export const registerActionsStage1 = () => {
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_patience',
-            level: 225,
+            level: 425,
         }],
         attributes: {
             baseXPCost: 1500,

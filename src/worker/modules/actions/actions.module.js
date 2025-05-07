@@ -94,8 +94,6 @@ export class ActionsModule extends GameModule {
             // Зберігаємо оновлений масив
             this.customFiltersOrder = newOrder;
 
-            // console.log('Re-sorted', payload, newOrder);
-
             this.sendActionsData(this.selectedFilterId, {
                 searchData: this.searchData,
             })
@@ -172,7 +170,7 @@ export class ActionsModule extends GameModule {
         })
 
         this.eventHandler.registerHandler('toggle-show-hidden', (payload) => {
-            this.showHidden = payload;
+            this.showHidden = payload.flag;
             this.sendActionsData(this.selectedFilterId, {
                 searchData: this.searchData,
             })
@@ -247,8 +245,6 @@ export class ActionsModule extends GameModule {
             }
         }, {})
 
-        // console.log('effectsRanks', effectsRanks);
-
         gameEntity.registerGameEntity('system_action_ranks_multiplier', {
             name: 'Action Rank',
             resourceModifier: {
@@ -281,7 +277,6 @@ export class ActionsModule extends GameModule {
     }
 
     setMonitored({ type, id }) {
-        // console.log('CHMON: ', id, type);
         if(!id) {
             this.monitorData = null;
             return;
@@ -435,7 +430,6 @@ export class ActionsModule extends GameModule {
         for(const filterId in this.customFilters) {
             this.generateFilterCache(filterId);
         }
-        //console.log('Caches: ', this.filtersCache);
     }
 
     setCustomFilterPinned({ id, flag }) {
@@ -452,8 +446,6 @@ export class ActionsModule extends GameModule {
         if(!payload.id) {
             this.customFiltersOrder.push(id);
         }
-
-        // console.log('this.customFiltersOrder', this.customFiltersOrder, payload, this.customFilters[id]);
 
         this.generateFilterCache(id);
 
@@ -533,7 +525,6 @@ export class ActionsModule extends GameModule {
 
                 // this.actions[act.originalId].focus.bonus = this.getFocusBonus(this.actions[act.originalId].focus.time);
                 const dxp = delta*this.getLearningRate(act.id);
-                // console.log('------------: ', act.id, dxp, delta, this.getLearningRate(act.id, undefined, true));
                 this.actions[act.originalId].xp += dxp;
                 this.actions[act.originalId].xpEarned = (this.actions[act.originalId].xpEarned || 0) + dxp;
 

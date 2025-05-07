@@ -65,7 +65,6 @@ export class ResourcePoolModule extends GameModule {
             tags: ['resource', 'health', 'basic', 'vital'],
             defaultCap: 0,
             unlockCondition: () => {
-                // console.log('ACTLVL: ', )
                 return gameEntity.getLevel('action_pushup') > 1
             }
         })
@@ -241,7 +240,6 @@ export class ResourcePoolModule extends GameModule {
 
     getResourcesData(pl) {
         const rs = gameResources.listResourcesByTags(['resource', 'population'], true);
-        // console.log('RS: ', JSON.stringify(gameResources.getResource('coins')));
         if(pl.includePinned) {
             const inventory = gameResources.listAllResources(['resource']);
             const pinned = inventory.filter(one => this.pinnedResources?.[one.id]);

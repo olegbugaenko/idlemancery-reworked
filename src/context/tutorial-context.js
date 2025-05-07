@@ -9,7 +9,6 @@ const TutorialContext = createContext(null);
 function MyTooltip({ step, closeProps, primaryProps, isNextAllowed, isLastStep, cantBeRetried }) {
 
     const handleSkip = (e) => {
-        // console.log('Skip button clicked');
 
         if (closeProps.onClick) {
             if(!cantBeRetried) {
@@ -27,10 +26,10 @@ function MyTooltip({ step, closeProps, primaryProps, isNextAllowed, isLastStep, 
             <div className={'step-content'}>{step.content}</div>
             <div className={'buttons'}>
                 <div className={'left'}>
-                    {isNextAllowed ? (<button {...primaryProps}>{isLastStep ? 'Complete' : 'Next'}</button>) : null}
+                    {isNextAllowed ? (<button className={'primary-action'} {...primaryProps}>{isLastStep ? 'Complete' : 'Next'}</button>) : null}
                 </div>
                 {!isLastStep ? (<div>
-                    <button onClick={handleSkip}>Skip</button>
+                    <button className={'warning-action'} onClick={handleSkip}>Skip</button>
                 </div>) : null}
 
             </div>

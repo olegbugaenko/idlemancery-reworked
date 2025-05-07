@@ -6,7 +6,6 @@ export function isElectron() {
 
 const checkFullscreen = async () => {
     const isFull = await window.electron.isFullscreen();
-    console.log('Fullscreen is:', isFull);
 };
 
 export const quitApp = () => {

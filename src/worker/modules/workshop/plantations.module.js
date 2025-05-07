@@ -65,7 +65,6 @@ export class PlantationsModule extends GameModule {
                     if(this.autoPurchase[key]) {
                         if(!gameEntity.isEntityUnlocked(key)) {
                             this.autoPurchase[key] = false;
-                            console.log('Planter '+key+' is locked. Toggling autopurchase');
                             continue;
                         }
 
@@ -92,7 +91,6 @@ export class PlantationsModule extends GameModule {
                     wateringLevel: 0,
                 }
             }
-            console.log(`Set Init ${key} to: `, this.purchasedItems);
             this.setItem(key, 0, true);
         }
         this.purchasedItems = {};
@@ -153,7 +151,6 @@ export class PlantationsModule extends GameModule {
     }
 
     removeItem(itemId) {
-        console.log(`Set Remove ${itemId} to: `, this.purchasedItems);
         this.setItem(itemId, 0, true);
     }
 

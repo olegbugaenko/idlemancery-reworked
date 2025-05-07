@@ -53,7 +53,6 @@ export class CraftingModule extends GameModule {
                 for(const id in this.craftingSlots) {
                     const ent = gameEntity.getEntity(id);
                     const isIgnore = payload.category && !ent.tags.includes(tagToCat[payload.category]);
-                    // console.log('Stop Craft: ', category, id, isIgnore, gameEntity.getEntity(id).tags)
                     if(!isIgnore && this.craftingSlots[id]?.level) {
                         hypotheticValues.push({
                             id,
@@ -79,12 +78,6 @@ export class CraftingModule extends GameModule {
 
     tick(game, delta) {
         this.lists.tick(game, delta);
-        /*if(gameEntity.entityExists('activeCrafting_craft_herbal_fibers')) {
-            console.log('DT: ',
-                gameEntity.getEntity('activeCrafting_craft_herbal_fibers'),
-                gameResources.getResource('inventory_ginseng')
-            )
-        }*/
     }
 
     save() {
@@ -120,7 +113,6 @@ export class CraftingModule extends GameModule {
         if(this.craftingSlots) {
             for(const id in this.craftingSlots) {
                 const isIgnore = category && !gameEntity.getEntity(id).tags.includes(tagToCat[category]);
-                // console.log('Stop Craft: ', category, id, isIgnore, gameEntity.getEntity(id).tags)
                 if(!isIgnore) {
                     this.setCraftingLevel({ id, level: 0, isForce: true });
                 }
@@ -160,7 +152,6 @@ export class CraftingModule extends GameModule {
                 })
             }
             const rs = gameEntity.setEntityLevel(`activeCrafting_${id}`, level, isForce);
-            // console.log('Update result: ', rs);
             this.craftingSlots[id].level = gameEntity.getLevel(`activeCrafting_${id}`);
         }
     }
@@ -266,7 +257,6 @@ export class CraftingModule extends GameModule {
 
     sendCraftingDetails(payload) {
         const data = this.getCraftingDetails(payload);
-        // console.log('Send crafting: crafting-details', data);
         this.eventHandler.sendData(`crafting-details`, data)
     }
 

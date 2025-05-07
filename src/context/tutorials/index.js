@@ -52,7 +52,7 @@ const stepsInitial = [
     },
     {
         target: '#item_action_walk',
-        content: 'Hovering over specific action will show you its details in the right panel. If you click on the action card - you will be able to pin its details to right sidebar.',
+        content: 'Hovering over or clicking specific action will show you its details in the right panel. If you click on the action card - you will be able to pin its details to right sidebar. Click on "Walking" action card to see details.',
         disableBeacon: true,
         disableOverlayClose: true,
         spotlightClicks: true,
@@ -116,6 +116,13 @@ const stepsInitial = [
     {
         target: '#level',
         content: 'While running actions, your mage will also gain experience. Each new mage level grants one skill point. Unspent points appear here, and clicking this indicator lets you allocate them.',
+        disableBeacon: true,
+        disableOverlayClose: true,
+        spotlightClicks: true,
+    },
+    {
+        target: '.banked-time',
+        content: "While you're away (when the game is closed), you accumulate banked time—up to 24 hours, that you can spend to speed up progress when you return.",
         disableBeacon: true,
         disableOverlayClose: true,
         spotlightClicks: true,

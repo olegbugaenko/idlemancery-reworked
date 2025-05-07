@@ -92,7 +92,7 @@ export const UnlocksList = () => {
                                 <p className={'unlock-title'}>{action.name}</p>
                                 {action.unlocks ? (<>
                                         <div className={'unlocks-progress'}>
-                                            <div className={'progress-bg'} style={{ width: `${action.progress}%`}}></div>
+                                            <div className={'progress-bg'} style={{ width: `${action.unlocks.progress}%`}}></div>
                                             <span className={'centered-percentage'}>
                                                         {formatValue(action.level)} / {formatInt(action.unlocks.level)}
                                                 &nbsp;({formatValue(action.unlocks.progress)}%)

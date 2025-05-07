@@ -112,8 +112,6 @@ export class MapTileListsSubmodule extends GameModule {
 
         this.mapLists[list.id].tiles = (this.mapLists[list.id].tiles || []).filter(one => one.time > 0);
 
-        // console.log('Saved List: ', list, payload);
-
         if(isReopenEdit) {
             this.sendListData(list.id, true);
         }
@@ -186,7 +184,6 @@ export class MapTileListsSubmodule extends GameModule {
             }
         }
         this.regenerateListsPriorityMap();
-        // console.log('RNN: ', this.runningList);
         if(obj?.runningList && Object.keys(obj?.runningList).length) {
             this.stopList();
             this.runList(obj?.runningList.id);
@@ -204,13 +201,11 @@ export class MapTileListsSubmodule extends GameModule {
 
     tick(game, delta) {
         // Here we checking autotrigger
-        // console.log('Autotrigger map', this.automationEnabled, this.listsAutotrigger, this.autotriggerCD);
         if(this.automationEnabled && this.listsAutotrigger.length && this.autotriggerCD <= 0) {
             this.autotriggerCD = this.autotriggerIntervalSetting || 10;
             const autotrigger = this.getAutotriggerList();
 
             if(autotrigger && this.runningList?.id !== autotrigger) {
-                // console.log('Run list autotrigger: ', autotrigger, this.runningList?.id, this.listsAutotrigger);
                 this.runList(autotrigger);
             }
         }
@@ -388,11 +383,6 @@ export class MapTileListsSubmodule extends GameModule {
                     value: c.value*weight
                 }));
 
-            /* console.log('ProcessingCosts: ', costs, gameCore
-                .getModule('map')
-                .mapTilesProcessed[tile.i][tile.j]
-                .cost);
-            */
             Object.values(costs).forEach(cost => {
                 if (!totalCosts[cost.id]) {
                     totalCosts[cost.id] = {

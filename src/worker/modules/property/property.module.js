@@ -174,8 +174,6 @@ export class PropertyModule extends GameModule {
             // Зберігаємо оновлений масив
             this.customFiltersOrder = newOrder;
 
-            // console.log('Re-sorted', payload, newOrder);
-
             this.sendFurnituresData({filterId}, {
                 searchData: this.searchData[filterId],
                 hideMaxed: this.hideMaxed[payload.filterId] || false,
@@ -252,7 +250,6 @@ export class PropertyModule extends GameModule {
         })
 
         this.eventHandler.registerHandler('set-furniture-hide-maxed', (payload) => {
-            // console.log('Set Hide Maxed: ', payload);
             if(payload.filterId) {
                 this.hideMaxed[payload.filterId] = payload.hideMaxed;
             }
@@ -388,11 +385,6 @@ export class PropertyModule extends GameModule {
             })
 
 
-            if(id == '18828') {
-                console.log('CHCK_ENT_RULES: ', id, entity.id, ruleResults, this.customFilters[filterId][id].condition, !this.customFilters[filterId][id].condition);
-            }
-
-
 
             let conditionExpression = this.customFilters[filterId][id].condition;
 
@@ -409,10 +401,6 @@ export class PropertyModule extends GameModule {
             });
 
             conditionExpression = conditionExpression.replace(/\bAND\b/g, '&&').replace(/\bOR\b/g, '||').replace(/\bNOT\b/g, '!');
-
-            if(id == '18828') {
-                console.log('CHCK_ENT_RULES: ', id, conditionExpression, eval(conditionExpression));
-            }
 
             try {
                 const result = eval(conditionExpression);
@@ -489,7 +477,6 @@ export class PropertyModule extends GameModule {
     applyCustomFilter({ filterId, id }) {
         this.selectedFilterId[filterId] = id;
         this.generateFilterCache(filterId, id);
-        console.log('AppliedFilter: ', this.selectedFilterId);
         this.sendFurnituresData({ filterId }, {
             hideMaxed: this.hideMaxed[filterId] || false,
             showHidden: this.showHidden[filterId] || false,
@@ -516,12 +503,10 @@ export class PropertyModule extends GameModule {
                     if(this.autoPurchase[key]) {
                         if(!gameEntity.isEntityUnlocked(key)) {
                             this.autoPurchase[key] = false;
-                            console.log('Furniture '+key+' is locked. Toggling autopurchase');
                             continue;
                         }
                         if(gameEntity.isCapped(key)) {
                             this.autoPurchase[key] = false;
-                            console.log('Furniture '+key+' is capped. Toggling autopurchase');
                             continue;
                         }
                         let cat = gameEntity.getEntity(key).tags?.includes('accessory') ? 'accessory' : (
@@ -775,7 +760,7 @@ export class PropertyModule extends GameModule {
 
         const spaceRes = gameResources.getResource('living_space');
 
-        console.log('showHidden: ', this.showHidden, options.showHidden);
+        // console.log('showHidden: ', this.showHidden, options.showHidden);
 
         return {
             available: entities.filter(one => one.isUnlocked

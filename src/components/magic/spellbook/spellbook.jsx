@@ -42,7 +42,6 @@ export const SpellbookWrap = ({ children }) => {
 
 
     const onToggleViewLasting = (id, flag) => {
-        console.log('toggle-view-lasting: ', id, flag);
         sendData('set-lasting-pinned', { id, flag });
     }
 
@@ -57,11 +56,9 @@ export const SpellbookWrap = ({ children }) => {
     }, [viewedOpenedId, detailOpenedId]);
 
     useEffect(() => {
-        // console.log('SpellChanged: ', isChanged)
     }, [isChanged]);
 
     useEffect(() => {
-        // console.log('New editData: ', editData);
     }, [editData])
 
     useEffect(() => {
@@ -87,7 +84,6 @@ export const SpellbookWrap = ({ children }) => {
     })
 
     onMessage('spell-details', (payload) => {
-        // console.log(`currViewing: ${viewedOpenedId}, edit: ${detailOpenedId}`, payload);
         if(viewedOpenedId) {
             setViewedData(payload);
         } else if(detailOpenedId) {
@@ -120,7 +116,6 @@ export const SpellbookWrap = ({ children }) => {
     const setSpellDetailsEdit = useCallback(({id, name}) => {
         sendData('set-monitored', { scope: 'effects', type: 'spell', id });
         if(id) {
-            // console.log('Edit: ', id, detailOpenedId, isChanged);
             if(detailOpenedId && isChanged) {
                 if(!confirm(`This will discard all your changes to ${detailOpenedId.name}. Are you sure`)) {
                     return;
@@ -205,15 +200,11 @@ export const SpellbookWrap = ({ children }) => {
                 ...newEdit.autocast.rules[index],
                 [key]: value
             };
-            // console.log('Setting Value with updated editData: ', newEdit);
             return newEdit;
         });
         setChanged(true);
     }, [editData])
 
-    useEffect(() => {
-        // console.log('New version of onSetAutoconsumeRuleValue created with editData:', editData);
-    }, [onSetAutoconsumeRuleValue]);
 
     const onToggleAutotrigger = useCallback(() => {
         if(editData) {
@@ -228,7 +219,6 @@ export const SpellbookWrap = ({ children }) => {
     }, [editData])
 
     const onSave = useCallback(() => {
-        // console.log('saving: ', editData);
         sendData('save-spell-settings', editData);
         setChanged(false);
         if(isMobile) {
@@ -247,7 +237,6 @@ export const SpellbookWrap = ({ children }) => {
     const [overlayPositions, setOverlayPositions] = useState([]);
 
     const handleFlash = (position) => {
-        // console.log('Adding flash: ', position);
         setOverlayPositions((prev) => [...prev, position]);
         setTimeout(() => {
             setOverlayPositions((prev) => prev.filter((p) => p !== position));
@@ -316,12 +305,8 @@ export const SpellCard = React.memo(({ id, monitored, name, isCasted, cooldownPr
 
     const handleContextMenu = (e) => {
         e.preventDefault(); // Prevents the default context menu
-        // console.log('Triger onpurchase: ', id);
         onPurchase(id); // Your custom right-click action
     };
-
-    // RERENDERING
-    // console.log('Item: ', id, cooldownProg, cooldown);
 
     return (<div ref={elementRef} id={`spell_card_${id}`} className={`icon-card item bigger flashable spell-card  ${isActive ? 'active' : ''} ${monitored ?? ''}`} onMouseEnter={() => !isMobile ? onShowDetails(id) : null} onMouseLeave={() => !isMobile ? onShowDetails(null) : null} onClick={handleClick} onContextMenu={handleContextMenu}>
         <div className={'icon-content'}>
@@ -354,7 +339,6 @@ export const SpellCard = React.memo(({ id, monitored, name, isCasted, cooldownPr
     if(prevProps.isChanged !== currProps.isChanged) {
         return false;
     }
-    // console.log('Rerender: ', prevProps, curr);
     return true;
 }))
 
@@ -555,17 +539,14 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
 }, (prevProps, currentProps) => {
 
     if(prevProps.isChanged !== currentProps.isChanged) {
-        //console.log('isChanged: ', prevProps.isChanged, currentProps.isChanged)
         return false;
     }
 
     if(prevProps.editData !== currentProps.editData) {
-        console.log('editData not equals: ', currentProps.editData?.autocast?.rules, prevProps.editData?.autocast?.rules)
         return false;
     }
 
     if(prevProps.viewedData !== currentProps.viewedData) {
-        //console.log('viewedChng: ', prevProps.viewedData, currentProps.viewedData)
         return false;
     }
 

@@ -51,7 +51,6 @@ export const Crafting = ({ setItemDetails, setItemLevel, filterId, newUnlocks, o
     }, [])
 
     onMessage(`crafting-data-${filterId}`, (craftables) => {
-        // console.log('CraftingData: ', craftables);
         setItemsData(craftables);
     })
 
@@ -60,7 +59,6 @@ export const Crafting = ({ setItemDetails, setItemLevel, filterId, newUnlocks, o
     }, []);
 
     const onViewList = useCallback(listData => {
-        console.log('onViewList: ', listData);
         openListDetails({ listData });
     }, []);
 
@@ -108,7 +106,6 @@ export const Crafting = ({ setItemDetails, setItemLevel, filterId, newUnlocks, o
                 automationEnabled={craftingData.craftingLists.automationEnabled}
                 autotriggerIntervalSetting={craftingData.craftingLists.autotriggerIntervalSetting}
                 editListToDetails={(id) => {
-                    console.log('editListToDetails: ', id);
                     onEditList({ id });
                 }}
                 viewListToDetails={(id) => {
@@ -246,7 +243,6 @@ export const CraftingListsPanel = ({ runningList, editListToDetails, lists, view
 
     useEffect(() => {
         const setOp = () => {
-            console.log('setOpToNull ')
             setOpenedFor(null);
         }
         if(openedFor) {
@@ -261,7 +257,6 @@ export const CraftingListsPanel = ({ runningList, editListToDetails, lists, view
     }, [openedFor])
 
     const editList = (id) => {
-        console.log('Set to edit: ', id);
         editListToDetails(id);
     }
 

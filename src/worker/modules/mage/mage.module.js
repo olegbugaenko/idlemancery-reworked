@@ -45,7 +45,6 @@ export class MageModule extends GameModule {
 
         this.eventHandler.registerHandler('set-lasting-pinned', ({id, flag}) => {
             this.activeEffectsFiltered[id] = !flag;
-            console.log('LAE: ', this.activeEffectsFiltered);
         })
 
         this.eventHandler.registerHandler('query-settings', (payload) => {
@@ -53,7 +52,6 @@ export class MageModule extends GameModule {
             if(payload?.prefix) {
                 label = `settings-${payload.prefix}`;
             }
-            console.log('Sent settings: ', label, this.settings);
             this.eventHandler.sendData(label, this.settings);
         })
 
@@ -61,13 +59,11 @@ export class MageModule extends GameModule {
             if(!this.settings) {
                 this.settings = {};
             }
-            console.log('setSetting: ', payload);
             this.settings[payload.key] = payload.value;
             this.eventHandler.sendData('settings', this.settings);
         })
 
         this.eventHandler.registerHandler('set_tour_finished', ({ skipStep }) => {
-            // console.log('TourFinished: ', skipStep);
             this.tourStatus = {
                 isComplete: true,
                 skipStep
@@ -334,18 +330,12 @@ export class MageModule extends GameModule {
                 continue;
             }
             const entityEffects = gameEntity.getEffectsStructured(skillId, 0, skillTree[skillId]);
-            //console.log('EffectsAsserted: ', entityEffects, totalEffects);
             let total = resourceApi.mergeEffects(totalEffects, entityEffects);
-            //console.log('Merged: ', total);
         }
-        //console.log('levelsByGroup', levelsByGroup);
         for(const groupId in levelsByGroup) {
             const entityEffects = gameEntity.getEffectsStructured(levelsByGroup[groupId].protoSkillId, 0, levelsByGroup[groupId].totalLevel);
-            //console.log('GroupEffectsAsserted: ', entityEffects, totalEffects);
             let total = resourceApi.mergeEffects(totalEffects, entityEffects);
-            //console.log('Merged: ', total);
         }
-        console.log('totalEffects', totalEffects);
         return totalEffects;
     }
 
@@ -416,7 +406,6 @@ export class MageModule extends GameModule {
 
     addSkillLevel(itemId) {
         const free = this.editModeSkills ? this.getFreeSPLeft() : gameResources.getResource('skill-points').balance;
-        console.log('Free: ', free, this.currentEditEffects);
         if(!free) {
             return;
         }
@@ -443,18 +432,14 @@ export class MageModule extends GameModule {
         }
 
         this.editModeSkills[itemId] = (this.editModeSkills[itemId] || 0) + 1;
-        console.log('newEdit: ', this.editModeSkills, this.editModeSkills[itemId])
 
         // once finish edit
         this.currentEditEffects = this.getSkillTreeEffects(this.editModeSkills);
-
-        console.log('AfterEdit: ', this.getFreeSPLeft(), this.currentEditEffects);
 
     }
 
     removeUnavailableSkills(skillId) {
         const dependents = this.skillsUnlock[skillId] || [];
-        console.log('>>>>>> ', dependents);
 
         for (const dependent of dependents) {
             const { id: dependentId, level: requiredLevel } = dependent;
@@ -501,8 +486,6 @@ export class MageModule extends GameModule {
         // Після видалень оновлюємо загальні ефекти
         this.currentEditEffects = this.getSkillTreeEffects(this.editModeSkills);
 
-        console.log('After Edit: ', this.getFreeSPLeft(), this.currentEditEffects);
-
     }
 
     purchaseItem(itemId) {
@@ -516,7 +499,6 @@ export class MageModule extends GameModule {
         }
 
         const newEnt = gameEntity.levelUpEntity(itemId);
-        console.log('Modifier: ', JSON.stringify(resourceModifiers.getModifier(`entity_${itemId}`)), resourceModifiers.getDependenciesToRegenerate(`entity_${itemId}`), gameResources.getResource('skill-points').balance);
         if(newEnt.success) {
             this.skillUpgrades[itemId] = gameEntity.getLevel(itemId);
             this.leveledId = itemId;
@@ -681,32 +663,6 @@ export class MageModule extends GameModule {
 
     }
 
-    /*getMageRank(level) {
-        let rank = this.mageRanks[0]; // Default to the lowest rank
-
-        for (const mageRank of this.mageRanks) {
-            if (level >= mageRank.level) {
-                rank = mageRank; // Update rank if level is sufficient
-            } else {
-                break; // Stop checking once we find a higher level rank
-            }
-        }
-
-        console.log('MGR: ', rank, this.mageRanks)
-
-        return rank;
-    }
-
-    reassertMageRank(level) {
-        const rank = this.getMageRank(level);
-        gameEntity.setEntityLevel('mage_rank', rank.rankLevel)
-    }*/
-
-    /*reassertCurrentMageLevel() {
-        const level = gameEntity.getLevel('mage');
-        return this.reassertMageRank(level);
-    }*/
-
     topValues(data) {
         return (data || []).sort((a, b) => b.value - a.value)
             .slice(0, 10);
@@ -738,7 +694,6 @@ export class MageModule extends GameModule {
         result.xpEarned = gameResources.getResource('mage-xp').earned;
         result.coinsEarned = gameResources.getResource('coins').earned;
         result.coinsSpent = gameResources.getResource('coins').spent;
-        // console.log('RS: ', result);
         return result;
     }
 
@@ -748,7 +703,6 @@ export class MageModule extends GameModule {
         const rs = gameResources.getResource('mage-xp');
         if(rs.amount >= rs.cap) {
             const rslt = gameEntity.levelUpEntity('mage');
-            // console.log('levelUp: ', rslt);
             // gameResources.addResource('skill-points', 1);
             this.isLeveledUp = true;
             const data = this.getMageData();
@@ -757,7 +711,6 @@ export class MageModule extends GameModule {
             this.eventHandler.playSound('hero_levelup');
         }
 
-        // console.log('B_TICK: ', this.bankedTime)
         if(!this.bankedTime.current) {
             this.bankedTime.current = 0;
         }
@@ -772,11 +725,9 @@ export class MageModule extends GameModule {
 
         if(this.shouldSendSkills) {
             this.shouldSendSkills = false;
-            console.log('Sending skill through reassert');
             const data = this.getSkillsData();
             this.eventHandler.sendData('skills-data', data);
         }
-        // console.log('A_TICK: ', this.bankedTime);
 
     }
 
@@ -843,7 +794,6 @@ export class MageModule extends GameModule {
                 const delta = Date.now() - (this.bankedTime.lastSave + 60000);
                 this.bankedTime.current = Math.min(this.bankedTime.max, this.bankedTime.current + delta);
             }
-            // console.log('loadedBankedTime: ', this.bankedTime, Date.now(), Date.now() - (this.bankedTime.lastSave + 60000))
         }
         /*if(!this.bankedTime?.current) {
             this.bankedTime.current = 3600*5.72*1000;
@@ -876,7 +826,6 @@ export class MageModule extends GameModule {
     }
 
     resetPerks() {
-        // console.log('resetPerks');
         for(const id in this.skillUpgrades) {
             this.setSkill(id, 0, true);
         }
@@ -888,7 +837,6 @@ export class MageModule extends GameModule {
         // const rank = gameEntity.getLevel('mage_rank');
         // const rankData = this.getMageRank(gameEntity.getLevel('mage'));
 
-        // console.log('rank: ', rankData);
 
         const actions = gameCore.getModule('actions').getTotalPlayerXPGains();
         const xpTotalIncome = actions.reduce((acc, a) => acc += a.dxp, 0);
@@ -913,7 +861,6 @@ export class MageModule extends GameModule {
     getSkillsData() {
         const skills = gameEntity.listEntitiesByTags(['skill']);
         const skillsRs = gameResources.getResource('skill-points');
-        console.log('rsData: ', cloneDeep(skillsRs));
 
         const currentEffects = this.getSkillTreeEffectsUnpacked(this.skillUpgrades);
 
@@ -972,7 +919,6 @@ export class MageModule extends GameModule {
     getActiveEffectsData() {
         const items = gameEntity.listEntitiesByTags(['active_effect']);
         // const presentSpells = items.filter(item => item.isUnlocked);
-        // console.log('[debug-error] activeEvents: ', items);
 
         return {
             list: items.filter(item => !this.activeEffectsFiltered[item.originalId] && !this.activeEffectsFiltered[item.copyFromId]).map(item => ({

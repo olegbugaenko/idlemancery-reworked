@@ -49,28 +49,22 @@ export class MainModule extends GameModule {
 
 
         this.eventHandler.registerHandler('initialize-game', (data) => {
-            console.log('gameCoreBeforeInited', data);
             gameCore.initialize({ is_demo: data.is_demo ? +data.is_demo : 0 });
-            // console.log('gameCoreInited', GameCore.instance);
             this.eventHandler.sendData('initialized', {...data, received: true});
-            // console.log('sent initialized')
         })
 
         this.eventHandler.registerHandler('load-game', (data) => {
-            // console.log('load-game received');
             this.loadGame(data);
         })
 
         this.eventHandler.registerHandler('reset-game', () => {
 
-            // console.log('reset-game received');
             this.loadGame({}, true);
         })
 
         this.eventHandler.registerHandler('start-ticking', () => {
             const cheat = 1;
             // const speedUpMode = gameCore.getModule('mage').bankedTime?.speedUpFactor ?? 1;
-            // console.log('gameCore', GameCore.instance, speedUpMode);
             gameCore.startTicking(100, () => 0.1*cheat*(gameCore.getModule('mage').bankedTime?.speedUpFactor ?? 1), () => {
                 if(gameCore.numTicks % 100 === 0) {
                     this.save();
@@ -141,7 +135,6 @@ export class MainModule extends GameModule {
         this.eventHandler.sendData('loading', {...data, received: true});
         gameCore.stopTicking();
         gameCore.load(data);
-        // console.log('loaded game -/|');
         this.eventHandler.sendData('loaded', {...data, received: true, isReset});
     }
 

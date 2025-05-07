@@ -229,7 +229,6 @@ export const ShopItems = ({ setItemDetails, purchaseItem, newUnlocks, isMobile }
     const [overlayPositions, setOverlayPositions] = useState([]);
 
     const handleFlash = (position) => {
-        // console.log('Adding flash: ', position);
         setOverlayPositions((prev) => [...prev, position]);
         setTimeout(() => {
             setOverlayPositions((prev) => prev.filter((p) => p !== position));
@@ -390,7 +389,6 @@ export const ItemResourceCard = ({ id, name, purchaseMultiplier, stock, level, m
         onMouseEnter={() => isMobile ? null : onShowDetails(id)}
         onMouseLeave={() => isMobile ? null : onShowDetails(null)}
         onClick={(e) => {
-            console.log('isMobile', isMobile);
             if(isMobile) {
                 onShowDetails(id)
             } else {
@@ -425,7 +423,6 @@ export const CourseCard = ({ toNext, id, efficiency, isRunning, name, level, pro
         onMouseEnter={() => isMobile ? null : onShowDetails(id)}
         onMouseLeave={() => isMobile ? null : onShowDetails(null)}
         onClick={(e) => {
-            console.log('isMobile', isMobile);
             if(isMobile) {
                 onShowDetails(id)
             } else {
@@ -516,7 +513,6 @@ export const ItemDetails = ({itemId, category, onClose, onPurchase}) => {
     if(!itemId || !item) return null;
 
     if(currentTourId === 'inventory' && itemId === 'inventory_brightleaf') {
-        console.log('CurrStep: ', stepIndex, item);
         unlockNextById(5);
     }
 

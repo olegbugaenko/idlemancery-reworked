@@ -28,7 +28,6 @@ export class MapModule extends GameModule {
         })
 
         this.eventHandler.registerHandler('map-highlight-filter', (payload) => {
-            // console.log('setHighLight: ', payload);
             if('highlightUnexplored' in payload) {
                 this.highlightFilters['highlightUnexplored'] = payload.highlightUnexplored;
             }
@@ -47,7 +46,6 @@ export class MapModule extends GameModule {
         })
 
         this.eventHandler.registerHandler('map-highlight-resources', (payload) => {
-            // console.log('setHighLight: ', payload);
             this.highlightResources = {};
             payload.ids.forEach(id => {
                 this.highlightResources[id] = true;
@@ -56,7 +54,6 @@ export class MapModule extends GameModule {
         })
 
         this.eventHandler.registerHandler('map-set-generated-level', (payload) => {
-            // console.log('setGeneratedLevel: ', payload);
             this.mapCreationSettings.level = Math.max(0, Math.min(Math.floor(gameEffects.getEffectValue('max_map_level')), payload.level));
             this.sendData();
             this.sendGeneralData();
@@ -217,8 +214,6 @@ export class MapModule extends GameModule {
             mid: potentialHuntables.filter(r => r.rarity >= 6 && r.rarity <= 10), // rarity 2-3
             high: potentialHuntables.filter(r => r.rarity >= 11 && r.rarity <= 15) // rarity 4-5
         };
-
-        // console.log('rarityBuckets: ', rarityBuckets, potentialResources);
 
         // Ensure we have at least 1 resource with rarity 0-1
         const drops = [];
@@ -583,14 +578,11 @@ export class MapModule extends GameModule {
 
     sendData() {
         const data = this.getData();
-        // console.log('DATA: ', data);
         this.eventHandler.sendData('map-data', data);
     }
 
     getDetails(i, j) {
-        console.log('GetDetails: ', i, j, this.mapTilesProcessed[i][j])
         const tile = this.mapTilesProcessed[i][j];
-        // console.log('Querying tile.drops: ', i, j, tile.drops, tile.drops.filter((drop, index) => (!tile.r?.includes(index)) && gameResources.isResourceUnlocked(drop.id)));
 
         return {
             ...tile,
@@ -635,7 +627,6 @@ export class MapModule extends GameModule {
                         if(!this.mapTiles[ent.attributes.i][ent.attributes.j].r.includes(index)) {
                             this.mapTiles[ent.attributes.i][ent.attributes.j].r.push(index);
                         }
-                        // console.log(`Found ${drop.id} at ${ent.attributes.i}:${ent.attributes.j} with chance ${roll} < ${drop.probability}: ${amt}. EntEff: ${ent.efficiency}`, this.mapTiles[ent.attributes.i][ent.attributes.j]);
                     }
                 })
             })

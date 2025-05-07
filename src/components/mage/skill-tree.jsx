@@ -14,7 +14,8 @@ import {BreakDown} from "../layout/sidebar.jsx";
 
 const SkillTree = () => {
     const [scale, setScale] = useState(80);
-    const center = { x: 1250, y: 1250 };
+    const scaleMult = scale/80;
+    const center = { x: 1250*scaleMult, y: 1250*scaleMult };
     const scrollRef = useRef(null);
     const contentRef = useRef(null);
     const [isDragging, setIsDragging] = useState(false);
@@ -48,7 +49,6 @@ const SkillTree = () => {
     }, [])
 
     onMessage('skills-data', (skills) => {
-        console.log('skills: ', skills);
         setSkillsData(skills);
     })
 
@@ -67,7 +67,7 @@ const SkillTree = () => {
             if (!e.ctrlKey && !e.metaKey) {
                 e.preventDefault();
 
-                const delta = e.deltaY < 0 ? 10 : -10;
+                const delta = e.deltaY < 0 ? 40 : -40;
                 setScale(prev => Math.min(160, Math.max(40, prev + delta)));
 
                 // 🧨 Блокуємо скрол:
@@ -89,7 +89,6 @@ const SkillTree = () => {
 
 
     const handleFlash = (position) => {
-        // console.log('Adding flash: ', position);
         setOverlayPositions((prev) => [...prev, position]);
         setTimeout(() => {
             setOverlayPositions((prev) => prev.filter((p) => p !== position));
@@ -97,22 +96,18 @@ const SkillTree = () => {
     };
 
     const onPurchase = (id) => {
-        // console.log('Purchase: ', id);
         sendData('purchase-skill', { id })
     }
 
     const onDelete = (id) => {
-        // console.log('Purchase: ', id);
         sendData('remove-skill', { id })
     }
 
     const onApply = () => {
-        // console.log('Purchase: ', id);
         sendData('apply-skill-changes', {  })
     }
 
     const onDiscard = () => {
-        // console.log('Purchase: ', id);
         sendData('discard-skill-changes', {  })
     }
 
@@ -120,7 +115,6 @@ const SkillTree = () => {
         if(isMobile) {
             setDetailsShown(skillsData.available[id]);
         }
-        // console.log('onShowDetails: ', id);
     }
 
 
@@ -158,13 +152,33 @@ const SkillTree = () => {
     };
 
     const handleWheel = (e) => {
-        console.log('Wheeling...', e.deltaY)
         if (!e.ctrlKey && !e.metaKey) {
             e.preventDefault();
-            const delta = e.deltaY < 0 ? 10 : -10;
+            const delta = e.deltaY < 0 ? 40 : -40;
             setScale(prev => Math.min(160, Math.max(40, prev + delta)));
         }
     };
+
+    const prevScale = useRef(scale);      // зберігаємо попередній зум
+
+    useEffect(() => {
+        const container = scrollRef.current?._container;
+        if (!container || prevScale.current === scale) return;
+
+        // поточний центр екрана у КООРДИНАТАХ canvas-а
+        const { scrollLeft, scrollTop, clientWidth, clientHeight } = container;
+        const cx = scrollLeft + clientWidth  / 2;
+        const cy = scrollTop  + clientHeight / 2;
+
+        // коефіцієнт, на який масштаб виріс/зменшився
+        const k = scale / prevScale.current;
+
+        // нові координати того самого world-центра після ресайзу полотна
+        container.scrollLeft = cx * k - clientWidth  / 2;
+        container.scrollTop  = cy * k - clientHeight / 2;
+
+        prevScale.current = scale;          // оновлюємо «минуле» значення
+    }, [scale]);
 
     const saveDraft = () => {
         const name = prompt("Enter draft name:");
@@ -250,9 +264,9 @@ const SkillTree = () => {
                         <div
                             ref={contentRef}
                             onMouseDown={handleMouseDown}
-                            style={{ position: "relative", width: "2500px", height: "2500px", cursor: isDragging ? "grabbing" : "grab" }}
+                            style={{ position: "relative", width: `${2500*scaleMult}px`, height: `${2500*scaleMult}px`, cursor: isDragging ? "grabbing" : "grab" }}
                         >
-                            <svg width="2500" height="2500" style={{ position: "absolute", top: 0, left: 0 }}>
+                            <svg width={2500*scaleMult} height={2500*scaleMult} style={{ position: "absolute", top: 0, left: 0 }}>
                                 {Object.entries(skillsData.available).map(([id, skill]) =>
                                     skill.unlockBySkills?.map((req, index) => {
                                         const from = skillsData.available[req.id];
@@ -478,7 +492,11 @@ export const ItemSkillCard = ({ id, iconId, isUnlocked, x, y, icon, isRequiremen
                     <img src={`icons/skills/${iconId ?? id}.png`} className={'resource'}/>)}
                 <span className={'level'}>{formatInt(level)}{max ? `/${formatInt(max)}` : ''}</span>
             </div>
-        </TippyWrapper>) : (<div className={`icon-content black`}></div>)}
+        </TippyWrapper>) : (<TippyWrapper content={<div className={'hint-popup'}>Continue to progress in game to unlock this skill</div> }>
+            <div className={`icon-content black`} style={{ '--size-mult': sizeMult }}>
+                <img src={`icons/ui/icon_locked.png`} className={'resource'}/>
+            </div></TippyWrapper>
+        )}
 
     </div> )
 }

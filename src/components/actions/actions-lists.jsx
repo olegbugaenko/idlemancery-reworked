@@ -19,13 +19,11 @@ export const ActionListsPanel = ({ automationUnlocked, runningList, editListToDe
 
 
     const editList = (id) => {
-        console.log('Set to edit: ', id);
         editListToDetails(id);
         setOpenedFor(null);
     }
 
     const cloneList = (id) => {
-        console.log('Set to clone: ', id);
         editListToDetails(id, { clone: true });
         setOpenedFor(null);
     }

@@ -108,8 +108,6 @@ export class ActionListsSubmodule extends GameModule {
                 }
             }));
 
-            // console.log('SendingData: ', JSON.stringify(data.prevEffects), JSON.stringify(data.resourcesEffects), data, id);
-
             const proportionsBar = this.getProportionsBar(listData)
 
             this.eventHandler.sendData('action-list-effects', {
@@ -162,7 +160,6 @@ export class ActionListsSubmodule extends GameModule {
             if (effect.scope === 'income') group.income += effect.value;
             else if (effect.scope === 'consumption') group.consumption += effect.value;
         });
-        console.log('Pre Iter: eff0 ', effects0, actions0, initialResourceBalance);
 
 
         const potentialConsumption = new Set();
@@ -178,7 +175,6 @@ export class ActionListsSubmodule extends GameModule {
 
         for (const [id, val] of Object.entries(initialResourceBalance)) {
             const net = val.current + val.income - val.consumption;
-            console.log('Pre Iter: check for push '+id+ ' :', net, val, potentialConsumption.has(id));
             if (net < 0 || potentialConsumption.has(id) || val.current < 0) {
                 keysToTrack.push(id);
             }
@@ -204,8 +200,6 @@ export class ActionListsSubmodule extends GameModule {
             }
         }
 
-        console.log('Pre Iter: ', skipDynamicActions.values(), keysToTrack, potentialConsumption.values());
-
         let dynamicValues = Object.fromEntries(dynamicActions.filter(one => !skipDynamicActions.has(one.id)).map(a => [a.id, 0.01]));
         let previousDeficits = {};
 
@@ -225,7 +219,6 @@ export class ActionListsSubmodule extends GameModule {
             const totalListTime = fixedTotal + dynamicTotal;
 
             const allEffects = this.getListEffects(null, { ...listData, actions });
-            console.log(`[Iter ${iter}] all-list-effects`, allEffects);
 
             const resourceBalanceMap = {};
             allEffects.forEach(effect => {
@@ -259,8 +252,6 @@ export class ActionListsSubmodule extends GameModule {
                 }
             }
 
-            console.log(`[Iter ${iter}] deficits`, currentDeficits, currentProficits);
-
             if (iter === 0) {
                 for (const [resourceId, deficit] of Object.entries(currentDeficits)) {
                     const actionsThatContribute = resourceToActions[resourceId];
@@ -280,7 +271,6 @@ export class ActionListsSubmodule extends GameModule {
                         const portion = (contrib?.value || 0) / totalValuePerSec;
                         const timeToAdd = totalNeededTime * portion;
                         dynamicValues[actionId] = (dynamicValues[actionId] || 0) + timeToAdd;
-                        console.log(`[Init] +${timeToAdd.toFixed(4)} сек до ${actionId} для ресурсу ${resourceId}`);
                     }
                 }
             } else {
@@ -305,8 +295,6 @@ export class ActionListsSubmodule extends GameModule {
                         const portion = (contrib?.value || 0) / totalValuePerSec;
                         const deltaTime = timeCorrection * portion;
                         const newTime = Math.max(0, (dynamicValues[actionId] || 0) + deltaTime);
-                        console.log(`[Iter ${iter}] ${deltaTime > 0 ? '+' : ''}${deltaTime.toFixed(4)} сек до ${actionId} для ресурсу ${resourceId}: ${dynamicValues[actionId]?.toFixed(4)} → ${newTime?.toFixed(4)}`);
-                        console.log(`[Iter ${iter}] reasoning: totalListTime = ${totalListTime}; timeCorrection = ${timeCorrection}; portion = ${portion}; totalValuePerSec=${totalValuePerSec}`);
                         dynamicValues[actionId] = newTime;
                     }
                 }
@@ -315,9 +303,7 @@ export class ActionListsSubmodule extends GameModule {
             let stable = true;
             for (const [resId, def] of Object.entries(currentDeficits)) {
                 const prev = previousDeficits[resId] ?? 0;
-                console.log(`[Iter ${iter}]: ${resId} CHECK: ${prev} VS ${def}`);
                 if (Math.abs(prev - def) > TOLERANCE || (def > TOLERANCE)) {
-                    console.log(`[Iter ${iter}]: ${resId} UNSTABLE: ${prev} VS ${def}`);
 
                     stable = false;
                     break;
@@ -327,12 +313,10 @@ export class ActionListsSubmodule extends GameModule {
             previousDeficits = { ...currentDeficits };
 
             if (stable) {
-                console.log(`[Iter ${iter}] stable → break`);
                 break;
             }
         }
 
-        console.log(`[Final] dynamicValues`, dynamicValues);
         return dynamicValues;
     }
 
@@ -444,7 +428,6 @@ export class ActionListsSubmodule extends GameModule {
                     effort: (listToRun.actions.find(o => o.id === active.originalId)?.time || 0) / Math.max(newTotalTime, 0.0001)
                 }
             })
-            console.log('Reassert list onSave: ', newTotalTime, gameCore.getModule('actions').activeActions);
             gameCore.getModule('actions').reassertRunningEfforts(true);
         }
     }
@@ -471,7 +454,6 @@ export class ActionListsSubmodule extends GameModule {
 
            return false;
         });
-        console.log('regenerateListPriority: ', listsBeingAutotrigger, listsBeingAutotriggerAvailable)
         this.listsAutotrigger = listsBeingAutotriggerAvailable.map(one => ({
             id: one.id,
             priority: one.autotrigger.priority ?? 0,
@@ -484,7 +466,6 @@ export class ActionListsSubmodule extends GameModule {
                 this.actionsLists[id].sort = sort;
             }
         });
-        console.log('newOrder: ', newOrder);
         this.sortLists(); // Re-sort the cached list
     }
 
@@ -553,7 +534,6 @@ export class ActionListsSubmodule extends GameModule {
             const autotrigger = this.getAutotriggerList();
 
             if(autotrigger && this.runningList?.id !== autotrigger) {
-                console.log('Run list autotrigger: ', autotrigger, this.runningList?.id, this.listsAutotrigger);
                 this.runList(autotrigger);
             }
         }
@@ -592,13 +572,12 @@ export class ActionListsSubmodule extends GameModule {
 
                 if (!isAvailable) {
                     // No available actions found in the list
-                    console.log('No available actions in the list.');
                     // Handle this case as needed, e.g., stop the running list
                     this.stopList();
                     gameCore.getModule('actions').setRunningAction(null);
                     return; // Exit the function early
                 } else {
-                    console.log('Toggled to:', this.runningList, action.id, delta);
+                    // console.log('Toggled to:', this.runningList, action.id, delta);
                 }
             }
 
@@ -650,7 +629,6 @@ export class ActionListsSubmodule extends GameModule {
                         effort: (listToRun.actions.find(o => o.id === active.originalId)?.time || 0) / newTotalTime
                     }
                 })
-                console.log('Reassert list: ', needReassert, newTotalTime, totalTime, gameCore.getModule('actions').activeActions);
                 gameCore.getModule('actions').reassertRunningEfforts();
             }
         }
@@ -661,7 +639,6 @@ export class ActionListsSubmodule extends GameModule {
                 this.autoApplyCD = 10;
                 const runningList = this.actionsLists[this.runningList.id];
                 this.actionsLists[this.runningList.id] = this.applyDynamicValuesToList(runningList);
-                console.log('Re-run after automations: ', this.runningList.id);
                 this.runList(this.runningList?.id);
             }
         }
@@ -749,9 +726,6 @@ export class ActionListsSubmodule extends GameModule {
                 nPrv.scope = 'consumption';
             }
 
-            console.log('Prv2: ', prev, effect, nPrv);
-
-
             prevEffects.push(nPrv);
 
             const newVal = (effect.scope === 'income' ? effect.value : -effect.value) + prev.balance;
@@ -772,8 +746,6 @@ export class ActionListsSubmodule extends GameModule {
         data.proportionsBar = proportionsBar;
 
         data.bForceOpen = bForceOpen;
-
-        console.log('SendingData: ', data);
 
         this.eventHandler.sendData('action-list-data', data);
     }
@@ -836,7 +808,6 @@ export class ActionListsSubmodule extends GameModule {
             const isEffectChanneling = gameEntity.getAttribute(action.id, 'isEffectChanneling', false);
             const effects = gameEntity.getEffects(action.id, gameEntity.getAttribute(action.id, 'isTraining') ? 1 : 0, gameEntity.getAttribute(action.id, 'isTraining') ? 1 : gameEntity.getLevel(action.id), true, action.time / totalTime);
 
-            // console.log('Temp P Iter: ', action.id, effects, action.time, totalTime);
             let learnRateFactor = gameCore.getModule('actions').getLearningRate(action.id) / gameCore.getModule('actions').getActionXPMax(action.id);
 
             effects.forEach(effToAdd => {

@@ -17,8 +17,6 @@ export const setMasterVolume = ({ master, sounds, music }) => {
     soundsVolume = sounds;
     musicVolume = music;
 
-    //console.log('settingVolume: ', { master, sounds, music }, volumeNodes);
-
     for (const key in volumeNodes) {
         const node = volumeNodes[key];
         if (key.startsWith('music:')) {
@@ -52,11 +50,25 @@ export const loadSounds = async (soundMap) => {
     return sounds;
 };
 
+const lastPlayedTimestamps = {};
+const COOLDOWN_MS = 2000; // 2 секунди
+
 export const playSound = (key) => {
-    //console.log('PlaySound: '+key, volumeNodes[key]?.gain?.value);
-    if (!sounds[key]) return;
+    const now = Date.now();
+
+    // Якщо останній запуск був менше ніж 2 секунди тому — не граємо
+    if (lastPlayedTimestamps[key] && now - lastPlayedTimestamps[key] < COOLDOWN_MS) {
+        return;
+    }
+
+    // Зберігаємо час запуску
+    lastPlayedTimestamps[key] = now;
+
+    const buffer = sounds[key];
+    if (!buffer) return;
+
     const source = audioContext.createBufferSource();
-    source.buffer = sounds[key];
+    source.buffer = buffer;
     source.connect(volumeNodes[key]);
     source.start(0);
 };

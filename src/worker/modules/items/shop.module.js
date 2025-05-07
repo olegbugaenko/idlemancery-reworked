@@ -77,7 +77,6 @@ export class ShopModule extends GameModule {
             this.stockRenewTimer = 0;
 
             const items = gameResources.listResourcesByTags(['inventory']);
-            // console.log('items: ', items);
             const presentItems = items.filter(item => item.isUnlocked && item.get_cost);
 
             presentItems.forEach(one => {

@@ -60,7 +60,7 @@ export const MainMenu = () => {
     }, [hotkeys]);
 
     onMessage('all-hotkeys-all', payload => {
-        console.log('Received AllHotkeys: ', payload);
+        // console.log('Received AllHotkeys: ', payload);
         setHotkeys(payload);
     })
 

@@ -105,7 +105,6 @@ export const InterfaceSettings = () => {
     });
 
     onMessage("settings", settings => {
-        console.log('Settings: ', settings);
         setSettings(settings);
     })
 

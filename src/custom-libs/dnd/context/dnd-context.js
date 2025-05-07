@@ -17,7 +17,6 @@ export const DndProvider = ({ children }) => {
 
         dropTargets.forEach((handler, id) => {
             const el = document.getElementById(id);
-            console.log('checkDroppable: ', id, el, handler.accept, data.type);
             if (!el) return;
 
             const accepts = handler.accept;
@@ -45,7 +44,6 @@ export const DndProvider = ({ children }) => {
     }, [dropTargets]);
 
     const registerDropTarget = useCallback((id, handler) => {
-        console.log('Register dt');
         setDropTargets(prev => {
             if (prev.get(id) === handler) return prev;
             const newMap = new Map(prev);
@@ -55,7 +53,7 @@ export const DndProvider = ({ children }) => {
     }, []);
 
     const unregisterDropTarget = useCallback((id) => {
-        console.log('Unregister dt');
+        // console.log('Unregister dt');
         setDropTargets(prev => {
             const newMap = new Map(prev);
             newMap.delete(id);

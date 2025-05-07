@@ -1365,10 +1365,10 @@ export const registerInventoryItems = () => {
             gameCore.getModule('mage').resetPerks()
         },
         getUsageCooldown: () => {
-            return 3600*24;
+            return 3600*44;
         },
         attributes: {
-            duration: 24*3600,
+            duration: 4*3600,
         },
         resourceModifier: {
             multiplier: {

@@ -751,12 +751,14 @@ p.small-hint, span.small-hint {
 
 .icon-card .icon-content.black {
     background: #333333;
+    width: calc(40px * var(--size-mult));
+    height: calc(40px * var(--size-mult));
 }
 
 
 .icon-card.semi-color .icon-content .semi-color{
-    width: 40px;
-    height: 40px;
+    width: calc(40px * var(--size-mult));
+    height: calc(40px * var(--size-mult));
     position: relative;
     border-radius: 50%;
     display: flex;

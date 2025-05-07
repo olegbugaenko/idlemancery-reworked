@@ -146,7 +146,6 @@ export const registerSkillsStage1 = () => {
         description: 'Increase your HP regen',
         level: 0,
         unlockCondition: () => {
-            // console.log('ACTLVL: ', )
             return gameEntity.getLevel('action_pushup') > 1
         },
         attributes: {
@@ -198,7 +197,6 @@ export const registerSkillsStage1 = () => {
         description: 'Increase potions and herbs consumption effects (Affect both negative and positive ones)',
         level: 0,
         unlockCondition: () => {
-            // console.log('ACTLVL: ', )
             return false;
         },
         attributes: {
@@ -240,7 +238,6 @@ export const registerSkillsStage1 = () => {
         description: 'Increase amount of items you can sell',
         level: 0,
         unlockCondition: () => {
-            // console.log('ACTLVL: ', )
             return gameEntity.getLevel('shop_item_backpack') >= 1
         },
         attributes: {
@@ -287,7 +284,6 @@ export const registerSkillsStage1 = () => {
         description: 'Increase your knowledge capacity and regeneration',
         level: 0,
         unlockCondition: () => {
-            // console.log('ACTLVL: ', )
             return gameEntity.getLevel('shop_item_library_entrance') >= 1
         },
         attributes: {
@@ -337,7 +333,6 @@ export const registerSkillsStage1 = () => {
         description: 'Increase your mana regen and capacity',
         level: 0,
         unlockCondition: () => {
-            // console.log('ACTLVL: ', )
             return gameEntity.getLevel('shop_item_spellbook') >= 1
         },
         attributes: {

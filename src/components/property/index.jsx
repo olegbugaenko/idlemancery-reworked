@@ -62,7 +62,6 @@ export const Property = ({}) => {
     })
 
     onMessage('new-unlocks-notifications-property', payload => {
-        // console.log('Received unlocks: ', payload);
         setNewUnlocks(payload);
     })
 

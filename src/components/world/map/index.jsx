@@ -47,12 +47,10 @@ export const MapWrap = ({ children }) => {
     })
 
     onMessage('new-unlocks-notifications-world', payload => {
-        // console.log('Received unlocks: ', payload);
         setNewUnlocks(payload);
     })
 
     onMessage('map-tile-list-data', (payload) => {
-        // console.log(`currViewing LIST: `, payload, listDetails);
         if(!listDetails) return;
 
         setListDetails({
@@ -66,7 +64,6 @@ export const MapWrap = ({ children }) => {
     })
 
     onMessage('map-tile-list-effects', (payload) => {
-        // console.log('GOT DATA: ', payload);
         setListDetails({
             ...listDetails,
             listData: {
@@ -178,20 +175,14 @@ export const MapWrap = ({ children }) => {
         }
     }, [listDetails])
 
-    useEffect(() => {
-        // console.log('Called select list', listDetails);
-    }, [listDetails])
-
     const setItemDetails = useCallback((pl) => {
         if(!pl) {
             setMapTileDetails(null);
             return;
         }
         const meta = pl?.meta;
-        // console.log('Called select tile', meta, listDetails);
         if(listDetails?.listData && listDetails?.isEdit) {
             if(meta) {
-                // console.log('Insert tile to list: ', meta, listDetails);
                 if(!listDetails.listData.tiles.find(one => one.id === `${meta.i}:${meta.j}`)) {
                     const newList = cloneDeep(listDetails.listData);
                     newList.tiles.push({
@@ -219,7 +210,6 @@ export const MapWrap = ({ children }) => {
 
     const openListDetails = (list) => {
         if(list.listData?.id) {
-            // console.log('loading list: ', list);
             setListDetails({
                 isEdit: list.isEdit,
                 isLoading: true,
@@ -462,7 +452,6 @@ export const ItemDetails = ({itemId, setItemDetails}) => {
     useEffect(() => {
         sendData('query-map-tile-details', itemId);
         const interval = setInterval(() => {
-            // console.log('queryingMap query-map-tile-details: ', itemId)
             sendData('query-map-tile-details', itemId);
         }, 1000);
 

@@ -39,7 +39,6 @@ export const ActionDetails = ({actionId, onClose, isSelected}) => {
 
 
     onMessage('action-details', (actions) => {
-        // console.log('received-details: ', actions, actionId);
         setDetailOpened(actions);
     })
 
@@ -52,18 +51,17 @@ export const ActionDetails = ({actionId, onClose, isSelected}) => {
 
 export const ActionDetailsComponent = React.memo(({onClose, isSelected, ...action}) => {
 
-    const { stepIndex, unlockNextById } = useTutorial();
+    const { stepIndex, unlockNextById, currentTourId } = useTutorial();
 
     useEffect(() => {
+        if(action.id === 'action_walk' && isSelected && currentTourId === 'initial') {
 
-        if(action.id === 'action_walk') {
-            // console.log('COMRF: ', stepIndex);
             requestAnimationFrame(() => {
                 unlockNextById(5);
             });
         }
-    }, [action.id]);
-    // console.log('re-render');
+    }, [action.id, isSelected, currentTourId, stepIndex]);
+
     return (<PerfectScrollbar>
         <div className={'blade-inner'}>
             <div className={'block'}>
@@ -173,35 +171,31 @@ export const ActionDetailsComponent = React.memo(({onClose, isSelected, ...actio
 }, (prevProps, currentProps) => {
     if(!prevProps && !currentProps) return true;
     if(!prevProps || !currentProps) {
-        //console.log('One of prp null or undefined. Re-render: ', prevProps, currentProps);
         return false;
     }
     if(prevProps.level !== currentProps.level) {
-        //console.log('Level mismatch. Re-render: ', prevProps, currentProps);
+        return false;
+    }
+    if(prevProps.isSelected !== currentProps.isSelected) {
         return false;
     }
     if(prevProps.xp !== currentProps.xp) {
-        //console.log('XP mismatch. Re-render: ', prevProps, currentProps);
         return false;
     }
     if(prevProps.id !== currentProps.id) {
-        //console.log('id mismatch. Re-render: ', prevProps, currentProps);
         return false;
     }
     if(prevProps.timeInvested !== currentProps.timeInvested) {
-        //console.log('id mismatch. Re-render: ', prevProps, currentProps);
         return false;
     }
 
     if(currentProps.potentialEffects.length) {
         for(let i = 0; i < currentProps.potentialEffects.length; i++) {
             if(!prevProps.potentialEffects[i]) {
-                //console.log('potEff mismatch length. Re-render: ', prevProps, currentProps);
                 return false;
             }
 
             if(prevProps.potentialEffects[i].value !== currentProps.potentialEffects[i].value) {
-                // console.log('One of prp of potEff mismatched: '+i+'. Re-render: ', prevProps, currentProps);
                 return false;
             }
         }
@@ -251,7 +245,6 @@ export const ListEditor = React.memo(({
     useEffect(() => {
         setEditing(listData);
         if(currentTourId === 'action-lists') {
-            console.log('CheckTour: ', stepIndex);
             if(listData.actions.find(one => one.id === 'action_walk') && listData.actions.find(one => one.id === 'action_beggar')) {
                 unlockNextById(4)
             }
@@ -259,7 +252,6 @@ export const ListEditor = React.memo(({
     }, [listData])
 
     const saveAndClose = (isClose) => {
-        console.log('Saving: ', editing);
         if(!isClose) {
             editing.isReopenEdit = true;
         }
@@ -285,7 +277,6 @@ export const ListEditor = React.memo(({
                     isRulesValid = true;
                 }
             }
-            console.log('Rules: ', editing?.autotrigger.rules, isRulesValid);
             if(isRulesValid) {
                 unlockNextById(6)
             }
@@ -326,7 +317,6 @@ export const ListEditor = React.memo(({
                                 if(currentTourId === 'action-lists') {
                                     setNextAllowedById(2)
                                 }
-                                console.log('updateListValue: ', 'name', e.target.value);
                                 onUpdateListValue('name', e.target.value)
                             }}/>) : (<span>{editing.name}</span>)}
                             <HowToSign scope={'action-lists'} />

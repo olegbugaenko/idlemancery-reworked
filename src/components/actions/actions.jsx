@@ -117,15 +117,12 @@ export const Actions = ({}) => {
     })
 
     onMessage('action-list-data', (payload) => {
-        // console.log(`currViewing: ${viewingList}, edit: ${editingList}`, payload);
         if(viewingList) {
             setViewedData(payload);
         } else if(editingList || payload.bForceOpen) {
             if(payload.bForceOpen && !editingList) {
                 setEditingList(payload.id);
-                // console.log('Set Editing to: ', payload);
             }
-            console.log('Attempt setting payload: ', payload);
             setListData(payload);
             setViewedData(null);
         } else if(listData?.copyId) {
@@ -152,11 +149,6 @@ export const Actions = ({}) => {
     })
 
     useEffect(() => {
-        console.log('listData set to: ', listData);
-    }, [listData])
-
-    useEffect(() => {
-        console.log('copying from: ', listData?.copyId);
         if(listData?.copyId) {
             sendData('query-actions-list-for-copy', { id: listData?.copyId });
         }
@@ -174,7 +166,6 @@ export const Actions = ({}) => {
     }
 
     const setActionDetails = (id) => {
-        // console.log('SettingOpened: ', id);
         // Additionally send signal to highlight action
         sendData('set-monitored', { scope: 'effects', type: 'action', id });
         if(!id) {
@@ -198,7 +189,6 @@ export const Actions = ({}) => {
                 setListData({ copyId: id, name: '', actions: []})
             }
         } else {
-            // console.log('Create new list. Setting listData')
             setViewingList(null);
             setEditingList(null);
             setListData({ name: '', actions: []})
@@ -214,7 +204,6 @@ export const Actions = ({}) => {
     }
 
     const onSelectAction = ({id, name, level}) => {
-        console.log('UpdatingAct: ', id, name, listData);
         playSound('click');
         if(listData) {
             setListData(prev => {
@@ -256,7 +245,6 @@ export const Actions = ({}) => {
     }
 
     const onUpdateListValue = (key, value) => {
-        console.log('Updating: ', key, value, listData, viewedData);
         if(listData) {
             const newList = cloneDeep(listData);
             newList[key] = value;
@@ -274,7 +262,6 @@ export const Actions = ({}) => {
     const [overlayPositions, setOverlayPositions] = useState([]);
 
     const handleFlash = (position) => {
-        console.log('Adding flash: ', position);
         setOverlayPositions((prev) => [...prev, position]);
         setTimeout(() => {
             setOverlayPositions((prev) => prev.filter((p) => p !== position));
@@ -301,7 +288,6 @@ export const Actions = ({}) => {
     };
 
     const onDragEnd = (dragData, dropData) => {
-        console.log('EventData: ', dragData, dropData);
         const { type, data, sourceId, index: sourceIndex } = dragData;
 
         if (!type || !data) return; // не дропнули ні на що
@@ -445,15 +431,14 @@ export const Actions = ({}) => {
     })
 
     const toggleShowHidden = useCallback(() => {
-        sendData('toggle-show-hidden', !actionsData.showHidden)
-    })
+        sendData('toggle-show-hidden', { flag: !actionsData.showHidden })
+    }, [actionsData.showHidden]);
 
     const toggleHiddenAction = useCallback((id, flag) => {
         sendData('toggle-hidden-action', { id, flag });
     })
 
     const setSearch = (searchData) => {
-        console.log('SetSearch: ', searchData);
         sendData('set-actions-search', { searchData });
     }
 
@@ -491,7 +476,6 @@ export const Actions = ({}) => {
     };
 
     if(currentTourId === 'actions') {
-        console.log('TourDets: ', currentTourId, actionsData.actionCategories.find(one => one.isSelected), stepIndex)
         if(actionsData.actionCategories.find(one => one.isSelected)?.id === 'all' && stepIndex === 1) {
             jumpOver(2);
         }
@@ -499,18 +483,6 @@ export const Actions = ({}) => {
         if(stepIndex === 1 && listData) {
             onCloseList(); // close list once tour is running
         }
-
-        /*if(id === 'action_beggar') {
-            if(stepIndex < 13) {
-                unlockNextById(12);
-            }
-            unlockNextById(13);
-        }
-
-        if(id === 'action_walk' && level > 1 && stepIndex === 8) {
-            console.log('JUMP! ');
-            jumpOver(11)
-        }*/
     }
 
     if(currentTourId === 'map') {
@@ -526,9 +498,7 @@ export const Actions = ({}) => {
     }
 
     useEffect(() => {
-        console.log('settInterval: ', currentTourId, stepIndex, actionsData?.runningList?.id);
         const interval = setInterval(() => {
-            // console.log('Querying current list effects if needed', currentTourId, stepIndex, actionsData?.runningList?.id);
             if(currentTourId === 'crafting' && (stepIndex === 8 || stepIndex === 7)) {
                 sendData('query-actions-running', { prefix: 'for-craft-tour', withEffects: true })
             }
@@ -544,7 +514,6 @@ export const Actions = ({}) => {
     }, [currentTourId, stepIndex, actionsData?.runningList?.id])
 
     onMessage('actions-running-for-craft-tour', (data) => {
-        console.log('Received data from current list: ', data, currentTourId, stepIndex);
         if(data.effects.some(one => one.id === 'inventory_wood') && data.effects.some(one => one.id === 'crafting_ability')) {
             if(stepIndex === 7) {
                 jumpOver(7, 2);
@@ -556,7 +525,6 @@ export const Actions = ({}) => {
     })
 
     onMessage('actions-running-for-alchemy-tour', (data) => {
-        console.log('Received data from current list: ', data, currentTourId, stepIndex);
         if(data.effects.some(one => one.id === 'alchemy_ability')) {
             if(stepIndex === 7) {
                 jumpOver(7, 2);
@@ -588,7 +556,6 @@ export const Actions = ({}) => {
                                 <li className={'add-custom-filter additional'}>
                                     <div className={'add-wrap'} onClick={(e) => {
                                         setCustomFilterOpened(true);
-                                        console.log('Opening...')
                                         if(currentTourId === 'actions') {
                                             unlockNextById(12);
                                         }
@@ -613,7 +580,6 @@ export const Actions = ({}) => {
                                                     setEditingCustomFilter(null);
                                                 }}
                                                 onSave={(data) => {
-                                                    console.log('saving: ', data)
                                                     sendData('save-actions-custom-filter', data);
                                                     setEditingCustomFilter(null);
                                                 }}
@@ -846,7 +812,6 @@ export const ActionCard = React.memo(({ id, category, monitored, entityEfficienc
     if(currentTourId === 'initial') {
         if(id === 'action_visit_city') {
             if(level < 2) {
-                console.log('AVC: ', stepIndex)
                 unlockNextById(12);
             }
         }
@@ -859,7 +824,6 @@ export const ActionCard = React.memo(({ id, category, monitored, entityEfficienc
         }
 
         if(id === 'action_walk' && level > 1 && stepIndex === 8) {
-            console.log('JUMP! ');
             jumpOver(11)
         }
     }

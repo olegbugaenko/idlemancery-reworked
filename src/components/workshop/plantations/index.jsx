@@ -74,7 +74,6 @@ export const ItemDetails = ({itemId, category, setItemDetails}) => {
     const [item, setDetailOpened] = useState(null);
 
     useEffect(() => {
-        // console.log('Details: ', itemId, category);
 
         const interval = setInterval(() => {
             sendData('query-plantation-details', { id: itemId });
@@ -88,7 +87,6 @@ export const ItemDetails = ({itemId, category, setItemDetails}) => {
     }, [itemId])
 
     onMessage('plantation-details', (items) => {
-        // console.log('PlantDetails: ', items)
         setDetailOpened(items);
     })
 

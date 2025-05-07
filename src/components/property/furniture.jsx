@@ -86,7 +86,6 @@ export const FurnitureUpgrades = ({ setItemDetails, purchaseItem, deleteItem, ne
     const [overlayPositions, setOverlayPositions] = useState([]);
 
     const handleFlash = (position) => {
-        // console.log('Adding flash: ', position);
         setOverlayPositions((prev) => [...prev, position]);
         setTimeout(() => {
             setOverlayPositions((prev) => prev.filter((p) => p !== position));
@@ -202,7 +201,6 @@ export const FurnitureUpgrades = ({ setItemDetails, purchaseItem, deleteItem, ne
                                         setEditingCustomFilter(null);
                                     }}
                                     onSave={(data) => {
-                                        // console.log('saving: ', data)
                                         sendData('save-property-custom-filter', {...data, filterId: 'furniture'});
                                         setEditingCustomFilter(null);
                                     }}

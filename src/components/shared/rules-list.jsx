@@ -230,7 +230,6 @@ const RulesList = React.memo(
             sendData('query-all-crafting-lists', { prefix });
 
             sendData('query-unlocks', { prefix: `automation-${prefix}`})
-            console.log('Sent queries...');
         }, []);
 
         useEffect(() => {
@@ -246,23 +245,19 @@ const RulesList = React.memo(
         }, [isAutoCheck, rules, pattern, prefix]);
 
         onMessage(`unlocks-automation-${prefix}`, (payload) => {
-            console.log('receivedUnlocks', payload);
             setUnlocks(payload);
         })
 
         onMessage(`rule-conditions-matched-${prefix}`, (payload) => {
-            // console.log('set-matched', payload);
             setRulesMatched(payload);
         })
 
         onMessage(`all-resources-${prefix}`, (payload) => {
             setResources(payload);
-            // console.log('RecRes: ', payload);
         })
 
         onMessage(`all-attributes-${prefix}`, (payload) => {
             setAttributes(payload);
-            console.log('AllAttrs: ', payload);
         })
 
         onMessage(`all-actions-${prefix}`, (payload) => {
@@ -363,7 +358,6 @@ const RulesList = React.memo(
                             if(!subjectValue && subjectOptions?.length) {
                                 subjectValue = {...subjectOptions[0]};
                                 if(subjectValue) {
-                                    console.log('Setting: ', mapCompareType[rule.compare_type].subject, subjectValue, subjectOptions )
                                     setRuleValue(index, mapCompareType[rule.compare_type].subject, subjectValue.value)
                                 }
                             }

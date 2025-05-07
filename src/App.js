@@ -28,24 +28,20 @@ function App() {
 
         // Cleanup
         return () => {
-            // console.log('Worker terminated...');
             worker.terminate();
         };
     }, []);
 
     onMessage('initialized', (event) => {
-        // console.log('Received from worker:', event);
         const saveString = window.localStorage.getItem('idlemanceryV2Reworked');
         if(!saveString) {
             sendData('reset-game', {});
             return
         }
-        // console.log('found save');
         sendData('load-game', JSON.parse(saveString));
     });
 
     onMessage('loading', (event) => {
-        // console.log('Received from worker:', event);
         setReadyToGo(false);
     });
 
@@ -53,7 +49,6 @@ function App() {
         // Request and apply sound valumes here
         setReadyToGo(true);
         if(pl.isReset) {
-            // console.log('Resetted: ', pl);
             setOpenedTab('actions');
         }
     })
