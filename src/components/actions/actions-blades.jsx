@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useCallback, useContext, useEffect, useState} from "react";
 import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
 import PerfectScrollbar from "react-perfect-scrollbar";
@@ -463,9 +463,17 @@ export const GeneralStats = ({ stats, aspects, setDetailVisible }) => {
 
     const {isMobile} = useAppContext();
 
+    const { currentTourId, unlockNextById, stepIndex } = useTutorial();
+
     const [isIntensityHidden, setIntensityHidden] = useUICache('actions_intensity_hidden', false)
     const [isLearningRatesHidden, setLearningRatesHidden] = useUICache('learning_rates_hidden', false)
     const [isDiscountsHidden, setDiscountsHidden] = useUICache('discounts_hidden', false)
+
+    useEffect(() => {
+        if(!isIntensityHidden && currentTourId === 'aspects') {
+            unlockNextById(1);
+        }
+    }, [isIntensityHidden, currentTourId, stepIndex])
 
     const setAspectLevel = (id, level) => {
         sendData('set-action-aspect-level', { id, level });
@@ -488,12 +496,16 @@ export const GeneralStats = ({ stats, aspects, setDetailVisible }) => {
         sendData('set-monitored', { scope: 'actions', type: 'discount', id });
     }
 
+    const setMonitoredAttribute = useCallback((id) => {
+        sendData('set-monitored', { scope: 'actions', type: 'attribute', id });
+    }, []);
 
     return (<PerfectScrollbar>
-        {aspects.isUnlocked ? (<div className={'block'}>
+        {aspects.isUnlocked ? (<div className={'block aspects-block'}>
             <div className={'block-heading flex-container flex-row'}>
                 <p>Actions Intensity</p>
-                <div className={`interface-icon icon-content small ${!isIntensityHidden ? ' reverted' : ''}`} onClick={() => setIntensityHidden(!isIntensityHidden)}>
+                <HowToSign scope={'aspects'} />
+                <div className={`interface-icon icon-content small show-hide-aspects ${!isIntensityHidden ? ' reverted' : ''}`} onClick={() => setIntensityHidden(!isIntensityHidden)}>
                     <img src={"icons/interface/toggle_hidden.png"} />
                 </div>
             </div>
@@ -502,14 +514,14 @@ export const GeneralStats = ({ stats, aspects, setDetailVisible }) => {
                 <p className={'hint'}>
                     Intensity boosts work speed but increases resource use. Max intensity depends on the attribute. "Keep Max" uses the highest available level. Lower intensity saves resources.
                 </p>
-                {aspects.list.map(one => (<div className={'aspect-wrap'} key={`aspect_${one.id}`}>
+                {aspects.list.map(one => (<div className={'aspect-wrap'} key={`aspect_${one.id}`} onMouseEnter={() => setMonitoredAttribute(one.attributeData?.id)} onMouseLeave={() => setMonitoredAttribute(null)}>
                     <div className={'flex-container aspect-row'}>
                         <span className={'col title'}>{one.name}</span>
                         <div className={'col amount'}>
-                            <input type={'number'} value={one.level} onChange={e => setAspectLevel(one.id, +e.target.value)}/>
+                            <input className={'set-aspect-level-input'} type={'number'} value={one.level} onChange={e => setAspectLevel(one.id, +e.target.value)}/>
                             <span> of {one.maxLevel}</span>
                             <label>
-                                <input type={'checkbox'} checked={one.keepMaxed} onChange={e => toggleMaxed(one.id, !one.keepMaxed)}/>
+                                <input className={'set-aspect-level-checkbox'} type={'checkbox'} checked={one.keepMaxed} onChange={e => toggleMaxed(one.id, !one.keepMaxed)}/>
                                 Keep Max
                             </label>
                         </div>

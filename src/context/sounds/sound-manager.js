@@ -9,6 +9,8 @@ let musicVolume = 0.5;
 
 const getMitiByKey = key => {
     if(key === 'music:track1') return 0.7;
+    if(key === 'music:track5') return 0.4;
+    if(key === 'music:track4') return 0.9;
     return 0.15;
 }
 

@@ -107,7 +107,7 @@ export const ResourcesBar = () => {
                 addClass += ' missing-blocker';
             }
 
-            return (<div key={res.id} className={`holder ${aff ? 'monitored' : ''} ${addClass}`} onMouseEnter={() => setMonitoredAttribute(res.id)} /*onMouseOut={() => setMonitoredAttribute(null)}*/ onMouseLeave={() => setMonitoredAttribute(null)}><div className={`resource-item ${affClassData}`}>
+            return (<div key={res.id} className={`holder ${aff ? 'monitored' : ''} ${addClass}`} onMouseEnter={() => setMonitoredAttribute(res.id)} onMouseLeave={() => setMonitoredAttribute(null)}><div className={`resource-item ${affClassData}`}>
                 <div className={'resource-label'}>
                     <RawResource name={res.name} id={res.id} />
                 </div>

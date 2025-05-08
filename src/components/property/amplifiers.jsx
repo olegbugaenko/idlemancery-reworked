@@ -166,7 +166,7 @@ export const AmplifiersUpgrades = ({ setItemDetails, purchaseItem, newUnlocks, i
                     </NewNotificationWrap>
                 </li> ))}
                 <li className={'add-custom-filter additional'}>
-                                <span className={'create-custom'} onClick={() => {
+                                <span className={'create-custom button-like'} onClick={() => {
                                     setCustomFilterOpened(true);
                                     // setEditingCustomFilter({ rules: [], condition: '', category: 'action', name: ''})
                                 }}>Edit Filters</span>

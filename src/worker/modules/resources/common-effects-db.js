@@ -85,7 +85,7 @@ export const registerCommomEffects = () => {
     })
 
     gameEffects.registerEffect('mental_training_learning_rate', {
-        name: 'Mental Training Rate',
+        name: 'Mental Training Learning',
         defaultValue: 1.,
         minValue: 1,
         saveBalanceTree: true,
@@ -93,7 +93,7 @@ export const registerCommomEffects = () => {
     })
 
     gameEffects.registerEffect('social_training_learning_rate', {
-        name: 'Social Training Rate',
+        name: 'Social Training Learning',
         defaultValue: 1.,
         minValue: 1,
         saveBalanceTree: true,

@@ -1,5 +1,5 @@
 {
-  "name": "idlemancery-v2-reworked",
+  "name": "idle-awakening",
   "version": "1.0.1",
   "description": "",
   "main": "index.js",
@@ -9,7 +9,8 @@
     "build": "npm update & webpack --config webpack.config.js",
     "build:demo": "set IS_DEMO=1 & webpack --config webpack.config.js",
     "electron:dev": "electron electron/main.js",
-    "electron:build": "npm update & webpack --config webpack.config.js & electron-builder"
+    "electron:build": "npm update & webpack --config webpack.config.js & electron-builder",
+    "electron:demo-build": "set IS_DEMO=1 & set IS_STEAM_BUILD=1 & npm update & webpack --config webpack.config.js & electron-builder"
   },
   "build": {
     "appId": "com.example.mygame",
@@ -26,7 +27,7 @@
     },
     "win": {
       "target": "nsis",
-      "icon": "assets/icons/icon.ico"
+      "icon": "public/favico.ico"
     },
     "linux": {
       "target": [

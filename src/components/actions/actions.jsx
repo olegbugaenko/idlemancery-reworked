@@ -554,7 +554,7 @@ export const Actions = ({}) => {
                                     </NewNotificationWrap>
                                 </li> ))}
                                 <li className={'add-custom-filter additional'}>
-                                    <div className={'add-wrap'} onClick={(e) => {
+                                    <div className={'add-wrap button-like'} onClick={(e) => {
                                         setCustomFilterOpened(true);
                                         if(currentTourId === 'actions') {
                                             unlockNextById(12);

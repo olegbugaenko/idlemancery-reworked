@@ -6,7 +6,7 @@ import {loadSounds, playSound, setMasterVolume as applyToAudioContext} from './s
 import {useWorkerClient} from "../../general/client";
 import { playMusic } from './sound-manager';
 
-const tracks = ['music:track3', 'music:track1', 'music:track2'];
+const tracks = ['music:track5', 'music:track4', 'music:track3', 'music:track1', 'music:track2'];
 
 const SoundContext = createContext();
 
@@ -68,6 +68,8 @@ export const SoundProvider = ({ children }) => {
             'music:track1': 'music/idle_awakening_main_theme_01.ogg',
             'music:track2': 'music/idle_awakening_main_theme_02.ogg',
             'music:track3': 'music/idle_awakening_main_theme_03.ogg',
+            'music:track4': 'music/music_track_04.ogg',
+            'music:track5': 'music/music_track_05.ogg',
         }).then(() => setSoundsLoaded(true));
     }, []);
 

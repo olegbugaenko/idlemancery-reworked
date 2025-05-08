@@ -1223,7 +1223,59 @@ const stepsListsAutomation = [
     },
 ];
 
-
+const stepsAspects = [
+    {
+        target: '.aspects-block',
+        content: 'Some actions have primary attribute. The higher your primary attribute is - the more intensively action can run (level-up faster, consume and produce more resources per second).',
+        disableBeacon: true,
+        disableOverlayClose: true,
+    },
+    {
+        target: '.aspects-block .show-hide-aspects',
+        content: 'Click here to open your action intensity panel',
+        disableBeacon: true,
+        disableOverlayClose: true,
+        placement: 'left',
+        spotlightClicks: true,
+        actionRequired: true
+    },
+    {
+        target: '.aspect-wrap',
+        content: 'Here are listed your unlocked action intensities.',
+        disableBeacon: true,
+        disableOverlayClose: true,
+    },
+    {
+        target: '.aspect-row',
+        content: 'You can set custom intensity for all actions using specific attribute. Setting more intensity meaning actions with this primary attribute will run faster and produce/consume more resources',
+        disableBeacon: true,
+        disableOverlayClose: true,
+    },
+    {
+        target: '.aspect-row .set-aspect-level-input',
+        content: 'Here you can set your intensity level. Maximum level that can be set depends on your corresponding attribute value. Action intensity is changed by 25% per intensity level (meaning intensity level 4 will make your action running twice as fast)',
+        disableBeacon: true,
+        disableOverlayClose: true,
+    },
+    {
+        target: '.aspect-row .set-aspect-level-checkbox',
+        content: 'Here you set your intensity to be always maximum. That means that increasing attribute level from 99 to 100 will automatically increase intensity from 3 to 4.',
+        disableBeacon: true,
+        disableOverlayClose: true,
+    },
+    {
+        target: '.aspect-row',
+        content: 'Hovering over specific intensity row will highlight actions that are affected by it. Also, primary attribute info can be found in action details panel, which can be opened by clicking/howering specific action.',
+        disableBeacon: true,
+        disableOverlayClose: true,
+    },
+    {
+        target: '.aspects-block',
+        content: 'Thats all about intensities',
+        disableBeacon: true,
+        disableOverlayClose: true,
+    }
+    ]
 
 export const tutorials = {
     initial: stepsInitial,
@@ -1236,4 +1288,5 @@ export const tutorials = {
     spellbook: stepsSpellbook,
     spellLevels: stepsSpellLevels,
     'lists-automation': stepsListsAutomation,
+    aspects: stepsAspects,
 }
