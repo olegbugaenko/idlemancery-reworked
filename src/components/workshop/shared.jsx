@@ -5,7 +5,7 @@ import React from "react";
 
 export const Balances = ({ resourceAmount, resourceBalance, breakDown }) => {
     const content = (<div className={'mid small-text'}>
-        <p>You own: {formatValue(resourceAmount)} <span className={`balance ${resourceBalance > 1.e-8 ? 'green' : ''} ${resourceBalance < -1.e-8 ? 'yellow' : ''}`}>({formatValue(resourceBalance, 2, true)})</span></p>
+        <p>You own: {formatValue(resourceAmount)} <span className={`balance ${resourceBalance > 1.e-8 ? 'green' : ''} ${resourceBalance < -1.e-8 ? 'yellow' : ''}`}>({formatValue(resourceBalance, Math.abs(resourceBalance) < 1 ? 3 : 2, true)})</span></p>
     </div>)
 
     if(!breakDown || !Object.values(breakDown).length) return content;

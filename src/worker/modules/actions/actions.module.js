@@ -182,6 +182,9 @@ export class ActionsModule extends GameModule {
 
         this.eventHandler.registerHandler('set-actions-search', ({searchData}) => {
             this.searchData = searchData;
+            this.sendActionsData(this.selectedFilterId, {
+                searchData: this.searchData,
+            })
         })
 
         this.eventHandler.registerHandler('query-action-xp-breakdown', (payload) => {
@@ -786,10 +789,6 @@ export class ActionsModule extends GameModule {
         }
 
         const total = (gameEffects.getEffectValue('plain_learn_rate') + baseXPRate * primaryEffect * gameEffects.getEffectValue('learning_rate')*focusBonus) * eff*effortMult*intensityEffect;
-
-        if(bGetBreakdowns) {
-            console.log('EffMult: ', id, baseXPRate, primaryEffect, eff, gameEffects.getEffectValue('learning_rate'), focusBonus, effortMult, total);
-        }
 
         if(bGetBreakdowns) {
             return {

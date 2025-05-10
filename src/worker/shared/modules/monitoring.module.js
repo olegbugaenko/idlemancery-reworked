@@ -23,12 +23,12 @@ export class MonitoringModule extends GameModule {
                 if(type === 'action') {
                     // if id null - clear monitors, else - replace em
                     if(id) {
-                        const data = gameEntity.getEffects(id, 1, gameCore.getModule('actions').actions[id]?.level || 1, true)
+                        const data = gameEntity.getEffects(id, 0, gameCore.getModule('actions').actions[id]?.level || 1, true)
                         const effects = data.filter(one => one.type === 'effects');
                         const resources = data.filter(one => one.type === 'resources');
 
                         gameCore.getModule('attributes').setMonitored(effects);
-                        gameCore.getModule('resource-pool').setMonitored(resources);
+                        gameCore.getModule('resource-pool').setMonitored(resources, ['runningActions']);
                     } else {
                         gameCore.getModule('attributes').setMonitored([]);
                         gameCore.getModule('resource-pool').setMonitored([]);
@@ -62,7 +62,7 @@ export class MonitoringModule extends GameModule {
                 if(['furniture', 'accessory', 'amplifier'].includes(type)) {
                     // if id null - clear monitors, else - replace em
                     if(id) {
-                        const data = gameEntity.getEffects(id, 1, 1, true)
+                        const data = gameEntity.getEffects(id, 0, 1, true)
                         const effects = data.filter(one => one.type === 'effects');
                         const resources = data.filter(one => one.type === 'resources');
 

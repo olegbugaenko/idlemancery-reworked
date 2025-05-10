@@ -1,5 +1,5 @@
 import {GameModule} from "../../shared/game-module";
-import {gameEntity, gameResources, gameCore, resourceCalculators} from "game-framework";
+import {gameEntity, gameResources, gameCore, resourceCalculators, gameEffects} from "game-framework";
 import {checkMatchingRules} from "../../shared/utils/rule-utils";
 import {mapObject} from "../../shared/utils/objects";
 import {SMALL_NUMBER} from "game-framework/src/utils/consts";
@@ -136,6 +136,7 @@ export class ActionListsSubmodule extends GameModule {
         const skipDynamicActions = new Set();
         const resourceToActions = {};
         const actionContributions = {};
+        const actionConsumptions = {};
         const keysToTrack = [];
 
         // 1. Ініціалізація дефіцитів для виявлення ключових ресурсів
@@ -145,11 +146,15 @@ export class ActionListsSubmodule extends GameModule {
         const effects0 = this.getListEffects(null, { ...listData, actions: actions0 });
 
         const initialResourceBalance = {};
+        /*if(gameEntity.entityExists(`activeCrafting_craft_refined_wood`)) {
+            console.log('WOOHOOD: ', gameEntity.getEntity(`activeCrafting_craft_refined_wood`), JSON.parse(JSON.stringify(gameEntity.getEntity('crafting_intensities'))), JSON.parse(JSON.stringify(gameCore.getModule('crafting').craftingSlots)), JSON.parse(JSON.stringify(gameEffects.getEffect('effort_craft_refined_wood'))), gameEffects.getEffectValue('effort_craft_refined_wood'));
+        }*/
         effects0.forEach(effect => {
             if (effect.type !== 'resources') return;
             const base = resourceCalculators.assertResource(effect.id, false, ['runningActions'], {
                 targetEfficiency: 1,
             });
+            console.log('RB: ', effect.id, base, gameResources.getResource('inventory_wood'));
             const currentIncome = base.balance;
 
             if (!initialResourceBalance[effect.id]) {
@@ -180,6 +185,8 @@ export class ActionListsSubmodule extends GameModule {
             }
         }
 
+        console.log('keysToTrack: ', keysToTrack, initialResourceBalance);
+
         // 2. Аналіз кожної динамічної дії — чи вона впливає на ключові ресурси
         for (const act of dynamicActions) {
             fallbackTimes[act.id] = act.time ?? 0.01;
@@ -187,6 +194,11 @@ export class ActionListsSubmodule extends GameModule {
             const oneActionEffects = this.getListEffects(null, { actions: [act] });
             const incomeEffects = oneActionEffects.filter(e => e.type === 'resources' && e.scope === 'income');
             actionContributions[act.id] = incomeEffects.map(e => ({ id: e.id, value: e.value }));
+            const consumptions = oneActionEffects
+                .filter(e => e.type === 'resources' && e.scope === 'consumption')
+                .map(e => ({ id: e.id, value: e.value }));
+
+            actionConsumptions[act.id] = consumptions/*.reduce((acc, item) => ({...acc, [item.id]: item.value}), {})*/;
 
             let contributesToDeficit = false;
             for (const { id } of incomeEffects) {
@@ -199,6 +211,9 @@ export class ActionListsSubmodule extends GameModule {
                 skipDynamicActions.add(act.id);
             }
         }
+
+        console.log('ActionsToSkip: ', skipDynamicActions, actionContributions, actionConsumptions);
+        const forecastedActionsEfficiencies = {};
 
         let dynamicValues = Object.fromEntries(dynamicActions.filter(one => !skipDynamicActions.has(one.id)).map(a => [a.id, 0.01]));
         let previousDeficits = {};
@@ -227,6 +242,7 @@ export class ActionListsSubmodule extends GameModule {
                 const base = resourceCalculators.assertResource(effect.id, false, ['runningActions'], {
                     targetEfficiency: 1,
                 });
+
                 const currentIncome = base.balance;
 
                 if (!resourceBalanceMap[effect.id]) {
@@ -236,7 +252,25 @@ export class ActionListsSubmodule extends GameModule {
                 const group = resourceBalanceMap[effect.id];
                 if (effect.scope === 'income') group.income += effect.value;
                 else if (effect.scope === 'consumption') group.consumption += effect.value;
+
+                if(group.consumption) {
+                    group.forecastedEfficiency = (base.income*base.multiplier) / (group.consumption + base.consumption);
+                } else {
+                    group.forecastedEfficiency = 1;
+                }
             });
+
+            const potentialEfficiencies = {};
+            for(const actId in actionConsumptions) {
+                potentialEfficiencies[actId] = 1;
+                for(const consumption of actionConsumptions[actId]) {
+                    if(resourceBalanceMap[consumption.id].forecastedEfficiency < 1 - SMALL_NUMBER) {
+                        potentialEfficiencies[actId] = Math.min(potentialEfficiencies[actId], resourceBalanceMap[consumption.id].forecastedEfficiency)
+                    }
+                }
+            }
+
+            console.log(`Iter${iter} balance map: `, resourceBalanceMap, potentialEfficiencies, dynamicValues);
 
             const currentDeficits = {};
             const currentProficits = {};
@@ -259,7 +293,7 @@ export class ActionListsSubmodule extends GameModule {
 
                     const totalValuePerSec = Array.from(actionsThatContribute).reduce((sum, actionId) => {
                         const contrib = actionContributions[actionId].find(c => c.id === resourceId);
-                        return sum + (contrib?.value || 0);
+                        return sum + (contrib?.value || 0)*((actionId in potentialEfficiencies) ? potentialEfficiencies[actionId] : 1);
                     }, 0);
 
                     if (totalValuePerSec <= 0) continue;
@@ -272,6 +306,8 @@ export class ActionListsSubmodule extends GameModule {
                         const timeToAdd = totalNeededTime * portion;
                         dynamicValues[actionId] = (dynamicValues[actionId] || 0) + timeToAdd;
                     }
+                    console.log('Iter0: ', resourceId, deficit, dynamicValues);
+
                 }
             } else {
                 for (const [resourceId, prevDeficit] of Object.entries(previousDeficits)) {
@@ -283,7 +319,7 @@ export class ActionListsSubmodule extends GameModule {
 
                     const totalValuePerSec = Array.from(actionsThatContribute).reduce((sum, actionId) => {
                         const contrib = actionContributions[actionId].find(c => c.id === resourceId);
-                        return sum + (contrib?.value || 0);
+                        return sum + (contrib?.value || 0)*((actionId in potentialEfficiencies) ? potentialEfficiencies[actionId] : 1);
                     }, 0);
 
                     if (totalValuePerSec <= 0) continue;
@@ -298,6 +334,7 @@ export class ActionListsSubmodule extends GameModule {
                         dynamicValues[actionId] = newTime;
                     }
                 }
+                console.log(`Iter${iter} values: `, dynamicValues, previousDeficits, currentDeficits);
             }
 
             let stable = true;

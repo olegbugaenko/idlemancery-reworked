@@ -90,14 +90,16 @@ export const ResourcesBar = () => {
     return (<div className={'resources'} id={'tutorial-resources'}>
         {resourceData.map(res => {
 
-            const aff = res.affData;
+            const aff = res.monitor;
 
             let affClassData = ''
             if(aff) {
-                affClassData = ` monitored ${aff.isAffordable ? 'affordable' : (aff.hardLocked ? 'locked' : 'unavailable')}`
+                affClassData = ` monitored ${aff?.bShow ? 'show-potential' : ''} ${aff.isAffordable ? 'affordable' : (aff.hardLocked ? 'locked' : 'unavailable')}`
             }
 
-            const isAffected = res.monitor?.direction;
+            const isAffected = aff?.direction;
+            const newBalance = aff?.newBalance;
+
             let addClass = '';
             if(isAffected) {
                 addClass = isAffected < 0 ? ' negative' : ' positive';
@@ -107,7 +109,7 @@ export const ResourcesBar = () => {
                 addClass += ' missing-blocker';
             }
 
-            return (<div key={res.id} className={`holder ${aff ? 'monitored' : ''} ${addClass}`} onMouseEnter={() => setMonitoredAttribute(res.id)} onMouseLeave={() => setMonitoredAttribute(null)}><div className={`resource-item ${affClassData}`}>
+            return (<div key={res.id} className={`holder ${aff ? 'monitored' : ''} ${aff?.bShow ? 'show-potential' : ''} ${addClass}`} onMouseEnter={() => setMonitoredAttribute(res.id)} onMouseLeave={() => setMonitoredAttribute(null)}><div className={`resource-item ${affClassData}`}>
                 <div className={'resource-label'}>
                     <RawResource name={res.name} id={res.id} />
                 </div>
@@ -117,13 +119,15 @@ export const ResourcesBar = () => {
                 <TippyWrapper content={<div className={'hint-popup'}><BreakDown breakDown={res.breakDown}/></div> }>
                     <span className={`resource-balance ${res.isNegative ? 'red' : ''} ${res.isPositive ? 'green' : ''}`}>{formatValue(res.balance || 0)}</span>
                 </TippyWrapper>
+                {aff && aff?.bShow ? (<div className={`appendix ${aff.newBalance > res.balance ? 'plus' : (aff.newBalance < res.balance ? 'minus' : 'neutral')}`}>
+                    <span>{formatValue(aff.newBalance)}</span>
+                </div> ) : null}
+
+            </div>
                 {res.capProgress ? (<div className={'next-unlock-holder resource'}>
                     <div className={'next-unlock-bar'} style={{ width: `${res.capProgress*100}%`}}></div>
                 </div>) : null}
-                {aff ? (<div className={'appendix'}>
-                    {aff.isAffordable ? (<span>{formatValue(aff.requirement)}</span>) : (<span>{formatValue(aff.actual - aff.requirement)}({secondsToString(aff.eta)})</span>)}
-                </div> ) : null}
-            </div></div>)
+            </div>)
         })}
     </div> )
 }

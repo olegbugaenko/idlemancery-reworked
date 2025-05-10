@@ -11,7 +11,7 @@ const tracks = ['music:track5', 'music:track4', 'music:track3', 'music:track1', 
 const SoundContext = createContext();
 
 const defaultVolumes = {
-    master: 0.5,
+    master: 1,
     sounds: 0.5,
     music: 0.1,
 };

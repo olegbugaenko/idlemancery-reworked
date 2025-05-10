@@ -57,11 +57,11 @@ export const CraftingWrap = ({ children }) => {
         }
     }
 
-    const setItemLevel = useCallback((id, level) => {
-        if(currentTourId === 'crafting' && level > 0) {
+    const setItemLevel = useCallback((id, effort) => {
+        if(currentTourId === 'crafting' && effort > 0) {
             unlockNextById(10);
         }
-        sendData('set-crafting-level', { id, level, filterId: 'crafting' });
+        sendData('set-crafting-level', { id, effort, filterId: 'crafting' });
     })
 
     onMessage('crafting-list-data', (payload) => {

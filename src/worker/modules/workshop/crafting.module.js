@@ -11,6 +11,8 @@ export class CraftingModule extends GameModule {
 
         this.lists = new CraftingListsSubmodule();
 
+        this.currentVersion = 2;
+
         this.craftingSlots = {};
 
         this.filters = [{
@@ -38,7 +40,7 @@ export class CraftingModule extends GameModule {
         })
 
         this.eventHandler.registerHandler('set-crafting-level', (payload) => {
-            this.setCraftingLevel(payload);
+            this.setCraftingEffort(payload);
             this.sendCraftingData(payload);
         })
 
@@ -84,21 +86,26 @@ export class CraftingModule extends GameModule {
         return {
             slots: this.craftingSlots,
             craftingLists: this.lists.save(),
+            version: this.currentVersion
         }
     }
 
     load(obj) {
         if(this.craftingSlots) {
-            for(const id in this.craftingSlots) {
-                this.setCraftingLevel({ id, level: 0, isForce: true });
-            }
+            this.craftingSlots = {};
+        }
+
+        // dont load deprecated crafting version
+        if(!obj?.version || obj?.version < this.currentVersion) {
+            return;
         }
         this.craftingSlots = obj?.slots || {};
         if(Array.isArray(this.craftingSlots)) {
             this.craftingSlots = {};
         }
+
         for(const id in this.craftingSlots) {
-            this.setCraftingLevel({ id, level: this.craftingSlots[id].level, isForce: true });
+            this.setCraftingEffort({ id, effort: this.craftingSlots[id].effort, isForce: true });
         }
         if(obj?.craftingLists) {
             this.lists.load(obj.craftingLists);
@@ -114,46 +121,120 @@ export class CraftingModule extends GameModule {
             for(const id in this.craftingSlots) {
                 const isIgnore = category && !gameEntity.getEntity(id).tags.includes(tagToCat[category]);
                 if(!isIgnore) {
-                    this.setCraftingLevel({ id, level: 0, isForce: true });
+                    this.setCraftingEffort({ id, effort: 0, isForce: true, filterId: category });
                 }
             }
         }
     }
 
-    setCraftingLevel({ id, level, isForce = false, filterId }) {
+    setCraftingEffort({ id, effort, isForce = false, filterId }) {
         if(!this.craftingSlots[id]) {
             this.craftingSlots[id] = {
-                level: 0
+                effort: 0,
+                filterId,
             }
         }
-        if(level < 0) {
-            level = 0;
+        if(effort < 0) {
+            effort = 0;
+        }
+
+        if(effort > 1) {
+            effort = 1;
+        }
+
+        this.craftingSlots[id].effort = effort;
+
+        const catToTag = tags => {
+            if(tags.includes('material')) return 'crafting';
+            if(tags.includes('alchemy')) return 'alchemy';
+            throw new Error('Invalid crafting')
+        }
+
+        if(!this.craftingSlots[id].filterId) {
+            this.craftingSlots[id].filterId = catToTag(gameEntity.getEntity(id).tags);
         }
 
         if(!isForce) {
-            const rrs = filterId === 'crafting' ? gameResources.getResource('crafting_slots') : gameResources.getResource('alchemy_slots')
-            const max = this.craftingSlots[id].level + rrs.amount;
-            if(level > max) {
-                level = Math.floor(max);
-            }
+            this.recalculateRemaining(id, filterId, 1 - effort)
         }
 
-        if(level === 0 && gameEntity.entityExists(`activeCrafting_${id}`)) {
+        if(effort === 0 && gameEntity.entityExists(`activeCrafting_${id}`)) {
             gameEntity.unsetEntity(`activeCrafting_${id}`)
-            this.craftingSlots[id].level = 0;
         }
-        if(level > 0) {
+        if(effort > 0) {
             if(!gameEntity.entityExists(`activeCrafting_${id}`)) {
                 gameEntity.registerGameEntity(`activeCrafting_${id}`, {
                     copyFromId: id,
-                    level,
+                    level: 1,
                     allowedImpacts: ['resources'],
                     tags: ['running', 'runningCrafting']
                 })
             }
-            const rs = gameEntity.setEntityLevel(`activeCrafting_${id}`, level, isForce);
-            this.craftingSlots[id].level = gameEntity.getLevel(`activeCrafting_${id}`);
         }
+
+        this.applyCraftingIntensities();
+
+    }
+
+    recalculateRemaining(skipId, category) {
+        const tagToCat = {
+            'crafting': 'material',
+            alchemy: 'alchemy'
+        }
+
+        const skippedEffort = this.craftingSlots[skipId]?.effort ?? 0;
+        const remainingToRedistribute = 1 - skippedEffort;
+        const currentRecipes = Object.entries(this.craftingSlots).filter(([key, one]) => gameEntity.getEntity(key).tags.includes(tagToCat[category]));
+        const currentEffortsTotal = currentRecipes.reduce((acc, [key, recipe]) => acc += recipe.effort, 0);
+        const mult = currentEffortsTotal ? remainingToRedistribute/currentEffortsTotal : 1;
+        if(Math.abs(mult - 1) > SMALL_NUMBER ) {
+            if(this.craftingSlots) {
+                for(const id in this.craftingSlots) {
+                    const isIgnore = category && !gameEntity.getEntity(id).tags.includes(tagToCat[category]);
+                    if(!isIgnore && skipId !== id) {
+                        this.craftingSlots[id].effort *= mult;
+                    }
+                }
+            }
+        }
+    }
+
+    applyCraftingIntensities() {
+
+        const resourceModifier = {
+            get_income: () => {
+
+                const intensities = {}
+                for(const key in this.craftingSlots) {
+                    intensities[`effort_${key}`] = {
+                        A: 0,
+                        B: this.craftingSlots[key].effort*(this.craftingSlots[key].filterId ? gameEffects.getEffectValue(`${this.craftingSlots[key].filterId}_effort`) : 0),
+                        type: 0,
+                    }
+                }
+
+                return {
+                    effects: intensities,
+                }
+            },
+            effectDeps: ['crafting_effort','alchemy_effort']
+        }
+        if(gameEntity.entityExists('crafting_intensities')) {
+            gameEntity.unsetEntity('crafting_intensities');
+        }
+        gameEntity.registerGameEntity('crafting_intensities', {
+            name: 'Crafting Intensities',
+            level: 1,
+            resourceModifier,
+        })
+
+        /*console.log('INTS: ', gameEntity.getEntity('crafting_intensities'), this.craftingSlots, gameResources.getResource('inventory_wood'));
+        if(gameEntity.entityExists(`activeCrafting_craft_refined_wood`)) {
+            console.log('WOOOOD: ', gameEntity.getEntity(`activeCrafting_craft_refined_wood`));
+        }
+        if(gameEntity.entityExists('runningAction_action_woodcutter')) {
+            console.log('Running woodcutter: ', gameEntity.getEntity('runningAction_action_woodcutter'))
+        }*/
     }
 
     regenerateNotifications() {
@@ -188,16 +269,14 @@ export class CraftingModule extends GameModule {
 
         const entities = gameEntity.listEntitiesByTags(['recipe', ...filter.tags]).filter(one => one.isUnlocked);
 
-        const rrs = filterId === 'crafting' ? gameResources.getResource('crafting_slots') : gameResources.getResource('alchemy_slots')
-        const efrs = filterId === 'crafting' ? gameResources.getResource('crafting_ability') : gameResources.getResource('alchemy_ability')
+        const efrs = filterId === 'crafting' ? gameEffects.getEffect('crafting_effort') : gameEffects.getEffect('alchemy_effort');
 
-        const eff_key =  filterId === 'crafting' ? 'crafting_ability' : 'alchemy_ability';
+        const eff_key =  filterId === 'crafting' ? 'crafting_effort' : 'alchemy_effort';
 
         const available = entities.map(recipe => ({
             ...recipe,
             icon_id: recipe.resourceId,
-            level: this.craftingSlots[recipe.id]?.level || 0,
-            maxLevel: rrs.amount + (this.craftingSlots[recipe.id]?.level || 0),
+            effort: this.craftingSlots[recipe.id]?.effort || 0,
             resourceAmount: gameResources.getResource(recipe.resourceId)?.amount,
             resourceBalance: gameResources.getResource(recipe.resourceId)?.balance,
             breakDown: gameResources.getResource(recipe.resourceId)?.breakDown,
@@ -205,17 +284,10 @@ export class CraftingModule extends GameModule {
             isLowerEfficiency: gameEntity.entityExists(`activeCrafting_${recipe.id}`) && gameEntity.getEntity(`activeCrafting_${recipe.id}`).modifier?.efficiency < 1 - SMALL_NUMBER
         }));
 
-        const slots = {
-            max: rrs.income,
-            total: rrs.amount
-        }
-
         return {
             available,
-            slots,
             efforts: {
                 ...efrs,
-                isPinned: !!gameCore.getModule('resource-pool').pinnedResources?.[eff_key]
             },
             craftingLists: this.lists.getLists({ category: filterId })
         }

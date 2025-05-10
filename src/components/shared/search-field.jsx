@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef } from "react";
 export const SearchField = ({ value, onSetValue, scopes, placeholder }) => {
     const [search, setSearch] = useState(value?.search);
     const [selectedScopes, setSelectedScopes] = useState(null);
-    const [isScopesOpened, setScopesOpened] = useState(true);
+    const [isScopesOpened, setScopesOpened] = useState(false);
 
     const popupRef = useRef(null);
 
@@ -11,28 +11,17 @@ export const SearchField = ({ value, onSetValue, scopes, placeholder }) => {
         if(!selectedScopes && value.selectedScopes) {
             setSelectedScopes(value.selectedScopes)
         }
-    }, [value]);
+        setSearch(value?.search);
+    }, [value?.search, JSON.stringify(value?.selectedScopes ?? [])]);
 
     useEffect(() => {
         // skip set data c
         if(!Array.isArray(selectedScopes)) return;
 
-        onSetValue({
-            search,
-            selectedScopes,
-        });
+
     }, [search, selectedScopes]);
 
-    useEffect(() => {
-        if (search) {
-            setScopesOpened(true);
-        } else {
-            setScopesOpened(false);
-        }
-    }, [search]);
-
     const onToggleScope = (id) => {
-        console.log('Scopes: ', scopes, selectedScopes);
         if (scopes.map((s) => s.id).includes(id)) {
             const newScopes = [...selectedScopes];
             if (!newScopes.includes(id)) {
@@ -41,11 +30,23 @@ export const SearchField = ({ value, onSetValue, scopes, placeholder }) => {
                 newScopes.splice(newScopes.indexOf(id), 1);
             }
             setSelectedScopes(newScopes);
+
+            onSetValue({
+                search,
+                selectedScopes: newScopes,
+            });
         }
     };
 
     const onChangeSearch = (e) => {
-        setSearch(e.target.value.toLowerCase());
+
+        onSetValue({
+            search: e.target.value.toLowerCase(),
+            selectedScopes,
+        });
+
+        console.log('OPening')
+        setScopesOpened(true);
     };
 
     const handleClickOutside = (event) => {
@@ -61,6 +62,7 @@ export const SearchField = ({ value, onSetValue, scopes, placeholder }) => {
         };
     }, []);
 
+
     return (
         <div className="search-rel-wrap" ref={popupRef}>
             <div className={'search-input-wrap'}>
@@ -69,6 +71,7 @@ export const SearchField = ({ value, onSetValue, scopes, placeholder }) => {
                     placeholder={placeholder}
                     value={search}
                     onChange={onChangeSearch}
+                    onClick={() => setScopesOpened(true)}
                 />
                 <span className={'clear'} onClick={() => { setSearch('') }}>X</span>
             </div>

@@ -605,7 +605,10 @@ export const Actions = ({}) => {
                                 <label>
                                     <SearchField
                                         placeholder={'Search'}
-                                        value={actionsData.searchData || ''}
+                                        value={actionsData.searchData || {
+                                            search: '',
+                                            selectedScopes: ['name','tags']
+                                        }}
                                         onSetValue={val => setSearch(val)}
                                         scopes={ACTIONS_SEARCH_SCOPES}
                                     />
@@ -623,7 +626,7 @@ export const Actions = ({}) => {
                         <div className={'list-wrap'} id={'actions-list-wrap'}>
                             <PerfectScrollbar>
                                 <div>
-                                    <div className="flex-container">
+                                    <div className="flex-container inner-actions-wrap">
                                         {actionsData.available.map((action, index) =>
                                             <NewNotificationWrap key={action.id} id={action.id} className={'narrow-wrapper'} isNew={newUnlocks.actions?.items?.all?.items?.[actionsData.selectedCategory]?.items?.[action.id]?.hasNew}>
                                                 <DraggableActionCard

@@ -1,5 +1,5 @@
 import {GameModule} from "../../shared/game-module";
-import { gameResources, gameEntity, gameCore, gameEffects } from "game-framework"
+import {gameResources, gameEntity, gameCore, gameEffects, resourceCalculators} from "game-framework"
 import {registerInventoryItems} from "../inventory/inventory-items-db";
 import {registerCommomEffects} from "./common-effects-db";
 import {SMALL_NUMBER} from "game-framework/src/utils/consts";
@@ -212,7 +212,7 @@ export class ResourcePoolModule extends GameModule {
         this.pinnedResources = obj?.pinnedResources ?? {};
     }
 
-    setMonitored(data) {
+    setMonitored(data, skip) {
         this.monitoredData = {};
         if(!data?.length) return;
         data.forEach(effect => {
@@ -223,10 +223,30 @@ export class ResourcePoolModule extends GameModule {
             if(effect.scope === 'multiplier' && effect.value < 1) {
                 direction = -1;
             }
+            const prev = resourceCalculators.assertResource(effect.id, false, skip);
+
+            let newBalance = 0;
+            switch (effect.scope) {
+                case 'consumption':
+                    newBalance = prev.balance - effect.value;
+                    break;
+                case 'income':
+                    newBalance = prev.balance + effect.value*prev.multiplier;
+                    break;
+                case 'multiplier':
+                    newBalance = (prev.income * prev.multiplier * effect.value) - prev.consumption;
+                    break;
+                default:
+                    newBalance = prev.balance;
+                    break;
+            }
             this.monitoredData[effect.id] = {
                 direction,
                 name: effect.name,
-                id: effect.id
+                id: effect.id,
+                amount: effect.value,
+                newBalance,
+                bShow: !!skip,
             };
         })
     }

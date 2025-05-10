@@ -325,7 +325,7 @@ p.small-hint, span.small-hint {
 
 
 .content-wrap .sidebar {
-    width: 330px;
+    width: 340px;
     height: calc(100% - 10px);
     background: var(--boxbg);
     overflow-x: visible;
@@ -344,6 +344,7 @@ p.small-hint, span.small-hint {
     padding: 2px 5px 4px;
     border-bottom: 1px solid #222233;
     position: relative;
+    height: calc(100% - 2px);
 }
 
 .content-wrap .sidebar .resource-item .name-wrap {
@@ -356,27 +357,54 @@ p.small-hint, span.small-hint {
     background-color: #222222;
 }
 
-.sidebar .holder.monitored {
+.sidebar .holder {
     height: 27px;
+    position: relative;
 }
 
-.content-wrap .sidebar .resource-item.monitored {
-    width: 420px;
+.inner-actions-wrap {
+    padding-left: 4px;
+}
+
+.content-wrap .sidebar .resource-item.monitored.show-potential {
+    width: 380px;
     position: absolute;
     z-index: 1;
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
+    background-color: #222;
 }
+
+/*.content-wrap .sidebar .holder.negative .resource-item.monitored {
+    background-color: #11111f;
+}*/
+
+
 .content-wrap .sidebar .resource-item .appendix {
-    font-size: 13px;
-    width: 140px;
-    border-left: 1px solid #ffffff;
+    font-size: 12px;
+    width: 40px;
     padding-left: 4px;
+}
+
+.content-wrap .sidebar .resource-item .appendix span {
+    font-size: 12px;
+}
+
+.content-wrap .sidebar .holder.negative .resource-item .appendix.plus span {
+    color: var(--green);
+}
+
+.content-wrap .sidebar .holder.negative .resource-item .appendix.minus span {
+    color: var(--red);
 }
 
 .content-wrap .sidebar .holder.negative .resource-item span,
 .content-wrap .sidebar .holder.negative .resource-item .name-wrap {
     color: var(--yellow);
+}
+
+.content-wrap .sidebar .holder.negative .resource-item span.resource-balance {
+    text-shadow: 0 0 12px var(--yellow);
 }
 
 .content-wrap .sidebar .holder.positive .resource-item span,
@@ -388,13 +416,13 @@ p.small-hint, span.small-hint {
     background: var(--darkgreen);
 }
 
-.content-wrap .sidebar .resource-item.unavailable {
+/*.content-wrap .sidebar .resource-item.unavailable {
     background: var(--yellow);
-}
+}*/
 
-.content-wrap .sidebar .resource-item.locked {
+/*.content-wrap .sidebar .resource-item.locked {
     background: var(--darkred);
-}
+}*/
 
 .content-wrap .sidebar .resource-item .resource-label {
     width: 115px;
@@ -3445,4 +3473,62 @@ ul.menu .add-custom-filter .add-wrap {
     height: 50%;
     padding-top: 4px;
     border-top: 1px solid #333333;
+}
+
+.card .bottom.self-placed {
+    padding: 0 12px;
+}
+
+.card .bottom.self-placed input.level-set {
+    width: 100px;
+}
+
+input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 6px;
+    background: #444;
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+    margin: 8px 0;
+}
+
+/* Track (webkit only) */
+input[type="range"]::-webkit-slider-runnable-track {
+    height: 6px;
+    background: #666;
+    border-radius: 3px;
+}
+
+/* Thumb (webkit only) */
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 14px;
+    width: 14px;
+    border-radius: 50%;
+    background: #00ccff;
+    border: 2px solid #222;
+    margin-top: -4px; /* half of thumb height minus half of track height */
+    transition: background 0.2s;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+    background: #33ddff;
+}
+
+/* Firefox */
+input[type="range"]::-moz-range-track {
+    height: 6px;
+    background: #666;
+    border-radius: 3px;
+}
+
+input[type="range"]::-moz-range-thumb {
+    height: 14px;
+    width: 14px;
+    border-radius: 50%;
+    background: #00ccff;
+    border: 2px solid #222;
+    cursor: pointer;
 }

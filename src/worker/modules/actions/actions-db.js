@@ -2967,7 +2967,7 @@ export const registerActionsStage1 = () => {
         category: ACTION_CATS.OTHER,
         name: 'Basic Craft',
         isAbstract: false,
-        allowedImpacts: ['effects'],
+        allowedImpacts: ['none'],
         description: 'Dedicate your time and efforts to crafting',
         level: 1,
         getLearnRate: () => {
@@ -2975,8 +2975,8 @@ export const registerActionsStage1 = () => {
         },
         resourceModifier: {
             get_income: () => ({
-                resources: {
-                    'crafting_ability': {
+                effects: {
+                    'crafting_effort': {
                         A: 0.001,
                         B: 0.029,
                         type: 0,
@@ -3004,7 +3004,8 @@ export const registerActionsStage1 = () => {
         },
         attributes: {
             baseXPCost: 100,
-            primaryAttribute: 'attribute_strength'
+            primaryAttribute: 'attribute_strength',
+            isEffectChanneling: true,
         }
     })
 

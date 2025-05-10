@@ -1,4 +1,5 @@
 import {gameEntity, gameCore, gameEffects, gameResources, resourceModifiers} from "game-framework"
+import {getRankId} from "../actions/actions-db";
 
 export const getPrimaryBonus = (attributeId) => {
     return 0.98 + 0.02*gameEffects.getEffectValue(attributeId);
@@ -6,9 +7,7 @@ export const getPrimaryBonus = (attributeId) => {
 
 export const registerCraftingRecipe = (id, options) => {
 
-    const primaryAttribute = options.attributes.primaryAttribute;
-
-    if(!primaryAttribute || !options.resourceModifier) {
+    if(!options.resourceModifier) {
         return gameEntity.registerGameEntity(id, options);
     }
 
@@ -16,11 +15,14 @@ export const registerCraftingRecipe = (id, options) => {
         options.resourceModifier.effectDeps = []
     }
 
-    if(!options.resourceModifier.effectDeps.includes(primaryAttribute)) {
-        options.resourceModifier.effectDeps.push(primaryAttribute);
-    }
+    gameEffects.registerEffect(`effort_${id}`, {
+        name: `${options.name} Effort`,
+        minValue: 0,
+        defaultValue: 0,
+    })
+    options.resourceModifier.effectDeps.push(`effort_${id}`);
 
-    options.getPrimaryEffect = () => getPrimaryBonus(primaryAttribute);
+    options.getEffortMultiplier = () => gameEffects.getEffectValue(`effort_${id}`)
 
     if(options.attributes.isTraining) {
         options.resourceModifier.customAmplifierApplyTypes = ['resources']
@@ -28,7 +30,7 @@ export const registerCraftingRecipe = (id, options) => {
         options.resourceModifier.customAmplifierApplyTypes = ['effects', 'resources']
     }
 
-    options.resourceModifier.getCustomAmplifier = () => options.getPrimaryEffect();
+    options.resourceModifier.getCustomAmplifier = () => options.getEffortMultiplier();
 
     return gameEntity.registerGameEntity(id, options);
 
@@ -61,17 +63,6 @@ export const registerCraftingRecipes = () => {
                         B: 1/gameEffects.getEffectValue('crafting_materials_discount'),
                         type: 1
                     },
-                    'crafting_ability': {
-                        A: 1.5,
-                        B: 1,
-                        type: 1,
-                    },
-                    'crafting_slots': {
-                        A: 1,
-                        B: 0,
-                        type: 0,
-                        ignoreEfficiency: true,
-                    },
                 }
             }),
             effectDeps: ['crafting_efficiency', 'crafting_materials_discount']
@@ -82,13 +73,6 @@ export const registerCraftingRecipes = () => {
         attributes: {
             baseXPCost: 10,
         },
-        get_cost: () => ({
-            'crafting_slots': {
-                A: 1,
-                B: 0,
-                type: 0
-            }
-        }),
     })
 
 
