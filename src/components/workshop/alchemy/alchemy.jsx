@@ -22,10 +22,6 @@ export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, op
     const { onMessage, sendData } = useWorkerClient(worker);
     const [craftingData, setItemsData] = useState({
         available: [],
-        slots: {
-            total: 0,
-            max: 0
-        },
         efforts: {
             consumption: 0,
             balance: 0,
@@ -63,18 +59,14 @@ export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, op
         openListDetails({ listData });
     }, []);
 
-    if(currentTourId === 'alchemy') {
+    /*if(currentTourId === 'alchemy') {
         if(craftingData.available?.length) {
-            unlockNextById(9);
+            unlockNextById(8);
         }
-    }
+    }*/
 
     return (<div className={'crafting-wrap'}>
         <div className={'head'}>
-            <div className={'space-item alchemy-slots'}>
-                <RawResource id={'alchemy_slots'} name={'Alchemy Slots'} />
-                <span className={`slots-amount ${craftingData.slots.total > 0 ? 'slots-available' : 'slots-unavailable'}`}>{formatInt(craftingData.slots.total)}/{formatInt(craftingData.slots.max)}</span>
-            </div>
             <div className={'flex-container'}>
                 <TippyWrapper content={<div className={'hint-popup'}>
                     <p className={'hint'}>Shows the amount of available effort you can use for alchemy.</p>
@@ -83,10 +75,9 @@ export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, op
                 </div> }>
                     <div className={'space-item alchemy-efforts'}>
                         <span>Alchemy Efforts:</span>
-                        <span>{formatValue(craftingData.efforts.balance)}/{formatValue(craftingData.efforts.balance + craftingData.efforts.consumption)}</span>
+                        <span>{formatValue(craftingData.efforts.value)}</span>
                     </div>
                 </TippyWrapper>
-                <PinResource isPinned={craftingData.efforts.isPinned} id={'alchemy_ability'} />
             </div>
 
         </div>
@@ -117,7 +108,7 @@ export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, op
     </div>)
 }
 
-export const ItemCard = ({ id, icon_id, isRunning, resourceAmount, resourceBalance, breakDown, isLowerEfficiency, name, level, maxLevel, onSetLevel, onShowDetails, addItemToList, isMobile, isEditList}) => {
+export const ItemCard = ({ id, icon_id, isRunning, resourceAmount, resourceBalance, breakDown, isLowerEfficiency, name, effort, maxLevel, onSetLevel, onShowDetails, addItemToList, isMobile, isEditList}) => {
 
     return (<div
         className={`card craftable ${isRunning ? 'running' : ''} ${isLowerEfficiency ? 'lower-eff' : ''}`}
@@ -133,39 +124,38 @@ export const ItemCard = ({ id, icon_id, isRunning, resourceAmount, resourceBalan
             <div className={'right'}>
                 <div className={'head'}>
                     <p className={'title'}>{name}</p>
-                    <span className={'level'}>{formatInt(level)}{maxLevel ? `/${formatInt(maxLevel)}` : ''}</span>
                 </div>
                 <Balances resourceAmount={resourceAmount} resourceBalance={resourceBalance} breakDown={breakDown} />
-                <div className={'bottom'}>
-                    <div className={'buttons'}>
-                        <span className={'label'}>Set Effort:</span>
-                        <TippyWrapper content={<div className={'hint-popup'}>
-                            <p>Increasing the effort level boosts both production and alchemy costs exponentially, but costs grow faster than output. Each additional effort level multiplies costs by 1.5 while increasing output by only 1.2.</p>
-                        </div> }>
-                            <div className={'effort-control flex-container flex-row'}>
-                                <div className={'icon-content minimize-icon interface-icon tiny'} onClick={(e) => {
-                                    e.stopPropagation();
-                                    e.preventDefault();
-                                    onSetLevel(id, 0)
-                                }}>
-                                    <img src={"icons/interface/minimize.png"}/>
-                                </div>
-                                <input className={'level-set'} type={'number'} min={0} max={maxLevel} value={level} onChange={e => {
-                                    e.stopPropagation();
-                                    e.preventDefault();
-                                    onSetLevel(id, Math.round(+e.target.value))
-                                }}/>
-                                <div className={'icon-content maximize-icon interface-icon tiny'} onClick={(e) => {
-                                    e.stopPropagation();
-                                    e.preventDefault();
-                                    onSetLevel(id, 1.e+9)
-                                }}>
-                                    <img src={"icons/interface/maximize.png"}/>
-                                </div>
-                            </div>
-                        </TippyWrapper>
+            </div>
+        </div>
+        <div className={'bottom self-placed'}>
+            <div className={'buttons'}>
+                <span className={'label'}>Set Effort:</span>
+                <TippyWrapper content={<div className={'hint-popup'}>
+                    <p>Regulate effort percentage for this recipe. Increasing it will prioritize this recipe, increasing its productivity while decreasing others</p>
+                </div> }>
+                    <div className={'effort-control flex-container flex-row'}>
+                        <div className={'icon-content minimize-icon interface-icon tiny'} onClick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            onSetLevel(id, 0)
+                        }}>
+                            <img src={"icons/interface/minimize.png"}/>
+                        </div>
+                        <input className={'level-set'} type={'range'} min={0} max={1} step={0.01} value={effort} onChange={e => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            onSetLevel(id, +e.target.value)
+                        }}/>
+                        <div className={'icon-content maximize-icon interface-icon tiny'} onClick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            onSetLevel(id, 1.e+9)
+                        }}>
+                            <img src={"icons/interface/maximize.png"}/>
+                        </div>
                     </div>
-                </div>
+                </TippyWrapper>
             </div>
         </div>
     </div> )

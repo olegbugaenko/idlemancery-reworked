@@ -61,7 +61,7 @@ export const Crafting = ({ setItemDetails, setItemLevel, filterId, newUnlocks, o
 
     if(currentTourId === 'crafting') {
         if(craftingData.available?.length) {
-            unlockNextById(9);
+            unlockNextById(8);
         }
     }
 
@@ -133,7 +133,7 @@ export const ItemCard = ({ id, icon_id, isRunning, isLowerEfficiency, name, effo
             <div className={'buttons'}>
                 <span className={'label'}>Set Effort:</span>
                 <TippyWrapper content={<div className={'hint-popup'}>
-                    <p>Increasing the effort level boosts both production and crafting costs exponentially, but costs grow faster than output. Each additional effort level multiplies costs by 1.5 while increasing output by only 1.2.</p>
+                    <p>Regulate effort percentage for this recipe. Increasing it will prioritize this recipe, increasing its productivity while decreasing others</p>
                 </div> }>
                     <div className={'effort-control flex-container flex-row'}>
                         <div className={'icon-content minimize-icon interface-icon tiny'} onClick={(e) => {

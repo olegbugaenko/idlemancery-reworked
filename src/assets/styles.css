@@ -1939,6 +1939,10 @@ h4 {
     margin-top: 4px;
 }
 
+.set-level-for-list {
+    width: 100px;
+}
+
 .pattern-wrap.flex-container {
     align-items: center;
     justify-content: space-between;

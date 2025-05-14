@@ -48,7 +48,7 @@ export const AlchemyWrap = ({ children }) => {
     })
 
     const setItemDetails = (id) => {
-        if(currentTourId === 'alchemy' && [3,14].includes(stepIndex)) {
+        if(currentTourId === 'alchemy' && [3,9].includes(stepIndex)) {
             return;
         }
         if(!id) {
@@ -58,11 +58,11 @@ export const AlchemyWrap = ({ children }) => {
         }
     }
 
-    const setItemLevel = useCallback((id, level) => {
-        if(currentTourId === 'alchemy' && level > 0) {
-            unlockNextById(10);
+    const setItemLevel = useCallback((id, effort) => {
+        if(currentTourId === 'alchemy' && effort > 0) {
+            unlockNextById(6);
         }
-        sendData('set-crafting-level', { id, level, filterId: 'alchemy' });
+        sendData('set-crafting-level', { id, effort, filterId: 'alchemy' });
     })
 
     onMessage('crafting-list-data', (payload) => {
@@ -381,7 +381,7 @@ export const ItemDetails = ({itemId, category, setItemDetails}) => {
 
     if(currentTourId === 'alchemy') {
         unlockNextById(2);
-        unlockNextById(13);
+        unlockNextById(8);
     }
 
 
@@ -389,7 +389,7 @@ export const ItemDetails = ({itemId, category, setItemDetails}) => {
         <PerfectScrollbar>
             <div className={'blade-inner recipe-details'}>
                 <div className={'block'}>
-                    <h4>{item.name} (x{formatInt(item.level)})</h4>
+                    <h4>{item.name}</h4>
                     <div className={'description'}>
                         {item.description}
                     </div>
@@ -508,29 +508,10 @@ export const AlchemyListDetails = ({
                                             </div>
                                             <div className={'col amount'}>
                                                 {isEditing
-                                                    ? (<span>Min: <input type={'number'} value={recipe.min}
-                                                                         onChange={(e) => onUpdateActionFromList(recipe.id, 'min', +e.target.value)}/></span>)
-                                                    : (<span>Min: {recipe.min}</span>)
-                                                }
-                                            </div>
-                                            <div className={'col amount'}>
-                                                {isEditing
-                                                    ? (<span>Max: <input type={'number'} value={recipe.max}
-                                                                         onChange={(e) => onUpdateActionFromList(recipe.id, 'max', +e.target.value)}/></span>)
-                                                    : (<span>Max: {recipe.max}</span>)
-                                                }
-                                            </div>
-                                            <div className={'col amount'}>
-                                                {isEditing
-                                                    ? (<span>% of slots<input type={'number'} value={recipe.percentage}
-                                                                    onChange={(e) => onUpdateActionFromList(recipe.id, 'percentage', +e.target.value)}/></span>)
+                                                    ? (<span>Effort, %<input className={'set-level-for-list'} type={'range'} min={0} max={1} value={recipe.effort} step={0.01}
+                                                                             onChange={(e) => onUpdateActionFromList(recipe.id, 'effort', +e.target.value)}/></span>)
                                                     : (<span> {recipe.percentage}%</span>)
                                                 }
-                                            </div>
-                                            <div className={'col assumed'}>
-                                                <TippyWrapper placement={'bottom'} content={<div className={'hint-popup'}>Asserted amount of slots that would be assigned to this recipe using current list settings</div> }>
-                                                    <span>{editing?.assumedDistribution?.find(one => one.id === recipe.id)?.level || 0}</span>
-                                                </TippyWrapper>
                                             </div>
                                             <div className={'col delete'}>
                                                 {isEditing ? (<span className={'close'} onClick={() => onDropActionFromList(recipe.id)}>X</span>) : null}

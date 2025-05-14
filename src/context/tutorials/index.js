@@ -647,31 +647,25 @@ const stepsCrafting = [
     },
     {
         target: '.recipe-details',
-        content: 'Here you can see what the recipe consumes and produces. This one uses crafting slots, crafting effort, and wood — and produces refined wood. All recipes consume Crafting Slots and Crafting Effort.',
+        content: 'Here you can see what the recipe consumes and produces. This one uses wood — and produces refined wood.',
         disableBeacon: true,
         disableOverlayClose: true,
     },
     {
         target: '.craftables-cat .card.craftable',
-        content: 'To start crafting, you need two things: 1) produce all required resources; 2) assign a crafting level to the recipe. The higher the level, the more resources it will consume and produce.',
-        disableBeacon: true,
-        disableOverlayClose: true,
-    },
-    {
-        target: '.crafting-slots',
-        content: 'Crafting slots determine how much crafting you can do at once. One slot is needed per crafting level. So, if you have one slot, you can run one recipe at level 1. Two slots could be used for one recipe at level 2 or two recipes at level 1 each.',
+        content: 'To start crafting, you need two things: 1) produce all required resources; 2) assign a crafting effort to the recipe. The higher effort, the more resources it will consume and produce.',
         disableBeacon: true,
         disableOverlayClose: true,
     },
     {
         target: '.crafting-efforts',
-        content: 'Crafting Effort represents the total amount of energy you can spend on crafting.',
+        content: 'Crafting Effort represents the total amount of crafting that you can perform. It multiplies both inputs and outputs',
         disableBeacon: true,
         disableOverlayClose: true,
     },
     {
         target: '#main-menu-actions',
-        content: 'You have crafting slots — but you still need Crafting Effort and resources. Let’s go to the Actions tab and produce them.',
+        content: 'You are producing some Crafting Effort by default. Now we need to take care about wood. Let’s go to the Actions tab and produce them.',
         disableBeacon: true,
         disableOverlayClose: true,
         spotlightClicks: true,
@@ -679,7 +673,7 @@ const stepsCrafting = [
     },
     {
         target: '.actions-wrap',
-        content: 'Create and run a list that produces Crafting Effort and wood. For example, include "Woodcutting" and "Basic Craft".',
+        content: 'Create and run action or list that produces wood. For example, include "Woodcutting" into the list',
         disableBeacon: true,
         disableOverlayClose: true,
         spotlightClicks: true,
@@ -687,7 +681,7 @@ const stepsCrafting = [
     },
     {
         target: '#main-menu-workshop',
-        content: 'Looks like you’re producing wood and Crafting Effort! Now let’s return to the Workshop.',
+        content: 'Looks like you’re producing wood! Now let’s return to the Workshop.',
         disableBeacon: true,
         disableOverlayClose: true,
         spotlightClicks: true,
@@ -695,21 +689,15 @@ const stepsCrafting = [
     },
     {
         target: '.craftables-cat .card.craftable input.level-set',
-        content: 'Now increase the crafting level of the recipe to any value above 0.',
+        content: 'Now increase the crafting effort of the recipe to any value above 0.',
         disableBeacon: true,
         disableOverlayClose: true,
         spotlightClicks: true,
         actionRequired: true
     },
     {
-        target: '.crafting-slots',
-        content: 'As you can see, you’re now using more crafting slots.',
-        disableBeacon: true,
-        disableOverlayClose: true,
-    },
-    {
         target: '.crafting-efforts',
-        content: 'You’ve also started using your Crafting Effort. If you don’t produce enough, your crafting efficiency will drop.',
+        content: 'Keep in mind that Crafting Effort has direct impact on your crafting speed. If you have enough materials for crafting and want to speed it up - try to look for some ways to increase your crafting effort',
         disableBeacon: true,
         disableOverlayClose: true,
     },
@@ -720,12 +708,6 @@ const stepsCrafting = [
         disableOverlayClose: true,
         spotlightClicks: true,
         actionRequired: true
-    },
-    {
-        target: '.recipe-details',
-        content: 'Increasing the crafting level will exponentially raise both input and output. Higher levels consume more resources but craft faster.',
-        disableBeacon: true,
-        disableOverlayClose: true,
     },
     {
         target: '.recipe-details .efficiency-block',
@@ -765,7 +747,7 @@ const stepsAlchemy = [
     },
     {
         target: '.recipe-details',
-        content: 'Here you can see what the recipe consumes and produces. For example, it uses alchemy slots, alchemy effort, and some herbs found on the map — and produces a Small Endurance Flask. All recipes consume Alchemy Slots and Alchemy Effort.',
+        content: 'Here you can see what the recipe consumes and produces. For example, it uses some herbs found on the map — and produces a Small Endurance Flask.',
         disableBeacon: true,
         disableOverlayClose: true,
     },
@@ -776,58 +758,22 @@ const stepsAlchemy = [
         disableOverlayClose: true,
     },
     {
-        target: '.alchemy-slots',
-        content: 'Alchemy slots determine how many potions you can brew at once. One slot is needed per recipe level. For example, with 2 slots, you could brew one recipe at level 2 or two recipes at level 1.',
-        disableBeacon: true,
-        disableOverlayClose: true,
-    },
-    {
         target: '.alchemy-efforts',
-        content: 'Alchemy Effort determines the total energy available for potion brewing.',
+        content: 'Alchemy Effort determines the total amount of potion brewing that you can perform. It multiplies both inputs and outputs',
         disableBeacon: true,
         disableOverlayClose: true,
-    },
-    {
-        target: '#main-menu-actions',
-        content: 'You have alchemy slots, but you still need Alchemy Effort and other ingredients. Let’s go to the Actions tab and produce them.',
-        disableBeacon: true,
-        disableOverlayClose: true,
-        spotlightClicks: true,
-        actionRequired: true
-    },
-    {
-        target: '.actions-wrap',
-        content: 'Create and run an action or list that produces Alchemy Effort.',
-        disableBeacon: true,
-        disableOverlayClose: true,
-        spotlightClicks: true,
-        actionRequired: true,
-    },
-    {
-        target: '#main-menu-workshop',
-        content: 'Looks like you’re producing Alchemy Effort! Let’s return to the Workshop.',
-        disableBeacon: true,
-        disableOverlayClose: true,
-        spotlightClicks: true,
-        actionRequired: true
     },
     {
         target: '.craftables-cat .card.craftable input.level-set',
-        content: 'Now increase the recipe’s brewing level to any value above 0.',
+        content: 'Now increase the recipe’s brewing effort to any value.',
         disableBeacon: true,
         disableOverlayClose: true,
         spotlightClicks: true,
         actionRequired: true
     },
     {
-        target: '.alchemy-slots',
-        content: 'As you can see, you’re now using more alchemy slots.',
-        disableBeacon: true,
-        disableOverlayClose: true,
-    },
-    {
         target: '.alchemy-efforts',
-        content: 'You’ve also started using your Alchemy Effort. If you don’t produce enough, your brewing efficiency will drop.',
+        content: 'Alchemy Effort has direct impact on your brewing speed. If you have enough materials for crafting and want to speed it up - try to look for some ways to increase your alchemy effort.',
         disableBeacon: true,
         disableOverlayClose: true,
     },
@@ -838,12 +784,6 @@ const stepsAlchemy = [
         disableOverlayClose: true,
         spotlightClicks: true,
         actionRequired: true
-    },
-    {
-        target: '.recipe-details',
-        content: 'Increasing a recipe’s brewing level exponentially increases its production and consumption. Higher levels use more resources but allow you to brew potions faster if you have the ingredients.',
-        disableBeacon: true,
-        disableOverlayClose: true,
     },
     {
         target: '.recipe-details .efficiency-block',

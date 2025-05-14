@@ -490,19 +490,19 @@ export const Actions = ({}) => {
     }
 
     if(currentTourId === 'crafting') {
-        unlockNextById(7);
+        unlockNextById(6);
     }
 
     if(currentTourId === 'alchemy') {
-        unlockNextById(7);
+        unlockNextById(6);
     }
 
     useEffect(() => {
         const interval = setInterval(() => {
-            if(currentTourId === 'crafting' && (stepIndex === 8 || stepIndex === 7)) {
+            if(currentTourId === 'crafting' && (stepIndex === 6 || stepIndex === 7)) {
                 sendData('query-actions-running', { prefix: 'for-craft-tour', withEffects: true })
             }
-            if(currentTourId === 'alchemy' && (stepIndex === 8 || stepIndex === 7)) {
+            if(currentTourId === 'alchemy' && (stepIndex === 6 || stepIndex === 7)) {
                 sendData('query-actions-running', { prefix: 'for-alchemy-tour', withEffects: true })
             }
         }, 1000)
@@ -514,23 +514,23 @@ export const Actions = ({}) => {
     }, [currentTourId, stepIndex, actionsData?.runningList?.id])
 
     onMessage('actions-running-for-craft-tour', (data) => {
-        if(data.effects.some(one => one.id === 'inventory_wood') && data.effects.some(one => one.id === 'crafting_ability')) {
-            if(stepIndex === 7) {
-                jumpOver(7, 2);
+        if(data.effects.some(one => one.id === 'inventory_wood')) {
+            if(stepIndex === 6) {
+                jumpOver(6, 2);
                 return;
             }
-            unlockNextById(8);
+            unlockNextById(7);
         }
         // unlockNextById(8);
     })
 
     onMessage('actions-running-for-alchemy-tour', (data) => {
         if(data.effects.some(one => one.id === 'alchemy_ability')) {
-            if(stepIndex === 7) {
-                jumpOver(7, 2);
+            if(stepIndex === 6) {
+                jumpOver(6, 2);
                 return;
             }
-            unlockNextById(8);
+            unlockNextById(7);
         }
         // unlockNextById(8);
     })

@@ -3000,7 +3000,7 @@ export const registerActionsStage1 = () => {
             effectDeps: []
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_crafting_courses') > 0
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && false
         },
         attributes: {
             baseXPCost: 100,
@@ -3054,7 +3054,7 @@ export const registerActionsStage1 = () => {
             level: 500,
         }],
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_crafting_courses') > 0
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && false
         },
         attributes: {
             baseXPCost: 500,
@@ -3107,7 +3107,7 @@ export const registerActionsStage1 = () => {
             level: 40000,
         }],
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_crafting_courses') > 0
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && false
         },
         attributes: {
             baseXPCost: 100000,
@@ -3154,7 +3154,7 @@ export const registerActionsStage1 = () => {
             effectDeps: []
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_alchemy_courses') > 0
+            return gameEntity.getLevel('shop_item_alchemy_courses') > 0 && false
         },
         attributes: {
             baseXPCost: 100,

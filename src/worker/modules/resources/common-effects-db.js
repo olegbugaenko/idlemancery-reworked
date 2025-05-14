@@ -442,16 +442,16 @@ export const registerCommomEffects = () => {
 
     gameEffects.registerEffect('crafting_effort', {
         name: 'Crafting Effort',
-        defaultValue: 0.,
-        minValue: 0,
+        defaultValue: 0.01,
+        minValue: 0.01,
         hasCap: false,
         saveBalanceTree: true,
     })
 
     gameEffects.registerEffect('alchemy_effort', {
         name: 'Alchemy Effort',
-        defaultValue: 0.,
-        minValue: 0,
+        defaultValue: 0.01,
+        minValue: 0.01,
         hasCap: false,
         saveBalanceTree: true,
     })

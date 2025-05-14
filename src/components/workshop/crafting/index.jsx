@@ -59,7 +59,8 @@ export const CraftingWrap = ({ children }) => {
 
     const setItemLevel = useCallback((id, effort) => {
         if(currentTourId === 'crafting' && effort > 0) {
-            unlockNextById(10);
+            console.log('stepIndex: ', stepIndex);
+            unlockNextById(9);
         }
         sendData('set-crafting-level', { id, effort, filterId: 'crafting' });
     })
@@ -77,10 +78,14 @@ export const CraftingWrap = ({ children }) => {
     })
 
     onMessage('crafting-list-effects', (payload) => {
+        const prev = listDetails.listData;
+        if(payload.assumedDistribution) {
+            prev.recipes = payload.assumedDistribution;
+        }
         setListDetails({
             ...listDetails,
             listData: {
-                ...listDetails.listData,
+                ...prev,
                 potentialEffects: payload.potentialEffects,
                 resourcesEffects: payload.resourcesEffects,
                 effectEffects: payload.effectEffects,
@@ -202,9 +207,7 @@ export const CraftingWrap = ({ children }) => {
                     newList.recipes.push({
                         id,
                         name,
-                        min: 0,
-                        max: 0,
-                        percentage: 25,
+                        effort: 1,
                     })
                     setListDetails({...listDetails, listData: {...newList}});
                     sendData('query-crafting-list-effects', { listData: newList });
@@ -428,7 +431,7 @@ export const ItemDetails = ({itemId, category, setItemDetails}) => {
 
     if(currentTourId === 'crafting') {
         unlockNextById(2);
-        unlockNextById(13);
+        unlockNextById(11);
     }
 
 
@@ -436,7 +439,7 @@ export const ItemDetails = ({itemId, category, setItemDetails}) => {
         <PerfectScrollbar>
             <div className={'blade-inner recipe-details'}>
                 <div className={'block'}>
-                    <h4>{item.name} (x{formatInt(item.level)})</h4>
+                    <h4>{item.name}</h4>
                     <div className={'description'}>
                         {item.description}
                     </div>
@@ -548,7 +551,7 @@ export const CraftingListDetails = ({
                             <p>Click on craft recipes to add/remove them from the list</p>
                             <div className={'recipes-list'}>
                                 <div className="actions-list-wrap">
-                                    {editing.recipes.length ? editing.recipes.map((recipe, index) => (
+                                    {editing.recipes?.length ? editing.recipes?.map((recipe, index) => (
                                         <div className={`action-row flex-container ${!recipe.isAvailable ? 'unavailable-recipe' : ''}`}
                                         >
                                             <div className={'col title'}>
@@ -556,29 +559,10 @@ export const CraftingListDetails = ({
                                             </div>
                                             <div className={'col amount'}>
                                                 {isEditing
-                                                    ? (<span>Min: <input type={'number'} value={recipe.min}
-                                                                         onChange={(e) => onUpdateActionFromList(recipe.id, 'min', +e.target.value)}/></span>)
-                                                    : (<span>Min: {recipe.min}</span>)
-                                                }
-                                            </div>
-                                            <div className={'col amount'}>
-                                                {isEditing
-                                                    ? (<span>Max: <input type={'number'} value={recipe.max}
-                                                                    onChange={(e) => onUpdateActionFromList(recipe.id, 'max', +e.target.value)}/></span>)
-                                                    : (<span>Max: {recipe.max}</span>)
-                                                }
-                                            </div>
-                                            <div className={'col amount'}>
-                                                {isEditing
-                                                    ? (<span>% of slots<input type={'number'} value={recipe.percentage}
-                                                                    onChange={(e) => onUpdateActionFromList(recipe.id, 'percentage', +e.target.value)}/></span>)
+                                                    ? (<span>Effort, %<input className={'set-level-for-list'} type={'range'} min={0} max={1} value={recipe.effort} step={0.01}
+                                                                    onChange={(e) => onUpdateActionFromList(recipe.id, 'effort', +e.target.value)}/></span>)
                                                     : (<span> {recipe.percentage}%</span>)
                                                 }
-                                            </div>
-                                            <div className={'col assumed'}>
-                                                <TippyWrapper placement={'bottom'} content={<div className={'hint-popup'}>Asserted amount of slots that would be assigned to this recipe using current list settings</div> }>
-                                                    <span>{editing?.assumedDistribution?.find(one => one.id === recipe.id)?.level || 0}</span>
-                                                </TippyWrapper>
                                             </div>
                                             <div className={'col delete'}>
                                                 {isEditing ? (<span className={'close'} onClick={() => onDropActionFromList(recipe.id)}>X</span>) : null}

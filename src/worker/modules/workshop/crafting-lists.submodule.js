@@ -150,7 +150,7 @@ export class CraftingListsSubmodule extends GameModule {
         const distributions = this.getRealListLevelsDistribution(id);
 
         distributions.forEach(item => {
-            gameCore.getModule('crafting').setCraftingLevel({ id: item.id, level: item.level, isForce: true })
+            gameCore.getModule('crafting').setCraftingEffort({ id: item.id, effort: item.effort, isForce: true })
         })
         gameCore.getModule('crafting').sendCraftingData({ filterId: this.craftingLists[id].category });
     }
@@ -357,104 +357,53 @@ export class CraftingListsSubmodule extends GameModule {
         this.eventHandler.sendData('crafting-list-data', data);
     }
 
+
     getRealListLevelsDistribution(id, listData) {
-        const list = id ? this.craftingLists[id] : {...listData};
+        const list = id ? this.craftingLists[id] : { ...listData };
 
-        let maxSlots = 0;
-        let possibleEntities = []
+        let possibleEntities = [];
 
-        if(list.category === 'crafting') {
-            maxSlots = gameResources.getResource('crafting_slots').income;
+        if (list.category === 'crafting') {
             possibleEntities = gameEntity.listEntitiesByTags(['crafting', 'material']);
         }
 
-        if(list.category === 'alchemy') {
-            maxSlots = gameResources.getResource('alchemy_slots').income;
+        if (list.category === 'alchemy') {
             possibleEntities = gameEntity.listEntitiesByTags(['crafting', 'alchemy']);
         }
 
-        if(!maxSlots || !possibleEntities) return [];
+        if (!possibleEntities) return [];
 
         const distribution = list?.recipes;
 
-        if(!distribution) return [];
+        if (!distribution) return [];
 
         const possibleIds = new Set(possibleEntities.map(({ id }) => id));
 
-        // Filter valid distribution entries and normalize percentages
-        const validDistribution = distribution
-            .filter(({ id }) => possibleIds.has(id))
-            .map((entry) => ({
+        // Filter valid distribution entries
+        const validDistribution = distribution.filter(({ id }) => possibleIds.has(id));
+
+        // Normalize effort values
+        const totalEffort = validDistribution.reduce((sum, { effort }) => sum + (effort || 0), 0);
+
+        console.log('totalEffortCalculations: ', totalEffort, validDistribution, listData);
+
+        if (totalEffort === 0) {
+            return validDistribution.map(entry => ({
                 ...entry,
-                percentage: entry.percentage / distribution.reduce((sum, { percentage }) => sum + percentage, 0),
+                effort: 0
             }));
-
-        let remainingSlots = maxSlots;
-        let result = [];
-
-        // First pass: Allocate minimum slots
-        for (const entry of validDistribution) {
-            const { id, min } = entry;
-            const allocated = Math.min(min ?? 0, remainingSlots);
-            result.push({ id, level: allocated });
-            remainingSlots -= allocated;
         }
 
-        // Second pass: Allocate slots based on percentage and constraints
-        // Другий прохід: обчислюємо idealTotal і збираємо інформацію для третього
-        const leftovers = [];
-
-        for (const entry of result) {
-            const original = validDistribution.find(({ id }) => id === entry.id);
-            const { max, percentage } = original;
-
-            const exactIdeal = maxSlots * percentage;
-            const floorIdeal = Math.floor(exactIdeal);
-            const currentLevel = entry.level;
-            const desiredAdditional = floorIdeal - currentLevel;
-
-            if (remainingSlots <= 0) continue;
-
-            const allowedAdditional = Math.max(0, Math.min(
-                desiredAdditional,
-                max ? max - currentLevel : Infinity,
-                remainingSlots
-            ));
-
-            entry.level += allowedAdditional;
-            remainingSlots -= allowedAdditional;
-
-            const fraction = exactIdeal - floorIdeal;
-            leftovers.push({
-                entry,
-                fraction,
-                max,
-            });
+        if(totalEffort < 1) {
+            return validDistribution;
         }
 
-
-        if (remainingSlots > 0) {
-            // Сортуємо від найбільшого дробового залишку до найменшого
-            leftovers.sort((a, b) => b.fraction - a.fraction);
-
-            for (const { entry, max, fraction } of leftovers) {
-                if (remainingSlots <= 0) break;
-
-                const currentLevel = entry.level;
-                const canAdd = max ? max - currentLevel : Infinity;
-
-                if (canAdd <= 0) continue;
-
-                entry.level += 1;
-                remainingSlots -= 1;
-            }
-        }
-
-        result = result.filter(one => one.level > 0);
-
-
-        return result;
+        return validDistribution.map(entry => ({
+            ...entry,
+            effort: (entry.effort || 0) / totalEffort
+        }));
     }
+
 
 
     getListEffects(id, listData) {
@@ -469,10 +418,12 @@ export class CraftingListsSubmodule extends GameModule {
 
         const totalEffects = [];
 
+        // console.log('CDIS: ', list.recipes, assumedDistribution);
+
         // attempt to get effects for every item according to distributions
         assumedDistribution.forEach(distribution => {
 
-            const effects = gameEntity.getEffects(distribution.id, 0, distribution.level, true);
+            const effects = gameEntity.getEffects(distribution.id, 0, 1, true, 1, 1, distribution.effort);
 
             effects.forEach(effToAdd => {
                 const foundId = totalEffects.findIndex(a => a.id === effToAdd.id

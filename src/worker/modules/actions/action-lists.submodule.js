@@ -121,6 +121,153 @@ export class ActionListsSubmodule extends GameModule {
         })
     }
 
+    optimizeDynamicEfforts({
+        dynamicActions,
+        fixedTotal,
+        initialResourceBalance, // {resId: {current, income, consumption}}
+        actionContributions,    // {actionId: [{id, value}]}
+        actionConsumptions,     // {actionId: [{id, value}]}
+        maxIterations = 100,
+        learningRate = 0.1,
+        tolerance = 1e-4,
+    }) {
+        const resourceIds = Object.keys(initialResourceBalance);
+        const dynamicIds = dynamicActions.map(a => a.id);
+        const T = Object.fromEntries(dynamicIds.map(id => [id, 100*SMALL_NUMBER])); // initial time guess
+
+        function computeDeficits(T_values) {
+            const totalDynamic = Object.values(T_values).reduce((a, b) => a + b, 0);
+            const totalTime = fixedTotal + totalDynamic;
+            const fixedFraction = fixedTotal / totalTime;
+
+            const balance = {};
+            const totalReqs = {};
+            const totalContribs = {};
+            const totalConsumes = {};
+
+            for (const r of resourceIds) {
+                const base = initialResourceBalance[r] || { current: 0, income: 0, consumption: 0, currentConsumption: 0 };
+                const fixedPart = base.current + base.income * fixedFraction - base.consumption * fixedFraction;
+                balance[r] = fixedPart;
+                totalReqs[r] = base.currentConsumption + base.consumption * fixedFraction;
+                totalContribs[r] = 0;
+                totalConsumes[r] = base.consumption * fixedFraction;
+            }
+
+            for (const id of dynamicIds) {
+                const t = T_values[id];
+                const contribs = actionContributions[id] || [];
+                const consumes = actionConsumptions[id] || [];
+
+                for (const { id: resId, value } of contribs) {
+                    const amount = value * (t / totalTime);
+                    balance[resId] += amount;
+                    totalContribs[resId] += amount;
+                }
+                for (const { id: resId, value } of consumes) {
+                    const amount = value * (t / totalTime);
+                    balance[resId] -= amount;
+                    totalConsumes[resId] += amount;
+                    totalReqs[resId] += amount;
+                }
+            }
+
+            const deficits = {};
+            for (const r of resourceIds) {
+                if (balance[r] < 0) {
+                    deficits[r] = -balance[r] / (totalReqs[r] || SMALL_NUMBER);
+                }
+            }
+
+            const averageContribs = {};
+            const averageConsumes = {};
+            for (const r of resourceIds) {
+                averageContribs[r] = totalContribs[r];
+                averageConsumes[r] = totalConsumes[r];
+            }
+
+            //console.log('defs: ', deficits, averageContribs, averageConsumes);
+
+            return { deficits, averageContribs, averageConsumes };
+        }
+
+        function computeTotalDeficit(deficits) {
+            return Object.values(deficits).reduce((sum, d) => sum + d * d, 0);
+        }
+
+        const maxContribs = {};
+        const maxConsumptions = {};
+
+        for (const resId of resourceIds) {
+            maxContribs[resId] = 0;
+            maxConsumptions[resId] = 0;
+        }
+
+        for (const id of dynamicIds) {
+            const contribs = actionContributions[id] || [];
+            const consumes = actionConsumptions[id] || [];
+
+            for (const { id: resId, value } of contribs) {
+                if (value > 0) {
+                    maxContribs[resId] = Math.max(maxContribs[resId], value);
+                }
+            }
+            for (const { id: resId, value } of consumes) {
+                if (value > 0) {
+                    maxConsumptions[resId] = Math.max(maxConsumptions[resId], value);
+                }
+            }
+        }
+
+        let prevDeficits = 10;
+
+        for (let iter = 0; iter < maxIterations; iter++) {
+            const { deficits, averageContribs, averageConsumes } = computeDeficits(T);
+            const totalError = computeTotalDeficit(deficits);
+
+            if (Math.abs(totalError - prevDeficits) < tolerance) break;
+
+            const gradient = {};
+
+            for (const id of dynamicIds) {
+                gradient[id] = 0;
+                const contribs = actionContributions[id] || [];
+                const consumes = actionConsumptions[id] || [];
+
+                for (const resId of resourceIds) {
+                    const d = deficits[resId] || 0;
+                    const c = contribs.find(e => e.id === resId)?.value || 0;
+                    const s = consumes.find(e => e.id === resId)?.value || 0;
+                    const maxC = maxContribs[resId] || SMALL_NUMBER;
+                    const maxS = maxConsumptions[resId] || SMALL_NUMBER;
+                    const avgC = averageContribs[resId] || 0;
+                    const avgS = averageConsumes[resId] || 0;
+
+                    const normNet = (c ? ((c - avgC) / maxC) : 0) - (s ? ((s - avgS) / maxS) : 0);
+                    gradient[id] += normNet * d;
+                    /*if(id === 'action_woodcutter') {
+                        console.log(`|-| ${gradient[id]}: ${resId} delta = ${normNet*d}: (${c} - ${avgC})/${maxC} - (${s} - ${avgS})/${maxS}`);
+                    }*/
+                }
+            }
+
+            const totalDynamic = Object.values(T).reduce((a, b) => a + b, 0);
+            const totalTime = fixedTotal + totalDynamic;
+
+            //console.log(`SubIter${iter}: ${Math.abs(totalError - prevDeficits)} < ${tolerance}`, deficits, initialResourceBalance, gradient, T);
+
+            for (const id of dynamicIds) {
+                const t = T[id];
+                const g = gradient[id];
+                T[id] = Math.max(0, t + learningRate * g * totalTime);
+            }
+
+            prevDeficits = totalError;
+        }
+
+        return T;
+    }
+
     getListDynamicValues(listData) {
         const MAX_ITER = 10;
         const TOLERANCE = 0.001;
@@ -137,7 +284,7 @@ export class ActionListsSubmodule extends GameModule {
         const resourceToActions = {};
         const actionContributions = {};
         const actionConsumptions = {};
-        const keysToTrack = [];
+        let keysToTrack = [];
 
         // 1. Ініціалізація дефіцитів для виявлення ключових ресурсів
         const actions0 = baseActions.map(one =>
@@ -154,11 +301,10 @@ export class ActionListsSubmodule extends GameModule {
             const base = resourceCalculators.assertResource(effect.id, false, ['runningActions'], {
                 targetEfficiency: 1,
             });
-            console.log('RB: ', effect.id, base, gameResources.getResource('inventory_wood'));
             const currentIncome = base.balance;
 
             if (!initialResourceBalance[effect.id]) {
-                initialResourceBalance[effect.id] = { income: 0, consumption: 0, current: currentIncome };
+                initialResourceBalance[effect.id] = { income: 0, consumption: 0, current: currentIncome, currentConsumption: base.consumption };
             }
 
             const group = initialResourceBalance[effect.id];
@@ -185,7 +331,8 @@ export class ActionListsSubmodule extends GameModule {
             }
         }
 
-        console.log('keysToTrack: ', keysToTrack, initialResourceBalance);
+        const maxIncomes = {};
+        const minConsumptions = {};
 
         // 2. Аналіз кожної динамічної дії — чи вона впливає на ключові ресурси
         for (const act of dynamicActions) {
@@ -201,10 +348,19 @@ export class ActionListsSubmodule extends GameModule {
             actionConsumptions[act.id] = consumptions/*.reduce((acc, item) => ({...acc, [item.id]: item.value}), {})*/;
 
             let contributesToDeficit = false;
-            for (const { id } of incomeEffects) {
+            for (const { id, value } of incomeEffects) {
                 if (!resourceToActions[id]) resourceToActions[id] = new Set();
                 resourceToActions[id].add(act.id);
-                if (keysToTrack.includes(id)) contributesToDeficit = true;
+                if (keysToTrack.includes(id)) {
+                    contributesToDeficit = true;
+                    maxIncomes[id] = Math.max(maxIncomes[id] ?? 0, value)
+                }
+            }
+
+            for (const { id, value } of consumptions) {
+                if (keysToTrack.includes(id)) {
+                    minConsumptions[id] = Math.min(minConsumptions[id] ?? 1.e+100, value)
+                }
             }
 
             if (!contributesToDeficit) {
@@ -212,11 +368,48 @@ export class ActionListsSubmodule extends GameModule {
             }
         }
 
-        console.log('ActionsToSkip: ', skipDynamicActions, actionContributions, actionConsumptions);
+        // 2.1 Аналіз фіксованих дій
+
+
+        const fixedActionEffects = this.getListEffects(null, { actions: fixedActions });
+        const incomeEffects = fixedActionEffects.filter(e => e.type === 'resources' && e.scope === 'income' && keysToTrack.includes(e.id));
+
+        const consumptions = fixedActionEffects
+            .filter(e => e.type === 'resources' && e.scope === 'consumption' && keysToTrack.includes(e.id))
+            .map(e => ({ id: e.id, value: e.value }));
+
+        for (const { id, value } of incomeEffects) {
+            maxIncomes[id] = Math.max(maxIncomes[id] ?? 0, value)
+        }
+
+        for (const { id, value } of consumptions) {
+            minConsumptions[id] = Math.min(minConsumptions[id] ?? 1.e+100, value)
+        }
+
+
+        // Temporarily commented out
+
+        /*keysToTrack = keysToTrack.filter(key => {
+            if(initialResourceBalance[key].current < 0 && ((maxIncomes[key] ?? 0) < -initialResourceBalance[key].current)) {
+                console.log('Unable to balance '+key, initialResourceBalance[key].current, maxIncomes[key])
+                return false;
+            }
+            if(initialResourceBalance[key].current > 0 && ((minConsumptions[key] ?? 0) > initialResourceBalance[key].current)) {
+                console.log('Unable to balance '+key, initialResourceBalance[key].current, minConsumptions[key])
+                return false;
+            }
+            return true;
+        })*/
+
         const forecastedActionsEfficiencies = {};
+        let finalDeficites = {};
 
         let dynamicValues = Object.fromEntries(dynamicActions.filter(one => !skipDynamicActions.has(one.id)).map(a => [a.id, 0.01]));
         let previousDeficits = {};
+
+        const bst = performance.now();
+
+        let stable = false;
 
         for (let iter = 0; iter < MAX_ITER; iter++) {
             const actions = baseActions.map(one =>
@@ -270,7 +463,7 @@ export class ActionListsSubmodule extends GameModule {
                 }
             }
 
-            console.log(`Iter${iter} balance map: `, resourceBalanceMap, potentialEfficiencies, dynamicValues);
+            //console.log(`Iter${iter} balance map: `, resourceBalanceMap, potentialEfficiencies, dynamicValues);
 
             const currentDeficits = {};
             const currentProficits = {};
@@ -306,7 +499,7 @@ export class ActionListsSubmodule extends GameModule {
                         const timeToAdd = totalNeededTime * portion;
                         dynamicValues[actionId] = (dynamicValues[actionId] || 0) + timeToAdd;
                     }
-                    console.log('Iter0: ', resourceId, deficit, dynamicValues);
+                    //console.log('Iter0: ', resourceId, deficit, dynamicValues);
 
                 }
             } else {
@@ -334,10 +527,10 @@ export class ActionListsSubmodule extends GameModule {
                         dynamicValues[actionId] = newTime;
                     }
                 }
-                console.log(`Iter${iter} values: `, dynamicValues, previousDeficits, currentDeficits);
+                //console.log(`Iter${iter} values: `, dynamicValues, previousDeficits, currentDeficits);
             }
 
-            let stable = true;
+            stable = true;
             for (const [resId, def] of Object.entries(currentDeficits)) {
                 const prev = previousDeficits[resId] ?? 0;
                 if (Math.abs(prev - def) > TOLERANCE || (def > TOLERANCE)) {
@@ -348,11 +541,34 @@ export class ActionListsSubmodule extends GameModule {
             }
 
             previousDeficits = { ...currentDeficits };
+            finalDeficites = {...currentDeficits};
 
             if (stable) {
                 break;
             }
         }
+
+        //console.log('currentDeficites: ', finalDeficites, actionContributions, actionConsumptions, performance.now() - bst, stable);
+
+        if(!stable) {
+            const st = performance.now();
+            const guessedMinimized = this.optimizeDynamicEfforts({
+                dynamicActions,
+                fixedTotal,
+                initialResourceBalance,
+                actionContributions,
+                actionConsumptions,
+                maxIterations: 20,
+                learningRate: 0.1,
+                tolerance: 0.0001,
+            });
+            //console.log('guessedMinimized: ', guessedMinimized, performance.now() - st);
+
+            return guessedMinimized;
+        }
+
+
+
 
         return dynamicValues;
     }

@@ -914,7 +914,7 @@ export class ActionsModule extends GameModule {
     }
 
     setRunningAction(id) {
-        console.log('Running: ', id)
+        //console.log('Running: ', id)
         this.stopRunningActions();
         this.addRunningAction(id, 1);
     }
@@ -1288,7 +1288,6 @@ export class ActionsModule extends GameModule {
         const results = [];
         runningActions.forEach(entity => {
             const effts = gameEntity.getEffects(entity.id);
-            console.log('Queried effects: ', effts);
             const suitable = effts.filter(u => u.type === 'effects' && u.id === id);
             // now that we have suitable action added - need to understand it inputs (effort, xpRate and so on...)
 

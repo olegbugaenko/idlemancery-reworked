@@ -55,13 +55,11 @@ export class CraftingModule extends GameModule {
                 for(const id in this.craftingSlots) {
                     const ent = gameEntity.getEntity(id);
                     const isIgnore = payload.category && !ent.tags.includes(tagToCat[payload.category]);
-                    if(!isIgnore && this.craftingSlots[id]?.level) {
+                    if(!isIgnore && this.craftingSlots[id]?.effort) {
                         hypotheticValues.push({
                             id,
                             name: ent.name,
-                            min: this.craftingSlots[id]?.level,
-                            max: this.craftingSlots[id]?.level,
-                            percentage: this.craftingSlots[id]?.level*100 / rrs.income
+                            effort: this.craftingSlots[id]?.effort
                         })
                     }
                 }
@@ -185,7 +183,7 @@ export class CraftingModule extends GameModule {
         const skippedEffort = this.craftingSlots[skipId]?.effort ?? 0;
         const remainingToRedistribute = 1 - skippedEffort;
         const currentRecipes = Object.entries(this.craftingSlots).filter(([key, one]) => gameEntity.getEntity(key).tags.includes(tagToCat[category]));
-        const currentEffortsTotal = currentRecipes.reduce((acc, [key, recipe]) => acc += recipe.effort, 0);
+        const currentEffortsTotal = currentRecipes.reduce((acc, [key, recipe]) => acc += ((key !== skipId) ? recipe.effort : 0), 0);
         const mult = currentEffortsTotal ? remainingToRedistribute/currentEffortsTotal : 1;
         if(Math.abs(mult - 1) > SMALL_NUMBER ) {
             if(this.craftingSlots) {
@@ -208,7 +206,7 @@ export class CraftingModule extends GameModule {
                 for(const key in this.craftingSlots) {
                     intensities[`effort_${key}`] = {
                         A: 0,
-                        B: this.craftingSlots[key].effort*(this.craftingSlots[key].filterId ? gameEffects.getEffectValue(`${this.craftingSlots[key].filterId}_effort`) : 0),
+                        B: this.craftingSlots[key].effort,
                         type: 0,
                     }
                 }
@@ -217,7 +215,7 @@ export class CraftingModule extends GameModule {
                     effects: intensities,
                 }
             },
-            effectDeps: ['crafting_effort','alchemy_effort']
+            effectDeps: ['crafting_effort', 'alchemy_effort']
         }
         if(gameEntity.entityExists('crafting_intensities')) {
             gameEntity.unsetEntity('crafting_intensities');
@@ -228,13 +226,7 @@ export class CraftingModule extends GameModule {
             resourceModifier,
         })
 
-        /*console.log('INTS: ', gameEntity.getEntity('crafting_intensities'), this.craftingSlots, gameResources.getResource('inventory_wood'));
-        if(gameEntity.entityExists(`activeCrafting_craft_refined_wood`)) {
-            console.log('WOOOOD: ', gameEntity.getEntity(`activeCrafting_craft_refined_wood`));
-        }
-        if(gameEntity.entityExists('runningAction_action_woodcutter')) {
-            console.log('Running woodcutter: ', gameEntity.getEntity('runningAction_action_woodcutter'))
-        }*/
+        gameEntity.setEntityLevel('crafting_intensities', 1, true);
     }
 
     regenerateNotifications() {
@@ -309,13 +301,15 @@ export class CraftingModule extends GameModule {
             bottleNeck = actualEntity.modifier?.bottleNeck ? gameResources.getResource(actualEntity.modifier?.bottleNeck) : null;
         }
 
+        const calculatedEffort = this.craftingSlots[entity.id]?.effort ? this.craftingSlots[entity.id]?.effort : 1;
+
         return {
             ...entity,
             efficiency,
             bottleNeck,
             effects: isRunning
                 ? gameEntity.getEffects(`activeCrafting_${id}`, 0, this.craftingSlots[entity.id]?.level || 1, false, 1)
-                : gameEntity.getEffects(entity.id, 0, this.craftingSlots[entity.id]?.level || 1, true, 1, 1 ),
+                : gameEntity.getEffects(entity.id, 0, 1, true, 1, 1,  calculatedEffort),
             affordable: gameEntity.getAffordable(entity.id),
             level: this.craftingSlots[entity.id]?.level || 0,
             maxLevel: gameResources.getResource('crafting_slots').amount + (this.craftingSlots[entity.id]?.level || 0)

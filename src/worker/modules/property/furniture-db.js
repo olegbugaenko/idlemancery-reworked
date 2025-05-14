@@ -1272,7 +1272,7 @@ export const registerFurnitureStage1 = () => {
         description: 'Provides additional space for crafting, revealing new crafting slot',
         level: 0,
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_crafting_courses') > 0;
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && false;
         },
         resourceModifier: {
             income: {
@@ -1375,11 +1375,11 @@ export const registerFurnitureStage1 = () => {
             return gameEntity.getLevel('shop_item_crafting_courses') > 0;
         },
         resourceModifier: {
-            multiplier: {
-                resources: {
-                    'crafting_ability': {
-                        A: 0.2,
-                        B: 1,
+            income: {
+                effects: {
+                    'crafting_effort': {
+                        A: 0.01,
+                        B: 0,
                         type: 0,
                     }
                 },
@@ -1397,7 +1397,7 @@ export const registerFurnitureStage1 = () => {
         get_cost: () => ({
             'coins': {
                 A: 1.5,
-                B: 80000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 20000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 1
             },
             'living_space': {
@@ -1415,7 +1415,7 @@ export const registerFurnitureStage1 = () => {
         description: 'Provides additional space for alchemy, revealing new alchemy slot',
         level: 0,
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_alchemy_courses') > 0;
+            return gameEntity.getLevel('shop_item_alchemy_courses') > 0 && false;
         },
         resourceModifier: {
             income: {
@@ -1460,11 +1460,11 @@ export const registerFurnitureStage1 = () => {
             return gameEntity.getLevel('shop_item_alchemy_courses') > 0;
         },
         resourceModifier: {
-            multiplier: {
-                resources: {
-                    'alchemy_ability': {
-                        A: 0.2,
-                        B: 1,
+            income: {
+                effects: {
+                    'alchemy_effort': {
+                        A: 0.01,
+                        B: 0,
                         type: 0,
                     }
                 },
