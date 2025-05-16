@@ -50,10 +50,14 @@ export class MapTileListsSubmodule extends GameModule {
 
         this.eventHandler.registerHandler('set-map-automation-enabled', ({ flag }) => {
             this.automationEnabled = !!flag;
+            const lists = this.getLists({});
+            this.eventHandler.sendData('map-tile-lists-refresh', lists);
         })
 
         this.eventHandler.registerHandler('set-map-autotrigger-interval', ({ interval }) => {
             this.autotriggerIntervalSetting = interval;
+            const lists = this.getLists({});
+            this.eventHandler.sendData('map-tile-lists-refresh', lists);
         })
 
 

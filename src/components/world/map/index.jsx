@@ -11,6 +11,7 @@ import {ResourceCost} from "../../shared/resource-cost.jsx";
 import StatRow from "../../shared/stat-row.jsx";
 import {useAppContext} from "../../../context/ui-context";
 import {useTutorial} from "../../../context/tutorial-context";
+import {TippyWrapper} from "../../shared/tippy-wrapper.jsx";
 
 export const MapWrap = ({ children }) => {
 
@@ -183,7 +184,7 @@ export const MapWrap = ({ children }) => {
         const meta = pl?.meta;
         if(listDetails?.listData && listDetails?.isEdit) {
             if(meta) {
-                if(!listDetails.listData.tiles.find(one => one.id === `${meta.i}:${meta.j}`)) {
+                if(!listDetails.listData.tiles.find(one => one.id === `${meta.i}:${meta.j}`) && meta.canExplore) {
                     const newList = cloneDeep(listDetails.listData);
                     newList.tiles.push({
                         id: `${meta.i}:${meta.j}`,
@@ -385,6 +386,10 @@ export const GeneralStats = ({ setDetailVisible }) => {
         setData(data)
     })
 
+    const setAutoinvestigationEnabled = (flag) => {
+        sendData('map-set-autoinvestigation', { flag })
+    }
+
 
     const setMapLevel = (level) => {
         sendData('map-set-generated-level', { level })
@@ -410,6 +415,15 @@ export const GeneralStats = ({ setDetailVisible }) => {
                     {data.stats.effects.map(stat => (<div>
                         <StatRow stat={stat} />
                     </div> ))}
+                </div>
+                <div className={'block'}>
+                    <TippyWrapper content={<div className={'hint-popup'}>
+                        <p>Enables automatic exploration of unexplored tiles, starting from the center.</p>
+                    </div> }>
+                        <button onClick={() => setAutoinvestigationEnabled(!data.isAutoinvestigationEnabled)}>
+                            {data.isAutoinvestigationEnabled ? 'Stop auto-explore' : 'Start auto-explore'}
+                        </button>
+                    </TippyWrapper>
                 </div>
                 {data.mapGeneration?.isUnlocked ? (<div className={'block'}>
                     <h4>Generate New Map</h4>
@@ -511,16 +525,19 @@ export const ItemDetails = ({itemId, setItemDetails}) => {
                         ))}
                     </div>
                 </div>
+                {!item.isProducingGathering ? (<div className={'block'}>
+                    <p className={'hint yellow'}>No Gathering Effort is being produced, so exploration won’t yield any resources.
+                        Add a Gathering action to fix this.</p></div>) : null}
                 <div className={'block'}>
-                    <div className={'buttons flex-container'}>
+                    {item.canExplore ? (<div className={'buttons flex-container'}>
                         <button id={'run-map-tile'} onClick={() => {
-                            if(!item.isRunning && currentTourId === 'map') {
+                            if (!item.isRunning && currentTourId === 'map') {
                                 unlockNextById(13);
                             }
                             toggleRunning(item.i, item.j, !item.isRunning)
                         }}>{item.isRunning ? 'Stop' : 'Explore'}</button>
                         <button onClick={() => setItemDetails(null)}>Close</button>
-                    </div>
+                    </div>) : (<p className={'hint yellow'}>Can't explore this tile</p>)}
                 </div>
             </div>
         </PerfectScrollbar>

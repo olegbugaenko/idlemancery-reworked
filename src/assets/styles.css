@@ -2038,7 +2038,7 @@ span.highlighted-span.yellow {
 }
 
 .two-side-card .left {
-    padding: 12px;
+    padding: 6px;
 }
 
 .two-side-card .right {
@@ -2583,6 +2583,10 @@ span.highlighted-span.yellow {
     border-bottom: 1px solid #333333;
 }
 
+.breakdown .box.unbordered {
+    border-bottom: none;
+}
+
 .breakdown .line {
     font-size: 13px;
 }
@@ -2637,18 +2641,21 @@ span.highlighted-span.yellow {
     pointer-events: none;
 }
 
-.autosell-amount.flex-container {
+.autosell-amount.flex-container,
+.autoconsume-amount.flex-container {
     justify-content: space-between;
     align-items: center;
     padding: 8px;
     margin: 0;
 }
 
-.autosell-amount.flex-container input {
+.autosell-amount.flex-container input,
+.autoconsume-amount.flex-container input {
     width: 120px;
 }
 
-.autosell-amount.flex-container p {
+.autosell-amount.flex-container p,
+.autoconsume-amount.flex-container p {
     margin: 0;
 }
 
@@ -3535,4 +3542,15 @@ input[type="range"]::-moz-range-thumb {
     background: #00ccff;
     border: 2px solid #222;
     cursor: pointer;
+}
+
+.placeholder-24 {
+    display: block;
+    width: 24px;
+    height: 24px;
+}
+
+.hint-popup .bold {
+    font-weight: bold;
+    font-size: 15px;
 }

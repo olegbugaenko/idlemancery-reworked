@@ -52,7 +52,7 @@ export class MonitoringModule extends GameModule {
                         const resources = data.filter(one => one.type === 'resources');
 
                         gameCore.getModule('attributes').setMonitored(attrs);
-                        gameCore.getModule('resource-pool').setMonitored(resources, undefined, id);
+                        gameCore.getModule('resource-pool').setMonitored(resources, undefined, [id, `active_${id}`]);
                     } else {
                         gameCore.getModule('attributes').setMonitored([]);
                         gameCore.getModule('resource-pool').setMonitored([]);
@@ -67,7 +67,7 @@ export class MonitoringModule extends GameModule {
                         const resources = data.filter(one => one.type === 'resources');
 
                         gameCore.getModule('attributes').setMonitored(effects);
-                        gameCore.getModule('resource-pool').setMonitored(resources, undefined, id);
+                        gameCore.getModule('resource-pool').setMonitored(resources, undefined, [id]);
                     } else {
                         gameCore.getModule('attributes').setMonitored([]);
                         gameCore.getModule('resource-pool').setMonitored([]);

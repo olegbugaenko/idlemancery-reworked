@@ -85,6 +85,8 @@ export const ActionListsPanel = ({ automationUnlocked, runningList, editListToDe
                         <label>
                             Switch lists interval:
                             <select onChange={e => changeAutomationInterval(+e.target.value)} value={autotriggerIntervalSetting}>
+                                <option value={2}>2 seconds</option>
+                                <option value={5}>5 seconds</option>
                                 <option value={10}>10 seconds</option>
                                 <option value={30}>30 seconds</option>
                                 <option value={60}>1 minute</option>

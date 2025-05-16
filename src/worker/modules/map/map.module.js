@@ -20,6 +20,8 @@ export class MapModule extends GameModule {
         this.mapTier = 0;
         this.relevantMapVersion = 17;
         this.currentMapVersion = null;
+        this.autoInvestigateTimer = 10;
+        this.isAutoinvestigationEnabled = false;
 
         this.lists = new MapTileListsSubmodule();
 
@@ -57,6 +59,10 @@ export class MapModule extends GameModule {
             this.mapCreationSettings.level = Math.max(0, Math.min(Math.floor(gameEffects.getEffectValue('max_map_level')), payload.level));
             this.sendData();
             this.sendGeneralData();
+        })
+
+        this.eventHandler.registerHandler('map-set-autoinvestigation', (payload) => {
+            this.isAutoinvestigationEnabled = payload.flag;
         })
 
         this.eventHandler.registerHandler('map-query-general-data', () => {
@@ -392,6 +398,7 @@ export class MapModule extends GameModule {
             currentMapVersion: this.currentMapVersion,
             highlightFilters: this.highlightFilters,
             mapTier: this.mapTier,
+            isAutoinvestigationEnabled: this.isAutoinvestigationEnabled,
         }
     }
 
@@ -400,6 +407,7 @@ export class MapModule extends GameModule {
         if(obj?.mapCreationSettings) {
             this.mapCreationSettings = obj?.mapCreationSettings;
         }
+        this.isAutoinvestigationEnabled = obj?.isAutoinvestigationEnabled;
         if(obj?.mapTiles && (this.currentMapVersion && this.currentMapVersion >= this.relevantMapVersion)) {
             this.mapTiles = obj.mapTiles;
             for(let i = 0; i < this.mapTiles.length; i++) {
@@ -538,6 +546,7 @@ export class MapModule extends GameModule {
                         resource: gameResources.getResource(drop.id),
                     })),
                     isHighlight: isHighlighted,
+                    canExplore: !(iRow === 7 && iCol === 7)
                 }
             })),
             explorationPoints: {
@@ -571,7 +580,8 @@ export class MapModule extends GameModule {
                     {...gameEffects.getEffect('hunting_amount_multiplier'), isMultiplier: true},
                     {...gameEffects.getEffect('map_generation_discount'), isMultiplier: true}
                 ].filter(one => ((!one.isMultiplier && (one.value > SMALL_NUMBER)) || (one.isMultiplier && (Math.abs(one.value - 1) > SMALL_NUMBER))))
-            }
+            },
+            isAutoinvestigationEnabled: this.isAutoinvestigationEnabled,
         }
         this.eventHandler.sendData('map-general-data', data);
     }
@@ -592,7 +602,9 @@ export class MapModule extends GameModule {
                 ...drop,
                 resource: gameResources.getResource(drop.id),
                 isRevealed: tile.r?.includes(index) && gameResources.isResourceUnlocked(drop.id)
-            })).filter(one => one.isRevealed)
+            })).filter(one => one.isRevealed),
+            canExplore: !(i === 7 && j === 7),
+            isProducingGathering: gameResources.getResource('gathering_effort').income > SMALL_NUMBER
         }
     }
 
@@ -632,8 +644,52 @@ export class MapModule extends GameModule {
             })
         }
 
+        if(this.isAutoinvestigationEnabled) {
+            if(this.lists.runningList) {
+                this.lists.stopList();
+            }
+            this.autoInvestigateTimer -= delta;
+            if(this.autoInvestigateTimer <= 0) {
+                this.autoInvestigateTimer = 10;
+                // check current first
+                const tile = this.getClosestNotExplored();
+                if(tile.minDistance < 15**2 && !(this.mapTilesProcessed[tile.i][tile.j].isRunning && this.mapTilesProcessed[tile.i][tile.j].effort === 1)) {
+                    console.log('Switching tile to', tile);
+                    this.stopRunningTiles();
+                    this.setTileRunning(tile.i, tile.j, true);
+                }
+
+            }
+        }
+
         this.lists.tick(game, delta);
 
 
+    }
+
+    getClosestNotExplored() {
+        let minDistance = 1.e+10;
+        let minCoords = { i: 15, j: 15}
+        this.mapTilesProcessed.forEach((row, iRow) => {
+            row.forEach((col, iCol) => {
+                const hasUnexplored = col.drops.some(drop =>
+                    gameResources.isResourceUnlocked(drop.id) && !drop.isRevealed
+                );
+                if(hasUnexplored) {
+                    const distance = Math.sqrt((iRow - 7) ** 2 + (iCol - 7) ** 2);
+                    if(distance < minDistance) {
+                        minDistance = distance;
+                        minCoords = {
+                            i: iRow,
+                            j: iCol,
+                        }
+                    }
+                }
+            })
+        })
+        return {
+            ...minCoords,
+            minDistance
+        }
     }
 }

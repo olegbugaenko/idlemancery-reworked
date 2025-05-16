@@ -257,6 +257,21 @@ export const Inventory = ({}) => {
         }
     }, [editData]);
 
+    const onSetAutoconsumeReserved = useCallback(reserved => {
+        if(editData) {
+            const newEdit = cloneDeep(editData);
+            if(!newEdit.autoconsume) {
+                newEdit.autoconsume = {};
+            }
+            if(!newEdit.autoconsume.rules) {
+                newEdit.autoconsume.rules = [];
+            }
+            newEdit.autoconsume.reserved = reserved;
+            setEditData({...newEdit});
+            setChanged(true);
+        }
+    }, [editData]);
+
     const onToggleAutosell = useCallback(() => {
         if(editData) {
             const newEdit = cloneDeep(editData);
@@ -430,6 +445,7 @@ export const Inventory = ({}) => {
                     onAddAutosellRule={onAddAutosellRule}
                     onSetAutosellRuleValue={onSetAutosellRuleValue}
                     onDeleteAutosellRule={onDeleteAutosellRule}
+                    onSetAutoconsumeReserved={onSetAutoconsumeReserved}
                     onSetAutoconsumePattern={onSetAutoconsumePattern}
                     onSetAutosellReserved={onSetAutosellReserved}
                     onSetAutosellPattern={onSetAutosellPattern}
@@ -542,7 +558,7 @@ export const InventoryCard = React.memo(({ isChanged, eta, allowMultiConsume, is
     return true;
 }))
 
-export const InventoryDetails = React.memo(({isChanged, editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onAddAutosellRule, onSetAutosellRuleValue, onDeleteAutosellRule, onSave, onCancel, onSell, onSetAutosellPattern, onSetAutoconsumePattern, onSetAutosellReserved, onToggleAutoconsume, onToggleAutosell, automationUnlocked, onConsume, onTogglePinned, onToggleViewLasting}) => {
+export const InventoryDetails = React.memo(({isChanged, editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onAddAutosellRule, onSetAutosellRuleValue, onDeleteAutosellRule, onSave, onCancel, onSell, onSetAutosellPattern, onSetAutoconsumePattern, onSetAutosellReserved, onSetAutoconsumeReserved, onToggleAutoconsume, onToggleAutosell, automationUnlocked, onConsume, onTogglePinned, onToggleViewLasting}) => {
 
     const worker = useContext(WorkerContext);
 
@@ -609,6 +625,10 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
 
     const setReservedValue = (reserved) => {
         onSetAutosellReserved(reserved)
+    }
+
+    const setReservedConsumeValue = (reserved) => {
+        onSetAutoconsumeReserved(reserved)
     }
 
     const toggleAutosell = () => {
@@ -724,6 +744,11 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
                                 setPattern={setAutoconsumePattern}
                                 isAutoCheck={item.autoconsume?.isEnabled}
                             />
+                            <div className={'autoconsume-amount flex-container'}>
+                                <p>Reserved Amount:</p>
+                                {isEditing ? <input type={'number'} onChange={e => setReservedConsumeValue(+e.target.value)}
+                                        value={item.autoconsume?.reserved || 0}/> : <span>{formatValue(item.autoconsume?.reserved || 0)}</span>}
+                            </div>
                         </div>) : null}
 
                         {item.isSellable && automationUnlocked ? (<div className={'autoconsume-setting block'}>
@@ -749,7 +774,8 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
                             />
                             <div className={'autosell-amount flex-container'}>
                                 <p>Reserved Amount:</p>
-                                <input type={'number'} onChange={e => setReservedValue(+e.target.value)} value={item.autosell?.reserved || 0}/>
+                                {isEditing ? <input type={'number'} onChange={e => setReservedValue(+e.target.value)}
+                                        value={item.autosell?.reserved || 0}/> : <span>{formatValue(item.autosell?.reserved || 0)}</span>}
                             </div>
                         </div>) : null}
 

@@ -280,6 +280,7 @@ export class CraftingModule extends GameModule {
             available,
             efforts: {
                 ...efrs,
+                usingRecipes: available.filter(one => one.effort > 0).map(({ id, name, effort }) => ({ id, name, effort })),
             },
             craftingLists: this.lists.getLists({ category: filterId })
         }

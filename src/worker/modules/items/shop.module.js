@@ -135,7 +135,9 @@ export class ShopModule extends GameModule {
         this.purchasedItems = {};
         if(saveObject?.items) {
             for(const id in saveObject.items) {
-                this.setItem(id, saveObject.items[id], true);
+                if(gameEntity.entityExists(id)) {
+                    this.setItem(id, saveObject.items[id], true);
+                }
             }
         }
         this.isUnlocked = saveObject?.isUnlocked || false;

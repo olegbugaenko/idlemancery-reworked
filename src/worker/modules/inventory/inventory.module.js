@@ -126,7 +126,7 @@ export class InventoryModule extends GameModule {
 
                 if(isMatching) {
                     let amount = 1;
-                    const reserved = this.inventoryItems[itemId]?.autosell?.reserved || 0;
+                    const reserved = this.inventoryItems[itemId]?.autoconsume?.reserved || 0;
                     const reserveLimit = Math.floor(
                         Math.max(0, gameResources.getResource(itemId).amount - reserved)
                     );

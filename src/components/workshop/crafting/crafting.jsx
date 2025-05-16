@@ -26,7 +26,7 @@ export const Crafting = ({ setItemDetails, setItemLevel, filterId, newUnlocks, o
         efforts: {
             consumption: 0,
             balance: 0,
-            breakDown: null,
+            usingRecipes: null,
             isPinned: false,
         },
         craftingLists: {
@@ -70,8 +70,15 @@ export const Crafting = ({ setItemDetails, setItemLevel, filterId, newUnlocks, o
             <div className={'flex-container'}>
                 <TippyWrapper content={<div className={'hint-popup'}>
                     <p className={'hint'}>Shows the amount of available effort you can use for crafting.</p>
-                    <p className={'hint'}>If your crafting effort is insufficient, your crafting efficiency will decrease.</p>
-                    <BreakDown breakDown={craftingData.efforts.breakDown} />
+                    {craftingData.efforts.usingRecipes?.length ? (<div className={'block breakdown'}>
+                        <div className={'box unbordered'}>
+                            {craftingData.efforts.usingRecipes.map(one => (<div className={'flex-row flex-container'}>
+                                <span>{one.name}</span>
+                                <span>{formatValue(one.effort*100)}%</span>
+                            </div> ))}
+                        </div>
+                    </div> ) : null}
+                    {/*<BreakDown breakDown={craftingData.efforts.breakDown} />*/}
                 </div> }>
                     <div className={'space-item crafting-efforts'}>
                         <span>Crafting Efforts:</span>
@@ -133,6 +140,7 @@ export const ItemCard = ({ id, icon_id, isRunning, isLowerEfficiency, name, effo
             <div className={'buttons'}>
                 <span className={'label'}>Set Effort:</span>
                 <TippyWrapper content={<div className={'hint-popup'}>
+                    <p className={'current bold'}>Current Effort: {formatValue(effort*100)}%</p>
                     <p>Regulate effort percentage for this recipe. Increasing it will prioritize this recipe, increasing its productivity while decreasing others</p>
                 </div> }>
                     <div className={'effort-control flex-container flex-row'}>

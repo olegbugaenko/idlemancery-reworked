@@ -1,4 +1,4 @@
-import React, {useCallback, useContext, useEffect, useState} from "react";
+import React, {useCallback, useContext, useEffect, useRef, useState} from "react";
 import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
 import PerfectScrollbar from "react-perfect-scrollbar";
@@ -242,8 +242,23 @@ export const ListEditor = React.memo(({
 
     const { stepIndex, unlockNextById, jumpOver, currentTourId, setNextAllowedById } = useTutorial();
 
+    const editingRef = useRef(editing);
+
+    useEffect(() => {
+        editingRef.current = editing;
+    }, [editing]);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            sendData('query-action-list-effects', { listData: editingRef.current });
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, []);
+
     useEffect(() => {
         setEditing(listData);
+        console.log('RecListData: ', listData);
         if(currentTourId === 'action-lists') {
             if(listData.actions.find(one => one.id === 'action_walk') && listData.actions.find(one => one.id === 'action_beggar')) {
                 unlockNextById(4)

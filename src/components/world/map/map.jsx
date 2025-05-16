@@ -116,6 +116,15 @@ export const Map = ({ setItemDetails, openListDetails, isEditList }) => {
         }
     })
 
+    onMessage('map-tile-lists-refresh', (data) => {
+        setMapTiles(prev => ({
+            ...prev,
+            mapLists: {
+                ...data,
+            }
+        }))
+    })
+
     const setItemDetailsCb = meta => {
         setItemDetails({ meta, type: 'map-tile' });
         setSelectedTile(meta);
@@ -207,7 +216,7 @@ export const Map = ({ setItemDetails, openListDetails, isEditList }) => {
                     {mapData.mapTiles.map((row, i) => {
                         return (<div className={'map-row'}>
                             {row.map((tile, j) => {
-                                return <MapTile i={i} j={j} isSelected={selectedTile && selectedTile?.i === i && selectedTile?.j === j} icon={tile.metaData.icon} setItemDetails={setItemDetailsCb} isExploring={tile.isRunning} isHighlight={tile.isHighlight} isEditList={isEditList} hintForTileShown={hintForTileShown} setHintShown={setHintShown}/>
+                                return <MapTile i={i} j={j} canExplore={tile.canExplore} isSelected={selectedTile && selectedTile?.i === i && selectedTile?.j === j} icon={tile.metaData.icon} setItemDetails={setItemDetailsCb} isExploring={tile.isRunning} isHighlight={tile.isHighlight} isEditList={isEditList} hintForTileShown={hintForTileShown} setHintShown={setHintShown}/>
                             })}
                         </div> )
                     })}
@@ -239,6 +248,7 @@ export const MapTile = React.memo(
          j,
          isSelected,
          setItemDetails,
+         canExplore,
          isExploring,
          isHighlight,
          hintForTileShown,
@@ -253,7 +263,7 @@ export const MapTile = React.memo(
                 }`}
                 id={`map-tile-${i}-${j}`}
                 style={{ backgroundImage: `url(icons/terrain/${icon}.png)` }}
-                onClick={() => isSelected ? setItemDetails(null) : setItemDetails({ i, j })}
+                onClick={() => isSelected ? setItemDetails(null) : setItemDetails({ i, j, canExplore })}
             ></div>
         );
 

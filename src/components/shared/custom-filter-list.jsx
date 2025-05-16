@@ -97,8 +97,8 @@ function CustomFiltersList({
                                                         </>
                                                     ) : (
                                                         <>
-                                                            <span />
-                                                            <span className="hint yellow">Required</span>
+                                                            <span className={'placeholder-24'}/>
+                                                            <span className={'placeholder-24'} />
                                                         </>
                                                     )}
                                                 </div>
