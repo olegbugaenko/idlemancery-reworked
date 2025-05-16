@@ -212,7 +212,7 @@ export class ResourcePoolModule extends GameModule {
         this.pinnedResources = obj?.pinnedResources ?? {};
     }
 
-    setMonitored(data, skip) {
+    setMonitored(data, skip, skipById) {
         this.monitoredData = {};
         if(!data?.length) return;
         data.forEach(effect => {
@@ -223,7 +223,9 @@ export class ResourcePoolModule extends GameModule {
             if(effect.scope === 'multiplier' && effect.value < 1) {
                 direction = -1;
             }
-            const prev = resourceCalculators.assertResource(effect.id, false, skip);
+            const prev = resourceCalculators.assertResource(effect.id, false, skip, {
+                skipById
+            });
 
             let newBalance = 0;
             switch (effect.scope) {
@@ -246,7 +248,7 @@ export class ResourcePoolModule extends GameModule {
                 id: effect.id,
                 amount: effect.value,
                 newBalance,
-                bShow: !!skip,
+                bShow: (!!skip || !!skipById) && !effect.isOneTime,
             };
         })
     }

@@ -368,7 +368,6 @@ export const ItemDetails = ({itemId, category, setItemDetails}) => {
 
 
     onMessage('crafting-details', (items) => {
-        console.log('CraftDetails: ', items)
         setDetailOpened(items);
     })
 

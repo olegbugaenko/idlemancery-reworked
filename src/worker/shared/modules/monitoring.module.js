@@ -47,12 +47,12 @@ export class MonitoringModule extends GameModule {
 
                         // console.log('Effs: ', effDurable, effects);
 
-                        const data = [...effDurable, ...effects];
+                        const data = [...effects.map(one => ({...one, isOneTime: true})), ...effDurable];
                         const attrs = data.filter(one => one.type === 'effects');
                         const resources = data.filter(one => one.type === 'resources');
 
                         gameCore.getModule('attributes').setMonitored(attrs);
-                        gameCore.getModule('resource-pool').setMonitored(resources);
+                        gameCore.getModule('resource-pool').setMonitored(resources, undefined, id);
                     } else {
                         gameCore.getModule('attributes').setMonitored([]);
                         gameCore.getModule('resource-pool').setMonitored([]);
@@ -62,12 +62,12 @@ export class MonitoringModule extends GameModule {
                 if(['furniture', 'accessory', 'amplifier'].includes(type)) {
                     // if id null - clear monitors, else - replace em
                     if(id) {
-                        const data = gameEntity.getEffects(id, 0, 1, true)
+                        const data = gameEntity.getEffects(id, 1, null, true)
                         const effects = data.filter(one => one.type === 'effects');
                         const resources = data.filter(one => one.type === 'resources');
 
                         gameCore.getModule('attributes').setMonitored(effects);
-                        gameCore.getModule('resource-pool').setMonitored(resources);
+                        gameCore.getModule('resource-pool').setMonitored(resources, undefined, id);
                     } else {
                         gameCore.getModule('attributes').setMonitored([]);
                         gameCore.getModule('resource-pool').setMonitored([]);

@@ -378,6 +378,7 @@ export class SpellModule extends GameModule {
                 cooldown: this.spells[spell.id]?.cooldown ?? 0,
                 cooldownProg: spell.getUsageCooldown ? (spell.getUsageCooldown() + SMALL_NUMBER - (this.spells[spell.id]?.cooldown ?? 0)) / (spell.getUsageCooldown() + SMALL_NUMBER) : 1,
                 monitored: this.getMonitoredData(spell),
+                maxLevel: this.isSpellLevelingAvailable() ? (this.spells[spell.id]?.level || 1) : undefined,
             })),
             isSpellLevelingAvailable: this.isSpellLevelingAvailable(),
             automationUnlocked: gameEntity.getLevel('shop_item_planner') > 0,

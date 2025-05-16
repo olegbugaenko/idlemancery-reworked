@@ -368,17 +368,18 @@ export const ListEditor = React.memo(({
                                                         <input type={'number'} value={action.time}
                                                                onChange={(e) => {
                                                                    if(currentTourId === 'action-lists' && +e.target.value > 1) {
-                                                                       console.log('cT: ', currentTourId, stepIndex);
                                                                        unlockNextById(9)
                                                                    }
                                                                    onUpdateActionFromList(action.id, 'time', +e.target.value)
                                                                }}/>
-                                                        <label className={`effort-auto-${action.id}`}>
-                                                            <input type={'checkbox'} checked={action.isDynamicTime} disabled={!action.isAutoTimeEnabled} onChange={(e) => {
-                                                                onUpdateActionFromList(action.id, 'isDynamicTime', !action.isDynamicTime)
-                                                            }}/>
-                                                            Auto
-                                                        </label>
+                                                        <TippyWrapper content={<div className={'hint-popup'}>Auto adjusts effort so this action produces enough to cover what others consume.</div> }>
+                                                            <label className={`effort-auto-${action.id}`}>
+                                                                <input type={'checkbox'} checked={action.isDynamicTime} disabled={!action.isAutoTimeEnabled} onChange={(e) => {
+                                                                    onUpdateActionFromList(action.id, 'isDynamicTime', !action.isDynamicTime)
+                                                                }}/>
+                                                                Auto
+                                                            </label>
+                                                        </TippyWrapper>
                                                         <span className={'percentage'}>{formatValue(editing.proportionsBar?.[index]?.percentage*100 || 0)} %</span>
                                                     </div>
                                                 )

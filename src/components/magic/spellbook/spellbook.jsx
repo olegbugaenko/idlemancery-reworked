@@ -291,7 +291,7 @@ export const SpellbookWrap = ({ children }) => {
 
 }
 
-export const SpellCard = React.memo(({ id, monitored, name, isCasted, cooldownProg, isActive, cooldown, onFlash, onPurchase, onShowDetails, onEditConfig, isMobile}) => {
+export const SpellCard = React.memo(({ id, level, maxLevel, monitored, name, isCasted, cooldownProg, isActive, cooldown, onFlash, onPurchase, onShowDetails, onEditConfig, isMobile}) => {
     const elementRef = useRef(null);
 
     useFlashOnLevelUp(isCasted, onFlash, elementRef);
@@ -313,6 +313,7 @@ export const SpellCard = React.memo(({ id, monitored, name, isCasted, cooldownPr
             <CircularProgress progress={cooldownProg}>
                 <img src={`icons/spells/${id}.png`} className={'resource'} />
             </CircularProgress>
+            {maxLevel ? (<span className={'level'}>{formatInt(level)}/{formatInt(maxLevel)}</span>) : null}
         </div>
     </div> )
 }, ((prevProps, currProps) => {
