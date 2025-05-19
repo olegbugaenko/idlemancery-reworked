@@ -132,8 +132,11 @@ export class InventoryModule extends GameModule {
                     );
                     if(gameResources.getResource(itemId).attributes?.allowMultiConsume) {
                         amount = reserveLimit;
+                    } else {
+                        amount = Math.min(amount, reserveLimit);
                     }
-                    if(amount > 0) {
+                    // console.log(`Consume ${itemId}: `, amount, reserved)
+                    if(amount >= 1) {
                         this.consumeItem(itemId, amount);
                     }
 
@@ -428,6 +431,8 @@ export class InventoryModule extends GameModule {
             }))
         }
 
+        // console.log('Usages: ', gameEntity.getUsingEntities('inventory_berry'));
+
         return {
             available: presentItems.map(resource => ({
                 ...resource,
@@ -438,7 +443,9 @@ export class InventoryModule extends GameModule {
                 cooldownProg: resource.getUsageCooldown ? (resource.getUsageCooldown() + SMALL_NUMBER - (this.inventoryItems[resource.id]?.cooldown ?? 0)) / (resource.getUsageCooldown() + SMALL_NUMBER) : 1,
                 allowMultiConsume: resource.attributes?.allowMultiConsume,
                 isPinned: !!gameCore.getModule('resource-pool').pinnedResources?.[resource.id],
-                eta: gameResources.assertToCapOrEmpty(resource.id)
+                eta: gameResources.assertToCapOrEmpty(resource.id),
+                usages: gameEntity.getUsingEntities(resource.id),
+                usagesFor: gameEntity.getUsedForEntities(resource.id),
             })),
             itemCategories: Object.values(perCats).filter(cat => cat.items.length > 0),
             payload: pl,

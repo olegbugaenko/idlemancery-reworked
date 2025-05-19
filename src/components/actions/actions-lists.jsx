@@ -6,6 +6,7 @@ import {DragDropContext, Draggable, Droppable} from "react-beautiful-dnd";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
 import {useTutorial} from "../../context/tutorial-context";
+import {useUICache} from "../../general/hooks/local-cache";
 
 export const ActionListsPanel = ({ automationUnlocked, runningList, editListToDetails, lists, viewListToDetails, automationEnabled, toggleAutomation, autotriggerIntervalSetting, changeAutomationInterval }) => {
 
@@ -110,11 +111,43 @@ export const ActionListsPopup = ({ lists, isOpened, setOpenedFor, onSelect, onHo
     const popupRef = useRef(null);
 
     const [search, setSearch] = useState('')
+    const [scope, setScope] = useUICache('list_search_scope', ['name']);
+
+    useEffect(() => {
+        if(!Array.isArray(scope)) {
+            console.warn('Invalid scope: ', scope);
+            setScope([]);
+        }
+    }, [scope])
+
+    const toggleScope = (sc) => {
+        setScope(prev => {
+            // console.log('Scopes: ', prev, scope);
+            if(prev.includes(sc)) {
+                return prev.filter(s => s !== sc);
+            } else {
+                return [...prev, sc];
+            }
+        })
+
+    }
 
     const listsDisplayed = useMemo(() => {
         if(!search) return lists;
-        return lists.filter(l => l.name.includes(search));
-    }, [lists, search])
+        return lists.filter(l => {
+            console.log('cahes: ', l.id, l.searchCache, scope);
+            for(const sc of scope) {
+                if(l.searchCache[sc]) {
+                    console.log('l cache', l.searchCache[sc], sc);
+                    if(l.searchCache[sc].some(st => st.includes(search.toLowerCase()))) {
+                        console.log(`Found ${l.id} by ${sc}`);
+                        return true;
+                    }
+                }
+            }
+            return false;
+        });
+    }, [lists, search, JSON.stringify(scope)])
 
     const onDragEnd = (result) => {
         const { source, destination } = result;
@@ -156,15 +189,18 @@ export const ActionListsPopup = ({ lists, isOpened, setOpenedFor, onSelect, onHo
 
     return (
         <DragDropContext onDragEnd={onDragEnd}>
-            <div className={"list-selector"} ref={popupRef}>
+            <div className={"list-selector selector-actions"} ref={popupRef}>
                 <div className={"list-selector-inner"}>
-                    <div className={"search-wrap"}>
+                    <div className={"search-wrap high"}>
                         <input
                             type={"text"}
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             onClick={(e) => e.stopPropagation()}
                         />
+                        <div className={'search-scopes'}>
+                            {['name','actions','resources','effects'].map(s => (<span className={`scope ${(scope || []).includes(s) ? 'selected' : ''}`} onClick={() => toggleScope(s)}>{s}</span> ))}
+                        </div>
                     </div>
                     <Droppable droppableId="actionLists">
                         {(provided) => (

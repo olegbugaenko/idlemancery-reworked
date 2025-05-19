@@ -61,6 +61,12 @@ export const registerCommomEffects = () => {
         minValue: 1,
     })
 
+    gameEffects.registerEffect('learn_languages_efficiency', {
+        name: 'Learn Languages Efficiency',
+        defaultValue: 1.,
+        minValue: 1,
+    })
+
     gameEffects.registerEffect('plain_learn_rate', {
         name: 'Plain Learn Bonus',
         description: 'Raw bonus to XP gained to action (not multiplied by other multipliers)',
@@ -454,5 +460,29 @@ export const registerCommomEffects = () => {
         minValue: 0.01,
         hasCap: false,
         saveBalanceTree: true,
+    })
+
+    gameEffects.registerEffect('job_efficiency_social', {
+        name: 'Social Jobs Efficiency',
+        defaultValue: 1.,
+        minValue: 1.,
+        description: 'Determines how efficient you would be in social jobs'
+
+    })
+
+    gameEffects.registerEffect('job_efficiency_physical', {
+        name: 'Physical Jobs Efficiency',
+        defaultValue: 1.,
+        minValue: 1.,
+        description: 'Determines how efficient you would be in physical jobs'
+
+    })
+
+    gameEffects.registerEffect('job_efficiency_magical', {
+        name: 'Magical Jobs Efficiency',
+        defaultValue: 1.,
+        minValue: 1.,
+        description: 'Determines how efficient you would be in magical jobs'
+
     })
 }

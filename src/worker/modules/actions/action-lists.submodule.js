@@ -25,6 +25,8 @@ export class ActionListsSubmodule extends GameModule {
 
         this.autoApplyCD = 0;
 
+        this.listsSearchCache = {};
+
         this.eventHandler.registerHandler('save-action-list', (payload) => {
             this.saveActionList(payload);
         })
@@ -77,7 +79,7 @@ export class ActionListsSubmodule extends GameModule {
             const data = this.getListEffects(null, listData);
 
             const prevEffects = [];
-            const resourcesEffects = this.packEffects(data.filter(one => one.type === 'resources').map(effect => {
+            const resourcesEffects = this.packEffects(data.filter(one => one.type === 'resources' && !['capMult','rawCap'].includes(one.scope)).map(effect => {
                 const prev = resourceCalculators.assertResource(effect.id, false, ['runningActions']);
 
                 if(effect.scope !== 'income' && effect.scope !== 'consumption') return effect;
@@ -114,11 +116,46 @@ export class ActionListsSubmodule extends GameModule {
                 potentialEffects: data,
                 resourcesEffects,
                 prevEffects: this.packEffects(prevEffects),
-                effectEffects: data.filter(one => one.type === 'effects'),
+                effectEffects: data.filter(one => one.type === 'effects' || ['capMult','rawCap'].includes(one.scope)),
                 proportionsBar,
                 newTimes: listData.actions,
             });
         })
+    }
+
+    generateSearchCacheForList(id) {
+        const list = this.actionsLists[id];
+        if(!list) return;
+        const actionsCache = list.actions.map(one => {
+            const action = gameEntity.getEntity(one.id)?.name;
+            return action.toLowerCase();
+        });
+        const effects = this.getListEffects(null, list);
+        const effectsCache = [];
+        const resourcesCache = [];
+        console.log('Regen: ', list.name, JSON.parse(JSON.stringify(effects)), JSON.parse(JSON.stringify(list)));
+        effects.forEach(eff => {
+            if(eff.type === 'resources') {
+                const ent = gameResources.getResource(eff.id)?.name;
+                resourcesCache.push(ent.toLowerCase());
+            }
+            if(eff.type === 'effects') {
+                const ent = gameEffects.getEffect(eff.id)?.name;
+                effectsCache.push(ent.toLowerCase());
+            }
+        })
+        this.listsSearchCache[id] = {
+            name: [list.name.toLowerCase()],
+            actions: actionsCache,
+            effects: effectsCache,
+            resources: resourcesCache,
+        }
+    }
+
+    generateAllListsSearchCache() {
+        for(const listId in this.actionsLists) {
+            this.generateSearchCacheForList(listId);
+        }
     }
 
     optimizeDynamicEfforts({
@@ -389,7 +426,7 @@ export class ActionListsSubmodule extends GameModule {
 
         // Temporarily commented out
 
-        /*keysToTrack = keysToTrack.filter(key => {
+        keysToTrack = keysToTrack.filter(key => {
             if(initialResourceBalance[key].current < 0 && ((maxIncomes[key] ?? 0) < -initialResourceBalance[key].current)) {
                 console.log('Unable to balance '+key, initialResourceBalance[key].current, maxIncomes[key])
                 return false;
@@ -399,7 +436,7 @@ export class ActionListsSubmodule extends GameModule {
                 return false;
             }
             return true;
-        })*/
+        })
 
         const forecastedActionsEfficiencies = {};
         let finalDeficites = {};
@@ -558,11 +595,11 @@ export class ActionListsSubmodule extends GameModule {
                 initialResourceBalance,
                 actionContributions,
                 actionConsumptions,
-                maxIterations: 20,
+                maxIterations: 30,
                 learningRate: 0.1,
                 tolerance: 0.0001,
             });
-            //console.log('guessedMinimized: ', guessedMinimized, performance.now() - st);
+            console.log('guessedMinimized: ', guessedMinimized, performance.now() - st);
 
             return guessedMinimized;
         }
@@ -663,6 +700,8 @@ export class ActionListsSubmodule extends GameModule {
 
         this.regenerateListsPriorityMap();
 
+        this.generateSearchCacheForList(list.id);
+
         if(this.runningList?.id && (this.runningList?.id === payload.id)) {
             const listToRun = this.actionsLists[this.runningList.id];
 
@@ -732,7 +771,8 @@ export class ActionListsSubmodule extends GameModule {
         }
         let ls = this._cachedSortedLists.map(one => ({
             ...one,
-            isUnlocked: true
+            isUnlocked: true,
+            searchCache: this.listsSearchCache[one.id],
         }));
 
         if(pl?.filterAutomated) {
@@ -769,6 +809,7 @@ export class ActionListsSubmodule extends GameModule {
         }
         this.sortLists();
         this.regenerateListsPriorityMap();
+        // this.generateAllListsSearchCache();
     }
 
     getAutotriggerList() {
@@ -957,8 +998,8 @@ export class ActionListsSubmodule extends GameModule {
 
         data.potentialEffects = this.getListEffects(id);
 
-        const resourcesEffects = data.potentialEffects.filter(one => one.type === 'resources');
-        data.effectEffects = data.potentialEffects.filter(one => one.type === 'effects');
+        const resourcesEffects = data.potentialEffects.filter(one => one.type === 'resources' && !['capMult','rawCap'].includes(one.scope));
+        data.effectEffects = data.potentialEffects.filter(one => (one.type === 'effects') || ['capMult','rawCap'].includes(one.scope));
 
         const prevEffects = [];
         data.resourcesEffects = this.packEffects(resourcesEffects.map(effect => {
@@ -1056,10 +1097,11 @@ export class ActionListsSubmodule extends GameModule {
         list.actions.forEach(action => {
             let isAvailable = gameEntity.isEntityUnlocked(action.id) && !gameEntity.isCapped(action.id);
             if(!isAvailable) {
+                console.warn(`${action.id} is unavailable`);
                 return;
             }
             const isEffectChanneling = gameEntity.getAttribute(action.id, 'isEffectChanneling', false);
-            const effects = gameEntity.getEffects(action.id, gameEntity.getAttribute(action.id, 'isTraining') ? 1 : 0, gameEntity.getAttribute(action.id, 'isTraining') ? 1 : gameEntity.getLevel(action.id), true, action.time / totalTime);
+            const effects = gameEntity.getEffects(action.id, gameEntity.getAttribute(action.id, 'isTraining') ? 1 : 0, gameEntity.getAttribute(action.id, 'isTraining') ? 1 : gameEntity.getLevel(action.id), true, 1, action.time / totalTime);
 
             let learnRateFactor = gameCore.getModule('actions').getLearningRate(action.id) / gameCore.getModule('actions').getActionXPMax(action.id);
 
@@ -1075,11 +1117,20 @@ export class ActionListsSubmodule extends GameModule {
 
                 if(effToAdd.scope === 'multiplier' && effToAdd.type === 'effects' && !isEffectChanneling) {
                     // we actually adding multiplier
-                    effToAdd.value *= learnRateFactor;
+                    effToAdd.value = 1 + learnRateFactor*(effToAdd.value - 1);
                 }
 
                 if(effToAdd.scope === 'income' && effToAdd.type === 'effects' && !isEffectChanneling) {
                     effToAdd.value *= learnRateFactor;
+                }
+
+                if((effToAdd.scope === 'rawCap' || effToAdd.scope === 'capMult') && effToAdd.type === 'resources') {
+                    console.log('origEff: ', {...effToAdd}, learnRateFactor);
+                    if(effToAdd.scope === 'capMult') {
+                        effToAdd.value = 1 + learnRateFactor*(effToAdd.value - 1);
+                    } else {
+                        effToAdd.value *= learnRateFactor;
+                    }
                 }
 
                 if(foundId < 0) {

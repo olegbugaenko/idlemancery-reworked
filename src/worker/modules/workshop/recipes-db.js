@@ -32,6 +32,8 @@ export const registerCraftingRecipe = (id, options) => {
 
     options.resourceModifier.getCustomAmplifier = () => options.getEffortMultiplier();
 
+    options.isPersistent = true;
+
     return gameEntity.registerGameEntity(id, options);
 
 }

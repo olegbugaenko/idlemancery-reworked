@@ -93,7 +93,8 @@ const registerGameAction = (id, options) => {
         options.getIntensityAspect = () => gameEffects.getEffectValue(`aspect_${primaryAttribute}`)
 
         if(options.attributes.isTraining) {
-            options.resourceModifier.customAmplifierApplyTypes = ['resources']
+            options.resourceModifier.customAmplifierApplyTypes = ['resources'];
+            options.resourceModifier.customAmplifierApplyScopes = ['income', 'consumption'];
         } else {
             options.resourceModifier.customAmplifierApplyTypes = ['effects', 'resources']
         }
@@ -104,14 +105,19 @@ const registerGameAction = (id, options) => {
     }
 
     options.searchableMeta = getResourceModifierDataSearchable(options.resourceModifier);
+    options.isPersistent = true;
 
 
+    if(!options.allowedScopes) {
+        options.allowedScopes = ['income', 'consumption', 'multiplier'];
+    }
     
     return gameEntity.registerGameEntity(id, options);
     
 }
 
 export const registerActionsStage1 = () => {
+
 
     registerGameAction('action_walk', {
         tags: ["action", "training", "physical"],
@@ -159,7 +165,7 @@ export const registerActionsStage1 = () => {
     })
 
     registerGameAction('action_visit_city', {
-        tags: ["action", "training", "physical"],
+        tags: ["action", "activity", "physical"],
         name: 'Visit City',
         category: ACTION_CATS.PHYSICAL,
         isAbstract: false,
@@ -178,7 +184,7 @@ export const registerActionsStage1 = () => {
     })
 
     registerGameAction('action_beggar', {
-        tags: ["action", "job", "social"],
+        tags: ["action", "job", "social", "social"],
         name: 'Beggar',
         category: ACTION_CATS.COINS,
         isAbstract: false,
@@ -186,12 +192,13 @@ export const registerActionsStage1 = () => {
         description: 'Wander the city streets, hoping for someone\'s help',
         level: 1,
         discountEffects: ['social_actions_discount'],
+        jobType: 'social',
         resourceModifier: {
             get_income: () => ({
                 resources: {
                     'coins': {
-                        A: 0.03*gameEffects.getEffectValue('begging_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
-                        B: 0.27*gameEffects.getEffectValue('begging_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
+                        A: 0.03*gameEffects.getEffectValue('begging_efficiency')*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_social'),
+                        B: 0.27*gameEffects.getEffectValue('begging_efficiency')*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_social'),
                         type: 0,
                     }
                 }
@@ -205,7 +212,7 @@ export const registerActionsStage1 = () => {
                     }
                 }
             }),
-            effectDeps: ['begging_efficiency', 'coins_earned_bonus']
+            effectDeps: ['begging_efficiency', 'coins_earned_bonus', 'job_efficiency_social']
         },
         getLearnRate: () => {
             return 1;
@@ -223,13 +230,14 @@ export const registerActionsStage1 = () => {
     })
 
     registerGameAction('action_street_musician', {
-        tags: ["action", "job", "politician"],
+        tags: ["action", "job", "politician", "social"],
         name: 'Street Musician',
         isAbstract: false,
         category: ACTION_CATS.COINS,
         allowedImpacts: ['effects'],
         description: 'Perform melodies for passersby and earn some coins through the power of music',
         level: 1,
+        jobType: 'social',
         getLearnRate: () => {
             return 1;
         },
@@ -239,8 +247,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'coins': {
-                        A: 0.2*gameEffects.getEffectValue('coins_earned_bonus'),
-                        B: 1.8*gameEffects.getEffectValue('coins_earned_bonus'),
+                        A: 0.2*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_social'),
+                        B: 1.8*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_social'),
                         type: 0,
                     }
                 }
@@ -254,12 +262,59 @@ export const registerActionsStage1 = () => {
                     }
                 }
             }),
-            effectDeps: ['begging_efficiency', 'coins_earned_bonus']
+            effectDeps: ['begging_efficiency', 'coins_earned_bonus', 'job_efficiency_social']
         },
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_charisma',
             level: 10,
+        }],
+        attributes: {
+            baseXPCost: 20,
+            primaryAttribute: 'attribute_charisma'
+        }
+    })
+
+
+    registerGameAction('action_street_artist', {
+        tags: ["action", "job", "politician", "social"],
+        name: 'Street Artist',
+        isAbstract: false,
+        category: ACTION_CATS.COINS,
+        allowedImpacts: ['effects'],
+        description: 'Why just play if you can actually sing? Turn heads, catch coins, and maybe even start a movement.',
+        level: 1,
+        jobType: 'social',
+        getLearnRate: () => {
+            return 1;
+        },
+        discountEffects: ['social_actions_discount'],
+        learningEffects: ['job_learning_rate'],
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'coins': {
+                        A: 0.5*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_social'),
+                        B: 4.5*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_social'),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0,
+                        B: 3,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['begging_efficiency', 'coins_earned_bonus', 'job_efficiency_social']
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_charisma',
+            level: 50,
         }],
         attributes: {
             baseXPCost: 20,
@@ -276,6 +331,7 @@ export const registerActionsStage1 = () => {
         description: 'Clean Stables to earn some gold',
         level: 1,
         discountEffects: ['physical_actions_discount'],
+        jobType: 'physical',
         getLearnRate: () => {
             return 1;
         },
@@ -284,8 +340,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'coins': {
-                        A: 0.3*gameEffects.getEffectValue('clean_stable_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
-                        B: 2.7*gameEffects.getEffectValue('clean_stable_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
+                        A: 0.3*gameEffects.getEffectValue('clean_stable_efficiency')*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_physical'),
+                        B: 2.7*gameEffects.getEffectValue('clean_stable_efficiency')*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_physical'),
                         type: 0,
                     }
                 }
@@ -304,7 +360,7 @@ export const registerActionsStage1 = () => {
                     }
                 }
             }),
-            effectDeps: ['coins_earned_bonus', 'clean_stable_efficiency']
+            effectDeps: ['coins_earned_bonus', 'clean_stable_efficiency', 'job_efficiency_physical']
         },
         unlockedBy: [{
             type: 'effect',
@@ -328,6 +384,7 @@ export const registerActionsStage1 = () => {
         description: 'Protect streets from hooligans and robbers. Its risky and hard job, but its well paid',
         level: 1,
         discountEffects: ['physical_actions_discount'],
+        jobType: 'physical',
         getLearnRate: () => {
             return 1;
         },
@@ -336,8 +393,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'coins': {
-                        A: 0.8*gameEffects.getEffectValue('coins_earned_bonus'),
-                        B: 7.2*gameEffects.getEffectValue('coins_earned_bonus'),
+                        A: 0.8*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_physical'),
+                        B: 7.2*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_physical'),
                         type: 0,
                     }
                 }
@@ -356,7 +413,7 @@ export const registerActionsStage1 = () => {
                     }
                 }
             }),
-            effectDeps: ['coins_earned_bonus']
+            effectDeps: ['coins_earned_bonus', 'job_efficiency_physical']
         },
         unlockedBy: [{
             type: 'effect',
@@ -381,6 +438,7 @@ export const registerActionsStage1 = () => {
         level: 1,
         minDemoVersion: 20,
         discountEffects: ['physical_actions_discount'],
+        jobType: 'physical',
         getLearnRate: () => {
             return 1;
         },
@@ -389,8 +447,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'coins': {
-                        A: 1.5*gameEffects.getEffectValue('coins_earned_bonus'),
-                        B: 13.5*gameEffects.getEffectValue('coins_earned_bonus'),
+                        A: 1.5*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_physical'),
+                        B: 13.5*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_physical'),
                         type: 0,
                     }
                 }
@@ -409,7 +467,7 @@ export const registerActionsStage1 = () => {
                     }
                 }
             }),
-            effectDeps: ['coins_earned_bonus']
+            effectDeps: ['coins_earned_bonus', 'job_efficiency_physical']
         },
         unlockedBy: [{
             type: 'effect',
@@ -433,6 +491,7 @@ export const registerActionsStage1 = () => {
         description: 'Work as senior builder. Its harder, but better paid',
         level: 1,
         discountEffects: ['physical_actions_discount'],
+        jobType: 'physical',
         getLearnRate: () => {
             return 1;
         },
@@ -441,8 +500,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'coins': {
-                        A: 3*gameEffects.getEffectValue('coins_earned_bonus'),
-                        B: 27*gameEffects.getEffectValue('coins_earned_bonus'),
+                        A: 3*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_physical'),
+                        B: 27*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_physical'),
                         type: 0,
                     }
                 }
@@ -461,7 +520,7 @@ export const registerActionsStage1 = () => {
                     }
                 }
             }),
-            effectDeps: ['coins_earned_bonus']
+            effectDeps: ['coins_earned_bonus', 'job_efficiency_physical']
         },
         unlockedBy: [{
             type: 'effect',
@@ -488,13 +547,14 @@ export const registerActionsStage1 = () => {
         getLearnRate: () => {
             return 1;
         },
+        jobType: 'physical',
         learningEffects: ['job_learning_rate'],
         resourceModifier: {
             get_income: () => ({
                 resources: {
                     'coins': {
-                        A: 6*gameEffects.getEffectValue('coins_earned_bonus'),
-                        B: 54*gameEffects.getEffectValue('coins_earned_bonus'),
+                        A: 6*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_physical'),
+                        B: 54*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_physical'),
                         type: 0,
                     }
                 }
@@ -513,7 +573,7 @@ export const registerActionsStage1 = () => {
                     }
                 }
             }),
-            effectDeps: ['coins_earned_bonus']
+            effectDeps: ['coins_earned_bonus', 'job_efficiency_physical']
         },
         unlockedBy: [{
             type: 'effect',
@@ -535,6 +595,7 @@ export const registerActionsStage1 = () => {
         description: 'Perform very primitive magical tricks to entertain people and collect some coins from them',
         level: 1,
         discountEffects: ['physical_actions_discount'],
+        jobType: 'magical',
         getLearnRate: () => {
             return 1;
         },
@@ -543,8 +604,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'coins': {
-                        A: 0.6*gameEffects.getEffectValue('clean_stable_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
-                        B: 5.4*gameEffects.getEffectValue('clean_stable_efficiency')*gameEffects.getEffectValue('coins_earned_bonus'),
+                        A: 0.6*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_magical'),
+                        B: 5.4*gameEffects.getEffectValue('coins_earned_bonus'),
                         type: 0,
                     }
                 }
@@ -563,7 +624,7 @@ export const registerActionsStage1 = () => {
                     }
                 }
             }),
-            effectDeps: ['coins_earned_bonus']
+            effectDeps: ['coins_earned_bonus', 'job_efficiency_magical']
         },
         unlockedBy: [{
             type: 'effect',
@@ -1912,16 +1973,17 @@ export const registerActionsStage1 = () => {
         getLearnRate: () => {
             return 1.
         },
+        satelliteEntityId: 'action_bonus_home_errands',
+        satelliteEntityLevelMod: (l) => Math.max(0, (l || 1) - 1), // modifier for entity
         learningEffects: ['routine_learning_speed'],
         resourceModifier: {
-            get_multiplier: () => ({
-                effects: {
-                    'coins_cap_bonus': {
+            get_capMult: () => ({
+                resources: {
+                    'coins': {
                         A: 0.05*gameEffects.getEffectValue(getRankId('action_home_errands')),
-                        B: 0.95,
+                        B: 0.95*gameEffects.getEffectValue(getRankId('action_home_errands')),
                         type: 0,
                     },
-
                 }
             }),
             get_consumption: () => ({
@@ -2167,7 +2229,7 @@ export const registerActionsStage1 = () => {
         level: 1,
         getLearnRate: () => 1,
         discountEffects: ['mental_actions_discount'],
-        learningEffects: ['mental_training_learning_rate'],
+        learningEffects: ['mental_training_learning_rate', 'learn_languages_efficiency'],
         resourceModifier: {
             get_income: () => ({
                 effects: {
@@ -2201,6 +2263,55 @@ export const registerActionsStage1 = () => {
         },
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_vocabulary') > 0
+        },
+        attributes: {
+            baseXPCost: 50,
+            displayPerLevel: 1,
+            isTraining: true,
+            isRankAvailable: true,
+        }
+    })
+
+    registerGameAction('action_linguistic_practices', {
+        tags: ["action", "training", "mental"],
+        name: 'Linguistic Drills',
+        category: ACTION_CATS.MENTAL,
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'You pay a grumpy scholar to drill you on obscure grammar rules until you understand how not to misunderstand ancient languages.',
+        level: 1,
+        maxLevel: 10,
+        getLearnRate: () => 1,
+        discountEffects: ['mental_actions_discount'],
+        learningEffects: ['mental_training_learning_rate'],
+        resourceModifier: {
+            get_income: () => ({
+                effects: {
+                    'learn_languages_efficiency': {
+                        A: 0.1*gameEffects.getEffectValue(getRankId('action_learn_languages')),
+                        B: -0.1,
+                        type: 0,
+                    },
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 2,
+                        type: 0,
+                    },
+                    'coins': {
+                        A: 0.0,
+                        B: 50,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['read_books_efficiency']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_linguistic_practices') > 0
         },
         attributes: {
             baseXPCost: 50,
@@ -2821,6 +2932,7 @@ export const registerActionsStage1 = () => {
         level: 1,
         maxLevel: 5,
         satelliteEntityId: 'furniture_illusory_urn',
+        satelliteEntityLevelMod: (l) => Math.max(0, (l || 1) - 1), // modifier for entity
         resourceModifier: {
             get_rawCap: () => ({
                 resources: {
@@ -3805,4 +3917,26 @@ export const registerActionsStage1 = () => {
             isRankAvailable: true,
         }
     })
+
+    // ------------------------//
+    // *** Bonuses Related *** //
+
+    gameEntity.registerGameEntity('action_bonus_home_errands', {
+        name: 'Home Errands Bonus',
+        isAbstract: false,
+        resourceModifier: {
+            get_capMult: () => ({
+                resources: {
+                    'coins': {
+                        A: 0.05*gameEffects.getEffectValue(getRankId('action_home_errands')),
+                        B: 1*gameEffects.getEffectValue(getRankId('action_home_errands')),
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: [getRankId('action_home_errands')],
+        },
+    })
+
+    console.log('-RM-=: ', )
 }

@@ -258,7 +258,6 @@ export const ListEditor = React.memo(({
 
     useEffect(() => {
         setEditing(listData);
-        console.log('RecListData: ', listData);
         if(currentTourId === 'action-lists') {
             if(listData.actions.find(one => one.id === 'action_walk') && listData.actions.find(one => one.id === 'action_beggar')) {
                 unlockNextById(4)

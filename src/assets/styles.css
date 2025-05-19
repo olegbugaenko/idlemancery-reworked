@@ -1389,7 +1389,7 @@ h4 {
 }
 
 .list-editor .actions-list-wrap .action-row .col.amount.large .editing-amounts .percentage {
-    width: 50px;
+    width: 60px;
     display: inline-block;
 }
 
@@ -2735,6 +2735,10 @@ span.highlighted-span.yellow {
     padding: 4px;
 }
 
+.padded-left {
+    padding-left: 4px;
+}
+
 .tutorial-popup {
     width: 300px;
     padding: 20px;
@@ -3553,4 +3557,26 @@ input[type="range"]::-moz-range-thumb {
 .hint-popup .bold {
     font-weight: bold;
     font-size: 15px;
+}
+
+.search-scopes {
+    display: flex;
+}
+
+.search-scopes .scope {
+    padding: 4px;
+    margin: 4px;
+    border: 1px solid #333333;
+    border-radius: 3px;
+    cursor: pointer;
+    display: block;
+}
+
+.search-scopes .scope:hover {
+    background-color: #222233;
+}
+
+.search-scopes .scope.selected {
+    background-color: #222233;
+    color: var(--highlight);
 }

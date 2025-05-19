@@ -11,6 +11,7 @@ export class ResourcePoolModule extends GameModule {
         this.dragonPower = 0;
         this.monitoredData = {};
         this.pinnedResources = {};
+        this.tickCD = 1;
 
         this.eventHandler.registerHandler('set-resource-pinned', (payload) => {
             this.pinnedResources[payload.id] = payload.flag;
@@ -198,8 +199,14 @@ export class ResourcePoolModule extends GameModule {
 
     }
 
-    tick() {
-
+    tick(game, delta) {
+        if(this.monitoredCaches && this.monitoredCaches?.data?.length) {
+            this.tickCD -= delta;
+            if(this.tickCD <= 0) {
+                this.tickCD = 1;
+                this.setMonitored(this.monitoredCaches.data, this.monitoredCaches.skip, this.monitoredCaches.skipById);
+            }
+        }
     }
 
     save() {
@@ -214,6 +221,11 @@ export class ResourcePoolModule extends GameModule {
 
     setMonitored(data, skip, skipById) {
         this.monitoredData = {};
+        this.monitoredCaches = {
+            data,
+            skip,
+            skipById
+        }
         if(!data?.length) return;
         data.forEach(effect => {
             let direction = 1;
@@ -228,6 +240,8 @@ export class ResourcePoolModule extends GameModule {
             });
 
             let newBalance = 0;
+            let newStorage = 0;
+            const defSt = gameResources.getResource(effect.id)?.defaultCap ?? 0;
             switch (effect.scope) {
                 case 'consumption':
                     newBalance = prev.balance - effect.value;
@@ -238,16 +252,28 @@ export class ResourcePoolModule extends GameModule {
                 case 'multiplier':
                     newBalance = (prev.income * prev.multiplier * effect.value) - prev.consumption;
                     break;
+                case 'rawCap':
+                    newStorage = (defSt + prev.rawCap + effect.value)*prev.capMult;
+                    break;
+                case 'capMult':
+                    newStorage = (defSt + prev.rawCap)*(prev.capMult * effect.value);
+                    break;
                 default:
                     newBalance = prev.balance;
                     break;
             }
+            if(effect.id === 'coins') {
+                console.log('Monn ', skip, skipById, effect, newStorage, prev);
+            }
+
+
             this.monitoredData[effect.id] = {
                 direction,
                 name: effect.name,
                 id: effect.id,
                 amount: effect.value,
                 newBalance,
+                newStorage,
                 bShow: (!!skip || !!skipById) && !effect.isOneTime,
             };
         })

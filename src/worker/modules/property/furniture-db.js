@@ -138,7 +138,7 @@ export const registerFurnitureStage1 = () => {
             get_rawCap: () => ({
                 resources: {
                     'coins': {
-                        A: 75*gameEffects.getEffectValue('urn_storage_bonus'),
+                        A: 80*gameEffects.getEffectValue('urn_storage_bonus'),
                         B: 0,
                         type: 0,
                     }
@@ -407,6 +407,95 @@ export const registerFurnitureStage1 = () => {
             multiplier: {
                 effects: {
                     'mental_training_learning_rate': {
+                        A: 0.25,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 1,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 400*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 1,
+                type: 0
+            }
+        }),
+    })
+
+    registerFurniture('furniture_meditation_mat', {
+        name: 'Meditation Mat',
+        description: 'A comfortable mat that helps you focus during long meditation sessions.',
+        tags: ["furniture", "upgrade", "purchaseable", 'actions'],
+        maxLevel: 4,
+        unlockCondition: () => gameEntity.isEntityUnlocked('action_meditation'),
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'spiritual_learning_rate': {
+                        A: 0.25,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 1,
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1.5,
+                B: 4000,
+                type: 1,
+            },
+            'living_space': {
+                A: 0,
+                B: 1,
+                type: 0,
+            }
+        })
+    });
+
+
+    registerFurniture('furniture_bench', {
+        tags: ["furniture", "upgrade", "purchaseable", "actions"],
+        name: 'Bench',
+        description: 'Place a bench next to your tent. Curious passersby will sit down and, as people do, spill a few secrets while they rest.',
+        level: 0,
+        maxLevel: 4,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_tent') > 0;
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_charisma',
+            level: 20,
+        }],
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'social_training_learning_rate': {
                         A: 0.25,
                         B: 1,
                         type: 0,

@@ -1236,14 +1236,14 @@ export class ActionsModule extends GameModule {
             max: entity.getMaxLevel ? entity.getMaxLevel() : entity.maxLevel || 0,
             level: this.actions[entity.id]?.level || 1,
             affordable: gameEntity.getAffordable(entity.id),
-            actionEffect: gameEntity.getEffects(entity.id, 0, this.actions[entity.id]?.level || 1, true).filter(eff => eff.type === 'resources' || entity.attributes.isEffectChanneling),
+            actionEffect: gameEntity.getEffects(entity.id, 0, this.actions[entity.id]?.level || 1, true).filter(eff => (eff.type === 'resources' || entity.attributes.isEffectChanneling) &&  !['capMult','rawCap'].includes(eff.scope)),
             potentialEffects: this.packEffects(
                 gameEntity.getEffects(entity.id, 1, this.actions[entity.id]?.level || 1, true),
-                item => item.type === 'effects'
+                item => (item.type === 'effects') || ['capMult','rawCap'].includes(item.scope)
             ),
             currentEffects: this.packEffects(
                 gameEntity.getEffects(entity.id, 0, this.actions[entity.id]?.level || 1, true),
-                item => item.type === 'effects'
+                item => (item.type === 'effects') || ['capMult','rawCap'].includes(item.scope)
             ),
             xp: this.actions[entity.id]?.xp || 0,
             maxXP: this.getActionXPMax(entity.id),
@@ -1365,4 +1365,8 @@ export class ActionsModule extends GameModule {
         this.eventHandler.sendData('actions-unlocks', data);
     }
 
+    onLoaded(game) {
+        console.log('onLoad');
+        this.lists.generateAllListsSearchCache();
+    }
 }

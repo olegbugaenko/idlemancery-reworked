@@ -241,7 +241,7 @@ export const registerShopItemsStage1 = () => {
     gameEntity.registerGameEntity('shop_item_panpipe', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Panpipe',
-        description: 'Perform some primitive show to improve begging efficiency',
+        description: 'Perform some primitive show to improve social jobs efficiency',
         level: 0,
         maxLevel: 1,
         unlockCondition: () => {
@@ -253,7 +253,7 @@ export const registerShopItemsStage1 = () => {
         resourceModifier: {
             multiplier: {
                 effects: {
-                    'begging_efficiency': {
+                    'job_efficiency_social': {
                         A: 0.2,
                         B: 1,
                         type: 0,
@@ -305,6 +305,37 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+    gameEntity.registerGameEntity('shop_item_storage_arrangement', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Storage Arrangement',
+        description: 'You convinced the shopkeeper to let you store some of your items in their storeroom. That frees up some space at home.',
+        level: 0,
+        maxLevel: 1,
+        unlockedBy: [{ type: 'effect', id: 'attribute_charisma', level: 25 }],
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            coins: {
+                A: 1,
+                B: 1000 * charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        }),
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'living_space': { A: 2, B: 0, type: 0 }
+                }
+            }),
+            get_rawCap: () => ({
+                resources: {
+                    'coins': { A: 250, B: 0, type: 0 },
+                },
+            })
+        },
+        unlockCondition: () => gameEntity.getLevel('shop_item_tent') > 0
+    });
 
     gameEntity.registerGameEntity('shop_item_training_weights', {
         tags: ["shop", "upgrade", "purchaseable"],
@@ -393,7 +424,7 @@ export const registerShopItemsStage1 = () => {
         resourceModifier: {
             multiplier: {
                 effects: {
-                    'clean_stable_efficiency': {
+                    'job_efficiency_physical': {
                         A: 0.2,
                         B: 1,
                         type: 0,
@@ -833,6 +864,79 @@ export const registerShopItemsStage1 = () => {
                 A: 2,
                 B: 1500*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 0
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_linguistic_practices', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Private Linguistic Lessons',
+        description: 'An old librarian offers to share advanced techniques for translating forgotten and obscure languages — for a modest fee, naturally.',
+        level: 0,
+        maxLevel: 1,
+        unlockedBy: [{
+            type: 'entity',
+            id: 'action_learn_languages',
+            level: 5
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_vocabulary') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'knowledge': {
+                A: 2,
+                B: 20*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            },
+            'coins': {
+                A: 2,
+                B: 1600*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_body_tempering', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Body Tempering Course',
+        description: 'You enroll in a four-day course led by a rugged survivalist. Through exposure to cold, fasting, and controlled discomfort, you train your body to stay calm and energized in any condition.',
+        level: 0,
+        maxLevel: 4,
+        unlockedBy: [{
+            type: 'entity',
+            id: 'action_endurance_training',
+            level: 25
+        }],
+        unlockCondition: () => {
+            return gameEntity.isEntityUnlocked('action_pushup')
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                resources: {
+                    energy: {
+                        A: 0.05,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'health': {
+                A: 5,
+                B: 15*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            },
+            'coins': {
+                A: 2,
+                B: 800*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
             }
         }),
     })

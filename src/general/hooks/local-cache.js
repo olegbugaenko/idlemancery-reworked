@@ -9,13 +9,16 @@ export function useUICache(cacheId, defaultValue) {
 
     return [
         value ?? stored,
-        (value) => {
+        (nv) => {
+            if (typeof nv === 'function') {
+                nv = nv(value ?? stored);
+            }
             let cache = JSON.parse(localStorage.getItem(`cache`) || '{}');
             if(!cache) {
                 cache = {};
             }
-            cache[cacheId] = value;
-            setValue(value);
+            cache[cacheId] = nv;
+            setValue(nv);
             localStorage.setItem('cache', JSON.stringify(cache));
         }
     ]

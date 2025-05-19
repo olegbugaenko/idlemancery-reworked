@@ -99,6 +99,7 @@ export const ResourcesBar = () => {
 
             const isAffected = aff?.direction;
             const newBalance = aff?.newBalance;
+            const newStorage = aff?.newStorage;
 
             let addClass = '';
             if(isAffected) {
@@ -108,6 +109,23 @@ export const ResourcesBar = () => {
             if(res.targetEfficiency < 1) {
                 addClass += ' missing-blocker';
             }
+            let directionClass = '';
+            let displayValue = '';
+            if(aff) {
+                let displayType = 'balance';
+                if(newStorage && (!newBalance || newBalance === res.balance)) {
+                    displayType = 'store';
+                }
+
+                if(displayType === 'store') {
+                    displayValue = `↑${formatValue(aff.newStorage)}`;
+                    directionClass = aff.newStorage > res.cap ? 'plus' : (aff.newStorage < res.cap ? 'minus' : 'neutral');
+                } else {
+                    displayValue = `${formatValue(aff.newBalance)}`;
+                    directionClass = aff.newBalance > res.balance ? 'plus' : (aff.newBalance < res.balance ? 'minus' : 'neutral');
+                }
+            }
+
 
             return (<div key={res.id} className={`holder ${aff ? 'monitored' : ''} ${aff?.bShow ? 'show-potential' : ''} ${addClass}`} onMouseEnter={() => setMonitoredAttribute(res.id)} onMouseLeave={() => setMonitoredAttribute(null)}><div className={`resource-item ${affClassData}`}>
                 <div className={'resource-label'}>
@@ -119,8 +137,8 @@ export const ResourcesBar = () => {
                 <TippyWrapper content={<div className={'hint-popup'}><BreakDown breakDown={res.breakDown}/></div> }>
                     <span className={`resource-balance ${res.isNegative ? 'red' : ''} ${res.isPositive ? 'green' : ''}`}>{formatValue(res.balance || 0)}</span>
                 </TippyWrapper>
-                {aff && aff?.bShow ? (<div className={`appendix ${aff.newBalance > res.balance ? 'plus' : (aff.newBalance < res.balance ? 'minus' : 'neutral')}`}>
-                    <span>{formatValue(aff.newBalance)}</span>
+                {aff && aff?.bShow ? (<div className={`appendix ${directionClass}`}>
+                    <span>{displayValue}</span>
                 </div> ) : null}
 
             </div>

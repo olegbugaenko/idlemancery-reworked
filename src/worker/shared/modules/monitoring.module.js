@@ -23,12 +23,27 @@ export class MonitoringModule extends GameModule {
                 if(type === 'action') {
                     // if id null - clear monitors, else - replace em
                     if(id) {
-                        const data = gameEntity.getEffects(id, 0, gameCore.getModule('actions').actions[id]?.level || 1, true)
+                        // let levelToAccount = gameCore.getModule('actions').actions[id]?.level;
+                        let skippedIds = [id, `active_${id}`];
+                        if(gameEntity.getEntity(id).satelliteEntityId) {
+                            skippedIds.push(gameEntity.getEntity(id).satelliteEntityId);
+                            console.log('satelliteLevel: ', gameEntity.getLevel(gameEntity.getEntity(id).satelliteEntityId));
+                        }
+                        const data = gameEntity.getEffects(id, 0, gameCore.getModule('actions').actions[id]?.level || 1, true);
+                        const nlvData = gameEntity.getEffects(id, 1, gameCore.getModule('actions').actions[id]?.level || 1, true);
                         const effects = data.filter(one => one.type === 'effects');
-                        const resources = data.filter(one => one.type === 'resources');
+                        const resources = data.filter(one => one.type === 'resources').map(r => {
+                            if(['rawCap', 'capMult'].includes(r.scope)) {
+                                // use potential
+                                const pt = nlvData.find(nr => nr.type === 'resources' && nr.id === r.id);
+                                console.log('MappingToPot', pt);
+                                return pt ? {...pt} : r;
+                            }
+                            return r;
+                        })
 
                         gameCore.getModule('attributes').setMonitored(effects);
-                        gameCore.getModule('resource-pool').setMonitored(resources, ['runningActions']);
+                        gameCore.getModule('resource-pool').setMonitored(resources, ['runningActions'], skippedIds);
                     } else {
                         gameCore.getModule('attributes').setMonitored([]);
                         gameCore.getModule('resource-pool').setMonitored([]);
@@ -59,7 +74,7 @@ export class MonitoringModule extends GameModule {
                     }
                 }
 
-                if(['furniture', 'accessory', 'amplifier'].includes(type)) {
+                if(['furniture', 'accessory', 'amplifier', 'shop_upgrade'].includes(type)) {
                     // if id null - clear monitors, else - replace em
                     if(id) {
                         const data = gameEntity.getEffects(id, 1, null, true)

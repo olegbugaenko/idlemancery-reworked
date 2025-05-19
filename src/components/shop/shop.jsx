@@ -55,6 +55,9 @@ export const Shop = ({}) => {
             setDetailOpened('inventory_brightleaf');
             return;
         }
+        if(selectedTab === 'upgrades') {
+            sendData('set-monitored', { scope: 'effects', type: 'shop_upgrade', id });
+        }
         if(!id) {
             setDetailOpened(null);
         } else {
