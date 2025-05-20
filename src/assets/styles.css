@@ -3580,3 +3580,23 @@ input[type="range"]::-moz-range-thumb {
     background-color: #222233;
     color: var(--highlight);
 }
+
+body::after {
+    content: "";
+    position: fixed;
+    width: 2px;
+    height: 2px;
+    background: rgba(0,0,0,0.02);
+    animation: gpu-nudge 1s infinite;
+    will-change: transform;
+    bottom: 0px;
+    right: 0px;
+    z-index: 999999;
+    pointer-events: none;
+}
+
+@keyframes gpu-nudge {
+    0% { transform: rotate(0); }
+    50% { transform: rotate(1deg); }
+    100% { transform: rotate(0); }
+}

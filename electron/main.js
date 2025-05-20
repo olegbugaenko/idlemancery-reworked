@@ -39,7 +39,7 @@ ipcMain.on('toggle-fullscreen', (event) => {
 app.commandLine.appendSwitch('--in-process-gpu', '--disable-direct-composition');
 
 app.on('ready', () => {
-    fs.appendFileSync('log.txt', `App is ready\n`);
+
     mainWindow = new BrowserWindow({
         width: 1920,
         height: 1080,
@@ -49,6 +49,7 @@ app.on('ready', () => {
             preload: path.join(__dirname, 'preload.js'), // За потреби
             contextIsolation: true,
             sandbox: false,
+            backgroundThrottling: false
         },
     });
 
@@ -56,4 +57,17 @@ app.on('ready', () => {
 
     // Завантажуємо React-додаток
     mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
+
+    let invalidateTimer = setInterval(() => {
+        if (mainWindow.isFocused()) {
+            mainWindow.webContents.invalidate();
+        }
+    }, 500);
+
+    mainWindow.on('closed', () => {
+        if (invalidateTimer) {
+            clearInterval(invalidateTimer);
+            invalidateTimer = null;
+        }
+    });
 });
