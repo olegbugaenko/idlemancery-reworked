@@ -23,11 +23,6 @@ export const SecondaryMenu = () => {
                         </div>
                     </TippyWrapper>
                 </li>
-                {/*<li>
-                    <span>
-                        <a target={'_blank'} href={'https://patreon.com/user?u=83421544'}>Support Me</a>
-                    </span>
-                </li>*/}
                 <li className={openedTab === 'about' ? 'active' : ''} onClick={() => setOpenedTab('about')}>
                     <span>v0.1.4d</span>
                 </li>
