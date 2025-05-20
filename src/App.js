@@ -32,8 +32,14 @@ function App() {
         };
     }, []);
 
-    onMessage('initialized', (event) => {
-        const saveString = window.localStorage.getItem('idlemanceryV2Reworked');
+    onMessage('initialized', async (event) => {
+        let saveString = window.localStorage.getItem('idlemanceryV2Reworked');
+        if (window.electron?.loadFromCloud()) {
+            saveString = await window.electron.loadFromCloud();
+        }
+        if(!saveString) {
+            saveString = window.localStorage.getItem('idlemanceryV2Reworked');
+        }
         if(!saveString) {
             sendData('reset-game', {});
             return
@@ -53,8 +59,11 @@ function App() {
         }
     })
 
-    onMessage('save-game', (data) => {
+    onMessage('save-game', async (data) => {
         window.localStorage.setItem('idlemanceryV2Reworked', JSON.stringify(data));
+        if (window.electron?.saveToCloud) {
+            await window.electron.saveToCloud(data); // При збереженні
+        }
     })
 
     useEffect(() => {

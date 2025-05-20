@@ -1,9 +1,23 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
+const fs = require("fs");
+fs.appendFileSync('log.txt', `Starting\n`);
 const { initSteamIfAvailable } = require('../src/general/utils/steam-init');
+const { saveToCloud, loadFromCloud } = require('../src/general/utils/steam-cloud-save');
+initSteamIfAvailable();
+fs.appendFileSync('log.txt', `Electron Required\n`);
 
 const path = require('path');
 
 let mainWindow;
+
+
+ipcMain.handle('cloud-save', (event, saveData) => {
+    return saveToCloud(saveData);
+});
+
+ipcMain.handle('cloud-load', () => {
+    return loadFromCloud();
+});
 
 ipcMain.handle('is-fullscreen', (event) => {
     const win = BrowserWindow.getFocusedWindow();
@@ -22,8 +36,10 @@ ipcMain.on('toggle-fullscreen', (event) => {
     }
 });
 
+app.commandLine.appendSwitch('--in-process-gpu', '--disable-direct-composition');
+
 app.on('ready', () => {
-    initSteamIfAvailable();
+    fs.appendFileSync('log.txt', `App is ready\n`);
     mainWindow = new BrowserWindow({
         width: 1920,
         height: 1080,

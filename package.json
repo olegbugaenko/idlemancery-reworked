@@ -22,6 +22,7 @@
       "dist/**/*",
       "electron/**/*",
       "src/general/utils/steam-init.js",
+      "src/general/utils/steam-cloud-save.js",
       "native/greenworks/**/*"
     ],
     "asarUnpack": [
