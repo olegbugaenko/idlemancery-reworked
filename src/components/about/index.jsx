@@ -6,6 +6,10 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+                <h3>Idle Awakening v0.1.4e</h3>
+                <div className={'features'}>
+                    <p>Fixed issues with Steam Overlay and Cloud Save</p>
+                </div>
                 <h3>Idle Awakening v0.1.4d</h3>
                 <div className={'features'}>
                     <p>Improved tutorial: added offline time explanation, colored buttons</p>
