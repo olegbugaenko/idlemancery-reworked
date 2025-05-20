@@ -1,4 +1,6 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
+const { initSteamIfAvailable } = require('../src/general/utils/steam-init');
+
 const path = require('path');
 
 let mainWindow;
@@ -21,6 +23,7 @@ ipcMain.on('toggle-fullscreen', (event) => {
 });
 
 app.on('ready', () => {
+    initSteamIfAvailable();
     mainWindow = new BrowserWindow({
         width: 1920,
         height: 1080,
@@ -29,6 +32,7 @@ app.on('ready', () => {
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'), // За потреби
             contextIsolation: true,
+            sandbox: false,
         },
     });
 

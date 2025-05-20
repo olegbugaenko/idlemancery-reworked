@@ -20,7 +20,13 @@
     },
     "files": [
       "dist/**/*",
-      "electron/**/*"
+      "electron/**/*",
+      "src/general/utils/steam-init.js",
+      "native/greenworks/**/*"
+    ],
+    "asarUnpack": [
+      "**/*.node",
+      "native/greenworks/lib/*.dll"
     ],
     "extraMetadata": {
       "main": "electron/main.js"

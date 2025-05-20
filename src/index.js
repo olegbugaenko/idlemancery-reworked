@@ -28,6 +28,7 @@ import AppProvided from "./App";
 // *** HACK-END *** //
 
 window.IS_DEMO = IS_DEMO;
+window.IS_STEAM_BUILD = IS_STEAM_BUILD;
 
 const container = document.getElementById('root');
 const root = ReactDOM.createRoot(container);

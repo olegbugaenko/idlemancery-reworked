@@ -57,6 +57,7 @@ module.exports = {
         }),
         new webpack.DefinePlugin({
             'IS_DEMO': JSON.stringify(process.env.IS_DEMO || '0'),
+            'IS_STEAM_BUILD': JSON.stringify(process.env.IS_STEAM_BUILD || '0'),
         }),
     ],
     devServer: {
