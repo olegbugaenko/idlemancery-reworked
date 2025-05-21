@@ -182,7 +182,7 @@ export const registerFurnitureStage1 = () => {
             get_rawCap: () => ({
                 resources: {
                     'coins': {
-                        A: 75*gameEffects.getEffectValue('urn_storage_bonus'),
+                        A: 80*gameEffects.getEffectValue('urn_storage_bonus'),
                         B: 0,
                         type: 0,
                     }
