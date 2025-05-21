@@ -22,12 +22,9 @@ function initSteamIfAvailable() {
                 greenworks.on('steam-shutdown', function() { log('shutdown'); });
                 return true;
             } else {
-                fs.appendFileSync('log.txt', `Steam API failed to initialize\n`);
                 console.warn('Steam API failed to initialize');
             }
         } catch (e) {
-            fs.appendFileSync('log.txt', `Steam API not available: ${e.toString()}\n`);
-            fs.appendFileSync('log.txt', `${e.stack}\n`);
             console.warn('Steam API not available:', e);
         }
     } else {

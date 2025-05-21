@@ -1,10 +1,8 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const fs = require("fs");
-fs.appendFileSync('log.txt', `Starting\n`);
 const { initSteamIfAvailable } = require('../src/general/utils/steam-init');
 const { saveToCloud, loadFromCloud } = require('../src/general/utils/steam-cloud-save');
 initSteamIfAvailable();
-fs.appendFileSync('log.txt', `Electron Required\n`);
 
 const path = require('path');
 

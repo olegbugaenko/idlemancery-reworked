@@ -2231,7 +2231,7 @@ export const registerSkillsStage1 = () => {
         unlockBySkills: [{ id: "skill_arcane_mind", level: 4 },{id: "skill_mental_mastery", level: 4},{id: "skill_mental_efficiency", level: 4},{id: "skill_general_training_1", level: 1},{id: "skill_general_training_3", level: 1}],
         unlockCondition: () => {
             // console.log('ACTLVL: ', )
-            return gameEntity.getLevel('shop_item_spellbook') >= 1
+            return gameEntity.getLevel('shop_item_spellbook') >= 1 && gameEntity.getLevel('shop_item_spellcraft') >= 1
         },
         attributes: {
             isCollectable: false,
