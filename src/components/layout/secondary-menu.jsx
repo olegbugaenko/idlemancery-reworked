@@ -2,6 +2,16 @@ import React, { useContext } from "react";
 import { useAppContext } from "../../context/ui-context";
 import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
 
+const openLink = (url) => {
+    const isElectron = navigator.userAgent.toLowerCase().indexOf('electron') > -1;
+    console.log('isElectron: ', isElectron, window.require);
+    if (window.electron?.openExternal) {
+        window.electron.openExternal(url);
+    } else {
+        window.open(url, '_blank'); // fallback у браузері
+    }
+};
+
 export const SecondaryMenu = () => {
     const { openedTab, setOpenedTab } = useAppContext();
     return (
@@ -23,8 +33,22 @@ export const SecondaryMenu = () => {
                         </div>
                     </TippyWrapper>
                 </li>
+                <li>
+                    <TippyWrapper content={<div className={'hint-popup'}>Wishlisting helps the game get more visibility on Steam and supports further development. Thank you!</div> }>
+                        <a onClick={() => openLink('https://store.steampowered.com/app/3678950/Idle_Awakening_Mages_Path')}>
+                            Wishlist on Steam
+                        </a>
+                    </TippyWrapper>
+                </li>
+                <li>
+                    <TippyWrapper content={<div className={'hint-popup'}>Your feedback is invaluable! Found bug? Please, let us know!</div> }>
+                        <a onClick={() => openLink('https://steamcommunity.com/app/3678950/discussions/1')}>
+                            Feedback
+                        </a>
+                    </TippyWrapper>
+                </li>
                 <li className={openedTab === 'about' ? 'active' : ''} onClick={() => setOpenedTab('about')}>
-                    <span>v0.1.4e</span>
+                    <span>v0.1.4f</span>
                 </li>
             </ul>
         </div>

@@ -2221,7 +2221,7 @@ export const registerSkillsStage1 = () => {
     gameEntity.registerGameEntity('skill_mysticism', {
         tags: ["skill", "upgrade", "purchaseable"],
         name: 'Mysticism',
-        description: 'Improves you feeling of magic, increasing spells XP rate and mana income',
+        description: 'Improves you feeling of magic, increasing spells XP rate and spiritual learning',
         level: 0,
         maxLevel: 10,
         uiPosition: {
@@ -2244,14 +2244,12 @@ export const registerSkillsStage1 = () => {
                         B: 1,
                         type: 0,
                     },
-                },
-                resources: {
-                    'mana': {
-                        A: 0.025,
+                    'spiritual_learning_rate': {
+                        A: 0.1,
                         B: 1,
                         type: 0,
-                    }
-                }
+                    },
+                },
             },
             consumption: {
                 resources: {
