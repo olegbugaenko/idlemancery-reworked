@@ -8,11 +8,11 @@ export const SearchField = ({ value, onSetValue, scopes, placeholder }) => {
     const popupRef = useRef(null);
 
     useEffect(() => {
-        if(!selectedScopes && value.selectedScopes) {
+        if(!selectedScopes && value.selectedScopes && Array.isArray(value.selectedScopes)) {
             setSelectedScopes(value.selectedScopes)
         }
         setSearch(value?.search);
-    }, [value?.search, JSON.stringify(value?.selectedScopes ?? [])]);
+    }, [value?.search, value?.selectedScopes ? JSON.stringify(value?.selectedScopes ?? []) : '']);
 
     useEffect(() => {
         // skip set data c

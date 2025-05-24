@@ -181,6 +181,10 @@ export class ActionsModule extends GameModule {
         })
 
         this.eventHandler.registerHandler('set-actions-search', ({searchData}) => {
+            if(!searchData.selectedScopes) {
+                console.error('Cant set empty or null scopes');
+                return;
+            }
             this.searchData = searchData;
             this.sendActionsData(this.selectedFilterId, {
                 searchData: this.searchData,
@@ -634,6 +638,9 @@ export class ActionsModule extends GameModule {
             search: '',
             selectedScopes: ['name','tags']
         };
+        if(!this.searchData.selectedScopes) {
+            this.searchData.selectedScopes = ['name','tags'];
+        }
         if(saveObject?.aspects) {
             for(const key in saveObject.aspects) {
                 gameEntity.setEntityLevel(key, saveObject.aspects[key], true);

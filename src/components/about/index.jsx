@@ -6,6 +6,13 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+                <h3>Idle Awakening v0.1.4g</h3>
+                <div className={'features'}>
+                    <p>Fixed a bug where stories were sorted by time only, ignoring the date</p>
+                    <p>Fixed a crash when loading a save with empty action search scopes</p>
+                    <p>Improved auto-effort calculation precision when balancing multiple resources</p>
+                    <p>Minor performance improvements</p>
+                </div>
                 <h3>Idle Awakening v0.1.4f</h3>
                 <div className={'features'}>
                     <p>Fixed links to feedback and wishlist</p>

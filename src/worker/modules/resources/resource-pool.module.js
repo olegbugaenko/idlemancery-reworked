@@ -262,9 +262,6 @@ export class ResourcePoolModule extends GameModule {
                     newBalance = prev.balance;
                     break;
             }
-            if(effect.id === 'coins') {
-                console.log('Monn ', skip, skipById, effect, newStorage, prev);
-            }
 
 
             this.monitoredData[effect.id] = {

@@ -605,9 +605,11 @@ export const Actions = ({}) => {
                                 <label>
                                     <SearchField
                                         placeholder={'Search'}
-                                        value={actionsData.searchData || {
-                                            search: '',
-                                            selectedScopes: ['name','tags']
+                                        value={{
+                                            ...(actionsData.searchData || {
+                                                search: '',
+                                                selectedScopes: ['name', 'tags']
+                                            })
                                         }}
                                         onSetValue={val => setSearch(val)}
                                         scopes={ACTIONS_SEARCH_SCOPES}

@@ -79,7 +79,7 @@ export class AchievementsModule extends GameModule {
     }
 
     sendCompleted() {
-        const list = this.listCompleted().sort((a, b) => a.completedAt > b.completedAt ? -1 : 1);
+        const list = this.listCompleted().sort((a, b) => new Date(a.completedAt).getTime() > new Date(b.completedAt).getTime() ? -1 : 1);
         this.eventHandler.sendData('completed-achievements', { list })
     }
 

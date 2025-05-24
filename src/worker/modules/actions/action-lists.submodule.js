@@ -282,7 +282,7 @@ export class ActionListsSubmodule extends GameModule {
 
                     const normNet = (c ? ((c - avgC) / maxC) : 0) - (s ? ((s - avgS) / maxS) : 0);
                     gradient[id] += normNet * d;
-                    /*if(id === 'action_woodcutter') {
+                    /*if(id === 'action_clean_stable') {
                         console.log(`|-| ${gradient[id]}: ${resId} delta = ${normNet*d}: (${c} - ${avgC})/${maxC} - (${s} - ${avgS})/${maxS}`);
                     }*/
                 }
@@ -291,7 +291,7 @@ export class ActionListsSubmodule extends GameModule {
             const totalDynamic = Object.values(T).reduce((a, b) => a + b, 0);
             const totalTime = fixedTotal + totalDynamic;
 
-            //console.log(`SubIter${iter}: ${Math.abs(totalError - prevDeficits)} < ${tolerance}`, deficits, initialResourceBalance, gradient, T);
+            // console.log(`SubIter${iter}: ${Math.abs(totalError - prevDeficits)} < ${tolerance}`, deficits, initialResourceBalance, gradient, T);
 
             for (const id of dynamicIds) {
                 const t = T[id];
