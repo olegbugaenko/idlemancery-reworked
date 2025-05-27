@@ -5,6 +5,7 @@ const { saveToCloud, loadFromCloud } = require('../src/general/utils/steam-cloud
 initSteamIfAvailable();
 
 const path = require('path');
+const {saveWindowState, loadWindowState} = require("../src/general/utils/window-settings");
 
 let mainWindow;
 
@@ -38,11 +39,13 @@ app.commandLine.appendSwitch('--in-process-gpu', '--disable-direct-composition')
 
 app.on('ready', () => {
 
+    const windowState = loadWindowState(app)
+
     mainWindow = new BrowserWindow({
-        width: 1920,
-        height: 1080,
+        width: windowState?.width ?? 1920,
+        height: windowState?.height ?? 1080,
         // frame: false,
-        fullscreen: true,
+        fullscreen: windowState?.fullscreen ?? true,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'), // За потреби
             contextIsolation: true,
@@ -61,6 +64,10 @@ app.on('ready', () => {
             mainWindow.webContents.invalidate();
         }
     }, 500);
+
+    mainWindow.on('close', () => {
+        saveWindowState(app, mainWindow);
+    })
 
     mainWindow.on('closed', () => {
         if (invalidateTimer) {

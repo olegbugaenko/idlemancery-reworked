@@ -594,7 +594,7 @@ export const registerActionsStage1 = () => {
         allowedImpacts: ['effects'],
         description: 'Perform very primitive magical tricks to entertain people and collect some coins from them',
         level: 1,
-        discountEffects: ['physical_actions_discount'],
+        discountEffects: ['magical_actions_discount'],
         jobType: 'magical',
         getLearnRate: () => {
             return 1;

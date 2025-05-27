@@ -269,8 +269,8 @@ export class ResourcePoolModule extends GameModule {
                 name: effect.name,
                 id: effect.id,
                 amount: effect.value,
-                newBalance,
-                newStorage,
+                newBalance: this.monitoredData[effect.id]?.newBalance ?? newBalance,
+                newStorage: this.monitoredData[effect.id]?.newStorage ?? newStorage,
                 bShow: (!!skip || !!skipById) && !effect.isOneTime,
             };
         })
