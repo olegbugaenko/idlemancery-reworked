@@ -228,6 +228,7 @@ export class ResourcePoolModule extends GameModule {
         }
         if(!data?.length) return;
         data.forEach(effect => {
+            // console.log('effect: ', effect);
             let direction = 1;
             if(effect.scope === 'consumption') {
                 direction = -1;
@@ -269,8 +270,8 @@ export class ResourcePoolModule extends GameModule {
                 name: effect.name,
                 id: effect.id,
                 amount: effect.value,
-                newBalance,
-                newStorage,
+                newBalance: this.monitoredData[effect.id]?.newBalance ?? newBalance,
+                newStorage: this.monitoredData[effect.id]?.newStorage ?? newStorage,
                 bShow: (!!skip || !!skipById) && !effect.isOneTime,
             };
         })

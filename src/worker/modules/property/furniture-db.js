@@ -703,7 +703,7 @@ export const registerFurnitureStage1 = () => {
         name: 'Contemplation Sofa',
         description: 'A wide and comfortable sofa designed for prolonged periods of deep thought and reflection. Its soft cushions and ergonomic design allow you to stay focused and relaxed during extended mental training sessions.',
         level: 0,
-        maxLevel: 4,
+        maxLevel: 10,
         minDemoVersion: 20,
         unlockedBy: [{
             type: 'effect',
@@ -717,7 +717,7 @@ export const registerFurnitureStage1 = () => {
             multiplier: {
                 effects: {
                     'mental_training_learning_rate': {
-                        A: 0.25,
+                        A: 0.2,
                         B: 1,
                         type: 0,
                     }
@@ -735,7 +735,7 @@ export const registerFurnitureStage1 = () => {
         },
         get_cost: () => ({
             'coins': {
-                A: 2,
+                A: 1.5,
                 B: 20000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 1
             },
@@ -949,7 +949,7 @@ export const registerFurnitureStage1 = () => {
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_strength',
-            level: 225,
+            level: 200,
         }],
         unlockCondition: () => {
             return true;
@@ -976,7 +976,7 @@ export const registerFurnitureStage1 = () => {
         },
         get_cost: () => ({
             'coins': {
-                A: 2,
+                A: 1.5,
                 B: 100000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 1
             },

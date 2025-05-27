@@ -185,7 +185,8 @@ export class CraftingModule extends GameModule {
         const currentRecipes = Object.entries(this.craftingSlots).filter(([key, one]) => gameEntity.getEntity(key).tags.includes(tagToCat[category]));
         const currentEffortsTotal = currentRecipes.reduce((acc, [key, recipe]) => acc += ((key !== skipId) ? recipe.effort : 0), 0);
         const mult = currentEffortsTotal ? remainingToRedistribute/currentEffortsTotal : 1;
-        if(Math.abs(mult - 1) > SMALL_NUMBER ) {
+        console.log('EffSet: ', remainingToRedistribute, skippedEffort, currentEffortsTotal, mult);
+        if(Math.abs(mult - 1) > SMALL_NUMBER && mult < 1) {
             if(this.craftingSlots) {
                 for(const id in this.craftingSlots) {
                     const isIgnore = category && !gameEntity.getEntity(id).tags.includes(tagToCat[category]);
@@ -272,7 +273,7 @@ export class CraftingModule extends GameModule {
             resourceAmount: gameResources.getResource(recipe.resourceId)?.amount,
             resourceBalance: gameResources.getResource(recipe.resourceId)?.balance,
             breakDown: gameResources.getResource(recipe.resourceId)?.breakDown,
-            isRunning: gameEntity.entityExists(`activeCrafting_${recipe.id}`),
+            isRunning: gameEntity.entityExists(`activeCrafting_${recipe.id}`) && this.craftingSlots[recipe.id]?.effort,
             isLowerEfficiency: gameEntity.entityExists(`activeCrafting_${recipe.id}`) && gameEntity.getEntity(`activeCrafting_${recipe.id}`).modifier?.efficiency < 1 - SMALL_NUMBER
         }));
 

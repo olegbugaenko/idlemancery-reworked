@@ -466,7 +466,7 @@ export const Inventory = ({}) => {
 
 }
 
-export const InventoryCard = React.memo(({ isChanged, eta, usages, usagesFor, allowMultiConsume, isConsumable, isRare, isSelected, id, name, amount, balance, breakDown, isConsumed, cooldownProg, cooldown, onFlash, onPurchase, onShowDetails, onEditConfig, isMobile}) => {
+export const InventoryCard = React.memo(({ isChanged, eta, usages, usagesFor, allowMultiConsume, isConsumable, isRare, isRareIngredient, isSelected, id, name, amount, balance, breakDown, isConsumed, cooldownProg, cooldown, onFlash, onPurchase, onShowDetails, onEditConfig, isMobile}) => {
     const elementRef = useRef(null);
 
     useFlashOnLevelUp(isConsumed, onFlash, elementRef);
@@ -492,7 +492,7 @@ export const InventoryCard = React.memo(({ isChanged, eta, usages, usagesFor, al
     return (<div
         id={`inventory-item-card-${id}`}
         ref={elementRef}
-        className={`icon-card item bigger flashable ${isSelected ? 'selected' : ''} ${isRare ? 'bluish' : ''}`}
+        className={`icon-card item bigger flashable ${isSelected ? 'selected' : ''} ${isRare ? 'bluish' : ''} ${isRareIngredient ? 'ingredient' : ''}`}
         onMouseOverCapture={(e) => {
             if (!isMobile) {
                 onShowDetails(id);

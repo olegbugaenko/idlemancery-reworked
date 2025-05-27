@@ -32,6 +32,11 @@ export class InventoryModule extends GameModule {
             tags: ['material'],
             isDefault: false,
         },{
+            id: 'ingredients',
+            name: 'Ingredients',
+            tags: ['ingredient'],
+            isDefault: false,
+        },{
             id: 'elemental',
             name: 'Elemental',
             tags: ['elemental'],
@@ -437,6 +442,7 @@ export class InventoryModule extends GameModule {
             available: presentItems.map(resource => ({
                 ...resource,
                 isRare: resource.attributes?.isRare,
+                isRareIngredient: resource.attributes?.isRare && resource.tags.includes('ingredient'),
                 isConsumable: resource.tags.includes('consumable'),
                 isConsumed: this.inventoryItems[resource.id]?.isConsumed,
                 cooldown: this.inventoryItems[resource.id]?.cooldown ?? 0,

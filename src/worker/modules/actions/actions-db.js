@@ -322,6 +322,52 @@ export const registerActionsStage1 = () => {
         }
     })
 
+    registerGameAction('action_street_speaker', {
+        tags: ["action", "job", "politician", "social"],
+        name: 'Town Crier',
+        isAbstract: false,
+        category: ACTION_CATS.COINS,
+        allowedImpacts: ['effects'],
+        description: 'Proclaim official announcements, public notices, and the latest news on behalf of the city. Loud voice preferred, political opinions optional',
+        level: 1,
+        jobType: 'social',
+        getLearnRate: () => {
+            return 1;
+        },
+        discountEffects: ['social_actions_discount'],
+        learningEffects: ['job_learning_rate'],
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'coins': {
+                        A: 0.7*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_social'),
+                        B: 6.3*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_social'),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0,
+                        B: 7.5,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['begging_efficiency', 'coins_earned_bonus', 'job_efficiency_social']
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_charisma',
+            level: 50,
+        }],
+        attributes: {
+            baseXPCost: 20,
+            primaryAttribute: 'attribute_charisma'
+        }
+    })
+
     registerGameAction('action_clean_stable', {
         tags: ["action", "job", "physical"],
         name: 'Clean Stable',
@@ -403,12 +449,12 @@ export const registerActionsStage1 = () => {
                 resources: {
                     'energy': {
                         A: 0.0,
-                        B: 4,
+                        B: 5,
                         type: 0,
                     },
                     'health': {
                         A: 0.0,
-                        B: 2,
+                        B: 2.5,
                         type: 0,
                     }
                 }
@@ -2008,7 +2054,7 @@ export const registerActionsStage1 = () => {
     })
 
 
-    registerGameAction('action_dig_vaults', {
+    /*registerGameAction('action_dig_vaults', {
         tags: ["action", "activity", "routine"],
         name: 'Dig Vaults',
         category: ACTION_CATS.ROUTINE,
@@ -2054,7 +2100,7 @@ export const registerActionsStage1 = () => {
             primaryAttribute: 'attribute_patience',
             isRankAvailable: true,
         }
-    })
+    })*/
 
 
     registerGameAction('action_learn_anatomy', {
@@ -2411,7 +2457,7 @@ export const registerActionsStage1 = () => {
         unlockedBy: [{
             type: 'entity',
             id: 'action_endurance_training',
-            level: 175,
+            level: 250,
         }],
         attributes: {
             baseXPCost: 500,
@@ -2459,7 +2505,7 @@ export const registerActionsStage1 = () => {
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_strength',
-            level: 200,
+            level: 400,
         }],
         attributes: {
             baseXPCost: 500,
@@ -3051,7 +3097,7 @@ export const registerActionsStage1 = () => {
                 resources: {
                     'energy': {
                         A: 0.0,
-                        B: 5,
+                        B: 15,
                         type: 0,
                     },
                     'knowledge': {

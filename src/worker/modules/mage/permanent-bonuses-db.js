@@ -2,9 +2,9 @@ import {gameEntity, gameCore, gameEffects, gameResources} from "game-framework"
 
 export const registerPermanentBonuses = () => {
 
-    gameEntity.registerGameEntity('rare_titanleaf_effect', {
+    gameEntity.registerGameEntity('rare_titans_potion_effect', {
         tags: ["bonus", "permanent", "herbal"],
-        name: 'Titan Leaf',
+        name: 'Titans Potion',
         level: 0,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_herbs_handbook_2') > 0;
@@ -15,11 +15,11 @@ export const registerPermanentBonuses = () => {
         resourceModifier: {
             multiplier: {
                 effects: {
-                    'attribute_strength': {
-                        A: 0.004,
-                        B: 50,
-                        C: 1,
-                        type: 4,
+                    'physical_actions_discount': {
+                        A: 100,
+                        B: 1,
+                        C: 0.03,
+                        type: 5,
                     }
                 }
             }
@@ -27,9 +27,9 @@ export const registerPermanentBonuses = () => {
     })
 
 
-    gameEntity.registerGameEntity('rare_heartroot_effect', {
+    gameEntity.registerGameEntity('rare_perseverance_potion_effect', {
         tags: ["bonus", "permanent", "herbal"],
-        name: 'Heartroot',
+        name: 'Perseverance Potion',
         level: 0,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_herbs_handbook_2') > 0;
@@ -40,37 +40,11 @@ export const registerPermanentBonuses = () => {
         resourceModifier: {
             multiplier: {
                 effects: {
-                    'attribute_vitality': {
-                        A: 0.004,
-                        B: 50,
-                        C: 1,
-                        type: 4,
-                    }
-                }
-            }
-        }
-    })
-
-
-
-    gameEntity.registerGameEntity('rare_energloom_effect', {
-        tags: ["bonus", "permanent", "herbal"],
-        name: 'Energloom',
-        level: 0,
-        unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_herbs_handbook_2') > 0;
-        },
-        attributes: {
-            isCollectable: false,
-        },
-        resourceModifier: {
-            multiplier: {
-                effects: {
-                    'attribute_stamina': {
-                        A: 0.004,
-                        B: 50,
-                        C: 1,
-                        type: 4,
+                    'routine_actions_discount': {
+                        A: 100,
+                        B: 1,
+                        C: 0.03,
+                        type: 5,
                     }
                 }
             }
@@ -79,9 +53,9 @@ export const registerPermanentBonuses = () => {
 
 
 
-    gameEntity.registerGameEntity('rare_lifebloom_effect', {
+    gameEntity.registerGameEntity('rare_mental_potion_effect', {
         tags: ["bonus", "permanent", "herbal"],
-        name: 'Lifebloom',
+        name: 'Mental Potion',
         level: 0,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_herbs_handbook_2') > 0;
@@ -92,11 +66,11 @@ export const registerPermanentBonuses = () => {
         resourceModifier: {
             multiplier: {
                 effects: {
-                    'attribute_recovery': {
-                        A: 0.004,
-                        B: 50,
-                        C: 1,
-                        type: 4,
+                    'mental_actions_discount': {
+                        A: 100,
+                        B: 1,
+                        C: 0.03,
+                        type: 5,
                     }
                 }
             }
@@ -105,9 +79,9 @@ export const registerPermanentBonuses = () => {
 
 
 
-    gameEntity.registerGameEntity('rare_stillfern_effect', {
+    gameEntity.registerGameEntity('rare_spirit_potion_effect', {
         tags: ["bonus", "permanent", "herbal"],
-        name: 'Stillfern',
+        name: 'Spirit Potion',
         level: 0,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_herbs_handbook_2') > 0;
@@ -118,22 +92,20 @@ export const registerPermanentBonuses = () => {
         resourceModifier: {
             multiplier: {
                 effects: {
-                    'attribute_patience': {
-                        A: 0.004,
-                        B: 50,
-                        C: 1,
-                        type: 4,
+                    'magical_actions_discount': {
+                        A: 100,
+                        B: 1,
+                        C: 0.03,
+                        type: 5,
                     }
                 }
             }
         }
     })
 
-
-
-    gameEntity.registerGameEntity('rare_mindroot_effect', {
+    gameEntity.registerGameEntity('rare_charisma_potion_effect', {
         tags: ["bonus", "permanent", "herbal"],
-        name: 'Mindroot',
+        name: 'Charisma Potion',
         level: 0,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_herbs_handbook_2') > 0;
@@ -144,37 +116,11 @@ export const registerPermanentBonuses = () => {
         resourceModifier: {
             multiplier: {
                 effects: {
-                    'attribute_memory': {
-                        A: 0.004,
-                        B: 50,
-                        C: 1,
-                        type: 4,
-                    }
-                }
-            }
-        }
-    })
-
-
-
-    gameEntity.registerGameEntity('rare_azureblossom_effect', {
-        tags: ["bonus", "permanent", "herbal"],
-        name: 'Azureblossom',
-        level: 0,
-        unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_herbs_handbook_2') > 0;
-        },
-        attributes: {
-            isCollectable: false,
-        },
-        resourceModifier: {
-            multiplier: {
-                effects: {
-                    'attribute_magic_ability': {
-                        A: 0.004,
-                        B: 50,
-                        C: 1,
-                        type: 4,
+                    'social_actions_discount': {
+                        A: 100,
+                        B: 1,
+                        C: 0.03,
+                        type: 5,
                     }
                 }
             }

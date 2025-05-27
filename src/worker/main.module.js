@@ -79,6 +79,7 @@ export class MainModule extends GameModule {
                 'shop': gameCore.getModule('shop').isUnlocked,
                 'inventory': gameEntity.getLevel('shop_item_backpack') > 0,
                 'property': gameEntity.getLevel('shop_item_tent') > 0,
+                'structures': gameEntity.getLevel('shop_item_constructing') > 0,
                 'magic': gameEntity.getLevel('shop_item_spellbook') > 0,
                 'spellbook': gameEntity.getLevel('shop_item_spellbook') > 0,
                 'crafting': gameEntity.getLevel('shop_item_crafting_courses') > 0,

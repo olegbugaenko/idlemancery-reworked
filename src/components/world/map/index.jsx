@@ -510,7 +510,7 @@ export const ItemDetails = ({itemId, setItemDetails}) => {
                 {item.drops ? (<div className={'block map-exploration-loot'}>
                     <p>Drops:</p>
                     {item.unlockedUnrevealedAmount > 0 ? (<p className={'hint'}>Discoverable as you explore</p> ) : null}
-                    {item.drops.map(drop => (<p className={`drop-row ${drop.rarityTier}`}>
+                    {item.drops.map(drop => (<p className={`drop-row ${drop.rarityTier} ${drop.ingredient ? 'ingredient' : ''}`}>
                         <span className={'name'}>{drop.resource.name}</span>
                         <span className={'probability'}>{formatValue(drop.probability*100)}%</span>
                         <span className={'amounts'}>{formatInt(drop.amountMin)} - {formatInt(drop.amountMax)}</span>

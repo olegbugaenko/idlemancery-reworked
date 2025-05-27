@@ -806,6 +806,10 @@ p.small-hint, span.small-hint {
     border: 1px solid var(--highlight);
 }
 
+.icon-card.bluish.ingredient {
+    border: 1px solid #adaafa;
+}
+
 .icon-card.active {
     box-shadow: 0 0 16px var(--highlight);
 }
@@ -2373,6 +2377,10 @@ span.highlighted-span.yellow {
 
 .block .drop-row.rare span {
     color: #5d9afa
+}
+
+.block .drop-row.rare.ingredient span {
+    color: #adaafa
 }
 
 .block .drop-row span {

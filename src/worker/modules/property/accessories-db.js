@@ -49,9 +49,9 @@ export const registerAccessoriesStage1 = () => {
             capMult: {
                 resources: {
                     'coins': {
-                        A: 0.1,
+                        A: 0.075,
                         B: 1,
-                        C: 1.01,
+                        C: 1.004,
                         type: 3,
                     }
                 }
@@ -59,7 +59,7 @@ export const registerAccessoriesStage1 = () => {
         },
         get_cost: () => ({
             'inventory_refined_wood': {
-                A: 1.1,
+                A: 1.15,
                 B: 1,
                 type: 1
             }
@@ -79,9 +79,9 @@ export const registerAccessoriesStage1 = () => {
             multiplier: {
                 resources: {
                     'health': {
-                        A: 0.02,
+                        A: 0.05,
                         B: 1,
-                        C: 1.01,
+                        C: 1.001,
                         type: 3,
                     }
                 }
@@ -89,8 +89,8 @@ export const registerAccessoriesStage1 = () => {
         },
         get_cost: () => ({
             'inventory_refined_wood': {
-                A: 1.1,
-                B: 2,
+                A: 1.15,
+                B: 1,
                 type: 1
             },
             'knowledge': {
@@ -114,9 +114,9 @@ export const registerAccessoriesStage1 = () => {
             capMult: {
                 resources: {
                     'knowledge': {
-                        A: 0.1,
+                        A: 0.075,
                         B: 1,
-                        C: 1.01,
+                        C: 1.004,
                         type: 3,
                     }
                 }
@@ -124,7 +124,7 @@ export const registerAccessoriesStage1 = () => {
         },
         get_cost: () => ({
             'inventory_refined_wood': {
-                A: 1.1,
+                A: 1.15,
                 B: 1,
                 type: 1
             }
@@ -144,9 +144,9 @@ export const registerAccessoriesStage1 = () => {
             multiplier: {
                 resources: {
                     'energy': {
-                        A: 0.02,
+                        A: 0.05,
                         B: 1,
-                        C: 1.01,
+                        C: 1.001,
                         type: 3,
                     }
                 }
@@ -154,8 +154,8 @@ export const registerAccessoriesStage1 = () => {
         },
         get_cost: () => ({
             'inventory_herbal_fibers': {
-                A: 1.1,
-                B: 2,
+                A: 1.15,
+                B: 1,
                 type: 1
             },
             'mana': {

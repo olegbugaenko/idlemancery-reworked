@@ -1007,9 +1007,9 @@ export const registerSkillsStage1 = () => {
         },
         resourceModifier: {
             multiplier: {
-                resources: {
-                    'crafting_ability': {
-                        A: 0.1,
+                effects: {
+                    'crafting_effort': {
+                        A: 0.05,
                         B: 1,
                         type: 0,
                     }
@@ -1055,7 +1055,7 @@ export const registerSkillsStage1 = () => {
             multiplier: {
                 effects: {
                     'physical_actions_discount': {
-                        A: 0.2,
+                        A: 0.1,
                         B: 1,
                         type: 0,
                     }

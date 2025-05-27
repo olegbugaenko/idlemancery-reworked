@@ -18,7 +18,7 @@ export class MapModule extends GameModule {
             level: 0,
         }
         this.mapTier = 0;
-        this.relevantMapVersion = 17;
+        this.relevantMapVersion = 18;
         this.currentMapVersion = null;
         this.autoInvestigateTimer = 10;
         this.isAutoinvestigationEnabled = false;
@@ -82,6 +82,7 @@ export class MapModule extends GameModule {
             if(flag) {
                 this.stopRunningTiles(); // only one tile in single tile mode
             }
+            this.isAutoinvestigationEnabled = false;
             this.setTileRunning(i, j, flag)
         })
     }
@@ -373,6 +374,7 @@ export class MapModule extends GameModule {
                         return {
                             ...d,
                             rarityTier: isRare ? 'rare' : 'common',
+                            ingredient: rs.tags.includes('ingredient'),
                             probability: prob,
                             amountMin: Math.max(1, 3*d.amountMult*effEff*amtHerbsMult*(rs.lootAmountMult || 1)),
                             amountMax: Math.max(1, 6*d.amountMult*effEff*amtHerbsMult*(rs.lootAmountMult || 1)),

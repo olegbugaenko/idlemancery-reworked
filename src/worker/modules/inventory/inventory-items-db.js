@@ -788,10 +788,28 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_crafting_courses') > 0
         },
-        sellPrice: 5600,
+        sellPrice: 1400,
         get_cost: (amount = 1) => ({
             coins: amount*50000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
         }),
+    })
+
+    registerInventoryItem('inventory_wooden_beam', {
+        name: 'Wooden Beam',
+        hasCap: false,
+        tags: ['inventory', 'material', 'craftable'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        attributes: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_constructing') > 0
+        },
+        sellPrice: 5600,
     })
 
 
@@ -1428,6 +1446,156 @@ export const registerInventoryItems = () => {
         sellPrice: 15000,
     })
 
+    // Rare Flasks
+
+    registerInventoryItem('inventory_titans_potion', {
+        name: 'Titans Potion',
+        hasCap: false,
+        tags: ['inventory', 'consumable', 'potion', 'rare'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+            updateLevelBy('rare_titans_potion_effect', amount)
+        },
+        getUsageCooldown: () => {
+            return 0.1;
+        },
+        attributes: {
+            isRare: true,
+            entityEffect: 'rare_titans_potion_effect',
+            allowMultiConsume: true,
+        },
+        resourceModifier: {
+
+        },
+        usageGain: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0
+        },
+        sellPrice: 12250,
+    })
+
+
+    registerInventoryItem('inventory_perseverance_potion', {
+        name: 'Perseverance Potion',
+        hasCap: false,
+        tags: ['inventory', 'consumable', 'potion', 'rare'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+            updateLevelBy('rare_perseverance_potion_effect', amount)
+        },
+        getUsageCooldown: () => {
+            return 0.1;
+        },
+        attributes: {
+            isRare: true,
+            entityEffect: 'rare_perseverance_potion_effect',
+            allowMultiConsume: true,
+        },
+        resourceModifier: {
+
+        },
+        usageGain: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0
+        },
+        sellPrice: 12250,
+    })
+
+    registerInventoryItem('inventory_mental_potion', {
+        name: 'Mental Potion',
+        hasCap: false,
+        tags: ['inventory', 'consumable', 'potion', 'rare'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+            updateLevelBy('rare_mental_potion_effect', amount)
+        },
+        getUsageCooldown: () => {
+            return 0.1;
+        },
+        attributes: {
+            isRare: true,
+            entityEffect: 'rare_mental_potion_effect',
+            allowMultiConsume: true,
+        },
+        resourceModifier: {
+
+        },
+        usageGain: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0
+        },
+        sellPrice: 12250,
+    })
+
+
+    registerInventoryItem('inventory_spirit_potion', {
+        name: 'Spirit Potion',
+        hasCap: false,
+        tags: ['inventory', 'consumable', 'potion', 'rare'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+            updateLevelBy('rare_spirit_potion_effect', amount)
+        },
+        getUsageCooldown: () => {
+            return 0.1;
+        },
+        attributes: {
+            isRare: true,
+            entityEffect: 'rare_spirit_potion_effect',
+            allowMultiConsume: true,
+        },
+        resourceModifier: {
+
+        },
+        usageGain: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0
+        },
+        sellPrice: 12250,
+    })
+
+
+    registerInventoryItem('inventory_charisma_potion', {
+        name: 'Charisma Potion',
+        hasCap: false,
+        tags: ['inventory', 'consumable', 'potion', 'rare'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+            updateLevelBy('rare_charisma_potion_effect', amount)
+        },
+        getUsageCooldown: () => {
+            return 0.1;
+        },
+        attributes: {
+            isRare: true,
+            entityEffect: 'rare_charisma_potion_effect',
+            allowMultiConsume: true,
+        },
+        resourceModifier: {
+
+        },
+        usageGain: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0
+        },
+        sellPrice: 12250,
+    })
+
     // Rare
 
     registerInventoryItem('inventory_rare_ironvine', {
@@ -1559,12 +1727,12 @@ export const registerInventoryItems = () => {
     registerInventoryItem('inventory_rare_titanleaf', {
         name: 'Titanleaf',
         hasCap: false,
-        tags: ['inventory', 'consumable', 'rare', 'gatherable', 'herb'],
+        tags: ['inventory', 'ingredient', 'rare', 'gatherable', 'herb'],
         defaultCap: 0,
         isAbstract: true,
-        onUse: (amount) => {
+        /*onUse: (amount) => {
             updateLevelBy('rare_titanleaf_effect', amount)
-        },
+        },*/
         getUsageCooldown: () => {
             return 0.1;
         },
@@ -1572,7 +1740,7 @@ export const registerInventoryItems = () => {
             baseChanceMult: 1,
             entityEffect: 'rare_titanleaf_effect',
             isRare: true,
-            allowMultiConsume: true,
+            allowMultiConsume: false,
         },
         usageGain: {
 
@@ -1613,7 +1781,7 @@ export const registerInventoryItems = () => {
 
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0 && false
         },
         sellPrice: 15000,
         rarity: 5,
@@ -1645,7 +1813,7 @@ export const registerInventoryItems = () => {
 
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0 && false
         },
         sellPrice: 15000,
         rarity: 5,
@@ -1677,7 +1845,7 @@ export const registerInventoryItems = () => {
 
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0 && false
         },
         sellPrice: 15000,
         rarity: 5,
@@ -1687,20 +1855,49 @@ export const registerInventoryItems = () => {
     registerInventoryItem('inventory_rare_stillfern', {
         name: 'Stillfern',
         hasCap: false,
-        tags: ['inventory', 'consumable', 'rare', 'gatherable', 'herb'],
+        tags: ['inventory', 'ingredient', 'rare', 'gatherable', 'herb'],
         defaultCap: 0,
         isAbstract: true,
-        onUse: (amount) => {
+        /*onUse: (amount) => {
             updateLevelBy('rare_stillfern_effect', amount)
-        },
+        },*/
         getUsageCooldown: () => {
             return 0.1;
         },
         attributes: {
             baseChanceMult: 1,
-            entityEffect: 'rare_stillfern_effect',
             isRare: true,
-            allowMultiConsume: true,
+            allowMultiConsume: false,
+        },
+        usageGain: {
+
+        },
+        resourceModifier: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
+        },
+        sellPrice: 15000,
+        rarity: 5,
+    })
+
+    registerInventoryItem('inventory_shadowfern', {
+        name: 'Shadowfern',
+        hasCap: false,
+        tags: ['inventory', 'ingredient', 'rare', 'gatherable', 'herb'],
+        defaultCap: 0,
+        isAbstract: true,
+        /*onUse: (amount) => {
+            updateLevelBy('rare_stillfern_effect', amount)
+        },*/
+        getUsageCooldown: () => {
+            return 0.1;
+        },
+        attributes: {
+            baseChanceMult: 1,
+            isRare: true,
+            allowMultiConsume: false,
         },
         usageGain: {
 
@@ -1718,20 +1915,19 @@ export const registerInventoryItems = () => {
     registerInventoryItem('inventory_rare_mindroot', {
         name: 'Mindroot',
         hasCap: false,
-        tags: ['inventory', 'consumable', 'rare', 'gatherable', 'herb'],
+        tags: ['inventory', 'ingredient', 'rare', 'gatherable', 'herb'],
         defaultCap: 0,
         isAbstract: true,
-        onUse: (amount) => {
+        /*onUse: (amount) => {
             updateLevelBy('rare_mindroot_effect', amount)
-        },
+        },*/
         getUsageCooldown: () => {
             return 0.1;
         },
         attributes: {
             baseChanceMult: 1,
-            entityEffect: 'rare_mindroot_effect',
             isRare: true,
-            allowMultiConsume: true,
+            allowMultiConsume: false,
         },
         usageGain: {
 
@@ -1749,20 +1945,19 @@ export const registerInventoryItems = () => {
     registerInventoryItem('inventory_rare_azureblossom', {
         name: 'Azureblossom',
         hasCap: false,
-        tags: ['inventory', 'consumable', 'rare', 'gatherable', 'herb'],
+        tags: ['inventory', 'ingredient', 'rare', 'gatherable', 'herb'],
         defaultCap: 0,
         isAbstract: true,
-        onUse: (amount) => {
+        /*onUse: (amount) => {
             updateLevelBy('rare_azureblossom_effect', amount)
-        },
+        },*/
         getUsageCooldown: () => {
             return 0.1;
         },
         attributes: {
             baseChanceMult: 1,
-            entityEffect: 'rare_azureblossom_effect',
             isRare: true,
-            allowMultiConsume: true,
+            allowMultiConsume: false,
         },
         usageGain: {
 
@@ -1803,7 +1998,7 @@ export const registerInventoryItems = () => {
 
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_3') > 0
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_1') > 0
         },
         sellPrice: 15000,
         rarity: 5,

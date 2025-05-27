@@ -77,6 +77,43 @@ export const registerCraftingRecipes = () => {
         },
     })
 
+    registerCraftingRecipe('craft_wooden_beam', {
+        tags: ["recipe", "crafting", "material", "physical"],
+        name: 'Craft Wooden Beam',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Use refined wood to create wooden beam - very basic resource for construction',
+        level: 1,
+        resourceId: 'inventory_wooden_beam',
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'inventory_wooden_beam': {
+                        A: 1.3,
+                        B: 0.2*gameEffects.getEffectValue('crafting_efficiency')*gameEffects.getEffectValue('crafting_effort'),
+                        type: 1,
+                    }
+                }
+            }),
+            get_consumption: ()=>({
+                resources: {
+                    'inventory_refined_wood': {
+                        A: 1.5,
+                        B: 1*gameEffects.getEffectValue('crafting_effort')/gameEffects.getEffectValue('crafting_materials_discount'),
+                        type: 1
+                    },
+                }
+            }),
+            effectDeps: ['crafting_efficiency', 'crafting_materials_discount', 'crafting_effort']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_constructing') > 0
+        },
+        attributes: {
+            baseXPCost: 10,
+        },
+    })
+
 
     registerCraftingRecipe('craft_paper', {
         tags: ["recipe", "crafting", "material", "physical"],
@@ -830,6 +867,249 @@ export const registerCraftingRecipes = () => {
         },
         attributes: {
             baseXPCost: 10,
+        },
+    })
+
+    registerCraftingRecipe('craft_titans_potion', {
+        tags: ["recipe", "crafting", "alchemy", "physical"],
+        name: 'Titans Potion',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Craft Titans Potion',
+        level: 1,
+        resourceId: 'inventory_titans_potion',
+        resourceModifier: {
+            get_income: ()=>({
+                resources: {
+                    'inventory_titans_potion': {
+                        A: 1.3,
+                        B: 0.13*gameEffects.getEffectValue('alchemy_effort')*gameEffects.getEffectValue('alchemy_efficiency'),
+                        type: 1,
+                    }
+                }
+            }),
+            get_consumption: ()=>({
+                resources: {
+                    'inventory_rare_titanleaf': {
+                        A: 1.5,
+                        B: 0.1*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    },
+                    'inventory_core_duckweed': {
+                        A: 1.5,
+                        B: 4*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    },
+                    'health': {
+                        A: 1.5,
+                        B: 100*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    }
+                }
+            }),
+            effectDeps: ['alchemy_efficiency','alchemy_materials_discount', 'alchemy_effort']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_alchemy_courses') > 0 && gameResources.isResourceUnlocked('inventory_rare_titanleaf')
+        },
+        attributes: {
+            baseXPCost: 10,
+            isRare: true,
+        },
+    })
+
+
+    registerCraftingRecipe('craft_perseverance_potion', {
+        tags: ["recipe", "crafting", "alchemy", "physical"],
+        name: 'Perseverance Potion',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Craft Perseverance Potion',
+        level: 1,
+        resourceId: 'inventory_perseverance_potion',
+        resourceModifier: {
+            get_income: ()=>({
+                resources: {
+                    'inventory_perseverance_potion': {
+                        A: 1.3,
+                        B: 0.13*gameEffects.getEffectValue('alchemy_effort')*gameEffects.getEffectValue('alchemy_efficiency'),
+                        type: 1,
+                    }
+                }
+            }),
+            get_consumption: ()=>({
+                resources: {
+                    'inventory_rare_stillfern': {
+                        A: 1.5,
+                        B: 0.1*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    },
+                    'inventory_focusberry': {
+                        A: 1.5,
+                        B: 4*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    },
+                    'energy': {
+                        A: 1.5,
+                        B: 100*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    }
+                }
+            }),
+            effectDeps: ['alchemy_efficiency','alchemy_materials_discount', 'alchemy_effort']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_alchemy_courses') > 0 && gameResources.isResourceUnlocked('inventory_rare_stillfern')
+        },
+        attributes: {
+            baseXPCost: 10,
+            isRare: true
+        },
+    })
+
+
+    registerCraftingRecipe('craft_mental_potion', {
+        tags: ["recipe", "crafting", "alchemy", "physical"],
+        name: 'Mental Potion',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Craft Mental Potion',
+        level: 1,
+        resourceId: 'inventory_mental_potion',
+        resourceModifier: {
+            get_income: ()=>({
+                resources: {
+                    'inventory_mental_potion': {
+                        A: 1.3,
+                        B: 0.13*gameEffects.getEffectValue('alchemy_effort')*gameEffects.getEffectValue('alchemy_efficiency'),
+                        type: 1,
+                    }
+                }
+            }),
+            get_consumption: ()=>({
+                resources: {
+                    'inventory_rare_mindroot': {
+                        A: 1.5,
+                        B: 0.1*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    },
+                    'inventory_thinkroot': {
+                        A: 1.5,
+                        B: 4*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    },
+                    'knowledge': {
+                        A: 1.5,
+                        B: 10*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    }
+                }
+            }),
+            effectDeps: ['alchemy_efficiency','alchemy_materials_discount', 'alchemy_effort']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_alchemy_courses') > 0 && gameResources.isResourceUnlocked('inventory_rare_mindroot')
+        },
+        attributes: {
+            baseXPCost: 10,
+            isRare: true
+        },
+    })
+
+    registerCraftingRecipe('craft_spirit_potion', {
+        tags: ["recipe", "crafting", "alchemy", "physical"],
+        name: 'Spirit Potion',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Craft Spirit Potion',
+        level: 1,
+        resourceId: 'inventory_spirit_potion',
+        resourceModifier: {
+            get_income: ()=>({
+                resources: {
+                    'inventory_spirit_potion': {
+                        A: 1.3,
+                        B: 0.13*gameEffects.getEffectValue('alchemy_effort')*gameEffects.getEffectValue('alchemy_efficiency'),
+                        type: 1,
+                    }
+                }
+            }),
+            get_consumption: ()=>({
+                resources: {
+                    'inventory_rare_azureblossom': {
+                        A: 1.5,
+                        B: 0.1*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    },
+                    'inventory_nightshade': {
+                        A: 1.5,
+                        B: 4*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    },
+                    'mana': {
+                        A: 1.5,
+                        B: 4*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    }
+                }
+            }),
+            effectDeps: ['alchemy_efficiency','alchemy_materials_discount', 'alchemy_effort']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_alchemy_courses') > 0 && gameResources.isResourceUnlocked('inventory_rare_azureblossom')
+        },
+        attributes: {
+            baseXPCost: 10,
+            isRare: true
+        },
+    })
+
+
+    registerCraftingRecipe('craft_charisma_potion', {
+        tags: ["recipe", "crafting", "alchemy", "physical"],
+        name: 'Charisma Potion',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Charisma Potion',
+        level: 1,
+        resourceId: 'inventory_charisma_potion',
+        resourceModifier: {
+            get_income: ()=>({
+                resources: {
+                    'inventory_charisma_potion': {
+                        A: 1.3,
+                        B: 0.13*gameEffects.getEffectValue('alchemy_effort')*gameEffects.getEffectValue('alchemy_efficiency'),
+                        type: 1,
+                    }
+                }
+            }),
+            get_consumption: ()=>({
+                resources: {
+                    'inventory_shadowfern': {
+                        A: 1.5,
+                        B: 0.1*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    },
+                    'inventory_fly_mushroom': {
+                        A: 1.5,
+                        B: 15*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    },
+                    'knowledge': {
+                        A: 1.5,
+                        B: 10*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    }
+                }
+            }),
+            effectDeps: ['alchemy_efficiency','alchemy_materials_discount', 'alchemy_effort']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_alchemy_courses') > 0 && gameResources.isResourceUnlocked('inventory_rare_azureblossom')
+        },
+        attributes: {
+            baseXPCost: 10,
+            isRare: true
         },
     })
 

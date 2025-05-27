@@ -1613,7 +1613,7 @@ export const registerShopItemsStage1 = () => {
             multiplier: {
                 effects: {
                     'learning_rate': {
-                        A: 0.25,
+                        A: 0.1,
                         B: 1,
                         type: 0,
                     }
@@ -1632,7 +1632,7 @@ export const registerShopItemsStage1 = () => {
     gameEntity.registerGameEntity('shop_item_stone_hammer', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Stone Hammer',
-        description: 'Cheap, but still useful tool to improve your crafting efficiency',
+        description: 'Cheap, but still useful tool to improve your crafting intensity',
         level: 0,
         maxLevel: 1,
         minDemoVersion: 10,
@@ -1646,7 +1646,7 @@ export const registerShopItemsStage1 = () => {
         resourceModifier: {
             multiplier: {
                 effects: {
-                    'crafting_efficiency': {
+                    'crafting_effort': {
                         A: 0.25,
                         B: 1,
                         type: 0,
@@ -1658,6 +1658,67 @@ export const registerShopItemsStage1 = () => {
             'coins': {
                 A: 2.25,
                 B: 150000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_stone_clamp', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Stone Clamp',
+        description: 'A primitive tool made of stone and rope, allowing both hands to focus on crafting. Greatly boosts crafting intensity, though a bit more exhausting.',
+        level: 0,
+        maxLevel: 1,
+        minDemoVersion: 10,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0;
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 150,
+        }],
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'crafting_effort': {
+                        A: 0.2,
+                        B: 1,
+                        type: 0,
+                    },
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2.25,
+                B: 300000 * charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    });
+
+    gameEntity.registerGameEntity('shop_item_constructing', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Construction Courses',
+        description: 'Learn how to construct some primitive buildings from your resources',
+        level: 0,
+        maxLevel: 1,
+        minDemoVersion: 10,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0
+            //||  gameEntity.getLevel('shop_item_conjuration_magic') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2.25,
+                B: 400000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 1
             }
         }),
