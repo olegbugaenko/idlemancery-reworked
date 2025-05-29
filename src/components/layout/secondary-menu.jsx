@@ -33,20 +33,20 @@ export const SecondaryMenu = () => {
                         </div>
                     </TippyWrapper>
                 </li>
-                <li>
+                <li className={'primary-cta'}>
                     <TippyWrapper content={<div className={'hint-popup'}>Wishlisting helps the game get more visibility on Steam and supports further development. Thank you!</div> }>
                         <a onClick={() => openLink('https://store.steampowered.com/app/3678950/Idle_Awakening_Mages_Path')}>
                             Wishlist on Steam
                         </a>
                     </TippyWrapper>
                 </li>
-                <li>
+                {/*<li>
                     <TippyWrapper content={<div className={'hint-popup'}>Your feedback is invaluable! Found bug? Please, let us know!</div> }>
                         <a onClick={() => openLink('https://steamcommunity.com/app/3678950/discussions/1')}>
                             Feedback
                         </a>
                     </TippyWrapper>
-                </li>
+                </li>*/}
                 <li className={openedTab === 'about' ? 'active' : ''} onClick={() => setOpenedTab('about')}>
                     <span>v0.1.4j</span>
                 </li>
