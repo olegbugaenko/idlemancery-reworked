@@ -9,7 +9,7 @@ export const AppProvider = ({ children }) => {
     const [activePopup, setActivePopup] = useState(null);
     const [popupMeta, setPopupMeta] = useState({});
     const [onClosePopupCb, setOnClosePopupCb] = useState(null);
-    const [isMobile, setIsMobile] = useState(window.innerWidth < 1300);
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 1260);
     const togglePopup = (id, onClosePopupCb, popupMeta) => {
         if(!id) {
             setActivePopup(null);
@@ -22,11 +22,11 @@ export const AppProvider = ({ children }) => {
     }
 
     window.addEventListener('resize', (e) => {
-        setIsMobile(window.innerWidth < 1300)
+        setIsMobile(window.innerWidth < 1260)
     })
 
     document.addEventListener('load', (e) => {
-        setIsMobile(window.innerWidth < 1300)
+        setIsMobile(window.innerWidth < 1260)
     })
 
 

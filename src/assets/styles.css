@@ -1258,18 +1258,6 @@ h4 {
     justify-content: space-between;
 }
 
-@media screen and (max-width: 1600px) {
-    .actions-wrap .categories {
-        display: flex;
-        flex-wrap: wrap;
-        height: 70px;
-    }
-
-    .actions-wrap .actions .list-wrap {
-        height: calc(100% - 160px);
-    }
-}
-
 .card.action {
     height: 110px;
 }
@@ -3260,168 +3248,6 @@ ul.menu .add-custom-filter .add-wrap {
     height: calc(100% - 40px);
 }
 
-@media screen and (max-width: 1700px) {
-    .action-lists-panel {
-        height: 80px;
-    }
-
-    .actions-wrap .actions .list-wrap {
-        height: calc(100% - 160px);
-    }
-}
-
-@media screen and (max-width: 1600px) {
-    .map-wrap .head {
-        height: 90px;
-        display: flex;
-        flex-wrap: wrap;
-    }
-
-    .map-wrap .head .other-filters {
-        flex-basis: 300px;
-        flex-shrink: 0;
-        flex-grow: 1;
-    }
-}
-
-@media screen and (max-width: 1300px){
-
-    .popup-wrap {
-        height: 80vh;
-    }
-
-    .popup-wrap .popup {
-        width: 100%;
-        left: 0px;
-        position: fixed;
-    }
-
-    .content-wrap {
-        height: 100vh;
-        display: block;
-        overflow-y: scroll !important;
-        overflow-x: hidden !important;
-    }
-
-    .content-wrap .sidebar {
-        width: 100%;
-        height: auto;
-    }
-
-    .content-wrap .sidebar .hideable-content {
-        width: 100%;
-        height: auto;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-    }
-
-    .content-wrap .sidebar .upper {
-        width: 320px;
-    }
-
-    .content-wrap .sidebar .lower {
-        width: 320px;
-    }
-
-    .content-wrap .sidebar .effects-list {
-        position: relative;
-        margin-top: 12px;
-    }
-
-    .content-wrap .actions-wrap,
-    .content-wrap .items-wrap,
-    .content-wrap .inventory-wrap{
-        display: block;
-    }
-
-    .footer {
-        z-index: 1;
-        position: fixed;
-        bottom: 0px;
-    }
-
-    .page-wrap {
-        height: 100vh;
-    }
-
-    .content-wrap .content {
-        margin: 6px 18px;
-        height: auto;
-    }
-
-    ul.menu {
-        flex-wrap: wrap;
-    }
-
-    .actions-wrap .categories {
-        height: auto;
-    }
-
-    .footer {
-        height: auto;
-    }
-
-    .detail-blade {
-        width: 90%;
-        height: calc(100vh - 200px);
-        position: fixed;
-        top: 20px;
-        margin: auto;
-    }
-
-    .detail-blade .blade-inner {
-        overflow-x: hidden;
-        margin-bottom: 16px;
-    }
-
-    .detail-blade.forced-bottom {
-        width: 100%;
-        height: auto;
-        position: relative;
-    }
-
-    .actions-wrap .additional-filters {
-        justify-content: space-between;
-    }
-
-    .action-lists-panel .flex-container .panel-col .list-selector {
-        position: fixed;
-        bottom: 200px;
-        left: 16px;
-    }
-    
-    span.highlighted-span {
-        cursor: pointer;
-        margin-left: 8px;
-    }
-
-    .items-wrap .items .menu-wrap {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-
-    .map-wrap .head {
-        height: 90px;
-    }
-
-    .workshop.head {
-        display: flex;
-    }
-
-    .workshop.head .menu-wrap {
-        flex: 1;
-    }
-
-    .skill-popup-container {
-        height: 50%;
-    }
-
-    .skills-wrap .skills-container {
-        width: 100%;
-    }
-}
 
 .show-lasting {
     padding: 5px;
@@ -3605,4 +3431,253 @@ body::after {
     0% { transform: rotate(0); }
     50% { transform: rotate(1deg); }
     100% { transform: rotate(0); }
+}
+
+@media screen and (max-width: 1700px) {
+    .action-lists-panel {
+        height: 80px;
+    }
+
+    .actions-wrap .actions .list-wrap {
+        height: calc(100% - 160px);
+    }
+}
+
+@media screen and (max-width: 1600px) {
+    .map-wrap .head {
+        height: 90px;
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .map-wrap .head .other-filters {
+        flex-basis: 300px;
+        flex-shrink: 0;
+        flex-grow: 1;
+    }
+}
+
+
+@media screen and (max-width: 1400px) {
+    .actions-wrap .categories {
+        display: flex;
+        flex-wrap: wrap;
+        height: 70px;
+    }
+
+    .actions-wrap .actions .list-wrap {
+        height: calc(100% - 160px);
+    }
+
+    .card.action {
+        width: 230px;
+    }
+
+    .card.furniture,
+    .card.craftable {
+        width: 240px;
+    }
+
+    .card.craftable .buttons .label{
+        width: 50px;
+        font-size: 13px;
+    }
+
+    .card .bottom.self-placed input.level-set {
+        width: 70px;
+    }
+
+
+    .furniture-wrap .head {
+        display: block;
+        padding: 4px 8px;
+    }
+
+    .space-item {
+        max-width: 150px;
+        padding-bottom: 8px;
+    }
+
+    .map-wrap .space-item,
+    .crafting-wrap .space-item {
+        max-width: 250px;
+        padding-bottom: 8px;
+    }
+
+    .furniture-wrap .filters label:first-child {
+        margin-left: 0;
+    }
+
+    .detail-blade.wide-blade {
+        width: 380px;
+    }
+
+    .list-editor .actions-list-wrap .action-row .col.amount.large {
+        width: 180px;
+    }
+
+    .list-editor .actions-list-wrap .action-row .title {
+        width: 130px;
+        font-size: 13px;
+        overflow: hidden;
+    }
+
+    .map-wrap .map-cat {
+        width: 450px;
+    }
+
+    .map-container .map-row .map-tile {
+        width: 30px;
+        height: 30px;
+    }
+
+    .popup-wrap .popup {
+        position: absolute;
+        width: calc(100% - 40px);
+        height: calc(100% - 40px);
+        left: 20px;
+        top: 20px;
+        background: var(--boxbg);
+        border: 1px solid #333;
+        padding: 8px;
+    }
+}
+
+@media screen and (max-width: 1260px){
+
+    .popup-wrap {
+        height: 80vh;
+    }
+
+    .popup-wrap .popup {
+        width: 100%;
+        left: 0px;
+        position: fixed;
+    }
+
+    .content-wrap {
+        height: 100vh;
+        display: block;
+        overflow-y: scroll !important;
+        overflow-x: hidden !important;
+    }
+
+    .content-wrap .sidebar {
+        width: 100%;
+        height: auto;
+    }
+
+    .content-wrap .sidebar .hideable-content {
+        width: 100%;
+        height: auto;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+
+    .content-wrap .sidebar .upper {
+        width: 320px;
+    }
+
+    .content-wrap .sidebar .lower {
+        width: 320px;
+    }
+
+    .content-wrap .sidebar .effects-list {
+        position: relative;
+        margin-top: 12px;
+    }
+
+    .content-wrap .actions-wrap,
+    .content-wrap .items-wrap,
+    .content-wrap .inventory-wrap{
+        display: block;
+    }
+
+    .footer {
+        z-index: 1;
+        position: fixed;
+        bottom: 0px;
+    }
+
+    .page-wrap {
+        height: 100vh;
+    }
+
+    .content-wrap .content {
+        margin: 6px 18px;
+        height: auto;
+    }
+
+    ul.menu {
+        flex-wrap: wrap;
+    }
+
+    .actions-wrap .categories {
+        height: auto;
+    }
+
+    .footer {
+        height: auto;
+    }
+
+    .detail-blade {
+        width: 90%;
+        height: calc(100vh - 200px);
+        position: fixed;
+        top: 20px;
+        margin: auto;
+    }
+
+    .detail-blade .blade-inner {
+        overflow-x: hidden;
+        margin-bottom: 16px;
+    }
+
+    .detail-blade.forced-bottom {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+
+    .actions-wrap .additional-filters {
+        justify-content: space-between;
+    }
+
+    .action-lists-panel .flex-container .panel-col .list-selector {
+        position: fixed;
+        bottom: 200px;
+        left: 16px;
+    }
+    
+    span.highlighted-span {
+        cursor: pointer;
+        margin-left: 8px;
+    }
+
+    .items-wrap .items .menu-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .map-wrap .head {
+        height: 90px;
+    }
+
+    .workshop.head {
+        display: flex;
+    }
+
+    .workshop.head .menu-wrap {
+        flex: 1;
+    }
+
+    .skill-popup-container {
+        height: 50%;
+    }
+
+    .skills-wrap .skills-container {
+        width: 100%;
+    }
 }

@@ -428,7 +428,8 @@ export const ItemResourceCard = ({ id, name, purchaseMultiplier, stock, level, m
         <TippyWrapper
             content={<div className={'hint-popup'}>
                 <p>{name} {amount > 0 ? `(${formatInt(amount)} in inventory)` : ''}</p>
-                <p>Press to buy x{formatInt(purchaseMultiplier)}. Hold Shift to by max</p>
+                <p>Left click to open details</p>
+                <p>Right click to buy x{formatInt(purchaseMultiplier)}. Hold Shift to by max</p>
             </div>}>
             <div className={'icon-content'}>
                 <img src={`icons/resources/${id}.png`} className={'resource'} />
