@@ -39,6 +39,7 @@ export const AutomationsSettings = () => {
     return (<div className={'inner-settings-wrap automations-wrap'}>
         <PerfectScrollbar>
             {unlocks.actionLists ? (<ActionsAutomations resources={resources}/>) : null}
+            {unlocks.inventory ? (<PurchaseAutomations resources={resources}/> ) : null}
             {unlocks.inventory ? (<SellAutomations resources={resources}/>) : null}
             {unlocks.inventory ? (<ConsumeAutomations resources={resources} />) : null}
             {unlocks.map ? (<MapTilesAutomations resources={resources} />) : null}
@@ -116,6 +117,76 @@ export const AutomatedAction = ({ auto, resources, onSaveAction }) => {
     />
 
 }
+
+
+
+export const PurchaseAutomations = ({ resources }) => {
+
+    const worker = useContext(WorkerContext);
+    const { onMessage, sendData } = useWorkerClient(worker);
+    const [automations, setAutomations] = useState([]);
+    const [isOpened, setOpened] = useState(false);
+
+    useEffect(() => {
+        sendData('query-items-resources-data', { filterAutomatedPurchase: true, includeAutomations: true, prefix: 'autopurchase' })
+    }, []);
+
+    onMessage('items-resources-data-autopurchase', (data) => {
+        if(data.payload.filterAutomatedPurchase) {
+            setAutomations(data.available);
+        }
+    })
+
+    const onSaveConsume = useCallback((id, saveData) => {
+        const prev = automations.find(a => a.id === id);
+        const toSave = {
+            ...prev,
+            autopurchase: {
+                ...(prev?.autopurchase || {}),
+                rules: saveData.rules,
+                pattern: saveData.pattern,
+                isEnabled: saveData.isEnabled
+            }
+        }
+        console.log('Saving: ', toSave, prev);
+        sendData('save-shop-resource-settings', toSave);
+    })
+
+    if(!automations || !automations.length || !resources) return;
+
+    return (<div className={`automations-box ${isOpened ? 'opened' : 'closed'}`}>
+        <div className={'automation-panel-title'} onClick={() => setOpened(!isOpened)}>
+            <h4>Purchase Automations</h4>
+            <span className={'arrow-down'}>&#8681;</span>
+        </div>
+        <div className={'automated-list'}>
+            {automations.map(auto => (<AutomatedPurchase auto={auto} resources={resources} onSaveConsume={onSaveConsume}/>))}
+        </div>
+    </div> )
+
+}
+
+export const AutomatedPurchase = ({ auto, resources, onSaveConsume }) => {
+
+    const onSave = useCallback((id, data) => {
+        onSaveConsume(id, data);
+    })
+
+    return <AutomatedItem
+        scope={'autopurchase'}
+        id={auto.id}
+        name={auto.name}
+        rules={auto.autopurchase.rules}
+        pattern={auto.autopurchase.pattern}
+        resources={resources}
+        isPriorityShown={false}
+        onSave={onSave}
+        isEnabled={auto.autopurchase.isEnabled}
+    />
+
+}
+
+
 
 export const ConsumeAutomations = ({ resources }) => {
 

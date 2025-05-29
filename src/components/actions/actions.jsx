@@ -434,6 +434,10 @@ export const Actions = ({}) => {
         sendData('toggle-show-hidden', { flag: !actionsData.showHidden })
     }, [actionsData.showHidden]);
 
+    const toggleShowMaxed = useCallback(() => {
+        sendData('toggle-show-maxed', { flag: !actionsData.showMaxed })
+    }, [actionsData.showMaxed]);
+
     const toggleHiddenAction = useCallback((id, flag) => {
         sendData('toggle-hidden-action', { id, flag });
     })
@@ -619,6 +623,10 @@ export const Actions = ({}) => {
                                     <input type={"checkbox"} checked={!!actionsData.showHidden} onChange={toggleShowHidden}/>
                                     Show hidden
                                 </label>
+                                <label>
+                                    <input type={"checkbox"} checked={!!actionsData.showMaxed} onChange={toggleShowMaxed}/>
+                                    Show completed
+                                </label>
                                 {isMobile ? (<div>
                                     <span className={'highlighted-span'} onClick={() => setDetailVisible(true)}>Info</span>
                                 </div>) : null}
@@ -793,7 +801,7 @@ const DraggableActionCard = ({ id, index, ...props }) => {
     );
 };
 
-export const ActionCard = React.memo(({ id, category, monitored, entityEfficiency, isEditingList, index, name, level, max, xp, maxXP, xpRate, isActive, effort, isLeveled, focused, isTraining, actionEffect, currentEffects, potentialEffects, isHidden, onFlash, onSelect, onActivate, onShowDetails, toggleHiddenAction, missingResourceId, isSelected, tags, ...props}) => {
+export const ActionCard = React.memo(({ id, category, monitored, entityEfficiency, isEditingList, index, isCapped, name, level, max, xp, maxXP, xpRate, isActive, effort, isLeveled, focused, isTraining, actionEffect, currentEffects, potentialEffects, isHidden, onFlash, onSelect, onActivate, onShowDetails, toggleHiddenAction, missingResourceId, isSelected, tags, ...props}) => {
     const elementRef = useRef(null);
 
     useEffect(() => {
@@ -871,7 +879,7 @@ export const ActionCard = React.memo(({ id, category, monitored, entityEfficienc
                         <span className={'level'}>{formatInt(level)}{max ? `/${formatInt(max)}` : ''}</span>
                     </div>
                     <div className={'bottom'}>
-                        <div className={'xp-box'}>
+                        {!isCapped ? (<div className={'xp-box'}>
                             <span className={'xp-text'}>
                                 XP: {formatInt(xp)}/{formatInt(maxXP)}
                             </span>
@@ -888,14 +896,14 @@ export const ActionCard = React.memo(({ id, category, monitored, entityEfficienc
                                     </span> ) : ''}
                                 </span>
                             </TippyWrapper>
-                        </div>
+                        </div>) : <p className={'completed'}>Completed</p>}
 
                         <div id={`level_up_indicator_${id}`}>
                             <ProgressBar className={'action-progress'} percentage={xp/maxXP}></ProgressBar>
                         </div>
                         <div className={'buttons'}>
                             <div className={'buttons-inner-wrap'}>
-                                {isActive ?
+                                {!isCapped ? (<>{isActive ?
                                         <CustomButton
                                             className={'icon-content interface-icon small clickable-icon'}
                                             onClick={(e) => {
@@ -925,7 +933,7 @@ export const ActionCard = React.memo(({ id, category, monitored, entityEfficienc
                                               playSound('click');
                                             }} >
                                             Run Action
-                                        </CustomButton>}
+                                        </CustomButton>}</>) : null}
                                 <CustomButton
                                     className={'icon-content interface-icon small clickable-icon'}
                                     onClick={(e) => {

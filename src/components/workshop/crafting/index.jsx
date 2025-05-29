@@ -601,7 +601,7 @@ export const CraftingListDetails = ({
                             <div className={'rules-header flex-container'}>
                                 <p>Autotrigger rules: {editing?.autotrigger?.rules?.length ? null : 'None'}</p>
                                 <label>
-                                    <input type={'checkbox'} checked={editing.autotrigger?.isEnabled} onChange={toggleAutotrigger}/>
+                                    <input type={'checkbox'} checked={editing.autotrigger?.isEnabled ?? undefined} onChange={toggleAutotrigger}/>
                                     {editing.autotrigger?.isEnabled ? ' ON' : ' OFF'}
                                 </label>
                                 {isEditing ? (<button onClick={addAutotriggerRule}>Add rule (AND)</button>) : null}

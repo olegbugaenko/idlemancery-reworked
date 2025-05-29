@@ -510,7 +510,7 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
                             <div className={'rules-header flex-container'}>
                                 <p>Autospell rules: </p>
                                 <label>
-                                    <input type={'checkbox'} checked={item.autocast?.isEnabled} onChange={toggleAutotrigger}/>
+                                    <input type={'checkbox'} checked={item.autocast?.isEnabled ?? undefined} onChange={toggleAutotrigger}/>
                                     {item.autocast?.isEnabled ? ' ON' : ' OFF'}
                                 </label>
                                 {isEditing ? (<button onClick={addAutoconsumeRule}>Add rule (AND)</button>) : null}

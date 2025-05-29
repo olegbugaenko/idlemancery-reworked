@@ -15,9 +15,14 @@ import {CustomButton} from "../shared/buttons/custom-button.jsx";
 import {AutomationIcon} from "../shared/buttons/automation-checkbox.jsx";
 import {useTutorial} from "../../context/tutorial-context";
 import {playSound} from "../../context/sounds/sound-manager";
+import RulesList from "../shared/rules-list.jsx";
+import {cloneDeep} from "lodash";
 
 export const Shop = ({}) => {
-    const [detailOpened, setDetailOpened] = useState(null)
+    const [detailOpened, setDetailOpened] = useState(null);
+    const [editOpened, setEditOpened] = useState(null);
+
+    const visibleDetailId = detailOpened || editOpened;
 
     const worker = useContext(WorkerContext);
 
@@ -105,12 +110,12 @@ export const Shop = ({}) => {
             <div className={'items ingame-box'}>
                 <div className={'menu-wrap'}>
                     <ul className={'menu'}>
-                        <li className={`${selectedTab === 'upgrades' ? 'active' : ''}`} onClick={() => {setSelectedTab('upgrades'); setDetailOpened(null);}}>
+                        <li className={`${selectedTab === 'upgrades' ? 'active' : ''}`} onClick={() => {setSelectedTab('upgrades'); setDetailOpened(null); setEditOpened(null);}}>
                             <NewNotificationWrap isNew={newUnlocks?.['shop']?.items?.['upgrades']?.hasNew}>
                                 <span>Upgrades</span>
                             </NewNotificationWrap>
                         </li>
-                        <li className={`${selectedTab === 'items' ? 'active' : ''}`} onClick={() => {setSelectedTab('items');setDetailOpened(null);}}>
+                        <li className={`${selectedTab === 'items' ? 'active' : ''}`} onClick={() => {setSelectedTab('items');setDetailOpened(null); setEditOpened(null);}}>
                             <NewNotificationWrap isNew={newUnlocks?.['shop']?.items?.['inventory']?.hasNew}>
                                 <span id={'shop-items-tab'}>Items</span>
                             </NewNotificationWrap>
@@ -118,6 +123,7 @@ export const Shop = ({}) => {
                         {unlocks?.courses ? (<li className={`${selectedTab === 'courses' ? 'active' : ''}`} onClick={() => {
                             setSelectedTab('courses');
                             setDetailOpened(null);
+                            setEditOpened(null);
                         }}>
                             <NewNotificationWrap isNew={newUnlocks?.['shop']?.items?.['courses']?.hasNew}>
                                 <span>Courses</span>
@@ -129,16 +135,27 @@ export const Shop = ({}) => {
                     </div>) : null}
                 </div>
                 {selectedTab === 'upgrades' ? (<ShopUpgrades isMobile={isMobile} setItemDetails={setItemDetails} purchaseItem={purchaseItem} newUnlocks={newUnlocks?.['shop']?.items?.['upgrades']?.items}/>) : null}
-                {selectedTab === 'items' ? (<ShopItems isMobile={isMobile} setItemDetails={setItemDetails} purchaseItem={purchaseResource} newUnlocks={newUnlocks?.['shop']?.items?.['inventory']?.items}/>) : null}
+                {selectedTab === 'items' ? (<ShopItems
+                    isMobile={isMobile}
+                    setItemDetails={setItemDetails}
+                    toggleEditedItem={(id) =>
+                        setEditOpened(prev => (prev === id ? null : id))
+                    }
+                    purchaseItem={purchaseResource}
+                    newUnlocks={newUnlocks?.['shop']?.items?.['inventory']?.items}
+                />) : null}
                 {selectedTab === 'courses' ? (<CourseItems isMobile={isMobile} setItemDetails={setItemDetails} purchaseItem={purchaseCourse} newUnlocks={newUnlocks?.['shop']?.items?.['courses']?.items}/>) : null}
             </div>
 
             {(!isMobile || isDetailVisible || detailOpened) ? (<div className={'item-detail ingame-box detail-blade'}>
-                {detailOpened ? (<ItemDetails
-                    itemId={detailOpened}
+                {visibleDetailId ? (<ItemDetails
+                    itemId={visibleDetailId}
                     category={selectedTab}
                     onClose={onCloseDetails}
                     onPurchase={selectedTab === 'items' ? purchaseResource : undefined}
+                    isEditMode={editOpened && (selectedTab === 'items' && editOpened === visibleDetailId)}
+                    editId={editOpened}
+                    onCloseEdit={() => setEditOpened(null)}
                 />) : (<GeneralStats setDetailVisible={setDetailVisible}/>)}
             </div>) : null}
         </div>
@@ -218,7 +235,7 @@ export const ShopUpgrades = ({ setItemDetails, purchaseItem, newUnlocks, isMobil
     </div>)
 }
 
-export const ShopItems = ({ setItemDetails, purchaseItem, newUnlocks, isMobile }) => {
+export const ShopItems = ({ setItemDetails, toggleEditedItem, purchaseItem, newUnlocks, isMobile }) => {
 
     const worker = useContext(WorkerContext);
 
@@ -283,7 +300,15 @@ export const ShopItems = ({ setItemDetails, purchaseItem, newUnlocks, isMobile }
             <PerfectScrollbar>
                 <div className={'flex-container'}>
                     {itemsData.available.map(item => <NewNotificationWrap key={`shop_${item.id}`} id={`shop_${item.id}`} className={'narrow-wrapper'} isNew={newUnlocks?.all?.items?.[`shop_${item.id}`]?.hasNew}>
-                        <ItemResourceCard isMobile={isMobile} onFlash={handleFlash} key={item.id} {...item} onPurchase={purchaseItem} onShowDetails={setItemDetails}/>
+                        <ItemResourceCard
+                            isMobile={isMobile}
+                            onFlash={handleFlash}
+                            key={item.id}
+                            {...item}
+                            onPurchase={purchaseItem}
+                            onShowDetails={setItemDetails}
+                            toggleEditedItem={toggleEditedItem}
+                        />
                     </NewNotificationWrap>)}
                     {overlayPositions.map((position, index) => (
                         <FlashOverlay key={index} position={position} />
@@ -379,7 +404,7 @@ export const ItemCard = ({ id, name, level, max, affordable, isLeveled, isCapped
     </div> )
 }
 
-export const ItemResourceCard = ({ id, name, purchaseMultiplier, stock, level, max, amount, affordable, isLeveled, onFlash, onPurchase, onShowDetails, isMobile}) => {
+export const ItemResourceCard = ({ id, name, purchaseMultiplier, stock, level, max, amount, affordable, isLeveled, onFlash, onPurchase, onShowDetails, toggleEditedItem, isMobile}) => {
 
     const elementRef = useRef(null);
 
@@ -392,12 +417,14 @@ export const ItemResourceCard = ({ id, name, purchaseMultiplier, stock, level, m
         onMouseEnter={() => isMobile ? null : onShowDetails(id)}
         onMouseLeave={() => isMobile ? null : onShowDetails(null)}
         onClick={(e) => {
-            if(isMobile) {
-                onShowDetails(id)
-            } else {
-                onPurchase(id, e.shiftKey ? 1e9 : purchaseMultiplier)
-            }
-        }}>
+            toggleEditedItem(id)
+        }}
+        onContextMenu={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onPurchase(id, e.shiftKey ? 1e9 : purchaseMultiplier)
+        }}
+    >
         <TippyWrapper
             content={<div className={'hint-popup'}>
                 <p>{name} {amount > 0 ? `(${formatInt(amount)} in inventory)` : ''}</p>
@@ -467,7 +494,7 @@ export const CourseCard = ({ toNext, id, efficiency, isRunning, name, level, pro
     </div> )
 }
 
-export const ItemDetails = ({itemId, category, onClose, onPurchase}) => {
+export const ItemDetails = ({itemId, category, editId, onPurchase, isEditMode, onCloseEdit}) => {
 
     const worker = useContext(WorkerContext);
 
@@ -478,6 +505,21 @@ export const ItemDetails = ({itemId, category, onClose, onPurchase}) => {
     const [item, setDetailOpened] = useState(null);
 
     const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
+
+    const [autopurchase, setAutopurchase] = useState(null);
+
+    const [isChanged, setChanged] = useState(false);
+
+    const [resources, setResources] = useState([]);
+
+    useEffect(() => {
+        sendData('query-all-resources', {});
+    }, [])
+
+    onMessage('all-resources', (payload) => {
+        setResources(payload);
+    })
+
 
     useEffect(() => {
         if(category === 'upgrades') {
@@ -513,75 +555,213 @@ export const ItemDetails = ({itemId, category, onClose, onPurchase}) => {
         setDetailOpened(items);
     })
 
+    useEffect(() => {
+        if(category === 'items' && editId) {
+            setAutopurchase(item?.autopurchase);
+        } else {
+            setAutopurchase(null);
+        }
+
+    },[category, editId]) // Pass directly editId
+
     if(!itemId || !item) return null;
+
+    const setAutopurchasePattern = (pattern) => {
+        setAutopurchase(prev => {
+            const newAutopurchase = cloneDeep(prev);
+            if(!newAutopurchase.rules) {
+                newAutopurchase.rules = [];
+            }
+            newAutopurchase.pattern = pattern;
+            setChanged(true);
+            return newAutopurchase;
+        })
+    }
+
+    const addAutopurchaseRule = () => {
+        setAutopurchase(prev => {
+            const newAutopurchase = cloneDeep(prev);
+            if(!newAutopurchase.rules) {
+                newAutopurchase.rules = [];
+            }
+            newAutopurchase.rules.push({
+                resource_id: resources[0].id,
+                condition: 'less_or_eq',
+                value_type: 'percentage',
+                value: 50,
+            });
+            setChanged(true);
+            return newAutopurchase;
+        })
+    }
+
+    const setAutopurchaseRuleValue = (index, key, value) => {
+        setAutopurchase(prev => {
+            const newAutopurchase = cloneDeep(prev);
+            if (!newAutopurchase.rules?.[index]) {
+                return newAutopurchase;
+            }
+            newAutopurchase.rules[index][key] = value;
+            setChanged(true);
+            return newAutopurchase;
+        })
+    }
+
+    const deleteAutopurchaseRule = (index) => {
+        setAutopurchase(prev => {
+            const newEdit = cloneDeep(prev);
+            newEdit.rules.splice(index, 1)
+            setChanged(true);
+            return newEdit
+        })
+    }
+
+    const setPurchaseMultiplierValue = (purchaseMultiplier) => {
+        setAutopurchase(prev => {
+            const newAutopurchase = cloneDeep(prev);
+            if(!newAutopurchase.rules) {
+                newAutopurchase.rules = [];
+            }
+            newAutopurchase.purchaseMultiplier = purchaseMultiplier;
+            setChanged(true);
+            return newAutopurchase;
+        })
+    }
+
+    const setReservedCoinsValue = (reserved) => {
+        setAutopurchase(prev => {
+            const newAutopurchase = cloneDeep(prev);
+            if(!newAutopurchase.rules) {
+                newAutopurchase.rules = [];
+            }
+            newAutopurchase.reserved = reserved;
+            setChanged(true);
+            return newAutopurchase;
+        })
+    }
+
+    const toggleAutopurchase = () => {
+        setAutopurchase(prev => {
+            const newAutopurchase = cloneDeep(prev);
+            if(!newAutopurchase.rules) {
+                newAutopurchase.rules = [];
+            }
+            newAutopurchase.isEnabled = !prev.isEnabled;
+            setChanged(true);
+            return newAutopurchase;
+        })
+    }
+
+    const saveAutopurchase = () => {
+        sendData('save-shop-resource-settings', { id: item.id, autopurchase })
+    }
 
     if(currentTourId === 'inventory' && itemId === 'inventory_brightleaf') {
         unlockNextById(5);
     }
 
+    const autopurchaseDisplayed = item?.isAutomationUnlocked ? (isEditMode ? autopurchase : item?.autopurchase) : null;
 
     return (
-        <PerfectScrollbar>
-            <div className={'blade-inner'}>
-                <div className={'block'}>
-                    <div className={'heading flex-container'}>
-                        <h4>{item.name}</h4>
-                        <span className={'level-indicator'}>Level {item.level} {item.max ? `of ${item.max}` : null}</span>
-                    </div>
+        <>
+            <div className={'blade-outer'}>
+                <PerfectScrollbar>
+                    <div className={'blade-inner'}>
+                        <div className={'block'}>
+                            <div className={'heading flex-container'}>
+                                <h4>{item.name}</h4>
+                                <span className={'level-indicator'}>Level {item.level} {item.max ? `of ${item.max}` : null}</span>
+                            </div>
 
-                    <div className={'description'}>
-                        {item.description}
+                            <div className={'description'}>
+                                {item.description}
+                            </div>
+                        </div>
+                        <div className={'block'}>
+                            <div className={'tags-container'}>
+                                {item.tags.map(tag => (<div key={tag} className={'tag'}>{tag}</div> ))}
+                            </div>
+                        </div>
+                        {item?.missingResource && item.entityEfficiency < 1 ? (<div className={'block'}>
+                            <p className={'hint yellow'}>
+                                This course is running {formatValue(100*item.entityEfficiency)}% efficiency due to missing {item?.missingResource?.name}
+                            </p>
+                        </div> ) : null}
+                        {Object.values(item.affordable.affordabilities || {}).length ? (<div className={'block price-section'}>
+                            <p>Cost: (x{formatInt(item.purchaseMultiplier)})</p>
+                            <div className={'costs-wrap'}>
+                                {Object.values(item.affordable.affordabilities || {}).map(aff => <ResourceCost
+                                    key={aff.id ?? aff.name} affordabilities={aff}/>)}
+                            </div>
+                        </div>) : null}
+                        {(item.potentialEffects?.length || item.currentEffects) ? (<div className={'block effects-section'}>
+                            <p>Effects:</p>
+                            <div className={'effects'}>
+                                {item.currentEffects ?
+                                    (<ResourceComparison effects1={item.currentEffects} effects2={item.potentialEffects}/>)
+                                    : (<EffectsSection effects={item.potentialEffects} maxDisplay={10}/>)
+                                }
+                            </div>
+                        </div>) : null}
+                        {(item.potentialLastingEffects?.length) ? (<div className={'block lasting-effects-section'}>
+                            <p>Lasting Effects: {secondsToString(item.duration)}</p>
+                            <div className={'effects'}>
+                                <EffectsSection effects={item.potentialLastingEffects} maxDisplay={10}/>
+                            </div>
+                        </div>) : null}
+                        {(item.learningEffects?.length) ? (<div className={'block'}>
+                            <p>Learning Upkeep:</p>
+                            <div className={'effects'}>
+                                <EffectsSection effects={item.learningEffects} maxDisplay={10}/>
+                            </div>
+                            <p>Learning Duration: {secondsToString(item.maxProgress)}</p>
+                        </div>) : null}
+                        {autopurchaseDisplayed ? (
+                            <div className={'autoconsume-setting block'}>
+                                    <div className={'rules-header flex-container'}>
+                                        <p>Autopurchase rules: {autopurchaseDisplayed?.rules?.length ? null : 'None'}</p>
+                                        <label>
+                                            <input type={'checkbox'} checked={autopurchaseDisplayed?.isEnabled ?? undefined} onChange={toggleAutopurchase}/>
+                                            {autopurchaseDisplayed?.isEnabled ? ' ON' : ' OFF'}
+                                        </label>
+                                        {isEditMode ? (<button onClick={addAutopurchaseRule}>Add rule (AND)</button>) : null}
+                                    </div>
+
+                                    <RulesList
+                                        prefix={'autopurchase'}
+                                        isEditing={isEditMode}
+                                        rules={autopurchaseDisplayed?.rules || []}
+                                        resources={resources}
+                                        pattern={autopurchaseDisplayed?.pattern}
+                                        deleteRule={deleteAutopurchaseRule}
+                                        setRuleValue={setAutopurchaseRuleValue}
+                                        setPattern={setAutopurchasePattern}
+                                        isAutoCheck={autopurchaseDisplayed?.isEnabled}
+                                    />
+                                    <div className={'autoconsume-amount flex-container'}>
+                                        <p>Reserved Coins:</p>
+                                        {isEditMode ? <input type={'number'} onChange={e => setReservedCoinsValue(+e.target.value)}
+                                                            value={autopurchaseDisplayed?.reserved || 0}/> : <span>{formatValue(autopurchaseDisplayed?.reserved || 0)}</span>}
+                                    </div>
+                                    <div className={'autoconsume-amount flex-container'}>
+                                        <p>Purchase Mult:</p>
+                                        {isEditMode ? <input type={'number'} onChange={e => setPurchaseMultiplierValue(Math.max(+(e.target.value ?? 1), 1))}
+                                                            value={autopurchaseDisplayed?.purchaseMultiplier || 1}/> : <span>{formatValue(autopurchaseDisplayed?.purchaseMultiplier || 1)}</span>}
+                                    </div>
+                                </div>
+                        ) : null}
                     </div>
-                </div>
-                <div className={'block'}>
-                    <div className={'tags-container'}>
-                        {item.tags.map(tag => (<div key={tag} className={'tag'}>{tag}</div> ))}
-                    </div>
-                </div>
-                {item?.missingResource && item.entityEfficiency < 1 ? (<div className={'block'}>
-                    <p className={'hint yellow'}>
-                        This course is running {formatValue(100*item.entityEfficiency)}% efficiency due to missing {item?.missingResource?.name}
-                    </p>
-                </div> ) : null}
-                {Object.values(item.affordable.affordabilities || {}).length ? (<div className={'block price-section'}>
-                    <p>Cost: (x{formatInt(item.purchaseMultiplier)})</p>
-                    <div className={'costs-wrap'}>
-                        {Object.values(item.affordable.affordabilities || {}).map(aff => <ResourceCost
-                            key={aff.id ?? aff.name} affordabilities={aff}/>)}
-                    </div>
-                </div>) : null}
-                {(item.potentialEffects?.length || item.currentEffects) ? (<div className={'block effects-section'}>
-                    <p>Effects:</p>
-                    <div className={'effects'}>
-                        {item.currentEffects ?
-                            (<ResourceComparison effects1={item.currentEffects} effects2={item.potentialEffects}/>)
-                            : (<EffectsSection effects={item.potentialEffects} maxDisplay={10}/>)
-                        }
-                    </div>
-                </div>) : null}
-                {(item.potentialLastingEffects?.length) ? (<div className={'block lasting-effects-section'}>
-                    <p>Lasting Effects: {secondsToString(item.duration)}</p>
-                    <div className={'effects'}>
-                        <EffectsSection effects={item.potentialLastingEffects} maxDisplay={10}/>
-                    </div>
-                </div>) : null}
-                {(item.learningEffects?.length) ? (<div className={'block'}>
-                    <p>Learning Upkeep:</p>
-                    <div className={'effects'}>
-                        <EffectsSection effects={item.learningEffects} maxDisplay={10}/>
-                    </div>
-                    <p>Learning Duration: {secondsToString(item.maxProgress)}</p>
-                </div>) : null}
-                {isMobile ? (<div className={'block buttons flex-container'}>
-                    <button onClick={onClose}>Close</button>
-                    {onPurchase ? (<>
-                        <button onClick={() => onPurchase(item.id)}>Purchase</button>
-                        {item.purchaseMultiplier > 1 ? (<button onClick={() => onPurchase(item.id, item.purchaseMultiplier)}>Purchase
-                            x{formatInt(item.purchaseMultiplier)}</button>) : null}
-                    </>) : null}
-                </div>) : null}
+                </PerfectScrollbar>
             </div>
-        </PerfectScrollbar>
+            {(isEditMode || isMobile) ? (<div className={'buttons flex-container main-buttons'}>
+                <button className={'primary-action'} onClick={saveAutopurchase}>Save</button>
+                    {onPurchase ? (<>
+                    {item.purchaseMultiplier > 1 ? (<button onClick={() => onPurchase(item.id, item.purchaseMultiplier)}>Purchase
+                        x{formatInt(item.purchaseMultiplier)}</button>) : <button onClick={() => onPurchase(item.id)}>Purchase</button>}
+                    </>) : null}
+                <button className={'warning-action'} onClick={onCloseEdit}>Cancel</button>
+            </div>) : null}
+        </>
     )
 }
 

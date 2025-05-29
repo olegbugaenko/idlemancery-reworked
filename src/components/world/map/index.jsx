@@ -692,7 +692,7 @@ export const MapTileListDetails = ({
                             <div className={'rules-header flex-container'}>
                                 <p>Autotrigger rules: {editing?.autotrigger?.rules?.length ? null : 'None'}</p>
                                 <label>
-                                    <input type={'checkbox'} checked={editing.autotrigger?.isEnabled}
+                                    <input type={'checkbox'} checked={editing.autotrigger?.isEnabled ?? undefined}
                                            onChange={toggleAutotrigger}/>
                                     {editing.autotrigger?.isEnabled ? ' ON' : ' OFF'}
                                 </label>
