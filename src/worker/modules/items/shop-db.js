@@ -2413,4 +2413,172 @@ export const registerShopItemsStage1 = () => {
             }
         }),
     })
+
+    gameEntity.registerGameEntity('shop_item_stone_refinement_manual', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Stone Refinement Manual',
+        description: 'Learn to extract precious gems from stone, unlocking ruby and sapphire production',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.isEntityUnlocked('action_quarrying')
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1,
+                B: 1500000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_self_organization_book', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Self-Organization Manual',
+        description: 'Learn the art of self-organization to increase your coin storage capacity',
+        level: 0,
+        maxLevel: 1,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 400
+        }],
+        unlockCondition: () => {
+            return gameEffects.getEffectValue('attribute_patience') >= 400
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1,
+                B: 3000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'knowledge': {
+                A: 1,
+                B: 1000,
+                type: 0
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_quality_mortar', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Quality Mortar & Pestle',
+        description: 'A finely crafted mortar and pestle set for grinding ingredients to perfect consistency, improving alchemy efficiency',
+        level: 0,
+        maxLevel: 1,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 200
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_alchemy_courses') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'alchemy_effort': {
+                        A: 0.25,
+                        B: 1,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1,
+                B: 300000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_precision_tools', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Precision Measuring Tools',
+        description: 'Exact measuring instruments for perfect ingredient proportions in alchemical recipes',
+        level: 0,
+        maxLevel: 1,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 500
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_alchemy_courses') > 0 && gameEntity.getLevel('shop_item_quality_mortar') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'alchemy_effort': {
+                        A: 0.25,
+                        B: 1,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1,
+                B: 5000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_saw', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Saw',
+        description: 'A quality saw for cutting wood more efficiently, increasing production of all wooden resources',
+        level: 0,
+        maxLevel: 1,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 250
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                resources: {
+                    'inventory_refined_wood': {
+                        A: 0.2,
+                        B: 1,
+                        type: 0
+                    },
+                    'inventory_wooden_beam': {
+                        A: 0.2,
+                        B: 1,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1,
+                B: 1000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
 }

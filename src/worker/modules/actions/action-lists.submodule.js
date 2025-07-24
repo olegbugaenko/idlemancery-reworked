@@ -400,6 +400,12 @@ export class ActionListsSubmodule extends GameModule {
                 }
             }
 
+            for(const key of keysToTrack) {
+                if(!consumptions.find(o => o.id === key)) {
+                    minConsumptions[key] = 0;
+                }
+            }
+
             if (!contributesToDeficit) {
                 skipDynamicActions.add(act.id);
             }
@@ -432,7 +438,7 @@ export class ActionListsSubmodule extends GameModule {
                 return false;
             }
             if(initialResourceBalance[key].current > 0 && ((minConsumptions[key] ?? 0) > initialResourceBalance[key].current)) {
-                console.log('Unable to balance '+key, initialResourceBalance[key].current, minConsumptions[key])
+                console.log('Unable to balance '+key+' due to minConsumption', initialResourceBalance[key].current, minConsumptions)
                 return false;
             }
             return true;

@@ -252,7 +252,7 @@ export const registerCraftingRecipes = () => {
                 resources: {
                     'inventory_ruby': {
                         A: 1.3,
-                        B: 0.05*gameEffects.getEffectValue('crafting_effort')*gameEffects.getEffectValue('crafting_efficiency'),
+                        B: 0.04*gameEffects.getEffectValue('crafting_effort')*gameEffects.getEffectValue('crafting_efficiency'),
                         type: 1,
                     }
                 }
@@ -269,7 +269,7 @@ export const registerCraftingRecipes = () => {
             effectDeps: ['crafting_efficiency', 'crafting_materials_discount', 'crafting_effort']
         },
         unlockCondition: () => {
-            return gameResources.isResourceUnlocked('inventory_stone')
+            return gameResources.isResourceUnlocked('inventory_ruby')
         },
         attributes: {
             baseXPCost: 10,
@@ -290,7 +290,7 @@ export const registerCraftingRecipes = () => {
                 resources: {
                     'inventory_sapphire': {
                         A: 1.3,
-                        B: 0.05*gameEffects.getEffectValue('crafting_effort')*gameEffects.getEffectValue('crafting_efficiency'),
+                        B: 0.04*gameEffects.getEffectValue('crafting_effort')*gameEffects.getEffectValue('crafting_efficiency'),
                         type: 1,
                     }
                 }
@@ -307,7 +307,7 @@ export const registerCraftingRecipes = () => {
             effectDeps: ['crafting_efficiency', 'crafting_materials_discount', 'crafting_effort']
         },
         unlockCondition: () => {
-            return gameResources.isResourceUnlocked('inventory_stone')
+            return gameResources.isResourceUnlocked('inventory_sapphire')
         },
         attributes: {
             baseXPCost: 10,
@@ -1110,6 +1110,43 @@ export const registerCraftingRecipes = () => {
         attributes: {
             baseXPCost: 10,
             isRare: true
+        },
+    })
+
+    registerCraftingRecipe('craft_stone_brick', {
+        tags: ["recipe", "crafting", "material", "physical"],
+        name: 'Craft Stone Brick',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Use stone to create bricks for construction',
+        level: 1,
+        resourceId: 'inventory_stone_brick',
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'inventory_stone_brick': {
+                        A: 1.3,
+                        B: 0.2*gameEffects.getEffectValue('crafting_efficiency')*gameEffects.getEffectValue('crafting_effort'),
+                        type: 1,
+                    }
+                }
+            }),
+            get_consumption: ()=>({
+                resources: {
+                    'inventory_stone': {
+                        A: 1.5,
+                        B: 1*gameEffects.getEffectValue('crafting_effort')/gameEffects.getEffectValue('crafting_materials_discount'),
+                        type: 1
+                    },
+                }
+            }),
+            effectDeps: ['crafting_efficiency', 'crafting_materials_discount', 'crafting_effort']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameResources.isResourceUnlocked('inventory_stone_brick')
+        },
+        attributes: {
+            baseXPCost: 10,
         },
     })
 

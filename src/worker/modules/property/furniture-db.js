@@ -726,7 +726,7 @@ export const registerFurnitureStage1 = () => {
             consumption: {
                 resources: {
                     'living_space': {
-                        A: 1,
+                        A: 2,
                         B: 0,
                         type: 0
                     }
@@ -741,7 +741,7 @@ export const registerFurnitureStage1 = () => {
             },
             'living_space': {
                 A: 0,
-                B: 1,
+                B: 2,
                 type: 0
             }
         }),
@@ -967,7 +967,7 @@ export const registerFurnitureStage1 = () => {
             consumption: {
                 resources: {
                     'living_space': {
-                        A: 3,
+                        A: 2,
                         B: 0,
                         type: 0
                     }
@@ -982,7 +982,7 @@ export const registerFurnitureStage1 = () => {
             },
             'living_space': {
                 A: 0,
-                B: 3,
+                B: 2,
                 type: 0
             }
         }),
@@ -1467,7 +1467,7 @@ export const registerFurnitureStage1 = () => {
             income: {
                 effects: {
                     'crafting_effort': {
-                        A: 0.01,
+                        A: 0.02,
                         B: 0,
                         type: 0,
                     }
@@ -1592,15 +1592,15 @@ export const registerFurnitureStage1 = () => {
             return gameEntity.getLevel('shop_item_alchemy_courses') > 0;
         },
         resourceModifier: {
-            multiplier: {
+            get_multiplier: () => ({
                 effects: {
                     'gathering_herbs_amount': {
-                        A: 0.1,
+                        A: 0.1 * gameEffects.getEffectValue('drying_rack_efficiency'),
                         B: 1,
                         type: 0,
                     }
                 },
-            },
+            }),
             consumption: {
                 resources: {
                     'living_space': {
@@ -1609,7 +1609,8 @@ export const registerFurnitureStage1 = () => {
                         type: 0
                     }
                 }
-            }
+            },
+            effectDeps: ['drying_rack_efficiency'],
         },
         get_cost: () => ({
             'coins': {
@@ -1627,95 +1628,12 @@ export const registerFurnitureStage1 = () => {
 
 
 
-    registerFurniture('furniture_herbs_plantation', {
-        tags: ["furniture", "upgrade", "purchaseable", "other", "planting"],
-        name: 'Herbs Plantation',
-        description: 'Devote some space for platations to grow your very own herbs and plants',
-        level: 0,
-        unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_herbalists_handbook') > 0;
-        },
-        resourceModifier: {
-            income: {
-                resources: {
-                    'plantation_slots': {
-                        A: 1,
-                        B: 0,
-                        type: 0,
-                    }
-                },
-            },
-            consumption: {
-                resources: {
-                    'living_space': {
-                        A: 3,
-                        B: 0,
-                        type: 0
-                    }
-                }
-            }
-        },
-        get_cost: () => ({
-            'coins': {
-                A: 1.5,
-                B: 200000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
-                type: 1
-            },
-            'living_space': {
-                A: 0,
-                B: 3,
-                type: 0
-            }
-        }),
-    })
 
 
 
 
-    registerFurniture('furniture_well', {
-        tags: ["furniture", "upgrade", "purchaseable", "other", "planting"],
-        name: 'Well',
-        description: 'Dig well to make watering process more efficient, increasing plants growth rate',
-        level: 0,
-        getMaxLevel: () => {
-            return 5 + gameEffects.getEffectValue('max_wells');
-        },
-        unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_herbalists_handbook') > 0;
-        },
-        resourceModifier: {
-            income: {
-                effects: {
-                    'plantations_efficiency': {
-                        A: 0.2,
-                        B: 0,
-                        type: 0,
-                    }
-                },
-            },
-            consumption: {
-                resources: {
-                    'living_space': {
-                        A: 2,
-                        B: 0,
-                        type: 0
-                    }
-                }
-            }
-        },
-        get_cost: () => ({
-            'coins': {
-                A: 1.5,
-                B: 500000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
-                type: 1
-            },
-            'living_space': {
-                A: 0,
-                B: 2,
-                type: 0
-            }
-        }),
-    })
+
+
 
 
 

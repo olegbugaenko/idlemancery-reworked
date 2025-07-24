@@ -18,7 +18,7 @@ export const registerPermanentBonuses = () => {
                     'physical_actions_discount': {
                         A: 100,
                         B: 1,
-                        C: 0.03,
+                        C: 0.05,
                         type: 5,
                     }
                 }
@@ -43,7 +43,7 @@ export const registerPermanentBonuses = () => {
                     'routine_actions_discount': {
                         A: 100,
                         B: 1,
-                        C: 0.03,
+                        C: 0.05,
                         type: 5,
                     }
                 }
@@ -69,7 +69,7 @@ export const registerPermanentBonuses = () => {
                     'mental_actions_discount': {
                         A: 100,
                         B: 1,
-                        C: 0.03,
+                        C: 0.05,
                         type: 5,
                     }
                 }
@@ -95,7 +95,7 @@ export const registerPermanentBonuses = () => {
                     'magical_actions_discount': {
                         A: 100,
                         B: 1,
-                        C: 0.03,
+                        C: 0.05,
                         type: 5,
                     }
                 }
@@ -119,7 +119,7 @@ export const registerPermanentBonuses = () => {
                     'social_actions_discount': {
                         A: 100,
                         B: 1,
-                        C: 0.03,
+                        C: 0.05,
                         type: 5,
                     }
                 }

@@ -321,6 +321,38 @@ export const achievementsDb = [{
     ],
     completeCondition: () => gameEntity.getLevel('action_pushup') >= 100
 },{
+    id: 'action_pushup_4',
+    title: 'The Two-Chair Challenge',
+    text: [
+        "Feeling strong enough, you decided to carry two chairs at once during your usual furniture rearranging.",
+        "Your arms didn't fail you, but the passage turned out to be too narrow.",
+        "The tent shifted, and you had to test not only your strength but also your patience and mastery of colorful language."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_pushup') >= 250
+},{
+    id: 'action_pushup_5',
+    title: 'The Wolf and the Pants',
+    text: [
+        "You decided to take an evening stroll through the forest when you spotted a wolf.",
+        "You ran as fast as you could to a tree and grabbed onto a branch with your hands.",
+        "The wolf turned out to be patient and sat for a long time, watching with hungry eyes.",
+        "Eventually, your hands couldn't hold on and slipped along the branches.",
+        "But you got caught by your pants on a lower branch, which saved you.",
+        "Now those pants are your talisman, which you wear to every training session, just in case your arms fail you again."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_pushup') >= 500
+},{
+    id: 'action_pushup_6',
+    title: 'The Hanging Workout',
+    text: [
+        "You decided that simply doing push-ups was no longer interesting.",
+        "So you tied a rock to your legs for extra weight and climbed a tree to do pull-ups on a branch.",
+        "After finishing your workout, satisfied with yourself, you decided to climb down.",
+        "But trouble struck—the rope got caught on a branch, and you hung upside down in the air.",
+        "You didn't have to call for help for long, but now many legends circulate about you!"
+    ],
+    completeCondition: () => gameEntity.getLevel('action_pushup') >= 1000
+},{
     id: 'action_train_endurance',
     title: 'Jogging with a Purpose',
     text: [
@@ -348,6 +380,39 @@ export const achievementsDb = [{
     ],
     completeCondition: () => gameEntity.getLevel('action_endurance_training') >= 100
 },{
+    id: 'action_endurance_training_4',
+    title: 'The Marathon Disaster',
+    text: [
+        "You decided to run a marathon around the settlement.",
+        "After completing half the route, you realized this wasn't the best idea.",
+        "You hadn't accounted for the tall nettles along the path.",
+        "Despite your heroism and perseverance, the forces were unequal.",
+        "You had to return, with shame in your eyes and burns below your waist, past everyone who had seen your heroic start."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_endurance_training') >= 250
+},{
+    id: 'action_endurance_training_5',
+    title: 'The Mountain Challenge',
+    text: [
+        "You decided to climb the highest mountain in the area.",
+        "Halfway up, you realized you had forgotten food and water.",
+        "You had to fight for berries with a local moose.",
+        "You had to descend, but you were still proud.",
+        "Now you know that endurance is also about planning."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_endurance_training') >= 500
+},{
+    id: 'action_endurance_training_6',
+    title: 'The Horse Chase',
+    text: [
+        "A neighbor's horse knocked down your fence, and you chased it through half the settlement with colorful language.",
+        "You tried to teach the violator a lesson.",
+        "Finally, the horse stopped, waited for you, and as soon as you swung at the 'bandit'—it kicked you in the side with all its might.",
+        "Despite the broken rib, you understood the main thing—even a horse couldn't get far away from you.",
+        "You are as healthy as a horse!"
+    ],
+    completeCondition: () => gameEntity.getLevel('action_endurance_training') >= 1000
+},{
     id: 'action_yoga_practice_1',
     title: 'Breathless Enlightenment',
     text: [
@@ -374,6 +439,29 @@ export const achievementsDb = [{
         "If only that delicious smell of roast turkey from the nearby tavern hadn’t broken your focus."
     ],
     completeCondition: () => gameEntity.getLevel('action_yoga_practices') >= 100
+},{
+    id: 'action_yoga_practice_4',
+    title: 'The Harmony Master',
+    text: [
+        "You met a self-proclaimed 'yoga master' who promised to teach you the most effective exercises for developing harmony between body and soul.",
+        "His 'unique' techniques involved standing on your head while balancing a pot of boiling water on your feet.",
+        "The master assured you that true enlightenment comes through overcoming physical limitations.",
+        "Your body and soul achieved perfect harmony—in the local hospital, where they treated your dislocated spine.",
+        "Your back will remember this lesson for a very long time. At least now you know that not every 'master' is actually a master."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_yoga_practices') >= 250
+},{
+    id: 'action_yoga_practice_5',
+    title: 'The Professional Instructor',
+    text: [
+        "Confident in your yoga skills, you decided to start offering paid lessons to the townsfolk.",
+        "You set up a beautiful outdoor studio with mats and incense, ready to share your wisdom.",
+        "After the first lesson, not a single student returned for the second session.",
+        "However, the local chiropractor approached you with an interesting business proposal.",
+        "He suggested a collaboration: you continue teaching yoga, and he handles the resulting injuries.",
+        "It's not exactly the spiritual enlightenment you were aiming for, but at least it's honest work."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_yoga_practices') >= 500
 },{
     id: 'action_meditate_1',
     title: 'The Magic Meditated Back',
@@ -416,6 +504,19 @@ export const achievementsDb = [{
     ],
     completeCondition: () => gameEntity.getLevel('action_meditate') >= 100
 },{
+    id: 'action_meditate_4',
+    title: 'The Bear Incident',
+    text: [
+        "Deep in meditation in the forest, you were suddenly interrupted by rustling bushes and heavy footsteps.",
+        "Convinced it was a bear, you panicked and shouted the first spell that came to mind.",
+        "The 'bear' fell to the ground with a loud thud, followed by even louder cursing.",
+        "It was then you realized that bears don't typically curse in the local dialect.",
+        "Turns out it was the local forester who had been watching your meditation sessions with great interest.",
+        "Fortunately, your spell misfired and only caused a minor stuttering problem. You had to escort him to the healer for an anti-stuttering potion.",
+        "The forester now gives you a wide berth, but at least you've proven that your magic can affect something other than your own concentration."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_meditate') >= 250
+},{
     id: 'action_home_errands_1',
     title: 'The Relic of Cleaning',
     text: [
@@ -456,6 +557,17 @@ export const achievementsDb = [{
         "You are, however, now on your fourth pair of replacement glasses. The previous ones remain missing in action."
     ],
     completeCondition: () => gameEntity.getLevel('action_home_errands') >= 100
+},{
+    id: 'action_home_errands_4',
+    title: 'The Domestic Philosopher',
+    text: [
+        "After five hundred sessions of what you've come to call 'organized chaos management,' you've achieved something remarkable.",
+        "Your camp now has designated zones for everything: a proper kitchen area with a stone fire pit, a reading nook under the largest tree, even a 'guest area' for the rare visitor who doesn't immediately flee from your eccentric lifestyle.",
+        "You've developed a system so efficient that you can find any item within thirty seconds—a personal record that would impress even the most organized librarian.",
+        "The local merchants have started referring to you as 'that person who actually knows where their things are.' It's not exactly the title you dreamed of, but it's honest recognition of your domestic achievements.",
+        "Your organizational skills have become legendary. Rumor has it that even the town's mayor considered hiring you to reorganize the city hall, but decided against it after seeing your 'creative' filing system."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_home_errands') >= 500
 },{
     id: 'shop_item_less_illusion',
     title: 'First Contact (Almost)',
@@ -545,6 +657,71 @@ export const achievementsDb = [{
         return gameEntity.getLevel('action_walking') >= 100000
     }
 },{
+    id: 'knowledge_500',
+    title: 'The Charity Quiz Champion',
+    text: [
+        "Today you met a man you used to cross paths with frequently at the free food distribution point. Obviously, your paths have diverged since then. But the man hasn't forgotten how you changed clothes three times to look like a different person, and shared extra portions.",
+        "So he informed you about a charity quiz being held among the homeless, where prizes were offered — specifically, free education and accommodation for a while. You thought about refusing, since you left the times of poverty far behind.",
+        "But your thirst for victory convinced you to find your old shirt and dress up as a destitute street singer.",
+        "And so, you answered all 30 questions, and in anticipation of the reward, you step onto the stage. But something went wrong — the local librarian, who was awarding medals, recognized you.",
+        "Instead of medals, punches awaited you, though your self-admiration didn't suffer from this — you won, and winners aren't judged!"
+    ],
+    completeCondition: () => {
+        return gameResources.getResource('knowledge').amount >= 500
+    }
+},{
+    id: 'action_woodcutting_50',
+    title: 'The Axe Whisperer',
+    text: [
+        "You've finally figured out which end of the axe to hold. But you still haven't learned to avoid hitting exactly where you're not supposed to.",
+        "After your tenth trip to the master craftsman, you decided to learn how to repair your tool yourself. The constant visits were starting to affect your reputation — and your wallet.",
+        "Yesterday, while attempting to chop a particularly stubborn oak, your axe handle cracked in half. Instead of panicking, you calmly examined the damage, gathered some sturdy branches, and spent the evening crafting a new handle.",
+        "The result wasn't pretty, but it held together. Today, you're back in the forest, swinging your homemade creation with renewed confidence.",
+        "True champions only grow stronger after defeats — and you're starting to feel like a real lumberjack, even if your trees sometimes look more like abstract art than firewood."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_woodcutter') >= 50
+    }
+},{
+    id: 'action_woodcutting_100',
+    title: 'The Accidental Axe Champion',
+    text: [
+        "Today you won an 'unexpected competition' in axe throwing, without even wanting to. You were doing your usual logging work when, mid-swing, you miscalculated, and the axe slipped from your hands.",
+        "After spinning through the air for what felt like an eternity, it masterfully knocked the hat off the head of a passing village elder. The precision was impressive — if only it had been intentional.",
+        "Despite your pride in the accuracy, you spent the entire day convincing the local council of elders not to ban you from logging in the settlement area.",
+        "Your argument about 'demonstrating exceptional axe control' didn't quite land as intended, but eventually they agreed that accidents happen to everyone.",
+        "Now you're back to chopping wood, though you've developed a habit of checking for any approaching officials before each swing. The elders still give you nervous glances when you pass by the village square."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_woodcutter') >= 100
+    }
+},{
+    id: 'action_quarrying_50',
+    title: 'The Stone Whisperer',
+    text: [
+        "You spent a long time trying to figure out what to do with the pickaxe. Eventually, you decided to throw it aside and try breaking stone with your bare hands, which sincerely amused the local stonemasons.",
+        "At first, they watched your attempts with a mix of confusion and pity. But as the day wore on, your determination — if not your technique — began to earn their respect.",
+        "By evening, leaving the tavern together with them, you realized you had found yourself friends. The laughter had turned into camaraderie, and your bruised knuckles became a badge of honor.",
+        "Happiness isn't in the stone, right? But it might just be in the company of those who understand the value of persistence, even when it looks ridiculous.",
+        "Now you're back at the quarry, this time with proper tools and a group of friends who occasionally still chuckle at your early attempts, but always share their lunch and their wisdom."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_quarrying') >= 50
+    }
+},{
+    id: 'action_quarrying_100',
+    title: 'The Fossil Finder',
+    text: [
+        "You've finally mastered the pickaxe properly. The stones still don't come out even, often they're jagged and rough. But today, you found something extraordinary in yet another split rock — what appeared to be a trilobite fossil.",
+        "Excited by your discovery, you carefully carried it to the local paleontologist, imagining yourself as a great explorer of ancient times.",
+        "However, he refused to take it, claiming it was just someone's old shoe that got stuck in mud and dried up. His scientific expertise was apparently not impressed by your 'prehistoric footwear.'",
+        "Undeterred by his skepticism, you kept the fossil for yourself. Now, every time you look at it, you proudly display your 'paleo-shoe' to anyone who will listen.",
+        "The stones may still be uneven, but you've found something even more valuable — a story that gets better with each telling, and a fossil that's definitely not just an old shoe. Probably."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_quarrying') >= 100
+    }
+},{
     id: 'action_craft_1',
     title: 'Stick Perfection',
     minDemoVersion: 20,
@@ -602,5 +779,79 @@ export const achievementsDb = [{
     ],
     completeCondition: () => {
         return gameEntity.getLevel('shop_item_weird_painting') >= 1
+    }
+},{
+    id: 'action_crafting_training_1',
+    title: 'The Carpenter\'s Face',
+    text: [
+        "Today at the shop, a man asked if you were a carpenter by any chance.",
+        "You were incredibly pleased that your craftsmanship was now written all over your face.",
+        "However, when you asked 'How did you know?', the man confessed that he had seen you yesterday carrying out the twentieth failed attempt at constructing an even bench that would fit between the tents.",
+        "Now you take out the trash at night."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_crafting_training') >= 50
+    }
+},{
+    id: 'action_crafting_training_2',
+    title: 'The Wooden Horse Champion',
+    text: [
+        "Today there was a competition for the best wooden craft, and you won!",
+        "At least that's what your friends told you, with whom you spent the evening drowning the sorrow of unrecognized talent.",
+        "Nevertheless, your wooden horse now stands in the sergeant's yard.",
+        "He even paid a few coins, saying it would be good to prop up his falling antique table that he inherited from his grandfather."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_crafting_training') >= 100
+    }
+},{
+    id: 'action_crafting_training_3',
+    title: 'The High Art of Stools',
+    text: [
+        "Your work has started bearing fruit—this week, two people already praised your homemade stools.",
+        "However, for some reason, no one dared to sit on them.",
+        "But you understand that they simply didn't dare touch high art."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_crafting_training') >= 250
+    }
+},{
+    id: 'action_alchemy_training_1',
+    title: 'The Memory Elixir Incident',
+    text: [
+        "And so, you seriously decided to study the secrets of potion brewing.",
+        "After buying another recipe, you enthusiastically returned home to prepare a memory elixir.",
+        "Finishing the brewing, you drank a glass without waiting for it to cool down.",
+        "Suddenly you remembered that you forgot to check the dosage.",
+        "By evening, you had to chat with fairies and unicorns.",
+        "Towards nightfall, a prophet descended to you and said that you are the very hero the world needs.",
+        "In the morning, you woke up on the floor, understanding that the memory elixir really helped—you'll remember yesterday for the rest of your life, as well as the fact that you need to pay attention to dosage."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_alchemy_training') >= 50
+    }
+},{
+    id: 'action_alchemy_training_2',
+    title: 'The Sweet Elixirs',
+    text: [
+        "Daily alchemy practice is bearing fruit.",
+        "You've now learned to add sugar and honey to your elixirs.",
+        "Maybe your muscles haven't become like a tiger's, but at least they're tasty."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_alchemy_training') >= 100
+    }
+},{
+    id: 'action_alchemy_training_3',
+    title: 'The Youth Elixir Business',
+    text: [
+        "Neighbors have started visiting you more and more often, praising your youth elixir.",
+        "Many note the effect after just the third dose.",
+        "However, for some reason everyone calls it 'cherry brandy' among themselves.",
+        "The other day, the patrol visited you and threatened arrest for illegal distribution of alcohol.",
+        "Well, had to choose a different direction in alchemy."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_alchemy_training') >= 250
     }
 }]

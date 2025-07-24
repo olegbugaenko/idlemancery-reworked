@@ -422,6 +422,14 @@ export const registerCommomEffects = () => {
         hasCap: false,
     })
 
+    gameEffects.registerEffect('drying_rack_efficiency', {
+        name: 'Drying Rack Efficiency',
+        description: 'Increases the efficiency of Herbalist\'s Drying Rack',
+        defaultValue: 1.,
+        minValue: 1,
+        hasCap: false,
+    })
+
     gameEffects.registerEffect('crafting_materials_discount', {
         name: 'Crafting Materials Discount',
         defaultValue: 1.,

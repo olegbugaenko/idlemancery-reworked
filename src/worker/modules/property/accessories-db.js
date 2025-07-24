@@ -416,7 +416,7 @@ export const registerAccessoriesStage1 = () => {
         description: 'Create ruby pendant that empowers your physical learning rate',
         level: 0,
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.isEntityUnlocked('action_quarrying');
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.getLevel('shop_item_stone_refinement_manual') >= 1;
         },
         resourceModifier: {
             multiplier: {
@@ -446,7 +446,7 @@ export const registerAccessoriesStage1 = () => {
         description: 'Increase your HP and energy caps',
         level: 0,
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.isEntityUnlocked('action_quarrying');
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.getLevel('shop_item_stone_refinement_manual') >= 1;
         },
         resourceModifier: {
             capMult: {
@@ -482,7 +482,7 @@ export const registerAccessoriesStage1 = () => {
         description: 'Increase your spell XP gain',
         level: 0,
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.isEntityUnlocked('action_quarrying');
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.getLevel('shop_item_stone_refinement_manual') >= 1;
         },
         resourceModifier: {
             multiplier: {
@@ -512,7 +512,7 @@ export const registerAccessoriesStage1 = () => {
         description: 'Increase your mana cap',
         level: 0,
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.isEntityUnlocked('action_quarrying');
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.getLevel('shop_item_stone_refinement_manual') >= 1;
         },
         resourceModifier: {
             capMult: {

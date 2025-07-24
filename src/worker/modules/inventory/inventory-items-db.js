@@ -906,6 +906,27 @@ export const registerInventoryItems = () => {
         }),
     })
 
+    registerInventoryItem('inventory_stone_brick', {
+        name: 'Stone Brick',
+        hasCap: false,
+        tags: ['inventory', 'material'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        attributes: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.isEntityUnlocked('action_quarrying')
+        },
+        sellPrice: 5000,
+        get_cost: (amount = 1) => ({
+            coins: amount*50000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+        }),
+    })
+
 
     registerInventoryItem('inventory_iron_ore', {
         name: 'Iron Ore',
@@ -946,13 +967,8 @@ export const registerInventoryItems = () => {
         attributes: {
 
         },
-        unlockedBy: [{
-            type: 'entity',
-            id: 'action_quarrying',
-            level: 2,
-        }],
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.isEntityUnlocked('action_quarrying')
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.getLevel('shop_item_stone_refinement_manual') >= 1
         },
         sellPrice: 12000,
         get_cost: (amount = 1) => ({
@@ -974,13 +990,8 @@ export const registerInventoryItems = () => {
         attributes: {
 
         },
-        unlockedBy: [{
-            type: 'entity',
-            id: 'action_quarrying',
-            level: 2,
-        }],
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.isEntityUnlocked('action_quarrying')
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.getLevel('shop_item_stone_refinement_manual') >= 1
         },
         sellPrice: 16000,
         get_cost: (amount = 1) => ({

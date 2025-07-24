@@ -68,7 +68,7 @@ export const registerStructuresStage1 = () => {
             },
             'inventory_wooden_beam': {
                 A: 1.2,
-                B: 10,
+                B: 2,
                 type: 1
             }
         }),
@@ -86,12 +86,12 @@ export const registerStructuresStage1 = () => {
             income: {
                 effects: {
                     'crafting_effort': {
-                        A: 0.04,
+                        A: 0.01,
                         B: 0,
                         type: 0,
                     },
                     'alchemy_effort': {
-                        A: 0.04,
+                        A: 0.01,
                         B: 0,
                         type: 0,
                     }
@@ -122,6 +122,208 @@ export const registerStructuresStage1 = () => {
                 A: 0,
                 B: 1,
                 type: 0
+            }
+        }),
+    })
+
+    registerStructure('structure_herbs_plantation', {
+        tags: ["structure", "upgrade", "purchaseable", "planting"],
+        name: 'Herbs Plantation',
+        description: 'Devote some space for plantations to grow your very own herbs and plants',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_herbalists_handbook') > 0;
+        },
+        resourceModifier: {
+            income: {
+                resources: {
+                    'plantation_slots': {
+                        A: 1,
+                        B: 0,
+                        type: 0,
+                    }
+                },
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 3,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'inventory_wooden_beam': {
+                A: 1.5,
+                B: 5,
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 3,
+                type: 0
+            }
+        }),
+    })
+
+    registerStructure('structure_well', {
+        tags: ["structure", "upgrade", "purchaseable", "planting"],
+        name: 'Well',
+        description: 'Dig well to make watering process more efficient, increasing plants growth rate',
+        level: 0,
+        getMaxLevel: () => {
+            return 5 + gameEffects.getEffectValue('max_wells');
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_herbalists_handbook') > 0 && gameResources.isResourceUnlocked('inventory_stone_brick');
+        },
+        resourceModifier: {
+            income: {
+                effects: {
+                    'plantations_efficiency': {
+                        A: 0.2,
+                        B: 0,
+                        type: 0,
+                    }
+                },
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 2,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'inventory_stone_brick': {
+                A: 1.5,
+                B: 5,
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 2,
+                type: 0
+            }
+        }),
+    })
+
+    registerStructure('structure_stone_workshop', {
+        tags: ["structure", "upgrade", "purchaseable", "crafting"],
+        name: 'Stone Workshop',
+        description: 'A sturdy workshop built with stone bricks, providing excellent conditions for crafting',
+        level: 0,
+        maxLevel: 5,
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_stone_brick')
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'crafting_effort': {
+                        A: 0.2,
+                        B: 1,
+                        type: 0,
+                    }
+                },
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 3,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'inventory_stone_brick': {
+                A: 1.5,
+                B: 10,
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 3,
+                type: 0
+            }
+        }),
+    })
+
+    registerStructure('structure_dry_storage', {
+        tags: ["structure", "upgrade", "purchaseable", "herbalism"],
+        name: 'Dry Storage',
+        description: 'A specialized stone building designed to maintain optimal conditions for drying herbs. Enhances the efficiency of your Herbalist\'s Drying Rack.',
+        level: 0,
+        maxLevel: 5,
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_stone_brick')
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'drying_rack_efficiency': {
+                        A: 0.2,
+                        B: 1,
+                        type: 0
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 2,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'inventory_stone_brick': {
+                A: 1.5,
+                B: 8,
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 2,
+                type: 0
+            }
+        }),
+    })
+
+    registerStructure('structure_underground_cellar', {
+        tags: ["structure", "upgrade", "purchaseable", "storage"],
+        name: 'Underground Cellar',
+        description: 'A deep stone cellar built underground, providing secure storage for your wealth. Being underground, it doesn\'t require living space.',
+        level: 0,
+        maxLevel: 25,
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_stone_brick')
+        },
+        resourceModifier: {
+            get_capMult: () => ({
+                resources: {
+                    coins: {
+                        A: 0.2,
+                        B: 1,
+                        type: 0
+                    }
+                }
+            }),
+        },
+        get_cost: () => ({
+            'inventory_stone_brick': {
+                A: 1.5,
+                B: 5,
+                type: 1
             }
         }),
     })

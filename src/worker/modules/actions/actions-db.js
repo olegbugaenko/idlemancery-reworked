@@ -518,7 +518,7 @@ export const registerActionsStage1 = () => {
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_strength',
-            level: 350,
+            level: 400,
         }],
         attributes: {
             baseXPCost: 20,
@@ -676,6 +676,57 @@ export const registerActionsStage1 = () => {
             type: 'effect',
             id: 'attribute_magic_ability',
             level: 50,
+        }],
+        attributes: {
+            baseXPCost: 20,
+            primaryAttribute: 'attribute_magic_capability'
+        }
+    })
+
+    registerGameAction('action_simple_illusions', {
+        tags: ["action", "job", "magical"],
+        name: 'Create Simple Illusions',
+        isAbstract: false,
+        category: ACTION_CATS.COINS,
+        allowedImpacts: ['effects'],
+        description: 'Create simple magical illusions to amaze audiences and earn more coins than basic tricks',
+        level: 1,
+        discountEffects: ['physical_actions_discount'],
+        jobType: 'magical',
+        getLearnRate: () => {
+            return 1;
+        },
+        learningEffects: ['job_learning_rate'],
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'coins': {
+                        A: 1.8*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_magical'),
+                        B: 16.2*gameEffects.getEffectValue('coins_earned_bonus'),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 12.5,
+                        type: 0,
+                    },
+                    'mana': {
+                        A: 0.0,
+                        B: 3.0,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['coins_earned_bonus', 'job_efficiency_magical']
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_magic_ability',
+            level: 150,
         }],
         attributes: {
             baseXPCost: 20,
@@ -2211,7 +2262,57 @@ export const registerActionsStage1 = () => {
         }
     })
 
-
+    registerGameAction('action_learn_self_organization', {
+        tags: ["action", "mental", "book"],
+        name: 'Learn Self-Organization',
+        category: ACTION_CATS.MENTAL,
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Learn self-organization techniques to increase your coin storage capacity',
+        level: 1,
+        maxLevel: 100,
+        discountEffects: ['mental_actions_discount'],
+        getLearnRate: () => {
+            return 1.
+        },
+        satelliteEntityId: 'action_bonus_self_organization',
+        satelliteEntityLevelMod: (l) => Math.max(0, (l || 1) - 1), // modifier for entity
+        learningEffects: ['books_learning_rate'],
+        resourceModifier: {
+            get_capMult: () => ({
+                resources: {
+                    'coins': {
+                        A: 0.02,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 100,
+                        type: 0,
+                    },
+                    'knowledge': {
+                        A: 0.0,
+                        B: 25,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['read_books_efficiency']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_self_organization_book') > 0
+        },
+        attributes: {
+            baseXPCost: 25000,
+            displayPerLevel: 1,
+            isTraining: true,
+        }
+    })
 
     registerGameAction('action_learn_botany', {
         tags: ["action", "mental", "book"],
@@ -2505,7 +2606,7 @@ export const registerActionsStage1 = () => {
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_strength',
-            level: 400,
+            level: 350,
         }],
         attributes: {
             baseXPCost: 500,
@@ -3168,110 +3269,7 @@ export const registerActionsStage1 = () => {
     })
 
 
-    registerGameAction('advanced_craft', {
-        tags: ["action", "activity", "physical", "crafting"],
-        name: 'Advanced Craft',
-        category: ACTION_CATS.OTHER,
-        isAbstract: false,
-        minDemoVersion: 20,
-        allowedImpacts: ['effects'],
-        description: 'Spend more time and efforts on crafting advanced things',
-        level: 1,
-        getLearnRate: () => {
-            return 2
-        },
-        resourceModifier: {
-            get_income: () => ({
-                resources: {
-                    'crafting_ability': {
-                        A: 0.005,
-                        B: 0.045,
-                        type: 0,
-                    }
-                }
-            }),
-            get_consumption: () => ({
-                resources: {
-                    'energy': {
-                        A: 0.0,
-                        B: 30,
-                        type: 0,
-                    },
-                    'health': {
-                        A: 0.0,
-                        B: 10,
-                        type: 0,
-                    }
-                }
-            }),
-            effectDeps: []
-        },
-        unlockedBy: [{
-            type: 'effect',
-            id: 'attribute_strength',
-            level: 500,
-        }],
-        unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && false
-        },
-        attributes: {
-            baseXPCost: 500,
-            primaryAttribute: 'attribute_strength'
-        }
-    })
-
-
-    registerGameAction('masterwork_craft', {
-        tags: ["action", "activity", "physical", "crafting"],
-        name: 'Masterwork Craft',
-        category: ACTION_CATS.OTHER,
-        isAbstract: false,
-        allowedImpacts: ['effects'],
-        description: 'A test of endurance, skill, and precision—Masterwork Crafting pushes the limits of craftsmanship, demanding immense physical and mental effort.',
-        level: 1,
-        minDemoVersion: 20,
-        getLearnRate: () => {
-            return 2
-        },
-        resourceModifier: {
-            get_income: () => ({
-                resources: {
-                    'crafting_ability': {
-                        A: 0.02,
-                        B: 0.18,
-                        type: 0,
-                    },
-                },
-            }),
-            get_consumption: () => ({
-                resources: {
-                    'energy': {
-                        A: 0.0,
-                        B: 120,
-                        type: 0,
-                    },
-                    'health': {
-                        A: 0.0,
-                        B: 40,
-                        type: 0,
-                    }
-                }
-            }),
-            effectDeps: []
-        },
-        unlockedBy: [{
-            type: 'effect',
-            id: 'attribute_strength',
-            level: 40000,
-        }],
-        unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && false
-        },
-        attributes: {
-            baseXPCost: 100000,
-            primaryAttribute: 'attribute_strength'
-        }
-    })
+    
 
 
     registerGameAction('action_alchemy', {
@@ -3964,6 +3962,114 @@ export const registerActionsStage1 = () => {
         }
     })
 
+    registerGameAction('action_crafting_training', {
+        tags: ["action", "training", "physical"],
+        name: 'Crafting Training',
+        category: ACTION_CATS.PHYSICAL,
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        discountEffects: ['physical_actions_discount'],
+        description: 'Intense physical training that improves your crafting efficiency through better control and strength',
+        level: 1,
+        getLearnRate: () => {
+            return 1
+        },
+        learningEffects: ['physical_training_learn_speed'],
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'crafting_effort': {
+                        A: 0.01*gameEffects.getEffectValue(getRankId('action_crafting_training')),
+                        B: 0.99,
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 150,
+                        type: 0,
+                    },
+                    'health': {
+                        A: 0.0,
+                        B: 125,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: []
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 600
+        }],
+        unlockCondition: () => {
+            return true
+        },
+        attributes: {
+            baseXPCost: 25000,
+            isTraining: true,
+            isRankAvailable: true,
+        }
+    })
+
+    registerGameAction('action_alchemy_training', {
+        tags: ["action", "training", "mental"],
+        name: 'Alchemy Training',
+        category: ACTION_CATS.MENTAL,
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        discountEffects: ['mental_actions_discount'],
+        description: 'Mental exercises that enhance your alchemy efficiency through improved focus and understanding',
+        level: 1,
+        getLearnRate: () => {
+            return 1
+        },
+        learningEffects: ['mental_training_learning_rate'],
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'alchemy_effort': {
+                        A: 0.01*gameEffects.getEffectValue(getRankId('action_alchemy_training')),
+                        B: 0.99,
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 500,
+                        type: 0,
+                    },
+                    'knowledge': {
+                        A: 0.0,
+                        B: 40,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: []
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 600
+        }],
+        unlockCondition: () => {
+            return true
+        },
+        attributes: {
+            baseXPCost: 25000,
+            isTraining: true,
+            isRankAvailable: true,
+        }
+    })
+
     // ------------------------//
     // *** Bonuses Related *** //
 
@@ -3981,6 +4087,23 @@ export const registerActionsStage1 = () => {
                 }
             }),
             effectDeps: [getRankId('action_home_errands')],
+        },
+    })
+
+    
+    gameEntity.registerGameEntity('action_bonus_self_organization', {
+        name: 'Self Organization Bonus',
+        isAbstract: false,
+        resourceModifier: {
+            get_capMult: () => ({
+                resources: {
+                    'coins': {
+                        A: 0.02,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }),
         },
     })
 
