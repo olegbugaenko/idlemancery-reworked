@@ -413,6 +413,72 @@ export const achievementsDb = [{
     ],
     completeCondition: () => gameEntity.getLevel('action_endurance_training') >= 1000
 },{
+    id: 'action_stamina_training_1',
+    title: 'The Gossip Marathon',
+    text: [
+        "Today you accomplished more than usual—you visited all the local gathering spots to listen to gossip.",
+        "You didn't even get tired.",
+        "However, you had to hear stories about yourself and your 'outstanding physical condition' several times.",
+        "Apparently, they didn't like that you can't climb the hill where your tents are located without getting out of breath."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_stamina_training') >= 50
+},{
+    id: 'action_stamina_training_2',
+    title: 'The Shortcut Disaster',
+    text: [
+        "You bet with a friend that you could reach the neighboring village faster.",
+        "Deciding to take a shortcut, you chose a shorter path.",
+        "However, you forgot that heavy rains had passed recently, and the stream you used to cross without problems now had to be swum across.",
+        "Having an insane will to win, being a born champion, you rushed to swim across.",
+        "However, you slightly miscalculated your strength...",
+        "By evening, you woke up in the neighboring village's hospital with a cold and despair from the lost bet."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_stamina_training') >= 100
+},{
+    id: 'action_stamina_training_3',
+    title: 'The Endless Day',
+    text: [
+        "You decided to test your stamina limits.",
+        "You worked in your garden all day, and after finishing, agreed to help your neighbors.",
+        "Satisfied with your endurance, you settled down to sleep.",
+        "Early in the morning, you were awakened by muscle soreness and a queue of people eager to help you test your endurance.",
+        "You won't make such mistakes again."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_stamina_training') >= 250
+},{
+    id: 'action_cardio_training_1',
+    title: 'The Heart Rate Challenge',
+    text: [
+        "You discovered that your heart rate increases significantly during intense activities.",
+        "Excited by this discovery, you decided to test how long you can maintain maximum effort.",
+        "During the jumping exercises, you landed awkwardly on a rock and sprained your ankle.",
+        "Now you know that your heart is healthier than your leg.",
+        "Apparently, normal people don't measure their heart rate by how many times they can jump in place."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_cardio_training') >= 50
+},{
+    id: 'action_cardio_training_2',
+    title: 'The Breathing Master',
+    text: [
+        "You've mastered the art of controlled breathing during intense workouts.",
+        "Your lung capacity has increased so much that you can hold your breath underwater for impressive durations.",
+        "You decided to demonstrate this skill at the local pond.",
+        "Unfortunately, you forgot that the pond is only knee-deep, and your dramatic underwater performance looked more like you were trying to drink the water.",
+        "The local children were thoroughly entertained by your 'swimming' technique."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_cardio_training') >= 100
+},{
+    id: 'action_cardio_training_3',
+    title: 'The Horse Replacement',
+    text: [
+        "Your neighbor's horse fell ill, and you decided to take advantage of the opportunity to test your strength.",
+        "So you harnessed yourself to the plow and got to work.",
+        "By evening, a crowd had gathered in the yard to watch the spectacle.",
+        "They clapped and shouted slogans in your support.",
+        "As a result, it all turned into a loud party in your honor."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_cardio_training') >= 250
+},{
     id: 'action_yoga_practice_1',
     title: 'Breathless Enlightenment',
     text: [

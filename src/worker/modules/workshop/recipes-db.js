@@ -372,7 +372,7 @@ export const registerCraftingRecipes = () => {
                 resources: {
                     'inventory_iron_plate': {
                         A: 1.3,
-                        B: 0.02*gameEffects.getEffectValue('crafting_effort')*gameEffects.getEffectValue('crafting_efficiency'),
+                        B: 0.01*gameEffects.getEffectValue('crafting_effort')*gameEffects.getEffectValue('crafting_efficiency'),
                         type: 1,
                     }
                 }

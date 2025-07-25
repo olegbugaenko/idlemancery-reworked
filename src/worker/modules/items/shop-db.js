@@ -2581,4 +2581,69 @@ export const registerShopItemsStage1 = () => {
             }
         }),
     })
+
+    gameEntity.registerGameEntity('shop_item_machinery', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Machinery',
+        description: 'Advanced mechanical systems that enable the operation of industrial facilities like the Lumber Mill. Unlocks the ability to build and operate large-scale production buildings.',
+        level: 0,
+        maxLevel: 1,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 1250
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_constructing') > 0 && gameEntity.getLevel('shop_item_saw') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'industrial_efficiency': {
+                        A: 0.5,
+                        B: 1,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1,
+                B: 50000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_market_license', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Market License',
+        description: 'An official license that allows you to build trading structures on your land. Unlocks the ability to construct Trade Stalls and Trade Warehouses.',
+        level: 0,
+        maxLevel: 1,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_charisma',
+            level: 1250
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_constructing') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1,
+                B: 200000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+
 }

@@ -567,10 +567,10 @@ export const registerAccessoriesStage1 = () => {
     })
 
 
-    registerAccessory('accessory_lumber_mill', {
+    registerAccessory('accessory_wood_processor', {
         tags: ["accessory", "upgrade", "purchaseable", "resource", "crafting"],
-        name: 'Lumber Mill',
-        description: 'Build a machine that helps you to process wood',
+        name: 'Wood Processor',
+        description: 'A compact device that helps you to process wood more efficiently',
         level: 0,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.isEntityUnlocked('action_mining');
@@ -579,7 +579,7 @@ export const registerAccessoriesStage1 = () => {
             multiplier: {
                 resources: {
                     'inventory_refined_wood': {
-                        A: 0.05,
+                        A: 0.0,
                         B: 1,
                         type: 0,
                     }

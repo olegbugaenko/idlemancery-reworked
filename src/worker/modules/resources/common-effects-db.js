@@ -433,7 +433,7 @@ export const registerCommomEffects = () => {
     gameEffects.registerEffect('crafting_materials_discount', {
         name: 'Crafting Materials Discount',
         defaultValue: 1.,
-        minValue: 1,
+        minValue: 1.,
         hasCap: false,
         saveBalanceTree: true,
     })
@@ -441,7 +441,7 @@ export const registerCommomEffects = () => {
     gameEffects.registerEffect('alchemy_materials_discount', {
         name: 'Alchemy Materials Discount',
         defaultValue: 1.,
-        minValue: 1,
+        minValue: 1.,
         hasCap: false,
         saveBalanceTree: true,
     })
@@ -449,7 +449,7 @@ export const registerCommomEffects = () => {
     gameEffects.registerEffect('map_generation_discount', {
         name: 'Map Generation Discount',
         defaultValue: 1.,
-        minValue: 1,
+        minValue: 1.,
         hasCap: false,
         saveBalanceTree: true,
     })
@@ -493,4 +493,29 @@ export const registerCommomEffects = () => {
         description: 'Determines how efficient you would be in magical jobs'
 
     })
+
+    gameEffects.registerEffect('industrial_efficiency', {
+        name: 'Industrial Efficiency',
+        defaultValue: 1.,
+        minValue: 1.,
+        description: 'Determines how efficient industrial facilities like Lumber Mill operate'
+    })
+
+    gameEffects.registerEffect('tinkers_shed_crafting_bonus', {
+        name: 'Tinker\'s Shed Crafting Bonus',
+        description: 'Increases the crafting efficiency bonus from Tinker\'s Shed',
+        defaultValue: 1.,
+        minValue: 1,
+        hasCap: false,
+    })
+
+    gameEffects.registerEffect('tinkers_shed_alchemy_bonus', {
+        name: 'Tinker\'s Shed Alchemy Bonus',
+        description: 'Increases the alchemy efficiency bonus from Tinker\'s Shed',
+        defaultValue: 1.,
+        minValue: 1,
+        hasCap: false,
+    })
+
+
 }

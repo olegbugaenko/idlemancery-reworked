@@ -871,7 +871,7 @@ export const registerActionsStage1 = () => {
             level: 1000,
         }],
         attributes: {
-            baseXPCost: 1500,
+            baseXPCost: 25000,
             primaryAttribute: 'attribute_strength'
         }
     })
@@ -1304,8 +1304,8 @@ export const registerActionsStage1 = () => {
             get_multiplier: () => ({
                 effects: {
                     'learning_rate': {
-                        A: 0.02*gameEffects.getEffectValue(getRankId('action_academic_discussions')),
-                        B: 0.98*gameEffects.getEffectValue(getRankId('action_academic_discussions')),
+                        A: 0.01*gameEffects.getEffectValue(getRankId('action_academic_discussions')),
+                        B: 0.99*gameEffects.getEffectValue(getRankId('action_academic_discussions')),
                         type: 0,
                     }
                 }
@@ -1314,7 +1314,7 @@ export const registerActionsStage1 = () => {
                 resources: {
                     'energy': {
                         A: 0.0,
-                        B: 25,
+                        B: 125,
                         type: 0,
                     },
                     'knowledge': {
@@ -2239,7 +2239,7 @@ export const registerActionsStage1 = () => {
                 resources: {
                     'energy': {
                         A: 0.0,
-                        B: 400,
+                        B: 800,
                         type: 0,
                     },
                     'knowledge': {
@@ -2255,7 +2255,7 @@ export const registerActionsStage1 = () => {
             return gameEntity.getLevel('shop_item_geography_book') > 0
         },
         attributes: {
-            baseXPCost: 5000,
+            baseXPCost: 50000,
             displayPerLevel: 1,
             isTraining: true,
             isRankAvailable: true,

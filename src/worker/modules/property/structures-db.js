@@ -83,20 +83,20 @@ export const registerStructuresStage1 = () => {
             return gameEntity.getLevel('shop_item_constructing') > 0;
         },
         resourceModifier: {
-            income: {
+            get_income: () => ({
                 effects: {
                     'crafting_effort': {
-                        A: 0.01,
+                        A: 0.01 * gameEffects.getEffectValue('tinkers_shed_crafting_bonus'),
                         B: 0,
                         type: 0,
                     },
                     'alchemy_effort': {
-                        A: 0.01,
+                        A: 0.01 * gameEffects.getEffectValue('tinkers_shed_alchemy_bonus'),
                         B: 0,
                         type: 0,
                     }
                 }
-            },
+            }),
             consumption: {
                 resources: {
                     'living_space': {
@@ -105,7 +105,8 @@ export const registerStructuresStage1 = () => {
                         type: 0,
                     }
                 }
-            }
+            },
+            effectDeps: ['tinkers_shed_crafting_bonus', 'tinkers_shed_alchemy_bonus']
         },
         get_cost: () => ({
             'inventory_wooden_beam': {
@@ -324,6 +325,244 @@ export const registerStructuresStage1 = () => {
                 A: 1.5,
                 B: 5,
                 type: 1
+            }
+        }),
+    })
+
+    registerStructure('structure_lumber_mill', {
+        tags: ["structure", "upgrade", "purchaseable", "resource", "crafting"],
+        name: 'Lumber Mill',
+        description: 'A large industrial facility for processing wood into refined materials. Requires advanced machinery to operate.',
+        level: 0,
+        maxLevel: 10,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_constructing') > 0 && gameEntity.getLevel('shop_item_machinery') > 0 && gameEntity.isEntityUnlocked('action_mining');
+        },
+        resourceModifier: {
+            multiplier: {
+                resources: {
+                    'inventory_refined_wood': {
+                        A: 0.1 * gameEffects.getEffectValue('industrial_efficiency'),
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+            consumption: {
+            resources: {
+                'living_space': {
+                    A: 2,
+                    B: 0,
+                    type: 0
+                }
+            }
+        },
+            effectDeps: ['industrial_efficiency']
+        },
+        get_cost: () => ({
+            'inventory_stone_brick': {
+                A: 1.5,
+                B: 25,
+                type: 1
+            },
+            'inventory_wooden_beam': {
+                A: 1.5,
+                B: 10,
+                type: 1
+            },
+            'inventory_iron_plate': {
+                A: 1.5,
+                B: 5,
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 2,
+                type: 0
+            }
+        }),
+    })
+
+    registerStructure('structure_stone_hut', {
+        tags: ["structure", "upgrade", "purchaseable", "housing"],
+        name: 'Stone Hut',
+        description: 'A sturdy stone hut providing more living space than a wooden one',
+        level: 0,
+        maxLevel: 5,
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_iron_ore');
+        },
+        resourceModifier: {
+            income: {
+                resources: {
+                    'living_space': {
+                        A: 4, // Більше ніж звичайна хибара (2)
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            },
+        },
+        get_cost: () => ({
+            'inventory_stone_brick': {
+                A: 1.5,
+                B: 45,
+                type: 1
+            },
+            'inventory_wooden_beam': {
+                A: 1.5,
+                B: 20,
+                type: 1
+            },
+            'inventory_iron_plate': {
+                A: 1.5,
+                B: 10,
+                type: 1
+            }
+        }),
+    })
+
+    registerStructure('structure_tool_workbench', {
+        tags: ["structure", "upgrade", "purchaseable", "crafting"],
+        name: 'Tool Workbench',
+        description: 'A specialized workbench for crafting and maintaining tools. Works in synergy with your Tinker\'s Shed.',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('structure_tinkers_shed') > 0 && gameEntity.getLevel('shop_item_machinery') > 0;
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'tinkers_shed_crafting_bonus': {
+                        A: 0.2,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }),
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 2,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            },
+        },
+        get_cost: () => ({
+            'inventory_stone_brick': {
+                A: 1.5,
+                B: 25,
+                type: 1
+            },
+            'inventory_iron_plate': {
+                A: 1.5,
+                B: 5,
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 2,
+                type: 0
+            }
+        }),
+    })
+
+    registerStructure('structure_trade_stall', {
+        tags: ["structure", "upgrade", "purchaseable", "trading"],
+        name: 'Trade Stall',
+        description: 'A simple wooden stall for selling goods. Increases the rate at which market stock renews.',
+        level: 0,
+        maxLevel: 5,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_market_license') > 0;
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'shop_stock_renew_rate': {
+                        A: 0.5,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 1,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            },
+            effectDeps: ['shop_stock_renew_rate']
+        },
+        get_cost: () => ({
+            'inventory_wooden_beam': {
+                A: 1.2,
+                B: 3,
+                type: 1
+            },
+            'inventory_stone_brick': {
+                A: 1.2,
+                B: 2,
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 1,
+                type: 0
+            }
+        }),
+    })
+
+    registerStructure('structure_trade_warehouse', {
+        tags: ["structure", "upgrade", "purchaseable", "trading"],
+        name: 'Trade Warehouse',
+        description: 'A large storage facility for trading goods. Increases the maximum amount of items that can be sold.',
+        level: 0,
+        maxLevel: 3,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_market_license') > 0;
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'shop_max_stock': {
+                        A: 1.0,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 3,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            },
+            effectDeps: ['shop_max_stock']
+        },
+        get_cost: () => ({
+            'inventory_stone_brick': {
+                A: 1.5,
+                B: 15,
+                type: 1
+            },
+            'inventory_iron_plate': {
+                A: 1.5,
+                B: 5,
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 3,
+                type: 0
             }
         }),
     })
