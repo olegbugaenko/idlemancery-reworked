@@ -339,25 +339,25 @@ export const registerStructuresStage1 = () => {
             return gameEntity.getLevel('shop_item_constructing') > 0 && gameEntity.getLevel('shop_item_machinery') > 0 && gameEntity.isEntityUnlocked('action_mining');
         },
         resourceModifier: {
-            multiplier: {
+            get_multiplier: () => ({
                 resources: {
                     'inventory_refined_wood': {
-                        A: 0.1 * gameEffects.getEffectValue('industrial_efficiency'),
+                        A: 0.1 * gameEffects.getEffectValue('industrial_efficiency') * gameEffects.getEffectValue('lumbermill_efficiency'),
                         B: 1,
                         type: 0,
                     }
                 }
-            },
+            }),
             consumption: {
-            resources: {
-                'living_space': {
-                    A: 2,
-                    B: 0,
-                    type: 0
+                resources: {
+                    'living_space': {
+                        A: 2,
+                        B: 0,
+                        type: 0
+                    }
                 }
-            }
-        },
-            effectDeps: ['industrial_efficiency']
+            },
+            effectDeps: ['industrial_efficiency', 'lumbermill_efficiency']
         },
         get_cost: () => ({
             'inventory_stone_brick': {
@@ -388,7 +388,7 @@ export const registerStructuresStage1 = () => {
         name: 'Stone Hut',
         description: 'A sturdy stone hut providing more living space than a wooden one',
         level: 0,
-        maxLevel: 5,
+        getMaxLevel: () => 5 + gameEffects.getEffectValue('stone_hut_max_level_bonus'),
         unlockCondition: () => {
             return gameResources.isResourceUnlocked('inventory_iron_ore');
         },
@@ -474,20 +474,31 @@ export const registerStructuresStage1 = () => {
         name: 'Trade Stall',
         description: 'A simple wooden stall for selling goods. Increases the rate at which market stock renews.',
         level: 0,
-        maxLevel: 5,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_market_license') > 0;
         },
         resourceModifier: {
-            multiplier: {
+            get_multiplier: () => ({
                 effects: {
                     'shop_stock_renew_rate': {
                         A: 0.5,
                         B: 1,
                         type: 0,
+                    },
+                    'social_training_learning_rate': {
+                        A: gameEffects.getEffectValue('trade_stall_social_learning_bonus'),
+                        B: 1,
+                        type: 0,
+                    },
+                },
+                resources: {
+                    'knowledge': {
+                        A: gameEffects.getEffectValue('trade_stall_knowledge_bonus'),
+                        B: 1,
+                        type: 0,
                     }
                 }
-            },
+            }),
             consumption: {
                 resources: {
                     'living_space': {
@@ -497,17 +508,17 @@ export const registerStructuresStage1 = () => {
                     }
                 }
             },
-            effectDeps: ['shop_stock_renew_rate']
+            effectDeps: ['shop_stock_renew_rate', 'social_training_rate', 'trade_stall_social_learning_bonus', 'trade_stall_knowledge_bonus']
         },
         get_cost: () => ({
             'inventory_wooden_beam': {
-                A: 1.2,
-                B: 3,
+                A: 1.5,
+                B: 30,
                 type: 1
             },
             'inventory_stone_brick': {
-                A: 1.2,
-                B: 2,
+                A: 1.5,
+                B: 20,
                 type: 1
             },
             'living_space': {
@@ -523,7 +534,6 @@ export const registerStructuresStage1 = () => {
         name: 'Trade Warehouse',
         description: 'A large storage facility for trading goods. Increases the maximum amount of items that can be sold.',
         level: 0,
-        maxLevel: 3,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_market_license') > 0;
         },
@@ -551,12 +561,12 @@ export const registerStructuresStage1 = () => {
         get_cost: () => ({
             'inventory_stone_brick': {
                 A: 1.5,
-                B: 15,
+                B: 150,
                 type: 1
             },
             'inventory_iron_plate': {
                 A: 1.5,
-                B: 5,
+                B: 25,
                 type: 1
             },
             'living_space': {
@@ -564,6 +574,146 @@ export const registerStructuresStage1 = () => {
                 B: 3,
                 type: 0
             }
+        }),
+    })
+
+    registerStructure('structure_library', {
+        tags: ["structure", "upgrade", "purchaseable", "education"],
+        name: 'Library',
+        description: 'A grand library filled with knowledge and wisdom. Each level provides a bonus to learning rate.',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('action_clay_mining') > 0;
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'learning_rate': {
+                        A: 0.1,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }),
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 3,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            },
+            effectDeps: ['learning_rate']
+        },
+        get_cost: () => ({
+            'inventory_wooden_beam': {
+                A: 1.5,
+                B: 50,
+                type: 1
+            },
+            'inventory_stone_brick': {
+                A: 1.5,
+                B: 140,
+                type: 1
+            },
+            'inventory_clay': {
+                A: 1.5,
+                B: 90,
+                type: 1
+            },
+            'inventory_iron_plate': {
+                A: 1.5,
+                B: 25,
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 3,
+                type: 0
+            }
+        }),
+    })
+
+    registerStructure('structure_smelter', {
+        tags: ["structure", "upgrade", "purchaseable", "resource", "crafting"],
+        name: 'Smelter',
+        description: 'A large industrial smelter for processing iron ore into iron plates. Significantly boosts iron plate production.',
+        level: 0,
+        maxLevel: 4,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 2500,
+        }],
+        unlockCondition: () => {
+            return true;
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                resources: {
+                    'inventory_iron_plate': {
+                        A: 0.25,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }),
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 2,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 8.e+8*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'inventory_stone_brick': {
+                A: 1.5,
+                B: 1000,
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 2,
+                type: 0
+            }
+        }),
+    })
+
+    registerStructure('structure_event_hall', {
+        tags: ["structure", "upgrade", "purchaseable", "events"],
+        name: 'Event Hall',
+        description: 'A grand hall for organizing social events and gatherings. Unlocks the ability to organize various events that provide temporary and permanent bonuses.',
+        level: 0,
+        maxLevel: 1,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_charisma',
+            level: 2000,
+        }],
+        unlockCondition: () => {
+            return gameEffects.getEffectValue('attribute_charisma') >= 2000;
+        },
+        resourceModifier: {
+            consumption: {
+                resources: {
+                    'living_space': { A: 5, B: 0, type: 0 }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': { A: 1.5, B: 1000000000, type: 1 },
+            'inventory_stone_brick': { A: 1.5, B: 500, type: 1 },
+            'inventory_iron_plate': { A: 1.5, B: 100, type: 1 },
+            'living_space': { A: 0, B: 5, type: 0 }
         }),
     })
 }

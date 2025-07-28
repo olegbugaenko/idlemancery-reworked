@@ -501,6 +501,20 @@ export const registerCommomEffects = () => {
         description: 'Determines how efficient industrial facilities like Lumber Mill operate'
     })
 
+    gameEffects.registerEffect('lumbermill_efficiency', {
+        name: 'Lumbermill Efficiency',
+        defaultValue: 1.,
+        minValue: 1.,
+        description: 'Determines how efficient Lumbermill operates'
+    })
+
+    gameEffects.registerEffect('mining_efficiency', {
+        name: 'Mining Efficiency',
+        defaultValue: 1.,
+        minValue: 1.,
+        description: 'Determines how efficient mining operations are'
+    })
+
     gameEffects.registerEffect('tinkers_shed_crafting_bonus', {
         name: 'Tinker\'s Shed Crafting Bonus',
         description: 'Increases the crafting efficiency bonus from Tinker\'s Shed',
@@ -514,6 +528,30 @@ export const registerCommomEffects = () => {
         description: 'Increases the alchemy efficiency bonus from Tinker\'s Shed',
         defaultValue: 1.,
         minValue: 1,
+        hasCap: false,
+    })
+
+    gameEffects.registerEffect('trade_stall_social_learning_bonus', {
+        name: 'Trade Stall Social Learning Bonus',
+        description: 'Increases social training rate from trade stalls',
+        defaultValue: 0.,
+        minValue: 0,
+        hasCap: false,
+    })
+
+    gameEffects.registerEffect('trade_stall_knowledge_bonus', {
+        name: 'Trade Stall Knowledge Bonus',
+        description: 'Increases knowledge gain from trade stalls',
+        defaultValue: 0.,
+        minValue: 0,
+        hasCap: false,
+    })
+
+    gameEffects.registerEffect('stone_hut_max_level_bonus', {
+        name: 'Stone Hut Max Level Bonus',
+        description: 'Increases the maximum level of Stone Hut',
+        defaultValue: 0,
+        minValue: 0,
         hasCap: false,
     })
 

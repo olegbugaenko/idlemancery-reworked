@@ -10,7 +10,6 @@ import {PropertyModule} from "./modules/property/property.module";
 import {SpellModule} from "./modules/magic/spells.module";
 import {CraftingModule} from "./modules/workshop/crafting.module";
 import {PlantationsModule} from "./modules/workshop/plantations.module";
-import {GuildsModule} from "./modules/social/guilds.module";
 import {UnlockNotificationsModule} from "./shared/modules/unlock-notifications.module";
 import {RandomEventsModule} from "./modules/general/random-events.module";
 import {TemporaryEffectsModule} from "./modules/general/temporary-effects.module";
@@ -20,6 +19,7 @@ import {MonitoringModule} from "./shared/modules/monitoring.module";
 import {RulesModule} from "./shared/modules/rules.module";
 import {CoursesModule} from "./modules/items/courses.module";
 import {AchievementsModule} from "./modules/mage/achievements.module";
+import {EventsModule} from "./modules/social/social-events.module";
 
 
 export class MainModule extends GameModule {
@@ -38,7 +38,6 @@ export class MainModule extends GameModule {
         gameCore.registerModule('magic', SpellModule);
         gameCore.registerModule('crafting', CraftingModule);
         gameCore.registerModule('plantations', PlantationsModule);
-        gameCore.registerModule('guilds', GuildsModule);
         gameCore.registerModule('unlock-notifications', UnlockNotificationsModule);
         //gameCore.registerModule('random-events', RandomEventsModule);
         gameCore.registerModule('map', MapModule);
@@ -46,6 +45,7 @@ export class MainModule extends GameModule {
         gameCore.registerModule('monitoring', MonitoringModule);
         gameCore.registerModule('rules', RulesModule);
         gameCore.registerModule('achievements', AchievementsModule);
+        gameCore.registerModule('events', EventsModule);
 
 
         this.eventHandler.registerHandler('initialize-game', (data) => {
@@ -87,12 +87,14 @@ export class MainModule extends GameModule {
                 'workshop': gameEntity.getLevel('shop_item_crafting_courses') > 0 || gameEntity.getLevel('shop_item_alchemy_courses') > 0 || gameResources.getResource('plantation_slots').income > 0,
                 'plantation': gameResources.getResource('plantation_slots').income > 0,
                 'guilds': gameEffects.getEffectValue('attribute_charisma') >= 500,
-                'social': gameEffects.getEffectValue('attribute_charisma') >= 500,
+                'social': gameEntity.getLevel('structure_event_hall') > 0,
                 'map': gameEntity.getLevel('shop_item_map') > 0,
                 'world': gameEntity.getLevel('shop_item_map') > 0,
                 'automations': gameEntity.getLevel('shop_item_planner') > 0,
                 'courses': gameEntity.getLevel('shop_item_training_room') > 0,
                 'amplifiers': gameEffects.getEffectValue('attribute_magic_ability') >= 15000,
+                'events': gameEntity.getLevel('structure_event_hall') > 0,
+                'social-main': gameEntity.getLevel('structure_event_hall') > 0,
             }
             let label = 'unlocks';
             if(payload?.prefix) {

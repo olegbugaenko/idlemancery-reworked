@@ -30,16 +30,7 @@ export class MageModule extends GameModule {
         this.isViewMode = false;
         this.settings = {};
         this.activeEffectsFiltered = {};
-        /*
-        this.eventHandler.registerHandler('feed-dragon', (data) => {
-            this.feedDragon();
 
-        })
-        this.eventHandler.registerHandler('hunt', (data) => {
-            const rs = gameResources.getResource('meat');
-            gameResources.addResource('meat', 1*rs.multiplier);
-        })
-         */
 
         this.skillGroupsCached = {};
 
@@ -712,7 +703,7 @@ export class MageModule extends GameModule {
         }
 
         if(!this.bankedTime.current) {
-            this.bankedTime.current = 0;
+            this.bankedTime.current = 86400000; // 24 hours in milliseconds
         }
 
         if(this.bankedTime?.speedUpFactor > 1) {

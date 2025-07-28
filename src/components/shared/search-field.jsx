@@ -38,6 +38,14 @@ export const SearchField = ({ value, onSetValue, scopes, placeholder }) => {
         }
     };
 
+    const clearValue = () => {
+        onSetValue({
+            search: '',
+            selectedScopes,
+        })
+        setSearch('');
+    }
+
     const onChangeSearch = (e) => {
 
         onSetValue({
@@ -73,7 +81,7 @@ export const SearchField = ({ value, onSetValue, scopes, placeholder }) => {
                     onChange={onChangeSearch}
                     onClick={() => setScopesOpened(true)}
                 />
-                <span className={'clear'} onClick={() => { setSearch('') }}>X</span>
+                <span className={'clear'} onClick={() => { clearValue() }}>X</span>
             </div>
             {isScopesOpened && scopes?.length ? (
                 <div className="scopes-popup">

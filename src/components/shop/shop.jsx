@@ -448,13 +448,20 @@ export const CourseCard = ({ toNext, id, efficiency, isRunning, name, level, pro
                                         ({formatValue(100*efficiency)}%)
                                     </span> ) : ''}
                 </div>
-                <div className={'bottom'}>
+                <div className={'bottom padded-left'}>
                     <div className={'buttons'}>
-                        <button disabled={!affordable.isAffordable} onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            onPurchase(id, !isRunning)
-                        }}>{isRunning ? 'Stop' : 'Start'}</button>
+                        <CustomButton
+                            disabled={!affordable.isAffordable}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                onPurchase(id, !isRunning)
+                            }}
+                            iconId={isRunning ? 'pause' : 'run'}
+                            className={'icon-content interface-icon small clickable-icon'}
+                        >
+                            {isRunning ? 'Stop Course' : 'Start Course'}
+                        </CustomButton>
                         {isAutomationUnlocked ? (<label className={'autobuy-label'}>
                             <input type={'checkbox'} checked={isAutoPurchase}
                                    onChange={() => toggleAutopurchase(id, !isAutoPurchase)}/>

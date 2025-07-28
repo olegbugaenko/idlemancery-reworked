@@ -1,4 +1,8 @@
 node_modules/
 TODOS.md
 .idea
+.vscode
 exec/
+dist/
+native/
+*.zip

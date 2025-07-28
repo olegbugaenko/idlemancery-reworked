@@ -118,13 +118,13 @@ export const MainMenu = () => {
                         </NewNotificationWrap>
                     </li>
                 )}
-                {/*{unlocks.social && (
+                {unlocks.social && (
                     <li id={'main-menu-social'} className={openedTab === 'social' ? 'active' : ''} onClick={() => setOpenedTab('social')}>
                         <NewNotificationWrap isNew={newUnlocks.social?.hasNew}>
                             <span>Social</span>
                         </NewNotificationWrap>
                     </li>
-                )}*/}
+                )}
                 {unlocks.spellbook && (
                     <li id={'main-menu-spellbook'} className={openedTab === 'spellbook' ? 'active' : ''} onClick={() => setOpenedTab('spellbook')}>
                         <NewNotificationWrap isNew={newUnlocks.spellbook?.hasNew}>

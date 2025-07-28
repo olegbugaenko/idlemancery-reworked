@@ -373,7 +373,7 @@ export class ActionListsSubmodule extends GameModule {
 
         // 2. Аналіз кожної динамічної дії — чи вона впливає на ключові ресурси
         for (const act of dynamicActions) {
-            fallbackTimes[act.id] = act.time ?? 0.01;
+            fallbackTimes[act.id] = act.time ?? 0.001;
 
             const oneActionEffects = this.getListEffects(null, { actions: [act] });
             const incomeEffects = oneActionEffects.filter(e => e.type === 'resources' && e.scope === 'income');
@@ -447,7 +447,7 @@ export class ActionListsSubmodule extends GameModule {
         const forecastedActionsEfficiencies = {};
         let finalDeficites = {};
 
-        let dynamicValues = Object.fromEntries(dynamicActions.filter(one => !skipDynamicActions.has(one.id)).map(a => [a.id, 0.01]));
+        let dynamicValues = Object.fromEntries(dynamicActions.filter(one => !skipDynamicActions.has(one.id)).map(a => [a.id, 0.001]));
         let previousDeficits = {};
 
         const bst = performance.now();
@@ -457,14 +457,14 @@ export class ActionListsSubmodule extends GameModule {
         for (let iter = 0; iter < MAX_ITER; iter++) {
             const actions = baseActions.map(one =>
                 one.isDynamicTime && !skipDynamicActions.has(one.id)
-                    ? { ...one, time: dynamicValues[one.id] || 0.01 }
+                    ? { ...one, time: dynamicValues[one.id] || 0.001 }
                     : one
             );
 
             const dynamicTotal = dynamicActions.reduce((acc, one) =>
                     skipDynamicActions.has(one.id)
-                        ? acc + (fallbackTimes[one.id] || 0.01)
-                        : acc + (dynamicValues[one.id] || 0.01)
+                        ? acc + (fallbackTimes[one.id] || 0.001)
+                        : acc + (dynamicValues[one.id] || 0.001)
                 , 0);
 
             const totalListTime = fixedTotal + dynamicTotal;
@@ -591,7 +591,7 @@ export class ActionListsSubmodule extends GameModule {
             }
         }
 
-        //console.log('currentDeficites: ', finalDeficites, actionContributions, actionConsumptions, performance.now() - bst, stable);
+        console.log('currentDeficites: ', finalDeficites, actionContributions, actionConsumptions, performance.now() - bst, stable);
 
         if(!stable) {
             const st = performance.now();
@@ -1065,7 +1065,7 @@ export class ActionListsSubmodule extends GameModule {
         };
 
         const rawPercentages = actions.map(a => a.time / total);
-        const minimumPercentage = 0.01;
+        const minimumPercentage = 0.001;
         const totalMinimum = minimumPercentage * actions.length;
         const normalizeFactor = (1 - totalMinimum) / rawPercentages.reduce((acc, p) => acc + Math.max(p - minimumPercentage, 0), 0);
 

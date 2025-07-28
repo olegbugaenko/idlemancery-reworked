@@ -89,6 +89,30 @@ export const registerInventoryItems = () => {
         allowedTileTypes: ['plain', 'lakes', 'swamp']
     })
 
+    registerInventoryItem('inventory_clay', {
+        name: 'Clay',
+        hasCap: false,
+        tags: ['inventory', 'material', 'construction'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        getUsageCooldown: () => {
+            return 0;
+        },
+        attributes: {
+            duration: 0,
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('action_clay_mining') > 0
+        },
+        get_cost: (amount = 1) => ({
+            coins: amount*15*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+        }),
+        sellPrice: 80,
+    })
+
 
     registerInventoryItem('inventory_candle', {
         name: 'Candle',

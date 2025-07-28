@@ -2012,27 +2012,27 @@ export const registerShopItemsStage1 = () => {
         })
     })
 
-    gameEntity.registerGameEntity('shop_item_breaking_limits', {
-        tags: ["shop", "upgrade", "purchaseable"],
-        name: 'Breaking Limits Instructions',
-        description: 'Learn how to use maximum of your body and soul. Unlock new intensity courses',
-        level: 0,
-        maxLevel: 1,
-        minDemoVersion: 20,
-        unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_training_room') > 0
-        },
-        attributes: {
-            isCollectable: false,
-        },
-        get_cost: () => ({
-            'coins': {
-                A: 2,
-                B: 1250000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
-                type: 0
-            }
-        })
-    })
+    // gameEntity.registerGameEntity('shop_item_breaking_limits', {
+    //     tags: ["shop", "upgrade", "purchaseable"],
+    //     name: 'Breaking Limits Instructions',
+    //     description: 'Learn how to use maximum of your body and soul. Unlock new intensity courses',
+    //     level: 0,
+    //     maxLevel: 1,
+    //     minDemoVersion: 20,
+    //     unlockCondition: () => {
+    //         return gameEntity.getLevel('shop_item_training_room') > 0
+    //     },
+    //     attributes: {
+    //         isCollectable: false,
+    //     },
+    //     get_cost: () => ({
+    //         'coins': {
+    //             A: 2,
+    //             B: 1250000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+    //             type: 0
+    //         }
+    //     })
+    // })
 
     gameEntity.registerGameEntity('shop_item_ink_crafting', {
         tags: ["shop", "upgrade", "purchaseable"],
@@ -2619,6 +2619,102 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+    gameEntity.registerGameEntity('shop_item_lumbermill_optimization', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Lumbermill Optimization',
+        description: 'Advanced techniques and equipment specifically designed to maximize the efficiency of your lumbermill operations.',
+        level: 0,
+        maxLevel: 5,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_machinery') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            income: {
+                effects: {
+                    'lumbermill_efficiency': {
+                        A: 0.2,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1.2,
+                B: 75000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_pickaxe', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Pickaxe',
+        description: 'A sturdy iron pickaxe that significantly improves mining efficiency and iron ore production.',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.isEntityUnlocked('action_mining')
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            income: {
+                effects: {
+                    'mining_efficiency': {
+                        A: 0.25,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1,
+                B: 200000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_steel_pickaxe', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Steel Pickaxe',
+        description: 'A high-quality steel pickaxe that provides even greater mining efficiency than the iron pickaxe.',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_pickaxe') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            income: {
+                effects: {
+                    'mining_efficiency': {
+                        A: 0.25,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1,
+                B: 500000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
     gameEntity.registerGameEntity('shop_item_market_license', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Market License',
@@ -2640,6 +2736,149 @@ export const registerShopItemsStage1 = () => {
             'coins': {
                 A: 1,
                 B: 200000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_gossip_exchange', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Gossip Exchange',
+        description: 'A network of information exchange that allows your trade stalls to facilitate social learning and knowledge sharing.',
+        level: 0,
+        maxLevel: 1,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_charisma',
+            level: 1500
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_market_license') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            income: {
+                effects: {
+                    'trade_stall_social_learning_bonus': {
+                        A: 0.1,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1,
+                B: 400000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_book_trading', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Book Trading',
+        description: 'A specialized trading license that allows your trade stalls to also trade in books and knowledge, providing bonuses to knowledge gain.',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_market_license') > 0 && gameEntity.getLevel('structure_library') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            income: {
+                effects: {
+                    'trade_stall_knowledge_bonus': {
+                        A: 0.15,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1,
+                B: 500000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_masonry_technology', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Masonry Technology',
+        description: 'Advanced construction techniques that allow you to build more sophisticated stone structures. Increases the maximum level of Stone Hut.',
+        level: 0,
+        maxLevel: 5,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 1500
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('action_clay_mining') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            income: {
+                effects: {
+                    'stone_hut_max_level_bonus': {
+                        A: 2,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1.5,
+                B: 300000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_alchemy_materials_discount', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Alchemy Materials Discount',
+        description: 'Advanced techniques that reduce the amount of materials needed for alchemy processes.',
+        level: 0,
+        maxLevel: 5,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 1750
+        }],
+        unlockCondition: () => {
+            return true
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            income: {
+                effects: {
+                    'alchemy_materials_discount': {
+                        A: 0.2,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1.2,
+                B: 400000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 1
             }
         }),

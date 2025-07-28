@@ -18,6 +18,9 @@ export const getScope = (entity) => {
     if(entity.tags.includes('furniture')) {
         return 'Furniture';
     }
+    if(entity.tags.includes('structure')) {
+        return 'Structure';
+    }
     if(entity.tags.includes('amplifier')) {
         return 'Amplifier';
     }

@@ -732,6 +732,26 @@ p.small-hint, span.small-hint {
     padding: 4px 8px;
 }
 
+.card.social-event {
+    display: flex;
+    flex-direction: column;
+    height: 140px;
+    width: 240px;
+}
+
+.card.social-event .head {
+    flex-shrink: 0;
+}
+
+.card.social-event .progress-section {
+    flex-shrink: 0;
+}
+
+.card.social-event .item-actions {
+    margin-top: auto;
+    flex-shrink: 0;
+}
+
 .card.action {
     width: 240px;
 }
@@ -746,6 +766,13 @@ p.small-hint, span.small-hint {
     overflow: hidden;
     text-overflow: ellipsis;
     flex: 0 1 100px;
+}
+
+.card.social-event .head p {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 0 1 130px;
 }
 
 .bar-container .bar-outer {
@@ -1272,7 +1299,8 @@ h4 {
     height: 110px;
 }
 
-.card.action .head {
+.card.action .head,
+.card.social-event .head {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -3114,6 +3142,10 @@ ul.menu .add-custom-filter .add-wrap {
     border: 1px solid #999999;*/
 }
 
+.left-offset {
+    margin-left: 8px;
+}
+
 .outer-xp-circle .level-circle {
     border-radius: 50%;
     width: 26px;
@@ -3607,4 +3639,122 @@ body::after {
     0% { transform: rotate(0); }
     50% { transform: rotate(1deg); }
     100% { transform: rotate(0); }
+}
+
+/* Event Hall Progress Bars */
+.progress-section {
+    margin: 10px 0;
+}
+
+.progress-section .progress-text {
+    font-size: 12px;
+    color: #ccc;
+    margin-top: 5px;
+    display: block;
+}
+
+.event-progress .bar-inner {
+    background: linear-gradient(90deg, var(--green), var(--darkgreen));
+}
+
+.cooldown-progress .bar-inner {
+    background: linear-gradient(90deg, #ff8c00, #ff6b00);
+}
+
+.card.social-event.locked .start-button {
+    background: linear-gradient(to bottom, rgb(50, 50, 50) 0%, rgb(40, 40, 40) 15%, rgb(30, 30, 30) 40%, rgb(30, 30, 30) 60%, rgb(40, 40, 40) 85%, rgb(50, 50, 50) 100%);
+    border: 1px solid rgb(70, 70, 70);
+    color: #888;
+    cursor: not-allowed;
+}
+
+.card.social-event.locked .start-button:hover {
+    background: linear-gradient(to bottom, rgb(50, 50, 50) 0%, rgb(40, 40, 40) 15%, rgb(30, 30, 30) 40%, rgb(30, 30, 30) 60%, rgb(40, 40, 40) 85%, rgb(50, 50, 50) 100%);
+    border: 1px solid rgb(70, 70, 70);
+    box-shadow: none;
+}
+
+/* Кольорове оформлення для соціальних подій за категоріями */
+.card.social-event.social {
+    background: linear-gradient(120deg, rgba(10, 20, 20, 1) 65%, rgba(25, 70, 70, 0.45));
+    border-color: rgb(25, 75, 75);
+}
+
+.card.social-event.social .bar-container .bar-outer {
+    border-color: rgba(25, 75, 75, 0.5);
+    background-color: rgba(92, 92, 92, 0.65);
+}
+
+.card.social-event.social .bar-container .bar-outer .bar-inner {
+    background-color: rgba(30, 130, 130, 1);
+}
+
+.card.social-event.physical {
+    background: linear-gradient(120deg, rgba(22, 12, 10, 1) 65%, rgba(60, 35, 20, 0.45));
+    border-color: rgb(70, 35, 20);
+}
+
+.card.social-event.physical .bar-container .bar-outer {
+    border-color: rgba(70, 35, 20, 0.5);
+    background-color: rgba(92, 92, 92, 0.65);
+}
+
+.card.social-event.physical .bar-container .bar-outer .bar-inner {
+    background-color: rgba(160, 85, 50, 1);
+}
+
+.card.social-event.routine {
+    background: linear-gradient(120deg, rgba(15, 25, 15, 1) 65%, rgba(60, 100, 60, 0.45));
+    border-color: rgb(60, 110, 60);
+}
+
+.card.social-event.routine .bar-container .bar-outer {
+    border-color: rgba(60, 110, 60, 0.5);
+    background-color: rgba(92, 92, 92, 0.65);
+}
+
+.card.social-event.routine .bar-container .bar-outer .bar-inner {
+    background-color: rgba(90, 150, 90, 1);
+}
+
+.card.social-event.magical {
+    background: linear-gradient(120deg, rgba(20, 10, 25, 1) 65%, rgba(60, 20, 75, 0.45));
+    border-color: rgb(75, 20, 90);
+}
+
+.card.social-event.magical .bar-container .bar-outer {
+    border-color: rgba(75, 20, 90, 0.5);
+    background-color: rgba(92, 92, 92, 0.65);
+}
+
+.card.social-event.magical .bar-container .bar-outer .bar-inner {
+    background-color: rgba(150, 60, 200, 1);
+}
+
+.card.social-event.educational {
+    background: linear-gradient(120deg, rgba(15, 20, 25, 1) 65%, rgba(40, 60, 100, 0.45));
+    border-color: rgb(40, 70, 110);
+}
+
+.card.social-event.educational .bar-container .bar-outer {
+    border-color: rgba(40, 70, 110, 0.5);
+    background-color: rgba(92, 92, 92, 0.65);
+}
+
+.card.social-event.educational .bar-container .bar-outer .bar-inner {
+    background-color: rgba(60, 120, 180, 1);
+}
+
+.card.social-event.other {
+    background: linear-gradient(120deg, rgba(15, 15, 15, 1) 65%, rgba(50, 50, 50, 0.55));
+    border-color: rgb(45, 45, 45);
+}
+
+.card.social-event.other .bar-container .bar-outer {
+    border-color: rgba(45, 45, 45, 0.5);
+    background-color: rgba(92, 92, 92, 0.65);
+}
+
+.card.social-event.other .bar-container .bar-outer .bar-inner {
+    background-color: rgba(150, 150, 150, 1);
 }

@@ -846,54 +846,7 @@ export const registerFurnitureStage1 = () => {
         }),
     })
 
-    registerFurniture('furniture_smelter', {
-        tags: ["furniture", "upgrade", "purchaseable", "resource", "crafting"],
-        name: 'Smelter',
-        description: 'Boosts iron plate production significantly.',
-        level: 0,
-        maxLevel: 4,
-        unlockedBy: [{
-            type: 'effect',
-            id: 'attribute_strength',
-            level: 3000,
-        }],
-        minDemoVersion: 20,
-        unlockCondition: () => {
-            return true;
-        },
-        resourceModifier: {
-            multiplier: {
-                resources: {
-                    'inventory_iron_plate': {
-                        A: 0.25,
-                        B: 1,
-                        type: 0,
-                    }
-                }
-            },
-            consumption: {
-                resources: {
-                    'living_space': {
-                        A: 2,
-                        B: 0,
-                        type: 0
-                    }
-                }
-            }
-        },
-        get_cost: () => ({
-            'coins': {
-                A: 2,
-                B: 8.e+9*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
-                type: 1
-            },
-            'living_space': {
-                A: 0,
-                B: 2,
-                type: 0
-            }
-        }),
-    })
+
 
     registerFurniture('furniture_workout_bench', {
         tags: ["furniture", "upgrade", "purchaseable", "actions"],
@@ -1552,7 +1505,7 @@ export const registerFurnitureStage1 = () => {
             income: {
                 effects: {
                     'alchemy_effort': {
-                        A: 0.01,
+                        A: 0.02,
                         B: 0,
                         type: 0,
                     }

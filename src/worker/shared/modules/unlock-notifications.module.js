@@ -175,7 +175,6 @@ export class UnlockNotificationsModule extends GameModule {
         gameCore.getModule('crafting').regenerateNotifications();
         gameCore.getModule('plantations').regenerateNotifications();
         gameCore.getModule('magic').regenerateNotifications();
-        gameCore.getModule('guilds').regenerateNotifications();
     }
 
     /**

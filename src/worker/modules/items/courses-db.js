@@ -190,121 +190,121 @@ export const registerCourseItemsStage1 = () => {
     })
 
 
-    registerCourse('course_strength_intensity', {
-        name: 'Physical Practices',
-        tags: ['physical', 'enchancement'],
-        minDemoVersion: 20,
-        attributes: {
-            basicDuration: 120,
-        },
-        level: 0,
-        unlockCondition: () => gameEntity.getLevel('shop_item_breaking_limits') > 0 && gameEntity.getLevel('shop_item_training_room') > 0,
-        resourceModifier: {
-            multiplier: {
-                effects: {
-                    'aspect_attribute_strength_reduction': {
-                        A: 0.05,
-                        B: 1,
-                        type: 0,
-                    }
-                }
-            },
-        }
-    }, {
-        get_consumption: () => ({
-            resources: {
-                /*'health': {
-                    A: 1.1,
-                    B: 100,
-                    type: 1,
-                },*/
-                'knowledge': {
-                    A: 1.1,
-                    B: 30/gameEffects.getEffectValue('courses_knowledge_discount'),
-                    type: 1,
-                }
-            }
-        }),
-        effectDeps: ['courses_knowledge_discount'],
-    })
+    // registerCourse('course_strength_intensity', {
+    //     name: 'Physical Practices',
+    //     tags: ['physical', 'enchancement'],
+    //     minDemoVersion: 20,
+    //     attributes: {
+    //         basicDuration: 120,
+    //     },
+    //     level: 0,
+    //     unlockCondition: () => gameEntity.getLevel('shop_item_breaking_limits') > 0 && gameEntity.getLevel('shop_item_training_room') > 0,
+    //     resourceModifier: {
+    //         multiplier: {
+    //             effects: {
+    //                 'aspect_attribute_strength_reduction': {
+    //                     A: 0.05,
+    //                     B: 1,
+    //                     type: 0,
+    //                 }
+    //             }
+    //         },
+    //     }
+    // }, {
+    //     get_consumption: () => ({
+    //         resources: {
+    //             /*'health': {
+    //                 A: 1.1,
+    //                 B: 100,
+    //                 type: 1,
+    //             },*/
+    //             'knowledge': {
+    //                 A: 1.1,
+    //                 B: 30/gameEffects.getEffectValue('courses_knowledge_discount'),
+    //                 type: 1,
+    //             }
+    //         }
+    //     }),
+    //     effectDeps: ['courses_knowledge_discount'],
+    // })
 
 
-    registerCourse('course_patience_intensity', {
-        name: 'Concentration',
-        tags: ['mental', 'enchancement'],
-        minDemoVersion: 20,
-        attributes: {
-            basicDuration: 120,
-        },
-        level: 0,
-        unlockCondition: () => gameEntity.getLevel('shop_item_breaking_limits') > 0 && gameEntity.getLevel('shop_item_training_room') > 0,
-        resourceModifier: {
-            multiplier: {
-                effects: {
-                    'aspect_attribute_patience_reduction': {
-                        A: 0.05,
-                        B: 1,
-                        type: 0,
-                    }
-                }
-            },
-        }
-    }, {
-        get_consumption: () => ({
-            resources: {
-                /*'energy': {
-                    A: 1.1,
-                    B: 150,
-                    type: 1,
-                },*/
-                'knowledge': {
-                    A: 1.1,
-                    B: 40/gameEffects.getEffectValue('courses_knowledge_discount'),
-                    type: 1,
-                }
-            }
-        }),
-        effectDeps: ['courses_knowledge_discount'],
-    })
+    // registerCourse('course_patience_intensity', {
+    //     name: 'Concentration',
+    //     tags: ['mental', 'enchancement'],
+    //     minDemoVersion: 20,
+    //     attributes: {
+    //         basicDuration: 120,
+    //     },
+    //     level: 0,
+    //     unlockCondition: () => gameEntity.getLevel('shop_item_breaking_limits') > 0 && gameEntity.getLevel('shop_item_training_room') > 0,
+    //     resourceModifier: {
+    //         multiplier: {
+    //             effects: {
+    //                 'aspect_attribute_patience_reduction': {
+    //                     A: 0.05,
+    //                     B: 1,
+    //                     type: 0,
+    //                 }
+    //             }
+    //         },
+    //     }
+    // }, {
+    //     get_consumption: () => ({
+    //         resources: {
+    //             /*'energy': {
+    //                 A: 1.1,
+    //                 B: 150,
+    //                 type: 1,
+    //             },*/
+    //             'knowledge': {
+    //                 A: 1.1,
+    //                 B: 40/gameEffects.getEffectValue('courses_knowledge_discount'),
+    //                 type: 1,
+    //             }
+    //         }
+    //     }),
+    //     effectDeps: ['courses_knowledge_discount'],
+    // })
 
 
-    registerCourse('course_charisma_intensity', {
-        name: 'Influence Training',
-        tags: ['social', 'enchancement'],
-        minDemoVersion: 20,
-        attributes: {
-            basicDuration: 120,
-        },
-        level: 0,
-        unlockCondition: () => gameEntity.getLevel('shop_item_breaking_limits') > 0 && gameEntity.getLevel('shop_item_training_room') > 0,
-        resourceModifier: {
-            multiplier: {
-                effects: {
-                    'aspect_attribute_charisma_reduction': {
-                        A: 0.05,
-                        B: 1,
-                        type: 0,
-                    }
-                }
-            },
-        }
-    }, {
-        get_consumption: () => ({
-            resources: {
-                /*'coins': {
-                    A: 1.1,
-                    B: 10000,
-                    type: 1,
-                },*/
-                'knowledge': {
-                    A: 1.1,
-                    B: 40/gameEffects.getEffectValue('courses_knowledge_discount'),
-                    type: 1,
-                }
-            }
-        }),
-        effectDeps: ['courses_knowledge_discount'],
-    })
+    // registerCourse('course_charisma_intensity', {
+    //     name: 'Influence Training',
+    //     tags: ['social', 'enchancement'],
+    //     minDemoVersion: 20,
+    //     attributes: {
+    //         basicDuration: 120,
+    //     },
+    //     level: 0,
+    //     unlockCondition: () => gameEntity.getLevel('shop_item_breaking_limits') > 0 && gameEntity.getLevel('shop_item_training_room') > 0,
+    //     resourceModifier: {
+    //         multiplier: {
+    //             effects: {
+    //                 'aspect_attribute_charisma_reduction': {
+    //                     A: 0.05,
+    //                     B: 1,
+    //                     type: 0,
+    //                 }
+    //             }
+    //         },
+    //     }
+    // }, {
+    //     get_consumption: () => ({
+    //         resources: {
+    //             /*'coins': {
+    //                 A: 1.1,
+    //                 B: 10000,
+    //                 type: 1,
+    //             },*/
+    //             'knowledge': {
+    //                 A: 1.1,
+    //                 B: 40/gameEffects.getEffectValue('courses_knowledge_discount'),
+    //                 type: 1,
+    //             }
+    //         }
+    //     }),
+    //     effectDeps: ['courses_knowledge_discount'],
+    // })
 
 
 

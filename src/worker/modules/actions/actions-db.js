@@ -368,6 +368,194 @@ export const registerActionsStage1 = () => {
         }
     })
 
+    registerGameAction('action_salesperson', {
+        tags: ["action", "job", "social"],
+        name: 'Salesperson',
+        isAbstract: false,
+        category: ACTION_CATS.COINS,
+        minDemoVersion: 20,
+        allowedImpacts: ['effects'],
+        description: 'Work as a salesperson, using your charm to sell products and earn commissions',
+        level: 1,
+        discountEffects: ['social_actions_discount'],
+        jobType: 'social',
+        getLearnRate: () => {
+            return 1;
+        },
+        learningEffects: ['job_learning_rate'],
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'coins': {
+                        A: 1.2*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_social'),
+                        B: 10.8*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_social'),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0,
+                        B: 12,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['coins_earned_bonus', 'job_efficiency_social']
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_charisma',
+            level: 250,
+        }],
+        attributes: {
+            baseXPCost: 20,
+            primaryAttribute: 'attribute_charisma'
+        }
+    })
+
+    registerGameAction('action_customer_service', {
+        tags: ["action", "job", "social"],
+        name: 'Customer Service',
+        isAbstract: false,
+        category: ACTION_CATS.COINS,
+        minDemoVersion: 20,
+        allowedImpacts: ['effects'],
+        description: 'Handle customer inquiries and complaints professionally',
+        level: 1,
+        discountEffects: ['social_actions_discount'],
+        jobType: 'social',
+        getLearnRate: () => {
+            return 1;
+        },
+        learningEffects: ['job_learning_rate'],
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'coins': {
+                        A: 1.6*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_social'),
+                        B: 14.4*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_social'),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0,
+                        B: 30,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['coins_earned_bonus', 'job_efficiency_social']
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_charisma',
+            level: 1000,
+        }],
+        attributes: {
+            baseXPCost: 20,
+            primaryAttribute: 'attribute_charisma'
+        }
+    })
+
+    registerGameAction('action_public_relations', {
+        tags: ["action", "job", "social"],
+        name: 'Public Relations',
+        isAbstract: false,
+        category: ACTION_CATS.COINS,
+        minDemoVersion: 20,
+        allowedImpacts: ['effects'],
+        description: 'Manage public image and media relations for organizations',
+        level: 1,
+        discountEffects: ['social_actions_discount'],
+        jobType: 'social',
+        getLearnRate: () => {
+            return 1;
+        },
+        learningEffects: ['job_learning_rate'],
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'coins': {
+                        A: 1.8*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_social'),
+                        B: 20.2*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_social'),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0,
+                        B: 35,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['coins_earned_bonus', 'job_efficiency_social']
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_charisma',
+            level: 5000,
+        }],
+        attributes: {
+            baseXPCost: 20,
+            primaryAttribute: 'attribute_charisma'
+        }
+    })
+
+    registerGameAction('action_negotiation_specialist', {
+        tags: ["action", "job", "social"],
+        name: 'Negotiation Specialist',
+        isAbstract: false,
+        category: ACTION_CATS.COINS,
+        minDemoVersion: 20,
+        allowedImpacts: ['effects'],
+        description: 'Lead high-stakes negotiations and broker major deals',
+        level: 1,
+        discountEffects: ['social_actions_discount'],
+        jobType: 'social',
+        getLearnRate: () => {
+            return 1;
+        },
+        learningEffects: ['job_learning_rate'],
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'coins': {
+                        A: 3.0*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_social'),
+                        B: 27.0*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_social'),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0,
+                        B: 60,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['coins_earned_bonus', 'job_efficiency_social']
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_charisma',
+            level: 25000,
+        }],
+        attributes: {
+            baseXPCost: 20,
+            primaryAttribute: 'attribute_charisma'
+        }
+    })
+
     registerGameAction('action_clean_stable', {
         tags: ["action", "job", "physical"],
         name: 'Clean Stable',
@@ -734,6 +922,214 @@ export const registerActionsStage1 = () => {
         }
     })
 
+    registerGameAction('action_magical_research', {
+        tags: ["action", "job", "magical"],
+        name: 'Magical Research',
+        isAbstract: false,
+        category: ACTION_CATS.COINS,
+        minDemoVersion: 20,
+        allowedImpacts: ['effects'],
+        description: 'Conduct research on magical phenomena and sell your findings',
+        level: 1,
+        discountEffects: ['physical_actions_discount'],
+        jobType: 'magical',
+        getLearnRate: () => {
+            return 1;
+        },
+        learningEffects: ['job_learning_rate'],
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'coins': {
+                        A: 2.7*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_magical'),
+                        B: 24.3*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_magical'),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 25,
+                        type: 0,
+                    },
+                    'mana': {
+                        A: 0.0,
+                        B: 8,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['coins_earned_bonus', 'job_efficiency_magical']
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_magic_ability',
+            level: 500,
+        }],
+        attributes: {
+            baseXPCost: 20,
+            primaryAttribute: 'attribute_magic_capability'
+        }
+    })
+
+    registerGameAction('action_spell_consultant', {
+        tags: ["action", "job", "magical"],
+        name: 'Spell Consultant',
+        isAbstract: false,
+        category: ACTION_CATS.COINS,
+        minDemoVersion: 20,
+        allowedImpacts: ['effects'],
+        description: 'Provide expert advice on spell casting and magical theory',
+        level: 1,
+        discountEffects: ['physical_actions_discount'],
+        jobType: 'magical',
+        getLearnRate: () => {
+            return 1;
+        },
+        learningEffects: ['job_learning_rate'],
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'coins': {
+                        A: 4.0*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_magical'),
+                        B: 36.0*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_magical'),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 40,
+                        type: 0,
+                    },
+                    'mana': {
+                        A: 0.0,
+                        B: 15,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['coins_earned_bonus', 'job_efficiency_magical']
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_magic_ability',
+            level: 4000,
+        }],
+        attributes: {
+            baseXPCost: 20,
+            primaryAttribute: 'attribute_magic_capability'
+        }
+    })
+
+    registerGameAction('action_magical_engineer', {
+        tags: ["action", "job", "magical"],
+        name: 'Magical Engineer',
+        isAbstract: false,
+        category: ACTION_CATS.COINS,
+        minDemoVersion: 20,
+        allowedImpacts: ['effects'],
+        description: 'Design and implement magical systems and enchantments',
+        level: 1,
+        discountEffects: ['physical_actions_discount'],
+        jobType: 'magical',
+        getLearnRate: () => {
+            return 1;
+        },
+        learningEffects: ['job_learning_rate'],
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'coins': {
+                        A: 6.0*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_magical'),
+                        B: 54.0*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_magical'),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 60,
+                        type: 0,
+                    },
+                    'mana': {
+                        A: 0.0,
+                        B: 25,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['coins_earned_bonus', 'job_efficiency_magical']
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_magic_ability',
+            level: 15000,
+        }],
+        attributes: {
+            baseXPCost: 20,
+            primaryAttribute: 'attribute_magic_capability'
+        }
+    })
+
+    registerGameAction('action_magical_architect', {
+        tags: ["action", "job", "magical"],
+        name: 'Magical Architect',
+        isAbstract: false,
+        category: ACTION_CATS.COINS,
+        minDemoVersion: 20,
+        allowedImpacts: ['effects'],
+        description: 'Design and construct magical buildings and structures',
+        level: 1,
+        discountEffects: ['physical_actions_discount'],
+        jobType: 'magical',
+        getLearnRate: () => {
+            return 1;
+        },
+        learningEffects: ['job_learning_rate'],
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'coins': {
+                        A: 8.0*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_magical'),
+                        B: 72.0*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_magical'),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 80,
+                        type: 0,
+                    },
+                    'mana': {
+                        A: 0.0,
+                        B: 40,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['coins_earned_bonus', 'job_efficiency_magical']
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_magic_ability',
+            level: 125000,
+        }],
+        attributes: {
+            baseXPCost: 20,
+            primaryAttribute: 'attribute_magic_capability'
+        }
+    })
+
     registerGameAction('action_woodcutter', {
         tags: ["action", "activity", "physical", "manual-labor"],
         name: 'Woodcutting',
@@ -843,8 +1239,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'inventory_iron_ore': {
-                        A: 0.0004*gameEffects.getEffectValue('manual_labor_efficiency'),
-                        B: 0.002*gameEffects.getEffectValue('manual_labor_efficiency'),
+                        A: 0.0004*gameEffects.getEffectValue('manual_labor_efficiency')*gameEffects.getEffectValue('mining_efficiency'),
+                        B: 0.002*gameEffects.getEffectValue('manual_labor_efficiency')*gameEffects.getEffectValue('mining_efficiency'),
                         type: 0,
                     }
                 }
@@ -863,7 +1259,7 @@ export const registerActionsStage1 = () => {
                     }
                 }
             }),
-            effectDeps: ['manual_labor_efficiency']
+            effectDeps: ['manual_labor_efficiency', 'mining_efficiency']
         },
         unlockedBy: [{
             type: 'effect',
@@ -875,6 +1271,60 @@ export const registerActionsStage1 = () => {
             primaryAttribute: 'attribute_strength'
         }
     })
+
+    
+    registerGameAction('action_clay_mining', {
+        tags: ["action", "activity", "physical", "manual-labor"],
+        name: 'Clay Mining',
+        category: ACTION_CATS.PHYSICAL,
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        discountEffects: ['physical_actions_discount'],
+        description: 'Extract clay from the earth for construction and pottery. Clay provides better wall treatment and thermal insulation.',
+        level: 1,
+        getLearnRate: () => {
+            return 1
+        },
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'inventory_clay': {
+                        A: 0.00005*gameEffects.getEffectValue('manual_labor_efficiency'),
+                        B: 0.00045*gameEffects.getEffectValue('manual_labor_efficiency'),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 80,
+                        type: 0,
+                    },
+                    'health': {
+                        A: 0.0,
+                        B: 40,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['mining_efficiency', 'job_efficiency_physical']
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 2000
+        }],
+        unlockCondition: () => {
+            return true
+        },
+        attributes: {
+            baseXPCost: 25000,
+            primaryAttribute: 'attribute_strength'
+        }
+    })
+
 
 
     registerGameAction('action_rest', {
