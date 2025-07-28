@@ -814,7 +814,7 @@ export const registerInventoryItems = () => {
         },
         sellPrice: 1400,
         get_cost: (amount = 1) => ({
-            coins: amount*50000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+            coins: amount*80000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
         }),
     })
 
@@ -899,7 +899,7 @@ export const registerInventoryItems = () => {
         },
         sellPrice: 10000,
         get_cost: (amount = 1) => ({
-            coins: amount*75000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+            coins: amount*100000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
         }),
     })
 

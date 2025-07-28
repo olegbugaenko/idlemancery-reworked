@@ -760,6 +760,12 @@ p.small-hint, span.small-hint {
     box-shadow: 0 0 15px #7797d7;
 }
 
+.card.action .completed {
+    color: #bbb;
+    font-size: 13px;
+    font-style: italic;
+}
+
 
 .card.action .head p {
     white-space: nowrap;

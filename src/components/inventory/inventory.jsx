@@ -739,7 +739,7 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
                             <div className={'rules-header flex-container'}>
                                 <p>Autoconsumption rules: {item.autoconsume?.rules?.length ? null : 'None'}</p>
                                 <label>
-                                    <input type={'checkbox'} checked={item.autoconsume?.isEnabled} onChange={toggleAutoconsume}/>
+                                    <input type={'checkbox'} checked={item.autoconsume?.isEnabled ?? undefined} onChange={toggleAutoconsume}/>
                                     {item.autoconsume?.isEnabled ? ' ON' : ' OFF'}
                                 </label>
                                 {isEditing ? (<button onClick={addAutoconsumeRule}>Add rule (AND)</button>) : null}
@@ -767,7 +767,7 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
                             <div className={'rules-header flex-container'}>
                                 <p>Autosell rules: {item.autosell?.rules?.length ? null : 'None'}</p>
                                 <label>
-                                    <input type={'checkbox'} checked={item.autosell?.isEnabled} onChange={toggleAutosell}/>
+                                    <input type={'checkbox'} checked={item.autosell?.isEnabled ?? undefined} onChange={toggleAutosell}/>
                                     {item.autosell?.isEnabled ? ' ON' : ' OFF'}
                                 </label>
                                 {isEditing ? (<button onClick={addAutosellRule}>Add rule (AND)</button>) : null}

@@ -6,6 +6,19 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+                <h3>Idle Awakening v0.1.4j</h3>
+                <div className={'features'}>
+                    <p>Added autopurchase for resources in shop.</p>
+                    <p>Added possibility to view maxed out actions.</p>
+                    <p>Fixed a bug where "ON/OFF" flag under automations was displayed incorrectly.</p>
+                </div>
+                <h3>Idle Awakening v0.1.4i</h3>
+                <div className={'features'}>
+                    <p>The window state is now saved properly — the game no longer always opens in fullscreen.</p>
+                    <p>Fixed a bug where "Perform Basic Tricks" was incorrectly affected by the physical actions discount.</p>
+                    <p>Fixed a display issue where the potential resource balance shown in the left sidebar could be incorrect.</p>
+                    <p>Increased basic values of "Crafting Effort" and "Alchemy Effort".</p>
+                </div>
                 <h3>Idle Awakening v0.1.4g</h3>
                 <div className={'features'}>
                     <p>Fixed a bug where stories were sorted by time only, ignoring the date</p>

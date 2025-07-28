@@ -3,6 +3,7 @@ import {GameModule} from "../../shared/game-module";
 import {charismaMod, registerShopItemsStage1} from "./shop-db";
 import {sellPriceMod} from "../inventory/inventory-items-db";
 import {SMALL_NUMBER} from "game-framework/src/utils/consts";
+import {checkMatchingRules} from "../../shared/utils/rule-utils";
 
 export class ShopModule extends GameModule {
 
@@ -17,6 +18,7 @@ export class ShopModule extends GameModule {
         this.sellStocks = {};
         this.showMaxed = false;
         this.stockRenewTimer = 0;
+        this.shopItemSettings = {};
         this.eventHandler.registerHandler('set-shop-autopurchase', ({ id, flag }) => {
             const entities = gameEntity.listEntitiesByTags(['shop']).filter(one => one.isUnlocked && !one.isCapped);
             entities.forEach(e => {
@@ -44,7 +46,7 @@ export class ShopModule extends GameModule {
         })
 
         this.eventHandler.registerHandler('query-items-resources-data', (payload) => {
-            this.sendPurchaseableItemsData();
+            this.sendPurchaseableItemsData(payload);
         })
 
         this.eventHandler.registerHandler('query-item-resource-details', (payload) => {
@@ -59,6 +61,10 @@ export class ShopModule extends GameModule {
             this.showMaxed = flag;
             this.sendItemsData();
         })
+
+        this.eventHandler.registerHandler('save-shop-resource-settings', payload => {
+            this.saveSettings(payload)
+        })
     }
 
     initialize() {
@@ -66,6 +72,15 @@ export class ShopModule extends GameModule {
 
         registerShopItemsStage1();
 
+    }
+
+    saveSettings(payload) {
+        if(payload.id) {
+            this.shopItemSettings[payload.id] = {
+                ...this.shopItemSettings[payload.id],
+                autopurchase: payload.autopurchase,
+            }
+        }
     }
 
     tick(game, delta) {
@@ -86,6 +101,28 @@ export class ShopModule extends GameModule {
                 }
                 if(this.sellStocks[one.id] < 1000*purchaseRenewRate) {
                     this.sellStocks[one.id] += 2*purchaseRenewRate;
+                }
+
+                if(this.shopItemSettings[one.id]?.autopurchase?.isEnabled) {
+                    // check if matching rules
+                    const isMatchingPurchase = checkMatchingRules(this.shopItemSettings[one.id]?.autopurchase?.rules, this.shopItemSettings[one.id]?.autopurchase?.pattern);
+
+                    if(isMatchingPurchase) {
+                        let amount = 1;
+                        const reserved = this.shopItemSettings[one.id]?.autopurchase?.reserved || 0;
+                        const purchaseMult = this.shopItemSettings[one.id]?.autopurchase?.purchaseMultiplier || 1.e+8;
+                        const reserveLimit = Math.floor(
+                            Math.max(0, gameResources.getResource('coins').amount - reserved)
+                        );
+
+                        amount = Math.min(this.sellStocks[one.id] ?? 0, reserveLimit, purchaseMult);
+
+                        console.log(`Consume ${one.id}: `, amount, reserved, this.sellStocks[one.id]);
+                        if(amount >= 1) {
+                            this.purchaseResource(one.id, amount);
+                        }
+
+                    }
                 }
             })
         }
@@ -115,6 +152,7 @@ export class ShopModule extends GameModule {
                     }
                 }
             }
+
         }
     }
 
@@ -125,6 +163,7 @@ export class ShopModule extends GameModule {
             purchaseMultiplier: this.purchaseMultiplier,
             autoPurchase: this.autoPurchase,
             sellStocks: this.sellStocks,
+            shopItemSettings: this.shopItemSettings,
         }
     }
 
@@ -133,12 +172,16 @@ export class ShopModule extends GameModule {
             this.setItem(key, 0, true);
         }
         this.purchasedItems = {};
+        this.shopItemSettings = {};
         if(saveObject?.items) {
             for(const id in saveObject.items) {
                 if(gameEntity.entityExists(id)) {
                     this.setItem(id, saveObject.items[id], true);
                 }
             }
+        }
+        if(saveObject?.shopItemSettings) {
+            this.shopItemSettings = saveObject?.shopItemSettings;
         }
         this.isUnlocked = saveObject?.isUnlocked || false;
         this.purchaseMultiplier = saveObject?.purchaseMultiplier || 1;
@@ -288,16 +331,17 @@ export class ShopModule extends GameModule {
             potentialEffects: gameEntity.getEffects(entity.id, 1),
             currentEffects: gameEntity.getEffects(entity.id),
             tags: entity.tags,
-            purchaseMultiplier: 1,
+            purchaseMultiplier: 1
         }
     }
+
 
     sendItemDetails(id) {
         const data = this.getItemDetails(id);
         this.eventHandler.sendData('item-details', data);
     }
 
-    getPurchaseableItemsData() {
+    getPurchaseableItemsData(payload) {
         const items = gameResources.listResourcesByTags(['inventory']);
         // console.log('items: ', items);
         const presentItems = items.filter(item => item.isUnlocked && item.get_cost);
@@ -309,7 +353,7 @@ export class ShopModule extends GameModule {
         })
 
         return {
-            available: presentItems.map(resource => {
+            available: presentItems.filter(r => !payload.filterAutomatedPurchase || this.shopItemSettings[r.id]?.autopurchase.isEnabled || this.shopItemSettings[r.id]?.autopurchase?.rules?.length).map(resource => {
                 const affordable = resourceCalculators.isAffordable(resource.get_cost());
 
                 return {
@@ -318,15 +362,21 @@ export class ShopModule extends GameModule {
                     affordable,
                     isLeveled: this.leveledId === resource.id,
                     purchaseMultiplier: Math.max(1, Math.min(this.purchaseMultiplier, affordable.max, (this.sellStocks[resource.id] ?? 0))),
+                    autopurchase: payload.includeAutomations ? this.shopItemSettings[resource.id]?.autopurchase : undefined,
                 }
             }),
             purchaseMultiplier: this.purchaseMultiplier,
+            payload,
         }
     }
 
-    sendPurchaseableItemsData() {
-        const data = this.getPurchaseableItemsData();
-        this.eventHandler.sendData('items-resources-data', data);
+    sendPurchaseableItemsData(payload) {
+        const data = this.getPurchaseableItemsData(payload);
+        let label = 'items-resources-data';
+        if(payload.prefix) {
+            label = `${label}-${payload.prefix}`
+        }
+        this.eventHandler.sendData(label, data);
     }
 
     getPurchaseableItemDetails(id) {
@@ -347,6 +397,8 @@ export class ShopModule extends GameModule {
             duration: entity.attributes?.duration || 0,
             tags: entity.tags,
             purchaseMultiplier: Math.max(1, Math.min(this.purchaseMultiplier, affordable.max, (this.sellStocks[entity.id] ?? 0))),
+            autopurchase: this.shopItemSettings?.[entity.id]?.autopurchase ?? { rules: [] },
+            isAutomationUnlocked: gameEntity.getLevel('shop_item_purchase_manager') > 0,
         }
     }
 

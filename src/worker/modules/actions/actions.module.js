@@ -54,6 +54,7 @@ export class ActionsModule extends GameModule {
         this.lists = new ActionListsSubmodule();
         this.focus = null;
         this.showHidden = false;
+        this.showMaxed = false;
         this.aspectUpdateCd = 0;
         this.searchData = {
             search: '',
@@ -171,6 +172,13 @@ export class ActionsModule extends GameModule {
 
         this.eventHandler.registerHandler('toggle-show-hidden', (payload) => {
             this.showHidden = payload.flag;
+            this.sendActionsData(this.selectedFilterId, {
+                searchData: this.searchData,
+            })
+        })
+
+        this.eventHandler.registerHandler('toggle-show-maxed', (payload) => {
+            this.showMaxed = payload.flag;
             this.sendActionsData(this.selectedFilterId, {
                 searchData: this.searchData,
             })
@@ -592,6 +600,8 @@ export class ActionsModule extends GameModule {
             selectedFilterId: this.selectedFilterId,
             searchData: this.searchData,
             focus: this.focus,
+            showHidden: this.showHidden,
+            showMaxed: this.showMaxed,
             aspects: gameEntity.listEntitiesByTags(['aspect']).filter(one => one.level > 0).reduce((acc, ent) => ({
                 ...acc,
                 [ent.id]: gameEntity.getLevel(ent.id)
@@ -671,6 +681,8 @@ export class ActionsModule extends GameModule {
         } else {
             this.customFiltersOrder = Object.keys(this.customFilters);
         }
+        this.showMaxed = saveObject?.showMaxed;
+        this.showHidden = saveObject?.showHidden;
         // console.log('[SAD]Loaded!', this.filtersCache, this.selectedFilterId, this.customFilters);
         this.sendActionsData(this.selectedFilterId,{
             searchData: this.searchData,
@@ -1110,7 +1122,7 @@ export class ActionsModule extends GameModule {
                 isPinned: filter.isPinned,
                 sortIndex: this.customFiltersOrder.findIndex(s => s === filter.id),
                 items: gameEntity.listEntitiesByTags(['action'])
-                    .filter(one => this.filtersCache[filter.id][one.id] && one.isUnlocked && !one.isCapped
+                    .filter(one => this.filtersCache[filter.id][one.id] && one.isUnlocked && (!one.isCapped || this.showMaxed)
                         && (options?.showHidden || this.showHidden || !this.actions?.[one.id]?.isHidden)
                         && this.matchActionSearch(one, options.searchData)
                     ),
@@ -1141,6 +1153,7 @@ export class ActionsModule extends GameModule {
             isActive: this.isRunningAction(entity.id),
             xpRate: this.isRunningAction(entity.id) ? this.getLearningRate(`runningAction_${entity.id}`) : this.getLearningRate(entity.id, 1),
             isLeveled: this.actions[entity.id]?.isLeveled,
+            isCapped: entity.isCapped,
             tags: entity.tags,
             /*focused: this.isRunningAction(entity.id) && this.actions[entity.id]?.focus?.bonus > 1 ? {
                 isFocused: true,
@@ -1171,6 +1184,7 @@ export class ActionsModule extends GameModule {
             available,
             current,
             showHidden: this.showHidden,
+            showMaxed: this.showMaxed,
             actionLists: this.lists.getLists(),
             runningList: this.lists.runningList,
             actionListsUnlocked: gameEntity.getLevel('shop_item_notebook') > 0,
