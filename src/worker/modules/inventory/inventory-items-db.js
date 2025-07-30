@@ -107,10 +107,7 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('action_clay_mining') > 0
         },
-        get_cost: (amount = 1) => ({
-            coins: amount*15*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
-        }),
-        sellPrice: 80,
+        sellPrice: 800,
     })
 
 
@@ -947,7 +944,7 @@ export const registerInventoryItems = () => {
         },
         sellPrice: 5000,
         get_cost: (amount = 1) => ({
-            coins: amount*50000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+            coins: amount*150000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
         }),
     })
 
@@ -974,7 +971,7 @@ export const registerInventoryItems = () => {
         },
         sellPrice: 15625,
         get_cost: (amount = 1) => ({
-            coins: amount*125000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+            coins: amount*225000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
         }),
     })
 
@@ -1068,9 +1065,9 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.isEntityUnlocked('action_mining')
         },
-        sellPrice: 160000,
+        sellPrice: 360000,
         get_cost: (amount = 1) => ({
-            coins: amount*10000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+            coins: amount*20000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
         }),
     })
 
@@ -1095,7 +1092,7 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.isEntityUnlocked('craft_forged_steel')
         },
-        sellPrice: 560000,
+        sellPrice: 1560000,
     })
 
 

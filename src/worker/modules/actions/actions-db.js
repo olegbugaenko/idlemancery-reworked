@@ -4269,12 +4269,12 @@ export const registerActionsStage1 = () => {
                 resources: {
                     'energy': {
                         A: 0.0,
-                        B: 500,
+                        B: 1500,
                         type: 0,
                     },
                     'knowledge': {
                         A: 0.0,
-                        B: 50,
+                        B: 150,
                         type: 0,
                     }
                 }

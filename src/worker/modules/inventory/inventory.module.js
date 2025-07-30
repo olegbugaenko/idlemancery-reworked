@@ -341,6 +341,9 @@ export class InventoryModule extends GameModule {
             gameResources.addResource('coins', earnings);
             this.inventoryItems[id].soldAmount += realCons;
             this.inventoryItems[id].coinsEarned += earnings;
+
+                            // Send trading event to statistics module
+                gameCore.getModule('statistics').recordTrade('sold', id, realCons, earnings);
         }
 
         this.sendInventoryData(this.selectedFilterId, {

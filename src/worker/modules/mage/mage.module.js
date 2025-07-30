@@ -910,7 +910,6 @@ export class MageModule extends GameModule {
     getActiveEffectsData() {
         const items = gameEntity.listEntitiesByTags(['active_effect']);
         // const presentSpells = items.filter(item => item.isUnlocked);
-
         return {
             list: items.filter(item => !this.activeEffectsFiltered[item.originalId] && !this.activeEffectsFiltered[item.copyFromId]).map(item => ({
                 ...item,
@@ -919,6 +918,7 @@ export class MageModule extends GameModule {
                 duration: gameEntity.getAttribute(item.id, 'current_duration'),
                 durationProg: 1,
                 className: gameEntity.getAttribute(item.id, 'className'),
+                // customIcon: gameEntity.getAttribute(item.id, 'customIcon'),
             }))
         }
     }

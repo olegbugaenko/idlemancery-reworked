@@ -15,6 +15,21 @@ export class CraftingModule extends GameModule {
 
         this.craftingSlots = {};
 
+        // Auto-rebalancing system
+        this.autoRebalanceEnabled = true;
+        this.originalAllocations = {}; // Store original player allocations
+        this.lastRebalanceCheck = 0;
+        this.rebalanceCheckInterval = 3; // Check every 3 seconds
+
+        // Alchemy auto-rebalancing system (separate from crafting)
+        this.alchemyAutoRebalanceEnabled = true;
+        this.alchemyOriginalAllocations = {}; // Store original player allocations for alchemy
+        this.alchemyLastRebalanceCheck = 0;
+
+        // Rebalance reasons storage
+        this.rebalanceReasons = {};
+        this.alchemyRebalanceReasons = {};
+
         this.filters = [{
             id: 'crafting',
             name: 'Crafting',
@@ -42,6 +57,26 @@ export class CraftingModule extends GameModule {
         this.eventHandler.registerHandler('set-crafting-level', (payload) => {
             this.setCraftingEffort(payload);
             this.sendCraftingData(payload);
+        })
+
+        this.eventHandler.registerHandler('set-auto-rebalance', (payload) => {
+            this.autoRebalanceEnabled = payload.enabled;
+            
+            // Clear original allocations and rebalance reasons when auto-rebalance is disabled
+            if (!payload.enabled) {
+                this.originalAllocations = {};
+                this.rebalanceReasons = {};
+            }
+        })
+
+        this.eventHandler.registerHandler('set-alchemy-auto-rebalance', (payload) => {
+            this.alchemyAutoRebalanceEnabled = payload.enabled;
+            
+            // Clear original allocations and rebalance reasons when auto-rebalance is disabled
+            if (!payload.enabled) {
+                this.alchemyOriginalAllocations = {};
+                this.alchemyRebalanceReasons = {};
+            }
         })
 
         this.eventHandler.registerHandler('query-running-craft-for-list', (payload) => {
@@ -78,12 +113,36 @@ export class CraftingModule extends GameModule {
 
     tick(game, delta) {
         this.lists.tick(game, delta);
+        
+        // Auto-rebalancing check for crafting
+        if (this.autoRebalanceEnabled) {
+            this.lastRebalanceCheck += delta;
+            if (this.lastRebalanceCheck >= this.rebalanceCheckInterval) {
+                this.lastRebalanceCheck = 0;
+                this.checkAndRebalance('crafting');
+            }
+        }
+        
+        // Auto-rebalancing check for alchemy
+        if (this.alchemyAutoRebalanceEnabled) {
+            this.alchemyLastRebalanceCheck += delta;
+            if (this.alchemyLastRebalanceCheck >= this.rebalanceCheckInterval) {
+                this.alchemyLastRebalanceCheck = 0;
+                this.checkAndRebalance('alchemy');
+            }
+        }
     }
 
     save() {
         return {
             slots: this.craftingSlots,
             craftingLists: this.lists.save(),
+            autoRebalanceEnabled: this.autoRebalanceEnabled,
+            originalAllocations: this.originalAllocations,
+            alchemyAutoRebalanceEnabled: this.alchemyAutoRebalanceEnabled,
+            alchemyOriginalAllocations: this.alchemyOriginalAllocations,
+            rebalanceReasons: this.rebalanceReasons,
+            alchemyRebalanceReasons: this.alchemyRebalanceReasons,
             version: this.currentVersion
         }
     }
@@ -101,6 +160,14 @@ export class CraftingModule extends GameModule {
         if(Array.isArray(this.craftingSlots)) {
             this.craftingSlots = {};
         }
+
+        // Load auto-rebalancing data
+        this.autoRebalanceEnabled = obj?.autoRebalanceEnabled ?? true;
+        this.originalAllocations = obj?.originalAllocations || {};
+        this.alchemyAutoRebalanceEnabled = obj?.alchemyAutoRebalanceEnabled ?? true;
+        this.alchemyOriginalAllocations = obj?.alchemyOriginalAllocations || {};
+        this.rebalanceReasons = obj?.rebalanceReasons || {};
+        this.alchemyRebalanceReasons = obj?.alchemyRebalanceReasons || {};
 
         for(const id in this.craftingSlots) {
             this.setCraftingEffort({ id, effort: this.craftingSlots[id].effort, isForce: true });
@@ -140,6 +207,10 @@ export class CraftingModule extends GameModule {
             effort = 1;
         }
 
+        if(id === 'craft_ruby') {
+            console.log('New Ruby Effort: ', effort);
+        }
+
         this.craftingSlots[id].effort = effort;
 
         const catToTag = tags => {
@@ -156,10 +227,16 @@ export class CraftingModule extends GameModule {
             this.recalculateRemaining(id, filterId, 1 - effort)
         }
 
-        if(effort === 0 && gameEntity.entityExists(`activeCrafting_${id}`)) {
+        // Safety check: ensure total effort doesn't exceed 100%
+        // this.normalizeTotalEffort(this.craftingSlots[id].filterId);
+
+        const allocations = this.craftingSlots[id].filterId === 'crafting' ? this.originalAllocations : this.alchemyOriginalAllocations;
+        const isEmpty = !allocations[id] && effort === 0;
+
+        if(isEmpty && gameEntity.entityExists(`activeCrafting_${id}`)) {
             gameEntity.unsetEntity(`activeCrafting_${id}`)
         }
-        if(effort > 0) {
+        if(!isEmpty) {
             if(!gameEntity.entityExists(`activeCrafting_${id}`)) {
                 gameEntity.registerGameEntity(`activeCrafting_${id}`, {
                     copyFromId: id,
@@ -170,7 +247,15 @@ export class CraftingModule extends GameModule {
             }
         }
 
+        if(id === 'craft_ruby') {
+            console.log('BAPP: ', this.craftingSlots['craft_ruby'].effort);
+        }
+
         this.applyCraftingIntensities();
+
+        if(id === 'craft_ruby') {
+            console.log('AAPP: ', this.craftingSlots['craft_ruby'].effort);
+        }
 
     }
 
@@ -230,6 +315,322 @@ export class CraftingModule extends GameModule {
         gameEntity.setEntityLevel('crafting_intensities', 1, true);
     }
 
+    normalizeTotalEffort(category) {
+        const tagToCat = {
+            'crafting': 'material',
+            alchemy: 'alchemy'
+        };
+
+        // Calculate total effort for this category
+        let totalEffort = 0;
+        for (const [recipeId, slot] of Object.entries(this.craftingSlots)) {
+            if (!slot.effort || slot.effort <= 0) continue;
+            
+            const recipeTags = gameEntity.getEntity(recipeId)?.tags || [];
+            if (!recipeTags.includes(tagToCat[category])) continue;
+            
+            totalEffort += slot.effort;
+        }
+
+        // If total effort exceeds 100%, normalize all efforts proportionally
+        if (totalEffort > 1.001) { // Small tolerance for floating point errors
+            console.warn(`Total effort for ${category} exceeded 100%: ${(totalEffort * 100).toFixed(2)}%. Normalizing...`);
+            
+            for (const [recipeId, slot] of Object.entries(this.craftingSlots)) {
+                if (!slot.effort || slot.effort <= 0) continue;
+                
+                const recipeTags = gameEntity.getEntity(recipeId)?.tags || [];
+                if (!recipeTags.includes(tagToCat[category])) continue;
+                
+                // Normalize this recipe's effort
+                const normalizedEffort = slot.effort / totalEffort;
+                this.craftingSlots[recipeId].effort = normalizedEffort;
+            }
+        }
+    }
+
+    // Auto-rebalancing methods
+    checkAndRebalance(category) {
+        const isEnabled = category === 'crafting' ? this.autoRebalanceEnabled : this.alchemyAutoRebalanceEnabled;
+        if (!isEnabled) return;
+        
+        // Try to restore individual recipes that can be restored
+        this.tryRestoreIndividualRecipes(category);
+
+        // Check for recipes that need rebalancing
+        this.rebalanceInefficientRecipes(category);
+    }
+
+    tryRestoreIndividualRecipes(category) {
+        const allocations = category === 'crafting' ? this.originalAllocations : this.alchemyOriginalAllocations;
+        const rebalanceReasons = category === 'crafting' ? this.rebalanceReasons : this.alchemyRebalanceReasons;
+        
+        for (const [recipeId, originalEffort] of Object.entries(allocations)) {
+            if (!this.craftingSlots[recipeId]) continue;
+            
+            const currentEffort = this.craftingSlots[recipeId]?.effort || 0;
+            
+            // If current effort is already close to original, skip
+            if (Math.abs(currentEffort - originalEffort) < 0.01) continue;
+
+            // dont restore in case its profitable
+            if(currentEffort > originalEffort) continue;
+            
+            // Check if we can run this specific recipe at original effort level for at least 3 seconds
+            if (this.canRunRecipeAtEffortForDuration(recipeId, originalEffort, 3)) {
+                // Restore this specific recipe
+                this.setCraftingEffort({ 
+                    id: recipeId, 
+                    effort: originalEffort, 
+                    isForce: false 
+                });
+                
+                // Remove from allocations and rebalance reasons
+                delete allocations[recipeId];
+                delete rebalanceReasons[recipeId];
+            }
+        }
+    }
+
+    canRestoreOriginalAllocations(category) {
+        const allocations = category === 'crafting' ? this.originalAllocations : this.alchemyOriginalAllocations;
+        
+        for (const [recipeId, originalEffort] of Object.entries(allocations)) {
+            if (!this.craftingSlots[recipeId]) continue;
+
+            // console.log('check: ', recipeId, gameEntity.entityExists(`activeCrafting_${recipeId}`));
+            
+            if (!gameEntity.entityExists(`activeCrafting_${recipeId}`)) continue;
+            
+            const currentEntity = gameEntity.getEntity(`activeCrafting_${recipeId}`);
+            if (!currentEntity) continue;
+            
+            const currentEffort = this.craftingSlots[recipeId]?.effort || 0;
+            
+            // If current effort is already close to original, don't restore
+            if (Math.abs(currentEffort - originalEffort) < 0.01) continue;
+            
+            // Check if we can run this recipe at original effort level for at least 3 seconds
+            if (!this.canRunRecipeAtEffortForDuration(recipeId, originalEffort, 3)) {
+                return false;
+            }
+        }
+        return Object.keys(allocations).length > 0;
+    }
+
+    canRunRecipeAtEffortForDuration(recipeId, effort, durationSeconds) {
+        // Get the recipe entity
+        const recipeEntity = gameEntity.getEntity(recipeId);
+        if (!recipeEntity) return false;
+        
+        // Get effects at original effort level
+        const effects = gameEntity.getEffects(recipeId, 0, 1, true, 1, 1, effort);
+         
+        // Filter for consumption effects that are resources
+        const consumptionEffects = effects.filter(effect => 
+            effect.scope === 'consumption' && 
+            effect.type === 'resources'
+        );
+        
+        // Check each consumption effect
+        for (const effect of consumptionEffects) {
+            const resourceId = effect.id;
+            const resource = gameResources.getResource(resourceId);
+            if (!resource) continue;
+            
+            // Calculate consumption per second at original effort
+            const consumptionPerSecond = Math.abs(effect.value || 0);
+            if (consumptionPerSecond <= 0) continue;
+            
+            // Calculate how much we need for the duration
+            const requiredForDuration = consumptionPerSecond * durationSeconds;
+            
+            /*if(recipeId === 'craft_mental_potion') {
+                console.log(`Recipe: ${recipeId}: need ${requiredForDuration} of ${resourceId}, has ${resource.amount}`);
+            
+            }*/
+            
+            // Check if we have enough resource
+            if (resource.amount < requiredForDuration && resource.balance < consumptionPerSecond) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
+    restoreOriginalAllocations(category) {
+        const allocations = category === 'crafting' ? this.originalAllocations : this.alchemyOriginalAllocations;
+        
+        for (const [recipeId, originalEffort] of Object.entries(allocations)) {
+            if (this.craftingSlots[recipeId]) {
+                this.setCraftingEffort({ 
+                    id: recipeId, 
+                    effort: originalEffort, 
+                    isForce: true 
+                });
+            }
+        }
+        
+        // Clear allocations and rebalance reasons for this category
+        if (category === 'crafting') {
+            this.originalAllocations = {};
+            this.rebalanceReasons = {};
+        } else {
+            this.alchemyOriginalAllocations = {};
+            this.alchemyRebalanceReasons = {};
+        }
+    }
+
+    rebalanceInefficientRecipes(category) {
+        const tagToCat = {
+            'crafting': 'material',
+            alchemy: 'alchemy'
+        };
+
+        let totalUnusedEffort = 0;
+        const recipesToRebalance = [];
+
+        // Check each recipe for inefficiency (only for the specific category)
+        for (const [recipeId, slot] of Object.entries(this.craftingSlots)) {
+            if (!slot.effort || slot.effort <= 0) continue;
+
+            if (!gameEntity.entityExists(`activeCrafting_${recipeId}`)) continue;
+
+            const currentEntity = gameEntity.getEntity(`activeCrafting_${recipeId}`);
+            if (!currentEntity) continue;
+
+            // Only process recipes for the specific category
+            const recipeTags = gameEntity.getEntity(recipeId)?.tags || [];
+            if (!recipeTags.includes(tagToCat[category])) continue;
+
+            const efficiency = currentEntity.modifier?.efficiency ?? 1;
+            
+            if (efficiency < 0.98) { // Recipe is running inefficiently
+                const unusedEffort = slot.effort * (1 - efficiency);
+                totalUnusedEffort += unusedEffort;
+                
+                // Get the bottleneck resource that caused this inefficiency
+                const bottleNeck = currentEntity.modifier?.bottleNeck ? gameResources.getResource(currentEntity.modifier.bottleNeck) : null;
+                const missingResourceName = bottleNeck?.name || 'resources';
+                
+                recipesToRebalance.push({ 
+                    recipeId, 
+                    unusedEffort, 
+                    efficiency, 
+                    missingResourceName 
+                });
+            }
+        }
+
+        if (totalUnusedEffort > 0.01) { // Only rebalance if there's significant unused effort
+            this.redistributeUnusedEffort(recipesToRebalance, totalUnusedEffort, category);
+        }
+    }
+
+    getPotentialAllocateTargets(category) {
+        const tagToCat = {
+            'crafting': 'material',
+            alchemy: 'alchemy'
+        };
+        
+        const allocations = category === 'crafting' ? this.originalAllocations : this.alchemyOriginalAllocations;
+        const potentialTargets = [];
+        
+        for (const [recipeId, slot] of Object.entries(this.craftingSlots)) {
+            if (!slot.effort || slot.effort <= 0) continue;
+
+            if (!gameEntity.entityExists(`activeCrafting_${recipeId}`)) continue;
+
+            // Only process recipes for the specific category
+            const recipeTags = gameEntity.getEntity(recipeId)?.tags || [];
+            if (!recipeTags.includes(tagToCat[category])) continue;
+
+            const currentEntity = gameEntity.getEntity(`activeCrafting_${recipeId}`);
+            if (!currentEntity) continue;
+
+            const efficiency = currentEntity.modifier?.efficiency ?? 1;
+            
+            // Check if this recipe was rebalanced down (current effort < original effort)
+            const originalEffort = allocations[recipeId];
+            const wasRebalancedDown = originalEffort !== undefined && slot.effort < originalEffort;
+            
+            // Only add recipes that are running efficiently (no bottlenecks) AND were not rebalanced down
+            if (efficiency > 0.98 && !wasRebalancedDown) {
+                potentialTargets.push({ recipeId, currentEffort: slot.effort });
+            }
+        }
+        
+        return potentialTargets;
+    }
+
+    redistributeUnusedEffort(recipesToRebalance, totalUnusedEffort, category) {
+        const tagToCat = {
+            'crafting': 'material',
+            alchemy: 'alchemy'
+        };
+        
+        const allocations = category === 'crafting' ? this.originalAllocations : this.alchemyOriginalAllocations;
+
+        // Store original allocations if not already stored
+        if (Object.keys(allocations).length === 0) {
+            for (const [recipeId, slot] of Object.entries(this.craftingSlots)) {
+                if (slot.effort > 0) {
+                    const recipeTags = gameEntity.getEntity(recipeId)?.tags || [];
+                    if (recipeTags.includes(tagToCat[category])) {
+                        allocations[recipeId] = slot.effort;
+                    }
+                }
+            }
+        }
+
+        // First, reduce effort on inefficient recipes
+        for (const { recipeId, unusedEffort, missingResourceName } of recipesToRebalance) {
+            const currentEffort = this.craftingSlots[recipeId]?.effort || 0;
+            const newEffort = Math.max(0, currentEffort - unusedEffort);
+            
+            // Store the reason for rebalancing this recipe
+            const rebalanceReasons = category === 'crafting' ? this.rebalanceReasons : this.alchemyRebalanceReasons;
+            rebalanceReasons[recipeId] = missingResourceName;
+            
+            this.setCraftingEffort({ 
+                id: recipeId, 
+                effort: newEffort, 
+                isForce: true 
+            });
+        }
+
+        // Get potential targets that can accept more effort (no bottlenecks)
+        const availableRecipes = this.getPotentialAllocateTargets(category);
+
+        
+        // Filter out recipes that were just rebalanced
+        const filteredAvailableRecipes = availableRecipes.filter(recipe => 
+            !recipesToRebalance.some(r => r.recipeId === recipe.recipeId)
+        );
+
+        if (filteredAvailableRecipes.length === 0) return;
+
+        // Calculate total effort of available recipes for proportional distribution
+        const totalAvailableEffort = filteredAvailableRecipes.reduce((sum, recipe) => sum + recipe.currentEffort, 0);
+
+        // Redistribute unused effort proportionally to available recipes
+        for (const availableRecipe of filteredAvailableRecipes) {
+            const proportion = availableRecipe.currentEffort / totalAvailableEffort;
+            const additionalEffort = totalUnusedEffort * proportion;
+            
+            const newEffort = availableRecipe.currentEffort + additionalEffort;
+            this.setCraftingEffort({ 
+                id: availableRecipe.recipeId, 
+                effort: newEffort, 
+                isForce: true, 
+            });
+        }
+
+        // Safety check after redistribution
+        this.normalizeTotalEffort(category);
+    }
+
     regenerateNotifications() {
 
         this.filters.forEach(filter => {
@@ -274,7 +675,29 @@ export class CraftingModule extends GameModule {
             resourceBalance: gameResources.getResource(recipe.resourceId)?.balance,
             breakDown: gameResources.getResource(recipe.resourceId)?.breakDown,
             isRunning: gameEntity.entityExists(`activeCrafting_${recipe.id}`) && this.craftingSlots[recipe.id]?.effort,
-            isLowerEfficiency: gameEntity.entityExists(`activeCrafting_${recipe.id}`) && gameEntity.getEntity(`activeCrafting_${recipe.id}`).modifier?.efficiency < 1 - SMALL_NUMBER
+            isLowerEfficiency: gameEntity.entityExists(`activeCrafting_${recipe.id}`) && gameEntity.getEntity(`activeCrafting_${recipe.id}`).modifier?.efficiency < 1 - SMALL_NUMBER,
+            isRebalanced: filterId === 'crafting' ? 
+                         this.autoRebalanceEnabled && 
+                         Object.keys(this.originalAllocations).length > 0 && 
+                         this.originalAllocations[recipe.id] !== undefined && 
+                         this.originalAllocations[recipe.id] !== this.craftingSlots[recipe.id]?.effort &&
+                         gameEntity.entityExists(`activeCrafting_${recipe.id}`) :
+                         filterId === 'alchemy' &&
+                         this.alchemyAutoRebalanceEnabled &&
+                         Object.keys(this.alchemyOriginalAllocations).length > 0 &&
+                         this.alchemyOriginalAllocations[recipe.id] !== undefined &&
+                         this.alchemyOriginalAllocations[recipe.id] !== this.craftingSlots[recipe.id]?.effort &&
+                         gameEntity.entityExists(`activeCrafting_${recipe.id}`),
+            isRebalancedBeneficial: filterId === 'crafting' ?
+                                  this.autoRebalanceEnabled &&
+                                  Object.keys(this.originalAllocations).length > 0 &&
+                                  this.originalAllocations[recipe.id] !== undefined &&
+                                  this.originalAllocations[recipe.id] < this.craftingSlots[recipe.id]?.effort :
+                                  filterId === 'alchemy' &&
+                                  this.alchemyAutoRebalanceEnabled &&
+                                  Object.keys(this.alchemyOriginalAllocations).length > 0 &&
+                                  this.alchemyOriginalAllocations[recipe.id] !== undefined &&
+                                  this.alchemyOriginalAllocations[recipe.id] < this.craftingSlots[recipe.id]?.effort
         }));
 
         return {
@@ -283,7 +706,16 @@ export class CraftingModule extends GameModule {
                 ...efrs,
                 usingRecipes: available.filter(one => one.effort > 0).map(({ id, name, effort }) => ({ id, name, effort })),
             },
-            craftingLists: this.lists.getLists({ category: filterId })
+            craftingLists: this.lists.getLists({ category: filterId }),
+            autoRebalance: {
+                enabled: filterId === 'crafting' ? this.autoRebalanceEnabled : this.alchemyAutoRebalanceEnabled,
+                hasOriginalAllocations: filterId === 'crafting' ? 
+                    Object.keys(this.originalAllocations).length > 0 : 
+                    Object.keys(this.alchemyOriginalAllocations).length > 0,
+                canRestore: filterId === 'crafting' ? 
+                    this.canRestoreOriginalAllocations('crafting') : 
+                    this.canRestoreOriginalAllocations('alchemy')
+            }
         }
     }
 
@@ -296,6 +728,7 @@ export class CraftingModule extends GameModule {
 
         let efficiency = 1;
         let bottleNeck = null;
+        let rebalanceInfo = null;
 
         if(isRunning) {
             actualEntity = gameEntity.getEntity(`activeCrafting_${id}`);
@@ -305,10 +738,34 @@ export class CraftingModule extends GameModule {
 
         const calculatedEffort = this.craftingSlots[entity.id]?.effort ? this.craftingSlots[entity.id]?.effort : 1;
 
+        // Check if this recipe was rebalanced
+        const currentEffort = this.craftingSlots[entity.id]?.effort || 0;
+        const originalEffort = this.originalAllocations[entity.id] || this.alchemyOriginalAllocations[entity.id];
+        
+        if (originalEffort !== undefined && Math.abs(originalEffort - currentEffort) > 0.001) {
+            const isBeneficial = currentEffort > originalEffort;
+            const intensityReduction = ((originalEffort - currentEffort) / originalEffort * 100).toFixed(2);
+            
+            // Get the stored rebalance reason, or fall back to current bottleneck
+            const rebalanceReasons = this.originalAllocations[entity.id] !== undefined ? this.rebalanceReasons : this.alchemyRebalanceReasons;
+            const storedMissingResource = rebalanceReasons[entity.id];
+            const missingResource = storedMissingResource || bottleNeck?.name || 'resources';
+            
+            rebalanceInfo = {
+                isRebalanced: true,
+                isBeneficial,
+                originalEffort,
+                currentEffort,
+                intensityReduction: Math.abs(intensityReduction),
+                missingResource
+            };
+        }
+
         return {
             ...entity,
             efficiency,
             bottleNeck,
+            rebalanceInfo,
             effects: isRunning
                 ? gameEntity.getEffects(`activeCrafting_${id}`, 0, this.craftingSlots[entity.id]?.level || 1, false, 1)
                 : gameEntity.getEffects(entity.id, 0, 1, true, 1, 1,  calculatedEffort),

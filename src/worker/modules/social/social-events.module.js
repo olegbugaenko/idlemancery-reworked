@@ -45,9 +45,17 @@ export class EventsModule extends GameModule {
     tick(game, delta) {
         const currentTime = gameCore.globalTime;
 
-        // Перевіряємо чи завершилася активна подія
-        if (this.activeEvent && currentTime >= this.eventEndTime) {
-            this.completeEvent();
+        // Оновлюємо тривалість активної події
+        if (this.activeEvent) {
+            const timeLeftSeconds = Math.max(0, this.eventEndTime - currentTime);
+            if (gameEntity.entityExists(`active_${this.activeEvent}`)) {
+                gameEntity.setAttribute(`active_${this.activeEvent}`, 'current_duration', timeLeftSeconds);
+            }
+            
+            // Перевіряємо чи завершилася активна подія
+            if (currentTime >= this.eventEndTime) {
+                this.completeEvent();
+            }
         }
 
         // Перевіряємо автоматизацію подій
@@ -94,6 +102,7 @@ export class EventsModule extends GameModule {
             level: 1,
             tags: ['active_event', 'active_effect'],
             scope: 'events',
+            customIcon: 'temporary_knowledge_buff',
             unlockedBy: undefined,
         });
 
@@ -150,6 +159,12 @@ export class EventsModule extends GameModule {
 
     // Встановити автоматизацію події
     setAutoEvent(eventId, enabled) {
+        if (enabled) {
+            // Якщо вмикаємо автоматизацію для однієї події, вимикаємо всі інші
+            for (const key in this.autoEvents) {
+                this.autoEvents[key] = false;
+            }
+        }
         this.autoEvents[eventId] = enabled;
         this.sendEventsData();
     }
@@ -288,6 +303,7 @@ export class EventsModule extends GameModule {
                         tags: ['active_event', 'active_effect'],
                         scope: 'events',
                         unlockedBy: undefined,
+                        customIcon: 'temporary_knowledge_buff',
                     });
                 }
             }

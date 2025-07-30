@@ -33,6 +33,11 @@ export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, op
             runningList: null,
             automationEnabled: false,
             autotriggerIntervalSetting: 10,
+        },
+        autoRebalance: {
+            enabled: true,
+            hasOriginalAllocations: false,
+            canRestore: false
         }
     });
 
@@ -48,6 +53,10 @@ export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, op
     onMessage(`crafting-data-${filterId}`, (craftables) => {
         setItemsData(craftables);
     })
+
+    const handleAutoRebalanceToggle = useCallback((enabled) => {
+        sendData('set-alchemy-auto-rebalance', { enabled });
+    }, [sendData]);
 
     const onEditList = useCallback(listData => {
         console.log('onEditList: ', { listData, isEdit: true })
@@ -85,8 +94,34 @@ export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, op
                         <span>{formatValue(craftingData.efforts.value)}</span>
                     </div>
                 </TippyWrapper>
+                
+                {/* Auto-rebalance controls for alchemy */}
+                <div className={'auto-rebalance-controls'}>
+                    <div className={'space-item'}>
+                        <label className={'checkbox-label'}>
+                            <input 
+                                type="checkbox" 
+                                checked={craftingData.autoRebalance.enabled}
+                                onChange={(e) => handleAutoRebalanceToggle(e.target.checked)}
+                            />
+                            <span>Auto-rebalance</span>
+                        </label>
+                    </div>
+                    {craftingData.autoRebalance.hasOriginalAllocations && (
+                                        <TippyWrapper content={<div className={'hint-popup'}>
+                    <p className={'hint'}>Some of your recipes don't have enough ingredients. Since you enabled automatic rebalancing, your efforts have been redirected to other available recipes.</p>
+                </div>}>
+                            <div className={'space-item rebalance-status'}>
+                                {craftingData.autoRebalance.canRestore ? (
+                                    <span className={'status-restore'}>Will restore original allocation</span>
+                                ) : (
+                                    <span className={'status-rebalanced'}>Temporarily rebalanced</span>
+                                )}
+                            </div>
+                        </TippyWrapper>
+                    )}
+                </div>
             </div>
-
         </div>
         <div className={'craftables-cat'}>
             <PerfectScrollbar>
@@ -115,10 +150,10 @@ export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, op
     </div>)
 }
 
-export const ItemCard = ({ id, icon_id, isRunning, resourceAmount, resourceBalance, breakDown, isLowerEfficiency, name, effort, maxLevel, onSetLevel, onShowDetails, addItemToList, isMobile, isEditList}) => {
+export const ItemCard = ({ id, icon_id, isRunning, resourceAmount, resourceBalance, breakDown, isLowerEfficiency, name, effort, maxLevel, onSetLevel, onShowDetails, addItemToList, isMobile, isEditList, isRebalanced, isRebalancedBeneficial}) => {
 
     return (<div
-        className={`card craftable ${isRunning ? 'running' : ''} ${isLowerEfficiency ? 'lower-eff' : ''}`}
+        className={`card craftable ${isRunning ? 'running' : ''} ${isLowerEfficiency ? 'lower-eff' : ''} ${isRebalanced ? (isRebalancedBeneficial ? 'rebalanced-beneficial' : 'rebalanced') : ''}`}
         onMouseEnter={() => !isMobile ? onShowDetails(id) : null}
         onMouseOver={() => !isMobile ? onShowDetails(id) : null}
         onMouseLeave={() => !isMobile ? onShowDetails(null) : null}

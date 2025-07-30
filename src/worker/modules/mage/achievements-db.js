@@ -920,4 +920,35 @@ export const achievementsDb = [{
     completeCondition: () => {
         return gameEntity.getLevel('action_alchemy_training') >= 250
     }
+},{
+    id: 'shop_item_magic_accessories_access_1',
+    title: 'The Accidental Mage',
+    text: [
+        "After a long argument with the shopkeeper about being a real mage, you decided to prove your magical abilities.",
+        "You tried to demonstrate by moving a small object with your mind, but nothing happened. The shopkeeper smirked.",
+        "Frustrated, you muttered what you thought was a harmless phrase under your breath.",
+        "Suddenly, a powerful gust of wind erupted from your hands, creating a miniature tornado that scattered books, papers, and various trinkets across the entire shop.",
+        "The shopkeeper's face went pale as he watched his carefully organized merchandise fly around the room.",
+        "You spent the rest of the evening helping him clean up the mess, apologizing profusely while secretly marveling at your unexpected magical outburst.",
+        "Now the shopkeeper is terrified of you and lets you access the magical accessories section without any questions.",
+        "At least you finally got what you wanted—though not exactly the way you planned."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('shop_item_magic_accessories_access') >= 1
+    }
+},{
+    id: 'shop_item_enchanted_scissors_1',
+    title: 'The Cursed Haircut',
+    text: [
+        "After purchasing your enchanted scissors, you were so excited that you immediately ran to show them to your neighbor.",
+        "You explained that these were special scissors designed for paper crafting and enchanted paper production.",
+        "Your neighbor, however, was more interested in their potential for a haircut. Despite your warnings, he insisted on borrowing them.",
+        "The next day, he returned with the scissors, sporting a bizarre hairstyle with aloe vera leaves and cactus pieces stuck to his head.",
+        "He was furious, shouting about how you should have warned him that the scissors were cursed.",
+        "You calmly reminded him that you had specifically told him they were for paper, not for cutting hair.",
+        "He stormed off, muttering about magical equipment safety warnings, while you quietly returned to your paper crafting with a satisfied smile."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('shop_item_enchanted_scissors') >= 1
+    }
 }]

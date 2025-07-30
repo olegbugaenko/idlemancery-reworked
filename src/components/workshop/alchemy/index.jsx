@@ -394,7 +394,15 @@ export const ItemDetails = ({itemId, category, setItemDetails}) => {
                     </div>
                 </div>
                 <div className={'block efficiency-block'}>
-                    {item.bottleNeck ? (<p className={'hint yellow'}>This activity running at {formatValue(item.efficiency*100)}% due to missing {item.bottleNeck.name}</p> ) : (<p className={'hint'}>Running 100% Efficient</p>)}
+                    {item.rebalanceInfo ? (
+                        <p className={`hint ${item.rebalanceInfo.isBeneficial ? 'green' : 'yellow'}`}>
+                            Alchemy Intensity {item.rebalanceInfo.isBeneficial ? 'increased' : 'reduced'} to {formatValue(item.rebalanceInfo.currentEffort * 100)}% due to missing {item.rebalanceInfo.missingResource}
+                        </p>
+                    ) : item.bottleNeck ? (
+                        <p className={'hint yellow'}>This activity running at {formatValue(item.efficiency*100)}% due to missing {item.bottleNeck.name}</p>
+                    ) : (
+                        <p className={'hint'}>Running 100% Efficient</p>
+                    )}
                 </div>
                 <div className={'block'}>
                     <p>Cost:</p>

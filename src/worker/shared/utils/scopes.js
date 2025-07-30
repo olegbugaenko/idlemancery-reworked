@@ -27,5 +27,8 @@ export const getScope = (entity) => {
     if(entity.tags.includes('recipe')) {
         return 'Recipe';
     }
+    if(entity.tags.includes('course')) {
+        return 'Course';
+    }
     return ''
 }

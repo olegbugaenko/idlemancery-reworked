@@ -758,7 +758,7 @@ export const registerFurnitureStage1 = () => {
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_patience',
-            level: 3500,
+            level: 3000,
         }],
         unlockCondition: () => {
             return true;
@@ -807,7 +807,7 @@ export const registerFurnitureStage1 = () => {
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_patience',
-            level: 3500,
+            level: 3000,
         }],
         unlockCondition: () => {
             return true;

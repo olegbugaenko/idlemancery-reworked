@@ -19,7 +19,7 @@ export const SecondaryMenu = () => {
             <ul className={'menu bigger'}>
                 <li className={openedTab === 'settings' ? 'active' : ''}>
                     <TippyWrapper content={<div className={'hint-popup'}>Settings</div> }>
-                        <div id={'statistics'} className={'icon-content edit-icon interface-icon'} onClick={() => setOpenedTab('settings')}>
+                        <div id={'settings'} className={'icon-content edit-icon interface-icon'} onClick={() => setOpenedTab('settings')}>
                             <img src={"icons/interface/settings.png"}/>
                         </div>
                     </TippyWrapper>

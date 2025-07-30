@@ -209,7 +209,7 @@ export const registerShopItemsStage1 = () => {
     gameEntity.registerGameEntity('shop_item_street_smarts', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Street Smarts',
-        description: 'You’ve learned a few tricks to make every coin count. Increases coins earned from all jobs.',
+        description: 'You\'ve learned a few tricks to make every coin count. Increases coins earned from all jobs.',
         level: 0,
         maxLevel: 3,
         unlockCondition: () => {
@@ -274,7 +274,7 @@ export const registerShopItemsStage1 = () => {
     gameEntity.registerGameEntity('shop_item_warm_gloves', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Warm Gloves',
-        description: 'With these gloves, even chilly mornings can’t stop your dedication. Makes routine work feel a little easier.',
+        description: 'With these gloves, even chilly mornings can\'t stop your dedication. Makes routine work feel a little easier.',
         level: 0,
         maxLevel: 5,
         unlockedBy: [{
@@ -1049,6 +1049,332 @@ export const registerShopItemsStage1 = () => {
     })
 
 
+    gameEntity.registerGameEntity('shop_item_magic_accessories_access', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Magic Accessories Access',
+        description: 'After a long argument with the shopkeeper about being a real mage, you accidentally cast a spell during your demonstration. The resulting tornado scattered books everywhere, but now the shopkeeper is afraid of you and lets you access the magical accessories section.',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEffects.getEffectValue('attribute_magic_ability') >= 1000
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2.0,
+                B: 250000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'mana': {
+                A: 1.0,
+                B: 100,
+                type: 0
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_magical_gloves', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Magical Gloves',
+        description: 'Enchanted gloves that enhance your gathering abilities with magical assistance.',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_magic_accessories_access') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                resources: {
+                    'gathering_effort': { A: 0.25, B: 1, type: 0 }
+                }
+            })
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2.0,
+                B: 500000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'mana': {
+                A: 1.0,
+                B: 200,
+                type: 0
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_magical_chisel', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Magical Chisel',
+        description: 'A precision tool enhanced with magical properties that improves your crafting efficiency.',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_magic_accessories_access') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'crafting_effort': {
+                        A: 0.25,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2.0,
+                B: 500000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'mana': {
+                A: 1.0,
+                B: 200,
+                type: 0
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_magical_yoga_mat', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Magical Yoga Mat',
+        description: 'A specially enchanted mat that enhances your yoga practice and learning speed.',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_magic_accessories_access') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'yoga_learn_speed': {
+                        A: 0.5,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2.0,
+                B: 1000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'mana': {
+                A: 1.0,
+                B: 400,
+                type: 0
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_magical_flask', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Magical Flask',
+        description: 'An enchanted flask that enhances your alchemy work with magical properties.',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_magic_accessories_access') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'alchemy_effort': {
+                        A: 0.25,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2.0,
+                B: 500000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'mana': {
+                A: 1.0,
+                B: 200,
+                type: 0
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_magical_garden_tools', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Magical Garden Tools',
+        description: 'Enchanted tools specifically designed for magical plant care and cultivation.',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_magic_accessories_access') > 0 && 
+                   gameEntity.getLevel('shop_item_herbalists_handbook') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'plantations_efficiency': {
+                        A: 0.25,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2.0,
+                B: 2000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'mana': {
+                A: 1.0,
+                B: 1000,
+                type: 0
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_magical_hatchet', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Magical Hatchet',
+        description: 'An enchanted hatchet that enhances your crafting capabilities with magical precision.',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_magic_accessories_access') > 0 && 
+                   gameEntity.getLevel('action_mining') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'crafting_effort': {
+                        A: 0.20,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2.0,
+                B: 8000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'mana': {
+                A: 1.0,
+                B: 2000,
+                type: 0
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_enchanted_knife', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Enchanted Knife',
+        description: 'A magically enhanced knife that improves your gathering perception and precision.',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_magic_accessories_access') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'gathering_herbs_amount': {
+                        A: 0.2,
+                        B: 1,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2.0,
+                B: 10000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'mana': {
+                A: 1.0,
+                B: 2000,
+                type: 0
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_enchanted_scissors', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Enchanted Scissors',
+        description: 'Magically enhanced scissors specifically designed for paper crafting and enchanted paper production.',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_magic_accessories_access') > 0 && 
+                   gameEntity.getLevel('shop_item_paper_working') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                resources: {
+                    'inventory_paper': {
+                        A: 0.2,
+                        B: 1,
+                        type: 0,
+                    },
+                    'inventory_enchanted_paper': {
+                        A: 0.2,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2.0,
+                B: 10000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'mana': {
+                A: 1.0,
+                B: 1000,
+                type: 0
+            }
+        }),
+    })
+
     gameEntity.registerGameEntity('shop_item_knife', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Knife',
@@ -1385,7 +1711,7 @@ export const registerShopItemsStage1 = () => {
     gameEntity.registerGameEntity('shop_item_mages_handbook', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Apprentice Handbook',
-        description: 'Finally, your knowledge is sufficient to read the title of the book. It appears to contain secrets of ancient magic. Although, you’re not entirely sure you’ll be able to read its contents… Still, your hand reaches for the shelf to take it.',
+        description: 'Finally, your knowledge is sufficient to read the title of the book. It appears to contain secrets of ancient magic. Although, you\'re not entirely sure you\'ll be able to read its contents… Still, your hand reaches for the shelf to take it.',
         level: 0,
         maxLevel: 1,
         unlockedBy: [{
@@ -1571,17 +1897,6 @@ export const registerShopItemsStage1 = () => {
         attributes: {
             isCollectable: false,
         },
-        resourceModifier: {
-            income: {
-                resources: {
-                    'crafting_slots': {
-                        A: 1,
-                        B: 0,
-                        type: 0,
-                    }
-                }
-            }
-        },
         get_cost: () => ({
             'coins': {
                 A: 2.25,
@@ -1754,6 +2069,70 @@ export const registerShopItemsStage1 = () => {
             'coins': {
                 A: 2.25,
                 B: 150000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_advanced_crafting_tools', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Advanced Crafting Tools',
+        description: 'High-quality tools that significantly improve your crafting efficiency',
+        level: 0,
+        maxLevel: 5,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_constructing') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'crafting_effort': {
+                        A: 0.2,
+                        B: 1,
+                        type: 0,
+                    }
+                },
+            },
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2.0,
+                B: 250000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_iron_hammer', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Iron Hammer',
+        description: 'A sturdy iron hammer that enhances your crafting capabilities',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('action_mining') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'crafting_effort': {
+                        A: 0.25,
+                        B: 1,
+                        type: 0,
+                    }
+                },
+            },
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2.25,
+                B: 3000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 1
             }
         }),

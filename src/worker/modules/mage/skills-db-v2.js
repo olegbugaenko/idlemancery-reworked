@@ -426,7 +426,7 @@ export const registerSkillsStage1 = () => {
             top: 0,
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_training_room') > 0 && gameEntity.getLevel('shop_item_advanced_training') > 0;
+            return gameEntity.getLevel('shop_item_training_room') > 0 && gameEffects.getEffectValue('attribute_clarity') >= 25;
         },
         unlockBySkills: [{ id: "skill_courses_speed", level: 4 }],
         attributes: {
@@ -472,7 +472,7 @@ export const registerSkillsStage1 = () => {
             top: -2,
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_training_room') > 0 && gameEntity.getLevel('shop_item_advanced_training') > 0;
+            return gameEntity.getLevel('shop_item_training_room') > 0 && gameEffects.getEffectValue('attribute_clarity') >= 25;
         },
         unlockBySkills: [{ id: "skill_courses_speed", level: 4 }],
         attributes: {
@@ -518,7 +518,7 @@ export const registerSkillsStage1 = () => {
             top: 2,
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_training_room') > 0 && gameEntity.getLevel('shop_item_advanced_training') > 0;
+            return gameEntity.getLevel('shop_item_training_room') > 0 && gameEffects.getEffectValue('attribute_clarity') >= 25;
         },
         unlockBySkills: [{ id: "skill_courses_speed", level: 4 }],
         attributes: {

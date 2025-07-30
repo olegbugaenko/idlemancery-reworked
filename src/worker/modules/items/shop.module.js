@@ -229,13 +229,21 @@ export class ShopModule extends GameModule {
         amount = Math.min(amount, aff.max, (this.sellStocks[itemId] ?? 0));
 
         if(aff.isAffordable) {
+            let totalCost = 0;
             for(const key in cost) {
-                gameResources.addResource(key, -cost[key]*amount);
+                const resourceCost = cost[key]*amount;
+                gameResources.addResource(key, -resourceCost);
+                if(key === 'coins') {
+                    totalCost += resourceCost;
+                }
             }
             gameResources.addResource(itemId, amount);
             this.sellStocks[itemId] -= amount;
 
             this.leveledId = itemId;
+
+                                // Send trading event to statistics module
+                    gameCore.getModule('statistics').recordTrade('bought', itemId, amount, totalCost);
 
             this.sendPurchaseableItemsData();
         }
@@ -341,7 +349,7 @@ export class ShopModule extends GameModule {
         this.eventHandler.sendData('item-details', data);
     }
 
-    getPurchaseableItemsData(payload) {
+    getPurchaseableItemsData(payload = {}) {
         const items = gameResources.listResourcesByTags(['inventory']);
         // console.log('items: ', items);
         const presentItems = items.filter(item => item.isUnlocked && item.get_cost);
@@ -353,7 +361,7 @@ export class ShopModule extends GameModule {
         })
 
         return {
-            available: presentItems.filter(r => !payload.filterAutomatedPurchase || this.shopItemSettings[r.id]?.autopurchase.isEnabled || this.shopItemSettings[r.id]?.autopurchase?.rules?.length).map(resource => {
+            available: presentItems.filter(r => !payload?.filterAutomatedPurchase || this.shopItemSettings[r.id]?.autopurchase.isEnabled || this.shopItemSettings[r.id]?.autopurchase?.rules?.length).map(resource => {
                 const affordable = resourceCalculators.isAffordable(resource.get_cost());
 
                 return {
@@ -373,7 +381,7 @@ export class ShopModule extends GameModule {
     sendPurchaseableItemsData(payload) {
         const data = this.getPurchaseableItemsData(payload);
         let label = 'items-resources-data';
-        if(payload.prefix) {
+        if(payload?.prefix) {
             label = `${label}-${payload.prefix}`
         }
         this.eventHandler.sendData(label, data);

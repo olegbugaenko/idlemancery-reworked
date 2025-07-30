@@ -20,6 +20,7 @@ import {RulesModule} from "./shared/modules/rules.module";
 import {CoursesModule} from "./modules/items/courses.module";
 import {AchievementsModule} from "./modules/mage/achievements.module";
 import {EventsModule} from "./modules/social/social-events.module";
+import {StatisticsModule} from "./modules/statistics/statistics.module";
 
 
 export class MainModule extends GameModule {
@@ -46,6 +47,7 @@ export class MainModule extends GameModule {
         gameCore.registerModule('rules', RulesModule);
         gameCore.registerModule('achievements', AchievementsModule);
         gameCore.registerModule('events', EventsModule);
+        gameCore.registerModule('statistics', StatisticsModule);
 
 
         this.eventHandler.registerHandler('initialize-game', (data) => {

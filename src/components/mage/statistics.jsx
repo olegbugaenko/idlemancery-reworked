@@ -5,6 +5,8 @@ import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
 import {Cell, Pie, PieChart, ResponsiveContainer} from "recharts";
 import {Tooltip} from "react-tippy";
+import TradingStatistics from "./trading-statistics.jsx";
+import EconomicMetrics from "./economic-metrics.jsx";
 
 const COLORS = ['#6088FE', '#00C49F', '#FFBB28', '#FF8042',
                 '#1019FE', '#30309F', '#AD09AD', '#FE66FE',
@@ -36,10 +38,10 @@ const MyPieChart = ({ data, key, fmt }) => (
 export const Statistics = () => {
 
     const worker = useContext(WorkerContext);
-
     const { onMessage, sendData } = useWorkerClient(worker);
 
     const [stats, setStats] = useState([]);
+    const [activeTab, setActiveTab] = useState('general');
 
     useEffect(() => {
         sendData('query-statistics', {});
@@ -49,51 +51,74 @@ export const Statistics = () => {
         setStats(stats);
     })
 
-    return (<div className={'statistics'}>
-        <PerfectScrollbar>
-            <div className={'stats-inner'}>
-                <div className={'flex-row stats'}>
-                    <p className={'stat-title'}>Total time played:</p>
-                    <p className={'stat-value'}>{secondsToString(stats.totalTimePlayed)}</p>
+    return (
+        <div className={'statistics'}>
+            <div className="statistics-header">
+                <h2>Statistics</h2>
+                <div className="tab-navigation">
+                    <button 
+                        className={`tab-button ${activeTab === 'general' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('general')}
+                    >
+                        General Stats
+                    </button>
+                    <button 
+                        className={`tab-button ${activeTab === 'trading' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('trading')}
+                    >
+                        Trading History
+                    </button>
+                    <button 
+                        className={`tab-button ${activeTab === 'economic' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('economic')}
+                    >
+                        Development Metrics
+                    </button>
                 </div>
-                <div className={'flex-row stats'}>
-                    <p className={'stat-title'}>Mage Level:</p>
-                    <p className={'stat-value'}>{formatInt(stats.mageLevel)}</p>
-                </div>
-                <div className={'flex-row stats'}>
-                    <p className={'stat-title'}>All Time XP Earned:</p>
-                    <p className={'stat-value'}>{formatInt(stats.xpEarned)}</p>
-                </div>
-                <div className={'flex-row stats'}>
-                    <p className={'stat-title'}>All Time Coins Earned:</p>
-                    <p className={'stat-value'}>{formatInt(stats.coinsEarned)}</p>
-                </div>
-                <div className={'flex-row stats'}>
-                    <p className={'stat-title'}>All Time Coins Spent:</p>
-                    <p className={'stat-value'}>{formatInt(stats.coinsSpent)}</p>
-                </div>
-                <div className={'flex-row stats'}>
-                    <p className={'stat-title'}>Actions Unlocked:</p>
-                    <p className={'stat-value'}>{formatInt(stats.actionsUnlocked)}</p>
-                </div>
-                {stats.actionTimes ? (<div className={'flex-row stats'}>
-                    <p className={'stat-title'}>Actions Time Spent:</p>
-                    <p className={'stat-value'}><MyPieChart
-                        key={'time-spent'}
-                        data={stats.actionTimes}
-                        fmt={(entry) => `${entry.name}: ${secondsToString(entry.value)}`}
-                    /></p>
-                </div>) : null}
-                {/*{stats.actionXP ? (<div className={'flex-row stats'}>
-                    <p className={'stat-title'}>Actions XP Earned:</p>
-                    <p className={'stat-value'}><MyPieChart
-                        key={'xp-earned'}
-                        data={stats.actionXP}
-                        fmt={(entry) => `${entry.name}: ${formatValue(entry.value)}`}
-                    /></p>
-                </div>) : null}*/}
             </div>
-        </PerfectScrollbar>
-    </div> )
 
+            <div className="statistics-content">
+                {activeTab === 'general' && (
+                    <PerfectScrollbar>
+                        <div className={'stats-inner'}>
+                            <div className={'flex-row stats'}>
+                                <p className={'stat-title'}>Total time played:</p>
+                                <p className={'stat-value'}>{secondsToString(stats.totalTimePlayed)}</p>
+                            </div>
+                            <div className={'flex-row stats'}>
+                                <p className={'stat-title'}>Mage Level:</p>
+                                <p className={'stat-value'}>{formatInt(stats.mageLevel)}</p>
+                            </div>
+                            <div className={'flex-row stats'}>
+                                <p className={'stat-title'}>All Time XP Earned:</p>
+                                <p className={'stat-value'}>{formatInt(stats.xpEarned)}</p>
+                            </div>
+                            <div className={'flex-row stats'}>
+                                <p className={'stat-title'}>All Time Coins Earned:</p>
+                                <p className={'stat-value'}>{formatInt(stats.coinsEarned)}</p>
+                            </div>
+                            <div className={'flex-row stats'}>
+                                <p className={'stat-title'}>All Time Coins Spent:</p>
+                                <p className={'stat-value'}>{formatInt(stats.coinsSpent)}</p>
+                            </div>
+                            <div className={'flex-row stats'}>
+                                <p className={'stat-title'}>Actions Unlocked:</p>
+                                <p className={'stat-value'}>{formatInt(stats.actionsUnlocked)}</p>
+                            </div>
+                            {stats.actionTimes ? (<div className={'flex-row stats'}>
+                                <p className={'stat-title'}>Actions Time Spent:</p>
+                                <p className={'stat-value'}><MyPieChart
+                                    key={'time-spent'}
+                                    data={stats.actionTimes}
+                                    fmt={(entry) => `${entry.name}: ${secondsToString(entry.value)}`}
+                                /></p>
+                            </div>) : null}
+                        </div>
+                    </PerfectScrollbar>
+                )}
+                {activeTab === 'trading' && <TradingStatistics />}
+                {activeTab === 'economic' && <EconomicMetrics />}
+            </div>
+        </div>
+    )
 }

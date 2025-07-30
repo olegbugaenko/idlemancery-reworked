@@ -12,6 +12,7 @@ import {About} from "../about/index.jsx";
 import {Workshop} from "../workshop/index.jsx";
 import {Social} from "../social/index.jsx";
 import {World} from "../world/index.jsx";
+import {Statistics} from "../mage/statistics.jsx";
 import {MainMenu} from "./main-menu.jsx";
 import {SecondaryMenu} from "./secondary-menu.jsx";
 
@@ -75,6 +76,10 @@ export const GetContent = ({ tab }) => {
 
     if(tab === 'about') {
         return <About />
+    }
+
+    if(tab === 'statistics') {
+        return <Statistics />
     }
 
     return (<h3>Unknown tab</h3>)

@@ -452,7 +452,7 @@ export const registerCraftingRecipes = () => {
                 resources: {
                     'inventory_green_ink': {
                         A: 1.3,
-                        B: 0.02*gameEffects.getEffectValue('crafting_effort')*gameEffects.getEffectValue('crafting_efficiency'),
+                        B: 0.01*gameEffects.getEffectValue('crafting_effort')*gameEffects.getEffectValue('crafting_efficiency'),
                         type: 1,
                     }
                 }
@@ -461,12 +461,12 @@ export const registerCraftingRecipes = () => {
                 resources: {
                     'inventory_knowledge_moss': {
                         A: 1.5,
-                        B: 6*gameEffects.getEffectValue('crafting_effort')/gameEffects.getEffectValue('crafting_materials_discount'),
+                        B: 2*gameEffects.getEffectValue('crafting_effort')/gameEffects.getEffectValue('crafting_materials_discount'),
                         type: 1
                     },
                     'inventory_golden_algae': {
                         A: 1.5,
-                        B: 6*gameEffects.getEffectValue('crafting_effort')/gameEffects.getEffectValue('crafting_materials_discount'),
+                        B: 2*gameEffects.getEffectValue('crafting_effort')/gameEffects.getEffectValue('crafting_materials_discount'),
                         type: 1
                     },
                 }
@@ -537,7 +537,7 @@ export const registerCraftingRecipes = () => {
                 resources: {
                     'inventory_map_fragment': {
                         A: 1.3,
-                        B: 0.02*gameEffects.getEffectValue('crafting_effort')*gameEffects.getEffectValue('crafting_efficiency'),
+                        B: 0.01*gameEffects.getEffectValue('crafting_effort')*gameEffects.getEffectValue('crafting_efficiency'),
                         type: 1,
                     }
                 }
@@ -546,12 +546,12 @@ export const registerCraftingRecipes = () => {
                 resources: {
                     'inventory_paper': {
                         A: 1.5,
-                        B: 6*gameEffects.getEffectValue('crafting_effort')/gameEffects.getEffectValue('crafting_materials_discount'),
+                        B: 3*gameEffects.getEffectValue('crafting_effort')/gameEffects.getEffectValue('crafting_materials_discount'),
                         type: 1
                     },
                     'inventory_green_ink': {
                         A: 1.5,
-                        B: (1*gameEffects.getEffectValue('crafting_effort')/1.5)/gameEffects.getEffectValue('crafting_materials_discount'),
+                        B: (0.5*gameEffects.getEffectValue('crafting_effort')/1.5)/gameEffects.getEffectValue('crafting_materials_discount'),
                         type: 1
                     },
                 }
