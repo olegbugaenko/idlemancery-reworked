@@ -1138,6 +1138,7 @@ export class ActionsModule extends GameModule {
 
         const entities = perCats[filterId].items;
 
+        const favoritesModule = gameCore.getModule('favorites');
         const available = entities.map(entity => ({
             id: entity.id,
             name: entity.name,
@@ -1155,6 +1156,7 @@ export class ActionsModule extends GameModule {
             isLeveled: this.actions[entity.id]?.isLeveled,
             isCapped: entity.isCapped,
             tags: entity.tags,
+            isFavorite: favoritesModule ? favoritesModule.isFavorite('actions', entity.id) : false,
             /*focused: this.isRunningAction(entity.id) && this.actions[entity.id]?.focus?.bonus > 1 ? {
                 isFocused: true,
                 focusTime: this.actions[entity.id].focus.time,

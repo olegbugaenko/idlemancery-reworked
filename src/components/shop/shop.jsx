@@ -15,6 +15,7 @@ import {CustomButton} from "../shared/buttons/custom-button.jsx";
 import {AutomationIcon} from "../shared/buttons/automation-checkbox.jsx";
 import {useTutorial} from "../../context/tutorial-context";
 import {playSound} from "../../context/sounds/sound-manager";
+import {FavoriteButton} from "../shared/favorite-button.jsx";
 import RulesList from "../shared/rules-list.jsx";
 import {cloneDeep} from "lodash";
 
@@ -440,7 +441,7 @@ export const ItemResourceCard = ({ id, name, purchaseMultiplier, stock, level, m
 }
 
 
-export const CourseCard = ({ toNext, id, efficiency, isRunning, name, level, progress, maxProgress, max, affordable, isLeveled, onFlash, onPurchase, onShowDetails, isAutoPurchase, toggleAutopurchase, isAutomationUnlocked, isMobile}) => {
+export const CourseCard = ({ toNext, id, efficiency, isRunning, name, level, progress, maxProgress, max, affordable, isLeveled, onFlash, onPurchase, onShowDetails, isAutoPurchase, toggleAutopurchase, isAutomationUnlocked, isMobile, isFavorite}) => {
 
     const elementRef = useRef(null);
 
@@ -489,6 +490,7 @@ export const CourseCard = ({ toNext, id, efficiency, isRunning, name, level, pro
                         >
                             {isRunning ? 'Stop Course' : 'Start Course'}
                         </CustomButton>
+                        <FavoriteButton type="courses" id={id} isFavorite={isFavorite} className="course-favorite-btn" />
                         {isAutomationUnlocked ? (<label className={'autobuy-label'}>
                             <input type={'checkbox'} checked={isAutoPurchase}
                                    onChange={() => toggleAutopurchase(id, !isAutoPurchase)}/>

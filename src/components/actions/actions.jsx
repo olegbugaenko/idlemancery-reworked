@@ -24,6 +24,7 @@ import {useAppContext} from "../../context/ui-context";
 import {useDrag} from "../../custom-libs/dnd";
 import {CustomButton} from "../shared/buttons/custom-button.jsx";
 import {playSound} from "../../context/sounds/sound-manager";
+import {FavoriteButton} from "../shared/favorite-button.jsx";
 
 const ACTIONS_SEARCH_SCOPES = [{
     id: 'name',
@@ -801,7 +802,7 @@ const DraggableActionCard = ({ id, index, ...props }) => {
     );
 };
 
-export const ActionCard = React.memo(({ id, category, monitored, entityEfficiency, isEditingList, index, isCapped, name, level, max, xp, maxXP, xpRate, isActive, effort, isLeveled, focused, isTraining, actionEffect, currentEffects, potentialEffects, isHidden, onFlash, onSelect, onActivate, onShowDetails, toggleHiddenAction, missingResourceId, isSelected, tags, ...props}) => {
+export const ActionCard = React.memo(({ id, category, isFavorite, monitored, entityEfficiency, isEditingList, index, isCapped, name, level, max, xp, maxXP, xpRate, isActive, effort, isLeveled, focused, isTraining, actionEffect, currentEffects, potentialEffects, isHidden, onFlash, onSelect, onActivate, onShowDetails, toggleHiddenAction, missingResourceId, isSelected, tags, ...props}) => {
     const elementRef = useRef(null);
 
     useEffect(() => {
@@ -934,6 +935,7 @@ export const ActionCard = React.memo(({ id, category, monitored, entityEfficienc
                                             }} >
                                             Run Action
                                         </CustomButton>}</>) : null}
+                                <FavoriteButton type="actions" id={id} isFavorite={isFavorite} className="action-favorite-btn icon-content interface-icon small clickable-icon" />
                                 <CustomButton
                                     className={'icon-content interface-icon small clickable-icon'}
                                     onClick={(e) => {
@@ -996,6 +998,7 @@ export const ActionCard = React.memo(({ id, category, monitored, entityEfficienc
     return (
         prevProps.id === nextProps.id &&
         prevProps.index === nextProps.index &&
+        prevProps.isFavorite === nextProps.isFavorite &&
         prevProps.isEditingList === nextProps.isEditingList &&
         prevProps.isSelected === nextProps.isSelected &&
         prevProps.isActive === nextProps.isActive &&

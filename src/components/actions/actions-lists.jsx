@@ -7,6 +7,7 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
 import {useTutorial} from "../../context/tutorial-context";
 import {useUICache} from "../../general/hooks/local-cache";
+import {FavoriteButton} from "../shared/favorite-button.jsx";
 
 export const ActionListsPanel = ({ automationUnlocked, runningList, editListToDetails, lists, viewListToDetails, automationEnabled, toggleAutomation, autotriggerIntervalSetting, changeAutomationInterval }) => {
 
@@ -229,6 +230,7 @@ export const ActionListsPopup = ({ lists, isOpened, setOpenedFor, onSelect, onHo
                                                     >
                                                         <div className={"list-item-row flex-container"}>
                                                             <span className={"list-name"}>{list.name}</span>
+                                                            <FavoriteButton type="actionLists" id={list.id} isFavorite={list.isFavorite} className="list-favorite-btn icon-content run-icon interface-icon small" />
                                                             <TippyWrapper content={<div className={"hint-popup"}>Run List</div>}>
                                                                 <div
                                                                     className={"icon-content run-icon interface-icon small"}

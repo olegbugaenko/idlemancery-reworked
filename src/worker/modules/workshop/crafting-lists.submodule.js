@@ -219,9 +219,11 @@ export class CraftingListsSubmodule extends GameModule {
     }
 
     getLists(pl) {
+        const favoritesModule = gameCore.getModule('favorites');
         let ls = Object.values(this.craftingLists).filter(one => one.category === pl.category).map(one => ({
             ...one,
-            isUnlocked: true
+            isUnlocked: true,
+            isFavorite: favoritesModule ? favoritesModule.isFavorite(pl.category === 'crafting' ? 'craftingLists' : 'alchemyLists', one.id) : false,
         }));
 
         if(pl?.filterAutomated) {

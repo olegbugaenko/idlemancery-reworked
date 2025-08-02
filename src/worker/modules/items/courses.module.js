@@ -178,6 +178,7 @@ export class CoursesModule extends GameModule {
 
     getItemsData() {
         const entities = gameEntity.listEntitiesByTags(['course']);
+        const favoritesModule = gameCore.getModule('favorites');
         return {
             available: entities.filter(one => one.isUnlocked && !one.isCapped).map(entity => ({
                 id: entity.id,
@@ -195,6 +196,7 @@ export class CoursesModule extends GameModule {
                 learningEffects: resourceApi.unpackEffects(entity.learningEntity.resourceModifier || {}, entity.level),
                 efficiency: gameEntity.entityExists(`learning_${entity.id}`) ? gameEntity.getEntityEfficiency(`learning_${entity.id}`) : 1,
                 toNext: gameEntity.entityExists(`learning_${entity.id}`) ? (this.getDuration(entity.id) - this.courses[entity.id]?.progress)/(gameEntity.getEntityEfficiency(`learning_${entity.id}`) + 1.e-8) : 0,
+                isFavorite: favoritesModule ? favoritesModule.isFavorite('courses', entity.id) : false,
             })),
         }
     }

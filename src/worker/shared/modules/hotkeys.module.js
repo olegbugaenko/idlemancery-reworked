@@ -19,6 +19,13 @@ export class HotkeysModule extends GameModule {
             this.eventHandler.sendData('all-hotkeys', this.hotKeys);
             this.eventHandler.sendData('all-hotkeys-all', this.hotKeys);
         })
+
+        this.eventHandler.registerHandler('trigger-hotkey', (payload) => {
+            const hotkey = this.hotKeys[payload.combination];
+            if (hotkey) {
+                this.eventHandler.sendData('hotkey-triggered', hotkey);
+            }
+        })
     }
 
     initialize() {

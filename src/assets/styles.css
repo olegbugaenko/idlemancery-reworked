@@ -4158,3 +4158,142 @@ body::after {
         grid-template-columns: 1fr;
     }
 }
+
+/* Quick Access Panel Styles */
+.quick-access-panel {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.quick-access-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.quick-access-section h4 {
+    margin: 0 0 10px 0;
+    color: #23a7d5;
+    border-bottom: 1px solid #333;
+    padding-bottom: 5px;
+}
+
+.items-list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.quick-access-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: linear-gradient(-45deg, #111, #1a1a1f 50%, #111);
+    border: 1px solid #333;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    width: 260px;
+    flex: 0 0 auto;
+}
+
+.quick-access-item .item-actions {
+    margin-left: 8px;
+}
+
+.quick-access-item:hover {
+    border-color: #23a7d5;
+    box-shadow: 0 0 8px rgba(35, 167, 213, 0.3);
+}
+
+.item-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+}
+
+.item-name {
+    font-weight: 500;
+    color: #fff;
+}
+
+.item-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.run-btn {
+    background: linear-gradient(to bottom, rgb(30, 30, 40) 0%, rgb(25, 25, 32) 15%, rgb(10, 10, 10) 40%, rgb(10, 10, 10) 60%, rgb(25, 25, 32) 85%, rgb(30, 30, 40) 100%);
+    border: 1px solid rgb(50, 60, 60);
+    padding: 4px 8px;
+    font-size: 12px;
+    color: #fff;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.run-btn:hover {
+    background: linear-gradient(to bottom, rgb(40, 40, 50) 0%, rgb(35, 35, 42) 15%, rgb(20, 20, 20) 40%, rgb(20, 20, 20) 60%, rgb(35, 35, 42) 85%, rgb(40, 40, 50) 100%);
+    border-color: rgb(90, 100, 100);
+    box-shadow: 0 0 8px rgb(90, 90, 105);
+}
+
+.remove-btn {
+    background: none;
+    border: none;
+    color: #fa502d;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 3px;
+    transition: all 0.2s ease;
+}
+
+.remove-btn:hover {
+    color: #da401d;
+    text-shadow: 0 0 12px #fa502d !important;
+    filter: drop-shadow(0 0 8px #fa502d);
+    font-size: 18px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #777;
+}
+
+.empty-state p {
+    margin: 10px 0;
+    font-size: 14px;
+}
+
+/* Title row styles for cards with favorites */
+.title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.title-row .title {
+    margin: 0;
+    flex: 1;
+}
+
+/* Favorites Button Styles */
+.favorite-btn.favorited {
+    color: #23a7d5 !important;
+    border-color: #23a7d5 !important;
+    box-shadow: 0 0 4px rgba(35, 167, 213, 0.4);
+}
+
+.action-favorite-btn,
+.course-favorite-btn {
+    margin-left: 4px;
+}
+
+.list-favorite-btn {
+    margin-right: 8px;
+}

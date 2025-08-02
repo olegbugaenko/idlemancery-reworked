@@ -74,6 +74,13 @@ export const BankedTimeWrap = () => {
                         </div>
                     </TippyWrapper>
                 </li>
+                <li>
+                    <TippyWrapper content={<div className={'hint-popup'}>View Favorites</div> }>
+                        <div id={'favorites'} className={'icon-content edit-icon interface-icon'} onClick={() => togglePopup('quick-access')}>
+                            <img src={"icons/interface/favorite.png"}/>
+                        </div>
+                    </TippyWrapper>
+                </li>
             </ul>
         </div>
     );

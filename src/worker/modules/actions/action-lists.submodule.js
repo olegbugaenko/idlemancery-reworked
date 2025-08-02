@@ -775,10 +775,12 @@ export class ActionListsSubmodule extends GameModule {
         if(!this._cachedSortedLists) {
             this.sortLists();
         }
+        const favoritesModule = gameCore.getModule('favorites');
         let ls = this._cachedSortedLists.map(one => ({
             ...one,
             isUnlocked: true,
             searchCache: this.listsSearchCache[one.id],
+            isFavorite: favoritesModule ? favoritesModule.isFavorite('actionLists', one.id) : false,
         }));
 
         if(pl?.filterAutomated) {

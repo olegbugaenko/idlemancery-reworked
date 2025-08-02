@@ -8,7 +8,7 @@ import {useTutorial} from "../../context/tutorial-context";
 export const MainMenu = () => {
     const worker = useContext(WorkerContext);
     const { onMessage, sendData } = useWorkerClient(worker);
-    const { openedTab, setOpenedTab } = useAppContext();
+    const { openedTab, setOpenedTab, togglePopup } = useAppContext();
     const [unlocks, setUnlocksData] = useState({});
     const [newUnlocks, setNewUnlocks] = useState({});
     const [hotkeys, setHotkeys] = useState({});
@@ -36,6 +36,8 @@ export const MainMenu = () => {
 
         if(hotkey.action === 'selectTab') {
             openTab(hotkey.param);
+        } else if(hotkey.action === 'openQuickAccess') {
+            togglePopup('quick-access');
         }
     }
 
@@ -62,6 +64,14 @@ export const MainMenu = () => {
     onMessage('all-hotkeys-all', payload => {
         // console.log('Received AllHotkeys: ', payload);
         setHotkeys(payload);
+    })
+
+    onMessage('hotkey-triggered', (hotkey) => {
+        if (hotkey.action === 'selectTab') {
+            openTab(hotkey.param);
+        } else if (hotkey.action === 'openQuickAccess') {
+            togglePopup('quick-access');
+        }
     })
 
     onMessage('unlocks-main-menu', setUnlocksData);

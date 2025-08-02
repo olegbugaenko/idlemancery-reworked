@@ -58,6 +58,12 @@ const automatedList = [{
     action: 'selectTab',
     label: 'Switch to Settings tab',
     param: 'settings'
+},{
+    id: 'quick_access_panel',
+    checkId: '',
+    action: 'openQuickAccess',
+    label: 'Open Quick Access Panel',
+    param: 'quick-access'
 }]
 
 export const InterfaceSettings = () => {

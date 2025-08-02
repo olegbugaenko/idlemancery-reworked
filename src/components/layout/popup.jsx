@@ -8,6 +8,7 @@ import {RandomEventPopup} from "../shared/random-events.jsx";
 import {HowTo} from "../how-to/index.jsx";
 import SkillTree from "../mage/skill-tree.jsx";
 import {AchievementsCompleted, CurrentAchievement} from "../shared/achievements.jsx";
+import {QuickAccessPanel} from "../shared/quick-access-panel.jsx";
 
 export const Popup = () => {
 
@@ -101,6 +102,12 @@ export const Popup = () => {
     if(activePopup === 'achievements') {
         return (<PopupComponent title={'Story'} onClose={onClosePopupRef.current}>
             <AchievementsCompleted />
+        </PopupComponent> )
+    }
+
+    if(activePopup === 'quick-access') {
+        return (<PopupComponent title={'Quick Access Panel'} onClose={onClosePopupRef.current}>
+            <QuickAccessPanel />
         </PopupComponent> )
     }
 

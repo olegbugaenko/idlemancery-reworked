@@ -11,6 +11,7 @@ import {Balances} from "../shared.jsx";
 import {useAppContext} from "../../../context/ui-context";
 import {PinResource} from "../../shared/pin-resource.jsx";
 import {useTutorial} from "../../../context/tutorial-context";
+import {FavoriteButton} from "../../shared/favorite-button.jsx";
 
 export const Crafting = ({ setItemDetails, setItemLevel, filterId, newUnlocks, openListDetails, addItemToList, isEditList }) => {
 
@@ -239,6 +240,7 @@ export const ActionListsPopup = ({ lists, isOpened, setOpenedFor, onSelect, onHo
                         {listsDisplayed.map(list => (<div className={'item'} onMouseEnter={() => onHover(list.id)} onMouseLeave={() => onHover(null)}>
                             <div className={'list-item-row flex-container'}>
                                 <span className={'list-name'}>{list.name}</span>
+                                <FavoriteButton type="craftingLists" id={list.id} isFavorite={list.isFavorite} className="list-favorite-btn icon-content interface-icon small" />
                                 <TippyWrapper content={<div className={'hint-popup'}>Run List</div> }>
                                     <div className={'icon-content run-icon interface-icon small'} onClick={() => onRun(list.id)}>
                                         <img src={"icons/interface/run.png"}/>

@@ -21,6 +21,7 @@ import {CoursesModule} from "./modules/items/courses.module";
 import {AchievementsModule} from "./modules/mage/achievements.module";
 import {EventsModule} from "./modules/social/social-events.module";
 import {StatisticsModule} from "./modules/statistics/statistics.module";
+import {FavoritesModule} from "./modules/favorites/favorites.module";
 
 
 export class MainModule extends GameModule {
@@ -48,6 +49,7 @@ export class MainModule extends GameModule {
         gameCore.registerModule('achievements', AchievementsModule);
         gameCore.registerModule('events', EventsModule);
         gameCore.registerModule('statistics', StatisticsModule);
+        gameCore.registerModule('favorites', FavoritesModule);
 
 
         this.eventHandler.registerHandler('initialize-game', (data) => {
@@ -72,6 +74,13 @@ export class MainModule extends GameModule {
                     this.save();
                 }
             }, false)
+        })
+
+        this.eventHandler.registerHandler('trigger-hotkey', (payload) => {
+            const hotkeysModule = gameCore.getModule('hotkeys');
+            if (hotkeysModule) {
+                hotkeysModule.eventHandler.sendData('trigger-hotkey', payload);
+            }
         })
 
         this.eventHandler.registerHandler('query-unlocks', (payload) => {
