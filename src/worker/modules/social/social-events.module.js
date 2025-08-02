@@ -284,7 +284,14 @@ export class EventsModule extends GameModule {
     }
 
     load(saveObject) {
-        if (saveObject) {
+        this.activeEvent = null;
+        this.eventStartTime = 0;
+        this.eventEndTime = 0;
+        this.cooldownEndTime = 0;
+        this.autoEvents = {};
+        this.eventHistory = {};
+            
+        if (saveObject && false) {
             this.activeEvent = saveObject.activeEvent || null;
             this.eventStartTime = saveObject.eventStartTime || 0;
             this.eventEndTime = saveObject.eventEndTime || 0;

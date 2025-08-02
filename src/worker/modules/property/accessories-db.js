@@ -567,45 +567,6 @@ export const registerAccessoriesStage1 = () => {
     })
 
 
-    registerAccessory('accessory_wood_processor', {
-        tags: ["accessory", "upgrade", "purchaseable", "resource", "crafting"],
-        name: 'Wood Processor',
-        description: 'A compact device that helps you to process wood more efficiently',
-        level: 0,
-        unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.isEntityUnlocked('action_mining');
-        },
-        resourceModifier: {
-            multiplier: {
-                resources: {
-                    'inventory_refined_wood': {
-                        A: 0.0,
-                        B: 1,
-                        type: 0,
-                    }
-                }
-            },
-        },
-        get_cost: () => ({
-            'inventory_iron_plate': {
-                A: 1.1,
-                B: 2,
-                type: 1
-            },
-            'inventory_stone': {
-                A: 1.1,
-                B: 5,
-                type: 1
-            },
-            'inventory_refined_wood': {
-                A: 1.1,
-                B: 5,
-                type: 1
-            }
-        }),
-    })
-
-
     registerAccessory('accessory_sages_notes', {
         tags: ["accessory", "upgrade", "purchaseable", "resource"],
         name: 'Sage\'s Notes',

@@ -56,6 +56,7 @@ export class CraftingModule extends GameModule {
 
         this.eventHandler.registerHandler('set-crafting-level', (payload) => {
             this.setCraftingEffort(payload);
+            this.normalizeTotalEffort(payload.filterId);
             this.sendCraftingData(payload);
         })
 

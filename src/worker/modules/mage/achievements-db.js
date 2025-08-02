@@ -446,6 +446,32 @@ export const achievementsDb = [{
     ],
     completeCondition: () => gameEntity.getLevel('action_stamina_training') >= 250
 },{
+    id: 'action_stamina_training_4',
+    title: 'The Flying Lantern Chase',
+    text: [
+        "Yesterday you unsuccessfully used a spell to repel mosquitoes. Instead of creating a barrier, your furniture went crazy. The lantern decided to finally assert its independence, and after hitting you hard on the head, it flew out of the tent and into the forest.",
+        "You rushed to catch up with it. After several hours of pursuit, you almost caught up with it. However, the lamp had its own plans - it suddenly turned around and flew straight at you.",
+        "In the morning you woke up lying in the forest, with a broken forehead and the lantern in your hand.",
+        "Tired but not broken, you return back - in the chase you still won, despite the knockout."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_stamina_training') >= 500
+    }
+},{
+    id: 'action_stamina_training_5',
+    title: 'The Sewing Machine Disaster',
+    text: [
+        "You have seriously taken up your physical training. Now you go for runs exclusively with additional weight.",
+        "Today you decided to kill two birds with one stone. Your neighbor asked you to help him carry his sewing machine to the repair shop.",
+        "You accepted this as a worthy challenge, so you grabbed the sewing machine and said you could carry it yourself. The neighbor looked at you with admiration, and this encouraged you even more.",
+        "You confidently ran with it for about 50 meters when you started to feel that your breathing was letting you down. And everything would have been fine, but then a stone rolled under your feet. You sat down in a split with screams, and the machine, breaking free from your embrace, rolled down and, flying another 20 meters, fell to pieces.",
+        "The admiration on the neighbor's face turned to horror, but you were no longer bothered by anything except unbearable pain.",
+        "Looks like now you'll have to train for a week to apply pain-relieving balms. But at least the neighbor won't bother you with his requests anymore."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_stamina_training') >= 1000
+    }
+},{
     id: 'action_cardio_training_1',
     title: 'The Heart Rate Challenge',
     text: [
@@ -478,6 +504,34 @@ export const achievementsDb = [{
         "As a result, it all turned into a loud party in your honor."
     ],
     completeCondition: () => gameEntity.getLevel('action_cardio_training') >= 250
+},{
+    id: 'action_cardio_training_4',
+    title: 'The Lost Book Panic',
+    text: [
+        "Yesterday you almost experienced clinical death.",
+        "You woke up and looking at the table you didn't see your favorite book with instructions for conducting magical rituals.",
+        "You frantically searched through all your belongings - but didn't find it.",
+        "You ran to the library, hoping you had forgotten it there... You ran around all the places where you were yesterday, but all in vain. Finally, you ran into the trading tent where you got your favorite sausages yesterday - and it wasn't there either.",
+        "You remembered how you loved that book. You understood little of it, but the illustrations of a mage conducting powerful rituals were always something particularly motivating for you...",
+        "You felt sick right near the tent, so you were hospitalized. But today the doctor sent you home. He noted that you have a very strong heart, but recommended worrying less. He also gave you back the book, which you had apparently given him to read a week ago!",
+        "Looks like it's time for you to continue working on improving your memory, otherwise cardio training won't help."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_cardio_training') >= 500
+    }
+},{
+    id: 'action_cardio_training_5',
+    title: 'The Handstand Challenge',
+    text: [
+        "Exhausting training continues to bring results, although they are not always unambiguous.",
+        "You agreed to be an animator at a school for middle-aged children. You showed the kids magic tricks, taught them yoga exercises, and everything was going well until it came to an improvised physical education lesson.",
+        "One boy showed how he can stand on his hands. You argued with the kids that you can walk on your hands, and can run around the school on them.",
+        "You got ready, and confidently stood on your hands. After walking a few meters, you realized you could do it. But your confidence quickly turned to confusion. Not seeing where you were going, you left the path and flew down. Finally, your flight ended with an epic collision with an old oak tree growing nearby.",
+        "The kids laughed. You got up with a feeling of anger and shame, and after muttering a spell, you gave the tree a good kick. A second later you were lying down again, this time writhing in pain in your leg. Ugh, even here the oak won. But it was a fair fight!"
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_cardio_training') >= 1000
+    }
 },{
     id: 'action_yoga_practice_1',
     title: 'Breathless Enlightenment',
@@ -528,6 +582,17 @@ export const achievementsDb = [{
         "It's not exactly the spiritual enlightenment you were aiming for, but at least it's honest work."
     ],
     completeCondition: () => gameEntity.getLevel('action_yoga_practices') >= 500
+},{
+    id: 'action_yoga_practice_6',
+    title: 'The Levitating Charity Class',
+    text: [
+        "You continued organizing yoga courses. This time you decided to organize a charity yoga retreat for the homeless. What's more, you know many of them personally from the times when you fought with them for the best bench in the park. So the event turned out to be well-attended.",
+        "However, during the class your back seized up. But you couldn't interrupt the lesson and call the osteopath. So you, trying not to show that something had gone wrong, attempted to whisper a healing spell for your back. However, you pronounced it too loudly, so the attendees repeated after you, thinking it was part of the yoga practice.",
+        "As it turned out, you had mixed up the spell. The people in the hall began to levitate. Everything turned into chaos - some were excitedly shouting: 'Hurray, I'm flying', others were crying that they were afraid of heights and didn't want to die.",
+        "It took 5 minutes before you managed to pull yourself together and lower everyone to the ground.",
+        "By evening, rumors about incredible yoga practices had spread throughout the settlement, and by the next day you couldn't walk down the street without being asked when the next classes would be. With such fame, you can even aspire to become a world-famous yoga master!"
+    ],
+    completeCondition: () => gameEntity.getLevel('action_yoga_practices') >= 1000
 },{
     id: 'action_meditate_1',
     title: 'The Magic Meditated Back',
@@ -582,6 +647,39 @@ export const achievementsDb = [{
         "The forester now gives you a wide berth, but at least you've proven that your magic can affect something other than your own concentration."
     ],
     completeCondition: () => gameEntity.getLevel('action_meditate') >= 250
+},{
+    id: 'action_meditate_5',
+    title: 'The Mysterious Stranger',
+    text: [
+        "It was quite hot outside, so you decided to dedicate the day to spiritual practices by the river. You spread out your herbal mat, cooled off in the water, returned to the shore, and began meditating. Birds were singing around you, and the sounds of flowing water lulled you.",
+        "Suddenly your sleep was interrupted by a magical but eccentric stranger. She approached within about 20 meters and stared at you intently.",
+        "'Who are you?' you asked confusedly.",
+        "The stranger silently muttered some spell and disappeared.",
+        "You felt incredible lightness. With a wave of your hands, you effortlessly lifted off the ground and began gliding over the forest. The cool breeze pleasantly tickled your face.",
+        "Suddenly the wind began to rise. You realized you needed to land on the ground. But you didn't know how. 'Need to go down' you started muttering, getting louder and louder.",
+        "'Need to go down...' It was with this phrase that you woke up and saw the figure of a doctor above you.",
+        "'Thank God, man. I was already thinking you wouldn't wake up, and our settlement would die of boredom.'",
+        "He told you that a local fisherman had found you when you were unconscious lying in the sun. Another half hour - and sunstroke could have been fatal."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_meditate') >= 500
+},{
+    id: 'action_meditate_6',
+    title: 'The Healing Aura',
+    text: [
+        "In the morning, as usual, you went out to the clearing and immersed yourself in sweet meditation.",
+        "However, your feeling of inner harmony and peace was interrupted by the sensation of something warm and wet on your cheek.",
+        "Opening your eyes, you saw a cow beside you. She looked at you with a calm gaze and licked your face again.",
+        "Dissatisfied with the interrupted meditation, you told the cow everything you thought about her and headed home. You noticed that the cow was following you. You tried to drive her away, but it didn't work.",
+        "The cow led you almost home when you saw a fellow villager beside himself with happiness.",
+        "'Lucy! Luuucy!' he began shouting and ran to hug the cow.",
+        "'Where did you find her? She's been sick for the last month, and a week ago she completely disappeared somewhere, I thought she had died!'",
+        "'I was just meditating on the clearing, and...'",
+        "The man, without listening to you, exclaimed: 'You healed her! I understand, you healed her!'",
+        "After kissing your hands and the cow's face, the man beside himself with happiness went on his way, the cow obediently followed him, only once turning to look at you as if thanking you.",
+        "Finally, you came to realize the power of your aura. What fame, what prospects are opening up before you!",
+        "Well, at least veterinary prospects definitely smiled at you today."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_meditate') >= 1000
 },{
     id: 'action_home_errands_1',
     title: 'The Relic of Cleaning',
@@ -950,5 +1048,323 @@ export const achievementsDb = [{
     ],
     completeCondition: () => {
         return gameEntity.getLevel('shop_item_enchanted_scissors') >= 1
+    }
+},{
+    id: 'shop_item_constructing_1',
+    title: 'The Moose Incident',
+    text: [
+        "Today you woke up to a terrible scream from the street. In panic, you jumped out of your bed and accidentally kicked the table leg in your haste. The table collapsed, spilling all your ginger tea onto the bed and your favorite biology textbook.",
+        "Rushing out of the tent, you saw a smug moose face staring at you with its inscrutable eyes. After chewing another clump of moss, it let out another scream that sounded eerily similar to that man you chased last week, trying to make him pay back his debt.",
+        "You cursed the moose with some choice words and returned to the tent to repair the table. A thought crossed your mind - the tent wasn't the best accommodation, and you could definitely make a sturdier table.",
+        "Spending the night on a wet sheet added even more motivation - it was time to get serious about building better living quarters and furniture."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('shop_item_constructing') >= 1
+    }
+},{
+    id: 'shop_item_herbs_handbook_2_1',
+    title: 'The Mysterious Blue Potion',
+    text: [
+        "Yesterday, while strolling through the streets, you wandered into a bookstore. Among the dull and monotonous covers, your gaze fell on one book with a bright blue potion painted on the cover. You bought the book without hesitation and brought it home.",
+        "You had to struggle through to the middle to find a familiar word. But you found a recipe with an eloquent illustration of ingredients. Getting incredible inspiration, you brewed the mixture until 4 in the morning, and it even turned out the same color as in the picture.",
+        "You were already reaching for a spoon to taste it when you remembered that you had no idea what this mixture was supposed to do.",
+        "You decided to approach it creatively - you left the mixture on the street, hoping that local raccoons would definitely decide to try it, and then you would see the effect.",
+        "The next day, to your surprise, the mixture remained standing on the table, and next to it lay a satisfied purring cat, enjoying the smell of mint.",
+        "You realized that it's still worth buying another dictionary to understand at least something. Good thing it's practically free compared to the cost of yesterday's purchase."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('shop_item_herbs_handbook_2') >= 1
+    }
+},{
+    id: 'action_spiritual_alignment_1',
+    title: 'The Rebellious Toothbrush',
+    text: [
+        "After long morning affirmations, you finally dared to make changes - now you would seriously take up the study of magic. Filled with inspiration, you tried to use a spell to make the toothbrush fly into your hand.",
+        "After 20 minutes of effort, a miracle happened - the brush flew up into the air from the glass - and... flew out into the street.",
+        "You rushed into the yard, trying to bring the situation under control, but without success - the mad toothbrush had finally decided to show its independence and shot straight into the nose of a guard who was passing by. Only after that, breaking in half, it innocently fell to the road.",
+        "You spent the day in the guardhouse, so you had time to think about your mistakes and understand where you went wrong - probably, next time it's worth tying the toothbrush to the sink."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_spiritual_alignment') >= 100
+    }
+},{
+    id: 'action_spiritual_alignment_2',
+    title: 'The Merchant\'s Dinner',
+    text: [
+        "Today you were invited to dinner by a local wealthy merchant, whom you accidentally met during a concert of local musicians, when you helped light a lantern with magic and helped him find his wallet that flew out of his pocket.",
+        "During dinner, your wealthy acquaintance introduced you as the strongest mage he had ever known, and asked you to demonstrate your magical skills.",
+        "You, stepping onto the podium, forgot all the magic you knew before due to nervousness. You loudly hiccuped, and only tried to utter a word when the hall burst into laughter. And then behind your back, an extinguished torch lit up.",
+        "The hall stopped laughing. You, having mastered yourself, exclaimed:",
+        "\"Tell me, didn't your mood lift? Isn't this magic?\"",
+        "The hall applauded and began laughing even harder.",
+        "The merchant said the next day that you saved the most boring party, and thanks to you, he got a serious contract to sell textiles to the neighboring province. However, after asking about your reward for your role in the contract, you never saw him again."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_spiritual_alignment') >= 250
+    }
+},{
+    id: 'action_spiritual_alignment_3',
+    title: 'The Boomerang Stone Incident',
+    text: [
+        "Deciding to take a break from constant training, you took your favorite sausages, fruits and came to sit by the lake.",
+        "You remembered how you used to love throwing stones into the lake and watching them skip across the water.",
+        "Hmm, what if you try to use magic to make the stone return to you like a boomerang.",
+        "You threw the stone, having previously enchanted it - and indeed, after skipping across the water, it began to turn around and skip back to you.",
+        "You tried throwing harder - and success again.",
+        "Finally, you swung and threw the stone with all your might. The stone flew over the lake and hid behind the trees. A scream came from somewhere beyond the lake. Within a few minutes, the guards were escorting you under escort, arresting you for an attempt on the local guard lieutenant.",
+        "Your harmony with nature and magic experiments ended with five days of imprisonment. However, you didn't get bored, you almost managed to make a hole in the wall using only magic. So now you know that no walls will stop you."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_spiritual_alignment') >= 500
+    }
+},{
+    id: 'action_spiritual_alignment_4',
+    title: 'The Rebellious Saw Incident',
+    text: [
+        "You have long worked on developing your magical abilities, and finally reached such a level that you learned to perform complex manipulations with objects using only magic.",
+        "You decided to try creating another wooden box without touching the tool with your hands. You easily lifted the saw from the table with the power of thought, and began to saw the board with it.",
+        "After the board was sawn into two equal parts, you realized that controlling objects for such a long time takes a lot of your strength, so you got tired and decided to 'put' the saw on the table. However, everything went wrong as expected - the saw vibrated and jumped into the air. Hanging there for a few seconds, it made a steep dive and began sawing the legs of your bed.",
+        "No matter how you tried to calm the rebellious saw, the table legs went next, and then the shelves.",
+        "Finally, when the saw calmed down, you had plenty of wooden materials and no intact furniture."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_spiritual_alignment') >= 1000
+    }
+},{
+    id: 'thinkroot_plantation_1',
+    title: 'The Forgotten Plantation',
+    text: [
+        "You remembered that Thinkroot helps you sleep better, and after that you even remember where you put your reading glasses. So you planted a plantation near your home.",
+        "However, the next day, you were still trying to remember where exactly you planted them..."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('thinkroot_plantation') >= 1
+    }
+},{
+    id: 'focusberry_plantation_1',
+    title: 'The Sunset Discovery',
+    text: [
+        "You were sitting on a bench, admiring the sunset and chewing your favorite Focusberry berries. They always helped you concentrate.",
+        "Suddenly, you glanced under the old tilted tent and noticed that one of the plants seemed to have sprouted. You realized that you could grow them at home too - just need shade and moisture."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('focusberry_plantation') >= 1
+    }
+},{
+    id: 'core_duckweed_plantation_1',
+    title: 'The Wet Boots Epiphany',
+    text: [
+        "After long hours of collecting Core Duckweed, you once again came home with wet boots. You thought you should buy better boots, but then it dawned on you - there's also a swampy area near you where you can try growing Core Duckweed.",
+        "Plus savings on boots!"
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('core_duckweed_plantation') >= 1
+    }
+},{
+    id: 'berry_plantation_1',
+    title: 'The Berry Discovery',
+    text: [
+        "You always loved picking berries in the forest, but one day you noticed that after picking berries, your mood improved and you gained energy. You thought - why not grow them at home?",
+        "Now you always have fresh berries, and you no longer need to walk far into the forest."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('berry_plantation') >= 1
+    }
+},{
+    id: 'fly_mushroom_plantation_1',
+    title: 'The Parallel Worlds Discovery',
+    text: [
+        "After accidentally eating a fly agaric, you discovered within yourself the ability to see parallel worlds. To hell with what the doctor who brought you to your senses says - you discovered your new alter ego - a super-mage who saved the world from an evil demon.",
+        "So, in the name of saving the parallel universe, you decided to plant a garden bed near your home."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('fly_mushroom_plantation') >= 1
+    }
+},{
+    id: 'golden_algae_plantation_1',
+    title: 'The Night Path Illumination',
+    text: [
+        "After night trips for rare plants or your favorite kvass home, you regularly stepped into swamps in the dark. You remembered the golden algae that glows in the dark.",
+        "So you decided to plant it in the swamp near your home. Now you won't need to walk far for it, and your night path for kvass with bread will become safer!"
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('golden_algae_plantation') >= 1
+    }
+},{
+    id: 'knowledge_moss_plantation_1',
+    title: 'The Slippery Slope Revelation',
+    text: [
+        "Walking on the cliffs near the settlement, you once again slipped on the moss that covered the stones. While you were flying down, you remembered all the Latin and all the alchemical recipes you knew.",
+        "Finally, landing on something soft, you looked around - and realized that it was the same moss you had just cursed that saved you.",
+        "Perhaps this is a sign - it's safer to plant moss near home."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('knowledge_moss_plantation') >= 1
+    }
+},{
+    id: 'aloe_vera_plantation_1',
+    title: 'The Guardian Angel Plant',
+    text: [
+        "Yesterday you decided to mow the grass near your home. Deciding to rest a bit, you lay down under a tree and fell asleep. However, the treacherous shadow didn't wait for you to wake up and went against the sun, leaving you to burn.",
+        "Waking up, you felt that everything was burning except your left heel, which was 'friendly' touched by aloe vera that accidentally sprouted under the alder.",
+        "Without thinking, you looked for root shoots and carefully transplanted them - now you'll have your own guardian angel against burns."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('aloe_vera_plantation') >= 1
+    }
+},{
+    id: 'ginseng_plantation_1',
+    title: 'The Longevity Garden',
+    text: [
+        "You have repeatedly noticed that after drinking ginseng tea, you endured the heat more easily and managed to bypass more tents in search of the most profitable price for your favorite sausages.",
+        "So the argument with your neighbor about whether he would outlive you became the last straw - filled with determination, you set about replenishing your own supply of longevity by planting ginseng."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('ginseng_plantation') >= 1
+    }
+},{
+    id: 'nightshade_plantation_1',
+    title: 'The Dream Experiment',
+    text: [
+        "You accidentally ate nightshade and saw strange dreams. You realized that this plant has special properties for magic.",
+        "Now you have your own plantation for dream experiments."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('nightshade_plantation') >= 1
+    }
+},{
+    id: 'harmony_blossom_plantation_1',
+    title: 'The Market Negotiator',
+    text: [
+        "After another trip to the market, you got into an argument with a watermelon seller and managed to buy them twice as cheap. Returning home, you realized that the whole thing was in a strange plant that you added to your tea.",
+        "Now at the market they call you 'the haggler', but you know how to get an exclusive discount and have found the secret of peace and balance - so you set about growing the miraculous sedative."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('harmony_blossom_plantation') >= 1
+    }
+},{
+    id: 'ember_leaf_plantation_1',
+    title: 'The Fence Jumping Incident',
+    text: [
+        "Yesterday you were at a party and returned home in the early morning. Tired after dancing, barely moving your legs, you suddenly felt that you had wandered into the wrong place. You heard growling and barking dogs, and realized that in the dark you had wandered into the yard of the local elder.",
+        "You started running as fast as you could wherever your eyes looked, until they rested on a high fence. And then you felt such burns on your feet that you didn't understand how you jumped over the fence.",
+        "The dogs remained behind the fence, and you remembered those burns. Coming home, you put on gloves, cleaned your pants of burrs and thorns, and that same night you set about planting these plants under the fence - let them now burn the neighbor's cows that disturb your peace."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('ember_leaf_plantation') >= 1
+    }
+},{
+    id: 'mystic_bloom_plantation_1',
+    title: 'The Stubborn Plant Battle',
+    text: [
+        "Finding a mysterious purple plant, you tried to plant it near your home for a long time, but no matter how hard you tried - it didn't take root.",
+        "However, you didn't give up and tried until the stubborn plant sprouted exactly where you were going to make a path, using a spell that stopped grass growth.",
+        "On the tenth day of continuous spells, when you with bags under your eyes and a glassy look were asking for another book of grass-stopping spells, you were still told that you could use a special weed killer.",
+        "Tired, but not broken - you still showed the grass where its place was, and now you have both a path and a plantation! Sometimes, science is even better than magic!"
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('mystic_bloom_plantation') >= 1
+    }
+},{
+    id: 'paper_working_1',
+    title: 'The Stone Notes Experiment',
+    text: [
+        "Yesterday you came to the shop again, hoping to buy your eighth notebook this week. The shopkeeper looked at you with surprise, doubting that you were really using them for their intended purpose.",
+        "As it turned out, you had bought out all the stock.",
+        "Disappointed, you went home and tried to lay out notes with stones under your house. Satisfied with your ingenuity and the money saved on notebooks, you went to sleep. However, what disappointment awaited you in the morning....",
+        "It had rained heavily during the night, so in place of your notes there was a large puddle in which a neighbor's pig was happily splashing around.",
+        "Looks like you'll have to take the paper supply situation into your own hands - you decided, and stocked up on a manual for creating your own paper supplies."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('shop_item_paper_working') >= 1
+    }
+},{
+    id: 'structure_hut_1',
+    title: 'The Tent Chase Incident',
+    text: [
+        "You had been telling yourself for too long that sleeping in a tent was the best way to achieve harmony with nature.",
+        "However, one night you woke up to a furious wind. Realizing you had forgotten to check if the tent was properly secured, you lit a candle and went outside. As soon as you stuck your nose out the door, the candle went out. Everything was swallowed by darkness, and the tent decided to go its own way, flying off with the wind with a treacherous rustle.",
+        "You ran after it with shouts of random curses and spells. Eventually, one of the spells worked, and the tent stopped. However, running closer you realized it had caught on the neighbor's apple tree. You climbed the tree, trying to get the tent tangled in the branches. After half an hour of futile efforts, a frightened neighbor jumped out of the house with a stick in his hands and shouts of: 'Thief! Robber! I'll show you now!' - and rushed straight at you.",
+        "Understanding that you had no time to explain anything, you ran for your life.",
+        "Reaching the other end of the settlement, realizing you had broken away from the chase, you decided to slowly return.",
+        "Already in the morning, when the neighbor had calmed down and could at least recognize you - you laughed long about this situation. But by the next evening you and the neighbor had finished work on your first 'normal' dwelling. From afar it resembles an architectural work of local children, but at least wooden branches are heavier than a tent, so the neighbor's apple tree will be safe."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('structure_hut') >= 1
+    }
+},{
+    id: 'action_public_engagement_1',
+    title: 'The First Applause',
+    text: [
+        "Today you once again gave a passionate motivational speech to the locals in the square. And you wouldn't believe what happened!",
+        "For the first time, you weren't pelted with banana peels! And two listeners even applauded!"
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_public_engagement') >= 100
+    }
+},{
+    id: 'action_public_engagement_2',
+    title: 'The Cookie Strategy',
+    text: [
+        "You have finally discovered a reliable recipe for oratory art and successful public engagement!",
+        "At the beginning of your speech, you promised that at the end of your speech, everyone would get free cookies.",
+        "However, you didn't calculate that everyone would be so interested in your speech. So you had to visit 3 shops to buy everything needed before you got beaten up.",
+        "Despite the fact that after the event everyone discussed exclusively your generosity, you are convinced that it was your oratory art that made such an impression on the audience."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_public_engagement') >= 250
+    }
+},{
+    id: 'action_academic_discussions_1',
+    title: 'The White Shirt Breakthrough',
+    text: [
+        "Today in the city hall, regular philosophical debates were taking place.",
+        "This time you wore a white shirt instead of your old torn robe, so you were allowed into the hall for the first time. Although you weren't given the floor to speak, and there wasn't even a seat for you. But at least you didn't have to listen to conversations from behind closed doors.",
+        "This is the first success!"
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_academic_discussions') >= 100
+    }
+},{
+    id: 'action_academic_discussions_2',
+    title: 'The Earth Shape Controversy',
+    text: [
+        "Today you got the opportunity to join a discussion about the shape of the Earth. Most of those present in the hall agreed that it was flat, although some weirdos tried to prove otherwise. Entering into a heated argument with them, you brought up argument after argument, and accidentally proved that it was not flat.",
+        "Most of the academics, with shouts of 'Ignoramus!' pushed you out of the hall.",
+        "Your pants suffered somewhat, but your dignity - not at all! Now you know for sure that the Earth is cubic, and you even convinced that the edge runs along the same mountain range nearby, from which you flew down when you tried to reach the clearing with beautiful Nightshade."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_academic_discussions') >= 250
+    }
+},{
+    id: 'action_nail_standing_1',
+    title: 'The Bear Alarm Incident',
+    text: [
+        "For a week straight, your neighbors couldn't sleep due to the screams coming from your tent when you tried to stand on nails.",
+        "The day before yesterday, guards burst into your tent, thinking that a wandering bear had broken in, which had been seen in the settlement recently."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_nail_standing') >= 100
+    }
+},{
+    id: 'action_nail_standing_2',
+    title: 'The Nail Boycott',
+    text: [
+        "You still turn pale when you walk past construction debris and see some nails, remembering your evening torments. However, persistence takes over.",
+        "Although you continue practicing every evening, in everyday life you declared a boycott of nails - now you've learned to cook resin to glue wooden boards together instead of nailing them."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_nail_standing') >= 250
+    }
+},{
+    id: 'action_nail_standing_3',
+    title: 'The Stone Path Mastery',
+    text: [
+        "Your persistence is bearing fruit.",
+        "You no longer have a panic fear of cutting your feet on stones, so now you can easily go to the forest for chanterelles by the shortcut.",
+        "However, nettles still cause you problems. But you're confident you can handle even that."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_nail_standing') >= 500
     }
 }]

@@ -340,6 +340,10 @@ export const SpellCard = React.memo(({ id, level, maxLevel, monitored, name, isC
     if(prevProps.isChanged !== currProps.isChanged) {
         return false;
     }
+
+    if(prevProps.level !== currProps.level) {
+        return false;
+    }
     return true;
 }))
 

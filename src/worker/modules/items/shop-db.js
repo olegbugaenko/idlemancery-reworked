@@ -1055,8 +1055,13 @@ export const registerShopItemsStage1 = () => {
         description: 'After a long argument with the shopkeeper about being a real mage, you accidentally cast a spell during your demonstration. The resulting tornado scattered books everywhere, but now the shopkeeper is afraid of you and lets you access the magical accessories section.',
         level: 0,
         maxLevel: 1,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_magic_ability',
+            level: 100,
+        }],
         unlockCondition: () => {
-            return gameEffects.getEffectValue('attribute_magic_ability') >= 1000
+            return gameEffects.getEffectValue('attribute_magic_ability') >= 100
         },
         attributes: {
             isCollectable: false,
@@ -1069,7 +1074,7 @@ export const registerShopItemsStage1 = () => {
             },
             'mana': {
                 A: 1.0,
-                B: 100,
+                B: 40,
                 type: 0
             }
         }),
@@ -1102,7 +1107,7 @@ export const registerShopItemsStage1 = () => {
             },
             'mana': {
                 A: 1.0,
-                B: 200,
+                B: 50,
                 type: 0
             }
         }),
@@ -1139,7 +1144,7 @@ export const registerShopItemsStage1 = () => {
             },
             'mana': {
                 A: 1.0,
-                B: 200,
+                B: 70,
                 type: 0
             }
         }),
@@ -1176,7 +1181,7 @@ export const registerShopItemsStage1 = () => {
             },
             'mana': {
                 A: 1.0,
-                B: 400,
+                B: 100,
                 type: 0
             }
         }),
@@ -1213,7 +1218,7 @@ export const registerShopItemsStage1 = () => {
             },
             'mana': {
                 A: 1.0,
-                B: 200,
+                B: 100,
                 type: 0
             }
         }),
@@ -1251,7 +1256,7 @@ export const registerShopItemsStage1 = () => {
             },
             'mana': {
                 A: 1.0,
-                B: 1000,
+                B: 200,
                 type: 0
             }
         }),
@@ -1265,7 +1270,7 @@ export const registerShopItemsStage1 = () => {
         maxLevel: 1,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_magic_accessories_access') > 0 && 
-                   gameEntity.getLevel('action_mining') > 0
+                   gameEntity.isEntityUnlocked('action_mining')
         },
         attributes: {
             isCollectable: false,
@@ -1289,7 +1294,7 @@ export const registerShopItemsStage1 = () => {
             },
             'mana': {
                 A: 1.0,
-                B: 2000,
+                B: 300,
                 type: 0
             }
         }),
@@ -1326,7 +1331,7 @@ export const registerShopItemsStage1 = () => {
             },
             'mana': {
                 A: 1.0,
-                B: 2000,
+                B: 250,
                 type: 0
             }
         }),
@@ -1369,7 +1374,7 @@ export const registerShopItemsStage1 = () => {
             },
             'mana': {
                 A: 1.0,
-                B: 1000,
+                B: 400,
                 type: 0
             }
         }),
@@ -1482,7 +1487,7 @@ export const registerShopItemsStage1 = () => {
         get_cost: () => ({
             'coins': {
                 A: 2,
-                B: 400000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 300000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 0
             }
         }),
@@ -2033,7 +2038,7 @@ export const registerShopItemsStage1 = () => {
         get_cost: () => ({
             'coins': {
                 A: 2.25,
-                B: 400000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 300000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 1
             }
         }),
@@ -2113,7 +2118,7 @@ export const registerShopItemsStage1 = () => {
         level: 0,
         maxLevel: 1,
         unlockCondition: () => {
-            return gameEntity.getLevel('action_mining') > 0
+            return gameEntity.isEntityUnlocked('action_mining')
         },
         attributes: {
             isCollectable: false,
@@ -2834,7 +2839,7 @@ export const registerShopItemsStage1 = () => {
         get_cost: () => ({
             'coins': {
                 A: 1,
-                B: 3000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 2500000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 1
             },
             'knowledge': {
@@ -3043,11 +3048,11 @@ export const registerShopItemsStage1 = () => {
             isCollectable: false,
         },
         resourceModifier: {
-            income: {
+            multiplier: {
                 effects: {
                     'mining_efficiency': {
                         A: 0.25,
-                        B: 0,
+                        B: 1,
                         type: 0
                     }
                 }

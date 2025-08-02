@@ -120,7 +120,7 @@ export class StatisticsModule extends GameModule {
         // Add new metrics
         this.economicMetrics.coins.push({
             timestamp: currentTime,
-            value: currentCoins
+            value: currentCoins,
         });
 
         this.economicMetrics.learningRate.push({
@@ -196,7 +196,7 @@ export class StatisticsModule extends GameModule {
         return {
             coins: this.economicMetrics.coins,
             learningRate: this.economicMetrics.learningRate,
-            currentCoins: gameResources.getResource('coins')?.amount || 0,
+            currentCoins: gameResources.getResource('coins')?.cap || 0,
             currentLearningRate: gameEffects.getEffectValue('learning_rate') || 0
         };
     }

@@ -99,14 +99,18 @@ export const Crafting = ({ setItemDetails, setItemLevel, filterId, newUnlocks, o
 
             <div className={'auto-rebalance-controls'}>
                 <div className={'space-item'}>
-                    <label className={'checkbox-label'}>
-                        <input 
-                            type="checkbox" 
-                            checked={craftingData.autoRebalance.enabled}
-                            onChange={(e) => handleAutoRebalanceToggle(e.target.checked)}
-                        />
-                        <span>Auto-rebalance</span>
-                    </label>
+                    <TippyWrapper content={<div className={'hint-popup'}>
+                        <p className={'hint'}>Auto-rebalance automatically redistributes efforts when one or more recipes lack resources. This ensures optimal resource usage by redirecting effort to recipes that can run efficiently.</p>
+                    </div>}>
+                        <label className={'checkbox-label'}>
+                            <input 
+                                type="checkbox" 
+                                checked={craftingData.autoRebalance.enabled}
+                                onChange={(e) => handleAutoRebalanceToggle(e.target.checked)}
+                            />
+                            <span>Auto-rebalance</span>
+                        </label>
+                    </TippyWrapper>
                 </div>
                 {craftingData.autoRebalance.hasOriginalAllocations && (
                                     <TippyWrapper content={<div className={'hint-popup'}>

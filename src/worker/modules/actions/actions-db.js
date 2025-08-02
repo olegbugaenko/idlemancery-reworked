@@ -1692,7 +1692,7 @@ export const registerActionsStage1 = () => {
         getLearnRate: () => {
             return 1.
         },
-        learningEffects: ['mental_activities_learn_rate'],
+        learningEffects: ['social_training_learning_rate'],
         discountEffects: ['social_actions_discount'],
         resourceModifier: {
             get_multiplier: () => ({
@@ -1729,7 +1729,7 @@ export const registerActionsStage1 = () => {
             return true
         },
         attributes: {
-            baseXPCost: 1000,
+            baseXPCost: 10000,
             isTraining: true,
             isRankAvailable: true,
         }
@@ -4000,7 +4000,7 @@ export const registerActionsStage1 = () => {
             return true
         },
         attributes: {
-            baseXPCost: 100000,
+            baseXPCost: 100000000,
             isTraining: true,
             isRankAvailable: true,
         }

@@ -583,7 +583,7 @@ export const registerStructuresStage1 = () => {
         description: 'A grand library filled with knowledge and wisdom. Each level provides a bonus to learning rate.',
         level: 0,
         unlockCondition: () => {
-            return gameEntity.getLevel('action_clay_mining') > 0;
+            return gameEntity.isEntityUnlocked('action_clay_mining');
         },
         resourceModifier: {
             get_multiplier: () => ({

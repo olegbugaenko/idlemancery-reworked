@@ -63,8 +63,19 @@ const EconomicMetrics = () => {
             return <p className="no-data">No data available for the selected interval.</p>;
         }
 
-        const maxValue = Math.max(...filteredData.map(d => d.value), currentValue);
-        const minValue = Math.min(...filteredData.map(d => d.value), currentValue);
+        // Add current value as the most recent data point if it's different from the last saved point
+        const lastSavedValue = filteredData.length > 0 ? filteredData[filteredData.length - 1].value : null;
+        const chartData = [...filteredData];
+        
+        if (lastSavedValue !== currentValue) {
+            chartData.push({
+                timestamp: Math.max(...filteredData.map(d => d.timestamp), 0) + 1, // Ensure it's the most recent
+                value: currentValue
+            });
+        }
+
+        const maxValue = Math.max(...chartData.map(d => d.value));
+        const minValue = Math.min(...chartData.map(d => d.value));
         const range = maxValue - minValue;
 
         return (
@@ -74,7 +85,7 @@ const EconomicMetrics = () => {
                     Current: {formatValue(currentValue)}
                 </div>
                 <div className="chart">
-                    {filteredData.map((point, index) => {
+                    {chartData.map((point, index) => {
                         const height = range > 0 ? ((point.value - minValue) / range) * 100 : 50;
                         return (
                             <div
@@ -83,7 +94,7 @@ const EconomicMetrics = () => {
                                 style={{
                                     height: `${height}%`,
                                     backgroundColor: color,
-                                    width: `${100 / Math.min(filteredData.length, 50)}%`
+                                    width: `${100 / Math.min(chartData.length, 50)}%`
                                 }}
                                 title={`${formatValue(point.value)} ${formatTime(point.timestamp)}`}
                             />
@@ -93,7 +104,7 @@ const EconomicMetrics = () => {
                 <div className="chart-info">
                     <span>Min: {formatValue(minValue)}</span>
                     <span>Max: {formatValue(maxValue)}</span>
-                    <span>Data points: {filteredData.length}</span>
+                    <span>Data points: {chartData.length}</span>
                 </div>
             </div>
         );
