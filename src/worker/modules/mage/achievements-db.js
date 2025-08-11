@@ -103,6 +103,37 @@ export const achievementsDb = [{
     ],
     completeCondition: () => gameEntity.getLevel('action_gossip') >= 100
 },{
+    id: 'action_gossip_4',
+    title: 'The Pink Shorts Revelation',
+    text: [
+        "After long conversations with neighbors about what color the mayor's daughter's dress was at the party, you realized that pink color drives people crazy. So you threw away your old pink shorts and bought new ones - white ones.",
+        "Now people pay attention to you as a fashion icon, and local elders are trying to arrange your marriage to the mayor's daughter."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_gossip') >= 1000
+},{
+    id: 'action_gossip_5',
+    title: 'The Dragon Hunt',
+    text: [
+        "In pursuit of fame, you cannot ignore rumors.",
+        "Yesterday you overheard a conversation between two people who saw a dragon and were discussing the direction it flew.",
+        "You asked for details and set off in search. Locals pointed you in the direction where to look for the mountain peak where the dragon went.",
+        "After three days of searching, you ran out of water and food. Nevertheless, you reached your destination - it turned out to be a dragon monument, which according to local legends protects the nearest settlements.",
+        "Disappointed, hungry and thirsty, you descended and stopped at a settlement along the way. At least there you could eat something and sleep, even though everything was more expensive."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_gossip') >= 2000
+},{
+    id: 'action_gossip_6',
+    title: 'The Monster Fish Hunt',
+    text: [
+        "Your own rumors about a monster fish that was about to crawl onto land and destroy the entire settlement reached you.",
+        "You learned about a guard squad that was going to hunt the big fish and protect the settlement, and decided to join them, explaining that you knew where to look for it.",
+        "After several days of fishing, one of the guards finally caught a large pike. You, realizing there wouldn't be a better moment, quietly cast a spell on the pike. The pike instantly grew legs and started running at the catcher - the guard who caught it. The guard quickly drew his sword and cut the pike in half. The cut pike grew a new head and continued moving.",
+        "You tried to cast a spell on the pike to kill it - however, the pike doubled again and continued the pursuit as an army of six pikes.",
+        "The frightened sergeant climbed a tree, and the pikes tried to continue the chase while you and the rest of the guards watched from the side. Eventually, the pikes, after several failed attempts to grab the sergeant, started suffocating and fell near the tree.",
+        "You triumphantly returned with several kilograms of pikes and cooked fish soup from them. This day is now officially the day of victory over the fish threat, and you and the young sergeant are true saviors of the settlement."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_gossip') >= 5000
+},{
     id: 'resource_coins_1',
     title: 'The First Clink',
     text: [
@@ -247,6 +278,27 @@ export const achievementsDb = [{
     ],
     completeCondition: () => gameEntity.getLevel('action_learn_anatomy') >= 1000
 },{
+    id: 'action_learn_anatomy_6',
+    title: 'The Satiety Spell Mishap',
+    text: [
+        "You learned to feel your own organs.",
+        "After another meditation session, you were interrupted by hunger, so you decided to approach the problem radically - you cast a satiety spell on your stomach.",
+        "For 30 seconds you felt pleasant fullness, however very soon this sensation changed to a feeling of sharp pain.",
+        "Casting a pain relief spell, you lost consciousness.",
+        "In the morning you woke up in the local psychiatric hospital, and spent a long time trying to explain that you weren't trying to commit suicide by eating yourself to death with stones.",
+        "Miraculously convincing the doctors, you returned home and decided to eat exclusively in a natural way."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_learn_anatomy') >= 2000
+},{
+    id: 'action_learn_anatomy_7',
+    title: 'The Knee Cap Conspiracy',
+    text: [
+        "Studying human anatomy, you came to a terrible conclusion - cartilage is much weaker than bone, and the local bone setter is a charlatan!",
+        "After long training sessions you felt immortal, however in the evening, reading a book after a long run, you sneezed and felt sudden pain in your knee. Getting up, you realized you couldn't properly step on your foot.",
+        "The doctor said you had a dislocated kneecap. However, you are convinced this is impossible, as you have read tons of anatomy literature and never saw anything about such problems. Clearly they want to deceive you..."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_learn_anatomy') >= 5000
+},{
     id: 'action_learn_languages',
     title: 'Alphabetical Aggression',
     text: [
@@ -294,6 +346,38 @@ export const achievementsDb = [{
         "Still, you’ve learned a valuable lesson: not only have your language skills improved, but you now choose your words much more carefully — especially when it comes to food."
     ],
     completeCondition: () => gameEntity.getLevel('action_learn_languages') >= 250
+},{
+    id: 'action_learn_languages_5',
+    title: 'The Hidden Treasure',
+    text: [
+        "You finally managed to read the inscription scratched on a board that you accidentally found while cleaning. It looks like directions to a hidden treasure.",
+        "You diligently followed the instructions from the board, came to the apple tree and started digging. After digging about 30 centimeters, you found a box with 3 hidden coins.",
+        "You remembered that a year ago you made this note on the board for yourself, so you wouldn't forget where you hid your wallet with coins."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_learn_languages') >= 1000
+},{
+    id: 'action_learn_languages_6',
+    title: 'The Pudding Spell Book',
+    text: [
+        "Your fellow villager, having heard about your skills in reading ancient languages, asked you to translate a spell book for him that he found under his pillow.",
+        "No matter how hard you tried to translate it, it looked like a pudding recipe. However, the man was convinced it was a book of secret spells passed down to him by his mother. So you decided not to disappoint the man and read a spell from it.",
+        "Suddenly, a pudding appeared on the table. The man clapped when his favorite cup suddenly turned into pudding. The man didn't have time to shout before his hat also turned into pudding.",
+        "Realizing you had done something wrong, you carefully reread the last page of the book before the entire house turned into pudding. As it turned out, it was enough to cross your fingers and shout 'Done'.",
+        "The next day, you and your new business partner were transforming human clothing and various unnecessary items into pudding on order, until the mayor passed by. Who knew he was allergic to strawberries, and there were important contracts in his briefcase...",
+        "In the evening, at the tavern, you and your partner finished eating the strawberry pudding hidden in your pocket. It turned out to be so delicious that you even agreed it was worth the 2-day imprisonment."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_learn_languages') >= 2000
+},{
+    id: 'action_learn_languages_7',
+    title: 'The Linguistic Dinner Disaster',
+    text: [
+        "You were invited to a dinner by linguists who were researching the cultural influence of ancient Elvish on modern magical dialect.",
+        "After eating a piece of fish, you felt that a bone got stuck in your throat. Wanting to get rid of the unpleasant sensation, you approached a mirror. Barely removing the bone, you felt relief.",
+        "However, suddenly, the bone you had just removed from your throat turned into a giant shark. Everyone ran out of the hall in horror.",
+        "You, remembering that fish cannot fly in the air and breathe without water, waited until the fish started suffocating and helplessly fell on its side, then cast a spell that evaporated the illusion.",
+        "Coming out alive from the building, you caused incredible admiration among those around you."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_learn_languages') >= 5000
 },{
     id: 'action_pushup_1',
     title: 'Pushup Prodigy (Sort of)',
@@ -352,6 +436,18 @@ export const achievementsDb = [{
         "You didn't have to call for help for long, but now many legends circulate about you!"
     ],
     completeCondition: () => gameEntity.getLevel('action_pushup') >= 1000
+},{
+    id: 'action_pushup_7',
+    title: 'The Magic Mirror Incident',
+    text: [
+        "You're not admiring your biceps in the mirror for the first time.",
+        "The time has come - you decided, and went to participate in a regional push-up tournament.",
+        "You easily reached the 1/8 finals, but here a seven-time competition participant came out against you. You, assessing the chances, decided to use cunning and magic. After doing 15 push-ups, you paused, muttering a spell that was supposed to create a multi-ton invisible load on your opponent's back.",
+        "Suddenly, you heard a crunch and fainted.",
+        "Coming to your senses a few days later, you learned that the competition hall was equipped with magic reflectors, so the load fell on you.",
+        "Well, at least you reached the 1/8 finals, and understood on your own spine that your magic works."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_pushup') >= 2000
 },{
     id: 'action_train_endurance',
     title: 'Jogging with a Purpose',
@@ -472,6 +568,18 @@ export const achievementsDb = [{
         return gameEntity.getLevel('action_stamina_training') >= 1000
     }
 },{
+    id: 'action_stamina_training_6',
+    title: 'The Shadow Chase',
+    text: [
+        "Inspired by your athlete friends' shadow boxing practices, you decided to arrange a chase after your own shadow.",
+        "After 10 miles, you finally managed to catch your own shadow, tripping over a stone and diving face-first into the grass.",
+        "Your shadow seemed to mock you, dancing around. You tried to grab it, but it always slipped from your hands. Desperate, you decided to use magic - cast a spell that was supposed to 'attach' the shadow to the ground.",
+        "The spell worked unexpectedly - your shadow became three-dimensional and started running around you like a real creature. Now you had a chase not after a flat shadow, but after a volumetric 'shadow clone'.",
+        "After another 5 miles of running, you realized the shadow was trying to lead you to something. It stopped near an old oak tree, where you found a hidden treasure - a bag of coins you had forgotten there a year ago.",
+        "Your shadow, satisfied that it helped you find the treasure, returned to normal state. Now you know that sometimes it's worth trusting even your own shadow, especially if it runs 15 miles in front of you."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_stamina_training') >= 2000
+},{
     id: 'action_cardio_training_1',
     title: 'The Heart Rate Challenge',
     text: [
@@ -532,6 +640,17 @@ export const achievementsDb = [{
     completeCondition: () => {
         return gameEntity.getLevel('action_cardio_training') >= 1000
     }
+},{
+    id: 'action_cardio_training_6',
+    title: 'The Log Incident',
+    text: [
+        "You decided to try new breathing practices during cardio training.",
+        "Exhaling after another step uphill with a log in your hands, you saw a strange silhouette in front of you.",
+        "Surprised, you dropped the log from your hands. Hitting you hard on the legs, it pulled you down. You tumbled for a long time before your epic flight ended.",
+        "You looked up - and saw no silhouette. Only the path you flew down... And the log flying straight at you.",
+        "The next day you woke up in the hospital. The doctor, without even asking anything, gave you a pill and sent you away with the words: When will you finally kill yourself..."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_cardio_training') >= 2000
 },{
     id: 'action_yoga_practice_1',
     title: 'Breathless Enlightenment',
@@ -680,6 +799,16 @@ export const achievementsDb = [{
         "Well, at least veterinary prospects definitely smiled at you today."
     ],
     completeCondition: () => gameEntity.getLevel('action_meditate') >= 1000
+},{
+    id: 'action_meditate_7',
+    title: 'The Regional Meditation Champion',
+    text: [
+        "Your ability to immerse yourself and find inner balance has reached a regional level.",
+        "You were invited to a monastery 400 miles from your home for a meditation competition. After several hours of travel under the scorching sun, the horses couldn't withstand the heat. So you had to stop. You stopped by the river, drank some water, and decided to practice meditation.",
+        "You woke up already in the monastery. The first thing you saw was the face of a monk who was sprinkling you with holy water. You asked him when and where the competition would take place, and to your surprise, you learned that you had already won in the 'deepest meditation' category.",
+        "Unfortunately, they didn't give you medals, so you asked the monk for a certificate in the 'Soundest Sleep' category. Nevertheless, you felt sleep-deprived, so you slept through most of the journey back."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_meditate') >= 2000
 },{
     id: 'action_home_errands_1',
     title: 'The Relic of Cleaning',
@@ -1366,5 +1495,174 @@ export const achievementsDb = [{
     ],
     completeCondition: () => {
         return gameEntity.getLevel('action_nail_standing') >= 500
+    }
+},{
+    id: 'action_deep_focus_1',
+    title: 'The Interrupted Meditation',
+    text: [
+        "Yesterday you decided to try deep focus practices on inner strength and spirit. So you sat on your mat and immersed yourself in a session...",
+        "Your session was interrupted by musicians playing the trumpet. You had already started mentally cursing them, but your love for music overcame your love for inner harmony. You went outside, but saw no one.",
+        "And then, suddenly, a new sound. And you realized it was the rumbling of your stomach. Seems like it's time to look for practices to calm the stomach without using sausages."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_deep_focus') >= 250
+    }
+},{
+    id: 'action_deep_focus_2',
+    title: 'The Sleep Therapy Discovery',
+    text: [
+        "You agreed with a friend who also studies alchemy to go to a neighboring settlement for Evergreen Fern flowers, which were supposed to enhance the effect of potions. However, you were skeptical about this idea from the very beginning, as you had never seen such a plant in any of the pictures you had looked at in books.",
+        "Nevertheless, for the sake of friendship, you agreed to go. The road was long. Accustomed to not wasting time, you engaged in meditation practices and deep focusing along the way. Sitting more comfortably on the hay that was laid under the cart, you immersed yourself in inner harmony.",
+        "You woke up from a strong impact. You saw a river in front of you, a broken cart, and your friend snoring next to you with a broken knee and forehead. You tried to wake him up, but to no avail.",
+        "You had to carry him back to the settlement in your arms.",
+        "After bringing him home, you put him on the bed and were about to go for a doctor when that fool woke up.",
+        "As it turned out, he had serious sleep problems that he wanted to solve with the help of potions.",
+        "He confessed that your practices had rocked him into such a deep sleep that he hadn't had in 10 years.",
+        "With mixed feelings of anger and pride, you went home. However, long before you crossed the threshold of your possessions, you were seized by the idea of making money on practices to combat insomnia."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_deep_focus') >= 500
+    }
+},{
+    id: 'action_yoga_practices_1',
+    title: 'The Osteopath Exchange',
+    text: [
+        "Your sleep was interrupted by a knock at the door.",
+        "You opened it and were met by a man. He had no face, was all pale, with bruises under his eyes, and in a trembling voice said: 'Maybe that's enough?'",
+        "You, not understanding what he was talking about, invited him for tea.",
+        "Somewhat relaxed, the man started talking. As it turned out, this was a new doctor - an osteopath. He complained that he couldn't cope with the influx of patients who had watched your yoga classes through the fence and were trying to repeat them at home, injuring themselves.",
+        "Finally, after drinking a bit more calming tea with fly agarics, you found a compromise. You went out the next day to replace the osteopath and dealt with the queue before lunch. In return, when you came home, you were greeted by trimmed grass and a satisfied, rosy-cheeked osteopath who was swinging on a self-made hammock.",
+        "+ Hammock, + Good doctor friend, + Satisfied patients. And all thanks to yoga!"
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_yoga_practices') >= 2000
+    }
+},{
+    id: 'event_self_motivation_art_permanent_bonus_1',
+    title: 'The Cherry Juice Stain Revelation',
+    text: [
+        "During yet another motivational speech, you were struck by an idea - what if people painted their goals and hung their paintings on the walls by their beds?",
+        "Without hesitation, you posted an announcement and eagerly awaited the first session.",
+        "Not many people came, but they painted with such enthusiasm that you ran out of ink by the 15th minute of training.",
+        "After the session ended, you discovered a terrible secret - most of the settlement's residents can neither write nor draw. So most of the 'paintings' were left to you.",
+        "However, one of the students' works reminded you of a cherry juice stain that you left on the sheet when you first tried to use magic to make a glass of juice lift itself from the table and fly to you.",
+        "You were overwhelmed by memories of how you started. And with the realization that now you can easily drink a mug of ale without spilling more than half of it, you were overcome with pride!"
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('event_self_motivation_art_permanent_bonus') >= 1
+    }
+},{
+    id: 'event_art_therapy_sessions_permanent_bonus_1',
+    title: 'The Strategic Pie Reserves',
+    text: [
+        "A week ago you slept extremely poorly - you were haunted by the same dream: you went on a hike to the mountains for meditation and forgot to take your beloved liver pies and sausages.",
+        "Yesterday you tried to paint a basket full of your favorite food and left it standing on an easel by your bed overnight. Waking up again, you looked at the painting and remembered the strategic reserves of pies under your pillow. After having a snack, you easily plunged into sleep, where you dreamed of an already empty basket and stomach rumbling, and your duel with the dragon, from which you of course emerged victorious.",
+        "The next day you firmly decided that you would help people fight their fears through creativity!"
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('event_art_therapy_sessions_permanent_bonus') >= 1
+    }
+},{
+    id: 'shop_item_steel_processing_technology_1',
+    title: 'The Neighbor\'s Gift',
+    text: [
+        "Yesterday your neighbor finally kept his promise.",
+        "You had been feeding him your signature tea with fly agarics and mint for a month, and his morning headaches finally stopped. He even saw an elf who prophesied health to him. So this morning you were greeted by a cart full of sturdy century-old oak, from which you had long planned to make a reliable crafting table and a bed that would finally not fall apart from every extra portion of pies you consumed.",
+        "So you took up the axe... And the axe shattered.",
+        "You tried to saw the oak with the power of thought, and after 3 hours of effort you even saw a light smoke and a mark on the bark when your neighbor stopped you, bringing a cup of hawthorn and lemon balm infusion. Looking in the mirror and seeing a red substance resembling a mixture of tomato juice and milk instead of a face, you realized that you would sooner have a stroke than develop woodworking skills using magic and willpower.",
+        "Fortunately, going out for some air, you saw your friend, with whom you shared the situation. The comrade laughed for a long time, then went into your yard and unceremoniously sawed the oak with a saw. You stood for a long time, marveling at his magic. However, the man, laughing friendly, gave you his saw, and you spent an hour sawing the entire trunk.",
+        "You treated him to herbal ale, and in the evening you flew home, knowing all the possibilities of brilliant gray metal.",
+        "Today you bought the last manual on metalworking at the bookstore without hesitation, and by lunchtime you were able to sharpen a nail that you had recently pulled from your neighbor's horse's hoof."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('shop_item_steel_processing_technology') >= 1
+    }
+},{
+    id: 'action_crafting_training_4',
+    title: 'The Rebellious Chair',
+    text: [
+        "Despite your skills in the art of working with materials, you never got around to making a proper comfortable chair for relaxation.",
+        "You were inspired after morning meditation and decided to take on the task.",
+        "After carefully drawing up a plan and precisely cutting each wooden detail, you began to assemble everything together.",
+        "While attaching the last leg, you swung the hammer properly, but accidentally dropped it. The hammer hit your knee, which had just started healing after a recent trip to the mountains.",
+        "Crouching in pain, you remembered all the words you know. However, a moment later you forgot about your knee - you accidentally read a spell. The chair, as if bewitched, flew out into the street and rushed at full speed into the reeds near the neighbor's pond.",
+        "You tried to catch up with the rebellious chair. The neighbor's cat, who was peacefully sleeping on the bench, got scared of you and ran away. The chair jumped out of the reeds and rushed after the cat, and you - after the chair.",
+        "The cat ran up an apple tree. The chair jumped after it and got tangled in the branches.",
+        "You ran to the apple tree and muttered a spell to calm the chair. It fell from the apple tree and scattered. In despair that your work had just crumbled before your eyes, you shook the apple tree hard. A second later, apples and a frightened meowing cat rained down on you.",
+        "A few minutes later, a frightened old man came out of the neighbor's house. A minute later, the horror on his face turned into a smile - 'Son, God bless you! I was just thinking about how to get those apples, I thought they'd go to waste.'",
+        "You quickly helped the neighbor collect the apples, and half an hour later you were chatting cheerfully, sitting in the neighbor's kitchen and drinking apple compote."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_crafting_training') >= 1000
+    }
+},{
+    id: 'action_crafting_training_5',
+    title: 'The Capital vs Local Master',
+    text: [
+        "You were standing in the yard, repairing your table, when an unfamiliar man approached you and started giving unsolicited advice.",
+        "As it turned out - he had worked as an emissary in the capital for quite a long time, and moved to the settlement for retirement when illness no longer allowed him to continue working.",
+        "However, you're not going to tolerate some upstart - the settlement already has the best craftsman.",
+        "You challenged the man to a duel, and began competing to make a better table. Within an hour your opponent finished his work, while you were still looking for the hammer you forgot where you put.",
+        "However, after 3 hours, you finished your work. Propping up your table's leg with a rock so it wouldn't be so obvious that it was crooked, you looked at it and realized that rock didn't help much.",
+        "Understanding that you needed to save the situation, you muttered a spell - and a decanter of wine and a good plate of bread and cheese appeared on the table.",
+        "The audience clapped enthusiastically and began to feast.",
+        "After 5 minutes the table couldn't withstand the excitement and fell to its side. However, everyone managed to feast, so the advantage in voting was on your side. Winning the competition, you decided to continue the action, renewing the food and drinks on your opponent's table.",
+        "In the evening you happily dragged a brand new and perfectly level table home. Its former craftsman gave it to you in exchange for several meditation lessons and a glass of elixir for knee pain relief."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_crafting_training') >= 2000
+    }
+},{
+    id: 'action_alchemy_training_4',
+    title: 'The Rooster\'s Recipe Discovery',
+    text: [
+        "Yesterday you brewed another batch of brain enhancement potion and left it to cool outside.",
+        "Lying down on your bed, you accidentally fell asleep.",
+        "In the morning you woke up to crowing right under your ear. Opening your eyes, you saw a bold rooster in front of you. You tried to chase it away, but the rooster was persistent. It jumped on the table, flipped through several pages of your notebook with its foot and pecked at a recipe.",
+        "And then you realized there was an error in the potion formula! Overjoyed, you hugged the rooster and quickly ran with corrected notes to fix the mistake.",
+        "By evening you had a working remedy for annoying mosquitoes, and your neighbor had a smart rooster with whom you could discuss the weather."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_alchemy_training') >= 1000
+    }
+},{
+    id: 'action_alchemy_training_5',
+    title: 'The Merchant\'s Donkey',
+    text: [
+        "In the evening, a man knocked on your door. He introduced himself as a wealthy merchant passing through.",
+        "He complained that he urgently needed to deliver goods by the end of the week, but his donkey had fallen ill. He was advised to seek you out as a talented alchemist who could heal people's bad moods with your magical potion made from sour grapes, so he turned to you to heal his four-legged companion.",
+        "You carefully examined the donkey, and understanding that you had no idea what to do with it, you were already thinking of refusing when you noticed a nail sticking out of its leg. You gave the donkey a pain-relieving elixir and removed the nail.",
+        "The man thanked you and was about to leave when he realized that the donkey had no desire to go anywhere - it calmly lay down on the grass and stayed there.",
+        "The man tried to force it to get up - the donkey took a few steps and fell.",
+        "'You poisoned it!' the man cried out in despair.",
+        "And then you realized that there was a full glass of pain reliever on the table, and in your hand you were holding an empty mug where your ale had been sloshing around just an hour ago.",
+        "You had to explain to the man that this was a side effect of the 'pain reliever.' So you offered the man to stay the night with you, and even as a sign of gratitude for this, you received a clay vase and a good portion of cookies for free."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_alchemy_training') >= 2000
+    }
+},{
+    id: 'action_elemental_channeling_1',
+    title: 'The Yawn Disaster',
+    text: [
+        "You have learned to work with the elements so masterfully that the candle no longer goes out when you yawn while trying to translate a book text.",
+        "However, yesterday you yawned so hard that the candle tipped over and fell on the carpet. The carpet caught fire.",
+        "You tried to create water to extinguish the flame. And you succeeded!",
+        "However, after that such a downpour began on the street that all your fly agaric plantations were hopelessly washed away."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_elemental_channeling') >= 500
+    }
+},{
+    id: 'action_elemental_channeling_2',
+    title: 'The Clean City Disaster',
+    text: [
+        "Today the city sergeant organized a clean city day - each townsman received a broom and a piece of road to sweep.",
+        "You, without thinking long, summoned a gust of wind that easily swept all the dust from the road... along with the facing masonry.",
+        "By evening, all the townspeople gathered in the park literally next door for mass festivities, but they were disturbed by the sound of a hammer and curses that reached them.",
+        "By morning you still restored the coating, and after drinking a calming infusion, you went to sleep."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_elemental_channeling') >= 1000
     }
 }]

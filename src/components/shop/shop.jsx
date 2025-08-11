@@ -31,7 +31,7 @@ export const Shop = ({}) => {
     const [isDetailVisible, setDetailVisible] = useState(!isMobile);
     const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
 
     const [ selectedTab, setSelectedTab ] = useState('upgrades');
 
@@ -86,13 +86,25 @@ export const Shop = ({}) => {
         }
     }, [])
 
-    onMessage('unlocks-shop', (unlocks) => {
-        setUnlocksData(unlocks);
-    })
+    useEffect(() => {
+        onMessage('unlocks-shop', (unlocks) => {
+            setUnlocksData(unlocks);
+        });
+        
+        return () => {
+            removeMessage('unlocks-shop');
+        };
+    }, []);
 
-    onMessage('new-unlocks-notifications-shop', payload => {
-        setNewUnlocks(payload);
-    })
+    useEffect(() => {
+        onMessage('new-unlocks-notifications-shop', payload => {
+            setNewUnlocks(payload);
+        });
+        
+        return () => {
+            removeMessage('new-unlocks-notifications-shop');
+        };
+    }, []);
 
     const onCloseDetails = useCallback((e) => {
         setDetailVisible(false);
@@ -169,7 +181,7 @@ export const ShopUpgrades = ({ setItemDetails, purchaseItem, newUnlocks, isMobil
 
     const worker = useContext(WorkerContext);
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const [itemsData, setItemsData] = useState({
         available: [],
         current: undefined,
@@ -199,9 +211,15 @@ export const ShopUpgrades = ({ setItemDetails, purchaseItem, newUnlocks, isMobil
         }
     }, [])
 
-    onMessage('items-data', (items) => {
-        setItemsData(items);
-    })
+    useEffect(() => {
+        onMessage('items-data', (items) => {
+            setItemsData(items);
+        });
+        
+        return () => {
+            removeMessage('items-data');
+        };
+    }, []);
 
     const toggleAutopurchase = useCallback((id, flag) => {
         sendData('set-shop-autopurchase', { id, flag })
@@ -240,7 +258,7 @@ export const ShopItems = ({ setItemDetails, toggleEditedItem, purchaseItem, newU
 
     const worker = useContext(WorkerContext);
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const [itemsData, setItemsData] = useState({
         available: [],
         current: undefined,
@@ -269,9 +287,15 @@ export const ShopItems = ({ setItemDetails, toggleEditedItem, purchaseItem, newU
         sendData('set-purchase-multiplier', { amount })
     }
 
-    onMessage('items-resources-data', (items) => {
-        setItemsData(items);
-    })
+    useEffect(() => {
+        onMessage('items-resources-data', (items) => {
+            setItemsData(items);
+        });
+        
+        return () => {
+            removeMessage('items-resources-data');
+        };
+    }, []);
 
     return (<div className={'items-cat'}>
         <div className={'heading flex-container'}>
@@ -325,7 +349,7 @@ export const CourseItems = ({ setItemDetails, purchaseItem, newUnlocks, isMobile
 
     const worker = useContext(WorkerContext);
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const [itemsData, setItemsData] = useState({
         available: [],
         current: undefined,
@@ -350,9 +374,15 @@ export const CourseItems = ({ setItemDetails, purchaseItem, newUnlocks, isMobile
         }
     }, [])
 
-    onMessage('course-data', (items) => {
-        setItemsData(items);
-    })
+    useEffect(() => {
+        onMessage('course-data', (items) => {
+            setItemsData(items);
+        });
+        
+        return () => {
+            removeMessage('course-data');
+        };
+    }, []);
 
     const toggleAutopurchase = useCallback((id, flag) => {
         sendData('set-course-autopurchase', { id, flag })
@@ -490,7 +520,7 @@ export const CourseCard = ({ toNext, id, efficiency, isRunning, name, level, pro
                         >
                             {isRunning ? 'Stop Course' : 'Start Course'}
                         </CustomButton>
-                        <FavoriteButton type="courses" id={id} isFavorite={isFavorite} className="course-favorite-btn" />
+                        <FavoriteButton type="courses" id={id} isFavorite={isFavorite} className="course-favorite-btn icon-content interface-icon small clickable-icon" />
                         {isAutomationUnlocked ? (<label className={'autobuy-label'}>
                             <input type={'checkbox'} checked={isAutoPurchase}
                                    onChange={() => toggleAutopurchase(id, !isAutoPurchase)}/>
@@ -509,7 +539,7 @@ export const ItemDetails = ({itemId, category, editId, onPurchase, isEditMode, o
 
     const { isMobile } = useAppContext();
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
 
     const [item, setDetailOpened] = useState(null);
 
@@ -525,10 +555,15 @@ export const ItemDetails = ({itemId, category, editId, onPurchase, isEditMode, o
         sendData('query-all-resources', {});
     }, [])
 
-    onMessage('all-resources', (payload) => {
-        setResources(payload);
-    })
-
+    useEffect(() => {
+        onMessage('all-resources', (payload) => {
+            setResources(payload);
+        });
+        
+        return () => {
+            removeMessage('all-resources');
+        };
+    }, []);
 
     useEffect(() => {
         if(category === 'upgrades') {
@@ -559,10 +594,15 @@ export const ItemDetails = ({itemId, category, editId, onPurchase, isEditMode, o
 
     }, [itemId])
 
-
-    onMessage('item-details', (items) => {
-        setDetailOpened(items);
-    })
+    useEffect(() => {
+        onMessage('item-details', (items) => {
+            setDetailOpened(items);
+        });
+        
+        return () => {
+            removeMessage('item-details');
+        };
+    }, []);
 
     useEffect(() => {
         if(category === 'items' && editId) {
@@ -780,7 +820,7 @@ export const GeneralStats = ({ category, setDetailVisible }) => {
 
     const { isMobile } = useAppContext();
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
 
     const [item, setDetailOpened] = useState(null);
 
@@ -794,15 +834,19 @@ export const GeneralStats = ({ category, setDetailVisible }) => {
             clearInterval(interval);
         }
 
-    }, [])
+    }, [category])
 
-
-    onMessage('general-shop-stats', (items) => {
-        setDetailOpened(items);
-    })
+    useEffect(() => {
+        onMessage('general-shop-stats', (items) => {
+            setDetailOpened(items);
+        });
+        
+        return () => {
+            removeMessage('general-shop-stats');
+        };
+    }, []);
 
     if(!item) return null;
-
 
     return (
         <PerfectScrollbar>
@@ -811,7 +855,7 @@ export const GeneralStats = ({ category, setDetailVisible }) => {
                     <h4>General Stats</h4>
                 </div>
                 <div className={'block'}>
-                    {item.stats.map(stat => (<div className={'row flex-row'} key={stat.name}>
+                    {item.stats?.map(stat => (<div className={'row flex-row'} key={stat.name}>
                         <TippyWrapper content={<div className={'hint-popup'}><p>{stat.description}</p></div> }>
                             <p>{stat.name}</p>
                         </TippyWrapper>

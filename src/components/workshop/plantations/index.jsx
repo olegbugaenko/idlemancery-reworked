@@ -17,7 +17,7 @@ export const PlantationsWrap = ({ children }) => {
     const { isMobile } = useAppContext();
     const [isDetailVisible, setDetailVisible] = useState(!isMobile);
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
 
     const [detailOpened, setDetailOpened] = useState(null);
 
@@ -33,9 +33,15 @@ export const PlantationsWrap = ({ children }) => {
         }
     }, [])
 
-    onMessage('new-unlocks-notifications-plantations', payload => {
-        setNewUnlocks(payload);
-    })
+    useEffect(() => {
+        onMessage('new-unlocks-notifications-plantations', payload => {
+            setNewUnlocks(payload);
+        });
+        
+        return () => {
+            removeMessage('new-unlocks-notifications-plantations');
+        };
+    }, []);
 
     const setItemDetails = (id) => {
         if(!id) {
@@ -69,7 +75,7 @@ export const ItemDetails = ({itemId, category, setItemDetails}) => {
 
     const { isMobile } = useAppContext()
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
 
     const [item, setDetailOpened] = useState(null);
 
@@ -86,9 +92,15 @@ export const ItemDetails = ({itemId, category, setItemDetails}) => {
 
     }, [itemId])
 
-    onMessage('plantation-details', (items) => {
-        setDetailOpened(items);
-    })
+    useEffect(() => {
+        onMessage('plantation-details', (items) => {
+            setDetailOpened(items);
+        });
+        
+        return () => {
+            removeMessage('plantation-details');
+        };
+    }, []);
 
     if(!itemId || !item) return null;
 

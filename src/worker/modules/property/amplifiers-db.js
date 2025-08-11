@@ -1,5 +1,4 @@
 import {gameEffects, gameEntity, gameResources} from "game-framework";
-import {registerAccessory} from "./accessories-db";
 
 const getResourceModifierDataSearchable = (rs) => {
 
@@ -60,7 +59,7 @@ export const registerAmplifiersStage1 = () => {
         get_cost: () => ({
             'inventory_earth': {
                 A: 1.2,
-                B: 100,
+                B: 100/gameEffects.getEffectValue('amplifier_cost_reduction'),
                 type: 1
             }
         }),
@@ -89,7 +88,7 @@ export const registerAmplifiersStage1 = () => {
         get_cost: () => ({
             'inventory_earth': {
                 A: 1.2,
-                B: 100,
+                B: 100/gameEffects.getEffectValue('amplifier_cost_reduction'),
                 type: 1
             }
         }),
@@ -120,7 +119,7 @@ export const registerAmplifiersStage1 = () => {
         get_cost: () => ({
             'inventory_air': {
                 A: 1.2,
-                B: 100,
+                B: 100/gameEffects.getEffectValue('amplifier_cost_reduction'),
                 type: 1
             }
         }),
@@ -150,7 +149,7 @@ export const registerAmplifiersStage1 = () => {
         get_cost: () => ({
             'inventory_air': {
                 A: 1.2,
-                B: 100,
+                B: 100/gameEffects.getEffectValue('amplifier_cost_reduction'),
                 type: 1
             }
         }),
@@ -180,7 +179,7 @@ export const registerAmplifiersStage1 = () => {
         get_cost: () => ({
             'inventory_air': {
                 A: 1.2,
-                B: 100,
+                B: 100/gameEffects.getEffectValue('amplifier_cost_reduction'),
                 type: 1
             }
         }),
@@ -216,7 +215,7 @@ export const registerAmplifiersStage1 = () => {
         get_cost: () => ({
             'inventory_air': {
                 A: 1.2,
-                B: 100,
+                B: 100/gameEffects.getEffectValue('amplifier_cost_reduction'),
                 type: 1
             }
         }),
@@ -262,7 +261,7 @@ export const registerAmplifiersStage1 = () => {
         get_cost: () => ({
             'inventory_spark': {
                 A: 1.2,
-                B: 100,
+                B: 100/gameEffects.getEffectValue('amplifier_cost_reduction'),
                 type: 1
             }
         }),
@@ -297,7 +296,7 @@ export const registerAmplifiersStage1 = () => {
         get_cost: () => ({
             'inventory_spark': {
                 A: 1.2,
-                B: 100,
+                B: 100/gameEffects.getEffectValue('amplifier_cost_reduction'),
                 type: 1
             }
         }),
@@ -327,7 +326,7 @@ export const registerAmplifiersStage1 = () => {
         get_cost: () => ({
             'inventory_light': {
                 A: 1.2,
-                B: 100,
+                B: 100/gameEffects.getEffectValue('amplifier_cost_reduction'),
                 type: 1
             }
         }),
@@ -356,7 +355,7 @@ export const registerAmplifiersStage1 = () => {
         get_cost: () => ({
             'inventory_light': {
                 A: 1.2,
-                B: 100,
+                B: 100/gameEffects.getEffectValue('amplifier_cost_reduction'),
                 type: 1
             }
         }),
@@ -386,7 +385,7 @@ export const registerAmplifiersStage1 = () => {
         get_cost: () => ({
             'inventory_fire': {
                 A: 1.2,
-                B: 100,
+                B: 100/gameEffects.getEffectValue('amplifier_cost_reduction'),
                 type: 1
             }
         }),
@@ -416,7 +415,7 @@ export const registerAmplifiersStage1 = () => {
         get_cost: () => ({
             'inventory_fire': {
                 A: 1.2,
-                B: 100,
+                B: 100/gameEffects.getEffectValue('amplifier_cost_reduction'),
                 type: 1
             }
         }),
@@ -446,7 +445,7 @@ export const registerAmplifiersStage1 = () => {
         get_cost: () => ({
             'inventory_fire': {
                 A: 1.2,
-                B: 100,
+                B: 100/gameEffects.getEffectValue('amplifier_cost_reduction'),
                 type: 1
             }
         }),
@@ -476,7 +475,7 @@ export const registerAmplifiersStage1 = () => {
         get_cost: () => ({
             'inventory_fire': {
                 A: 1.2,
-                B: 100,
+                B: 100/gameEffects.getEffectValue('amplifier_cost_reduction'),
                 type: 1
             }
         }),

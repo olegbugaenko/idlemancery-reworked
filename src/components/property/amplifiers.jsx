@@ -36,7 +36,7 @@ export const AmplifiersUpgrades = ({ setItemDetails, purchaseItem, newUnlocks, i
 
     const worker = useContext(WorkerContext);
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const [furnituresData, setItemsData] = useState({
         available: [],
         space: {
@@ -67,9 +67,15 @@ export const AmplifiersUpgrades = ({ setItemDetails, purchaseItem, newUnlocks, i
         }
     }, [])
 
-    onMessage('furnitures-data', (furnitures) => {
-        setItemsData(furnitures);
-    })
+    useEffect(() => {
+        onMessage('furnitures-data', (furnitures) => {
+            setItemsData(furnitures);
+        });
+        
+        return () => {
+            removeMessage('furnitures-data');
+        };
+    }, []);
 
     const [overlayPositions, setOverlayPositions] = useState([]);
 

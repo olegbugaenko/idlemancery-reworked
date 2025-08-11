@@ -5,7 +5,7 @@ import {useWorkerClient} from "../../general/client";
 export const ActiveActions = () => {
     const worker = useContext(WorkerContext);
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const [actionsData, setActionsData] = useState({ title: 'Nothing' });
 
     useEffect(() => {
@@ -16,9 +16,15 @@ export const ActiveActions = () => {
         return () => {
             clearInterval(interval);
         }
-    }, [])
+    }, [sendData])
 
-    onMessage('actions-running', setActionsData);
+    useEffect(() => {
+        onMessage('actions-running', setActionsData);
+
+        return () => {
+            removeMessage('actions-running');
+        };
+    }, [onMessage, removeMessage]);
 
     return (<div className={'active-actions-wrap'}>
         <p>Running Actions: {actionsData.title}</p>

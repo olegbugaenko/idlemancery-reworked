@@ -1923,12 +1923,12 @@ export const registerActionsStage1 = () => {
                 resources: {
                     'energy': {
                         A: 0,
-                        B: 4000,
+                        B: 8000,
                         type: 0
                     },
                     'health': {
                         A: 0,
-                        B: 2000,
+                        B: 4000,
                         type: 0
                     }
                 }
@@ -1950,7 +1950,7 @@ export const registerActionsStage1 = () => {
             return gameEntity.getLevel('action_walk') > 19
         },
         attributes: {
-            baseXPCost: 250000,
+            baseXPCost: 5250000,
             isTraining: true,
             isRankAvailable: true,
         }
@@ -2808,7 +2808,7 @@ export const registerActionsStage1 = () => {
             return gameEntity.getLevel('shop_item_botany_book') > 0
         },
         attributes: {
-            baseXPCost: 2500000,
+            baseXPCost: 25000000,
             displayPerLevel: 1,
             isTraining: true,
             isRankAvailable: true,
@@ -4555,6 +4555,59 @@ export const registerActionsStage1 = () => {
                 }
             }),
         },
+    })
+
+    registerGameAction('action_expedition', {
+        tags: ["action", "activity", "routine", "expedition"],
+        category: ACTION_CATS.ROUTINE,
+        name: 'Expedition',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Embark on expeditions to discover ancient artifacts, mystical scrolls, and hidden treasures. This action generates expedition effort needed for launching expeditions.',
+        level: 1,
+        discountEffects: ["routine_actions_discount"],
+        getLearnRate: () => {
+            return 1.
+        },
+        learningEffects: ['routine_learning_speed'],
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'expedition_effort': {
+                        A: 0.0004*gameEffects.getEffectValue('expedition_efficiency'),
+                        B: 0.0036*gameEffects.getEffectValue('expedition_efficiency'),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 200,
+                        type: 0,
+                    },
+                    'health': {
+                        A: 0.0,
+                        B: 100,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['expedition_efficiency']
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_magic_ability',
+            level: 20000
+        }],
+        unlockCondition: () => {
+            return true
+        },
+        attributes: {
+            baseXPCost: 500000000000,
+            primaryAttribute: 'attribute_patience'
+        }
     })
 
     console.log('-RM-=: ', )

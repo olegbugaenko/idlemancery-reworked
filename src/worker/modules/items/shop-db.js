@@ -1,4 +1,4 @@
-import { gameEntity, gameCore, gameEffects } from "game-framework"
+import { gameEntity, gameCore, gameEffects, gameResources } from "game-framework"
 
 export const charismaMod = (attr) => attr > 0 ? 1. / (1. + 0.02*Math.log2(attr*gameEffects.getEffectValue('prices_discount'))) : 1.;
 
@@ -1380,6 +1380,43 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+    gameEntity.registerGameEntity('shop_item_magical_compass', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Magical Compass',
+        description: 'A mystical compass that resonates with anomalies and relics, increasing the amount of resources found during expeditions by 25%.',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.isEntityUnlocked('action_expedition')
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'expedition_resource_amount': {
+                        A: 0.25,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2.0,
+                B: 100000000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'mana': {
+                A: 1.0,
+                B: 100000,
+                type: 0
+            }
+        }),
+    })
+
     gameEntity.registerGameEntity('shop_item_knife', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Knife',
@@ -1845,6 +1882,37 @@ export const registerShopItemsStage1 = () => {
             'coins': {
                 A: 2.25,
                 B: 3000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_pottery_secrets_handbook', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Pottery Secrets Handbook',
+        description: 'Learn the ancient art of pottery making. Unlocks the ability to craft pots and build pottery cellars.',
+        level: 0,
+        maxLevel: 1,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 10000,
+        }],
+        unlockCondition: () => {
+            return gameEffects.getEffectValue('attribute_strength') >= 10000
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2.0,
+                B: 30000000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'knowledge': {
+                A: 1.5,
+                B: 300000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 1
             }
         }),
@@ -2541,7 +2609,7 @@ export const registerShopItemsStage1 = () => {
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_patience',
-            level: 10000
+            level: 7500
         }],
         unlockCondition: () => {
             return true
@@ -2552,7 +2620,7 @@ export const registerShopItemsStage1 = () => {
         get_cost: () => ({
             'coins': {
                 A: 2,
-                B: 4.e+10*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 6.e+9*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 0
             }
         })
@@ -3265,6 +3333,127 @@ export const registerShopItemsStage1 = () => {
                 B: 400000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 1
             }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_iron_tools', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Iron Tools',
+        description: 'Secrets of creating compact and reliable metal products. Now Tool Workshop will also increase the efficiency of Master\'s Table furniture.',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_forged_steel')
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            income: {
+                effects: {
+                    'masters_table_workbench_bonus': {
+                        A: 0.2,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1,
+                B: 15000000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_steel_processing_technology', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Steel Processing Technology',
+        description: 'Advanced manual that reveals the secrets of steel processing and industrial techniques. Unlocks metalworking furniture.',
+        level: 0,
+        maxLevel: 1,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 8000
+        }],
+        unlockCondition: () => {
+            return gameEffects.getEffectValue('attribute_strength') >= 8000
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1,
+                B: 25000000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_barter_contracts', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Barter Contracts',
+        description: 'Establish barter contracts that increase the maximum coin capacity of trade warehouses.',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_pottery_secrets_handbook') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            income: {
+                effects: {
+                    'trade_warehouse_coins_cap_bonus': {
+                        A: 0.1,
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2.0,
+                B: 45000000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'knowledge': {
+                A: 1.5,
+                B: 450000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_advanced_engineering', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Advanced Engineering',
+        description: 'Master advanced construction techniques. Unlocks masonry cottage and alchemist laboratory.',
+        level: 0,
+        maxLevel: 1,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 15000,
+        }],
+        unlockCondition: () => {
+            return gameEffects.getEffectValue('attribute_strength') >= 15000
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2.0,
+                B: 50000000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
         }),
     })
 

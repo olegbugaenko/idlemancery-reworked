@@ -11,6 +11,7 @@ import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
 import {HowToSign} from "../shared/how-to-sign.jsx";
 import {ProgressBar} from "../layout/progress-bar.jsx";
 import {CustomButton} from "../shared/buttons/custom-button.jsx";
+import StatRow from "../shared/stat-row.jsx";
 
 export const EventHallWrap = ({ children }) => {
 
@@ -19,7 +20,7 @@ export const EventHallWrap = ({ children }) => {
     const { isMobile } = useAppContext();
     const [isDetailVisible, setDetailVisible] = useState(!isMobile);
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
 
     const [detailOpened, setDetailOpened] = useState(null);
 
@@ -34,9 +35,15 @@ export const EventHallWrap = ({ children }) => {
         }
     }, [])
 
-    onMessage('social-events-data', (data) => {
-        setEvents(data.events || []);
-    })
+    useEffect(() => {
+        onMessage('social-events-data', (data) => {
+            setEvents(data.events || []);
+        });
+        
+        return () => {
+            removeMessage('social-events-data');
+        };
+    }, []);
 
     const setItemDetails = (id) => {
         if(!id) {
@@ -172,7 +179,7 @@ export const GeneralStats = ({ setDetailVisible }) => {
 
     const { isMobile } = useAppContext();
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
 
     const [stats, setStats] = useState([]);
 
@@ -185,29 +192,44 @@ export const GeneralStats = ({ setDetailVisible }) => {
         }
     }, [])
 
-    onMessage('social-events-stats', (data) => {
-        setStats(data.events || []);
-    })
+    useEffect(() => {
+        onMessage('social-events-data-stats', (data) => {
+            setStats(data.events || []);
+        });
+        
+        return () => {
+            removeMessage('social-events-stats');
+        };
+    }, []);
 
     return (
         <PerfectScrollbar>
             <div className={'blade-inner'}>
                 <div className={'block'}>
-                    <h5>Active Events</h5>
+                    <h5>Events</h5>
                     {stats.filter(event => event.isActive).map(event => (
-                        <div key={event.id} className={'active-event-stat'}>
-                            <span>{event.name}</span>
-                            <span>{secondsToString(event.timeRemaining / 1000)} remaining</span>
-                        </div>
+                        <StatRow 
+                            key={event.id} 
+                            isExplicit={true}
+                            stat={{
+                                id: event.id,
+                                name: event.name,
+                                value: secondsToString(event.timeRemaining / 1000),
+                                description: `Time remaining for ${event.name}`
+                            }}
+                        />
                     ))}
                     {stats.filter(event => event.isActive).length === 0 && (
                         <p>No active events</p>
                     )}
-                </div>
-
-                <div className={'block'}>
-                    <h5>Total Events Completed</h5>
-                    <p>{stats.reduce((total, event) => total + event.timesCompleted, 0)}</p>
+                    <StatRow 
+                        stat={{
+                            id: 'total_events_completed',
+                            name: 'Total Events Completed',
+                            value: stats.reduce((total, event) => total + event.timesCompleted, 0),
+                            description: 'Total number of events completed across all event types'
+                        }}
+                    />
                 </div>
 
                 {isMobile ? (<div className={'block buttons flex-container'}>
@@ -222,7 +244,7 @@ export const EventDetails = ({eventId, setItemDetails}) => {
 
     const worker = useContext(WorkerContext);
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
 
     const { isMobile } = useAppContext();
 
@@ -238,9 +260,15 @@ export const EventDetails = ({eventId, setItemDetails}) => {
         }
     }, [eventId])
 
-    onMessage('event-details', (data) => {
-        setEvent(data);
-    })
+    useEffect(() => {
+        onMessage('event-details', (data) => {
+            setEvent(data);
+        });
+        
+        return () => {
+            removeMessage('event-details');
+        };
+    }, []);
 
     if(!eventId || !event) return null;
 

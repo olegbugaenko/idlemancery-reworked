@@ -10,6 +10,7 @@ import {PropertyModule} from "./modules/property/property.module";
 import {SpellModule} from "./modules/magic/spells.module";
 import {CraftingModule} from "./modules/workshop/crafting.module";
 import {PlantationsModule} from "./modules/workshop/plantations.module";
+import {ArtifactsCraftingModule} from "./modules/workshop/artifacts-crafting.module";
 import {UnlockNotificationsModule} from "./shared/modules/unlock-notifications.module";
 import {RandomEventsModule} from "./modules/general/random-events.module";
 import {TemporaryEffectsModule} from "./modules/general/temporary-effects.module";
@@ -22,6 +23,7 @@ import {AchievementsModule} from "./modules/mage/achievements.module";
 import {EventsModule} from "./modules/social/social-events.module";
 import {StatisticsModule} from "./modules/statistics/statistics.module";
 import {FavoritesModule} from "./modules/favorites/favorites.module";
+import {ExpeditionsModule} from "./modules/expeditions/expeditions.module";
 
 
 export class MainModule extends GameModule {
@@ -40,6 +42,7 @@ export class MainModule extends GameModule {
         gameCore.registerModule('magic', SpellModule);
         gameCore.registerModule('crafting', CraftingModule);
         gameCore.registerModule('plantations', PlantationsModule);
+        gameCore.registerModule('artifacts-crafting', ArtifactsCraftingModule);
         gameCore.registerModule('unlock-notifications', UnlockNotificationsModule);
         //gameCore.registerModule('random-events', RandomEventsModule);
         gameCore.registerModule('map', MapModule);
@@ -50,6 +53,7 @@ export class MainModule extends GameModule {
         gameCore.registerModule('events', EventsModule);
         gameCore.registerModule('statistics', StatisticsModule);
         gameCore.registerModule('favorites', FavoritesModule);
+        gameCore.registerModule('expeditions', ExpeditionsModule);
 
 
         this.eventHandler.registerHandler('initialize-game', (data) => {
@@ -96,6 +100,7 @@ export class MainModule extends GameModule {
                 'crafting': gameEntity.getLevel('shop_item_crafting_courses') > 0,
                 'alchemy': gameEntity.getLevel('shop_item_alchemy_courses') > 0,
                 'workshop': gameEntity.getLevel('shop_item_crafting_courses') > 0 || gameEntity.getLevel('shop_item_alchemy_courses') > 0 || gameResources.getResource('plantation_slots').income > 0,
+                'artifacts': gameEntity.getLevel('action_expedition') > 0,
                 'plantation': gameResources.getResource('plantation_slots').income > 0,
                 'guilds': gameEffects.getEffectValue('attribute_charisma') >= 500,
                 'social': gameEntity.getLevel('structure_event_hall') > 0,
@@ -106,6 +111,7 @@ export class MainModule extends GameModule {
                 'amplifiers': gameEffects.getEffectValue('attribute_magic_ability') >= 15000,
                 'events': gameEntity.getLevel('structure_event_hall') > 0,
                 'social-main': gameEntity.getLevel('structure_event_hall') > 0,
+                'expeditions': gameEntity.getLevel('action_expedition') > 0,
             }
             let label = 'unlocks';
             if(payload?.prefix) {

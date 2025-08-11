@@ -1,6 +1,9 @@
 import React, { cloneElement, isValidElement, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
+// Global state to track active popovers
+let activePopovers = new Set();
+
 export const TippyWrapper = ({
                                  content,
                                  children,
@@ -12,6 +15,7 @@ export const TippyWrapper = ({
     const [visible, setVisible] = useState(false);
     const ref = useRef();
     const popoverRef = useRef();
+    const portalContainerRef = useRef();
 
     const placementsPriority = {
         top: ['top', 'bottom'],
@@ -21,9 +25,33 @@ export const TippyWrapper = ({
     };
 
     useEffect(() => {
-        if (visible) onShow();
-        else onHide();
+        if (visible) {
+            activePopovers.add(ref.current);
+            onShow();
+        } else {
+            activePopovers.delete(ref.current);
+            onHide();
+        }
     }, [visible]);
+
+    // Create portal container on mount
+    useEffect(() => {
+        if (!portalContainerRef.current) {
+            portalContainerRef.current = document.createElement('div');
+            portalContainerRef.current.className = 'tippy-portal-container';
+            document.body.appendChild(portalContainerRef.current);
+        }
+
+        // Cleanup on unmount
+        return () => {
+            setVisible(false); // Hide popover before unmounting
+            activePopovers.delete(ref.current);
+            if (portalContainerRef.current && portalContainerRef.current.parentNode) {
+                portalContainerRef.current.parentNode.removeChild(portalContainerRef.current);
+                portalContainerRef.current = null;
+            }
+        };
+    }, []);
 
     const positionPopover = () => {
         if (!popoverRef.current || !ref.current) return;
@@ -105,7 +133,12 @@ export const TippyWrapper = ({
 
     const cloned = cloneElement(children, {
         ref,
-        onMouseEnter: () => setVisible(true),
+        onMouseEnter: () => {
+            // Limit to max 3 active popovers
+            if (activePopovers.size < 3) {
+                setVisible(true);
+            }
+        },
         onMouseLeave: () => setVisible(false),
     });
 
@@ -122,7 +155,7 @@ export const TippyWrapper = ({
     return (
         <>
             {cloned}
-            {createPortal(popoverElement, document.body)}
+            {portalContainerRef.current && createPortal(popoverElement, portalContainerRef.current)}
         </>
     );
 };

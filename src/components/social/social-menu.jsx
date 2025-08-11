@@ -7,7 +7,7 @@ export const SocialMenu = ({ selectedTab, setSelectedTab }) => {
 
     const worker = useContext(WorkerContext);
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
 
     const [newUnlocks, setNewUnlocks] = useState({});
 
@@ -24,13 +24,25 @@ export const SocialMenu = ({ selectedTab, setSelectedTab }) => {
         }
     }, [])
 
-    onMessage('unlocks-social', (unlocks) => {
-        setUnlocksData(unlocks);
-    })
+    useEffect(() => {
+        onMessage('unlocks-social', (unlocks) => {
+            setUnlocksData(unlocks);
+        });
+        
+        return () => {
+            removeMessage('unlocks-social');
+        };
+    }, []);
 
-    onMessage('new-unlocks-notifications-social', payload => {
-        setNewUnlocks(payload);
-    })
+    useEffect(() => {
+        onMessage('new-unlocks-notifications-social', payload => {
+            setNewUnlocks(payload);
+        });
+        
+        return () => {
+            removeMessage('new-unlocks-notifications-social');
+        };
+    }, []);
 
     return (
             <ul className={'menu'}>

@@ -25,7 +25,7 @@ export const AlchemyWrap = ({ children }) => {
 
     const [isDetailVisible, setDetailVisible] = useState(!isMobile);
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
 
     const [detailOpened, setDetailOpened] = useState(null);
 
@@ -43,9 +43,15 @@ export const AlchemyWrap = ({ children }) => {
         }
     }, [])
 
-    onMessage('new-unlocks-notifications-alchemy', payload => {
-        setNewUnlocks(payload);
-    })
+    useEffect(() => {
+        onMessage('new-unlocks-notifications-alchemy', payload => {
+            setNewUnlocks(payload);
+        });
+        
+        return () => {
+            removeMessage('new-unlocks-notifications-alchemy');
+        };
+    }, []);
 
     const setItemDetails = (id) => {
         if(currentTourId === 'alchemy' && [3,9].includes(stepIndex)) {
@@ -65,31 +71,42 @@ export const AlchemyWrap = ({ children }) => {
         sendData('set-crafting-level', { id, effort, filterId: 'alchemy' });
     })
 
-    onMessage('crafting-list-data', (payload) => {
-        if(!listDetails) return;
+    useEffect(() => {
+        onMessage('crafting-list-data', (payload) => {
+            if(!listDetails) return;
 
-        setListDetails({
-            ...listDetails,
-            listData: payload,
-            isEdit: listDetails.isEdit,
-            isLoading: false,
-        })
+            setListDetails({
+                ...listDetails,
+                listData: payload,
+                isEdit: listDetails.isEdit,
+                isLoading: false,
+            })
+        });
+        
+        return () => {
+            removeMessage('crafting-list-data');
+        };
+    }, [listDetails]);
 
-    })
-
-    onMessage('crafting-list-effects', (payload) => {
-        setListDetails({
-            ...listDetails,
-            listData: {
-                ...listDetails.listData,
-                potentialEffects: payload.potentialEffects,
-                resourcesEffects: payload.resourcesEffects,
-                effectEffects: payload.effectEffects,
-                prevEffects: payload.prevEffects,
-                assumedDistribution: payload.assumedDistribution,
-            }
-        })
-    })
+    useEffect(() => {
+        onMessage('crafting-list-effects', (payload) => {
+            setListDetails({
+                ...listDetails,
+                listData: {
+                    ...listDetails.listData,
+                    potentialEffects: payload.potentialEffects,
+                    resourcesEffects: payload.resourcesEffects,
+                    effectEffects: payload.effectEffects,
+                    prevEffects: payload.prevEffects,
+                    assumedDistribution: payload.assumedDistribution,
+                }
+            })
+        });
+        
+        return () => {
+            removeMessage('crafting-list-effects');
+        };
+    }, [listDetails]);
 
     const setAutotriggerPriority = useCallback((priority) => {
         const { listData } = listDetails ?? {};
@@ -279,13 +296,19 @@ export const AlchemyWrap = ({ children }) => {
         sendData('query-running-craft-for-list', { category: 'alchemy' });
     }
 
-    onMessage('running-craft-for-list', recipes => {
-        const { listData } = listDetails ?? {};
-        const newList = listData;
-        listData.recipes = recipes;
-        setListDetails({...listDetails, listData: {...newList}});
-        sendData('query-crafting-list-effects', { listData: newList });
-    })
+    useEffect(() => {
+        onMessage('running-craft-for-list', recipes => {
+            const { listData } = listDetails ?? {};
+            const newList = listData;
+            listData.recipes = recipes;
+            setListDetails({...listDetails, listData: {...newList}});
+            sendData('query-crafting-list-effects', { listData: newList });
+        });
+        
+        return () => {
+            removeMessage('running-craft-for-list');
+        };
+    }, [listDetails]);
 
     const onCloseList = () => {
         setListDetails(null);

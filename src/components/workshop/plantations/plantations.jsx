@@ -18,7 +18,7 @@ export const Plantations = ({ setItemDetails, newUnlocks }) => {
 
     const { isMobile } = useAppContext();
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const [plantationsData, setItemsData] = useState({
         available: [],
         slots: {
@@ -37,9 +37,15 @@ export const Plantations = ({ setItemDetails, newUnlocks }) => {
         }
     }, [])
 
-    onMessage(`plantations-data`, (plantations) => {
-        setItemsData(plantations);
-    })
+    useEffect(() => {
+        onMessage(`plantations-data`, (plantations) => {
+            setItemsData(plantations);
+        });
+        
+        return () => {
+            removeMessage(`plantations-data`);
+        };
+    }, []);
 
     const purchaseItem = useCallback((id) => {
         sendData(`purchase-plantation`, { id })

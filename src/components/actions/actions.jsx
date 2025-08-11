@@ -48,7 +48,7 @@ export const Actions = ({}) => {
     const worker = useContext(WorkerContext);
     const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const { isMobile } = useAppContext();
     const [isDetailVisible, setDetailVisible] = useState(!isMobile);
     const [actionsData, setActionsData] = useState({
@@ -105,49 +105,58 @@ export const Actions = ({}) => {
         }
     }, [editingList, viewingList])
 
-    onMessage('new-unlocks-notifications-actions', payload => {
-        setNewUnlocks(payload);
-    })
+    useEffect(() => {
+        onMessage('new-unlocks-notifications-actions', payload => {
+            setNewUnlocks(payload);
+        });
 
-    onMessage('all-resources', (payload) => {
-        setResources(payload);
-    })
+        onMessage('all-resources', (payload) => {
+            setResources(payload);
+        });
 
-    onMessage('actions-data', (actions) => {
-        setActionsData(actions);
-    })
+        onMessage('actions-data', (actions) => {
+            setActionsData(actions);
+        });
 
-    onMessage('action-list-data', (payload) => {
-        if(viewingList) {
-            setViewedData(payload);
-        } else if(editingList || payload.bForceOpen) {
-            if(payload.bForceOpen && !editingList) {
-                setEditingList(payload.id);
+        onMessage('action-list-data', (payload) => {
+            if(viewingList) {
+                setViewedData(payload);
+            } else if(editingList || payload.bForceOpen) {
+                if(payload.bForceOpen && !editingList) {
+                    setEditingList(payload.id);
+                }
+                setListData(payload);
+                setViewedData(null);
+            } else if(listData?.copyId) {
+                setEditingList(null);
+                setViewingList(null);
+                setListData(payload);
             }
-            setListData(payload);
-            setViewedData(null);
-        } else if(listData?.copyId) {
-            setEditingList(null);
-            setViewingList(null);
-            setListData(payload);
-        }
+        });
 
-    })
+        onMessage('action-list-effects', (payload) => {
+            if(listData) {
+                const actions = payload.newTimes ?? listData.actions;
+                setListData({
+                    ...listData,
+                    potentialEffects: payload.potentialEffects,
+                    resourcesEffects: payload.resourcesEffects,
+                    effectEffects: payload.effectEffects,
+                    prevEffects: payload.prevEffects,
+                    proportionsBar: payload.proportionsBar,
+                    actions,
+                })
+            }
+        });
 
-    onMessage('action-list-effects', (payload) => {
-        if(listData) {
-            const actions = payload.newTimes ?? listData.actions;
-            setListData({
-                ...listData,
-                potentialEffects: payload.potentialEffects,
-                resourcesEffects: payload.resourcesEffects,
-                effectEffects: payload.effectEffects,
-                prevEffects: payload.prevEffects,
-                proportionsBar: payload.proportionsBar,
-                actions,
-            })
-        }
-    })
+        return () => {
+            removeMessage('new-unlocks-notifications-actions');
+            removeMessage('all-resources');
+            removeMessage('actions-data');
+            removeMessage('action-list-data');
+            removeMessage('action-list-effects');
+        };
+    }, []);
 
     useEffect(() => {
         if(listData?.copyId) {

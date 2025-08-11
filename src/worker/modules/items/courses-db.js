@@ -501,7 +501,7 @@ export const registerCourseItemsStage1 = () => {
         },{
             type: 'effect',
             id: 'attribute_patience',
-            level: 20000
+            level: 10000
         }],
         unlockCondition: () => gameEntity.getLevel('shop_item_training_room') > 0,
         resourceModifier: {

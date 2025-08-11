@@ -15,6 +15,11 @@ export function useWorkerClient(worker) {
         globalEventHandlers[event] = callback;
     }, []);
 
+    // Function to remove event handlers
+    const removeMessage = useCallback((event) => {
+        delete globalEventHandlers[event];
+    }, []);
+
     // Function to send data to the worker
     const sendData = useCallback((event, payload) => {
         if (worker) {
@@ -62,5 +67,5 @@ export function useWorkerClient(worker) {
         }
     }, [worker, handleMessage]);
 
-    return { onMessage, sendData };
+    return { onMessage, sendData, removeMessage };
 }

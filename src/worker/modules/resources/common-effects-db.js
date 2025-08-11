@@ -26,6 +26,26 @@ export const registerCommomEffects = () => {
         minValue: 1,
     })
 
+    gameEffects.registerEffect('expedition_efficiency', {
+        name: 'Expedition Efficiency',
+        defaultValue: 1.,
+        minValue: 1,
+    })
+
+    gameEffects.registerEffect('expedition_xp_rate', {
+        name: 'Expedition XP Rate',
+        defaultValue: 1.,
+        minValue: 1,
+        description: 'Multiplier to XP gained from expeditions'
+    })
+
+    gameEffects.registerEffect('expedition_resource_amount', {
+        name: 'Expedition Resource Amount',
+        defaultValue: 1.,
+        minValue: 1,
+        description: 'Multiplier to amount of resources found during expeditions'
+    })
+
     gameEffects.registerEffect('gathering_perception', {
         name: 'Gathering Perception',
         defaultValue: 1.,
@@ -148,7 +168,7 @@ export const registerCommomEffects = () => {
     gameEffects.registerEffect('manual_labor_efficiency', {
         name: 'Manual Labor Efficiency',
         defaultValue: 1.,
-        minValue: 1.,
+        minValue: 1,
         description: 'Increase productivity of all actions with tag "manual-labour"'
     })
 
@@ -163,7 +183,7 @@ export const registerCommomEffects = () => {
     gameEffects.registerEffect('mental_activities_learn_rate', {
         name: 'Mental Activities Learning Rate',
         defaultValue: 1.,
-        minValue: 1.,
+        minValue: 1,
         description: 'Increase amount of XP per second obtained by all mental activities actions',
         saveBalanceTree: true,
     })
@@ -171,14 +191,14 @@ export const registerCommomEffects = () => {
     gameEffects.registerEffect('crafting_efficiency', {
         name: 'Crafting Efficiency',
         defaultValue: 1.,
-        minValue: 1.,
+        minValue: 1,
         saveBalanceTree: true,
     })
 
     gameEffects.registerEffect('alchemy_efficiency', {
         name: 'Alchemy Efficiency',
         defaultValue: 1.,
-        minValue: 1.,
+        minValue: 1,
         saveBalanceTree: true,
     })
 
@@ -395,6 +415,13 @@ export const registerCommomEffects = () => {
         minValue: 1,
     })
 
+    gameEffects.registerEffect('nature_spells_efficiency', {
+        name: 'Nature Magic Efficiency',
+        description: 'Increase output of spells with tag "nature"',
+        defaultValue: 1,
+        minValue: 1,
+    })
+
     gameEffects.registerEffect('plantations_efficiency', {
         name: 'Plantations Efficiency',
         description: 'Increase plantations yield',
@@ -444,6 +471,22 @@ export const registerCommomEffects = () => {
         minValue: 1.,
         hasCap: false,
         saveBalanceTree: true,
+    })
+
+    gameEffects.registerEffect('amplifier_cost_reduction', {
+        name: 'Amplifier Cost Reduction',
+        defaultValue: 1.,
+        minValue: 1.,
+        hasCap: false,
+        saveBalanceTree: true,
+    })
+
+    gameEffects.registerEffect('trade_warehouse_coins_cap_bonus', {
+        name: 'Trade Warehouse Coins Cap Bonus',
+        defaultValue: 0.,
+        minValue: 0.,
+        hasCap: false,
+        saveBalanceTree: false,
     })
 
     gameEffects.registerEffect('map_generation_discount', {
@@ -552,6 +595,30 @@ export const registerCommomEffects = () => {
         description: 'Increases the maximum level of Stone Hut',
         defaultValue: 0,
         minValue: 0,
+        hasCap: false,
+    })
+
+    gameEffects.registerEffect('masters_table_efficiency', {
+        name: 'Master\'s Table Efficiency',
+        description: 'Increases the efficiency of Master\'s Table furniture',
+        defaultValue: 1.,
+        minValue: 1,
+        hasCap: false,
+    })
+
+    gameEffects.registerEffect('masters_table_workbench_bonus', {
+        name: 'Master\'s Table Workbench Bonus',
+        description: 'Provides additional bonus to Master\'s Table efficiency from Tool Workshop',
+        defaultValue: 0.,
+        minValue: 0,
+        hasCap: false,
+    })
+
+    gameEffects.registerEffect('training_social_effects_efficiency', {
+        name: 'Training Social Effects Efficiency',
+        description: 'Increases the efficiency of social events with training tag',
+        defaultValue: 1.,
+        minValue: 1,
         hasCap: false,
     })
 

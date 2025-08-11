@@ -495,7 +495,7 @@ export const registerCraftingRecipes = () => {
                 resources: {
                     'inventory_red_ink': {
                         A: 1.3,
-                        B: 0.02*gameEffects.getEffectValue('crafting_effort')*gameEffects.getEffectValue('crafting_efficiency'),
+                        B: 0.01*gameEffects.getEffectValue('crafting_effort')*gameEffects.getEffectValue('crafting_efficiency'),
                         type: 1,
                     }
                 }
@@ -1144,6 +1144,48 @@ export const registerCraftingRecipes = () => {
         },
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameResources.isResourceUnlocked('inventory_stone_brick')
+        },
+        attributes: {
+            baseXPCost: 10,
+        },
+    })
+
+    registerCraftingRecipe('craft_pot', {
+        tags: ["recipe", "crafting", "material", "physical"],
+        name: 'Craft Pot',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Create a pot from clay for storing potions and ingredients',
+        level: 1,
+        resourceId: 'inventory_pot',
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'inventory_pot': {
+                        A: 1.3,
+                        B: 0.01*gameEffects.getEffectValue('crafting_efficiency')*gameEffects.getEffectValue('crafting_effort'),
+                        type: 1,
+                    }
+                }
+            }),
+            get_consumption: ()=>({
+                resources: {
+                    'inventory_clay': {
+                        A: 1.5,
+                        B: 20*gameEffects.getEffectValue('crafting_effort')/gameEffects.getEffectValue('crafting_materials_discount'),
+                        type: 1
+                    },
+                    'energy': {
+                        A: 0,
+                        B: 100*gameEffects.getEffectValue('crafting_effort'),
+                        type: 0
+                    }
+                }
+            }),
+            effectDeps: ['crafting_efficiency', 'crafting_materials_discount', 'crafting_effort']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_pottery_secrets_handbook') > 0
         },
         attributes: {
             baseXPCost: 10,

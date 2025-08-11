@@ -8,7 +8,7 @@ export const ActionXPBreakdown = ({ id }) => {
 
     const worker = useContext(WorkerContext);
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const [breakdowns, setBreakdowns] = useState({
         breakDowns: {},
         total: 0,
@@ -26,12 +26,17 @@ export const ActionXPBreakdown = ({ id }) => {
         return () => {
             clearInterval(interval);
         }
-    }, [])
+    }, [id])
 
-    onMessage(`action-xp-breakdown-${id}`, breakdowns => {
-        setBreakdowns(breakdowns);
-    })
-
+    useEffect(() => {
+        onMessage(`action-xp-breakdown-${id}`, breakdowns => {
+            setBreakdowns(breakdowns);
+        });
+        
+        return () => {
+            removeMessage(`action-xp-breakdown-${id}`);
+        };
+    }, [id]);
 
     return (<div className={'hint-popup breakdowns'}>
         {breakdowns.breakDowns && Object.values(breakdowns.breakDowns).length ? (

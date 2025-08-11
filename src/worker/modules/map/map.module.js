@@ -222,6 +222,7 @@ export class MapModule extends GameModule {
             high: potentialHuntables.filter(r => r.rarity >= 11 && r.rarity <= 15) // rarity 4-5
         };
 
+        console.log('rarityBuckets', rarityBuckets);
         // Ensure we have at least 1 resource with rarity 0-1
         const drops = [];
         if (rarityBuckets.low.length > 0) {
@@ -296,7 +297,6 @@ export class MapModule extends GameModule {
 
         // Ensure unique drops (remove duplicates by ID)
         const uniqueDrops = Array.from(new Map(drops.map(r => [r.id, r])).values());
-
         // Trim to exactly 3 drops
         return uniqueDrops.slice(0, 15);
     }

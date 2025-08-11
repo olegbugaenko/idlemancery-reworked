@@ -7,6 +7,7 @@ import {cloneDeep} from "lodash";
 import {registerAmplifiersStage1} from "./amplifiers-db";
 import {charismaMod} from "../items/shop-db";
 import {registerStructuresStage1} from "./structures-db";
+import {registerArtifactsStage1} from "./artifacts-db";
 
 const DEFAULT_PROPERTY_FILTERS = {
     'all': {
@@ -121,6 +122,42 @@ const DEFAULT_STRUCTURES_FILTERS = {
     }
 }
 
+const DEFAULT_ARTIFACTS_FILTERS = {
+    'all': {
+        id: 'all',
+        condition: '',
+        rules: [],
+        name: 'All',
+        isRequired: true,
+        isPinned: true,
+        sortIndex: 0,
+    },
+    'mana': {
+        id: 'mana',
+        condition: '',
+        rules: [{ type: 'tag', object: 'mana'}],
+        name: 'Mana',
+        isPinned: true,
+        sortIndex: 1,
+    },
+    'wealth': {
+        id: 'wealth',
+        condition: '',
+        rules: [{ type: 'tag', object: 'wealth'}],
+        name: 'Wealth',
+        isPinned: true,
+        sortIndex: 2,
+    },
+    'crafting': {
+        id: 'crafting',
+        condition: '',
+        rules: [{ type: 'tag', object: 'crafting'}],
+        name: 'Crafting',
+        isPinned: true,
+        sortIndex: 3,
+    }
+}
+
 
 export class PropertyModule extends GameModule {
 
@@ -147,6 +184,10 @@ export class PropertyModule extends GameModule {
             amplifier: {
                 search: '',
                 selectedScopes: ['name']
+            },
+            artifact: {
+                search: '',
+                selectedScopes: ['name']
             }
         };
         this.hiddenItems = {
@@ -158,6 +199,8 @@ export class PropertyModule extends GameModule {
 
             },
             amplifier: {
+            },
+            artifact: {
             }
         };
         this.autoPurchase = {};
@@ -166,13 +209,15 @@ export class PropertyModule extends GameModule {
             furniture: cloneDeep(DEFAULT_PROPERTY_FILTERS),
             accessory: cloneDeep(DEFAULT_ACCESSORY_FILTERS),
             structure: cloneDeep(DEFAULT_STRUCTURES_FILTERS),
-            amplifier: cloneDeep(DEFAULT_AMPLIFIERS_FILTERS)
+            amplifier: cloneDeep(DEFAULT_AMPLIFIERS_FILTERS),
+            artifact: cloneDeep(DEFAULT_ARTIFACTS_FILTERS)
         };
         this.customFiltersOrder = {
             furniture: Object.keys(this.customFilters.furniture),
             accessory: Object.keys(this.customFilters.accessory),
             structure: Object.keys(this.customFilters.structure),
-            amplifier: Object.keys(this.customFilters.amplifier)
+            amplifier: Object.keys(this.customFilters.amplifier),
+            artifact: Object.keys(this.customFilters.artifact)
         };
 
         this.eventHandler.registerHandler('actions-change-custom-filters-order', payload => {
@@ -367,6 +412,7 @@ export class PropertyModule extends GameModule {
             accessory: {},
             structure: {},
             amplifier: {},
+            artifact: {}
         };
     }
 
@@ -383,6 +429,7 @@ export class PropertyModule extends GameModule {
         registerAccessoriesStage1();
         registerStructuresStage1();
         registerAmplifiersStage1();
+        registerArtifactsStage1();
 
     }
 
@@ -592,6 +639,8 @@ export class PropertyModule extends GameModule {
             structure: {
             },
             amplifier: {
+            },
+            artifact: {
             }
         };
         this.searchData = saveObject?.searchData || {
@@ -611,6 +660,10 @@ export class PropertyModule extends GameModule {
                 search: '',
                 selectedScopes: ['name']
             },
+            artifact: {
+                search: '',
+                selectedScopes: ['name']
+            },
         };
         this.autoPurchase = {};
         if(saveObject?.autoPurchase) {
@@ -621,23 +674,25 @@ export class PropertyModule extends GameModule {
             furniture: cloneDeep(DEFAULT_PROPERTY_FILTERS),
             accessory: cloneDeep(DEFAULT_ACCESSORY_FILTERS),
             structure: cloneDeep(DEFAULT_STRUCTURES_FILTERS),
-            amplifier: cloneDeep(DEFAULT_AMPLIFIERS_FILTERS)
+            amplifier: cloneDeep(DEFAULT_AMPLIFIERS_FILTERS),
+            artifact: cloneDeep(DEFAULT_ARTIFACTS_FILTERS)
         };
         this.customFiltersOrder = {
             furniture: Object.keys(this.customFilters.furniture),
             accessory: Object.keys(this.customFilters.accessory),
             structure: Object.keys(this.customFilters.structure),
-            amplifier: Object.keys(this.customFilters.amplifier)
+            amplifier: Object.keys(this.customFilters.amplifier),
+            artifact: Object.keys(this.customFilters.artifact)
         };
         this.selectedFilterId = {};
         if(saveObject?.customFilters) {
             for(const key in saveObject.customFilters) {
-                if(!['furniture', 'accessory', 'structure', 'amplifier'].includes(key)) {
+                if(!['furniture', 'accessory', 'structure', 'amplifier', 'artifact'].includes(key)) {
                     delete saveObject.customFilters[key];
                 }
             }
             for(const key in saveObject.customFiltersOrder) {
-                if(!['furniture', 'accessory', 'structure', 'amplifier'].includes(key)) {
+                if(!['furniture', 'accessory', 'structure', 'amplifier', 'artifact'].includes(key)) {
                     delete saveObject.customFiltersOrder[key];
                 }
             }
@@ -653,6 +708,7 @@ export class PropertyModule extends GameModule {
                     'accessory': DEFAULT_ACCESSORY_FILTERS,
                     'structure': DEFAULT_STRUCTURES_FILTERS,
                     'amplifier': DEFAULT_AMPLIFIERS_FILTERS,
+                    'artifact': DEFAULT_ARTIFACTS_FILTERS,
                 }
                 const defFlt = keyMap[key];
                 for(const fltId in defFlt) {
@@ -680,14 +736,16 @@ export class PropertyModule extends GameModule {
                 accessory: Object.keys(this.customFilters.accessory),
                 structure: Object.keys(this.customFilters.structure),
                 amplifier: Object.keys(this.customFilters.amplifier),
+                artifact: Object.keys(this.customFilters.artifact),
                 ...saveObject.customFiltersOrder
             };
-        } else {
+                } else {
             this.customFiltersOrder = {
                 furniture: Object.keys(this.customFilters.furniture),
                 accessory: Object.keys(this.customFilters.accessory),
                 structure: Object.keys(this.customFilters.structure),
-                amplifier: Object.keys(this.customFilters.amplifier)
+                amplifier: Object.keys(this.customFilters.amplifier),
+                artifact: Object.keys(this.customFilters.artifact)
             };
         }
 
@@ -731,7 +789,7 @@ export class PropertyModule extends GameModule {
 
     regenerateNotifications() {
 
-        ['furniture', 'accessory', 'structure', 'amplifier'].forEach(filter => {
+        ['furniture', 'accessory', 'structure', 'amplifier', 'artifact'].forEach(filter => {
             // const items = gameEntity.listEntitiesByTags([filter]);
             Object.values(this.customFilters[filter]).forEach(filterData => {
                 const items = gameEntity.listEntitiesByTags([filter]).filter(one => this.filtersCache[filter][filterData.id][one.id]);
@@ -789,6 +847,7 @@ export class PropertyModule extends GameModule {
                         && (options?.showHidden || !this.hiddenItems[payload.filterId]?.[one.id])
                         && !one.isUnpurchaseable
                         && this.matchSearch(one, options.searchData)
+                        && (payload.filterId !== 'artifact' || gameCore.getModule('artifacts-crafting').isRecipeUnlocked(one.id))
                     ),
                 isSelected: this.selectedFilterId[payload.filterId] === filter.id
             }

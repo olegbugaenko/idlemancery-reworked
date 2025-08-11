@@ -41,7 +41,7 @@ export const registerStructuresStage1 = () => {
     const charismaMod = (attr) => attr > 0 ? 1. / (1. + 0.02*Math.log2(attr*gameEffects.getEffectValue('prices_discount'))) : 1.;
 
     registerStructure('structure_hut', {
-        tags: ["structure", "upgrade", "purchaseable", "actions"],
+        tags: ["structure", "upgrade", "purchaseable", "living"],
         name: 'Hut',
         description: 'Build a hut on your land to get better place to live and store your goods',
         level: 0,
@@ -75,7 +75,7 @@ export const registerStructuresStage1 = () => {
     })
 
     registerStructure('structure_tinkers_shed', {
-        tags: ["structure", "upgrade", "purchaseable", "actions"],
+        tags: ["structure", "upgrade", "purchaseable", "crafting"],
         name: 'Tinkers Shed',
         description: 'A crooked, smoky shack cobbled together from planks and determination. Half workshop, half alchemical corner — cramped, but surprisingly efficient.',
         level: 0,
@@ -330,7 +330,7 @@ export const registerStructuresStage1 = () => {
     })
 
     registerStructure('structure_lumber_mill', {
-        tags: ["structure", "upgrade", "purchaseable", "resource", "crafting"],
+        tags: ["structure", "upgrade", "purchaseable", "resource", "crafting", "industrial"],
         name: 'Lumber Mill',
         description: 'A large industrial facility for processing wood into refined materials. Requires advanced machinery to operate.',
         level: 0,
@@ -384,7 +384,7 @@ export const registerStructuresStage1 = () => {
     })
 
     registerStructure('structure_stone_hut', {
-        tags: ["structure", "upgrade", "purchaseable", "housing"],
+        tags: ["structure", "upgrade", "purchaseable", "living"],
         name: 'Stone Hut',
         description: 'A sturdy stone hut providing more living space than a wooden one',
         level: 0,
@@ -437,6 +437,11 @@ export const registerStructuresStage1 = () => {
                         A: 0.2,
                         B: 1,
                         type: 0,
+                    },
+                    'masters_table_efficiency': {
+                        A: gameEffects.getEffectValue('masters_table_workbench_bonus'),
+                        B: 1,
+                        type: 0,
                     }
                 }
             }),
@@ -449,6 +454,7 @@ export const registerStructuresStage1 = () => {
                     }
                 }
             },
+            effectDeps: ['masters_table_workbench_bonus'],
         },
         get_cost: () => ({
             'inventory_stone_brick': {
@@ -547,6 +553,15 @@ export const registerStructuresStage1 = () => {
                     }
                 }
             },
+            get_capMult: () => ({
+                resources: {
+                    'coins': {
+                        A: gameEffects.getEffectValue('trade_warehouse_coins_cap_bonus'),
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }),
             consumption: {
                 resources: {
                     'living_space': {
@@ -556,17 +571,17 @@ export const registerStructuresStage1 = () => {
                     }
                 }
             },
-            effectDeps: ['shop_max_stock']
+            effectDeps: ['shop_max_stock', 'trade_warehouse_coins_cap_bonus']
         },
         get_cost: () => ({
             'inventory_stone_brick': {
                 A: 1.5,
-                B: 150,
+                B: 450,
                 type: 1
             },
             'inventory_iron_plate': {
                 A: 1.5,
-                B: 25,
+                B: 75,
                 type: 1
             },
             'living_space': {
@@ -636,7 +651,7 @@ export const registerStructuresStage1 = () => {
     })
 
     registerStructure('structure_smelter', {
-        tags: ["structure", "upgrade", "purchaseable", "resource", "crafting"],
+        tags: ["structure", "upgrade", "purchaseable", "resource", "crafting", "industrial"],
         name: 'Smelter',
         description: 'A large industrial smelter for processing iron ore into iron plates. Significantly boosts iron plate production.',
         level: 0,
@@ -653,7 +668,7 @@ export const registerStructuresStage1 = () => {
             get_multiplier: () => ({
                 resources: {
                     'inventory_iron_plate': {
-                        A: 0.25,
+                        A: 0.2 * gameEffects.getEffectValue('industrial_efficiency'),
                         B: 1,
                         type: 0,
                     }
@@ -667,7 +682,8 @@ export const registerStructuresStage1 = () => {
                         type: 0
                     }
                 }
-            }
+            },
+            effectDeps: ['industrial_efficiency']
         },
         get_cost: () => ({
             'coins': {
@@ -711,9 +727,154 @@ export const registerStructuresStage1 = () => {
         },
         get_cost: () => ({
             'coins': { A: 1.5, B: 1000000000, type: 1 },
-            'inventory_stone_brick': { A: 1.5, B: 500, type: 1 },
+            'inventory_stone_brick': { A: 1.5, B: 7500, type: 1 },
             'inventory_iron_plate': { A: 1.5, B: 100, type: 1 },
             'living_space': { A: 0, B: 5, type: 0 }
+        }),
+    })
+
+    registerStructure('structure_pottery_cellar', {
+        tags: ["structure", "upgrade", "purchaseable", "alchemy"],
+        name: 'Pottery Cellar',
+        description: 'A specialized storage facility using ceramic pots to preserve potions and ingredients more effectively.',
+        level: 0,
+        maxLevel: 5,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_pottery_secrets_handbook') > 0;
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'alchemy_materials_discount': {
+                        A: 0.2,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 2,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            },
+            effectDeps: ['alchemy_materials_discount']
+        },
+        get_cost: () => ({
+            'inventory_stone_brick': {
+                A: 1.5,
+                B: 50,
+                type: 1
+            },
+            'inventory_pot': {
+                A: 1.5,
+                B: 10,
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 2,
+                type: 0
+            }
+        }),
+    })
+
+    registerStructure('structure_masonry_cottage', {
+        tags: ["structure", "upgrade", "purchaseable", "living"],
+        name: 'Masonry Cottage',
+        description: 'A sturdy stone cottage with ceramic elements. Provides significant living space.',
+        level: 0,
+        maxLevel: 10,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_advanced_engineering') > 0;
+        },
+        resourceModifier: {
+            income: {
+                resources: {
+                    'living_space': {
+                        A: 5,
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 0,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'inventory_stone_brick': {
+                A: 1.5,
+                B: 2000,
+                type: 1
+            },
+            'inventory_wooden_beam': {
+                A: 1.5,
+                B: 5000,
+                type: 1
+            },
+            'inventory_pot': {
+                A: 1.5,
+                B: 125,
+                type: 1
+            }
+        }),
+    })
+
+    registerStructure('structure_alchemist_laboratory', {
+        tags: ["structure", "upgrade", "purchaseable", "alchemy"],
+        name: 'Alchemist Laboratory',
+        description: 'A specialized laboratory for advanced alchemical research. Significantly boosts alchemy effort.',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_advanced_engineering') > 0;
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'alchemy_effort': {
+                        A: 0.2,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 3,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            },
+            effectDeps: ['alchemy_effort']
+        },
+        get_cost: () => ({
+            'inventory_stone_brick': {
+                A: 1.5,
+                B: 1000,
+                type: 1
+            },
+            'inventory_pot': {
+                A: 1.5,
+                B: 120,
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 3,
+                type: 0
+            }
         }),
     })
 }

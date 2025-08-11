@@ -1211,6 +1211,55 @@ export const registerFurnitureStage1 = () => {
     })
 
 
+    registerFurniture('furniture_nature_magic_circle', {
+        tags: ["furniture", "upgrade", "purchaseable", "magic"],
+        name: 'Nature Magic Circle',
+        description: 'Improves your nature magic efficiency',
+        level: 0,
+        maxLevel: 4,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_magic_ability',
+            level: 3000
+        }],
+        unlockCondition: () => {
+            return gameEffects.getEffectValue('attribute_magic_ability') >= 3000;
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'nature_spells_efficiency': {
+                        A: 0.25,
+                        B: 1,
+                        type: 0,
+                    }
+                },
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 3,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1.5,
+                B: 100000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 3,
+                type: 0
+            }
+        }),
+    })
+
+
     registerFurniture('furniture_spirit_crystal', {
         tags: ["furniture", "upgrade", "purchaseable", "magic", "resource", "storage"],
         name: 'Spirit Crystal',
@@ -1307,49 +1356,6 @@ export const registerFurnitureStage1 = () => {
         }),
     })
 
-
-    registerFurniture('furniture_crafting_table', {
-        tags: ["furniture", "upgrade", "purchaseable", "crafting"],
-        name: 'Crafting Table',
-        description: 'Provides additional space for crafting, revealing new crafting slot',
-        level: 0,
-        unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && false;
-        },
-        resourceModifier: {
-            income: {
-                resources: {
-                    'crafting_slots': {
-                        A: 1,
-                        B: 0,
-                        type: 0,
-                    }
-                },
-            },
-            consumption: {
-                resources: {
-                    'living_space': {
-                        A: 2,
-                        B: 0,
-                        type: 0
-                    }
-                }
-            }
-        },
-        get_cost: () => ({
-            'coins': {
-                A: 1.5,
-                B: 80000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
-                type: 1
-            },
-            'living_space': {
-                A: 0,
-                B: 2,
-                type: 0
-            }
-        }),
-    })
-
     registerFurniture('furniture_masterwork_bench', {
         tags: ["furniture", "upgrade", "purchaseable", "crafting"],
         name: 'Masterwork Bench',
@@ -1417,15 +1423,15 @@ export const registerFurnitureStage1 = () => {
             return gameEntity.getLevel('shop_item_crafting_courses') > 0;
         },
         resourceModifier: {
-            income: {
+            get_income: () => ({
                 effects: {
                     'crafting_effort': {
-                        A: 0.02,
+                        A: 0.02 * gameEffects.getEffectValue('masters_table_efficiency'),
                         B: 0,
                         type: 0,
                     }
                 },
-            },
+            }),
             consumption: {
                 resources: {
                     'living_space': {
@@ -1434,7 +1440,8 @@ export const registerFurnitureStage1 = () => {
                         type: 0
                     }
                 }
-            }
+            },
+            effectDeps: ['masters_table_efficiency']
         },
         get_cost: () => ({
             'coins': {
@@ -1606,6 +1613,11 @@ export const registerFurnitureStage1 = () => {
                         A: 0.25,
                         B: 1,
                         type: 0,
+                    },
+                    'masters_table_efficiency': {
+                        A: 0.25 * gameEffects.getEffectValue('masters_table_workbench_bonus'),
+                        B: 1,
+                        type: 0,
                     }
                 },
             },
@@ -1765,7 +1777,7 @@ export const registerFurnitureStage1 = () => {
         get_cost: () => ({
             'coins': {
                 A: 1.5,
-                B: 5.e+9*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 2.e+9*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 1
             },
             'living_space': {
@@ -1872,6 +1884,102 @@ export const registerFurnitureStage1 = () => {
             'living_space': {
                 A: 0,
                 B: 2,
+                type: 0
+            }
+        }),
+    })
+
+    registerFurniture('furniture_metal_vise', {
+        tags: ["furniture", "upgrade", "purchaseable", "crafting"],
+        name: 'Metal Vise',
+        description: 'Heavy-duty metalworking vise for precise crafting work. Increases crafting efficiency.',
+        level: 0,
+        maxLevel: 5,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_steel_processing_technology') > 0;
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'crafting_effort': {
+                        A: 0.1,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 1,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1.5,
+                B: 5000000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'inventory_forged_steel': {
+                A: 0,
+                B: 100,
+                type: 0
+            },
+            'living_space': {
+                A: 0,
+                B: 1,
+                type: 0
+            }
+        }),
+    })
+
+    registerFurniture('furniture_metal_grinder', {
+        tags: ["furniture", "upgrade", "purchaseable", "crafting"],
+        name: 'Metal Grinder',
+        description: 'Industrial-grade grinding wheel for metal processing. Increases industrial efficiency.',
+        level: 0,
+        maxLevel: 5,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_steel_processing_technology') > 0;
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'industrial_efficiency': {
+                        A: 0.1,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 1,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1.5,
+                B: 5000000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'inventory_forged_steel': {
+                A: 0,
+                B: 100,
+                type: 0
+            },
+            'living_space': {
+                A: 0,
+                B: 1,
                 type: 0
             }
         }),

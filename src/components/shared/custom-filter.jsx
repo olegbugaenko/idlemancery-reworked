@@ -102,6 +102,10 @@ const CustomFilter = React.memo(({
             sendData('query-all-accessory-tags', { prefix });
             sendData('query-all-property-effects', { prefix, filterId: category });
         }
+        if(category === 'structure') {
+            sendData('query-all-structure-tags', { prefix });
+            sendData('query-all-property-effects', { prefix, filterId: category });
+        }
     }, [prefix]);
 
     // Subscribe to incoming data
@@ -127,6 +131,10 @@ const CustomFilter = React.memo(({
         });
 
         onMessage(`all-accessory-tags-${prefix}`, (payload) => {
+            setTags(payload);
+        });
+
+        onMessage(`all-structure-tags-${prefix}`, (payload) => {
             setTags(payload);
         });
     }, [prefix]);

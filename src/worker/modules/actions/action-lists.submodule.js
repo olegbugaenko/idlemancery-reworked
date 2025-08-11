@@ -182,6 +182,14 @@ export class ActionListsSubmodule extends GameModule {
             const totalContribs = {};
             const totalConsumes = {};
 
+            const maxContrib = {};
+            const maxConsumes = {};
+
+            for (const resId of resourceIds) {
+                maxContrib[resId] = 0;
+                maxConsumes[resId] = 0;
+            }
+
             for (const r of resourceIds) {
                 const base = initialResourceBalance[r] || { current: 0, income: 0, consumption: 0, currentConsumption: 0 };
                 const fixedPart = base.current + base.income * fixedFraction - base.consumption * fixedFraction;
@@ -189,6 +197,8 @@ export class ActionListsSubmodule extends GameModule {
                 totalReqs[r] = base.currentConsumption + base.consumption * fixedFraction;
                 totalContribs[r] = 0;
                 totalConsumes[r] = base.consumption * fixedFraction;
+                maxContrib[r] = 0;
+                maxConsumes[r] = base.consumption;
             }
 
             for (const id of dynamicIds) {
@@ -200,13 +210,19 @@ export class ActionListsSubmodule extends GameModule {
                     const amount = value * (t / totalTime);
                     balance[resId] += amount;
                     totalContribs[resId] += amount;
+                    maxContrib[resId] = Math.max(maxContrib[resId], value)
                 }
                 for (const { id: resId, value } of consumes) {
                     const amount = value * (t / totalTime);
                     balance[resId] -= amount;
                     totalConsumes[resId] += amount;
                     totalReqs[resId] += amount;
+                    maxConsumes[resId] = Math.max(maxConsumes[resId], value)
+                    if(id === 'action_read_books' && resId === 'energy') {
+                        console.log('CRB: ', T_values[id], totalTime, consumes, totalConsumes, amount, value);
+                    }
                 }
+                
             }
 
             const deficits = {};
@@ -225,7 +241,7 @@ export class ActionListsSubmodule extends GameModule {
 
             //console.log('defs: ', deficits, averageContribs, averageConsumes);
 
-            return { deficits, averageContribs, averageConsumes };
+            return { deficits, averageContribs, averageConsumes, maxContrib, maxConsumes, maxContrib };
         }
 
         function computeTotalDeficit(deficits) {
@@ -259,7 +275,7 @@ export class ActionListsSubmodule extends GameModule {
         let prevDeficits = 10;
 
         for (let iter = 0; iter < maxIterations; iter++) {
-            const { deficits, averageContribs, averageConsumes } = computeDeficits(T);
+            const { deficits, averageContribs, averageConsumes, maxConsumes, maxContrib } = computeDeficits(T);
             const totalError = computeTotalDeficit(deficits);
 
             if (Math.abs(totalError - prevDeficits) < tolerance) break;
@@ -275,23 +291,23 @@ export class ActionListsSubmodule extends GameModule {
                     const d = deficits[resId] || 0;
                     const c = contribs.find(e => e.id === resId)?.value || 0;
                     const s = consumes.find(e => e.id === resId)?.value || 0;
-                    const maxC = maxContribs[resId] || SMALL_NUMBER;
-                    const maxS = maxConsumptions[resId] || SMALL_NUMBER;
+                    const maxC = maxContrib[resId] || SMALL_NUMBER;
+                    const maxS = maxConsumes[resId] || SMALL_NUMBER;
                     const avgC = averageContribs[resId] || 0;
                     const avgS = averageConsumes[resId] || 0;
 
                     const normNet = (c ? ((c - avgC) / maxC) : 0) - (s ? ((s - avgS) / maxS) : 0);
                     gradient[id] += normNet * d;
-                    /*if(id === 'action_clean_stable') {
+                    if(id === 'action_read_books') {
                         console.log(`|-| ${gradient[id]}: ${resId} delta = ${normNet*d}: (${c} - ${avgC})/${maxC} - (${s} - ${avgS})/${maxS}`);
-                    }*/
+                    }
                 }
             }
 
             const totalDynamic = Object.values(T).reduce((a, b) => a + b, 0);
             const totalTime = fixedTotal + totalDynamic;
 
-            // console.log(`SubIter${iter}: ${Math.abs(totalError - prevDeficits)} < ${tolerance}`, deficits, initialResourceBalance, gradient, T);
+            console.log(`SubIter${iter}: ${Math.abs(totalError - prevDeficits)} < ${tolerance}`, deficits, initialResourceBalance, gradient, T);
 
             for (const id of dynamicIds) {
                 const t = T[id];

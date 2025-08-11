@@ -38,7 +38,7 @@ export const StructureUpgrades = ({ setItemDetails, purchaseItem, deleteItem, ne
 
     const worker = useContext(WorkerContext);
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const [structuresData, setItemsData] = useState({
         available: [],
         space: {
@@ -67,9 +67,15 @@ export const StructureUpgrades = ({ setItemDetails, purchaseItem, deleteItem, ne
         }
     }, [])
 
-    onMessage('furnitures-data', (furnitures) => {
-        setItemsData(furnitures);
-    })
+    useEffect(() => {
+        onMessage('furnitures-data', (furnitures) => {
+            setItemsData(furnitures);
+        });
+        
+        return () => {
+            removeMessage('furnitures-data');
+        };
+    }, []);
 
     const setSearch = (searchData) => {
         sendData('set-furniture-search-text', { filterId: 'structure', searchData: searchData });

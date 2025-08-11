@@ -110,6 +110,27 @@ export const registerInventoryItems = () => {
         sellPrice: 800,
     })
 
+    registerInventoryItem('inventory_pot', {
+        name: 'Pot',
+        hasCap: false,
+        tags: ['inventory', 'material', 'craftable'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        getUsageCooldown: () => {
+            return 0;
+        },
+        attributes: {
+            duration: 0,
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_pottery_secrets_handbook') > 0
+        },
+        sellPrice: 1200,
+    })
+
 
     registerInventoryItem('inventory_candle', {
         name: 'Candle',
@@ -688,7 +709,7 @@ export const registerInventoryItems = () => {
     registerInventoryItem('inventory_water', {
         name: 'Water',
         hasCap: false,
-        tags: ['inventory', 'elemental'],
+        tags: ['inventory', 'elemental', 'artifact-material'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -797,7 +818,7 @@ export const registerInventoryItems = () => {
     registerInventoryItem('inventory_refined_wood', {
         name: 'Refined Wood',
         hasCap: false,
-        tags: ['inventory', 'material', 'craftable'],
+        tags: ['inventory', 'material', 'craftable', 'artifact-material'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -979,7 +1000,7 @@ export const registerInventoryItems = () => {
     registerInventoryItem('inventory_ruby', {
         name: 'Ruby',
         hasCap: false,
-        tags: ['inventory', 'material', 'craftable'],
+        tags: ['inventory', 'material', 'craftable', 'artifact-material'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -1002,7 +1023,7 @@ export const registerInventoryItems = () => {
     registerInventoryItem('inventory_sapphire', {
         name: 'Sapphire',
         hasCap: false,
-        tags: ['inventory', 'material', 'craftable'],
+        tags: ['inventory', 'material', 'craftable', 'artifact-material'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -1075,7 +1096,7 @@ export const registerInventoryItems = () => {
     registerInventoryItem('inventory_forged_steel', {
         name: 'Forged Steel',
         hasCap: false,
-        tags: ['inventory', 'material', 'craftable'],
+        tags: ['inventory', 'material', 'craftable', 'artifact-material'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -1506,7 +1527,7 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0
         },
-        sellPrice: 12250,
+        sellPrice: 522500,
     })
 
 
@@ -1536,7 +1557,7 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0
         },
-        sellPrice: 12250,
+        sellPrice: 522500,
     })
 
     registerInventoryItem('inventory_mental_potion', {
@@ -1565,7 +1586,7 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0
         },
-        sellPrice: 12250,
+        sellPrice: 522500,
     })
 
 
@@ -1595,7 +1616,7 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0
         },
-        sellPrice: 12250,
+        sellPrice: 522500,
     })
 
 
@@ -1625,7 +1646,7 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0
         },
-        sellPrice: 12250,
+        sellPrice: 522500,
     })
 
     // Rare
@@ -1770,7 +1791,6 @@ export const registerInventoryItems = () => {
         },
         attributes: {
             baseChanceMult: 1,
-            entityEffect: 'rare_titanleaf_effect',
             isRare: true,
             allowMultiConsume: false,
         },
@@ -1972,6 +1992,35 @@ export const registerInventoryItems = () => {
         },
         sellPrice: 15000,
         rarity: 5,
+        allowedTileTypes: ['forest', 'mountain', 'hills']
+    })
+
+    registerInventoryItem('inventory_rare_titableaf', {
+        name: 'Titableaf',
+        hasCap: false,
+        tags: ['inventory', 'ingredient', 'rare', 'gatherable', 'herb'],
+        defaultCap: 0,
+        isAbstract: true,
+        getUsageCooldown: () => {
+            return 0.1;
+        },
+        attributes: {
+            baseChanceMult: 1,
+            isRare: true,
+            allowMultiConsume: false,
+        },
+        usageGain: {
+
+        },
+        resourceModifier: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
+        },
+        sellPrice: 12000,
+        rarity: 4,
+        //allowedTileTypes: ['forest', 'swamp', 'lakes']
     })
 
     registerInventoryItem('inventory_rare_azureblossom', {
@@ -2099,6 +2148,115 @@ export const registerInventoryItems = () => {
         sellPrice: 150000000,
         rarity: 8,
         lootAmountMult: 0.1,
+    })
+
+    // Artifact Materials
+    registerInventoryItem('inventory_charged_amethyst', {
+        name: 'Charged Amethyst',
+        hasCap: false,
+        tags: ['inventory', 'material', 'rare', 'artifact-material'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        attributes: {
+            isRare: true,
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('action_expedition') > 0
+        },
+        sellPrice: 1500000,
+    })
+
+    registerInventoryItem('inventory_vibrating_pot', {
+        name: 'Vibrating Pot',
+        hasCap: false,
+        tags: ['inventory', 'material', 'rare', 'artifact-material'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        attributes: {
+            isRare: true,
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('action_expedition') > 0
+        },
+        sellPrice: 1500000,
+    })
+
+    registerInventoryItem('inventory_dynosaur_bone', {
+        name: 'Dynosaur Bone',
+        hasCap: false,
+        tags: ['inventory', 'material', 'rare', 'artifact-material'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        attributes: {
+            isRare: true,
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('action_expedition') > 0
+        },
+        sellPrice: 1500000,
+    })
+
+    registerInventoryItem('inventory_ochre', {
+        name: 'Ochre',
+        hasCap: false,
+        tags: ['inventory', 'material', 'rare', 'artifact-material'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        attributes: {
+            isRare: true,
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('action_expedition') > 0
+        },
+        sellPrice: 1500000,
+    })
+
+    registerInventoryItem('inventory_magic_lens', {
+        name: 'Magic Lens',
+        hasCap: false,
+        tags: ['inventory', 'material', 'rare', 'artifact-material'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        attributes: {
+            isRare: true,
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('action_expedition') > 0
+        },
+        sellPrice: 1500000,
+    })
+
+    registerInventoryItem('inventory_hunter_flask', {
+        name: 'Hunter Flask',
+        hasCap: false,
+        tags: ['inventory', 'material', 'rare', 'artifact-material'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        attributes: {
+            isRare: true,
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('action_expedition') > 0
+        },
+        sellPrice: 1500000,
     })
 
 }

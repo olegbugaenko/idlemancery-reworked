@@ -670,17 +670,17 @@ export const registerAccessoriesStage1 = () => {
         get_cost: () => ({
             'inventory_paper': {
                 A: 1.1,
-                B: 15,
+                B: 150,
                 type: 1
             },
             'inventory_red_ink': {
                 A: 1.1,
-                B: 5,
+                B: 50,
                 type: 1
             },
             'inventory_green_ink': {
                 A: 1.1,
-                B: 10,
+                B: 100,
                 type: 1
             },
         }),
@@ -712,17 +712,17 @@ export const registerAccessoriesStage1 = () => {
         get_cost: () => ({
             'inventory_paper': {
                 A: 1.1,
-                B: 15,
+                B: 150,
                 type: 1
             },
             'inventory_red_ink': {
                 A: 1.1,
-                B: 5,
+                B: 50,
                 type: 1
             },
             'knowledge': {
                 A: 1.1,
-                B: 25,
+                B: 250,
                 type: 1
             }
         }),
@@ -798,17 +798,17 @@ export const registerAccessoriesStage1 = () => {
         get_cost: () => ({
             'inventory_paper': {
                 A: 1.1,
-                B: 15,
+                B: 150,
                 type: 1
             },
             'inventory_red_ink': {
                 A: 1.1,
-                B: 5,
+                B: 50,
                 type: 1
             },
             'knowledge': {
                 A: 1.1,
-                B: 25,
+                B: 250,
                 type: 1
             }
         }),
@@ -990,46 +990,6 @@ export const registerAccessoriesStage1 = () => {
         }),
     })
 
-    registerAccessory('accessory_masters_pendant', {
-        tags: ["accessory", "upgrade", "purchaseable", "crafting"],
-        name: 'Masters Forge Pendant',
-        description: 'Increase amount of available crafting slots',
-        level: 0,
-        unlockedBy: [{
-            type: 'effect',
-            id: 'attribute_strength',
-            level: 15000,
-        }],
-        minDemoVersion: 20,
-        unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_crafting_courses') > 0
-                && gameResources.isResourceUnlocked('inventory_forged_steel');
-        },
-        resourceModifier: {
-            income: {
-                resources: {
-                    'crafting_slots': {
-                        A: 1,
-                        B: 0,
-                        type: 0,
-                    },
-                }
-            },
-        },
-        get_cost: () => ({
-            'inventory_forged_steel': {
-                A: 2,
-                B: 50,
-                type: 1
-            },
-            'inventory_obsidian_shard': {
-                A: 2,
-                B: 50,
-                type: 1
-            }
-        }),
-    })
-
 
     registerAccessory('accessory_expedition_planner', {
         tags: ["accessory", "upgrade", "purchaseable", "effect", "maps"],
@@ -1189,6 +1149,46 @@ export const registerAccessoriesStage1 = () => {
                 B: 500,
                 type: 1
             }
+        }),
+    })
+
+    registerAccessory('accessory_magical_atlas', {
+        tags: ["accessory", "upgrade", "purchaseable", "resource", "maps"],
+        name: 'Magical Atlas',
+        description: 'A magical atlas that glows red to warn of dangers ahead. Your patience allows you to carefully study its maps and plan safe routes, making your resource gathering more efficient.',
+        level: 0,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 12500
+        }],
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_enchanted_paper') 
+                && gameResources.isResourceUnlocked('inventory_green_ink');
+        },
+        resourceModifier: {
+            multiplier: {
+                resources: {
+                    'gathering_effort': {
+                        A: 0.04,
+                        B: 1,
+                        C: 1.01,
+                        type: 3,
+                    }
+                }
+            },
+        },
+        get_cost: () => ({
+            'inventory_enchanted_paper': {
+                A: 1.5,
+                B: 50,
+                type: 1
+            },
+            'inventory_green_ink': {
+                A: 1.5,
+                B: 25,
+                type: 1
+            },
         }),
     })
 }

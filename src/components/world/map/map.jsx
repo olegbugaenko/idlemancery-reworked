@@ -73,7 +73,7 @@ export const Map = ({ setItemDetails, openListDetails, isEditList }) => {
     const worker = useContext(WorkerContext);
     const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const [mapData, setMapTiles] = useState({
         mapTiles: [],
         explorationPoints: {
@@ -107,23 +107,35 @@ export const Map = ({ setItemDetails, openListDetails, isEditList }) => {
         }
     }, [])
 
-    onMessage('map-data', (mapData) => {
-        setMapTiles(mapData);
-        if(currentTourId === 'map' && stepIndex === 7) {
-            if(mapData.explorationPoints.balance > 0 || mapData.explorationPoints.consumption > 0) {
-                jumpOver(7, 4);
+    useEffect(() => {
+        onMessage('map-data', (mapData) => {
+            setMapTiles(mapData);
+            if(currentTourId === 'map' && stepIndex === 7) {
+                if(mapData.explorationPoints.balance > 0 || mapData.explorationPoints.consumption > 0) {
+                    jumpOver(7, 4);
+                }
             }
-        }
-    })
+        });
+        
+        return () => {
+            removeMessage('map-data');
+        };
+    }, [currentTourId, stepIndex]);
 
-    onMessage('map-tile-lists-refresh', (data) => {
-        setMapTiles(prev => ({
-            ...prev,
-            mapLists: {
-                ...data,
-            }
-        }))
-    })
+    useEffect(() => {
+        onMessage('map-tile-lists-refresh', (data) => {
+            setMapTiles(prev => ({
+                ...prev,
+                mapLists: {
+                    ...data,
+                }
+            }))
+        });
+        
+        return () => {
+            removeMessage('map-tile-lists-refresh');
+        };
+    }, []);
 
     const setItemDetailsCb = meta => {
         setItemDetails({ meta, type: 'map-tile' });
@@ -458,7 +470,7 @@ export const TileDetailsPopup = ({itemId}) => {
 
     const worker = useContext(WorkerContext);
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
 
     const [item, setDetailOpened] = useState(null);
 
@@ -473,12 +485,17 @@ export const TileDetailsPopup = ({itemId}) => {
             clearInterval(interval);
         }
 
-    }, [])
+    }, [itemId])
 
-
-    onMessage('map-tile-details', (items) => {
-        setDetailOpened(items);
-    })
+    useEffect(() => {
+        onMessage('map-tile-details', (items) => {
+            setDetailOpened(items);
+        });
+        
+        return () => {
+            removeMessage('map-tile-details');
+        };
+    }, []);
 
     if(!itemId || !item) return null;
 

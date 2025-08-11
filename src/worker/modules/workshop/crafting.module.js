@@ -16,13 +16,13 @@ export class CraftingModule extends GameModule {
         this.craftingSlots = {};
 
         // Auto-rebalancing system
-        this.autoRebalanceEnabled = true;
+        this.autoRebalanceEnabled = false;
         this.originalAllocations = {}; // Store original player allocations
         this.lastRebalanceCheck = 0;
         this.rebalanceCheckInterval = 3; // Check every 3 seconds
 
         // Alchemy auto-rebalancing system (separate from crafting)
-        this.alchemyAutoRebalanceEnabled = true;
+        this.alchemyAutoRebalanceEnabled = false;
         this.alchemyOriginalAllocations = {}; // Store original player allocations for alchemy
         this.alchemyLastRebalanceCheck = 0;
 
@@ -163,9 +163,9 @@ export class CraftingModule extends GameModule {
         }
 
         // Load auto-rebalancing data
-        this.autoRebalanceEnabled = obj?.autoRebalanceEnabled ?? true;
+        this.autoRebalanceEnabled = obj?.autoRebalanceEnabled ?? false;
         this.originalAllocations = obj?.originalAllocations || {};
-        this.alchemyAutoRebalanceEnabled = obj?.alchemyAutoRebalanceEnabled ?? true;
+        this.alchemyAutoRebalanceEnabled = obj?.alchemyAutoRebalanceEnabled ?? false;
         this.alchemyOriginalAllocations = obj?.alchemyOriginalAllocations || {};
         this.rebalanceReasons = obj?.rebalanceReasons || {};
         this.alchemyRebalanceReasons = obj?.alchemyRebalanceReasons || {};
@@ -360,6 +360,8 @@ export class CraftingModule extends GameModule {
 
         // Check for recipes that need rebalancing
         this.rebalanceInefficientRecipes(category);
+
+        this.normalizeTotalEffort(category);
     }
 
     tryRestoreIndividualRecipes(category) {

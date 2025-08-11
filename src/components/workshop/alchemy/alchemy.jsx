@@ -20,7 +20,7 @@ export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, op
 
     const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const [craftingData, setItemsData] = useState({
         available: [],
         efforts: {
@@ -49,11 +49,17 @@ export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, op
         return () => {
             clearInterval(interval);
         }
-    }, [])
+    }, [filterId])
 
-    onMessage(`crafting-data-${filterId}`, (craftables) => {
-        setItemsData(craftables);
-    })
+    useEffect(() => {
+        onMessage(`crafting-data-${filterId}`, (craftables) => {
+            setItemsData(craftables);
+        });
+        
+        return () => {
+            removeMessage(`crafting-data-${filterId}`);
+        };
+    }, [filterId]);
 
     const handleAutoRebalanceToggle = useCallback((enabled) => {
         sendData('set-alchemy-auto-rebalance', { enabled });
@@ -101,6 +107,7 @@ export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, op
                     <div className={'space-item'}>
                         <TippyWrapper content={<div className={'hint-popup'}>
                             <p className={'hint'}>Auto-rebalance automatically redistributes efforts when one or more recipes lack resources. This ensures optimal resource usage by redirecting effort to recipes that can run efficiently.</p>
+                            <p className={'hint'}>When enabled, the system will temporarily adjust your effort allocations to maximize production from available resources. You can restore your original allocations at any time.</p>
                         </div>}>
                             <label className={'checkbox-label'}>
                                 <input 
@@ -112,13 +119,13 @@ export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, op
                             </label>
                         </TippyWrapper>
                     </div>
-                    {craftingData.autoRebalance.hasOriginalAllocations && (
+                    {craftingData.autoRebalance.hasOriginalAllocations && !craftingData.autoRebalance.canRestore && !craftingData.autoRebalance.canRestore && (
                                         <TippyWrapper content={<div className={'hint-popup'}>
                     <p className={'hint'}>Some of your recipes don't have enough ingredients. Since you enabled automatic rebalancing, your efforts have been redirected to other available recipes.</p>
                 </div>}>
                             <div className={'space-item rebalance-status'}>
                                 {craftingData.autoRebalance.canRestore ? (
-                                    <span className={'status-restore'}>Will restore original allocation</span>
+                                    <span className={'status-restore'}>Using original allocation</span>
                                 ) : (
                                     <span className={'status-rebalanced'}>Temporarily rebalanced</span>
                                 )}
@@ -237,7 +244,7 @@ export const ActionListsPopup = ({ lists, isOpened, setOpenedFor, onSelect, onHo
                         {listsDisplayed.map(list => (<div className={'item'} onMouseEnter={() => onHover(list.id)} onMouseLeave={() => onHover(null)}>
                             <div className={'list-item-row flex-container'}>
                                 <span className={'list-name'}>{list.name}</span>
-                                <FavoriteButton type="alchemyLists" id={list.id} isFavorite={list.isFavorite} className="list-favorite-btn icon-content run-icon interface-icon small" />
+                                <FavoriteButton type="alchemyLists" id={list.id} isFavorite={list.isFavorite} className="list-favorite-btn icon-content interface-icon small" />
                                 <TippyWrapper content={<div className={'hint-popup'}>Run List</div> }>
                                     <div className={'icon-content run-icon interface-icon small'} onClick={() => onRun(list.id)}>
                                         <img src={"icons/interface/run.png"}/>

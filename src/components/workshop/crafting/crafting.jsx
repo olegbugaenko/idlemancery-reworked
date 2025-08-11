@@ -21,7 +21,7 @@ export const Crafting = ({ setItemDetails, setItemLevel, filterId, newUnlocks, o
 
     const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const [craftingData, setItemsData] = useState({
         available: [],
         efforts: {
@@ -50,11 +50,17 @@ export const Crafting = ({ setItemDetails, setItemLevel, filterId, newUnlocks, o
         return () => {
             clearInterval(interval);
         }
-    }, [])
+    }, [filterId])
 
-    onMessage(`crafting-data-${filterId}`, (craftables) => {
-        setItemsData(craftables);
-    })
+    useEffect(() => {
+        onMessage(`crafting-data-${filterId}`, (craftables) => {
+            setItemsData(craftables);
+        });
+        
+        return () => {
+            removeMessage(`crafting-data-${filterId}`);
+        };
+    }, [filterId]);
 
     const onEditList = useCallback(listData => {
         openListDetails({ listData, isEdit: true });
@@ -102,6 +108,7 @@ export const Crafting = ({ setItemDetails, setItemLevel, filterId, newUnlocks, o
                 <div className={'space-item'}>
                     <TippyWrapper content={<div className={'hint-popup'}>
                         <p className={'hint'}>Auto-rebalance automatically redistributes efforts when one or more recipes lack resources. This ensures optimal resource usage by redirecting effort to recipes that can run efficiently.</p>
+                        <p className={'hint'}>When enabled, the system will temporarily adjust your effort allocations to maximize production from available resources. You can restore your original allocations at any time.</p>
                     </div>}>
                         <label className={'checkbox-label'}>
                             <input 
@@ -113,7 +120,7 @@ export const Crafting = ({ setItemDetails, setItemLevel, filterId, newUnlocks, o
                         </label>
                     </TippyWrapper>
                 </div>
-                {craftingData.autoRebalance.hasOriginalAllocations && (
+                {craftingData.autoRebalance.hasOriginalAllocations && !craftingData.autoRebalance.canRestore && (
                                     <TippyWrapper content={<div className={'hint-popup'}>
                     <p className={'hint'}>Some of your recipes don't have enough ingredients. Since you enabled automatic rebalancing, your efforts have been redirected to other available recipes.</p>
                 </div>}>

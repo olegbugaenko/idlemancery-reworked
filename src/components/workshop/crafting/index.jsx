@@ -22,7 +22,7 @@ export const CraftingWrap = ({ children }) => {
     const { isMobile } = useAppContext();
     const [isDetailVisible, setDetailVisible] = useState(!isMobile);
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
 
     const [detailOpened, setDetailOpened] = useState(null);
 
@@ -42,9 +42,15 @@ export const CraftingWrap = ({ children }) => {
         }
     }, [])
 
-    onMessage('new-unlocks-notifications-crafting', payload => {
-        setNewUnlocks(payload);
-    })
+    useEffect(() => {
+        onMessage('new-unlocks-notifications-crafting', payload => {
+            setNewUnlocks(payload);
+        });
+        
+        return () => {
+            removeMessage('new-unlocks-notifications-crafting');
+        };
+    }, []);
 
     const setItemDetails = (id) => {
         if(currentTourId === 'crafting' && [3,14].includes(stepIndex)) {
@@ -65,35 +71,46 @@ export const CraftingWrap = ({ children }) => {
         sendData('set-crafting-level', { id, effort, filterId: 'crafting' });
     })
 
-    onMessage('crafting-list-data', (payload) => {
-        if(!listDetails) return;
+    useEffect(() => {
+        onMessage('crafting-list-data', (payload) => {
+            if(!listDetails) return;
 
-        setListDetails({
-            ...listDetails,
-            listData: payload,
-            isEdit: listDetails.isEdit,
-            isLoading: false,
-        })
+            setListDetails({
+                ...listDetails,
+                listData: payload,
+                isEdit: listDetails.isEdit,
+                isLoading: false,
+            })
+        });
+        
+        return () => {
+            removeMessage('crafting-list-data');
+        };
+    }, [listDetails]);
 
-    })
-
-    onMessage('crafting-list-effects', (payload) => {
-        const prev = listDetails.listData;
-        if(payload.assumedDistribution) {
-            prev.recipes = payload.assumedDistribution;
-        }
-        setListDetails({
-            ...listDetails,
-            listData: {
-                ...prev,
-                potentialEffects: payload.potentialEffects,
-                resourcesEffects: payload.resourcesEffects,
-                effectEffects: payload.effectEffects,
-                prevEffects: payload.prevEffects,
-                assumedDistribution: payload.assumedDistribution,
+    useEffect(() => {
+        onMessage('crafting-list-effects', (payload) => {
+            const prev = listDetails.listData;
+            if(payload.assumedDistribution) {
+                prev.recipes = payload.assumedDistribution;
             }
-        })
-    })
+            setListDetails({
+                ...listDetails,
+                listData: {
+                    ...prev,
+                    potentialEffects: payload.potentialEffects,
+                    resourcesEffects: payload.resourcesEffects,
+                    effectEffects: payload.effectEffects,
+                    prevEffects: payload.prevEffects,
+                    assumedDistribution: payload.assumedDistribution,
+                }
+            })
+        });
+        
+        return () => {
+            removeMessage('crafting-list-effects');
+        };
+    }, [listDetails]);
 
     const setAutotriggerPriority = useCallback((priority) => {
         const { listData } = listDetails ?? {};
@@ -281,13 +298,19 @@ export const CraftingWrap = ({ children }) => {
         sendData('query-running-craft-for-list', { category: 'crafting' });
     }
 
-    onMessage('running-craft-for-list', recipes => {
-        const { listData } = listDetails ?? {};
-        const newList = listData;
-        listData.recipes = recipes;
-        setListDetails({...listDetails, listData: {...newList}});
-        sendData('query-crafting-list-effects', { listData: newList });
-    })
+    useEffect(() => {
+        onMessage('running-craft-for-list', recipes => {
+            const { listData } = listDetails ?? {};
+            const newList = listData;
+            listData.recipes = recipes;
+            setListDetails({...listDetails, listData: {...newList}});
+            sendData('query-crafting-list-effects', { listData: newList });
+        });
+        
+        return () => {
+            removeMessage('running-craft-for-list');
+        };
+    }, [listDetails]);
 
     const onCloseList = () => {
         setListDetails(null);

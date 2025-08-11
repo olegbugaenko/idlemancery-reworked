@@ -12,7 +12,7 @@ export const Guilds = ({ setItemDetails, filterId, newUnlocks, isMobile }) => {
 
     const worker = useContext(WorkerContext);
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const [guildsData, setGuildsData] = useState({
         guilds: [],
         current: null,
@@ -30,11 +30,17 @@ export const Guilds = ({ setItemDetails, filterId, newUnlocks, isMobile }) => {
         return () => {
             clearInterval(interval);
         }
-    }, [])
+    }, [filterId])
 
-    onMessage(`guild-items-data`, (guilds) => {
-        setGuildsData(guilds);
-    })
+    useEffect(() => {
+        onMessage(`guild-items-data`, (guilds) => {
+            setGuildsData(guilds);
+        });
+        
+        return () => {
+            removeMessage(`guild-items-data`);
+        };
+    }, []);
 
 
     const purchaseUpgrade = useCallback((id) => {

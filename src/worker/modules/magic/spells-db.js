@@ -1054,4 +1054,115 @@ export const initSpellsDB1 = () => {
             return true
         },
     })
+
+    registerSpell('spell_sacred_earth', {
+        name: 'Sacred Earth',
+        description: 'Channel the power of nature to temporarily enhance all plantations efficiency. The earth responds to your magic, increasing crop yields significantly.',
+        hasCap: false,
+        tags: ['spell', 'magic', 'nature', 'nature_magic'],
+        defaultCap: 0,
+        isAbstract: true,
+        level: 1,
+        onUse: (amount) => {
+
+        },
+        getUsageCooldown: () => {
+            return 0;
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'plantations_efficiency': {
+                        A: 0.05*gameEffects.getEffectValue('nature_spells_efficiency'),
+                        B: 1. + 0.1*gameEffects.getEffectValue('nature_spells_efficiency'),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    mana: {
+                        A: 1.5,
+                        B: 10*getCostReduction('spell_sacred_earth'),
+                        type: 1,
+                    }
+                }
+            }),
+            effectDeps: ['nature_spells_efficiency']
+        },
+        usageGain: {
+            get_consumption: () => ({
+                resources: {
+                    mana: {
+                        A: 1.5,
+                        B: 50*getCostReduction('spell_sacred_earth'),
+                        type: 1,
+                    }
+                }
+            })
+        },
+        attributes: {
+            duration: 10,
+            xpOnCast: 4,
+        },
+        unlockCondition: () => {
+            return gameEffects.getEffectValue('attribute_magic_ability') >= 3000
+        },
+    })
+
+    registerSpell('spell_natures_strength', {
+        name: 'Nature\'s Strength',
+        description: 'Channel the raw power of nature to enhance your physical capabilities. Temporarily increases the efficiency of manual labor tasks like gathering wood and mining stone.',
+        hasCap: false,
+        tags: ['spell', 'magic', 'nature', 'nature_magic'],
+        defaultCap: 0,
+        isAbstract: true,
+        level: 1,
+        onUse: (amount) => {
+
+        },
+        getUsageCooldown: () => {
+            return 0;
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'manual_labor_efficiency': {
+                        A: 0.1*gameEffects.getEffectValue('nature_spells_efficiency'),
+                        B: 1. + 0.2*gameEffects.getEffectValue('nature_spells_efficiency'),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    mana: {
+                        A: 2.0,
+                        B: 15*getCostReduction('spell_natures_strength'),
+                        type: 1,
+                    }
+                }
+            }),
+            effectDeps: ['nature_spells_efficiency']
+        },
+        usageGain: {
+            get_consumption: () => ({
+                resources: {
+                    mana: {
+                        A: 2.0,
+                        B: 75*getCostReduction('spell_natures_strength'),
+                        type: 1,
+                    }
+                }
+            })
+        },
+        attributes: {
+            duration: 15,
+            xpOnCast: 6,
+        },
+        unlockCondition: () => {
+            return gameEffects.getEffectValue('attribute_magic_ability') >= 4000
+        },
+    })
+
 }

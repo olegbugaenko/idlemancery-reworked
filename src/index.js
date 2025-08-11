@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import AppProvided from "./App";
 
 // *** HACK *** //
-
+/*
 (() => {
     const originalAdd = EventTarget.prototype.addEventListener;
     const originalRemove = EventTarget.prototype.removeEventListener;
@@ -24,7 +24,7 @@ import AppProvided from "./App";
 
     window.__getAllEventListeners = () => listeners;
 })();
-
+*/
 // *** HACK-END *** //
 
 window.IS_DEMO = IS_DEMO;

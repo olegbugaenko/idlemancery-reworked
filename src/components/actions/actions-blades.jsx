@@ -20,27 +20,29 @@ export const ActionDetails = ({actionId, onClose, isSelected}) => {
 
     const worker = useContext(WorkerContext);
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
 
     const [action, setDetailOpened] = useState(null);
-
-    const [interval, setIntervalRef] = useState(null);
 
     useEffect(() => {
         const intervalLoc = setInterval(() => {
             sendData('query-action-details', { id: actionId });
         }, 100);
-        setIntervalRef(intervalLoc);
 
         return () => {
             clearInterval(intervalLoc);
         }
     }, [actionId])
 
-
-    onMessage('action-details', (actions) => {
-        setDetailOpened(actions);
-    })
+    useEffect(() => {
+        onMessage('action-details', (actions) => {
+            setDetailOpened(actions);
+        });
+        
+        return () => {
+            removeMessage('action-details');
+        };
+    }, []);
 
     if(!actionId || !action) return null;
 

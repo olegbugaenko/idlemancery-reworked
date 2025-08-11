@@ -49,7 +49,26 @@ const EconomicMetrics = () => {
         const currentTime = Math.max(...data.map(d => d.timestamp));
         const cutoffTime = currentTime - intervalSeconds;
         
-        return data.filter(point => point.timestamp >= cutoffTime);
+        let filteredData = data.filter(point => point.timestamp >= cutoffTime);
+        
+        // Limit the number of data points based on interval to maintain consistent chart width
+        const maxDataPoints = 50; // Maximum number of bars to display
+        if (filteredData.length > maxDataPoints) {
+            // Sample data points evenly across the interval
+            const step = Math.ceil(filteredData.length / maxDataPoints);
+            const sampledData = [];
+            for (let i = 0; i < filteredData.length; i += step) {
+                sampledData.push(filteredData[i]);
+            }
+            // Always include the last data point
+            if (sampledData[sampledData.length - 1] !== filteredData[filteredData.length - 1]) {
+                sampledData.push(filteredData[filteredData.length - 1]);
+            }
+            filteredData = sampledData;
+            console.log(`filterDataByInterval: Limited from ${filteredData.length + (filteredData.length * step)} to ${filteredData.length} points`);
+        }
+        
+        return filteredData;
     };
 
     const formatTime = (timestamp) => {
@@ -65,7 +84,7 @@ const EconomicMetrics = () => {
 
         // Add current value as the most recent data point if it's different from the last saved point
         const lastSavedValue = filteredData.length > 0 ? filteredData[filteredData.length - 1].value : null;
-        const chartData = [...filteredData];
+        let chartData = [...filteredData];
         
         if (lastSavedValue !== currentValue) {
             chartData.push({
@@ -74,9 +93,32 @@ const EconomicMetrics = () => {
             });
         }
 
+        // Ensure we don't exceed max data points even after adding current value
+        const maxDataPoints = 50;
+        if (chartData.length > maxDataPoints) {
+            const step = Math.ceil(chartData.length / maxDataPoints);
+            const sampledData = [];
+            for (let i = 0; i < chartData.length; i += step) {
+                sampledData.push(chartData[i]);
+            }
+            // Always include the last data point
+            if (sampledData[sampledData.length - 1] !== chartData[chartData.length - 1]) {
+                sampledData.push(chartData[chartData.length - 1]);
+            }
+            chartData = sampledData;
+            console.log(`renderChart: Limited from ${chartData.length + (chartData.length * step)} to ${chartData.length} points`);
+        }
+        
+        console.log(`Final chart data points: ${chartData.length}`);
+
         const maxValue = Math.max(...chartData.map(d => d.value));
         const minValue = Math.min(...chartData.map(d => d.value));
+        
+        // Add 5% padding to the range to ensure minimum values are visible
         const range = maxValue - minValue;
+        const padding = range * 0.05;
+        const adjustedMinValue = minValue - padding;
+        const adjustedRange = range + (padding * 2);
 
         return (
             <div className="chart-container">
@@ -84,17 +126,18 @@ const EconomicMetrics = () => {
                 <div className="current-value">
                     Current: {formatValue(currentValue)}
                 </div>
-                <div className="chart">
+                <div className="chart" style={{ height: '200px', display: 'flex', alignItems: 'flex-end' }}>
                     {chartData.map((point, index) => {
-                        const height = range > 0 ? ((point.value - minValue) / range) * 100 : 50;
+                        const height = adjustedRange > 0 ? ((point.value - adjustedMinValue) / adjustedRange) * 100 : 50;
                         return (
                             <div
                                 key={index}
                                 className="chart-bar"
                                 style={{
-                                    height: `${height}%`,
+                                    height: `${Math.max(height, 2)}%`, // Minimum 2% height for visibility
                                     backgroundColor: color,
-                                    width: `${100 / Math.min(chartData.length, 50)}%`
+                                    width: `${100 / 50}%`, // Fixed width based on max data points
+                                    minHeight: '2px' // Ensure even tiny bars are visible
                                 }}
                                 title={`${formatValue(point.value)} ${formatTime(point.timestamp)}`}
                             />

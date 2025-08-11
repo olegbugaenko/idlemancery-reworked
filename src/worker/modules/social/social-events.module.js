@@ -75,7 +75,8 @@ export class EventsModule extends GameModule {
 
         // Перевіряємо чи є достатньо ресурсів
         const cost = eventEntity.get_cost();
-        if (!resourceCalculators.isAffordable(cost)) {
+        const affordability = gameEntity.getAffordable(eventId);
+        if (!affordability.isAffordable) {
             return { success: false, message: 'Not enough resources' };
         }
 
@@ -176,9 +177,16 @@ export class EventsModule extends GameModule {
         for (const [eventId, enabled] of Object.entries(this.autoEvents)) {
             if (enabled) {
                 const eventEntity = gameEntity.getEntity(eventId);
-                if (eventEntity && resourceCalculators.isAffordable(eventEntity.get_cost())) {
-                    this.startEvent(eventId);
-                    break; // Запускаємо тільки одну подію за раз
+                if (eventEntity) {
+                    // Перевіряємо чи є достатньо ресурсів
+                    const cost = eventEntity.get_cost();
+                    const affordability = gameEntity.getAffordable(eventId);
+                    
+                    if (affordability.isAffordable) {
+                        
+                        this.startEvent(eventId);
+                        break; // Запускаємо тільки одну подію за раз
+                    }
                 }
             }
         }
@@ -196,24 +204,21 @@ export class EventsModule extends GameModule {
                 const isActive = this.activeEvent === eventId;
                 const isOnCooldown = gameCore.globalTime < this.cooldownEndTime;
                 const canStart = !this.activeEvent && !isOnCooldown;
-                const hasEnoughResources = resourceCalculators.isAffordable(eventEntity.get_cost());
+                const affordable = gameEntity.getAffordable(eventId);
                 const timesCompleted = this.eventHistory[eventId] || 0;
                 const isAutoEnabled = this.autoEvents[eventId] || false;
-
-                if(isOnCooldown) {
-                    console.log('Event on cooldown:', eventId, 'cooldown remaining:', this.cooldownEndTime - gameCore.globalTime, 'seconds');
-                }
 
                 events.push({
                     id: eventId,
                     name: eventEntity.name,
                     description: eventEntity.description,
                     cost: eventEntity.get_cost(),
+                    affordable,
                     category: eventEntity.category,
                     isActive,
                     isOnCooldown,
                     canStart,
-                    hasEnoughResources,
+                    hasEnoughResources: affordable.isAffordable,
                     timesCompleted,
                     isAutoEnabled,
                     progress: isActive ? Math.min(1, (gameCore.globalTime - this.eventStartTime) / ((eventEntity.attributes.eventDuration || 1) / 1000)) : 0,
@@ -291,7 +296,7 @@ export class EventsModule extends GameModule {
         this.autoEvents = {};
         this.eventHistory = {};
             
-        if (saveObject && false) {
+        if (saveObject) {
             this.activeEvent = saveObject.activeEvent || null;
             this.eventStartTime = saveObject.eventStartTime || 0;
             this.eventEndTime = saveObject.eventEndTime || 0;

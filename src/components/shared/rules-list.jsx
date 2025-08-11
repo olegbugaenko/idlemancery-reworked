@@ -425,6 +425,7 @@ const RulesList = React.memo(
                                             classNamePrefix="react-select"
                                             styles={customStyles}
                                             menuPortalTarget={document.body}
+                                            menuPlacement={'auto'}
                                         />
                                     ) : (
                                         <span className={'display-rule-value'}>
@@ -455,6 +456,7 @@ const RulesList = React.memo(
                                                 classNamePrefix="react-select"
                                                 styles={customStyles}
                                                 menuPortalTarget={document.body}
+                                                menuPlacement="auto"
                                             />
                                         ) : (
                                             <span className={'display-rule-value'}>{Array.isArray(subjectValue) ? subjectValue.map(one => `${one?.label}`).join(',') : (subjectValue?.label || 'Invalid')}</span>

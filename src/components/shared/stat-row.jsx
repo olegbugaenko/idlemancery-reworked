@@ -3,7 +3,7 @@ import {TippyWrapper} from './tippy-wrapper.jsx'; // Переконайтесь,
 import {BreakDown} from './../layout/sidebar.jsx';
 import {formatValue} from "../../general/utils/strings"; // Компонент для розбивки, якщо необхідно
 
-const StatRow = ({ stat, onHover = () => {} }) => {
+const StatRow = ({ stat, isExplicit, onHover = () => {} }) => {
     if (!stat) return null;
 
     return (
@@ -35,9 +35,9 @@ const StatRow = ({ stat, onHover = () => {} }) => {
                         </div>
                     }
                 >
-                    {stat.isMultiplier ? (<p>X{formatValue(stat.value)}</p>) : (<p>{formatValue(stat.value)}</p>)}
+                    {isExplicit ? stat.value : (stat.isMultiplier ? (<p>X{formatValue(stat.value)}</p>) : (<p>{formatValue(stat.value)}</p>))}
                 </TippyWrapper>
-            ) : (stat.isMultiplier ? (<p>X{formatValue(stat.value)}</p>) : (<p>{formatValue(stat.value)}</p>))}
+            ) : (isExplicit ? stat.value : (stat.isMultiplier ? (<p>X{formatValue(stat.value)}</p>) : (<p>{formatValue(stat.value)}</p>)))}
         </div>
     );
 };

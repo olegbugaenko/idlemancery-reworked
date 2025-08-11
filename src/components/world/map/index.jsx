@@ -24,7 +24,7 @@ export const MapWrap = ({ children }) => {
 
     const worker = useContext(WorkerContext);
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
 
     const [unlocks, setUnlocksData] = useState({});
 
@@ -43,38 +43,61 @@ export const MapWrap = ({ children }) => {
         }
     }, [])
 
-    onMessage('unlocks-world', (unlocks) => {
-        setUnlocksData(unlocks);
-    })
+    useEffect(() => {
+        onMessage('unlocks-world', (unlocks) => {
+            setUnlocksData(unlocks);
+        });
+        
+        return () => {
+            removeMessage('unlocks-world');
+        };
+    }, []);
 
-    onMessage('new-unlocks-notifications-world', payload => {
-        setNewUnlocks(payload);
-    })
+    useEffect(() => {
+        onMessage('new-unlocks-notifications-world', payload => {
+            setNewUnlocks(payload);
+        });
+        
+        return () => {
+            removeMessage('new-unlocks-notifications-world');
+        };
+    }, []);
 
-    onMessage('map-tile-list-data', (payload) => {
-        if(!listDetails) return;
+    useEffect(() => {
+        onMessage('map-tile-list-data', (payload) => {
+            if(!listDetails) return;
 
-        setListDetails({
-            ...listDetails,
-            listData: payload,
-            isEdit: listDetails.isEdit,
-            isLoading: false,
-            automationUnlocked: listDetails.automationUnlocked,
-        })
+            setListDetails({
+                ...listDetails,
+                listData: payload,
+                isEdit: listDetails.isEdit,
+                isLoading: false,
+                automationUnlocked: listDetails.automationUnlocked,
+            })
+        });
+        
+        return () => {
+            removeMessage('map-tile-list-data');
+        };
+    }, [listDetails]);
 
-    })
-
-    onMessage('map-tile-list-effects', (payload) => {
-        setListDetails({
-            ...listDetails,
-            listData: {
-                ...listDetails.listData,
-                drops: payload.potentialDrops,
-                costs: payload.costs,
-                proportionsBar: payload.proportionsBar,
-            }
-        })
-    })
+    useEffect(() => {
+        onMessage('map-tile-list-effects', (payload) => {
+            setListDetails({
+                ...listDetails,
+                listData: {
+                    ...listDetails.listData,
+                    drops: payload.potentialDrops,
+                    costs: payload.costs,
+                    proportionsBar: payload.proportionsBar,
+                }
+            })
+        });
+        
+        return () => {
+            removeMessage('map-tile-list-effects');
+        };
+    }, [listDetails]);
 
     const setAutotriggerPriority = useCallback((priority) => {
         const { listData } = listDetails ?? {};
@@ -259,26 +282,32 @@ export const MapWrap = ({ children }) => {
         sendData('query-map-list-highlighted-tiles', {});
     }
 
-    onMessage('map-list-highlighted-tiles', (data) => {
-        const { listData } = listDetails ?? {};
-        if(listData) {
-            const newList = listData;
-            data.tiles.map(({ iRow, iCol}) => {
-                const oTP = {
-                    id: `${iRow}:${iCol}`,
-                    name: `Tile ${iRow}:${iCol}`,
-                    i: iRow,
-                    j: iCol,
-                    time: 1,
-                }
-                if(!newList.tiles.find(o => o.id === oTP.id)) {
-                    newList.tiles.push(oTP)
-                }
-            })
-            setListDetails({...listDetails, listData: {...newList}});
-            sendData('query-map-tile-list-effects', { listData: newList });
-        }
-    })
+    useEffect(() => {
+        onMessage('map-list-highlighted-tiles', (data) => {
+            const { listData } = listDetails ?? {};
+            if(listData) {
+                const newList = listData;
+                data.tiles.map(({ iRow, iCol}) => {
+                    const oTP = {
+                        id: `${iRow}:${iCol}`,
+                        name: `Tile ${iRow}:${iCol}`,
+                        i: iRow,
+                        j: iCol,
+                        time: 1,
+                    }
+                    if(!newList.tiles.find(o => o.id === oTP.id)) {
+                        newList.tiles.push(oTP)
+                    }
+                })
+                setListDetails({...listDetails, listData: {...newList}});
+                sendData('query-map-tile-list-effects', { listData: newList });
+            }
+        });
+        
+        return () => {
+            removeMessage('map-list-highlighted-tiles');
+        };
+    }, [listDetails]);
 
     const onUpdateActionFromList = (id, key, value) => {
         const { listData } = listDetails ?? {};
@@ -369,7 +398,7 @@ export const GeneralStats = ({ setDetailVisible }) => {
 
     const { isMobile } = useAppContext();
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
 
     useEffect(() => {
         sendData('map-query-general-data', {})
@@ -382,9 +411,15 @@ export const GeneralStats = ({ setDetailVisible }) => {
         }
     }, [])
 
-    onMessage('map-general-data', data => {
-        setData(data)
-    })
+    useEffect(() => {
+        onMessage('map-general-data', data => {
+            setData(data)
+        });
+        
+        return () => {
+            removeMessage('map-general-data');
+        };
+    }, []);
 
     const setAutoinvestigationEnabled = (flag) => {
         sendData('map-set-autoinvestigation', { flag })
@@ -444,9 +479,9 @@ export const GeneralStats = ({ setDetailVisible }) => {
                         Regenerating map will totally regenerate all your map tiles and remove map lists
                     </p>
                 </div>) : null}
-                <div className={'block'}>
-                    {isMobile ? (<button onClick={() => setDetailVisible(false)}>Close</button> ) : null}
-                </div>
+                {isMobile ? (<div className={'block buttons'}>
+                    <button onClick={() => setDetailVisible(false)}>Close</button>
+                </div>) : null}
             </div>
         </PerfectScrollbar>
     )
@@ -456,29 +491,31 @@ export const ItemDetails = ({itemId, setItemDetails}) => {
 
     const worker = useContext(WorkerContext);
 
-    const { onMessage, sendData } = useWorkerClient(worker);
-
-    const [item, setDetailOpened] = useState(null);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
 
     const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
 
+    const [item, setDetailOpened] = useState(null);
 
     useEffect(() => {
-        sendData('query-map-tile-details', itemId);
         const interval = setInterval(() => {
             sendData('query-map-tile-details', itemId);
-        }, 1000);
+        }, 100);
 
         return () => {
             clearInterval(interval);
         }
-
     }, [itemId])
 
-
-    onMessage('map-tile-details', (items) => {
-        setDetailOpened(items);
-    })
+    useEffect(() => {
+        onMessage('map-tile-details', (items) => {
+            setDetailOpened(items);
+        });
+        
+        return () => {
+            removeMessage('map-tile-details');
+        };
+    }, []);
 
     const toggleRunning = (i, j, flag) => {
         sendData('toggle-map-tile-running', { i, j, flag })

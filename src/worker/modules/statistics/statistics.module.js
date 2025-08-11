@@ -44,7 +44,6 @@ export class StatisticsModule extends GameModule {
 
     tick(game, delta) {
         // Save economic metrics every 30 minutes
-        console.log('LS: ', this.lastMetricsSave, this.metricsSaveInterval, this.economicMetrics);
         this.lastMetricsSave += delta;
         if (this.lastMetricsSave >= this.metricsSaveInterval) {
             this.lastMetricsSave = 0;
@@ -172,7 +171,7 @@ export class StatisticsModule extends GameModule {
 
         // Process sold resources
         for (const [resourceId, data] of Object.entries(this.tradingHistory.sold)) {
-            const resource = gameEntity.getEntity(resourceId);
+            const resource = gameResources.getResource(resourceId);
             if (resource) {
                 tradingStats.sold.push({
                     id: resourceId,

@@ -7,7 +7,7 @@ export const WorkshopMenu = ({ selectedTab, setSelectedTab }) => {
 
     const worker = useContext(WorkerContext);
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
 
     const [newUnlocks, setNewUnlocks] = useState({});
 
@@ -24,13 +24,25 @@ export const WorkshopMenu = ({ selectedTab, setSelectedTab }) => {
         }
     }, [])
 
-    onMessage('unlocks-world', (unlocks) => {
-        setUnlocksData(unlocks);
-    })
+    useEffect(() => {
+        onMessage('unlocks-world', (unlocks) => {
+            setUnlocksData(unlocks);
+        });
+        
+        return () => {
+            removeMessage('unlocks-world');
+        };
+    }, []);
 
-    onMessage('new-unlocks-notifications-workshop', payload => {
-        setNewUnlocks(payload);
-    })
+    useEffect(() => {
+        onMessage('new-unlocks-notifications-workshop', payload => {
+            setNewUnlocks(payload);
+        });
+        
+        return () => {
+            removeMessage('new-unlocks-notifications-workshop');
+        };
+    }, []);
 
     return (
             <ul className={'menu'}>
@@ -47,6 +59,11 @@ export const WorkshopMenu = ({ selectedTab, setSelectedTab }) => {
                 {unlocks.plantation ? (<li id={'workshop-menu-plantation'} className={`${selectedTab === 'plantation' ? 'active' : ''}`} onClick={() => {setSelectedTab('plantation');}}>
                     <NewNotificationWrap isNew={newUnlocks.workshop?.items?.plantations?.hasNew}>
                         <span>Plantations</span>
+                    </NewNotificationWrap>
+                </li>) : null}
+                {unlocks.artifacts ? (<li id={'workshop-menu-artifacts'} className={`${selectedTab === 'artifacts' ? 'active' : ''}`} onClick={() => {setSelectedTab('artifacts');}}>
+                    <NewNotificationWrap isNew={newUnlocks.workshop?.items?.artifacts?.hasNew}>
+                        <span>Artifacts</span>
                     </NewNotificationWrap>
                 </li>) : null}
             </ul>

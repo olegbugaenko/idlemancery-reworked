@@ -739,7 +739,7 @@ p.small-hint, span.small-hint {
 .card.social-event {
     display: flex;
     flex-direction: column;
-    height: 140px;
+    height: 130px;
     width: 240px;
 }
 
@@ -1311,7 +1311,8 @@ h4 {
 }
 
 .card.action .head,
-.card.social-event .head {
+.card.social-event .head,
+.card.expedition .head {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -2894,6 +2895,30 @@ span.highlighted-span.yellow {
     color: var(--yellow);
 }
 
+.expedition-efforts-indicator {
+    display: flex;
+    align-items: center;
+    margin-right: 16px;
+}
+
+.expedition-label {
+    font-size: 14px;
+    color: #cccccc;
+}
+
+.expedition-value {
+    margin-left: 12px;
+    font-weight: normal;
+}
+
+.expedition-value.green {
+    color: #2dfa50;
+}
+
+.expedition-value.yellow {
+    color: var(--yellow);
+}
+
 .balance.green {
     color: #2dfa50;
 }
@@ -3294,6 +3319,16 @@ ul.menu .add-custom-filter .add-wrap {
     max-width: 300px;
     white-space: normal;
     pointer-events: none;
+}
+
+.tippy-portal-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9998;
 }
 
 .spell-wrap .menu-wrap.magic {
@@ -4103,12 +4138,16 @@ body::after {
     padding: 10px;
     border-radius: 5px;
     margin-bottom: 10px;
+    overflow: hidden;
 }
 
 .chart-bar {
     min-width: 2px;
+    min-height: 2px;
     transition: all 0.3s ease;
     cursor: pointer;
+    border-radius: 1px;
+    margin: 0 1px;
 }
 
 .chart-bar:hover {
@@ -4256,7 +4295,6 @@ body::after {
     color: #da401d;
     text-shadow: 0 0 12px #fa502d !important;
     filter: drop-shadow(0 0 8px #fa502d);
-    font-size: 18px;
 }
 
 .empty-state {
@@ -4286,7 +4324,7 @@ body::after {
 .favorite-btn.favorited {
     color: #23a7d5 !important;
     border-color: #23a7d5 !important;
-    box-shadow: 0 0 4px rgba(35, 167, 213, 0.4);
+    box-shadow: 0 0 12px var(--highlight);
 }
 
 .action-favorite-btn,
@@ -4296,4 +4334,72 @@ body::after {
 
 .list-favorite-btn {
     margin-right: 8px;
+}
+
+/* Expeditions Styles */
+.expeditions-wrap {
+    display: flex;
+    height: 100%;
+    background: var(--darkbg);
+}
+
+.expeditions {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.card.expedition {
+    height: 110px;
+    width: 240px;
+}
+
+.card.expedition .xp-box {
+    font-size: 11px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card.expedition .xp-box .xp-text {
+    flex: 1;
+    text-align: left;
+}
+
+.card.expedition .xp-box .xp-income {
+    flex: 0 0 auto;
+    text-align: right;
+}
+
+.artifacts-crafting-header {
+    text-align: center;
+}
+
+.artifacts-crafting .crafting-slots {
+    text-align: center;
+}
+
+.artifacts-crafting .crafting-slots .icon-content {
+    width: 64px;
+    height: 64px;
+}
+
+.artifacts-crafting .slots-container {
+    justify-content: center;
+}
+
+.artifacts-crafting-header h2 {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* Artifact crafting slot highlighting */
+.crafting-slot.highlight-green {
+    box-shadow: 0 0 10px #4CAF50;
+    border: 2px solid #4CAF50;
+}
+
+.crafting-slot.highlight-red {
+    box-shadow: 0 0 10px #f44336;
+    border: 2px solid #f44336;
 }

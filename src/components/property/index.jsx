@@ -16,6 +16,7 @@ import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
 import StatRow from "../shared/stat-row.jsx";
 import {playSound} from "../../context/sounds/sound-manager";
 import {StructureUpgrades} from "./structures.jsx";
+import {ArtifactUpgrades} from "./artifacts.jsx";
 
 export const Property = ({}) => {
     const [detailOpened, setDetailOpened] = useState(null)
@@ -52,7 +53,8 @@ export const Property = ({}) => {
             furniture: 'property',
             accessory: 'crafting',
             structure: 'structures',
-            amplifier: 'amplifiers'
+            amplifier: 'amplifiers',
+            artifact: 'artifacts'
         }
 
         if(!unlocks[mapToPages[selectedTab]]) {
@@ -111,12 +113,18 @@ export const Property = ({}) => {
                                 <span>Amplifiers</span>
                             </NewNotificationWrap>
                         </li>) : null}
+                        {unlocks.artifacts ? (<li className={`${selectedTab === 'artifact' ? 'active' : ''}`} onClick={() => {setSelectedTab('artifact'); setDetailOpened(null);}}>
+                            <NewNotificationWrap isNew={newUnlocks?.['property']?.items?.['artifact']?.hasNew}>
+                                <span>Artifacts</span>
+                            </NewNotificationWrap>
+                        </li>) : null}
                     </ul>
                 </div>
                 {selectedTab === 'furniture' ? (<FurnitureUpgrades setItemDetails={setItemDetails} purchaseItem={purchaseItem} deleteItem={deleteItem} newUnlocks={newUnlocks?.['property']?.items?.['furniture']?.items} isMobile={isMobile}/>) : null}
                 {selectedTab === 'accessory' ? (<AccessoryUpgrades setItemDetails={setItemDetails} purchaseItem={purchaseItem} deleteItem={deleteItem} newUnlocks={newUnlocks?.['property']?.items?.['accessory']?.items} isMobile={isMobile}/>) : null}
                 {selectedTab === 'structure' ? (<StructureUpgrades setItemDetails={setItemDetails} purchaseItem={purchaseItem} deleteItem={deleteItem} newUnlocks={newUnlocks?.['property']?.items?.['structure']?.items} isMobile={isMobile}/>) : null}
                 {selectedTab === 'amplifier' ? (<AmplifiersUpgrades setItemDetails={setItemDetails} purchaseItem={purchaseItem} deleteItem={deleteItem} newUnlocks={newUnlocks?.['property']?.items?.['amplifier']?.items} isMobile={isMobile}/>) : null}
+                {selectedTab === 'artifact' ? (<ArtifactUpgrades setItemDetails={setItemDetails} purchaseItem={purchaseItem} deleteItem={deleteItem} newUnlocks={newUnlocks?.['property']?.items?.['artifact']?.items} isMobile={isMobile}/>) : null}
             </div>
 
             {(!isMobile || detailOpened) ? (<div className={'item-detail ingame-box detail-blade'}>
@@ -140,7 +148,7 @@ export const ItemDetails = ({itemId, category, setItemDetails, purchaseItem}) =>
     const {isMobile} = useAppContext();
 
     useEffect(() => {
-        if (category === 'furniture' || category === 'accessory' || category === 'structure' || category === 'amplifier') {
+        if (category === 'furniture' || category === 'accessory' || category === 'structure' || category === 'amplifier' || category === 'artifact') {
             const interval = setInterval(() => {
                 sendData('query-furniture-details', {id: itemId});
             }, 100);

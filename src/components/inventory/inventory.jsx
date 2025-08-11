@@ -44,7 +44,7 @@ export const Inventory = ({}) => {
     const [isDetailVisible, setDetailVisible] = useState(!isMobile);
     const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const [inventoryData, setItemsData] = useState({
         available: [],
         current: undefined,
@@ -88,41 +88,70 @@ export const Inventory = ({}) => {
         }
     }, [])
 
-    onMessage('new-unlocks-notifications-inventory', payload => {
-        setNewUnlocks(payload);
-    })
+    useEffect(() => {
+        onMessage('new-unlocks-notifications-inventory', payload => {
+            setNewUnlocks(payload);
+        });
+        
+        return () => {
+            removeMessage('new-unlocks-notifications-inventory');
+        };
+    }, []);
 
-    onMessage('all-resources', (payload) => {
-        setResources(payload);
-    })
+    useEffect(() => {
+        onMessage('all-resources', (payload) => {
+            setResources(payload);
+        });
+        
+        return () => {
+            removeMessage('all-resources');
+        };
+    }, []);
 
-    onMessage('inventory-details', (payload) => {
-        if(viewedOpenedId) {
-            setViewedData(payload);
-        } else if(detailOpenedId) {
-            setEditData(payload);
-            setViewedData(null);
-        } else {
-            setViewedData(null);
-            setEditData(null);
-        }
+    useEffect(() => {
+        onMessage('inventory-details', (payload) => {
+            if(viewedOpenedId) {
+                setViewedData(payload);
+            } else if(detailOpenedId) {
+                setEditData(payload);
+                setViewedData(null);
+            } else {
+                setViewedData(null);
+                setEditData(null);
+            }
+        });
+        
+        return () => {
+            removeMessage('inventory-details');
+        };
+    }, [viewedOpenedId, detailOpenedId]);
 
-    })
-
-    onMessage('inventory-data', (inventory) => {
-        setItemsData(inventory);
-    })
+    useEffect(() => {
+        onMessage('inventory-data', (inventory) => {
+            setItemsData(inventory);
+        });
+        
+        return () => {
+            removeMessage('inventory-data');
+        };
+    }, []);
 
     // Handle sell-details messages
-    onMessage("sell-details", (payload) => {
-        if (editData && payload.id === editData.id) {
-            setEditData((prevData) => ({
-                ...prevData,
-                isSellable: payload.isSellable,
-                maxSell: payload.maxSell,
-            }));
-        }
-    });
+    useEffect(() => {
+        onMessage("sell-details", (payload) => {
+            if (editData && payload.id === editData.id) {
+                setEditData((prevData) => ({
+                    ...prevData,
+                    isSellable: payload.isSellable,
+                    maxSell: payload.maxSell,
+                }));
+            }
+        });
+        
+        return () => {
+            removeMessage('sell-details');
+        };
+    }, [editData]);
 
     // Set up interval to query sell details
     useEffect(() => {
@@ -574,7 +603,7 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
 
     const worker = useContext(WorkerContext);
 
-    const { sendData, onMessage } = useWorkerClient(worker);
+    const { sendData, onMessage, removeMessage } = useWorkerClient(worker);
 
     const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
 
@@ -599,9 +628,15 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
         }
     }, [details?.numConsumed, details?.currentDuration]);
 
-    onMessage('detail-blade-inventory-details', (data) => {
-        setDetails(data);
-    })
+    useEffect(() => {
+        onMessage('detail-blade-inventory-details', (data) => {
+            setDetails(data);
+        });
+        
+        return () => {
+            removeMessage('detail-blade-inventory-details');
+        };
+    }, []);
 
     const setAutoconsumePattern = (pattern) => {
       onSetAutoconsumePattern(pattern)
