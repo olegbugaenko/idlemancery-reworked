@@ -454,7 +454,16 @@ export class InventoryModule extends GameModule {
                 isPinned: !!gameCore.getModule('resource-pool').pinnedResources?.[resource.id],
                 eta: gameResources.assertToCapOrEmpty(resource.id),
                 usages: gameEntity.getUsingEntities(resource.id),
-                usagesFor: gameEntity.getUsedForEntities(resource.id),
+                usagesFor: gameEntity.getUsedForEntities(resource.id).filter(one => {
+                    // Для артефактів не показуємо, поки рецепт не відкрито в модулі крафту артефактів
+                    const isArtifact = gameEntity.getEntity(one.id)?.tags?.includes('artifact');
+                    if (!isArtifact) return true;
+                    try {
+                        return gameCore.getModule('artifacts-crafting')?.isRecipeUnlocked(one.id) || false;
+                    } catch (e) {
+                        return false;
+                    }
+                }),
             })),
             itemCategories: Object.values(perCats).filter(cat => cat.items.length > 0),
             payload: pl,

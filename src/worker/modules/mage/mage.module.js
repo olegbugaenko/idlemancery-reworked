@@ -909,9 +909,10 @@ export class MageModule extends GameModule {
 
     getActiveEffectsData() {
         const items = gameEntity.listEntitiesByTags(['active_effect']);
+        // console.log('itemsActive: ', items);
         // const presentSpells = items.filter(item => item.isUnlocked);
         return {
-            list: items.filter(item => !this.activeEffectsFiltered[item.originalId] && !this.activeEffectsFiltered[item.copyFromId]).map(item => ({
+            list: items.filter(item => !this.activeEffectsFiltered[item.originalId] && !this.activeEffectsFiltered[item.copyFromId] && (item.efficiency)).map(item => ({
                 ...item,
                 originalId: item.originalId ?? item.copyFromId,
                 effects: gameEntity.getEffects(item.id, item.level, 0, false, 1, item.modifier.efficiency),

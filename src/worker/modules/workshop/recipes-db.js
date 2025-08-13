@@ -180,12 +180,12 @@ export const registerCraftingRecipes = () => {
                     },
                     mana: {
                         A: 1.5,
-                        B: 40*gameEffects.getEffectValue('crafting_effort')/gameEffects.getEffectValue('crafting_materials_discount'),
+                        B: 40*gameEffects.getEffectValue('crafting_effort')/gameEffects.getEffectValue('crafting_materials_discount')/gameEffects.getEffectValue('enchanted_paper_mana_discount'),
                         type: 1,
                     }
                 }
             }),
-            effectDeps: ['crafting_efficiency', 'crafting_materials_discount', 'crafting_effort']
+            effectDeps: ['crafting_efficiency', 'crafting_materials_discount', 'crafting_effort', 'enchanted_paper_mana_discount']
         },
         unlockCondition: () => {
             return gameResources.isResourceUnlocked('inventory_enchanted_paper')

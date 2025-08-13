@@ -63,6 +63,11 @@ export const formatInt = (number, numDigits = 2) => {
 };
 
 export function secondsToString(seconds) {
+    // Перевіряємо на NaN, null, undefined
+    if (seconds == null || isNaN(seconds) || seconds === undefined) {
+        return 'Unknown';
+    }
+    
     if(seconds > 1.e+12) {
         return 'Never';
     }

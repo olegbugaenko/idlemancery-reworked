@@ -99,9 +99,9 @@ export const ArtifactUpgrades = ({ setItemDetails, purchaseItem, deleteItem, new
                         {artifactsData.available.map(item => 
                             <NewNotificationWrap 
                                 key={`artifact_${item.id}`} 
-                                id={`artifact_${item.id}`} 
+                                id={item.id} 
                                 className={'narrow-wrapper'} 
-                                isNew={newUnlocks?.[`artifact_${item.id}`]?.hasNew}
+                                isNew={newUnlocks?.all?.items?.[item.id]?.hasNew}
                             >
                                 <ArtifactCard 
                                     isMobile={isMobile}

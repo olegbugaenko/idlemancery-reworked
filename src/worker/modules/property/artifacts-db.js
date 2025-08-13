@@ -86,10 +86,10 @@ export const registerArtifactsStage1 = () => {
         description: 'A magical container that expands your capacity to store wealth, increasing maximum coins',
         level: 0,
         resourceModifier: {
-            get_rawCap: () => ({
+            get_capMult: () => ({
                 resources: {
                     coins: {
-                        A: 0.1,
+                        A: 0.05,
                         B: 1,
                         C: 1.05,
                         type: 3,
@@ -299,6 +299,187 @@ export const registerArtifactsStage1 = () => {
                 type: 1
             }
         })
+    })
+
+    registerArtifact('artifact_enchanted_paper_optimizer', {
+        tags: ["artifact", "upgrade", "purchaseable", "mineral", "device"],
+        name: 'Enchanted Paper Optimizer',
+        allowedImpacts: ['effects'],
+        description: 'A sophisticated artifact crafted from magical lens, sapphire, and charged amethyst that optimizes the mana consumption when crafting enchanted paper, significantly reducing the magical energy required',
+        level: 0,
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'enchanted_paper_mana_discount': {
+                        A: 0.2,
+                        B: 1,
+                        C: 1.02,
+                        type: 3,
+                    }
+                }
+            })
+        },
+        get_cost: () => ({
+            'inventory_magic_lens': {
+                A: 1.2,
+                B: 25,
+                type: 1
+            },
+            'inventory_sapphire': {
+                A: 1.2,
+                B: 500,
+                type: 1
+            },
+            'inventory_charged_amethyst': {
+                A: 1.2,
+                B: 30,
+                type: 1
+            }
+        })
+    })
+
+    // Magical Bookmark + Dynosaur Bone + Refined Wood -> Tome accessories efficiency
+    registerArtifact('artifact_scholars_bookmark', {
+        tags: ["artifact", "upgrade", "purchaseable"],
+        name: 'Scholar\'s Bookmark',
+        allowedImpacts: ['effects'],
+        description: 'An enchanted marker carved onto ancient bone and wood. It subtly amplifies the power of accessories classified as tomes.',
+        level: 0,
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'tome_accessories_efficiency': {
+                        A: 0.05,
+                        B: 1,
+                        C: 1.02,
+                        type: 3,
+                    }
+                }
+            })
+        },
+        get_cost: () => ({
+            'inventory_magical_bookmark': { A: 1.2, B: 10, type: 1 },
+            'inventory_dynosaur_bone': { A: 1.2, B: 8, type: 1 },
+            'inventory_refined_wood': { A: 1.2, B: 150000, type: 1 },
+        })
+    })
+
+    // Vibrating Pot + Scribe Quill + Red Ink -> Alchemy effort boost
+    registerArtifact('artifact_alchemists_resonator', {
+        tags: ["artifact", "upgrade", "purchaseable"],
+        name: 'Alchemist\'s Resonator',
+        allowedImpacts: ['effects'],
+        description: 'A resonant set crafted from an enchanted vessel, a master quill and ritual ink. It heightens alchemical intensity.',
+        level: 0,
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'alchemy_effort': {
+                        A: 0.08,
+                        B: 1,
+                        C: 1.02,
+                        type: 3,
+                    }
+                }
+            })
+        },
+        get_cost: () => ({
+            'inventory_vibrating_pot': { A: 1.2, B: 10, type: 1 },
+            'inventory_scribe_quill': { A: 1.2, B: 10, type: 1 },
+            'inventory_red_ink': { A: 1.2, B: 2000, type: 1 },
+        })
+    })
+
+    // Magic Lens + Magical Bookmark + Sapphire -> Knowledge cap boost
+    registerArtifact('artifact_lens_of_retention', {
+        tags: ["artifact", "upgrade", "purchaseable", "mineral", "device"],
+        name: 'Lens of Retention',
+        allowedImpacts: ['resources'],
+        description: 'A precise assembly that focuses insight through a sapphire core and mnemonic bookmark, increasing knowledge capacity.',
+        level: 0,
+        resourceModifier: {
+            get_capMult: () => ({
+                resources: {
+                    'knowledge': {
+                        A: 0.10,
+                        B: 1,
+                        C: 1.02,
+                        type: 3,
+                    }
+                }
+            })
+        },
+        get_cost: () => ({
+            'inventory_magic_lens': { A: 1.2, B: 12, type: 1 },
+            'inventory_magical_bookmark': { A: 1.2, B: 10, type: 1 },
+            'inventory_sapphire': { A: 1.2, B: 6000, type: 1 },
+        })
+    })
+
+    // Scribe Quill + Magical Bookmark + Paper -> Mental training learning speed
+    registerArtifact('artifact_scholars_set', {
+        tags: ["artifact", "upgrade", "purchaseable", "paper"],
+        name: 'Scholar\'s Set',
+        allowedImpacts: ['effects'],
+        description: 'A classic study kit that inspires dedication and clarity, improving mental training learning rate.',
+        level: 0,
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'mental_training_learning_rate': {
+                        A: 0.12,
+                        B: 1,
+                        C: 1.02,
+                        type: 3,
+                    }
+                }
+            })
+        },
+        get_cost: () => ({
+            'inventory_scribe_quill': { A: 1.2, B: 10, type: 1 },
+            'inventory_magical_bookmark': { A: 1.2, B: 10, type: 1 },
+            'inventory_paper': { A: 1.2, B: 5000, type: 1 },
+        })
+    })
+
+    registerArtifact('artifact_reading_spectacles', {
+        tags: ["artifact", "upgrade", "purchaseable", "mineral", "device"],
+        name: 'Reading Spectacles',
+        allowedImpacts: ['effects'],
+        description: 'Magical spectacles crafted from pince-nez, charged amethyst, and refined wood that enhance your ability to read and comprehend books, significantly increasing reading efficiency',
+        level: 0,
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'read_books_efficiency': {
+                        A: 0.15,
+                        B: 1,
+                        C: 1.02,
+                        type: 3,
+                    }
+                }
+            })
+        },
+        get_cost: () => ({
+            'inventory_pince_nez': {
+                A: 1.2,
+                B: 15,
+                type: 1
+            },
+            'inventory_charged_amethyst': {
+                A: 1.2,
+                B: 25,
+                type: 1
+            },
+            'inventory_refined_wood': {
+                A: 1.2,
+                B: 200000,
+                type: 1
+            }
+        }),
+        unlockCondition: () => {
+            return gameEntity.isEntityUnlocked('expedition_ancient_library');
+        }
     })
 
 }

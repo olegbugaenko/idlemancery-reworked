@@ -46,6 +46,13 @@ export const registerCommomEffects = () => {
         description: 'Multiplier to amount of resources found during expeditions'
     })
 
+    gameEffects.registerEffect('enchanted_paper_mana_discount', {
+        name: 'Enchanted Paper Mana Discount',
+        defaultValue: 1.,
+        minValue: 1,
+        description: 'Discount to mana cost when crafting enchanted paper'
+    })
+
     gameEffects.registerEffect('gathering_perception', {
         name: 'Gathering Perception',
         defaultValue: 1.,
@@ -415,6 +422,14 @@ export const registerCommomEffects = () => {
         minValue: 1,
     })
 
+    // Accessories tag-based efficiency
+    gameEffects.registerEffect('tome_accessories_efficiency', {
+        name: 'Tome Accessories Efficiency',
+        description: 'Increases effects provided by accessories with tag "tome"',
+        defaultValue: 1,
+        minValue: 1,
+    })
+
     gameEffects.registerEffect('nature_spells_efficiency', {
         name: 'Nature Magic Efficiency',
         description: 'Increase output of spells with tag "nature"',
@@ -593,6 +608,23 @@ export const registerCommomEffects = () => {
     gameEffects.registerEffect('stone_hut_max_level_bonus', {
         name: 'Stone Hut Max Level Bonus',
         description: 'Increases the maximum level of Stone Hut',
+        defaultValue: 0,
+        minValue: 0,
+        hasCap: false,
+    })
+
+    // Max level bonuses for specific structures
+    gameEffects.registerEffect('stone_workshop_max_level_bonus', {
+        name: 'Stone Workshop Max Level Bonus',
+        description: 'Additional max levels for Stone Workshop provided by other buildings',
+        defaultValue: 0,
+        minValue: 0,
+        hasCap: false,
+    })
+
+    gameEffects.registerEffect('dry_storage_max_level_bonus', {
+        name: 'Dry Storage Max Level Bonus',
+        description: 'Additional max levels for Dry Storage provided by other buildings',
         defaultValue: 0,
         minValue: 0,
         hasCap: false,

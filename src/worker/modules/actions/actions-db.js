@@ -1325,6 +1325,42 @@ export const registerActionsStage1 = () => {
         }
     })
 
+    // Coal Mining — unlocked at 30000 Strength (replacing previous Masterwork bench idea)
+    registerGameAction('action_coal_mining', {
+        tags: ["action", "activity", "physical", "manual-labor"],
+        name: 'Coal Mining',
+        category: ACTION_CATS.PHYSICAL,
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        discountEffects: ['physical_actions_discount'],
+        description: 'Mine coal. Output is intentionally modest but enables automation era.',
+        level: 1,
+        getLearnRate: () => 1,
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'inventory_coal': {
+                        A: 0.00001*gameEffects.getEffectValue('manual_labor_efficiency')*gameEffects.getEffectValue('mining_efficiency'),
+                        B: 0.00008*gameEffects.getEffectValue('manual_labor_efficiency')*gameEffects.getEffectValue('mining_efficiency'),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': { A: 0.0, B: 120, type: 0 },
+                    'health': { A: 0.0, B: 60, type: 0 },
+                }
+            }),
+            effectDeps: ['manual_labor_efficiency', 'mining_efficiency']
+        },
+        unlockedBy: [{ type: 'effect', id: 'attribute_strength', level: 30000 }],
+        attributes: {
+            baseXPCost: 75000,
+            primaryAttribute: 'attribute_strength'
+        }
+    })
+
 
 
     registerGameAction('action_rest', {
@@ -3943,7 +3979,7 @@ export const registerActionsStage1 = () => {
             return true
         },
         attributes: {
-            baseXPCost: 100000000,
+            baseXPCost: 1000000000000,
             isTraining: true,
             isRankAvailable: true,
         }

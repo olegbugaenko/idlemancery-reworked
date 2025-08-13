@@ -1984,4 +1984,33 @@ export const registerFurnitureStage1 = () => {
             }
         }),
     })
+
+    // Press vice: boosts refined wood and stone brick production
+    registerFurniture('furniture_press_vice', {
+        tags: ["furniture", "upgrade", "purchaseable", "crafting"],
+        name: 'Press Vice',
+        description: 'Heavy-duty press that increases throughput for refined wood and stone brick production.',
+        level: 0,
+        maxLevel: 5,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_press_technology') > 0;
+        },
+        resourceModifier: {
+            multiplier: {
+                resources: {
+                    'inventory_refined_wood': { A: 0.15, B: 1, type: 0 },
+                    'inventory_stone_brick': { A: 0.15, B: 1, type: 0 },
+                }
+            },
+            consumption: {
+                resources: {
+                    'living_space': { A: 1, B: 0, type: 0 }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': { A: 2, B: 50000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')), type: 1 },
+            'living_space': { A: 0, B: 1, type: 0 }
+        })
+    })
 }

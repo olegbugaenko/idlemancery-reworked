@@ -221,6 +221,7 @@ export class EventsModule extends GameModule {
                     hasEnoughResources: affordable.isAffordable,
                     timesCompleted,
                     isAutoEnabled,
+                    isFavorite: gameCore.getModule('favorites')?.isFavorite('socialEvents', eventId) || false,
                     progress: isActive ? Math.min(1, (gameCore.globalTime - this.eventStartTime) / ((eventEntity.attributes.eventDuration || 1) / 1000)) : 0,
                     timeRemaining: isActive ? Math.max(0, (this.eventEndTime - gameCore.globalTime) * 1000) : 0, // Конвертуємо в мілісекунди для UI
                     cooldownRemaining: isOnCooldown ? Math.max(0, (this.cooldownEndTime - gameCore.globalTime) * 1000) : 0, // Конвертуємо назад в мілісекунди для UI

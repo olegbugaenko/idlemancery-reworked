@@ -332,7 +332,10 @@ export class ExpeditionsModule extends GameModule {
     }
 
     getExpeditionsData(payload) {
-        const expeditions = gameEntity.listEntitiesByTags(['expedition-location']);
+        // Показуємо лише відкриті експедиції
+        const expeditions = gameEntity
+            .listEntitiesByTags(['expedition-location'])
+            .filter(exp => gameEntity.isEntityUnlocked(exp.id));
         return {
             expeditions: expeditions.map(expedition => {
                 const expeditionData = this.expeditions[expedition.id] || {
@@ -355,7 +358,7 @@ export class ExpeditionsModule extends GameModule {
                     isRunning: expeditionData.isRunning,
                     currentXp: currentXp,
                     requiredXp: requiredXp,
-                    isUnlocked: expedition.unlockCondition ? expedition.unlockCondition() : true
+                    isUnlocked: true
                 };
             }),
             expeditionEffort: {

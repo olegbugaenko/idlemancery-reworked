@@ -1,14 +1,16 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
+import { AppProvider } from './context/ui-context.js';
+import { SoundProvider } from './context/sounds/sound-context.jsx';
+import { TutorialProvider } from './context/tutorial-context.js';
+import { TippyProvider } from './context/tippy-context.jsx';
+import { Main } from './components/main.jsx';
 import Worker from './worker/main.worker.js';
-import {useWorkerClient} from "./general/client";
-import {Main} from "./components/main.jsx";
-import 'react-tippy/dist/tippy.css'
-import WorkerContext from "./context/worker-context";
+import {useWorkerClient} from "./general/client.js";
+import {useAppContext} from "./context/ui-context.js";
 import './assets/styles.css';
 import 'react-perfect-scrollbar/dist/css/styles.css';
-import {AppProvider, useAppContext} from "./context/ui-context";
-import {DndProvider} from "./custom-libs/dnd";
-import {SoundProvider} from "./context/sounds/sound-context.jsx";
+import {DndProvider} from "./custom-libs/dnd/index.js";
+import WorkerContext from "./context/worker-context.js";
 
 function App() {
     const worker = window.worker || new Worker();
@@ -78,13 +80,21 @@ function App() {
     }, [readyToGo])
 
     return (
-        <WorkerContext.Provider value={worker}>
-            <SoundProvider>
-                <div className="App">
-                    <Main readyToGo={readyToGo} isLoading={isLoading}/>
-                </div>
-            </SoundProvider>
-        </WorkerContext.Provider>
+        <AppProvider>
+            <WorkerContext.Provider value={worker}>
+                <SoundProvider>
+                    <TutorialProvider>
+                        <TippyProvider>
+                            <DndProvider>
+                                <div className="App">
+                                    <Main readyToGo={readyToGo} isLoading={isLoading}/>
+                                </div>
+                            </DndProvider>
+                        </TippyProvider>
+                    </TutorialProvider>
+                </SoundProvider>
+            </WorkerContext.Provider>
+        </AppProvider>
     );
 }
 

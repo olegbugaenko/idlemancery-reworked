@@ -15,7 +15,9 @@ export const QuickAccessPanel = () => {
         actionLists: [],
         craftingLists: [],
         alchemyLists: [],
-        courses: []
+        courses: [],
+        guilds: [],
+        socialEvents: []
     });
 
     const [favoritesData, setFavoritesData] = useState({
@@ -23,7 +25,9 @@ export const QuickAccessPanel = () => {
         actionLists: {},
         craftingLists: {},
         alchemyLists: {},
-        courses: {}
+        courses: {},
+        guilds: {},
+        socialEvents: {}
     });
 
     useEffect(() => {
@@ -195,14 +199,47 @@ export const QuickAccessPanel = () => {
                     )}
 
                     {favorites.courses.length > 0 && (
-                        <div className="quick-access-section">
+                        <div className={'favorites-section'}>
                             <h4>Favorite Courses</h4>
-                            <div className="items-list">
-                                {favorites.courses.map(id => {
-                                    const course = favoritesData.courses[id];
-                                    return course ? renderCourseItem(course) : null;
-                                })}
-                            </div>
+                            {favorites.courses.map(id => {
+                                const course = favoritesData.courses[id];
+                                return course ? (
+                                    <div key={id} className={'favorite-item'}>
+                                        <span className="item-name">{course.name}</span>
+                                        <span onClick={() => removeFavorite('courses', id)} className="remove-btn">×</span>
+                                    </div>
+                                ) : null;
+                            })}
+                        </div>
+                    )}
+
+                    {favorites.guilds.length > 0 && (
+                        <div className={'favorites-section'}>
+                            <h4>Favorite Guilds</h4>
+                            {favorites.guilds.map(id => {
+                                const guild = favoritesData.guilds[id];
+                                return guild ? (
+                                    <div key={id} className={'favorite-item'}>
+                                        <span className="item-name">{guild.name}</span>
+                                        <span onClick={() => removeFavorite('guilds', id)} className="remove-btn">×</span>
+                                    </div>
+                                ) : null;
+                            })}
+                        </div>
+                    )}
+
+                    {favorites.socialEvents.length > 0 && (
+                        <div className={'favorites-section'}>
+                            <h4>Favorite Social Events</h4>
+                            {favorites.socialEvents.map(id => {
+                                const event = favoritesData.socialEvents[id];
+                                return event ? (
+                                    <div key={id} className={'favorite-item'}>
+                                        <span className="item-name">{event.name}</span>
+                                        <span onClick={() => removeFavorite('socialEvents', id)} className="remove-btn">×</span>
+                                    </div>
+                                ) : null;
+                            })}
                         </div>
                     )}
 

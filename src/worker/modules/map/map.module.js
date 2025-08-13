@@ -453,11 +453,12 @@ export class MapModule extends GameModule {
         const level = this.mapCreationSettings.level ?? 0;
         const maxDist = 7*Math.sqrt(2);
         const maxComplexity = Math.max(1, (maxDist-2) + 5*level + (1 + 0.75*(level**0.5))*(maxDist-2 + 3*(level**0.5)))*Math.pow(1.3, level)
-        const minComplexity = Math.max(1, (-1 + 5*level + 0.75*(level**0.5))*(-1 + 3*(level**0.5)))*Math.pow(1.3, level)
+        const minComplexity = Math.max(1, -1 +         5*level + (0.75*(level**0.5))*(-1 + 3*(level**0.5)))*Math.pow(1.3, level)
         let result = {
             min: 0.25 * minComplexity ** 1.75,
             max: maxComplexity ** 1.75,
         }
+        console.log('mapComplex: ', minComplexity, maxComplexity);
         return result;
     }
 

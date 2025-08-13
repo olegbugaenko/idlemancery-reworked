@@ -38,7 +38,7 @@ export const registerAccessory = (id, options) => {
 export const registerAccessoriesStage1 = () => {
 
     registerAccessory('accessory_wooden_casket', {
-        tags: ["accessory", "upgrade", "purchaseable", "storage"],
+        tags: ["accessory", "upgrade", "purchaseable", "storage", "wooden", "container"],
         name: 'Wooden Casket',
         description: 'Create compact and easy to handle wooden caskets to improve your coins storage',
         level: 0,
@@ -68,7 +68,7 @@ export const registerAccessoriesStage1 = () => {
 
 
     registerAccessory('accessory_wooden_talisman', {
-        tags: ["accessory", "upgrade", "purchaseable", "resource"],
+        tags: ["accessory", "upgrade", "purchaseable", "resource", "wooden", "trinket"],
         name: 'Wooden Talisman',
         description: 'Create wooden talisman that holds information about your bio-rhythms and improve your health regeneration',
         level: 0,
@@ -103,7 +103,7 @@ export const registerAccessoriesStage1 = () => {
 
 
     registerAccessory('accessory_wooden_bookcase', {
-        tags: ["accessory", "upgrade", "purchaseable", "storage"],
+        tags: ["accessory", "upgrade", "purchaseable", "storage", "wooden", "container"],
         name: 'Wooden Bookcase',
         description: 'Minimalistic and very convenient bookcase can significantly increase amount of books you can store, and therefore increase your knowledge cap',
         level: 0,
@@ -133,7 +133,7 @@ export const registerAccessoriesStage1 = () => {
 
 
     registerAccessory('accessory_aromatic_carpet', {
-        tags: ["accessory", "upgrade", "purchaseable", "resource"],
+        tags: ["accessory", "upgrade", "purchaseable", "resource", "fabric", "trinket"],
         name: 'Aromatic Carpet',
         description: 'Craft aromatic carpet that inspires you and boosts your energy recovery',
         level: 0,
@@ -168,7 +168,7 @@ export const registerAccessoriesStage1 = () => {
 
 
     registerAccessory('accessory_scroll_of_wisdom', {
-        tags: ["accessory", "upgrade", "purchaseable", "resource"],
+        tags: ["accessory", "upgrade", "purchaseable", "resource", "paper", "scroll"],
         name: 'Scroll of Wisdom',
         description: 'A scroll inscribed with glowing runes that impart knowledge to the reader. It continuously generates insight, aiding the bearer in gradually increasing their understanding and intelligence over time.',
         level: 0,
@@ -203,7 +203,7 @@ export const registerAccessoriesStage1 = () => {
 
 
     registerAccessory('accessory_scroll_of_restoration', {
-        tags: ["accessory", "upgrade", "purchaseable", "effect", "magic"],
+        tags: ["accessory", "upgrade", "purchaseable", "effect", "magic", "paper", "scroll"],
         name: 'Charm of Recovery Magic',
         description: 'A delicately folded paper charm shaped like a bird, imbued with recovery magic (NOTE. Not every restoration spell is recovery one)',
         level: 0,
@@ -243,7 +243,7 @@ export const registerAccessoriesStage1 = () => {
 
 
     registerAccessory('accessory_scroll_of_persuasion', {
-        tags: ["accessory", "upgrade", "purchaseable", "effect", "actions-learning"],
+        tags: ["accessory", "upgrade", "purchaseable", "effect", "actions-learning", "paper", "scroll"],
         name: 'Scroll of Persuasion',
         description: 'This enchanted parchment enhances your ability to connect with others, significantly boosting the efficiency of social training.',
         level: 0,
@@ -283,7 +283,7 @@ export const registerAccessoriesStage1 = () => {
     })
 
     registerAccessory('accessory_diplomatic_weave', {
-        tags: ["accessory", "upgrade", "purchaseable", "effect"],
+        tags: ["accessory", "upgrade", "purchaseable", "effect", "fabric", "trinket"],
         name: 'Diplomatic Weave',
         description: 'Crafted from the finest herbal fibers, this intricate weave symbolizes trust and cooperation, easing negotiations.',
         level: 0,
@@ -329,7 +329,7 @@ export const registerAccessoriesStage1 = () => {
 
 
     registerAccessory('accessory_tome_of_mentalist', {
-        tags: ["accessory", "upgrade", "purchaseable", "effect", "actions-learning"],
+        tags: ["accessory", "upgrade", "purchaseable", "effect", "actions-learning", "paper", "tome"],
         name: 'Mentalist\'s Tome',
         description: 'Magic book containing a lot of mental power',
         level: 0,
@@ -338,16 +338,17 @@ export const registerAccessoriesStage1 = () => {
             return gameEntity.getLevel('shop_item_paper_enhance') > 0;
         },
         resourceModifier: {
-            multiplier: {
+            get_multiplier: () => ({
                 effects: {
                     'mental_training_learning_rate': {
-                        A: 0.04,
-                        B: 1,
+                        A: 0.04*gameEffects.getEffectValue('tome_accessories_efficiency'),
+                        B: gameEffects.getEffectValue('tome_accessories_efficiency'),
                         C: 1.01,
                         type: 3,
                     }
                 }
-            },
+            }),
+            effectDeps: ['tome_accessories_efficiency']
         },
         get_cost: () => ({
             'inventory_enchanted_paper': {
@@ -370,7 +371,7 @@ export const registerAccessoriesStage1 = () => {
 
 
     registerAccessory('accessory_tome_of_occultism', {
-        tags: ["accessory", "upgrade", "purchaseable", "effect", "actions-learning"],
+        tags: ["accessory", "upgrade", "purchaseable", "effect", "actions-learning", "paper", "tome"],
         name: 'Occultist\'s Tome',
         description: 'Small glowing tome. You feel inspiration every time you touch it',
         level: 0,
@@ -379,16 +380,17 @@ export const registerAccessoriesStage1 = () => {
             return gameEntity.getLevel('shop_item_paper_enhance') > 0;
         },
         resourceModifier: {
-            multiplier: {
+            get_multiplier: () => ({
                 effects: {
                     'spiritual_learning_rate': {
-                        A: 0.04,
-                        B: 1,
+                        A: 0.04*gameEffects.getEffectValue('tome_accessories_efficiency'),
+                        B: gameEffects.getEffectValue('tome_accessories_efficiency'),
                         C: 1.01,
                         type: 3,
                     }
                 }
-            },
+            }),
+            effectDeps: ['tome_accessories_efficiency']
         },
         get_cost: () => ({
             'inventory_enchanted_paper': {
@@ -411,7 +413,7 @@ export const registerAccessoriesStage1 = () => {
 
 
     registerAccessory('accessory_ruby_pendant', {
-        tags: ["accessory", "upgrade", "purchaseable", "effect", "actions-learning"],
+        tags: ["accessory", "upgrade", "purchaseable", "effect", "actions-learning", "mineral", "jewelry"],
         name: 'Ruby Pendant',
         description: 'Create ruby pendant that empowers your physical learning rate',
         level: 0,
@@ -441,7 +443,7 @@ export const registerAccessoriesStage1 = () => {
 
 
     registerAccessory('accessory_vitality_talisman', {
-        tags: ["accessory", "upgrade", "purchaseable", "storage"],
+        tags: ["accessory", "upgrade", "purchaseable", "storage", "mineral", "trinket"],
         name: 'Vitality Talisman',
         description: 'Increase your HP and energy caps',
         level: 0,
@@ -477,7 +479,7 @@ export const registerAccessoriesStage1 = () => {
 
 
     registerAccessory('accessory_sapphire_ring', {
-        tags: ["accessory", "upgrade", "purchaseable", "effect", "magic"],
+        tags: ["accessory", "upgrade", "purchaseable", "effect", "magic", "mineral", "jewelry"],
         name: 'Sapphire Ring',
         description: 'Increase your spell XP gain',
         level: 0,
@@ -507,7 +509,7 @@ export const registerAccessoriesStage1 = () => {
 
 
     registerAccessory('accessory_sapphire_pendant', {
-        tags: ["accessory", "upgrade", "purchaseable", "storage", "magic"],
+        tags: ["accessory", "upgrade", "purchaseable", "storage", "magic", "mineral", "jewelry"],
         name: 'Sapphire Pendant',
         description: 'Increase your mana cap',
         level: 0,
@@ -537,7 +539,7 @@ export const registerAccessoriesStage1 = () => {
 
 
     registerAccessory('accessory_iron_stash', {
-        tags: ["accessory", "upgrade", "purchaseable", "storage"],
+        tags: ["accessory", "upgrade", "purchaseable", "storage", "metal", "container"],
         name: 'Iron Stash',
         description: 'Craft better and more reliable iron containers for storing coins',
         level: 0,
@@ -568,7 +570,7 @@ export const registerAccessoriesStage1 = () => {
 
 
     registerAccessory('accessory_sages_notes', {
-        tags: ["accessory", "upgrade", "purchaseable", "resource"],
+        tags: ["accessory", "upgrade", "purchaseable", "resource", "paper", "scroll"],
         name: 'Sage\'s Notes',
         description: 'Increase your knowledge generation',
         level: 0,
@@ -608,7 +610,7 @@ export const registerAccessoriesStage1 = () => {
     })
 
     registerAccessory('accessory_mages_notes', {
-        tags: ["accessory", "upgrade", "purchaseable", "resource", "magic"],
+        tags: ["accessory", "upgrade", "purchaseable", "resource", "magic", "paper", "scroll"],
         name: 'Mage\'s Notes',
         description: 'Increase your mana generation',
         level: 0,
@@ -647,7 +649,7 @@ export const registerAccessoriesStage1 = () => {
     })
 
     registerAccessory('accessory_accelerated_study_scroll', {
-        tags: ["accessory", "upgrade", "purchaseable", "effect", "courses"],
+        tags: ["accessory", "upgrade", "purchaseable", "effect", "courses", "paper", "scroll"],
         name: 'Accelerated Study Scroll',
         description: 'A meticulously crafted scroll, inscribed with red ink, that reduces the time required for studying and mastering courses.',
         level: 0,
@@ -688,7 +690,7 @@ export const registerAccessoriesStage1 = () => {
 
 
     registerAccessory('accessory_scribes_notes', {
-        tags: ["accessory", "upgrade", "purchaseable", "effect", "courses"],
+        tags: ["accessory", "upgrade", "purchaseable", "effect", "courses", "paper", "scroll"],
         name: 'Scribe\'s Notes',
         description: 'Detailed notes that enhance course efficiency, reducing XP requirements for mastering actions.',
         level: 0,
@@ -773,7 +775,7 @@ export const registerAccessoriesStage1 = () => {
 
 
     registerAccessory('accessory_red_seal_notes', {
-        tags: ["accessory", "upgrade", "purchaseable", "resource"],
+        tags: ["accessory", "upgrade", "purchaseable", "resource", "paper", "scroll"],
         name: 'Red Seal Scroll',
         description: 'A magically sealed scroll that boosts mental energy income, encouraging heightened focus and clarity.',
         level: 0,
@@ -816,7 +818,7 @@ export const registerAccessoriesStage1 = () => {
 
 
     registerAccessory('accessory_obsidian_pendant', {
-        tags: ["accessory", "upgrade", "purchaseable", "resource"],
+        tags: ["accessory", "upgrade", "purchaseable", "resource", "mineral", "jewelry"],
         name: 'Obsidian Pendant',
         description: 'A sleek pendant forged from obsidian shards, it channels the stone\'s raw power to amplify your vitality, increasing your energy income.',
         level: 0,
@@ -859,7 +861,7 @@ export const registerAccessoriesStage1 = () => {
 
 
     registerAccessory('accessory_obsidian_amulet', {
-        tags: ["accessory", "upgrade", "purchaseable", "effect", "actions-learning"],
+        tags: ["accessory", "upgrade", "purchaseable", "effect", "actions-learning", "mineral", "trinket"],
         name: 'Obsidian Amulet',
         description: 'An intricately crafted amulet of polished obsidian, its dark surface seems to absorb distraction, sharpening your focus and accelerating the mastery of routine tasks.',
         level: 0,
@@ -901,7 +903,7 @@ export const registerAccessoriesStage1 = () => {
 
 
     registerAccessory('accessory_steel_amulet', {
-        tags: ["accessory", "upgrade", "purchaseable", "resource"],
+        tags: ["accessory", "upgrade", "purchaseable", "resource", "metal", "trinket"],
         name: 'Steel Amulet',
         description: 'A steel amulet increasing your health regeneration',
         level: 0,
@@ -943,7 +945,7 @@ export const registerAccessoriesStage1 = () => {
     })
 
     registerAccessory('accessory_steel_hammer', {
-        tags: ["accessory", "upgrade", "purchaseable", "resource"],
+        tags: ["accessory", "upgrade", "purchaseable", "resource", "metal", "tool"],
         name: 'Steel Hammer',
         description: 'Increase stone refinement efficiency',
         level: 0,
@@ -992,7 +994,7 @@ export const registerAccessoriesStage1 = () => {
 
 
     registerAccessory('accessory_expedition_planner', {
-        tags: ["accessory", "upgrade", "purchaseable", "effect", "maps"],
+        tags: ["accessory", "upgrade", "purchaseable", "effect", "maps", "paper", "device"],
         name: 'Expedition Planner',
         description: 'A meticulously crafted toolset used by seasoned explorers to optimize their expeditions, reducing the cost of generating new map layers.',
         level: 0,
@@ -1032,7 +1034,7 @@ export const registerAccessoriesStage1 = () => {
     })
 
     registerAccessory('accessory_craft_binder', {
-        tags: ["accessory", "upgrade", "purchaseable", "crafting"],
+        tags: ["accessory", "upgrade", "purchaseable", "crafting", "metal", "device"],
         name: 'Craftbinder',
         description: 'A structured metal core wrapped in organic and forged layers. It channels your inner discipline into parallel creation.',
         level: 0,
@@ -1071,7 +1073,7 @@ export const registerAccessoriesStage1 = () => {
     })
 
     registerAccessory('accessory_focus_crystal', {
-        tags: ["accessory", "upgrade", "purchaseable", "effect", "maps"],
+        tags: ["accessory", "upgrade", "purchaseable", "effect", "maps", "mineral", "device"],
         name: 'Crystal of Focus',
         description: 'A glowing crystal formed from ancient amber and volcanic obsidian. It enhances your mental clarity, letting you learn faster and more deeply.',
         level: 0,
@@ -1106,7 +1108,7 @@ export const registerAccessoriesStage1 = () => {
 
 
     registerAccessory('accessory_metallurgist_hammer', {
-        tags: ["accessory", "upgrade", "purchaseable", "resource"],
+        tags: ["accessory", "upgrade", "purchaseable", "resource", "metal", "tool"],
         name: 'Metallurgist Hammer',
         description: 'Increase metals forging and refinement efficiency',
         level: 0,
@@ -1153,7 +1155,7 @@ export const registerAccessoriesStage1 = () => {
     })
 
     registerAccessory('accessory_magical_atlas', {
-        tags: ["accessory", "upgrade", "purchaseable", "resource", "maps"],
+        tags: ["accessory", "upgrade", "purchaseable", "resource", "maps", "paper", "device"],
         name: 'Magical Atlas',
         description: 'A magical atlas that glows red to warn of dangers ahead. Your patience allows you to carefully study its maps and plan safe routes, making your resource gathering more efficient.',
         level: 0,

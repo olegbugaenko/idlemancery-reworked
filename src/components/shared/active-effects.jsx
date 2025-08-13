@@ -49,7 +49,9 @@ export const ActiveEffectItem = ({ id, originalId, customIcon, scope, name, desc
                         </div>
                     </div>
                     <div className={'other block'}>
-                        <p>Expires in: {secondsToString(duration)}</p>
+                        {duration && duration > 0 && !isNaN(duration) && (
+                            <p>Expires in: {secondsToString(duration)}</p>
+                        )}
                     </div>
                 </div>
 

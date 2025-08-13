@@ -858,7 +858,7 @@ export const registerInventoryItems = () => {
     registerInventoryItem('inventory_paper', {
         name: 'Paper',
         hasCap: false,
-        tags: ['inventory', 'material', 'craftable'],
+        tags: ['inventory', 'material', 'craftable', 'artifact-material', 'paper'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -1093,6 +1093,18 @@ export const registerInventoryItems = () => {
     })
 
 
+    registerInventoryItem('inventory_coal', {
+        name: 'Coal',
+        hasCap: false,
+        tags: ['inventory', 'material', 'mineral', 'fuel'],
+        defaultCap: 0,
+        isAbstract: true,
+        unlockCondition: () => {
+            return gameEntity.isEntityUnlocked('action_coal_mining');
+        },
+        sellPrice: 100000,
+    })
+
     registerInventoryItem('inventory_forged_steel', {
         name: 'Forged Steel',
         hasCap: false,
@@ -1139,7 +1151,7 @@ export const registerInventoryItems = () => {
     registerInventoryItem('inventory_red_ink', {
         name: 'Red Ink',
         hasCap: false,
-        tags: ['inventory', 'material', 'craftable'],
+        tags: ['inventory', 'material', 'craftable', 'artifact-material', 'ink'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -2257,6 +2269,60 @@ export const registerInventoryItems = () => {
             return gameEntity.getLevel('action_expedition') > 0
         },
         sellPrice: 1500000,
+    })
+
+    registerInventoryItem('inventory_pince_nez', {
+        name: 'Pince-nez',
+        hasCap: false,
+        tags: ['inventory', 'material', 'rare', 'artifact-material', 'library-material'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        attributes: {
+            isRare: true,
+        },
+        unlockCondition: () => {
+            return gameEntity.isEntityUnlocked('expedition_ancient_library')
+        },
+        sellPrice: 2000000,
+    })
+
+    registerInventoryItem('inventory_scribe_quill', {
+        name: 'Scribe Quill',
+        hasCap: false,
+        tags: ['inventory', 'material', 'rare', 'artifact-material', 'library-material'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        attributes: {
+            isRare: true,
+        },
+        unlockCondition: () => {
+            return gameEntity.isEntityUnlocked('expedition_ancient_library')
+        },
+        sellPrice: 1800000,
+    })
+
+    registerInventoryItem('inventory_magical_bookmark', {
+        name: 'Magical Bookmark',
+        hasCap: false,
+        tags: ['inventory', 'material', 'rare', 'artifact-material', 'library-material'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        attributes: {
+            isRare: true,
+        },
+        unlockCondition: () => {
+            return gameEntity.isEntityUnlocked('expedition_ancient_library')
+        },
+        sellPrice: 1600000,
     })
 
 }

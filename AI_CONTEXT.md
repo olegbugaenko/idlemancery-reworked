@@ -106,12 +106,194 @@ gameEntity.registerGameEntity('shop_item_magical_compass', {
                 'expedition_resource_amount': { A: 0.25, B: 1, type: 0 }
             }
         }
-    },
-    get_cost: () => ({
-        'coins': { A: 2.0, B: 5000000*charismaMod(...), type: 1 },
-        'mana': { A: 1.0, B: 300, type: 0 }
-    })
+    }
 })
+```
+
+## 🎨 UI ПАТТЕРНИ ТА КОМПОНЕНТИ
+
+### Структура карточки (Card):
+```jsx
+<div className="item-card card">
+    {/* 1. HEAD секція - заголовок та основна інформація */}
+    <div className="head">
+        <p className="title">{item.name}</p>
+        <span className="level">{item.level}</span>
+        {/* НЕ додавати кнопки сюди! */}
+    </div>
+    
+    {/* 2. CONTENT секція - опис, прогрес, статистика */}
+    <div className="content">
+        {/* Опис, прогрес-бари, ресурси */}
+    </div>
+    
+    {/* 3. ITEM-ACTIONS секція - ВСІ кнопки та елементи керування */}
+    <div className="item-actions padded-left buttons">
+        {/* Кнопка запуску/зупинки */}
+        <CustomButton onClick={handleAction}>
+            {isActive ? 'Stop' : 'Start'}
+        </CustomButton>
+        
+        {/* Checkbox для автоматизації */}
+        <label className="automate-checkbox">
+            <input type="checkbox" checked={isAuto} onChange={handleAuto} />
+            <span>Automate</span>
+        </label>
+        
+        {/* Кнопка favorite - ЗАВЖДИ тут! */}
+        <FavoriteButton 
+            type="socialEvents" 
+            id={item.id} 
+            isFavorite={item.isFavorite} 
+            className="event-favorite-btn icon-content interface-icon small clickable-icon" 
+        />
+    </div>
+</div>
+```
+
+### ⚠️ ВАЖЛИВО: Зона для кнопок
+**ВСІ інтерактивні елементи (кнопки, чекбокси, favorite) повинні бути в `item-actions` секції:**
+
+- ✅ **ПРАВИЛЬНО:** `FavoriteButton` в `item-actions` поруч з кнопкою запуску
+- ❌ **НЕПРАВИЛЬНО:** `FavoriteButton` в `head` секції або окремо
+
+**Приклади правильного розташування:**
+- `actions.jsx` - favorite кнопка в `action-actions`
+- `shop.jsx` - favorite кнопка в `course-actions`  
+- `event-hall.jsx` - favorite кнопка в `item-actions`
+- `guilds.jsx` - favorite кнопка в `guild-card-inner`
+
+**CSS класи для зони кнопок:**
+```css
+.item-actions {
+    /* Всі кнопки та елементи керування */
+}
+
+.buttons {
+    /* Додатковий клас для стилізації */
+}
+
+.flex-container {
+    /* Для flexbox розташування кнопок */
+}
+```
+
+### 🧹 Tippy Tooltip Cleanup (ВИПРАВЛЕНО)
+**Проблема:** Накопичення `tippy-portal-container` елементів в DOM, що призводить до memory leak.
+
+**Рішення:**
+1. **Глобальний контейнер:** Використовується один `tippy-portal-container` замість створення нового для кожного tooltip'а
+2. **Автоматичне очищення:** Tooltip'и очищаються при зміні вкладки та закритті додатку
+3. **Функції cleanup:** `clearAllTooltips()` та `cleanupAllTippyContainers()`
+
+**Використання:**
+```javascript
+import { clearAllTooltips, cleanupAllTippyContainers } from "../shared/tippy-wrapper.jsx";
+
+// Очищення при зміні вкладки
+useEffect(() => {
+    clearAllTooltips();
+    cleanupAllTippyContainers();
+}, [openedTab]);
+
+// Очищення при закритті
+useEffect(() => {
+    return () => {
+        clearAllTooltips();
+        cleanupAllTippyContainers();
+    };
+}, []);
+```
+
+**Результат:** DOM залишається чистим, немає накопичення tooltip контейнерів.
+
+### 🎯 Tippy Tooltip Позиціонування (ВИПРАВЛЕНО)
+**Проблема:** Tooltip'и іноді "стрибають" в лівий верхній кут екрану.
+
+**Рішення:**
+1. **Перевірка видимості:** Tooltip не показується якщо елемент-ціль має нульові розміри
+2. **ResizeObserver:** Автоматичне оновлення позиції при зміні розміру вікна
+3. **Валідація позиції:** Tooltip приховується якщо виходить за межі екрану
+4. **Обмеження кількості:** Максимум 3 активних tooltip'и одночасно
+
+**Технічні деталі:**
+```javascript
+// Перевірка видимості елемента
+if (targetRect.width === 0 || targetRect.height === 0) {
+    setVisible(false);
+    return;
+}
+
+// ResizeObserver для автоматичного оновлення
+resizeObserver = new ResizeObserver(() => {
+    if (visible && popoverRef.current) {
+        setTimeout(() => positionPopover(), 50);
+    }
+});
+
+// Валідація позиції
+if (top < 0 || top > viewportHeight || left < 0 || left > viewportWidth) {
+    setVisible(false);
+    return;
+}
+```
+
+**Результат:** Tooltip'и завжди показуються в правильній позиції, немає "стрибання" в кут екрану.
+
+### 🔓 ПРАВИЛЬНЕ ВИКОРИСТАННЯ ФУНКЦІЙ АНЛОКА (ВАЖЛИВО!)
+
+**КРИТИЧНО ВАЖЛИВО:** Використовувати правильну функцію `isUnlocked` для кожного типу об'єкта!
+
+```javascript
+// ✅ ПРАВИЛЬНО - для ентіті (артефакти, дії, структури)
+if (!gameEntity.isEntityUnlocked(entityId)) continue;
+
+// ✅ ПРАВИЛЬНО - для ресурсів (матеріали, валюта)
+if (!gameResources.isResourceUnlocked(resourceId)) continue;
+
+// ✅ ПРАВИЛЬНО - для ефектів
+if (!gameEffects.isEffectUnlocked(effectId)) continue;
+```
+
+**НЕПРАВИЛЬНО:**
+```javascript
+// ❌ НЕПРАВИЛЬНО - використання gameEntity.isEntityUnlocked() для ресурсів
+if (!gameEntity.isEntityUnlocked(resourceId)) continue;
+
+// ❌ НЕПРАВИЛЬНО - використання gameResources.isResourceUnlocked() для ентіті
+if (!gameResources.isResourceUnlocked(entityId)) continue;
+```
+
+### 📁 ІМПОРТИ ФАЙЛІВ (ВАЖЛИВО!)
+
+**ОБОВ'ЯЗКОВО** вказувати розширення файлів в імпортах:
+
+```javascript
+// ✅ ПРАВИЛЬНО - з розширенням
+import { Component } from './components/component.jsx';
+import { Hook } from './hooks/hook.js';
+import { Context } from './context/context.js';
+
+// ❌ НЕПРАВИЛЬНО - без розширення
+import { Component } from './components/component';
+import { Hook } from './hooks/hook';
+import { Context } from './context/context';
+```
+
+**Правила:**
+- **`.jsx`** - для React компонентів та JSX файлів
+- **`.js`** - для звичайних JavaScript файлів
+- **`.worker.js`** - для Web Worker файлів
+- **`.css`** - для стилів
+- **`.png/.jpg/.svg`** - для зображень
+
+**Приклади правильних імпортів:**
+```javascript
+import { AppProvider } from './context/ui-context.js';
+import { SoundProvider } from './context/sounds/sound-context.jsx';
+import { TippyProvider } from './context/tippy-context.jsx';
+import { Main } from './components/main.jsx';
+import { DndProvider } from './custom-libs/dnd/index.js';
 ```
 
 ## ⚠️ НАЙЧАСТІШІ ПОМИЛКИ AI
@@ -245,7 +427,7 @@ public/icons/
 - `expeditions.jsx:42` - інтервал 100ms може бути занадто швидким
 - Перевірити чи правильно передається `expedition.isRunning` з worker
 
-## �� ГЕЙМПЛЕЙ КОНТЕКСТ
+## 🎮 ГЕЙМПЛЕЙ КОНТЕКСТ
 
 ### Експедиції:
 - Гравці відправляються в expedition_ancient_ruins, expedition_ancient_cemetery

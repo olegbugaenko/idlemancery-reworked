@@ -12,6 +12,7 @@ import {HowToSign} from "../shared/how-to-sign.jsx";
 import {ProgressBar} from "../layout/progress-bar.jsx";
 import {CustomButton} from "../shared/buttons/custom-button.jsx";
 import StatRow from "../shared/stat-row.jsx";
+import {FavoriteButton} from "../shared/favorite-button.jsx";
 
 export const EventHallWrap = ({ children }) => {
 
@@ -159,7 +160,8 @@ export const EventCard = ({event, setItemDetails, startEvent, setAutoEvent, isMo
                 >
                     {event.isActive ? 'Running' : event.isOnCooldown ? 'Preparing...' : 'Start Event'}
                 </CustomButton>
-                
+            
+                <FavoriteButton type="socialEvents" id={event.id} isFavorite={event.isFavorite} className="event-favorite-btn icon-content interface-icon small clickable-icon" />    
                 <label className={'automate-checkbox'}>
                     <input 
                         type="checkbox" 

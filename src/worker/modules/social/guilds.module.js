@@ -216,6 +216,7 @@ export class GuildsModule extends GameModule {
         const guilds = gameEntity.listEntitiesByTags(['guild']).map(one => ({
             ...one,
             icon_id: one.attributes.icon_id,
+            isFavorite: gameCore.getModule('favorites')?.isFavorite('guilds', one.id) || false,
         }));
         const current = this.selectedGuild ? guilds.find(g => g.id === this.selectedGuild) : undefined;
         const upgrades = gameEntity.listEntitiesByTags(['guild-upgrade']);

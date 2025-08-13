@@ -3071,6 +3071,26 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+    // Press Technology
+    gameEntity.registerGameEntity('shop_item_press_technology', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Press Technology',
+        description: 'Mastery of mechanical pressing allows higher throughput for compression and shaping. Unlocks the Press vice furniture.',
+        level: 0,
+        maxLevel: 1,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 20000,
+        }],
+        unlockCondition: () => true,
+        attributes: { isCollectable: false },
+        resourceModifier: {},
+        get_cost: () => ({
+            'coins': { A: 1, B: 200000000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')), type: 1 }
+        }),
+    })
+
     gameEntity.registerGameEntity('shop_item_lumbermill_optimization', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Lumbermill Optimization',

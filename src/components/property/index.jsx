@@ -88,6 +88,8 @@ export const Property = ({}) => {
         }
     }
 
+    console.log('ArtNot: ', newUnlocks?.['property']?.items);
+
     return (
         <div className={'items-wrap'}>
             <div className={'items ingame-box'}>

@@ -117,7 +117,7 @@ export class ShopModule extends GameModule {
 
                         amount = Math.min(this.sellStocks[one.id] ?? 0, reserveLimit, purchaseMult);
 
-                        console.log(`Consume ${one.id}: `, amount, reserved, this.sellStocks[one.id]);
+                        // console.log(`Consume ${one.id}: `, amount, reserved, this.sellStocks[one.id]);
                         if(amount >= 1) {
                             this.purchaseResource(one.id, amount);
                         }

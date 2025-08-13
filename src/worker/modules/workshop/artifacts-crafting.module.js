@@ -104,6 +104,9 @@ export class ArtifactsCraftingModule extends GameModule {
             // Skip if already unlocked
             if (this.unlockedRecipes.includes(artifact.id)) continue;
             
+            // Skip if artifact is not unlocked (check unlockCondition)
+            if (!gameEntity.isEntityUnlocked(artifact.id)) continue;
+            
             // Get ingredients from artifact
             const ingredients = this.getArtifactIngredients(artifact);
             
@@ -138,6 +141,9 @@ export class ArtifactsCraftingModule extends GameModule {
         for (const artifact of artifacts) {
             // Skip if already unlocked
             if (this.unlockedRecipes.includes(artifact.id)) continue;
+            
+            // Skip if artifact is not unlocked (check unlockCondition)
+            if (!gameEntity.isEntityUnlocked(artifact.id)) continue;
             
             // Get ingredients from artifact
             const ingredients = this.getArtifactIngredients(artifact);
@@ -178,6 +184,11 @@ export class ArtifactsCraftingModule extends GameModule {
             return;
         }
 
+        // Check if material is already in another slot (prevent duplicates)
+        if (this.slots.includes(materialId)) {
+            return;
+        }
+
         this.slots[slotIndex] = materialId;
         this.sendSlotsStatus();
         
@@ -201,6 +212,9 @@ export class ArtifactsCraftingModule extends GameModule {
         for (const artifact of artifacts) {
             // Skip if already unlocked
             if (this.unlockedRecipes.includes(artifact.id)) continue;
+            
+            // Skip if artifact is not unlocked (check unlockCondition)
+            if (!gameEntity.isEntityUnlocked(artifact.id)) continue;
             
             // Get ingredients from artifact
             const ingredients = this.getArtifactIngredients(artifact);

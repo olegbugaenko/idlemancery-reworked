@@ -11,7 +11,9 @@ export class FavoritesModule extends GameModule {
             actionLists: {},
             craftingLists: {},
             alchemyLists: {},
-            courses: {}
+            courses: {},
+            guilds: {},
+            socialEvents: {}
         };
 
         this.eventHandler.registerHandler('add-favorite', (payload) => {
@@ -72,11 +74,13 @@ export class FavoritesModule extends GameModule {
     sendFavorites() {
         // Convert objects to arrays for backward compatibility
         const favoritesArray = {
-            actions: Object.keys(this.favorites.actions),
-            actionLists: Object.keys(this.favorites.actionLists),
-            craftingLists: Object.keys(this.favorites.craftingLists),
-            alchemyLists: Object.keys(this.favorites.alchemyLists),
-            courses: Object.keys(this.favorites.courses)
+            actions: Object.keys(this.favorites.actions || {}),
+            actionLists: Object.keys(this.favorites.actionLists || {}),
+            craftingLists: Object.keys(this.favorites.craftingLists || {}),
+            alchemyLists: Object.keys(this.favorites.alchemyLists || {}),
+            courses: Object.keys(this.favorites.courses || {}),
+            guilds: Object.keys(this.favorites.guilds || {}),
+            socialEvents: Object.keys(this.favorites.socialEvents || {})
         };
         this.eventHandler.sendData('favorites', favoritesArray);
     }
@@ -87,7 +91,9 @@ export class FavoritesModule extends GameModule {
             actionLists: {},
             craftingLists: {},
             alchemyLists: {},
-            courses: {}
+            courses: {},
+            guilds: {},
+            socialEvents: {}
         };
 
         // Get favorite actions data
@@ -143,6 +149,40 @@ export class FavoritesModule extends GameModule {
             });
         }
 
+        // Get favorite guilds data
+        const guildsModule = gameCore.getModule('guilds');
+        if (guildsModule) {
+            try {
+                const guildsData = guildsModule.getGuildsData().guilds;
+                if (guildsData && Array.isArray(guildsData)) {
+                    guildsData.forEach(guild => {
+                        if (guild.isFavorite) {
+                            favoriteItems.guilds[guild.id] = guild;
+                        }
+                    });
+                }
+            } catch (error) {
+                console.warn('Failed to get guilds data:', error);
+            }
+        }
+
+        // Get favorite social events data
+        const socialEventsModule = gameCore.getModule('social-events');
+        if (socialEventsModule) {
+            try {
+                const eventsData = socialEventsModule.getEventsData().events;
+                if (eventsData && Array.isArray(eventsData)) {
+                    eventsData.forEach(event => {
+                        if (event.isFavorite) {
+                            favoriteItems.socialEvents[event.id] = event;
+                        }
+                    });
+                }
+            } catch (error) {
+                console.warn('Failed to get social events data:', error);
+            }
+        }
+
         this.eventHandler.sendData('favorite-items', favoriteItems);
     }
 
@@ -162,10 +202,20 @@ export class FavoritesModule extends GameModule {
                     actionLists: saveObject.favorites.actionLists.reduce((acc, id) => { acc[id] = true; return acc; }, {}),
                     craftingLists: saveObject.favorites.craftingLists.reduce((acc, id) => { acc[id] = true; return acc; }, {}),
                     alchemyLists: saveObject.favorites.alchemyLists.reduce((acc, id) => { acc[id] = true; return acc; }, {}),
-                    courses: saveObject.favorites.courses.reduce((acc, id) => { acc[id] = true; return acc; }, {})
+                    courses: saveObject.favorites.courses.reduce((acc, id) => { acc[id] = true; return acc; }, {}),
+                    guilds: saveObject.favorites.guilds?.reduce((acc, id) => { acc[id] = true; return acc; }, {}) || {},
+                    socialEvents: saveObject.favorites.socialEvents?.reduce((acc, id) => { acc[id] = true; return acc; }, {}) || {}
                 };
             } else {
-                this.favorites = saveObject.favorites;
+                this.favorites = {
+                    actions: saveObject.favorites.actions || {},
+                    actionLists: saveObject.favorites.actionLists || {},
+                    craftingLists: saveObject.favorites.craftingLists || {},
+                    alchemyLists: saveObject.favorites.alchemyLists || {},
+                    courses: saveObject.favorites.courses || {},
+                    guilds: saveObject.favorites.guilds || {},
+                    socialEvents: saveObject.favorites.socialEvents || {}
+                };
             }
         }
     }

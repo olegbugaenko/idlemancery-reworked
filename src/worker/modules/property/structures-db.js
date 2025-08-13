@@ -219,7 +219,7 @@ export const registerStructuresStage1 = () => {
         name: 'Stone Workshop',
         description: 'A sturdy workshop built with stone bricks, providing excellent conditions for crafting',
         level: 0,
-        maxLevel: 5,
+        getMaxLevel: () => 5 + gameEffects.getEffectValue('stone_workshop_max_level_bonus'),
         unlockCondition: () => {
             return gameResources.isResourceUnlocked('inventory_stone_brick')
         },
@@ -262,7 +262,7 @@ export const registerStructuresStage1 = () => {
         name: 'Dry Storage',
         description: 'A specialized stone building designed to maintain optimal conditions for drying herbs. Enhances the efficiency of your Herbalist\'s Drying Rack.',
         level: 0,
-        maxLevel: 5,
+        getMaxLevel: () => 5 + gameEffects.getEffectValue('dry_storage_max_level_bonus'),
         unlockCondition: () => {
             return gameResources.isResourceUnlocked('inventory_stone_brick')
         },
@@ -875,6 +875,40 @@ export const registerStructuresStage1 = () => {
                 B: 3,
                 type: 0
             }
+        }),
+    })
+
+    // Hydraulic Press — increases max levels of Dry Storage and Stone Workshop by +2 per level
+    registerStructure('structure_hydraulic_press', {
+        tags: ["structure", "upgrade", "purchaseable", "industrial"],
+        name: 'Hydraulic Press',
+        description: 'A powerful hydraulic press enabling advanced processing and structural reinforcement.',
+        level: 0,
+        maxLevel: 5,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_press_technology') > 0 &&
+                   gameResources.isResourceUnlocked('inventory_water') &&
+                   gameResources.isResourceUnlocked('inventory_stone_brick');
+        },
+        resourceModifier: {
+            get_income: () => ({
+                effects: {
+                    // +2 max level per Hydraulic Press level (additive)
+                    'dry_storage_max_level_bonus': { A: 2, B: 0, type: 0 },
+                    'stone_workshop_max_level_bonus': { A: 2, B: 0, type: 0 },
+                }
+            }),
+            consumption: {
+                resources: {
+                    'living_space': { A: 2, B: 0, type: 0 }
+                }
+            }
+        },
+        get_cost: () => ({
+            'inventory_water': { A: 1.5, B: 25000, type: 1 },
+            'inventory_forged_steel': { A: 1.5, B: 10000, type: 1 },
+            'inventory_stone_brick': { A: 1.5, B: 37500, type: 1 },
+            'living_space': { A: 0, B: 2, type: 0 },
         }),
     })
 }

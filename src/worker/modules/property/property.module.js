@@ -794,12 +794,18 @@ export class PropertyModule extends GameModule {
             Object.values(this.customFilters[filter]).forEach(filterData => {
                 const items = gameEntity.listEntitiesByTags([filter]).filter(one => this.filtersCache[filter][filterData.id][one.id]);
                 items.forEach(item => {
+                    // Для артефактів вважаємо "unlocked" лише якщо рецепт вже знайдено у модулі крафту артефактів
+                    const isArtifact = filter === 'artifact';
+                    const isUnlockedForNotifications = isArtifact
+                        ? (item.isUnlocked && !!gameCore.getModule('artifacts-crafting')?.isRecipeUnlocked(item.id))
+                        : (item.isUnlocked && !item.isCapped);
+
                     gameCore.getModule('unlock-notifications').registerNewNotification(
                         'property',
                         filter,
                         filterData.id,
                         item.id,
-                        item.isUnlocked && !item.isCapped
+                        isUnlockedForNotifications
                     )
                 })
             })

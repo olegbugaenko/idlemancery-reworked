@@ -7,6 +7,7 @@ import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
 import {BreakDown} from "../layout/sidebar.jsx";
 import {ResourceComparison} from "../shared/resource-comparison.jsx";
 import {NewNotificationWrap} from "../shared/new-notification-wrap.jsx";
+import {FavoriteButton} from "../shared/favorite-button.jsx";
 
 export const Guilds = ({ setItemDetails, filterId, newUnlocks, isMobile }) => {
 
@@ -68,7 +69,10 @@ export const Guilds = ({ setItemDetails, filterId, newUnlocks, isMobile }) => {
                                 <div className={'image-holder'}>
                                     <img src={`icons/guilds/${guild.icon_id}.png`} className={'guild big'}/>
                                 </div>
-                                <p>{guild.name}</p>
+                                <div className={'guild-info'}>
+                                    <p>{guild.name}</p>
+                                    <FavoriteButton type="guilds" id={guild.id} isFavorite={guild.isFavorite} className="guild-favorite-btn icon-content interface-icon small clickable-icon" />
+                                </div>
                             </div>
                         </div> ))}
                     </div>

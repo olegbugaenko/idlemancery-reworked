@@ -30,5 +30,8 @@ export const getScope = (entity) => {
     if(entity.tags.includes('course')) {
         return 'Course';
     }
+    if(entity.tags.includes('expedition-location')) {
+        return 'Expedition Location';
+    }
     return ''
 }
