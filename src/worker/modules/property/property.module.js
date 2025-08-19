@@ -8,6 +8,7 @@ import {registerAmplifiersStage1} from "./amplifiers-db";
 import {charismaMod} from "../items/shop-db";
 import {registerStructuresStage1} from "./structures-db";
 import {registerArtifactsStage1} from "./artifacts-db";
+import {registerMachineryStage1} from "./machinery-db";
 
 const DEFAULT_PROPERTY_FILTERS = {
     'all': {
@@ -122,6 +123,18 @@ const DEFAULT_STRUCTURES_FILTERS = {
     }
 }
 
+const DEFAULT_MACHINERY_FILTERS = {
+    'all': {
+        id: 'all',
+        condition: '',
+        rules: [],
+        name: 'All',
+        isRequired: true,
+        isPinned: true,
+        sortIndex: 0,
+    }
+}
+
 const DEFAULT_ARTIFACTS_FILTERS = {
     'all': {
         id: 'all',
@@ -181,6 +194,10 @@ export class PropertyModule extends GameModule {
                 search: '',
                 selectedScopes: ['name']
             },
+            machinery: {
+                search: '',
+                selectedScopes: ['name']
+            },
             amplifier: {
                 search: '',
                 selectedScopes: ['name']
@@ -198,6 +215,9 @@ export class PropertyModule extends GameModule {
             structure: {
 
             },
+            machinery: {
+
+            },
             amplifier: {
             },
             artifact: {
@@ -209,6 +229,7 @@ export class PropertyModule extends GameModule {
             furniture: cloneDeep(DEFAULT_PROPERTY_FILTERS),
             accessory: cloneDeep(DEFAULT_ACCESSORY_FILTERS),
             structure: cloneDeep(DEFAULT_STRUCTURES_FILTERS),
+            machinery: cloneDeep(DEFAULT_MACHINERY_FILTERS),
             amplifier: cloneDeep(DEFAULT_AMPLIFIERS_FILTERS),
             artifact: cloneDeep(DEFAULT_ARTIFACTS_FILTERS)
         };
@@ -216,6 +237,7 @@ export class PropertyModule extends GameModule {
             furniture: Object.keys(this.customFilters.furniture),
             accessory: Object.keys(this.customFilters.accessory),
             structure: Object.keys(this.customFilters.structure),
+            machinery: Object.keys(this.customFilters.machinery),
             amplifier: Object.keys(this.customFilters.amplifier),
             artifact: Object.keys(this.customFilters.artifact)
         };
@@ -403,6 +425,11 @@ export class PropertyModule extends GameModule {
             this.sendAllStructuresTags(payload)
         })
 
+        this.eventHandler.registerHandler('set-machine-load', ({ id, value }) => {
+            const val = Math.max(0, Math.min(1, value ?? 0));
+            gameEntity.setAttribute(id, 'manualLoad', val);
+        })
+
         this.eventHandler.registerHandler('query-all-property-effects', (payload) => {
             this.sendAllFurnitureEffects(payload);
         })
@@ -411,6 +438,7 @@ export class PropertyModule extends GameModule {
             furniture: {},
             accessory: {},
             structure: {},
+            machinery: {},
             amplifier: {},
             artifact: {}
         };
@@ -428,6 +456,7 @@ export class PropertyModule extends GameModule {
         registerFurnitureStage1();
         registerAccessoriesStage1();
         registerStructuresStage1();
+        registerMachineryStage1();
         registerAmplifiersStage1();
         registerArtifactsStage1();
 
@@ -674,6 +703,7 @@ export class PropertyModule extends GameModule {
             furniture: cloneDeep(DEFAULT_PROPERTY_FILTERS),
             accessory: cloneDeep(DEFAULT_ACCESSORY_FILTERS),
             structure: cloneDeep(DEFAULT_STRUCTURES_FILTERS),
+            machinery: cloneDeep(DEFAULT_MACHINERY_FILTERS),
             amplifier: cloneDeep(DEFAULT_AMPLIFIERS_FILTERS),
             artifact: cloneDeep(DEFAULT_ARTIFACTS_FILTERS)
         };
@@ -681,18 +711,19 @@ export class PropertyModule extends GameModule {
             furniture: Object.keys(this.customFilters.furniture),
             accessory: Object.keys(this.customFilters.accessory),
             structure: Object.keys(this.customFilters.structure),
+            machinery: Object.keys(this.customFilters.machinery),
             amplifier: Object.keys(this.customFilters.amplifier),
             artifact: Object.keys(this.customFilters.artifact)
         };
         this.selectedFilterId = {};
         if(saveObject?.customFilters) {
             for(const key in saveObject.customFilters) {
-                if(!['furniture', 'accessory', 'structure', 'amplifier', 'artifact'].includes(key)) {
+                if(!['furniture', 'accessory', 'structure', 'machinery', 'amplifier', 'artifact'].includes(key)) {
                     delete saveObject.customFilters[key];
                 }
             }
             for(const key in saveObject.customFiltersOrder) {
-                if(!['furniture', 'accessory', 'structure', 'amplifier', 'artifact'].includes(key)) {
+                if(!['furniture', 'accessory', 'structure', 'machinery', 'amplifier', 'artifact'].includes(key)) {
                     delete saveObject.customFiltersOrder[key];
                 }
             }
@@ -707,6 +738,7 @@ export class PropertyModule extends GameModule {
                     'furniture': DEFAULT_PROPERTY_FILTERS,
                     'accessory': DEFAULT_ACCESSORY_FILTERS,
                     'structure': DEFAULT_STRUCTURES_FILTERS,
+                    'machinery': DEFAULT_MACHINERY_FILTERS,
                     'amplifier': DEFAULT_AMPLIFIERS_FILTERS,
                     'artifact': DEFAULT_ARTIFACTS_FILTERS,
                 }
@@ -735,6 +767,7 @@ export class PropertyModule extends GameModule {
                 furniture: Object.keys(this.customFilters.furniture),
                 accessory: Object.keys(this.customFilters.accessory),
                 structure: Object.keys(this.customFilters.structure),
+                machinery: Object.keys(this.customFilters.machinery),
                 amplifier: Object.keys(this.customFilters.amplifier),
                 artifact: Object.keys(this.customFilters.artifact),
                 ...saveObject.customFiltersOrder
@@ -744,6 +777,7 @@ export class PropertyModule extends GameModule {
                 furniture: Object.keys(this.customFilters.furniture),
                 accessory: Object.keys(this.customFilters.accessory),
                 structure: Object.keys(this.customFilters.structure),
+                machinery: Object.keys(this.customFilters.machinery),
                 amplifier: Object.keys(this.customFilters.amplifier),
                 artifact: Object.keys(this.customFilters.artifact)
             };
@@ -789,7 +823,7 @@ export class PropertyModule extends GameModule {
 
     regenerateNotifications() {
 
-        ['furniture', 'accessory', 'structure', 'amplifier', 'artifact'].forEach(filter => {
+        ['furniture', 'accessory', 'structure', 'machinery', 'amplifier', 'artifact'].forEach(filter => {
             // const items = gameEntity.listEntitiesByTags([filter]);
             Object.values(this.customFilters[filter]).forEach(filterData => {
                 const items = gameEntity.listEntitiesByTags([filter]).filter(one => this.filtersCache[filter][filterData.id][one.id]);
@@ -885,7 +919,9 @@ export class PropertyModule extends GameModule {
                 isCapped: entity.isCapped,
                 isHidden: this.hiddenItems[payload.filterId]?.[entity.id],
                 isAutoPurchase: this.autoPurchase[entity.id] ?? false,
-                spaceUsage: gameEntity.getEffects(entity.id, 0).find(one => one.id === 'living_space')?.value / Math.max(1, spaceRes.consumption)
+                spaceUsage: gameEntity.getEffects(entity.id, 0).find(one => one.id === 'living_space')?.value / Math.max(1, spaceRes.consumption),
+                manualLoad: entity.attributes?.manualLoad,
+                efficiency: gameEntity.getEntityEfficiency(entity.id) ?? 1,
             })),
             propertyCategories: Object.values(perCats).filter(cat => cat.items.length > 0).sort((a, b) => a.sortIndex - b.sortIndex),
             space: {
@@ -921,7 +957,9 @@ export class PropertyModule extends GameModule {
             affordable: gameEntity.getAffordable(entity.id),
             potentialEffects: gameEntity.getEffects(entity.id, 1),
             currentEffects: gameEntity.getEffects(entity.id),
-            tags: entity.tags
+            tags: entity.tags,
+            efficiency: gameEntity.getEntityEfficiency(entity.id) ?? 1,
+            missingResource: gameEntity.getEntity(entity.id)?.modifier?.bottleNeck ? gameResources.getResource(gameEntity.getEntity(entity.id)?.modifier?.bottleNeck) : null
         }
     }
 
@@ -970,6 +1008,16 @@ export class PropertyModule extends GameModule {
     sendAllStructuresTags(payload) {
         const data = this.getAllItemsTags('structure');
         let label = 'all-structure-tags';
+        if(payload?.prefix) {
+            label = `${label}-${payload?.prefix}`
+        }
+        this.eventHandler.sendData(label, data);
+    }
+
+    // Optional helper for machinery tags UI if needed in future
+    sendAllMachineryTags(payload) {
+        const data = this.getAllItemsTags('machinery');
+        let label = 'all-machinery-tags';
         if(payload?.prefix) {
             label = `${label}-${payload?.prefix}`
         }

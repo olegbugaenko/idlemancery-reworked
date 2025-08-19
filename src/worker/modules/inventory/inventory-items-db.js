@@ -2010,7 +2010,7 @@ export const registerInventoryItems = () => {
     registerInventoryItem('inventory_rare_titableaf', {
         name: 'Titableaf',
         hasCap: false,
-        tags: ['inventory', 'ingredient', 'rare', 'gatherable', 'herb'],
+        tags: ['inventory', 'ingredient', 'fake'],
         defaultCap: 0,
         isAbstract: true,
         getUsageCooldown: () => {

@@ -129,6 +129,13 @@ export class UnlockNotificationsModule extends GameModule {
         if (!this.byId[id]) {
             return;
         }
+        // Ensure record exists even if path was registered after load
+        if (!this.viewedById[id]) {
+            this.viewedById[id] = {
+                isUnlocked: false,
+                isViewed: false,
+            };
+        }
         this.viewedById[id].isViewed = isViewed;
         this.syncNotificationCats(id);
     }

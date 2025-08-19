@@ -17,6 +17,7 @@ import StatRow from "../shared/stat-row.jsx";
 import {playSound} from "../../context/sounds/sound-manager";
 import {StructureUpgrades} from "./structures.jsx";
 import {ArtifactUpgrades} from "./artifacts.jsx";
+import {MachineryUpgrades} from "./machinery.jsx";
 
 export const Property = ({}) => {
     const [detailOpened, setDetailOpened] = useState(null)
@@ -53,6 +54,7 @@ export const Property = ({}) => {
             furniture: 'property',
             accessory: 'crafting',
             structure: 'structures',
+            machinery: 'machinery',
             amplifier: 'amplifiers',
             artifact: 'artifacts'
         }
@@ -88,8 +90,6 @@ export const Property = ({}) => {
         }
     }
 
-    console.log('ArtNot: ', newUnlocks?.['property']?.items);
-
     return (
         <div className={'items-wrap'}>
             <div className={'items ingame-box'}>
@@ -110,6 +110,11 @@ export const Property = ({}) => {
                                 <span>Structures</span>
                             </NewNotificationWrap>
                         </li>) : null}
+                        {unlocks.machinery ? (<li className={`${selectedTab === 'machinery' ? 'active' : ''}`} onClick={() => {setSelectedTab('machinery'); setDetailOpened(null);}}>
+                            <NewNotificationWrap isNew={newUnlocks?.['property']?.items?.['machinery']?.hasNew}>
+                                <span>Machinery</span>
+                            </NewNotificationWrap>
+                        </li>) : null}
                         {unlocks.amplifiers ? (<li className={`${selectedTab === 'amplifier' ? 'active' : ''}`} onClick={() => {setSelectedTab('amplifier'); setDetailOpened(null);}}>
                             <NewNotificationWrap isNew={newUnlocks?.['property']?.items?.['amplifier']?.hasNew}>
                                 <span>Amplifiers</span>
@@ -125,6 +130,7 @@ export const Property = ({}) => {
                 {selectedTab === 'furniture' ? (<FurnitureUpgrades setItemDetails={setItemDetails} purchaseItem={purchaseItem} deleteItem={deleteItem} newUnlocks={newUnlocks?.['property']?.items?.['furniture']?.items} isMobile={isMobile}/>) : null}
                 {selectedTab === 'accessory' ? (<AccessoryUpgrades setItemDetails={setItemDetails} purchaseItem={purchaseItem} deleteItem={deleteItem} newUnlocks={newUnlocks?.['property']?.items?.['accessory']?.items} isMobile={isMobile}/>) : null}
                 {selectedTab === 'structure' ? (<StructureUpgrades setItemDetails={setItemDetails} purchaseItem={purchaseItem} deleteItem={deleteItem} newUnlocks={newUnlocks?.['property']?.items?.['structure']?.items} isMobile={isMobile}/>) : null}
+                {selectedTab === 'machinery' ? (<MachineryUpgrades setItemDetails={setItemDetails} purchaseItem={purchaseItem} deleteItem={deleteItem} newUnlocks={newUnlocks?.['property']?.items?.['machinery']?.items} isMobile={isMobile}/>) : null}
                 {selectedTab === 'amplifier' ? (<AmplifiersUpgrades setItemDetails={setItemDetails} purchaseItem={purchaseItem} deleteItem={deleteItem} newUnlocks={newUnlocks?.['property']?.items?.['amplifier']?.items} isMobile={isMobile}/>) : null}
                 {selectedTab === 'artifact' ? (<ArtifactUpgrades setItemDetails={setItemDetails} purchaseItem={purchaseItem} deleteItem={deleteItem} newUnlocks={newUnlocks?.['property']?.items?.['artifact']?.items} isMobile={isMobile}/>) : null}
             </div>
@@ -150,7 +156,7 @@ export const ItemDetails = ({itemId, category, setItemDetails, purchaseItem}) =>
     const {isMobile} = useAppContext();
 
     useEffect(() => {
-        if (category === 'furniture' || category === 'accessory' || category === 'structure' || category === 'amplifier' || category === 'artifact') {
+        if (category === 'furniture' || category === 'accessory' || category === 'structure' || category === 'amplifier' || category === 'artifact' || category === 'machinery') {
             const interval = setInterval(() => {
                 sendData('query-furniture-details', {id: itemId});
             }, 100);
@@ -192,6 +198,13 @@ export const ItemDetails = ({itemId, category, setItemDetails, purchaseItem}) =>
                     </div>
                 </div>
                 <div className={'block'}>
+                    {category === 'machinery' && item.efficiency < 0.999 ? (
+                        <div className={'block'}>
+                            <p className={'hint yellow'}>
+                                Running {formatValue(100*item.efficiency)}% efficiency{item.missingResource ? ` due to missing ${item.missingResource.name}` : ''}
+                            </p>
+                        </div>
+                    ) : null}
                     <p>Effects:</p>
                     <div className={'effects'}>
                         {item.currentEffects ?

@@ -236,6 +236,8 @@ export const ListEditor = React.memo(({
       onDragEnd,
   }) => {
 
+    console.log('editList: ', editListId, listData);
+
     const worker = useContext(WorkerContext);
 
     const { onMessage, sendData } = useWorkerClient(worker);
@@ -252,17 +254,23 @@ export const ListEditor = React.memo(({
 
     useEffect(() => {
         const interval = setInterval(() => {
-            sendData('query-action-list-effects', { listData: editingRef.current });
+            const payload = editingRef.current;
+            console.log('editingRef.current', editingRef.current);
+            if(payload && Array.isArray(payload.actions) && payload.actions.length > 0) {
+                sendData('query-action-list-effects', { listData: payload });
+            }
         }, 1000);
 
         return () => clearInterval(interval);
     }, []);
 
     useEffect(() => {
-        setEditing(listData);
-        if(currentTourId === 'action-lists') {
-            if(listData.actions.find(one => one.id === 'action_walk') && listData.actions.find(one => one.id === 'action_beggar')) {
-                unlockNextById(4)
+        if(listData && Array.isArray(listData.actions)) {
+            setEditing(listData);
+            if(currentTourId === 'action-lists') {
+                if(listData.actions.find(one => one.id === 'action_walk') && listData.actions.find(one => one.id === 'action_beggar')) {
+                    unlockNextById(4)
+                }
             }
         }
     }, [listData])
@@ -320,7 +328,7 @@ export const ListEditor = React.memo(({
 
     useDrop('action-editor-wrap', { accept: 'action', onDrop: onDragEnd });
 
-    if(!editing) return ;
+    if(!editing || !Array.isArray(editing.actions)) return null;
 
     return (<>
         <div className={'blade-outer'}>

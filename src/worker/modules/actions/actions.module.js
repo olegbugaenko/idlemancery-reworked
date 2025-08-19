@@ -957,6 +957,7 @@ export class ActionsModule extends GameModule {
     }
 
     getActionsUnlocks(showUnlocked) {
+        const FREEZE_FUTURE_UNLOCKS = true; // Temporary: hide upcoming unlocks to focus on polishing current content
         const items = gameEntity
             .listEntitiesByTags(['action'], false, [], { listPrevious: showUnlocked })
             .filter(one => one.isUnlocked && !one.isCapped && (one.nextUnlocks?.length || (showUnlocked && one.prevUnlocks?.length)))
@@ -964,7 +965,7 @@ export class ActionsModule extends GameModule {
 
                 /*console.log('ActionUnlocks: ', one.nextUnlocks);*/
 
-                if(one.nextUnlocks?.length) {
+                if(!FREEZE_FUTURE_UNLOCKS && one.nextUnlocks?.length) {
                     one.unlocks = {
                         level: one.nextUnlocks[0].level,
                         progress: 100*one.level / one.nextUnlocks[0].level,

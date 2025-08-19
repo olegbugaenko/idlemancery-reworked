@@ -1356,63 +1356,6 @@ export const registerFurnitureStage1 = () => {
         }),
     })
 
-    registerFurniture('furniture_masterwork_bench', {
-        tags: ["furniture", "upgrade", "purchaseable", "crafting"],
-        name: 'Masterwork Bench',
-        description: 'A massive and meticulously crafted workbench that requires both strength and skill to wield effectively. In the hands of a true master, it turns raw materials into works of perfection, pushing the limits of craftsmanship beyond the ordinary.',
-        level: 0,
-        minDemoVersion: 20,
-        unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_crafting_courses') > 0;
-        },
-        unlockedBy: [{
-            type: 'effect',
-            id: 'attribute_strength',
-            level: 30000,
-        }],
-        maxLevel: 5,
-        resourceModifier: {
-            income: {
-                resources: {
-                    'crafting_slots': {
-                        A: 2,
-                        B: 0,
-                        type: 0,
-                    }
-                },
-            },
-            multiplier: {
-                effects: {
-                    crafting_efficiency: {
-                        A: 0.2,
-                        B: 1,
-                        type: 0,
-                    }
-                }
-            },
-            consumption: {
-                resources: {
-                    'living_space': {
-                        A: 4,
-                        B: 0,
-                        type: 0
-                    }
-                }
-            }
-        },
-        get_cost: () => ({
-            'coins': {
-                A: 1.75,
-                B: 2.e+11*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
-                type: 1
-            },
-            'living_space': {
-                A: 0,
-                B: 4,
-                type: 0
-            }
-        }),
-    })
 
     registerFurniture('furniture_masters_table', {
         tags: ["furniture", "upgrade", "purchaseable", "crafting"],
@@ -1841,6 +1784,7 @@ export const registerFurnitureStage1 = () => {
         }),
     })
 
+    /*
     registerFurniture('furniture_preservation_rack', {
         tags: ["furniture", "upgrade", "purchaseable", "resource", "hunting"],
         name: 'Preservation Rack',
@@ -1888,7 +1832,7 @@ export const registerFurnitureStage1 = () => {
             }
         }),
     })
-
+*/
     registerFurniture('furniture_metal_vise', {
         tags: ["furniture", "upgrade", "purchaseable", "crafting"],
         name: 'Metal Vise',
@@ -2009,7 +1953,7 @@ export const registerFurnitureStage1 = () => {
             }
         },
         get_cost: () => ({
-            'coins': { A: 2, B: 50000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')), type: 1 },
+            'coins': { A: 2, B: 500000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')), type: 1 },
             'living_space': { A: 0, B: 1, type: 0 }
         })
     })

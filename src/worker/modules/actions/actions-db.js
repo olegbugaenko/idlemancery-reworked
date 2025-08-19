@@ -767,7 +767,7 @@ export const registerActionsStage1 = () => {
         }
     })
 
-
+/*
     registerGameAction('action_foreman', {
         tags: ["action", "job", "physical"],
         name: 'Foreman',
@@ -819,7 +819,7 @@ export const registerActionsStage1 = () => {
             primaryAttribute: 'attribute_strength'
         }
     })
-
+*/
     registerGameAction('action_basic_illusions', {
         tags: ["action", "job", "magical"],
         name: 'Perform Basic Tricks',
@@ -1078,7 +1078,7 @@ export const registerActionsStage1 = () => {
         }
     })
 
-    registerGameAction('action_magical_architect', {
+    /*registerGameAction('action_magical_architect', {
         tags: ["action", "job", "magical"],
         name: 'Magical Architect',
         isAbstract: false,
@@ -1129,7 +1129,7 @@ export const registerActionsStage1 = () => {
             primaryAttribute: 'attribute_magic_capability'
         }
     })
-
+*/
     registerGameAction('action_woodcutter', {
         tags: ["action", "activity", "physical", "manual-labor"],
         name: 'Woodcutting',
@@ -1356,7 +1356,7 @@ export const registerActionsStage1 = () => {
         },
         unlockedBy: [{ type: 'effect', id: 'attribute_strength', level: 30000 }],
         attributes: {
-            baseXPCost: 75000,
+            baseXPCost: 75000000000000,
             primaryAttribute: 'attribute_strength'
         }
     })

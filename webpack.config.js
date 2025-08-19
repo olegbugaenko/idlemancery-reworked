@@ -10,6 +10,9 @@ module.exports = {
         path: path.resolve(__dirname, 'dist'),
     },
     mode: 'development',
+    // Avoid huge duplicated in-memory strings from the default 'eval' devtool
+    // Use external source maps instead
+    devtool: 'cheap-module-source-map',
     module: {
         rules: [
             {

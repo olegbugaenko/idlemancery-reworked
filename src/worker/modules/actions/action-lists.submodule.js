@@ -1107,10 +1107,12 @@ export class ActionListsSubmodule extends GameModule {
     getListEffects(id, listData) {
         let list = this.actionsLists[id];
         if(!list) {
-            if(!listData) {
+            // Use provided runtime listData as source when id is not provided or not found
+            if(listData && Array.isArray(listData.actions)) {
+                list = listData;
+            } else {
                 throw new Error(`List with id ${id} not found`);
             }
-            list = listData;
         }
         const totalTime = list.actions
             .filter(action => gameEntity.isEntityUnlocked(action.id) && !gameEntity.isCapped(action.id))

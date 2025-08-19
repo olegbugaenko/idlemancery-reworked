@@ -221,18 +221,13 @@ export const registerAmplifiersStage1 = () => {
         }),
     })
 
-
+/*
     registerAmplifier('amplifier_arcane_conduit', {
         tags: ["amplifier", "upgrade", "purchaseable", "spark", "actions"],
         name: 'Arcane Conduit Amplifier',
         description: 'Increase mana cap and regeneration.',
         level: 0,
         minDemoVersion: 20,
-        /*unlockedBy: [{
-            type: 'effect',
-            id: 'attribute_magic_ability',
-            level: 60000,
-        }],*/
         unlockCondition: () => {
             return gameResources.isResourceUnlocked('inventory_spark');
         },
@@ -268,16 +263,11 @@ export const registerAmplifiersStage1 = () => {
     })
 
     registerAmplifier('amplifier_scolars_ignition', {
-        tags: ["amplifier", "upgrade", "purchaseable", "spark", "actions"],
+        tags: ["", "upgrade", "purchaseable", "spark", "actions"],
         name: 'Scholars Ignition Amplifier',
         minDemoVersion: 20,
         description: 'Increase courses learn speed',
         level: 0,
-        /*unlockedBy: [{
-            type: 'effect',
-            id: 'attribute_magic_ability',
-            level: 60000,
-        }],*/
         unlockCondition: () => {
             return gameResources.isResourceUnlocked('inventory_spark');
         },
@@ -308,7 +298,7 @@ export const registerAmplifiersStage1 = () => {
         description: 'Increase courses learn speed',
         level: 0,
         minDemoVersion: 20,
-        unlockCondition: () => {
+        unlockamplifierCondition: () => {
             return gameResources.isResourceUnlocked('inventory_light');
         },
         resourceModifier: {
@@ -480,5 +470,6 @@ export const registerAmplifiersStage1 = () => {
             }
         }),
     })
-
+*/
 }
+    

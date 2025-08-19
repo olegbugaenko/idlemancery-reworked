@@ -741,6 +741,112 @@ export const initSpellsDB1 = () => {
     })
 
 
+    // Advanced conjuration: Stone
+    registerSpell('spell_conjure_stone', {
+        name: 'Conjure Stone',
+        description: 'Condense raw earth essence into solid stone.',
+        hasCap: false,
+        tags: ['spell', 'magic', 'conjuration_magic', 'elemental'],
+        defaultCap: 0,
+        isAbstract: true,
+        level: 1,
+        onUse: () => {},
+        getUsageCooldown: () => 0,
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    inventory_stone: {
+                        A: 1.2,
+                        B: 600*gameEffects.getEffectValue('conjuration_spells_efficiency')*gameEffects.getEffectValue('elemental_spells_efficiency'),
+                        type: 1,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    mana: {
+                        A: 1.5,
+                        B: 220.0*getCostReduction('spell_conjure_stone')/1.5,
+                        type: 1,
+                    }
+                }
+            }),
+            effectDeps: ['conjuration_spells_efficiency','elemental_spells_efficiency']
+        },
+        usageGain: {
+            get_consumption: () => ({
+                resources: {
+                    mana: {
+                        A: 1.5,
+                        B: 260.*getCostReduction('spell_conjure_stone')/1.5,
+                        type: 1,
+                    }
+                }
+            })
+        },
+        attributes: {
+            duration: 20,
+            xpOnCast: 50,
+            baseXPCost: 1.e+9,
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_advanced_conjuration') > 0;
+        },
+    })
+
+    // Advanced conjuration: Coal (rarer, more mana)
+    registerSpell('spell_conjure_coal', {
+        name: 'Conjure Coal',
+        description: 'Compress elemental essence into combustible coal.',
+        hasCap: false,
+        tags: ['spell', 'magic', 'conjuration_magic', 'elemental'],
+        defaultCap: 0,
+        isAbstract: true,
+        level: 1,
+        onUse: () => {},
+        getUsageCooldown: () => 0,
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    inventory_coal: {
+                        A: 1.2,
+                        B: 10*gameEffects.getEffectValue('conjuration_spells_efficiency')*gameEffects.getEffectValue('elemental_spells_efficiency'),
+                        type: 1,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    mana: {
+                        A: 1.5,
+                        B: 450.0*getCostReduction('spell_conjure_coal')/1.5,
+                        type: 1,
+                    }
+                }
+            }),
+            effectDeps: ['conjuration_spells_efficiency','elemental_spells_efficiency']
+        },
+        usageGain: {
+            get_consumption: () => ({
+                resources: {
+                    mana: {
+                        A: 1.5,
+                        B: 520.*getCostReduction('spell_conjure_coal')/1.5,
+                        type: 1,
+                    }
+                }
+            })
+        },
+        attributes: {
+            duration: 20,
+            xpOnCast: 50,
+            baseXPCost: 1.e+9,
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_advanced_conjuration') > 0;
+        },
+    })
+
     registerSpell('spell_conjure_earth', {
         name: 'Conjure Earth',
         description: 'Create a bunch of earth',
@@ -866,7 +972,7 @@ export const initSpellsDB1 = () => {
         },
     })
 
-
+/*
     registerSpell('spell_conjure_spark', {
         name: 'Conjure Spark',
         description: 'Create a spark',
@@ -1054,7 +1160,7 @@ export const initSpellsDB1 = () => {
             return true
         },
     })
-
+*/
     registerSpell('spell_sacred_earth', {
         name: 'Sacred Earth',
         description: 'Channel the power of nature to temporarily enhance all plantations efficiency. The earth responds to your magic, increasing crop yields significantly.',

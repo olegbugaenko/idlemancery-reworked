@@ -992,7 +992,7 @@ export const registerAccessoriesStage1 = () => {
         }),
     })
 
-
+/*
     registerAccessory('accessory_expedition_planner', {
         tags: ["accessory", "upgrade", "purchaseable", "effect", "maps", "paper", "device"],
         name: 'Expedition Planner',
@@ -1032,7 +1032,7 @@ export const registerAccessoriesStage1 = () => {
             },
         }),
     })
-
+*/
     registerAccessory('accessory_craft_binder', {
         tags: ["accessory", "upgrade", "purchaseable", "crafting", "metal", "device"],
         name: 'Craftbinder',
@@ -1106,53 +1106,6 @@ export const registerAccessoriesStage1 = () => {
         }),
     })
 
-
-    registerAccessory('accessory_metallurgist_hammer', {
-        tags: ["accessory", "upgrade", "purchaseable", "resource", "metal", "tool"],
-        name: 'Metallurgist Hammer',
-        description: 'Increase metals forging and refinement efficiency',
-        level: 0,
-        unlockedBy: [{
-            type: 'effect',
-            id: 'attribute_strength',
-            level: 80000
-        }],
-        unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_crafting_courses') > 0
-                && gameResources.isResourceUnlocked('inventory_forged_steel');
-        },
-        minDemoVersion: 20,
-        resourceModifier: {
-            multiplier: {
-                resources: {
-                    'inventory_iron_plate': {
-                        A: 0.02,
-                        B: 1,
-                        C: 1.01,
-                        type: 3,
-                    },
-                    'inventory_forged_steel': {
-                        A: 0.02,
-                        B: 1,
-                        C: 1.01,
-                        type: 3,
-                    },
-                }
-            },
-        },
-        get_cost: () => ({
-            'inventory_obsidian_shard': {
-                A: 1.1,
-                B: 5,
-                type: 1
-            },
-            'inventory_ruby': {
-                A: 1.1,
-                B: 500,
-                type: 1
-            }
-        }),
-    })
 
     registerAccessory('accessory_magical_atlas', {
         tags: ["accessory", "upgrade", "purchaseable", "resource", "maps", "paper", "device"],

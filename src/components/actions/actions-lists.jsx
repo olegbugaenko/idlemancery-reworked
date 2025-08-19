@@ -21,6 +21,7 @@ export const ActionListsPanel = ({ automationUnlocked, runningList, editListToDe
 
 
     const editList = (id) => {
+        console.log('editList: ', id);
         editListToDetails(id);
         setOpenedFor(null);
     }

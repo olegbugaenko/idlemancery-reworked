@@ -442,6 +442,35 @@ export const registerArtifactsStage1 = () => {
         })
     })
 
+    // Titan's Dumbbell — Dynosaur Bone + Ochre + Magic Feather -> boosts physical training learning rate
+    registerArtifact('artifact_titans_dumbbell', {
+        tags: ["artifact", "upgrade", "purchaseable", "physical", "training"],
+        name: 'Titan\'s Dumbbell',
+        allowedImpacts: ['effects'],
+        description: 'You almost faint from the sheer grandeur and power of this artifact—once wielded by the Titans themselves to forge their mighty muscles.',
+        level: 0,
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'physical_training_learn_speed': {
+                        A: 0.16,
+                        B: 1,
+                        C: 1.02,
+                        type: 3,
+                    }
+                }
+            })
+        },
+        get_cost: () => ({
+            'inventory_dynosaur_bone': { A: 1.2, B: 12, type: 1 },
+            'inventory_ochre': { A: 1.2, B: 15, type: 1 },
+            'inventory_scribe_quill': { A: 1.2, B: 10, type: 1 },
+        }),
+        unlockCondition: () => {
+            return gameEntity.isEntityUnlocked('expedition_ancient_library');
+        }
+    })
+
     registerArtifact('artifact_reading_spectacles', {
         tags: ["artifact", "upgrade", "purchaseable", "mineral", "device"],
         name: 'Reading Spectacles',

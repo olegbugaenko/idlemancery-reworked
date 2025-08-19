@@ -2627,7 +2627,7 @@ export const registerShopItemsStage1 = () => {
     })
 
     // Unlock courses reducing crafting and alchemy upkeeps
-    gameEntity.registerGameEntity('shop_item_advanced_training', {
+    /* gameEntity.registerGameEntity('shop_item_advanced_training', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Advanced Training',
         description: 'Learn best practices from best masters. Unlocks new reductive courses',
@@ -2838,8 +2838,8 @@ export const registerShopItemsStage1 = () => {
             }
         }),
     })
-
-    gameEntity.registerGameEntity('shop_item_hunting', {
+*/
+    /*gameEntity.registerGameEntity('shop_item_hunting', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Hunting',
         description: 'Allows you hunting for magic creatures, and get unique loot.',
@@ -2864,7 +2864,7 @@ export const registerShopItemsStage1 = () => {
                 type: 1
             }
         }),
-    })
+    })*/
 
     gameEntity.registerGameEntity('shop_item_stone_refinement_manual', {
         tags: ["shop", "upgrade", "purchaseable"],
@@ -3088,6 +3088,40 @@ export const registerShopItemsStage1 = () => {
         resourceModifier: {},
         get_cost: () => ({
             'coins': { A: 1, B: 200000000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')), type: 1 }
+        }),
+    })
+
+    // Automated Mechanisms — unlocks machinery era (future devices tab)
+    gameEntity.registerGameEntity('shop_item_automated_mechanisms', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Automated Mechanisms',
+        description: 'Blueprints and protocols for autonomous machinery. Opens the path to industrial automation.',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEntity.isEntityUnlocked('action_coal_mining');
+        },
+        attributes: { isCollectable: false },
+        resourceModifier: {},
+        get_cost: () => ({
+            'coins': { A: 1, B: 500000000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')), type: 1 },
+        }),
+    })
+
+    // Advanced Conjuration — enables conjuration spells for stone and coal
+    gameEntity.registerGameEntity('shop_item_advanced_conjuration', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Advanced Conjuration',
+        description: 'Unlocks advanced conjuration practices including conjuring stone and coal.',
+        level: 0,
+        maxLevel: 1,
+        unlockedBy: [{ type: 'effect', id: 'attribute_magic_ability', level: 30000 }],
+        unlockCondition: () => true,
+        attributes: { isCollectable: false },
+        resourceModifier: {},
+        get_cost: () => ({
+            'coins': { A: 1, B: 500000000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')), type: 1 },
+            'knowledge': { A: 1, B: 2000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')), type: 0 },
         }),
     })
 

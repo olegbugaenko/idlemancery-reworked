@@ -1,4 +1,4 @@
-import React, {useCallback, useContext, useEffect, useState} from "react";
+import React, {useCallback, useContext, useEffect, useMemo, useState} from "react";
 import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
 import PerfectScrollbar from "react-perfect-scrollbar";
@@ -13,6 +13,7 @@ import {ProgressBar} from "../layout/progress-bar.jsx";
 import {CustomButton} from "../shared/buttons/custom-button.jsx";
 import StatRow from "../shared/stat-row.jsx";
 import {FavoriteButton} from "../shared/favorite-button.jsx";
+import {NewNotificationWrap} from "../shared/new-notification-wrap.jsx";
 
 export const EventHallWrap = ({ children }) => {
 
@@ -24,12 +25,15 @@ export const EventHallWrap = ({ children }) => {
     const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
 
     const [detailOpened, setDetailOpened] = useState(null);
+    const [lockedId, setLockedId] = useState(null);
 
     const [events, setEvents] = useState([]);
+    const [newUnlocks, setNewUnlocks] = useState({});
 
     useEffect(() => {
         const interval = setInterval(() => {
             sendData('query-social-events', {});
+            sendData('query-new-unlocks-notifications', { suffix: 'social', scope: 'social' });
         }, 100);
         return () => {
             clearInterval(interval);
@@ -46,10 +50,42 @@ export const EventHallWrap = ({ children }) => {
         };
     }, []);
 
-    const setItemDetails = (id) => {
+    useEffect(() => {
+        onMessage('new-unlocks-notifications-social', (payload) => {
+            
+            setNewUnlocks(payload);
+        });
+        return () => removeMessage('new-unlocks-notifications-social');
+    }, []);
+
+    const setItemDetails = useCallback((id) => {
         if(!id) {
             setDetailOpened(null);
+            setLockedId(null);
         } else {
+            setDetailOpened(id);
+        }
+    }, [])
+
+    const onHoverEnter = (id) => {
+        if(isMobile) return;
+        setDetailOpened(id);
+    }
+
+    const onHoverLeave = () => {
+        if(isMobile) return;
+        if(lockedId) {
+            setDetailOpened(lockedId);
+        } else {
+            setDetailOpened(null);
+        }
+    }
+
+    const onClickCard = (id) => {
+        if(lockedId === id) {
+            setLockedId(null);
+        } else {
+            setLockedId(id);
             setDetailOpened(id);
         }
     }
@@ -70,39 +106,63 @@ export const EventHallWrap = ({ children }) => {
                     <span className={'highlighted-span'} onClick={() => setDetailVisible(true)}>Info</span>
                 </div>) : null}
             </div>
-            <EventHall filterId={'events'} setItemDetails={setItemDetails} events={events} isMobile={isMobile} startEvent={startEvent} setAutoEvent={setAutoEvent}/>
+            <EventHall
+                filterId={'events'}
+                setItemDetails={setItemDetails}
+                events={events}
+                newUnlocks={newUnlocks}
+                isMobile={isMobile}
+                startEvent={startEvent}
+                setAutoEvent={setAutoEvent}
+                onHoverEnter={onHoverEnter}
+                onHoverLeave={onHoverLeave}
+                onClickCard={onClickCard}
+            />
         </div>
 
-        {(!isMobile || isDetailVisible || detailOpened) ? (<div className={'item-detail ingame-box detail-blade'}>
-            {detailOpened ? (
-                <EventDetails eventId={detailOpened} setItemDetails={setItemDetails}/>) : (
-                <GeneralStats setDetailVisible={setDetailVisible}/>)}
-        </div>) : null}
+        {(!isMobile || isDetailVisible) ? (
+            <div className={'item-detail ingame-box detail-blade'}>
+                {detailOpened ? (
+                    <EventDetails eventId={detailOpened} setItemDetails={setItemDetails}/>
+                ) : (
+                    <GeneralStats setDetailVisible={setDetailVisible}/>
+                )}
+            </div>
+        ) : null}
     </div>)
 
 }
 
-export const EventHall = ({filterId, setItemDetails, events, isMobile, startEvent, setAutoEvent}) => {
+export const EventHall = ({filterId, setItemDetails, events, newUnlocks, isMobile, startEvent, setAutoEvent, onHoverEnter, onHoverLeave, onClickCard}) => {
 
     return (
         <PerfectScrollbar>
             <div className={'items-list flex-container'}>
                 {events.map(event => (
-                    <EventCard 
+                    <NewNotificationWrap
                         key={event.id}
-                        event={event}
-                        setItemDetails={setItemDetails}
-                        startEvent={startEvent}
-                        setAutoEvent={setAutoEvent}
-                        isMobile={isMobile}
-                    />
+                        id={event.id}
+                        className={'narrow-wrapper'}
+                        isNew={newUnlocks?.['social']?.items?.['events']?.items?.['all']?.items?.[event.id]?.hasNew}
+                    >
+                        <EventCard 
+                            event={event}
+                            setItemDetails={setItemDetails}
+                            startEvent={startEvent}
+                            setAutoEvent={setAutoEvent}
+                            isMobile={isMobile}
+                            onHoverEnter={onHoverEnter}
+                            onHoverLeave={onHoverLeave}
+                            onClickCard={onClickCard}
+                        />
+                    </NewNotificationWrap>
                 ))}
             </div>
         </PerfectScrollbar>
     )
 }
 
-export const EventCard = ({event, setItemDetails, startEvent, setAutoEvent, isMobile}) => {
+export const EventCard = ({event, setItemDetails, startEvent, setAutoEvent, isMobile, onHoverEnter, onHoverLeave, onClickCard}) => {
 
     const handleStart = () => {
         if (event.canStart && event.hasEnoughResources) {
@@ -118,8 +178,9 @@ export const EventCard = ({event, setItemDetails, startEvent, setAutoEvent, isMo
     return (
         <div 
             className={`item-card card social-event ${event.category || 'other'} ${event.isActive ? 'active' : ''} ${!event.hasEnoughResources ? 'unavailable' : ''} ${event.isOnCooldown ? 'locked' : ''}`}
-            onMouseEnter={() => !isMobile ? setItemDetails(event.id) : null}
-            onMouseLeave={() => !isMobile ? setItemDetails(null) : null}
+            onMouseEnter={() => onHoverEnter ? onHoverEnter(event.id) : (!isMobile ? setItemDetails(event.id) : null)}
+            onMouseLeave={() => onHoverLeave ? onHoverLeave() : (!isMobile ? setItemDetails(null) : null)}
+            onClick={(e) => { e.stopPropagation(); if(onClickCard) onClickCard(event.id); else setItemDetails(event.id); }}
         >
             <div className={'head'}>
                 <p className="title">{event.name}</p>
@@ -242,7 +303,9 @@ export const GeneralStats = ({ setDetailVisible }) => {
     )
 }
 
-export const EventDetails = ({eventId, setItemDetails}) => {
+// automation rules UI removed
+
+export const EventDetails = React.memo(({eventId, setItemDetails}) => {
 
     const worker = useContext(WorkerContext);
 
@@ -251,6 +314,7 @@ export const EventDetails = ({eventId, setItemDetails}) => {
     const { isMobile } = useAppContext();
 
     const [event, setEvent] = useState(null);
+    // automation editing removed
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -314,6 +378,8 @@ export const EventDetails = ({eventId, setItemDetails}) => {
                     </div>
                 </div>
 
+                {/* automation UI removed */}
+
                 <div className={'block'}>
                     <p>Event Info:</p>
                     <div className={'event-info'}>
@@ -338,4 +404,7 @@ export const EventDetails = ({eventId, setItemDetails}) => {
             </div>
         </PerfectScrollbar>
     )
-} 
+}, (prevProps, nextProps) => {
+    // prevent parent-driven rerenders; let internal state updates (onMessage) control rendering
+    return prevProps.eventId === nextProps.eventId;
+})

@@ -1,6 +1,7 @@
 import {GameModule} from "../../shared/game-module";
 import {gameEntity, gameResources, gameEffects, gameCore, resourceCalculators} from "game-framework";
 import {registerEventsStage1} from "./social-events-db";
+// import {checkMatchingRules} from "../../shared/utils/rule-utils";
 
 export class EventsModule extends GameModule {
 
@@ -10,14 +11,31 @@ export class EventsModule extends GameModule {
         this.eventStartTime = 0;
         this.eventEndTime = 0;
         this.cooldownEndTime = 0; // Глобальний кулдаун для Event Hall
-        this.autoEvents = {}; // Автоматизація подій
+        this.autoEvents = {}; // Автоматизація (legacy simple toggle)
         this.eventHistory = {}; // Історія проведених подій
+        // removed advanced autotrigger (rules-based)
     }
 
     initialize() {
         registerEventsStage1();
         this.loadEventHistory();
         
+        // Register unlock notifications for social events
+        try {
+            const eventEntities = gameEntity.listEntitiesByTags(['event-hall']);
+            eventEntities.forEach(evt => {
+                if (evt.attributes?.isEvent) {
+                    gameCore.getModule('unlock-notifications').registerNewNotification(
+                        'social',
+                        'events',
+                        'all',
+                        evt.id,
+                        evt.isUnlocked && !evt.isCapped
+                    );
+                }
+            });
+        } catch (e) {}
+
         // API handlers
         this.eventHandler.registerHandler('query-social-events', () => {
             this.sendEventsData();
@@ -36,6 +54,8 @@ export class EventsModule extends GameModule {
             this.setAutoEvent(payload.eventId, payload.enabled);
         });
 
+        // removed advanced autotrigger handlers
+
         this.eventHandler.registerHandler('query-event-details', (payload) => {
             const details = this.getEventDetails(payload.eventId);
             this.eventHandler.sendData('event-details', details);
@@ -47,7 +67,7 @@ export class EventsModule extends GameModule {
 
         // Оновлюємо тривалість активної події
         if (this.activeEvent) {
-            const timeLeftSeconds = Math.max(0, this.eventEndTime - currentTime);
+            const timeLeftSeconds = Math.max(0, Math.floor(this.eventEndTime - currentTime));
             if (gameEntity.entityExists(`active_${this.activeEvent}`)) {
                 gameEntity.setAttribute(`active_${this.activeEvent}`, 'current_duration', timeLeftSeconds);
             }
@@ -58,8 +78,10 @@ export class EventsModule extends GameModule {
             }
         }
 
-        // Перевіряємо автоматизацію подій
+        // Перевіряємо legacy toggle
         this.checkAutoEvents(currentTime);
+
+        // removed advanced autotrigger tick
     }
 
     // Почати подію
@@ -192,6 +214,8 @@ export class EventsModule extends GameModule {
         }
     }
 
+    // removed getAutotriggerEvent
+
     // Отримати дані про події
     getEventsData() {
         const events = [];
@@ -199,6 +223,8 @@ export class EventsModule extends GameModule {
 
         for (const [index, eventEntity] of Object.entries(eventEntities)) {
             if (eventEntity.attributes?.isEvent) {
+                // Show only unlocked events in the listing
+                if(!eventEntity.isUnlocked) continue;
                 
                 const eventId = eventEntity.id;
                 const isActive = this.activeEvent === eventId;
@@ -223,8 +249,8 @@ export class EventsModule extends GameModule {
                     isAutoEnabled,
                     isFavorite: gameCore.getModule('favorites')?.isFavorite('socialEvents', eventId) || false,
                     progress: isActive ? Math.min(1, (gameCore.globalTime - this.eventStartTime) / ((eventEntity.attributes.eventDuration || 1) / 1000)) : 0,
-                    timeRemaining: isActive ? Math.max(0, (this.eventEndTime - gameCore.globalTime) * 1000) : 0, // Конвертуємо в мілісекунди для UI
-                    cooldownRemaining: isOnCooldown ? Math.max(0, (this.cooldownEndTime - gameCore.globalTime) * 1000) : 0, // Конвертуємо назад в мілісекунди для UI
+                    timeRemaining: isActive ? Math.max(0, Math.floor(this.eventEndTime - gameCore.globalTime) * 1000) : 0,
+                    cooldownRemaining: isOnCooldown ? Math.max(0, Math.floor(this.cooldownEndTime - gameCore.globalTime) * 1000) : 0,
                     cooldown: eventEntity.attributes.eventCooldown || 30 * 60 * 1000
                 });
             }
@@ -233,7 +259,8 @@ export class EventsModule extends GameModule {
         return {
             events,
             activeEvent: this.activeEvent,
-            autoEvents: this.autoEvents
+            autoEvents: this.autoEvents,
+            newUnlocks: gameCore.getModule('unlock-notifications').getNewNotificationsByScope?.('social')
         };
     }
 
@@ -268,7 +295,8 @@ export class EventsModule extends GameModule {
             permanentBonusEffects: gameEntity.getEffects(permanentBonusId),
             permanentBonusPotentialEffects: gameEntity.getEffects(permanentBonusId, 1),
             activeEventEffects: gameEntity.entityExists(activeEventId) ? gameEntity.getEffects(activeEventId) : [],
-            activeEventPotentialEffects: gameEntity.entityExists(activeEventId) ? gameEntity.getEffects(activeEventId, 1) : []
+            activeEventPotentialEffects: gameEntity.entityExists(activeEventId) ? gameEntity.getEffects(activeEventId, 1) : [],
+            // automation removed
         };
     }
 
@@ -296,6 +324,7 @@ export class EventsModule extends GameModule {
         this.cooldownEndTime = 0;
         this.autoEvents = {};
         this.eventHistory = {};
+        // clear legacy only
             
         if (saveObject) {
             this.activeEvent = saveObject.activeEvent || null;
@@ -304,6 +333,7 @@ export class EventsModule extends GameModule {
             this.cooldownEndTime = saveObject.cooldownEndTime || 0;
             this.autoEvents = saveObject.autoEvents || {};
             this.eventHistory = saveObject.eventHistory || {};
+            // advanced autotrigger no longer loaded
             
             // Відновлюємо активну подію якщо вона була активна
             if (this.activeEvent && this.eventEndTime > gameCore.globalTime) {

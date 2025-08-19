@@ -15,9 +15,9 @@ export const SocialMenu = ({ selectedTab, setSelectedTab }) => {
 
     useEffect(() => {
         sendData('query-unlocks', { prefix: 'social' });
-        sendData('query-new-unlocks-notifications', { suffix: 'social', scope: 'social' });
+        sendData('query-new-unlocks-notifications', { suffix: 'social-menu', scope: 'social' });
         const interval = setInterval(() => {
-            sendData('query-new-unlocks-notifications', { suffix: 'social', scope: 'social' })
+            sendData('query-new-unlocks-notifications', { suffix: 'social-menu', scope: 'social' })
         }, 1000);
         return () => {
             clearInterval(interval);
@@ -35,12 +35,12 @@ export const SocialMenu = ({ selectedTab, setSelectedTab }) => {
     }, []);
 
     useEffect(() => {
-        onMessage('new-unlocks-notifications-social', payload => {
+        onMessage('new-unlocks-notifications-social-menu', payload => {
             setNewUnlocks(payload);
         });
         
         return () => {
-            removeMessage('new-unlocks-notifications-social');
+            removeMessage('new-unlocks-notifications-social-menu');
         };
     }, []);
 

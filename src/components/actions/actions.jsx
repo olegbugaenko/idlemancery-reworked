@@ -73,6 +73,8 @@ export const Actions = ({}) => {
     const [detailOpened, setDetailOpened] = useState(null);
     const [editingList, setEditingList] = useState(null);
     const [viewingList, setViewingList] = useState(null);
+    const editingListRef = useRef(editingList);
+    const viewingListRef = useRef(viewingList);
     const [listData, setListData] = useState(null);
     const [viewedData, setViewedData] = useState(null);
     const [selectedAction, setSelectedAction] = useState(null);
@@ -98,9 +100,12 @@ export const Actions = ({}) => {
         }
     }, [])
 
+    useEffect(() => { editingListRef.current = editingList; }, [editingList]);
+    useEffect(() => { viewingListRef.current = viewingList; }, [viewingList]);
+
     useEffect(() => {
-        const id = viewingList ?? editingList;
-        if(id !== null) {
+        const id = viewingListRef.current ?? editingListRef.current;
+        if(id !== null && id !== undefined) {
             sendData('load-action-list', { id });
         }
     }, [editingList, viewingList])
@@ -119,10 +124,10 @@ export const Actions = ({}) => {
         });
 
         onMessage('action-list-data', (payload) => {
-            if(viewingList) {
+            if(viewingListRef.current) {
                 setViewedData(payload);
-            } else if(editingList || payload.bForceOpen) {
-                if(payload.bForceOpen && !editingList) {
+            } else if(editingListRef.current || payload.bForceOpen) {
+                if(payload.bForceOpen && !editingListRef.current) {
                     setEditingList(payload.id);
                 }
                 setListData(payload);

@@ -109,6 +109,7 @@ export class MainModule extends GameModule {
                 'automations': gameEntity.getLevel('shop_item_planner') > 0,
                 'courses': gameEntity.getLevel('shop_item_training_room') > 0,
                 'amplifiers': gameEffects.getEffectValue('attribute_magic_ability') >= 15000,
+                'machinery': gameEntity.getLevel('shop_item_automated_mechanisms') > 0,
                 'events': gameEntity.getLevel('structure_event_hall') > 0,
                 'social-main': gameEntity.getLevel('structure_event_hall') > 0,
                 'expeditions': gameEntity.getLevel('action_expedition') > 0,

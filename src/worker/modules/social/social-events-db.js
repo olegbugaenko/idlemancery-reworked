@@ -322,4 +322,83 @@ export const registerEventsStage1 = () => {
             }
         })
     })
+
+    // New: Non-training social campaign events unlocked by Charisma >= 30000
+    const charismaUnlock = () => gameEffects.getEffectValue('attribute_charisma') >= 30000;
+
+    // Scholarly Outreach — boosts courses learning speed
+    registerGameSocialEvent('event_scholarly_outreach', {
+        name: 'Scholarly Outreach',
+        description: 'Host public lectures and distribute study notes to accelerate course learning for everyone.',
+        permanentEffect: 'courses_learning_speed',
+        temporaryEffect: 'courses_learning_speed',
+        category: 'educational',
+        tags: ["socio_campaign", "courses"],
+        unlockCondition: charismaUnlock,
+        unlockedBy: [{ type: 'effect', id: 'attribute_charisma', level: 30000 }],
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    courses_learning_speed: {
+                        A: 0.75,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }
+        },
+        permanentResourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    courses_learning_speed: {
+                        A: 0.05,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            })
+        },
+        get_cost: () => ({
+            'coins': { A: 0, B: 2500000000, type: 0 },
+            'inventory_paper': { A: 0, B: 50000, type: 0 },
+        })
+    })
+
+    // Herbalists’ Fair — increases herbs found on the map
+    registerGameSocialEvent('event_herbalists_fair', {
+        name: 'Herbalists’ Fair',
+        description: 'Organize a fair promoting herbalism and wildcrafting to boost herb findings across the land.',
+        permanentEffect: 'gathering_herbs_amount',
+        temporaryEffect: 'gathering_herbs_amount',
+        category: 'gathering',
+        tags: ["socio_campaign", "herbalism"],
+        unlockCondition: charismaUnlock,
+        unlockedBy: [{ type: 'effect', id: 'attribute_charisma', level: 30000 }],
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    gathering_herbs_amount: {
+                        A: 0.75,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }
+        },
+        permanentResourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    gathering_herbs_amount: {
+                        A: 0.04,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            })
+        },
+        get_cost: () => ({
+            'coins': { A: 0, B: 2500000000, type: 0 },
+            'inventory_herbal_fibers': { A: 0, B: 20000, type: 0 },
+        })
+    })
 } 

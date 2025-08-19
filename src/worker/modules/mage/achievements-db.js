@@ -1497,6 +1497,19 @@ export const achievementsDb = [{
         return gameEntity.getLevel('action_nail_standing') >= 500
     }
 },{
+    id: 'action_nail_standing_4',
+    title: 'The Night Toad and the Nail',
+    text: [
+        "You woke up in the middle of the night from a nightmare — in your dream, a giant toad attacked you and you had to run.",
+        "Still shaken with shame and fear, you jumped out of bed to drink some water, but accidentally stepped on a teacup you had left under the bed.",
+        "You felt a crunch and pain in your foot. Nevertheless, the pain subsided rather quickly.",
+        "You lit a candle and examined your foot — the shards hadn't pierced your sole, but you noticed a nail sticking out of your foot.",
+        "Swearing, you pulled the nail out and realized that taking a sleeping potion before nail standing is not the best idea."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_nail_standing') >= 2000
+    }
+},{
     id: 'action_deep_focus_1',
     title: 'The Interrupted Meditation',
     text: [
