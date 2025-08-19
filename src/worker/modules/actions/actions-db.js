@@ -360,7 +360,7 @@ export const registerActionsStage1 = () => {
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_charisma',
-            level: 50,
+            level: 125,
         }],
         attributes: {
             baseXPCost: 20,

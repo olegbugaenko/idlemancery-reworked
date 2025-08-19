@@ -6,6 +6,12 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+                <h3>Idle Awakening v0.2.0</h3>
+                <div className={'features'}>
+                    <p>Massive content addition (Structures, new Alchemy and much more).</p>
+                    <p>Fixed crashes issues.</p>
+                    <p>Fixed a bug where autopurchase multiplier applied incorrectly.</p>
+                </div>
                 <h3>Idle Awakening v0.1.4j</h3>
                 <div className={'features'}>
                     <p>Added autopurchase for resources in shop.</p>

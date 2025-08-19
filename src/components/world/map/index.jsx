@@ -83,21 +83,21 @@ export const MapWrap = ({ children }) => {
 
     useEffect(() => {
         onMessage('map-tile-list-effects', (payload) => {
-            setListDetails({
-                ...listDetails,
+            setListDetails(prev => ({
+                ...prev,
                 listData: {
-                    ...listDetails.listData,
+                    ...prev.listData,
                     drops: payload.potentialDrops,
                     costs: payload.costs,
                     proportionsBar: payload.proportionsBar,
                 }
-            })
+            }))
         });
         
         return () => {
             removeMessage('map-tile-list-effects');
         };
-    }, [listDetails]);
+    }, []);
 
     const setAutotriggerPriority = useCallback((priority) => {
         const { listData } = listDetails ?? {};

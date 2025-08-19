@@ -459,7 +459,7 @@ export const ItemResourceCard = ({ id, name, purchaseMultiplier, stock, level, m
         <TippyWrapper
             content={<div className={'hint-popup'}>
                 <p>{name} {amount > 0 ? `(${formatInt(amount)} in inventory)` : ''}</p>
-                <p>Press to buy x{formatInt(purchaseMultiplier)}. Hold Shift to by max</p>
+                <p>Right click to buy x{formatInt(purchaseMultiplier)}. Hold Shift to by max</p>
             </div>}>
             <div className={'icon-content'}>
                 <img src={`icons/resources/${id}.png`} className={'resource'} />
@@ -552,11 +552,11 @@ export const ItemDetails = ({itemId, category, editId, onPurchase, isEditMode, o
     const [resources, setResources] = useState([]);
 
     useEffect(() => {
-        sendData('query-all-resources', {});
+        sendData('query-all-resources', { prefix: 'shop'});
     }, [])
 
     useEffect(() => {
-        onMessage('all-resources', (payload) => {
+        onMessage('all-resources-shop', (payload) => {
             setResources(payload);
         });
         
@@ -606,12 +606,19 @@ export const ItemDetails = ({itemId, category, editId, onPurchase, isEditMode, o
 
     useEffect(() => {
         if(category === 'items' && editId) {
-            setAutopurchase(item?.autopurchase);
+            const ap = item?.autopurchase || {};
+            setAutopurchase({
+                rules: ap.rules || [],
+                pattern: ap.pattern,
+                isEnabled: ap.isEnabled || false,
+                reserved: ap.reserved ?? 0,
+                purchaseMultiplier: ap.purchaseMultiplier ?? 1,
+            });
         } else {
             setAutopurchase(null);
         }
 
-    },[category, editId]) // Pass directly editId
+    },[category, editId, item?.autopurchase?.purchaseMultiplier]) // include item so defaults are applied when data arrives
 
     if(!itemId || !item) return null;
 

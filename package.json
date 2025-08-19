@@ -9,7 +9,7 @@
     "build": "npm update & webpack --config webpack.config.js",
     "build:demo": "set IS_DEMO=1 & webpack --config webpack.config.js",
     "electron:dev": "electron electron/main.js",
-    "electron:build": "npm update & webpack --config webpack.config.js & electron-builder",
+    "electron:build": "set IS_STEAM_BUILD=1 & npm update & webpack --config webpack.config.js & electron-builder",
     "electron:demo-build": "set IS_DEMO=1 & set IS_STEAM_BUILD=1 & npm update & webpack --config webpack.config.js & electron-builder"
   },
   "build": {

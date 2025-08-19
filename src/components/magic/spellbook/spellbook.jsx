@@ -37,6 +37,7 @@ export const SpellbookWrap = ({ children }) => {
     const [editData, setEditData] = useState(null);
     const [viewedData, setViewedData] = useState(null);
     const [resources, setResources] = useState([]);
+    const resourcesRef = useRef();
     const [isChanged, setChanged] = useState(false);
     const [newUnlocks, setNewUnlocks] = useState({});
 
@@ -65,7 +66,7 @@ export const SpellbookWrap = ({ children }) => {
         const interval = setInterval(() => {
             sendData('query-spell-data', {});
         }, 100);
-        sendData('query-all-resources', {});
+        sendData('query-all-resources', { prefix: 'spellbook'});
         const interval2 = setInterval(() => {
             sendData('query-new-unlocks-notifications', { suffix: 'spellbook', scope: 'spellbook' })
         }, 1000)
@@ -75,11 +76,16 @@ export const SpellbookWrap = ({ children }) => {
         }
     }, [])
 
+    useEffect(() => {
+        resourcesRef.current = resources;
+    }, [resources]);
+
     onMessage('new-unlocks-notifications-spellbook', payload => {
         setNewUnlocks(payload);
     })
 
-    onMessage('all-resources', (payload) => {
+    onMessage('all-resources-spellbook', (payload) => {
+        console.log('all-resources: ', payload);
         setResources(payload);
     })
 
@@ -94,15 +100,18 @@ export const SpellbookWrap = ({ children }) => {
     })
 
     onMessage('spell-level-effects', (payload) => {
-        if(editData) {
-            setEditData({
-                ...editData,
-                effects: payload.effects,
-                potentialEffects: payload.potentialEffects,
-                affordable: payload.affordable,
-                xpRate: payload.xpRate,
-            });
-        }
+        setEditData(prev => {
+            if(prev) {
+                return {
+                    ...prev,
+                    effects: payload.effects,
+                    potentialEffects: payload.potentialEffects,
+                    affordable: payload.affordable,
+                    xpRate: payload.xpRate,
+                };
+            }
+            return prev;
+        });
     })
 
     onMessage('spell-data', (spell) => {
@@ -172,8 +181,15 @@ export const SpellbookWrap = ({ children }) => {
     const onAddAutoconsumeRule = useCallback(() => {
         if(editData) {
             const newEdit = cloneDeep(editData);
+            
+            // Safety check for resources
+            if (!resourcesRef.current || !resourcesRef.current.length) {
+                console.warn('No resources available for autoconsume rule');
+                return;
+            }
+            
             newEdit.autocast.rules.push({
-                resource_id: resources[0].id,
+                resource_id: resourcesRef.current[0].id,
                 condition: 'less_or_eq',
                 value_type: 'percentage',
                 value: 50,
@@ -203,7 +219,7 @@ export const SpellbookWrap = ({ children }) => {
             return newEdit;
         });
         setChanged(true);
-    }, [editData])
+    }, [])
 
 
     const onToggleAutotrigger = useCallback(() => {

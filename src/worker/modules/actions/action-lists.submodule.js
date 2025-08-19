@@ -74,6 +74,7 @@ export class ActionListsSubmodule extends GameModule {
 
 
         this.eventHandler.registerHandler('query-action-list-effects', ({ id, listData }) => {
+            
             listData = this.applyDynamicValuesToList(listData);
 
             const data = this.getListEffects(null, listData);
@@ -218,9 +219,9 @@ export class ActionListsSubmodule extends GameModule {
                     totalConsumes[resId] += amount;
                     totalReqs[resId] += amount;
                     maxConsumes[resId] = Math.max(maxConsumes[resId], value)
-                    if(id === 'action_read_books' && resId === 'energy') {
-                        console.log('CRB: ', T_values[id], totalTime, consumes, totalConsumes, amount, value);
-                    }
+                    //if(id === 'action_read_books' && resId === 'energy') {
+                    //    console.log('CRB: ', T_values[id], totalTime, consumes, totalConsumes, amount, value);
+                    //}
                 }
                 
             }
@@ -298,16 +299,16 @@ export class ActionListsSubmodule extends GameModule {
 
                     const normNet = (c ? ((c - avgC) / maxC) : 0) - (s ? ((s - avgS) / maxS) : 0);
                     gradient[id] += normNet * d;
-                    if(id === 'action_read_books') {
-                        console.log(`|-| ${gradient[id]}: ${resId} delta = ${normNet*d}: (${c} - ${avgC})/${maxC} - (${s} - ${avgS})/${maxS}`);
-                    }
+                    //if(id === 'action_read_books') {
+                    //    console.log(`|-| ${gradient[id]}: ${resId} delta = ${normNet*d}: (${c} - ${avgC})/${maxC} - (${s} - ${avgS})/${maxS}`);
+                    //}
                 }
             }
 
             const totalDynamic = Object.values(T).reduce((a, b) => a + b, 0);
             const totalTime = fixedTotal + totalDynamic;
 
-            console.log(`SubIter${iter}: ${Math.abs(totalError - prevDeficits)} < ${tolerance}`, deficits, initialResourceBalance, gradient, T);
+            //console.log(`SubIter${iter}: ${Math.abs(totalError - prevDeficits)} < ${tolerance}`, deficits, initialResourceBalance, gradient, T);
 
             for (const id of dynamicIds) {
                 const t = T[id];
@@ -703,6 +704,7 @@ export class ActionListsSubmodule extends GameModule {
         const list = {...payload};
 
         delete list['isReopenEdit'];
+        delete list['copyId'];
 
         const isReopenEdit = payload.isReopenEdit
 
@@ -1009,6 +1011,7 @@ export class ActionListsSubmodule extends GameModule {
             if(!data) {
                 console.error('Reffering to listId: ', id, this.actionsLists, options);
             }
+            data.copyId = data.id;
             data = {...data};
             data.name = data.name + ' (Copy)';
             data.id = undefined;

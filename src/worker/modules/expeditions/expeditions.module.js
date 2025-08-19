@@ -203,8 +203,8 @@ export class ExpeditionsModule extends GameModule {
     }
 
     load(saveObject) {
-        this.expeditions = saveObject.expeditions || {};
-        this.discoveredResources = saveObject.discoveredResources || {};
+        this.expeditions = saveObject?.expeditions || {};
+        this.discoveredResources = saveObject?.discoveredResources || {};
         
         // Migrate old Set-based discoveredResources to arrays
         for (const expeditionId in this.discoveredResources) {

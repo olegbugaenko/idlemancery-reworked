@@ -41,13 +41,13 @@ export const ExpeditionsWrap = ({ children }) => {
         const interval = setInterval(() => {
             sendData('query-expedition-data', {});
         }, 100);
-        sendData('query-all-resources', {});
+        sendData('query-all-resources', { prefix: 'expeditions'});
         return () => {
             clearInterval(interval);
         }
     }, [])
 
-    onMessage('all-resources', (payload) => {
+    onMessage('all-resources-expeditions', (payload) => {
         setResources(payload);
     })
 
@@ -57,9 +57,12 @@ export const ExpeditionsWrap = ({ children }) => {
         })
 
         onMessage('edit-expedition-details', (payload) => {
-            if (payload && editData && payload.id === editData.id) {
-                setEditData(payload);
-            }
+            setEditData(prev => {
+                if (payload && prev && payload.id === prev.id) {
+                    return payload;
+                }
+                return prev;
+            });
         })
 
     onMessage('expedition-details', (payload) => {

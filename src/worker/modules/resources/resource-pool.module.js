@@ -311,7 +311,7 @@ export class ResourcePoolModule extends GameModule {
             const pinned = inventory.filter(one => this.pinnedResources?.[one.id]);
             rs.push(...pinned);
         }
-        return rs.filter(one => one.isUnlocked).map(resource => ({
+        return rs.filter(one => gameResources.resourceExists(one.id) && one.isUnlocked).map(resource => ({
             ...resource,
             isNegative: resource.balance < 0,
             isPositive: resource.balance > 0 && resource.amount < resource.cap - SMALL_NUMBER,

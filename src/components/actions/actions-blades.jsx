@@ -356,7 +356,7 @@ export const ListEditor = React.memo(({
                                     <TippyWrapper content={
                                         <div className={'hint-popup'}>
                                             <p>{one.name}</p>
-                                            <p>Effort: {formatValue(one.percentage*100)}%</p>
+                                            <p>Effort: {formatValue(one?.percentage*100)}%</p>
                                         </div> }>
                                         <div style={{width: one.displayPercentage, backgroundColor: one.color}} className={'proportion-bar'}>
                                         </div>
@@ -407,7 +407,7 @@ export const ListEditor = React.memo(({
                                                         <span className={'percentage'}>{formatValue(editing.proportionsBar?.[index]?.percentage*100 || 0)} %</span>
                                                     </div>
                                                 )
-                                                : (<span>{formatValue(editing.proportionsBar[index].percentage*100)} %</span>)
+                                                : (<span>{formatValue(editing.proportionsBar[index]?.percentage*100)} %</span>)
                                             }
                                         </div>
                                         <div className={'col delete'}>

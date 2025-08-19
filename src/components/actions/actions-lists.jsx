@@ -27,6 +27,7 @@ export const ActionListsPanel = ({ automationUnlocked, runningList, editListToDe
     }
 
     const cloneList = (id) => {
+        console.log('Cloning: ', id);
         editListToDetails(id, { clone: true });
         setOpenedFor(null);
     }

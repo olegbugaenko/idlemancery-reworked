@@ -89,7 +89,7 @@ export const Actions = ({}) => {
         const interval = setInterval(() => {
             sendData('query-actions-data', {  });
         }, 100);
-        sendData('query-all-resources', {});
+        sendData('query-all-resources', { prefix: 'inventory'});
         const interval2 = setInterval(() => {
             sendData('query-new-unlocks-notifications', { suffix: 'actions', scope: 'actions' })
         }, 1000)
@@ -115,7 +115,7 @@ export const Actions = ({}) => {
             setNewUnlocks(payload);
         });
 
-        onMessage('all-resources', (payload) => {
+        onMessage('all-resources-inventory', (payload) => {
             setResources(payload);
         });
 
@@ -124,6 +124,7 @@ export const Actions = ({}) => {
         });
 
         onMessage('action-list-data', (payload) => {
+            console.log('LIST DATA', payload, listData);
             if(viewingListRef.current) {
                 setViewedData(payload);
             } else if(editingListRef.current || payload.bForceOpen) {
@@ -132,7 +133,7 @@ export const Actions = ({}) => {
                 }
                 setListData(payload);
                 setViewedData(null);
-            } else if(listData?.copyId) {
+            } else if(listData?.copyId || payload.copyId) {
                 setEditingList(null);
                 setViewingList(null);
                 setListData(payload);
@@ -140,18 +141,23 @@ export const Actions = ({}) => {
         });
 
         onMessage('action-list-effects', (payload) => {
-            if(listData) {
-                const actions = payload.newTimes ?? listData.actions;
-                setListData({
-                    ...listData,
-                    potentialEffects: payload.potentialEffects,
-                    resourcesEffects: payload.resourcesEffects,
-                    effectEffects: payload.effectEffects,
-                    prevEffects: payload.prevEffects,
-                    proportionsBar: payload.proportionsBar,
-                    actions,
+
+                setListData(prev =>{
+                    if(!prev) return;
+
+                    const actions = payload.newTimes ?? prev.actions;
+                    console.log('NAEL: ', actions);
+                    
+                    return {
+                        ...prev,
+                        potentialEffects: payload.potentialEffects,
+                        resourcesEffects: payload.resourcesEffects,
+                        effectEffects: payload.effectEffects,
+                        prevEffects: payload.prevEffects,
+                        proportionsBar: payload.proportionsBar,
+                        actions,
+                    }
                 })
-            }
         });
 
         return () => {

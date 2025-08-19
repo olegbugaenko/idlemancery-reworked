@@ -703,7 +703,7 @@ export class MageModule extends GameModule {
         }
 
         if(!this.bankedTime.current) {
-            this.bankedTime.current = 86400000; // 24 hours in milliseconds
+            this.bankedTime.current = 0; // 24 hours in milliseconds
         }
 
         if(this.bankedTime?.speedUpFactor > 1) {

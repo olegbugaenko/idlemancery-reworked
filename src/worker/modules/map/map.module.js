@@ -327,6 +327,9 @@ export class MapModule extends GameModule {
                     effEff,
                     drops: this.mapTiles[i][j].drops.map((d, index) => {
                         const isRevealed = this.mapTiles[i][j].r?.includes(index);
+                        if(!gameResources.resourceExists(d.id)) {
+                            return;
+                        }
                         const rs = gameResources.getResource(d.id);
                         const isHerb = rs.tags.includes('herb');
                         const isRare = rs.tags.includes('rare');
@@ -380,7 +383,7 @@ export class MapModule extends GameModule {
                             amountMax: Math.max(1, 6*d.amountMult*effEff*amtHerbsMult*(rs.lootAmountMult || 1)),
                             isRevealed,
                         }
-                    }),
+                    }).filter(one => !!one),
                     cost: {
                         ['gathering_effort']: {
                             name: gameResources.getResource('gathering_effort').name,

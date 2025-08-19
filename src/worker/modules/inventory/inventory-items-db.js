@@ -2007,34 +2007,6 @@ export const registerInventoryItems = () => {
         allowedTileTypes: ['forest', 'mountain', 'hills']
     })
 
-    registerInventoryItem('inventory_rare_titableaf', {
-        name: 'Titableaf',
-        hasCap: false,
-        tags: ['inventory', 'ingredient', 'fake'],
-        defaultCap: 0,
-        isAbstract: true,
-        getUsageCooldown: () => {
-            return 0.1;
-        },
-        attributes: {
-            baseChanceMult: 1,
-            isRare: true,
-            allowMultiConsume: false,
-        },
-        usageGain: {
-
-        },
-        resourceModifier: {
-
-        },
-        unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
-        },
-        sellPrice: 12000,
-        rarity: 4,
-        //allowedTileTypes: ['forest', 'swamp', 'lakes']
-    })
-
     registerInventoryItem('inventory_rare_azureblossom', {
         name: 'Azureblossom',
         hasCap: false,
