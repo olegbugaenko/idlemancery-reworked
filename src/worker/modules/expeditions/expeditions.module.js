@@ -161,7 +161,7 @@ export class ExpeditionsModule extends GameModule {
                 
                 // Calculate effort consumed by this specific expedition
                 const consumpt = gameResources.getResource('expedition_effort').consumption;
-                if (consumpt > 0) {
+                if (consumpt > 0 && gameResources.getResource('expedition_effort').income) {
                     const effortConsumed = consumpt * delta;
                     const xpRate = gameEffects.getEffectValue('expedition_xp_rate');
                     

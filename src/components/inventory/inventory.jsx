@@ -78,7 +78,7 @@ export const Inventory = ({}) => {
         const interval = setInterval(() => {
             sendData('query-inventory-data', {});
         }, 100);
-        sendData('query-all-resources', {});
+        sendData('query-all-resources', { prefix: 'inventory'});
         const interval2 = setInterval(() => {
             sendData('query-new-unlocks-notifications', { suffix: 'inventory', scope: 'inventory' })
         }, 1000)
@@ -99,7 +99,7 @@ export const Inventory = ({}) => {
     }, []);
 
     useEffect(() => {
-        onMessage('all-resources', (payload) => {
+        onMessage('all-resources-inventory', (payload) => {
             setResources(payload);
         });
         

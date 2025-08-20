@@ -16,12 +16,12 @@ export const AutomationsSettings = () => {
     const [unlocks, setUnlocksData] = useState({});
 
     useEffect(() => {
-        sendData('query-all-resources', {});
+        sendData('query-all-resources', { prefix: 'automation'});
         sendData('query-unlocks', {});
 
     }, [])
 
-    onMessage('all-resources', (payload) => {
+    onMessage('all-resources-automation', (payload) => {
         setResources(payload);
     })
 

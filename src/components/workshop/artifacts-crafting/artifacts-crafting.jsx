@@ -105,7 +105,7 @@ export const ArtifactsCrafting = ({ children }) => {
         const material = materials.find(m => m.id === materialId);
         if (!material) return null;
         
-        return `/icons/resources/${material.id}.png`;
+        return `icons/resources/${material.id}.png`;
     };
 
     const getMaterialName = (materialId) => {
@@ -209,11 +209,11 @@ export const ArtifactsCrafting = ({ children }) => {
                                 >
                                     <div className='icon-content'>
                                         <img 
-                                            src={`/icons/resources/${material.id}.png`}
+                                            src={`icons/resources/${material.id}.png`}
                                             alt={material.name}
                                             className="material-icon"
                                             onError={(e) => {
-                                                e.target.src = '/icons/resources/resource_placeholder.png';
+                                                e.target.src = 'icons/resources/resource_placeholder.png';
                                             }}
                                         />
                                     </div>

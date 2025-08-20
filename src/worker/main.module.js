@@ -100,7 +100,7 @@ export class MainModule extends GameModule {
                 'crafting': gameEntity.getLevel('shop_item_crafting_courses') > 0,
                 'alchemy': gameEntity.getLevel('shop_item_alchemy_courses') > 0,
                 'workshop': gameEntity.getLevel('shop_item_crafting_courses') > 0 || gameEntity.getLevel('shop_item_alchemy_courses') > 0 || gameResources.getResource('plantation_slots').income > 0,
-                'artifacts': gameEntity.getLevel('action_expedition') > 0,
+                'artifacts': gameEntity.isEntityUnlocked('action_expedition'),
                 'plantation': gameResources.getResource('plantation_slots').income > 0,
                 'guilds': gameEffects.getEffectValue('attribute_charisma') >= 500,
                 'social': gameEntity.getLevel('structure_event_hall') > 0,
@@ -112,7 +112,7 @@ export class MainModule extends GameModule {
                 'machinery': gameEntity.getLevel('shop_item_automated_mechanisms') > 0,
                 'events': gameEntity.getLevel('structure_event_hall') > 0,
                 'social-main': gameEntity.getLevel('structure_event_hall') > 0,
-                'expeditions': gameEntity.getLevel('action_expedition') > 0,
+                'expeditions': gameEntity.isEntityUnlocked('action_expedition'),
             }
             let label = 'unlocks';
             if(payload?.prefix) {

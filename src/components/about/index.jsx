@@ -6,6 +6,14 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+                <h3>Idle Awakening v0.2.0a</h3>
+                <div className={'features'}>
+                    <p>Fixed bug when some content was visible before it really can be used</p>
+                    <p>Fixed images loading issues</p>
+                    <p>Fixed whitescreen issue when adding condition to spell automation.</p>
+                    <p>Fixed bug when spell level could not be adjusted</p>
+                    <p>Fixed action lists effects display in list details</p>
+                </div>
                 <h3>Idle Awakening v0.2.0</h3>
                 <div className={'features'}>
                     <p>Massive content addition (Structures, new Alchemy and much more).</p>
