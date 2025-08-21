@@ -23,7 +23,7 @@ export const registerEventsStage1 = () => {
         // Реєструємо ентіті для постійного бонусу
         const permanentBonusId = `${id}_permanent_bonus`
         gameEntity.registerGameEntity(permanentBonusId, {
-            tags: ["social-event", "permanent_bonus"],
+            tags: ["social-event", "permanent_bonus", "social_perma_bonus"],
             name: `${options.name} Permanent Bonus`,
             description: `Permanent bonus from ${options.name}`,
             level: 0,
