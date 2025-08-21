@@ -41,7 +41,7 @@ export const SecondaryMenu = () => {
                     </TippyWrapper>
                 </li>
                 <li className={openedTab === 'about' ? 'active' : ''} onClick={() => setOpenedTab('about')}>
-                    <span>v0.2.0a</span>
+                    <span>v0.2.0b</span>
                 </li>
             </ul>
         </div>

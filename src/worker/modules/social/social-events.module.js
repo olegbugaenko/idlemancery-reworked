@@ -357,6 +357,10 @@ export class EventsModule extends GameModule {
     }
 
     loadEventHistory() {
+        const allPermanentBonuses = gameEntity.listEntitiesByTags(['social_perma_bonus']);
+        for (const bonusEntity of allPermanentBonuses) {
+            gameEntity.setEntityLevel(bonusEntity.id, 0, true);
+        }
         // Оновлюємо всі постійні бонуси при завантаженні
         for (const [eventId, timesCompleted] of Object.entries(this.eventHistory)) {
             const permanentBonusId = `${eventId}_permanent_bonus`;

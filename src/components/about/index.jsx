@@ -6,6 +6,12 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+                <h3>Idle Awakening v0.2.0b</h3>
+                <div className={'features'}>
+                    <p>Fixed bug when some recipes were showing without components being unlocked</p>
+                    <p>Fixed bug when action unlocks didnt show up properly</p>
+                    <p>Fixed a bug when social data was not cleared properly when importing new save</p>
+                </div>
                 <h3>Idle Awakening v0.2.0a</h3>
                 <div className={'features'}>
                     <p>Fixed bug when some content was visible before it really can be used</p>

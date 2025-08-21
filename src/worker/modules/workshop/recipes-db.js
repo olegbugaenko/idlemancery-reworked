@@ -34,6 +34,15 @@ export const registerCraftingRecipe = (id, options) => {
 
     options.isPersistent = true;
 
+    if(options.resourceId) {
+        const originalUnlockCondition = options.unlockCondition;
+        options.unlockCondition = () => {
+            const baseCondition = originalUnlockCondition ? originalUnlockCondition() : true;
+            const resourceUnlocked = gameResources.isResourceUnlocked(options.resourceId);
+            return baseCondition && resourceUnlocked;
+        };
+    }
+
     return gameEntity.registerGameEntity(id, options);
 
 }

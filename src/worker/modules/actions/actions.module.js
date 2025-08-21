@@ -957,7 +957,7 @@ export class ActionsModule extends GameModule {
     }
 
     getActionsUnlocks(showUnlocked) {
-        const FREEZE_FUTURE_UNLOCKS = true; // Temporary: hide upcoming unlocks to focus on polishing current content
+        const FREEZE_FUTURE_UNLOCKS = false; // Temporary: hide upcoming unlocks to focus on polishing current content
         const items = gameEntity
             .listEntitiesByTags(['action'], false, [], { listPrevious: showUnlocked })
             .filter(one => one.isUnlocked && !one.isCapped && (one.nextUnlocks?.length || (showUnlocked && one.prevUnlocks?.length)))

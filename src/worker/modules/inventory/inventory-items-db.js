@@ -913,7 +913,7 @@ export const registerInventoryItems = () => {
 
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_crafting_courses') > 0
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_1') > 0
         },
         sellPrice: 10000,
         get_cost: (amount = 1) => ({
@@ -1161,7 +1161,7 @@ export const registerInventoryItems = () => {
 
         },
         unlockCondition: () => {
-            return (gameEntity.getLevel('shop_item_crafting_courses') > 0) && (gameEntity.getLevel('shop_item_better_ink_crafting') > 0)
+            return (gameEntity.getLevel('shop_item_crafting_courses') > 0) && (gameEntity.getLevel('shop_item_better_ink_crafting') > 0) && gameEntity.getLevel('shop_item_herbs_handbook_3') > 0
         },
         sellPrice: 160000,
     })
@@ -1320,7 +1320,7 @@ export const registerInventoryItems = () => {
             })
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_1') > 0
         },
         sellPrice: 225,
     })
@@ -1353,7 +1353,7 @@ export const registerInventoryItems = () => {
             })
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_1') > 0
         },
         sellPrice: 425,
     })
@@ -1400,7 +1400,8 @@ export const registerInventoryItems = () => {
             })
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_1') > 0
+            && gameEntity.getLevel('shop_item_spellbook') > 0
         },
         sellPrice: 1500,
     })
@@ -1465,7 +1466,7 @@ export const registerInventoryItems = () => {
             },
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_1') > 0
         },
         sellPrice: 15000,
     })
@@ -1506,7 +1507,7 @@ export const registerInventoryItems = () => {
             })
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_3') > 0
         },
         sellPrice: 15000,
     })
