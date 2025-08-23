@@ -32,7 +32,7 @@ export class ResourcePoolModule extends GameModule {
             if(payload?.prefix) {
                 label = `${label}-${payload?.prefix}`
             }
-            this.eventHandler.sendData(label, data.map(one => ({ id: one.id, name: one.name, isCapped: one.isCapped, isUnlocked: one.unlockCondition ? one.unlockCondition() : true })));
+            this.eventHandler.sendData(label, data.map(one => ({ id: one.id, name: one.name, isCapped: one.isCapped, isUnlocked: gameResources.isResourceUnlocked(one.id) })));
         })
     }
 
@@ -109,6 +109,7 @@ export class ResourcePoolModule extends GameModule {
             tags: ['crafting', 'secondary'],
             name: 'Crafting Slots',
             isService: true,
+            unlockCondition: () => false,
         })
 
         gameResources.registerResource('alchemy_ability', {
@@ -121,6 +122,7 @@ export class ResourcePoolModule extends GameModule {
             tags: ['alchemy', 'secondary'],
             name: 'Alchemy Slots',
             isService: true,
+            unlockCondition: () => false,
         })
 
         gameResources.registerResource('plantation_slots', {
@@ -144,13 +146,6 @@ export class ResourcePoolModule extends GameModule {
         gameResources.registerResource('inventory_scrolls', {
             tags: ['inventory', 'expedition', 'scrolls'],
             name: 'Scrolls',
-            hasCap: true,
-            defaultCap: 0,
-        })
-
-        gameResources.registerResource('inventory_artifacts', {
-            tags: ['inventory', 'expedition', 'artifacts'],
-            name: 'Artifacts',
             hasCap: true,
             defaultCap: 0,
         })
@@ -207,6 +202,7 @@ export class ResourcePoolModule extends GameModule {
             hasCap: true,
             tags: ['guild', 'reputation'],
             defaultCap: 0,
+            unlockCondition: () => false,
         })
 
         gameResources.registerResource('guild-points', {
@@ -215,6 +211,7 @@ export class ResourcePoolModule extends GameModule {
             tags: ['guild', 'points'],
             defaultCap: 0,
             isService: true,
+            unlockCondition: () => false,
         })
 
     }

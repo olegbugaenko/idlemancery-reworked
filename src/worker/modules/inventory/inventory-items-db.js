@@ -105,7 +105,7 @@ export const registerInventoryItems = () => {
             duration: 0,
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('action_clay_mining') > 0
+            return gameEntity.isEntityUnlocked('action_clay_mining')
         },
         sellPrice: 800,
     })
@@ -1538,7 +1538,7 @@ export const registerInventoryItems = () => {
 
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
         },
         sellPrice: 522500,
     })
@@ -1568,7 +1568,7 @@ export const registerInventoryItems = () => {
 
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
         },
         sellPrice: 522500,
     })
@@ -1597,7 +1597,7 @@ export const registerInventoryItems = () => {
 
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
         },
         sellPrice: 522500,
     })
@@ -1627,7 +1627,7 @@ export const registerInventoryItems = () => {
 
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
         },
         sellPrice: 522500,
     })
@@ -1657,7 +1657,7 @@ export const registerInventoryItems = () => {
 
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_alchemy_courses') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_2') > 0
         },
         sellPrice: 522500,
     })
@@ -2149,7 +2149,7 @@ export const registerInventoryItems = () => {
             isRare: true,
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('action_expedition') > 0
+            return gameEntity.isEntityUnlocked('action_expedition')
         },
         sellPrice: 1500000,
     })
@@ -2167,7 +2167,7 @@ export const registerInventoryItems = () => {
             isRare: true,
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('action_expedition') > 0
+            return gameEntity.isEntityUnlocked('action_expedition')
         },
         sellPrice: 1500000,
     })
@@ -2185,7 +2185,7 @@ export const registerInventoryItems = () => {
             isRare: true,
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('action_expedition') > 0
+            return gameEntity.isEntityUnlocked('action_expedition')
         },
         sellPrice: 1500000,
     })
@@ -2203,7 +2203,7 @@ export const registerInventoryItems = () => {
             isRare: true,
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('action_expedition') > 0
+            return gameEntity.isEntityUnlocked('action_expedition')
         },
         sellPrice: 1500000,
     })
@@ -2221,7 +2221,7 @@ export const registerInventoryItems = () => {
             isRare: true,
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('action_expedition') > 0
+            return gameEntity.isEntityUnlocked('action_expedition')
         },
         sellPrice: 1500000,
     })
@@ -2239,7 +2239,7 @@ export const registerInventoryItems = () => {
             isRare: true,
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('action_expedition') > 0
+            return gameEntity.isEntityUnlocked('action_expedition')
         },
         sellPrice: 1500000,
     })

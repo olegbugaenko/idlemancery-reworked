@@ -6,6 +6,13 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+                <h3>Idle Awakening v0.2.0c</h3>
+                <div className={'features'}>
+                    <p>Fixed bug when action lists sorting didn't worked</p>
+                    <p>Fixed bug when some resources shown up in automation rules even when they were not unlocked</p>
+                    <p>Fixed bug when reset didn't worked properly for crafting and alchemy</p>
+                    <p>Fixed some deprecated descriptions and hints</p>
+                </div>
                 <h3>Idle Awakening v0.2.0b</h3>
                 <div className={'features'}>
                     <p>Fixed bug when some recipes were showing without components being unlocked</p>

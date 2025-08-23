@@ -777,16 +777,28 @@ export class ActionListsSubmodule extends GameModule {
     }
 
     reorderLists(newOrder) {
-        newOrder.forEach(({ id, sort }) => {
+        // console.log('newOrder reordering: ', newOrder);
+        if(Array.isArray(newOrder)) {
+            newOrder.forEach(({ id, sort }) => {
             if (this.actionsLists[id]) {
                 this.actionsLists[id].sort = sort;
             }
         });
+        } else {
+            for(const key in newOrder) {
+                const { id, sort } = newOrder[key];
+                if (this.actionsLists[id]) {
+                    this.actionsLists[id].sort = sort;
+                }
+            }
+        }
+        
         this.sortLists(); // Re-sort the cached list
     }
 
     sortLists() {
         this._cachedSortedLists = Object.values(this.actionsLists).sort((a, b) => a.sort - b.sort);
+        // console.log('NewOrder sorted: ', this._cachedSortedLists);
     }
 
     getLists(pl) {

@@ -87,7 +87,7 @@ export class CraftingModule extends GameModule {
             }
             const hypotheticValues = [];
             if(this.craftingSlots) {
-                const rrs = (payload.category === 'crafting') ? gameResources.getResource('crafting_slots') : gameResources.getResource('alchemy_slots');
+                // Slots system is deprecated, using direct effort allocation instead
                 for(const id in this.craftingSlots) {
                     const ent = gameEntity.getEntity(id);
                     const isIgnore = payload.category && !ent.tags.includes(tagToCat[payload.category]);
@@ -150,6 +150,9 @@ export class CraftingModule extends GameModule {
 
     load(obj) {
         if(this.craftingSlots) {
+            for(const id in this.craftingSlots) {
+                this.setCraftingEffort({ id, effort: 0, isForce: true });
+            }
             this.craftingSlots = {};
         }
 
@@ -774,7 +777,7 @@ export class CraftingModule extends GameModule {
                 : gameEntity.getEffects(entity.id, 0, 1, true, 1, 1,  calculatedEffort),
             affordable: gameEntity.getAffordable(entity.id),
             level: this.craftingSlots[entity.id]?.level || 0,
-            maxLevel: gameResources.getResource('crafting_slots').amount + (this.craftingSlots[entity.id]?.level || 0)
+            maxLevel: 1
         }
     }
 
@@ -791,7 +794,6 @@ export class CraftingModule extends GameModule {
 
     sendGeneralData(category_id) {
         const rs = category_id === 'crafting' ? 'crafting_ability' : 'alchemy_ability';
-        const sl = category_id === 'crafting' ? 'crafting_slots' : 'alchemy_slots';
         let stats = {}
         if(category_id === 'crafting') {
             stats = {
@@ -807,7 +809,6 @@ export class CraftingModule extends GameModule {
         }
         const data = {
             isProducingEffort: gameResources.getResource(rs).income > SMALL_NUMBER,
-            hasSlots: gameResources.getResource(sl).income > SMALL_NUMBER,
             stats
         }
         this.eventHandler.sendData('crafting-general-data', data);
