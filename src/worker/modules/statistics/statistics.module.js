@@ -18,6 +18,12 @@ export class StatisticsModule extends GameModule {
         this.economicMetrics = {
             coins: [],      // [{timestamp: number, value: number}]
             learningRate: [], // [{timestamp: number, value: number}]
+            attributes: {
+                attribute_strength: [],     // [{timestamp: number, value: number}]
+                attribute_charisma: [],     // [{timestamp: number, value: number}]
+                attribute_patience: [],     // [{timestamp: number, value: number}]
+                attribute_magic_ability: [], // [{timestamp: number, value: number}]
+            }
         };
 
         this.lastMetricsSave = 0;
@@ -70,6 +76,12 @@ export class StatisticsModule extends GameModule {
             this.economicMetrics = {
                 coins: [],
                 learningRate: [],
+                attributes: {
+                    attribute_strength: [],
+                    attribute_charisma: [],
+                    attribute_patience: [],
+                    attribute_magic_ability: [],
+                }
             };
             return;
         }
@@ -82,6 +94,12 @@ export class StatisticsModule extends GameModule {
         this.economicMetrics = obj?.economicMetrics || {
             coins: [],
             learningRate: [],
+            attributes: {
+                attribute_strength: [],
+                attribute_charisma: [],
+                attribute_patience: [],
+                attribute_magic_ability: [],
+            }
         };
 
         this.lastMetricsSave = obj?.lastMetricsSave ?? 0;
@@ -92,6 +110,30 @@ export class StatisticsModule extends GameModule {
         }
         if (!Array.isArray(this.economicMetrics.learningRate)) {
             this.economicMetrics.learningRate = [];
+        }
+        
+        // Ensure attribute arrays exist
+        if (!this.economicMetrics.attributes) {
+            this.economicMetrics.attributes = {
+                attribute_strength: [],
+                attribute_charisma: [],
+                attribute_patience: [],
+                attribute_magic_ability: [],
+            };
+        }
+        
+        // Ensure each attribute array exists
+        if (!Array.isArray(this.economicMetrics.attributes.attribute_strength)) {
+            this.economicMetrics.attributes.attribute_strength = [];
+        }
+        if (!Array.isArray(this.economicMetrics.attributes.attribute_charisma)) {
+            this.economicMetrics.attributes.attribute_charisma = [];
+        }
+        if (!Array.isArray(this.economicMetrics.attributes.attribute_patience)) {
+            this.economicMetrics.attributes.attribute_patience = [];
+        }
+        if (!Array.isArray(this.economicMetrics.attributes.attribute_magic_ability)) {
+            this.economicMetrics.attributes.attribute_magic_ability = [];
         }
     }
 
@@ -116,6 +158,24 @@ export class StatisticsModule extends GameModule {
         
         const currentLearningRate = gameEffects.getEffectValue('learning_rate');
         
+        // Get current attribute values (only if unlocked)
+        const currentStrength = gameEffects.isEffectUnlocked('attribute_strength') ? gameEffects.getEffectValue('attribute_strength') : 0;
+        const currentCharisma = gameEffects.isEffectUnlocked('attribute_charisma') ? gameEffects.getEffectValue('attribute_charisma') : 0;
+        const currentPatience = gameEffects.isEffectUnlocked('attribute_patience') ? gameEffects.getEffectValue('attribute_patience') : 0;
+        const currentMagicAbility = gameEffects.isEffectUnlocked('attribute_magic_ability') ? gameEffects.getEffectValue('attribute_magic_ability') : 0;
+        
+        console.log('Saving economic metrics:', {
+            time: currentTime,
+            coins: currentCoins,
+            learningRate: currentLearningRate,
+            attributes: {
+                strength: currentStrength,
+                charisma: currentCharisma,
+                patience: currentPatience,
+                magicAbility: currentMagicAbility
+            }
+        });
+
         // Add new metrics
         this.economicMetrics.coins.push({
             timestamp: currentTime,
@@ -125,6 +185,27 @@ export class StatisticsModule extends GameModule {
         this.economicMetrics.learningRate.push({
             timestamp: currentTime,
             value: currentLearningRate
+        });
+
+        // Add attribute metrics
+        this.economicMetrics.attributes.attribute_strength.push({
+            timestamp: currentTime,
+            value: currentStrength,
+        });
+
+        this.economicMetrics.attributes.attribute_charisma.push({
+            timestamp: currentTime,
+            value: currentCharisma,
+        });
+
+        this.economicMetrics.attributes.attribute_patience.push({
+            timestamp: currentTime,
+            value: currentPatience,
+        });
+
+        this.economicMetrics.attributes.attribute_magic_ability.push({
+            timestamp: currentTime,
+            value: currentMagicAbility,
         });
 
         // Keep only recent data (last week)
@@ -143,6 +224,13 @@ export class StatisticsModule extends GameModule {
         this.economicMetrics.learningRate = this.economicMetrics.learningRate
             .filter(entry => entry.timestamp >= oneWeekAgo)
             .slice(-this.maxMetricsEntries);
+
+        // Trim attribute data
+        Object.keys(this.economicMetrics.attributes).forEach(attrKey => {
+            this.economicMetrics.attributes[attrKey] = this.economicMetrics.attributes[attrKey]
+                .filter(entry => entry.timestamp >= oneWeekAgo)
+                .slice(-this.maxMetricsEntries);
+        });
     }
 
     getTradingStatistics() {
@@ -195,8 +283,15 @@ export class StatisticsModule extends GameModule {
         return {
             coins: this.economicMetrics.coins,
             learningRate: this.economicMetrics.learningRate,
+            attributes: this.economicMetrics.attributes,
             currentCoins: gameResources.getResource('coins')?.cap || 0,
-            currentLearningRate: gameEffects.getEffectValue('learning_rate') || 0
+            currentLearningRate: gameEffects.getEffectValue('learning_rate') || 0,
+            currentAttributes: {
+                attribute_strength: gameEffects.isEffectUnlocked('attribute_strength') ? gameEffects.getEffectValue('attribute_strength') : 0,
+                attribute_charisma: gameEffects.isEffectUnlocked('attribute_charisma') ? gameEffects.getEffectValue('attribute_charisma') : 0,
+                attribute_patience: gameEffects.isEffectUnlocked('attribute_patience') ? gameEffects.getEffectValue('attribute_patience') : 0,
+                attribute_magic_ability: gameEffects.isEffectUnlocked('attribute_magic_ability') ? gameEffects.getEffectValue('attribute_magic_ability') : 0,
+            }
         };
     }
 
@@ -207,6 +302,7 @@ export class StatisticsModule extends GameModule {
 
     sendEconomicMetrics() {
         const data = this.getEconomicMetrics();
+        console.log('Sending economic metrics:', data);
         this.eventHandler.sendData('economic-metrics', data);
     }
 } 

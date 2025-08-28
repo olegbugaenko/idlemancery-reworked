@@ -12,10 +12,12 @@ import {useAppContext} from "../../../context/ui-context";
 import {PinResource} from "../../shared/pin-resource.jsx";
 import {useTutorial} from "../../../context/tutorial-context";
 import {FavoriteButton} from "../../shared/favorite-button.jsx";
+import { InterfaceSettingsContext } from "./index.jsx";
 
-export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, openListDetails, addItemToList, isEditList }) => {
+export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, openListDetails, addItemToList, isEditList, setShowNumericInputs }) => {
 
     const worker = useContext(WorkerContext);
+    const { showNumericInputs } = useContext(InterfaceSettingsContext);
     const { isMobile } = useAppContext();
 
     const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
@@ -119,6 +121,20 @@ export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, op
                             </label>
                         </TippyWrapper>
                     </div>
+                    <div className={'space-item'}>
+                        <TippyWrapper content={<div className={'hint-popup'}>
+                            <p className={'hint'}>When enabled, shows numeric input fields instead of sliders for setting effort values. This allows for more precise control over effort allocation.</p>
+                        </div>}>
+                            <label className={'checkbox-label'}>
+                                <input 
+                                    type="checkbox" 
+                                    checked={showNumericInputs}
+                                    onChange={(e) => setShowNumericInputs(e.target.checked)}
+                                />
+                                <span>Show numeric inputs</span>
+                            </label>
+                        </TippyWrapper>
+                    </div>
                     {craftingData.autoRebalance.hasOriginalAllocations && !craftingData.autoRebalance.canRestore && !craftingData.autoRebalance.canRestore && (
                                         <TippyWrapper content={<div className={'hint-popup'}>
                     <p className={'hint'}>Some of your recipes don't have enough ingredients. Since you enabled automatic rebalancing, your efforts have been redirected to other available recipes.</p>
@@ -138,8 +154,8 @@ export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, op
         <div className={'craftables-cat'}>
             <PerfectScrollbar>
                 <div className={'flex-container'}>
-                    {craftingData.available.map(craftable => <NewNotificationWrap id={`crafting_${craftable.id}`} className={'narrow-wrapper'} isNew={newUnlocks?.all?.items?.[`crafting_${craftable.id}`]?.hasNew}>
-                        <ItemCard addItemToList={addItemToList} key={craftable.id} {...craftable} onSetLevel={setItemLevel} onShowDetails={setItemDetails} isMobile={isMobile} isEditList={isEditList}/>
+                    {craftingData.available.map(craftable => <NewNotificationWrap id={`alchemy_${craftable.id}`} key={`alchemy_${craftable.id}`} className={'narrow-wrapper'} isNew={newUnlocks?.all?.items?.[`alchemy_${craftable.id}`]?.hasNew}>
+                        <ItemCard addItemToList={addItemToList} key={craftable.id} {...craftable} onSetLevel={setItemLevel} onShowDetails={setItemDetails} isMobile={isMobile} isEditList={isEditList} showNumericInputs={showNumericInputs}/>
                     </NewNotificationWrap>)}
                 </div>
             </PerfectScrollbar>
@@ -162,7 +178,26 @@ export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, op
     </div>)
 }
 
-export const ItemCard = ({ id, icon_id, isRunning, resourceAmount, resourceBalance, breakDown, isLowerEfficiency, name, effort, maxLevel, onSetLevel, onShowDetails, addItemToList, isMobile, isEditList, isRebalanced, isRebalancedBeneficial}) => {
+export const ItemCard = ({ id, icon_id, isRunning, resourceAmount, resourceBalance, breakDown, isLowerEfficiency, name, effort, maxLevel, onSetLevel, onShowDetails, addItemToList, isMobile, isEditList, isRebalanced, isRebalancedBeneficial, showNumericInputs }) => {
+
+    const [inputValue, setInputValue] = useState(effort);
+
+    useEffect(() => {
+        setInputValue(effort);
+    }, [effort]);
+
+    const handleInputChange = (e) => {
+        const value = parseFloat(e.target.value);
+        if (!isNaN(value) && value >= 0 && value <= 1) {
+            const roundedValue = Math.round(value * 1000) / 1000;
+            setInputValue(roundedValue);
+            onSetLevel(id, roundedValue);
+        }
+    };
+
+    const handleInputBlur = () => {
+        setInputValue(effort);
+    };
 
     return (<div
         className={`card craftable ${isRunning ? 'running' : ''} ${isLowerEfficiency ? 'lower-eff' : ''} ${isRebalanced ? (isRebalancedBeneficial ? 'rebalanced-beneficial' : 'rebalanced') : ''}`}
@@ -197,15 +232,34 @@ export const ItemCard = ({ id, icon_id, isRunning, resourceAmount, resourceBalan
                         }}>
                             <img src={"icons/interface/minimize.png"}/>
                         </div>
-                        <input className={'level-set'} type={'range'} min={0} max={1} step={0.01} value={effort} onChange={e => {
-                            e.stopPropagation();
-                            e.preventDefault();
-                            onSetLevel(id, +e.target.value)
-                        }}/>
+                        {showNumericInputs ? (
+                            <input
+                                type="number"
+                                className="level-set numeric-input"
+                                min={0}
+                                max={1}
+                                step={0.001}
+                                value={inputValue}
+                                onChange={handleInputChange}
+                                onBlur={handleInputBlur}
+                                onClick={(e) => e.stopPropagation()}
+                                onKeyDown={(e) => e.stopPropagation()}
+                            />
+                        ) : (
+                            <input
+                                type="range"
+                                className="level-set"
+                                min={0}
+                                max={1}
+                                step={0.001}
+                                value={inputValue}
+                                onChange={handleInputChange}
+                            />
+                        )}
                         <div className={'icon-content maximize-icon interface-icon tiny'} onClick={(e) => {
                             e.stopPropagation();
                             e.preventDefault();
-                            onSetLevel(id, 1.e+9)
+                            onSetLevel(id, 1)
                         }}>
                             <img src={"icons/interface/maximize.png"}/>
                         </div>

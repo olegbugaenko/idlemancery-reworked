@@ -1,0 +1,4 @@
+.metrics-scroll-container .ps__content {
+    height: fit-content; /* Allow content to size naturally */
+    min-height: 100%; /* Ensure content fills container */
+}

@@ -1276,7 +1276,7 @@ export const registerActionsStage1 = () => {
     registerGameAction('action_clay_mining', {
         tags: ["action", "activity", "physical", "manual-labor"],
         name: 'Clay Mining',
-        category: ACTION_CATS.PHYSICAL,
+        category: ACTION_CATS.OTHER,
         isAbstract: false,
         allowedImpacts: ['effects'],
         discountEffects: ['physical_actions_discount'],
@@ -3659,7 +3659,7 @@ export const registerActionsStage1 = () => {
     registerGameAction('action_spiritual_alignment', {
         tags: ["action", "training", "mental"],
         name: 'Spiritual Alignment',
-        category: ACTION_CATS.MAGICAL,
+        category: ACTION_CATS.MENTAL,
         isAbstract: false,
         minDemoVersion: 20,
         allowedImpacts: ['effects'],

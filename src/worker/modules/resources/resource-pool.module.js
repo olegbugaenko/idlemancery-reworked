@@ -143,13 +143,6 @@ export class ResourcePoolModule extends GameModule {
             isService: true,
         })
 
-        gameResources.registerResource('inventory_scrolls', {
-            tags: ['inventory', 'expedition', 'scrolls'],
-            name: 'Scrolls',
-            hasCap: true,
-            defaultCap: 0,
-        })
-
         gameResources.registerResource('hunting_effort', {
             tags: ['exploration', 'secondary'],
             name: 'Hunting Effort',

@@ -52,7 +52,7 @@ export const UnlocksList = () => {
                         </div>
 
                         <div className={'body'}>
-                            {effects.map(effect => (<div className={'effect-block block'}>
+                            {effects.map(effect => (<div key={effect.id} className={'effect-block block'}>
                                     <div className={'row flex-container'}>
                                         <p className={'unlock-title'}>{effect.name}</p>
                                         {effect.unlocks ? (
@@ -66,8 +66,8 @@ export const UnlocksList = () => {
                                                     </div>
                                                     <div className={'unlocked-items-container'}>
                                                         {effect.unlocks.items.map(item => (
-                                                            <TippyWrapper placement={'bottom'} content={<div className={'hint-popup'}>{item.meta?.description}</div> }>
-                                                                <p className={'unlock-goal'}>{item.meta?.scope}: {item.meta?.name}</p>
+                                                            <TippyWrapper key={item.unlockId} placement={'bottom'} content={<div className={'hint-popup'}>{item.meta?.description || 'No description available'}</div>}>
+                                                                <p className={'unlock-goal'}>{item.meta?.scope && item.meta?.name ? `${item.meta.scope}: ${item.meta.name}` : 'Unknown'}</p>
                                                             </TippyWrapper>
                                                         ))}
                                                     </div>
@@ -76,10 +76,14 @@ export const UnlocksList = () => {
                                                 </>)
                                             : (<div className={'completed'}> <p>Complete</p></div>)}
                                     </div>
-                                    {effect.prevUnlocks.map(prev => (<div className={'prev-unlock flex-container flex-row'}>
-                                        <p className={'unlock-subtitle'}>{prev.data?.name}</p>
-                                        <p className={'unlock-subtitle'}>{formatValue(effect.value)}/{formatValue(prev.level)}</p>
-                                    </div> ))}
+                                    {effect.prevUnlocks.map(prev => (
+                                        <TippyWrapper key={prev.unlockId} placement={'left'} content={<div className={'hint-popup'}>{prev.meta?.description || 'No description available'}</div>}>
+                                            <div className={'prev-unlock flex-container flex-row'}>
+                                                <p className={'unlock-subtitle'}>{prev.meta?.scope && prev.meta?.name ? `${prev.meta.scope}: ${prev.meta.name}` : prev.data?.name || 'Unknown'}</p>
+                                                <p className={'unlock-subtitle'}>{formatValue(effect.value)}/{formatValue(prev.level)}</p>
+                                            </div>
+                                        </TippyWrapper>
+                                    ))}
 
                                 </div>
                             ))}
@@ -88,7 +92,7 @@ export const UnlocksList = () => {
                     <div className={'container'}>
                         <h5>Actions unlocks</h5>
                         <div className={'body'}>
-                            {actions.map(action => (<div className={'row flex-container'}>
+                            {actions.map(action => (<div key={action.id} className={'row flex-container'}>
                                 <p className={'unlock-title'}>{action.name}</p>
                                 {action.unlocks ? (<>
                                         <div className={'unlocks-progress'}>
@@ -100,17 +104,21 @@ export const UnlocksList = () => {
                                         </div>
                                         <div className={'unlocked-items-container'}>
                                             {action.unlocks.items.map(item => (
-                                                <TippyWrapper placement={'bottom'} content={<div className={'hint-popup'}>{item.meta?.description}</div> }>
-                                                    <p className={'unlock-goal'}>{item.meta?.scope}: {item.meta?.name}</p>
+                                                <TippyWrapper key={item.unlockId} placement={'bottom'} content={<div className={'hint-popup'}>{item.meta?.description || 'No description available'}</div>}>
+                                                    <p className={'unlock-goal'}>{item.meta?.scope && item.meta?.name ? `${item.meta.scope}: ${item.meta.name}` : 'Unknown'}</p>
                                                 </TippyWrapper>
                                             ))}
                                         </div>
                                     </>)
                                     : (<div className={'completed'}> <p>Complete</p>
-                                        {action.prevUnlocks.map(prev => (<div className={'prev-unlock flex-container flex-row'}>
-                                            <p className={'unlock-subtitle'}>{prev.data?.name}</p>
-                                            <p className={'unlock-subtitle'}>{formatValue(action.level)}/{formatValue(prev.level)}</p>
-                                        </div> ))}
+                                        {action.prevUnlocks.map(prev => (
+                                            <TippyWrapper key={prev.unlockId} placement={'left'} content={<div className={'hint-popup'}>{prev.meta?.description || 'No description available'}</div>}>
+                                                <div className={'prev-unlock flex-container flex-row'}>
+                                                    <p className={'unlock-subtitle'}>{prev.meta?.scope && prev.meta?.name ? `${prev.meta.scope}: ${prev.meta.name}` : prev.data?.name || 'Unknown'}</p>
+                                                    <p className={'unlock-subtitle'}>{formatValue(action.level)}/{formatValue(prev.level)}</p>
+                                                </div>
+                                            </TippyWrapper>
+                                        ))}
                                     </div>)
                                 }
                             </div> ))}

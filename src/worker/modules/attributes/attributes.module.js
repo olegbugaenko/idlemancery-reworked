@@ -91,16 +91,22 @@ export class AttributesModule extends GameModule {
                 return {
                     ...one,
                     prevUnlocks: (one.prevUnlocks ?? []).map(unlock => {
-
                         let data = {};
+                        let meta = {};
 
                         if(gameEntity.entityExists(unlock.unlockId)) {
                             data = gameEntity.getEntity(unlock.unlockId);
+                            meta = {
+                                name: data.name,
+                                description: data.description,
+                                scope: getScope(data)
+                            };
                         }
 
                         return {
                             ...unlock,
-                            data
+                            data,
+                            meta
                         }
                     }).sort((a, b) => b.level - a.level),
                 }

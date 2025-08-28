@@ -6,6 +6,14 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+                <h3>Idle Awakening v0.2.0d</h3>
+                <div className={'features'}>
+                    <p>Added some attributes to development statistics wraps</p>
+                    <p>Few balance changes, decreased costs of some potions and late game buildings</p>
+                    <p>Fixed bug when reaching 7.5K Strength broke the game</p>
+                    <p>Fixed some descriptions</p>
+                    <p>Tiny UI fixes</p>
+                </div>
                 <h3>Idle Awakening v0.2.0c</h3>
                 <div className={'features'}>
                     <p>Fixed bug when action lists sorting didn't worked</p>

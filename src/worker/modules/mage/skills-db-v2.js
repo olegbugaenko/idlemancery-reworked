@@ -1221,7 +1221,7 @@ export const registerSkillsStage1 = () => {
     gameEntity.registerGameEntity('skill_treasurer', {
         tags: ["skill", "upgrade", "purchaseable"],
         name: 'Treasurer',
-        description: 'Increase your coins cap',
+        description: 'Increase your coins rate and routine learning rate',
         level: 0,
         maxLevel: 5,
         uiPosition: {

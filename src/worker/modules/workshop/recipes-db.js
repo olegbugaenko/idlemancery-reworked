@@ -773,12 +773,12 @@ export const registerCraftingRecipes = () => {
                 resources: {
                     'inventory_knowledge_moss': {
                         A: 1.5,
-                        B: 75*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        B: 10*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
                         type: 1
                     },
                     'inventory_golden_algae': {
                         A: 1.5,
-                        B: 250*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        B: 25*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
                         type: 1
                     },
                 }

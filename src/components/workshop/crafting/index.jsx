@@ -1,4 +1,4 @@
-import React, {useCallback, useContext, useEffect, useState} from "react";
+import React, {useCallback, useContext, useEffect, useState, createContext} from "react";
 import WorkerContext from "../../../context/worker-context";
 import {useWorkerClient} from "../../../general/client";
 import PerfectScrollbar from "react-perfect-scrollbar";
@@ -15,12 +15,20 @@ import {TippyWrapper} from "../../shared/tippy-wrapper.jsx";
 import {HowToSign} from "../../shared/how-to-sign.jsx";
 import {useTutorial} from "../../../context/tutorial-context";
 
+const InterfaceSettingsContext = createContext();
+
+export { InterfaceSettingsContext };
+
 export const CraftingWrap = ({ children }) => {
 
     const worker = useContext(WorkerContext);
 
     const { isMobile } = useAppContext();
     const [isDetailVisible, setDetailVisible] = useState(!isMobile);
+    const [showNumericInputs, setShowNumericInputs] = useState(() => {
+        const saved = localStorage.getItem('crafting-show-numeric-inputs');
+        return saved ? JSON.parse(saved) : false;
+    });
 
     const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
 
@@ -31,6 +39,11 @@ export const CraftingWrap = ({ children }) => {
     const [listDetails, setListDetails] = useState(null)
 
     const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
+
+    const handleShowNumericInputsChange = useCallback((value) => {
+        setShowNumericInputs(value);
+        localStorage.setItem('crafting-show-numeric-inputs', JSON.stringify(value));
+    }, []);
 
 
     useEffect(() => {
@@ -317,47 +330,50 @@ export const CraftingWrap = ({ children }) => {
     }
 
     return (<div className={'items-wrap crafting-workshop-wrap'}>
-
-        <div className={'items ingame-box'}>
-            <div className={'menu-wrap workshop'}>
-                <div className={'head'}>
-                    {children}
+        <InterfaceSettingsContext.Provider value={{ showNumericInputs, setShowNumericInputs: handleShowNumericInputsChange }}>
+            <div className={'items ingame-box'}>
+                <div className={'menu-wrap workshop'}>
+                    <div className={'head'}>
+                        {children}
+                    </div>
+                    <div className={'flex-container additional-filters'}>
+                        {isMobile ? (<div>
+                            <span className={'highlighted-span'} onClick={() => setDetailVisible(true)}>Info</span>
+                        </div>) : null}
+                        <HowToSign scope={'crafting'} />
+                    </div>
                 </div>
-                <div className={'flex-container additional-filters'}>
-                    {isMobile ? (<div>
-                        <span className={'highlighted-span'} onClick={() => setDetailVisible(true)}>Info</span>
-                    </div>) : null}
-                    <HowToSign scope={'crafting'} />
-                </div>
+                <Crafting filterId={'crafting'} setItemDetails={setItemDetails} setItemLevel={setItemLevel} newUnlocks={newUnlocks.workshop?.items?.crafting?.items} openListDetails={openListDetails} addItemToList={addItemToList} isEditList={listDetails?.isEdit} setShowNumericInputs={handleShowNumericInputsChange}/>
             </div>
-            <Crafting filterId={'crafting'} setItemDetails={setItemDetails} setItemLevel={setItemLevel} newUnlocks={newUnlocks.workshop?.items?.crafting?.items} openListDetails={openListDetails} addItemToList={addItemToList} isEditList={listDetails?.isEdit}/>
-        </div>
 
-        {(!isMobile || isDetailVisible || listDetails?.listData || detailOpened) ? (<div className={`item-detail ingame-box detail-blade ${listDetails?.listData && (listDetails?.isEdit || !detailOpened) ? 'wide-blade' : ''} ${listDetails?.listData ? 'forced-bottom' : ''}`}>
-            {listDetails?.listData && (listDetails?.isEdit || !detailOpened) ? (<CraftingListDetails
-                listDetails={listDetails.listData}
-                isEditing={listDetails.isEdit}
-                onUpdateActionFromList={onUpdateActionFromList}
-                onDropActionFromList={onDropActionFromList}
-                onUpdateListValue={onUpdateListValue}
-                onAddAutotriggerRule={onAddAutotriggerRule}
-                onSetAutotriggerRuleValue={onSetAutotriggerRuleValue}
-                onDeleteAutotriggerRule={onDeleteAutotriggerRule}
-                setAutotriggerPriority={setAutotriggerPriority}
-                onSetAutotriggerPattern={onSetAutotriggerPattern}
-                onCloseList={onCloseList}
-                onToggleAutotrigger={onToggleAutotrigger}
-                onApplyCurrent={onApplyCurrent}
-            />) : null}
-            {detailOpened && !listDetails?.isEdit ? (<ItemDetails itemId={detailOpened} category={'crafting'} setItemDetails={setItemDetails}/>) : null}
-            {!detailOpened && !listDetails?.listData ? (<GeneralStats setDetailVisible={setDetailVisible}/>) : null}
-        </div>) : null}
+            {(!isMobile || isDetailVisible || listDetails?.listData || detailOpened) ? (<div className={`item-detail ingame-box detail-blade ${listDetails?.listData && (listDetails?.isEdit || !detailOpened) ? 'wide-blade' : ''} ${listDetails?.listData ? 'forced-bottom' : ''}`}>
+                {listDetails?.listData && (listDetails?.isEdit || !detailOpened) ? (<CraftingListDetails
+                    listDetails={listDetails.listData}
+                    isEditing={listDetails.isEdit}
+                    onUpdateActionFromList={onUpdateActionFromList}
+                    onDropActionFromList={onDropActionFromList}
+                    onUpdateListValue={onUpdateListValue}
+                    onAddAutotriggerRule={onAddAutotriggerRule}
+                    onSetAutotriggerRuleValue={onSetAutotriggerRuleValue}
+                    onDeleteAutotriggerRule={onDeleteAutotriggerRule}
+                    setAutotriggerPriority={setAutotriggerPriority}
+                    onSetAutotriggerPattern={onSetAutotriggerPattern}
+                    onCloseList={onCloseList}
+                    onToggleAutotrigger={onToggleAutotrigger}
+                    onApplyCurrent={onApplyCurrent}
+                />) : null}
+                {detailOpened && !listDetails?.isEdit ? (<ItemDetails itemId={detailOpened} category={'crafting'} setItemDetails={setItemDetails}/>) : null}
+                {!detailOpened && !listDetails?.listData ? (<GeneralStats setDetailVisible={setDetailVisible}/>) : null}
+            </div>) : null}
+        </InterfaceSettingsContext.Provider>
     </div>)
 
 }
 
 
 export const GeneralStats = ({ setDetailVisible }) => {
+
+    const { showNumericInputs, setShowNumericInputs } = useContext(InterfaceSettingsContext);
 
     const [data, setData] = useState({
         isProducingEffort: false,
@@ -587,8 +603,8 @@ export const CraftingListDetails = ({
                                             </div>
                                             <div className={'col amount'}>
                                                 {isEditing
-                                                    ? (<span>Effort, %<input className={'set-level-for-list'} type={'range'} min={0} max={1} value={recipe.effort} step={0.01}
-                                                                    onChange={(e) => onUpdateActionFromList(recipe.id, 'effort', +e.target.value)}/></span>)
+                                                    ? (<span>Effort, %<input className={'set-level-for-list'} type={'range'} min={0} max={1} value={recipe.effort} step={0.001}
+                                                                      onChange={(e) => onUpdateActionFromList(recipe.id, 'effort', Math.round(+e.target.value * 1000) / 1000)}/></span>)
                                                     : (<span> {recipe.percentage}%</span>)
                                                 }
                                             </div>

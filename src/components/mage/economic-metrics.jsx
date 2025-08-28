@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import WorkerContext from '../../context/worker-context';
 import { useWorkerClient } from '../../general/client';
 import { formatValue, secondsToString } from '../../general/utils/strings';
+import PerfectScrollbar from 'react-perfect-scrollbar';
 
 const EconomicMetrics = () => {
     const worker = useContext(WorkerContext);
@@ -21,6 +22,7 @@ const EconomicMetrics = () => {
     }, [sendData]);
 
     onMessage('economic-metrics', (data) => {
+        console.log('Received economic metrics:', data);
         setMetrics(data);
     });
 
@@ -28,7 +30,41 @@ const EconomicMetrics = () => {
         return <div className="loading">Loading economic metrics...</div>;
     }
 
-    const { coins, learningRate, currentCoins, currentLearningRate } = metrics;
+    // Ensure all required properties exist
+    const { 
+        coins = [], 
+        learningRate = [], 
+        attributes = {}, 
+        currentCoins = 0, 
+        currentLearningRate = 0, 
+        currentAttributes = {} 
+    } = metrics;
+
+    console.log('Rendering economic metrics:', {
+        coins: coins?.length || 0,
+        learningRate: learningRate?.length || 0,
+        attributes: attributes,
+        currentCoins,
+        currentLearningRate,
+        currentAttributes
+    });
+
+    // Helper function to check if an attribute is unlocked
+    const isAttributeUnlocked = (attributeKey) => {
+        return currentAttributes && currentAttributes[attributeKey] && currentAttributes[attributeKey] > 0;
+    };
+
+    // Helper function to safely get attribute data
+    const getAttributeData = (attributeKey) => {
+        return (attributes && attributes[attributeKey] && Array.isArray(attributes[attributeKey])) ? attributes[attributeKey] : [];
+    };
+
+    // Helper function to get attribute unlock status
+    const getAttributeStatus = (attributeKey) => {
+        if (!currentAttributes || !currentAttributes[attributeKey]) return 'Locked';
+        if (currentAttributes[attributeKey] === 0) return 'Locked';
+        return 'Unlocked';
+    };
 
     // Calculate interval in seconds
     const getIntervalSeconds = (interval) => {
@@ -43,7 +79,7 @@ const EconomicMetrics = () => {
 
     // Filter data based on selected interval
     const filterDataByInterval = (data, interval) => {
-        if (!data || data.length === 0) return [];
+        if (!data || !Array.isArray(data) || data.length === 0) return [];
         
         const intervalSeconds = getIntervalSeconds(interval);
         const currentTime = Math.max(...data.map(d => d.timestamp));
@@ -76,9 +112,46 @@ const EconomicMetrics = () => {
     };
 
     const renderChart = (data, title, currentValue, color) => {
-        const filteredData = filterDataByInterval(data, selectedInterval);
+        // Ensure data is an array
+        const safeData = Array.isArray(data) ? data : [];
+        const filteredData = filterDataByInterval(safeData, selectedInterval);
         
         if (!filteredData || filteredData.length === 0) {
+            // Check if this is an attribute chart and show appropriate message
+            if (title.includes('Attribute')) {
+                const isUnlocked = currentValue > 0;
+                const attributeName = title.split(' ')[0]; // Extract attribute name from title
+                return (
+                    <div className="chart-container">
+                        <h4>{title}</h4>
+                        <div className="current-value">
+                            Current: {formatValue(currentValue)}
+                        </div>
+                        <p className="no-data">
+                            {isUnlocked 
+                                ? 'No historical data available yet. Data will appear after the first save (every 30 minutes).' 
+                                : `Attribute not yet unlocked. Check the info section below for unlock requirements.`
+                            }
+                        </p>
+                        {!isUnlocked && (
+                            <div style={{ 
+                                background: '#1a1a1a', 
+                                padding: '10px', 
+                                borderRadius: '5px', 
+                                fontSize: '12px', 
+                                color: '#888',
+                                marginTop: '10px'
+                            }}>
+                                <strong>Unlock Requirements:</strong><br />
+                                {attributeName === 'Strength' && 'Requires Stamina attribute to reach level 100+'}
+                                {attributeName === 'Charisma' && 'Unlocks as you progress through social activities'}
+                                {attributeName === 'Patience' && 'Becomes available through game progression'}
+                                {attributeName === 'Magic' && 'Unlocks when you gain access to spellcasting'}
+                            </div>
+                        )}
+                    </div>
+                );
+            }
             return <p className="no-data">No data available for the selected interval.</p>;
         }
 
@@ -86,7 +159,7 @@ const EconomicMetrics = () => {
         const lastSavedValue = filteredData.length > 0 ? filteredData[filteredData.length - 1].value : null;
         let chartData = [...filteredData];
         
-        if (lastSavedValue !== currentValue) {
+        if (lastSavedValue !== currentValue && currentValue > 0) {
             chartData.push({
                 timestamp: Math.max(...filteredData.map(d => d.timestamp), 0) + 1, // Ensure it's the most recent
                 value: currentValue
@@ -102,7 +175,7 @@ const EconomicMetrics = () => {
                 sampledData.push(chartData[i]);
             }
             // Always include the last data point
-            if (sampledData[sampledData.length - 1] !== chartData[chartData.length - 1]) {
+            if (sampledData.length > 0 && chartData.length > 0 && sampledData[sampledData.length - 1] !== chartData[chartData.length - 1]) {
                 sampledData.push(chartData[chartData.length - 1]);
             }
             chartData = sampledData;
@@ -170,21 +243,100 @@ const EconomicMetrics = () => {
                 </select>
             </div>
             
-            <div className="metrics-grid">
-                <div className="metric-card">
-                    {renderChart(coins, 'Coins Cap over Time', currentCoins, '#ffd700')}
-                </div>
-                
-                <div className="metric-card">
-                    {renderChart(learningRate, 'Learning Rate Over Time', currentLearningRate, '#4CAF50')}
-                </div>
+            <div className="metrics-scroll-container">
+                <PerfectScrollbar>
+                    <div className="metrics-grid">
+                        <div className="metric-card">
+                            {renderChart(coins, 'Coins Cap over Time', currentCoins, '#ffd700')}
+                        </div>
+                        
+                        <div className="metric-card">
+                            {renderChart(learningRate, 'Learning Rate Over Time', currentLearningRate, '#4CAF50')}
+                        </div>
+
+                        {/* Only show Strength chart if unlocked */}
+                        {isAttributeUnlocked('attribute_strength') ? (
+                            <div className="metric-card">
+                                {renderChart(
+                                    getAttributeData('attribute_strength'), 
+                                    'Strength Attribute Over Time', 
+                                    (currentAttributes?.attribute_strength || 0), 
+                                    '#ad4329'
+                                )}
+                            </div>
+                        ) : null}
+
+                        {/* Only show Charisma chart if unlocked */}
+                        {isAttributeUnlocked('attribute_charisma') ? (
+                            <div className="metric-card">
+                                {renderChart(
+                                    getAttributeData('attribute_charisma'), 
+                                    'Charisma Attribute Over Time', 
+                                    (currentAttributes?.attribute_charisma || 0), 
+                                    '#5da329'
+                                )}
+                            </div>
+                        ) : null}
+
+                        {/* Only show Patience chart if unlocked */}
+                        {isAttributeUnlocked('attribute_patience') ? (
+                            <div className="metric-card">
+                                {renderChart(
+                                    getAttributeData('attribute_patience'), 
+                                    'Patience Attribute Over Time', 
+                                    (currentAttributes?.attribute_patience || 0), 
+                                    '#8B4513'
+                                )}
+                            </div>
+                        ) : null}
+
+                        {/* Only show Magic Ability chart if unlocked */}
+                        {isAttributeUnlocked('attribute_magic_ability') ? (
+                            <div className="metric-card">
+                                {renderChart(
+                                    getAttributeData('attribute_magic_ability'), 
+                                    'Magic Ability Attribute Over Time', 
+                                    (currentAttributes?.attribute_magic_ability || 0), 
+                                    '#9932CC'
+                                )}
+                            </div>
+                        ) : null}
+                    </div>
+                </PerfectScrollbar>
             </div>
 
             <div className="metrics-info">
                 <p>
-                    <strong>Note:</strong> Development metrics are automatically saved every 30 minutes. 
+                    <strong>Note:</strong> Development metrics (coins cap, learning rate, and key attributes) are automatically saved every 30 minutes. 
                     Data older than 7 days is automatically removed to save space.
                 </p>
+                <p style={{ marginTop: '10px', fontSize: '13px', color: '#aaa' }}>
+                    <strong>Data Collection:</strong> Attribute values are automatically tracked every 30 minutes once unlocked. 
+                    Historical data shows your progression over time, helping you see how your character develops.
+                </p>
+                {process.env.NODE_ENV === 'development' && false && (
+                    <details style={{ marginTop: '15px' }}>
+                        <summary style={{ cursor: 'pointer', color: '#888' }}>Debug Info</summary>
+                        <pre style={{ 
+                            background: '#1a1a1a', 
+                            padding: '10px', 
+                            borderRadius: '5px', 
+                            fontSize: '12px', 
+                            color: '#ccc',
+                            overflow: 'auto',
+                            maxHeight: '200px'
+                        }}>
+                            {JSON.stringify({
+                                coins: coins?.length || 0,
+                                learningRate: learningRate?.length || 0,
+                                attributes: attributes,
+                                currentCoins,
+                                currentLearningRate,
+                                currentAttributes
+                            }, null, 2)}
+                        </pre>
+                    </details>
+                )}
             </div>
         </div>
     );

@@ -1123,7 +1123,7 @@ export const registerInventoryItems = () => {
             level: 7500,
         }],
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.isEntityUnlocked('craft_forged_steel')
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEffects.getEffectValue('attribute_strength') >= 7500
         },
         sellPrice: 1560000,
     })
@@ -1449,7 +1449,7 @@ export const registerInventoryItems = () => {
             gameCore.getModule('mage').resetPerks()
         },
         getUsageCooldown: () => {
-            return 3600*44;
+            return 3600*24;
         },
         attributes: {
             duration: 4*3600,
@@ -1789,6 +1789,38 @@ export const registerInventoryItems = () => {
         rarity: 4,
     })
 
+    
+    registerInventoryItem('inventory_rare_verdant_coil', {
+        name: 'Verdant Coil',
+        hasCap: false,
+        tags: ['inventory', 'consumable', 'rare', 'gatherable', 'herb'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+            updateLevelBy('rare_verdant_coil_effect', amount)
+        },
+        getUsageCooldown: () => {
+            return 0.1;
+        },
+        attributes: {
+            baseChanceMult: 1,
+            entityEffect: 'rare_verdant_coil_effect',
+            isRare: true,
+            allowMultiConsume: true,
+        },
+        usageGain: {
+
+        },
+        resourceModifier: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_1') > 0
+        },
+        sellPrice: 15000,
+        rarity: 5,
+    })
+
 
     registerInventoryItem('inventory_rare_titanleaf', {
         name: 'Titanleaf',
@@ -2039,36 +2071,6 @@ export const registerInventoryItems = () => {
     })
 
 
-    registerInventoryItem('inventory_rare_verdant_coil', {
-        name: 'Verdant Coil',
-        hasCap: false,
-        tags: ['inventory', 'consumable', 'rare', 'gatherable', 'herb'],
-        defaultCap: 0,
-        isAbstract: true,
-        onUse: (amount) => {
-            updateLevelBy('rare_verdant_coil_effect', amount)
-        },
-        getUsageCooldown: () => {
-            return 0.1;
-        },
-        attributes: {
-            baseChanceMult: 1,
-            entityEffect: 'rare_verdant_coil_effect',
-            isRare: true,
-            allowMultiConsume: true,
-        },
-        usageGain: {
-
-        },
-        resourceModifier: {
-
-        },
-        unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_herbs_handbook_1') > 0
-        },
-        sellPrice: 15000,
-        rarity: 5,
-    })
 
     registerInventoryItem('inventory_rare_stormbird_heart', {
         name: 'Stormbird Heart',

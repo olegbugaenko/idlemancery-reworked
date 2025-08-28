@@ -331,7 +331,7 @@ export const registerStructuresStage1 = () => {
 
     registerStructure('structure_lumber_mill', {
         tags: ["structure", "upgrade", "purchaseable", "resource", "crafting", "industrial"],
-        name: 'Lumber Mill',
+        name: 'Lumbermill',
         description: 'A large industrial facility for processing wood into refined materials. Requires advanced machinery to operate.',
         level: 0,
         maxLevel: 10,

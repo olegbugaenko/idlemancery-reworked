@@ -3037,7 +3037,7 @@ export const registerShopItemsStage1 = () => {
     gameEntity.registerGameEntity('shop_item_machinery', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Machinery',
-        description: 'Advanced mechanical systems that enable the operation of industrial facilities like the Lumber Mill. Unlocks the ability to build and operate large-scale production buildings.',
+        description: 'Advanced mechanical systems that enable the operation of industrial facilities like the Lumbermill. Unlocks the ability to build and operate large-scale production buildings.',
         level: 0,
         maxLevel: 1,
         unlockedBy: [{
@@ -3202,11 +3202,11 @@ export const registerShopItemsStage1 = () => {
             isCollectable: false,
         },
         resourceModifier: {
-            income: {
+            multiplier: {
                 effects: {
                     'mining_efficiency': {
                         A: 0.25,
-                        B: 0,
+                        B: 1,
                         type: 0
                     }
                 }
