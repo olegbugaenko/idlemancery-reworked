@@ -148,12 +148,12 @@ export const Map = ({ setItemDetails, openListDetails, isEditList }) => {
     };*/
 
     const onEditList = useCallback(listData => {
-        openListDetails({ listData, isEdit: true, automationUnlocked: mapData.mapLists.automationUnlocked });
-    }, []);
+        openListDetails({ listData, isEdit: true, automationUnlocked: mapData.mapLists.automationUnlocked ?? false });
+    }, [mapData.mapLists.automationUnlocked]);
 
     const onViewList = useCallback(listData => {
-        openListDetails({ listData, automationUnlocked: mapData.mapLists.automationUnlocked });
-    }, []);
+        openListDetails({ listData, automationUnlocked: mapData.mapLists.automationUnlocked ?? false });
+    }, [mapData.mapLists.automationUnlocked]);
 
     const setHighlighted = useCallback(data => {
         sendData('map-highlight-resources', {ids: data.map(one => one.value)})

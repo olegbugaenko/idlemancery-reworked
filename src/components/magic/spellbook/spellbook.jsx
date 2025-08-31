@@ -92,16 +92,15 @@ export const SpellbookWrap = ({ children }) => {
     onMessage('spell-details', (payload) => {
         if(viewedOpenedId) {
             setViewedData(payload);
-        } else if(detailOpenedId) {
+        } else if(detailOpenedId && payload.id === detailOpenedId.id) {
             setEditData(payload);
             setViewedData(null);
         }
-
     })
 
     onMessage('spell-level-effects', (payload) => {
         setEditData(prev => {
-            if(prev) {
+            if(prev && prev.id === payload.id) {
                 return {
                     ...prev,
                     effects: payload.effects,
@@ -127,6 +126,7 @@ export const SpellbookWrap = ({ children }) => {
         if(id) {
             if(detailOpenedId && isChanged) {
                 if(!confirm(`This will discard all your changes to ${detailOpenedId.name}. Are you sure`)) {
+                    // User cancelled - stay in edit mode for current spell
                     return;
                 }
             }
@@ -167,7 +167,7 @@ export const SpellbookWrap = ({ children }) => {
         if(editData) {
             const newEdit = cloneDeep(editData);
             if(!newEdit.autocast) {
-                newEdit.autocast = {};
+                newEdit.autocast = { rules: [], pattern: '', isEnabled: false };
             }
             if(!newEdit.autocast.rules) {
                 newEdit.autocast.rules = [];
@@ -188,6 +188,14 @@ export const SpellbookWrap = ({ children }) => {
                 return;
             }
             
+            // Ensure autocast structure exists
+            if (!newEdit.autocast) {
+                newEdit.autocast = { rules: [], pattern: '', isEnabled: false };
+            }
+            if (!Array.isArray(newEdit.autocast.rules)) {
+                newEdit.autocast.rules = [];
+            }
+            
             newEdit.autocast.rules.push({
                 resource_id: resourcesRef.current[0].id,
                 condition: 'less_or_eq',
@@ -202,6 +210,15 @@ export const SpellbookWrap = ({ children }) => {
     const onDeleteAutoconsumeRule = useCallback((index) => {
         if(editData) {
             const newEdit = cloneDeep(editData);
+            
+            // Ensure autocast structure exists
+            if (!newEdit.autocast) {
+                newEdit.autocast = { rules: [], pattern: '', isEnabled: false };
+            }
+            if (!Array.isArray(newEdit.autocast.rules)) {
+                newEdit.autocast.rules = [];
+            }
+            
             newEdit.autocast.rules.splice(index, 1)
             setEditData(newEdit);
             setChanged(true);
@@ -212,6 +229,20 @@ export const SpellbookWrap = ({ children }) => {
         setEditData(prevEditData => {
             if (!prevEditData) return prevEditData;
             const newEdit = cloneDeep(prevEditData);
+            
+            // Ensure autocast structure exists
+            if (!newEdit.autocast) {
+                newEdit.autocast = { rules: [], pattern: '', isEnabled: false };
+            }
+            if (!Array.isArray(newEdit.autocast.rules)) {
+                newEdit.autocast.rules = [];
+            }
+            
+            // Ensure rule exists at index
+            if (!newEdit.autocast.rules[index]) {
+                newEdit.autocast.rules[index] = {};
+            }
+            
             newEdit.autocast.rules[index] = {
                 ...newEdit.autocast.rules[index],
                 [key]: value
@@ -226,7 +257,7 @@ export const SpellbookWrap = ({ children }) => {
         if(editData) {
             const newEdit = cloneDeep(editData);
             if(!newEdit.autocast) {
-                newEdit.autocast = {};
+                newEdit.autocast = { rules: [], pattern: '', isEnabled: false };
             }
             newEdit.autocast.isEnabled = !newEdit.autocast.isEnabled;
             setEditData(newEdit);
@@ -369,6 +400,14 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
 
     let isEditing = !!editData && !viewedData;
 
+    // Ensure item has valid structure for RulesList
+    if (item && !item.autocast) {
+        item.autocast = { rules: [], pattern: '', isEnabled: false };
+    }
+    if (item && item.autocast && !Array.isArray(item.autocast.rules)) {
+        item.autocast.rules = [];
+    }
+
     const [spellDetails, setSpellDetails] = useState(null);
 
     const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
@@ -403,9 +442,17 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
         }
     }, [spellDetails?.numCasted])
 
-    onMessage('detail-spell-details', (data) => {
-        setSpellDetails(data);
-    })
+    useEffect(() => {
+        const handleDetailSpellDetails = (data) => {
+            setSpellDetails(data);
+        };
+        
+        onMessage('detail-spell-details', handleDetailSpellDetails);
+        
+        return () => {
+            // Cleanup message handler
+        };
+    }, []);
 
 
     if(!item) return null;
@@ -459,6 +506,8 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
             unlockNextById(4);
         }
     }
+
+
 
     return (
         <>
@@ -537,6 +586,7 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
                             </div>
 
                             <RulesList
+                                key={`${item.id}-${isEditing}-${item.autocast?.rules?.length || 0}`}
                                 isEditing={isEditing}
                                 rules={item.autocast?.rules || []}
                                 resources={resources}

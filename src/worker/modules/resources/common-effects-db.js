@@ -647,8 +647,8 @@ export const registerCommomEffects = () => {
     })
 
     gameEffects.registerEffect('training_social_effects_efficiency', {
-        name: 'Training Social Effects Efficiency',
-        description: 'Increases the efficiency of social events with training tag',
+        name: 'Training Event Hall Effects',
+        description: 'Increases the permanent effect of Event Hall social events with training tag',
         defaultValue: 1.,
         minValue: 1,
         hasCap: false,

@@ -1333,7 +1333,7 @@ export const registerActionsStage1 = () => {
         isAbstract: false,
         allowedImpacts: ['effects'],
         discountEffects: ['physical_actions_discount'],
-        description: 'Mine coal. Output is intentionally modest but enables automation era.',
+        description: 'Mine coal and get access to new automations',
         level: 1,
         getLearnRate: () => 1,
         resourceModifier: {

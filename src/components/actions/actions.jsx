@@ -266,12 +266,14 @@ export const Actions = ({}) => {
     }
 
     const onUpdateListValue = (key, value) => {
-        if(listData) {
-            const newList = cloneDeep(listData);
+        setListData(prev => {
+            if(!prev) return prev;
+            
+            const newList = cloneDeep(prev);
             newList[key] = value;
-            setListData({...newList});
-            // sendData('query-action-list-effects', { id });
-        }
+            return newList;
+        });
+        // sendData('query-action-list-effects', { id });
     }
 
     const onCloseList = () => {
@@ -319,18 +321,28 @@ export const Actions = ({}) => {
         if (sourceId === 'actions-list' && targetId === 'action-editor-wrap') {
             // Гравець перетягнув нову дію з "available" в список
             const action = actionsData.available.find(a => a.id === id);
-            if (!action || !listData) return;
+            if (!action) return;
 
-            const newList = { ...listData };
-            newList.actions.push({
-                id: action.id,
-                name: action.name,
-                time: 1,
-                isAvailable: true,
-                isDynamicTime: false,
+            setListData(prev => {
+                if (!prev) return prev;
+                
+                const newList = { ...prev };
+                newList.actions.push({
+                    id: action.id,
+                    name: action.name,
+                    time: 1,
+                    isAvailable: true,
+                    isDynamicTime: false,
+                });
+                return newList;
             });
-            setListData(newList);
-            sendData('query-action-list-effects', { listData: newList });
+            
+            // Отримуємо оновлений стан для запиту
+            setListData(prev => {
+                if (!prev) return prev;
+                sendData('query-action-list-effects', { listData: prev });
+                return prev;
+            });
         }
 
         if (sourceId === 'action-list-editor' && targetId === 'action-editor-wrap') {
@@ -339,19 +351,31 @@ export const Actions = ({}) => {
             const newIndex = targetIndex;
 
             if (oldIndex !== newIndex) {
-                const updated = [...listData.actions];
-                const [moved] = updated.splice(oldIndex, 1);
-                updated.splice(newIndex, 0, moved);
-                const newList = { ...listData, actions: updated };
-                setListData(newList);
-                sendData('query-action-list-effects', { listData: newList });
+                setListData(prev => {
+                    if (!prev) return prev;
+                    
+                    const updated = [...prev.actions];
+                    const [moved] = updated.splice(oldIndex, 1);
+                    updated.splice(newIndex, 0, moved);
+                    const newList = { ...prev, actions: updated };
+                    return newList;
+                });
+                
+                // Отримуємо оновлений стан для запиту
+                setListData(prev => {
+                    if (!prev) return prev;
+                    sendData('query-action-list-effects', { listData: prev });
+                    return prev;
+                });
             }
         }
     };
 
     const setAutotriggerPriority = useCallback((priority) => {
-        if(listData) {
-            const newList = cloneDeep(listData);
+        setListData(prev => {
+            if(!prev) return prev;
+            
+            const newList = cloneDeep(prev);
             if(!newList.autotrigger) {
                 newList.autotrigger = {};
             }
@@ -359,13 +383,15 @@ export const Actions = ({}) => {
                 newList.autotrigger.rules = [];
             }
             newList.autotrigger.priority = priority;
-            setListData({...newList});
-        }
-    }, [listData]);
+            return newList;
+        });
+    }, []);
 
     const onSetAutotriggerPattern = useCallback(pattern => {
-        if(listData) {
-            const newList = cloneDeep(listData);
+        setListData(prev => {
+            if(!prev) return prev;
+            
+            const newList = cloneDeep(prev);
             if(!newList.autotrigger) {
                 newList.autotrigger = {};
             }
@@ -373,13 +399,15 @@ export const Actions = ({}) => {
                 newList.autotrigger.rules = [];
             }
             newList.autotrigger.pattern = pattern;
-            setListData({...newList});
-        }
-    }, [listData]);
+            return newList;
+        });
+    }, []);
 
     const onToggleAutotrigger = useCallback(() => {
-        if(listData) {
-            const newList = cloneDeep(listData);
+        setListData(prev => {
+            if(!prev) return prev;
+            
+            const newList = cloneDeep(prev);
             if(!newList.autotrigger) {
                 newList.autotrigger = {};
             }
@@ -387,15 +415,21 @@ export const Actions = ({}) => {
                 newList.autotrigger.rules = [];
             }
             newList.autotrigger.isEnabled = !newList.autotrigger.isEnabled;
-            setListData({...newList});
-        }
-    }, [listData]);
+            return newList;
+        });
+    }, []);
 
 
     const onAddAutotriggerRule = useCallback(() => {
-
-        if(listData) {
-            const newList = cloneDeep(listData);
+        if (!resources || !resources.length) {
+            console.warn('No resources available for autotrigger rule');
+            return;
+        }
+        
+        setListData(prev => {
+            if(!prev) return prev;
+            
+            const newList = cloneDeep(prev);
             if(!newList.autotrigger) {
                 newList.autotrigger = {};
             }
@@ -408,40 +442,49 @@ export const Actions = ({}) => {
                 value_type: 'percentage',
                 value: 50,
             });
-            setListData({...newList});
-        }
-    }, [listData])
+            return newList;
+        });
+    }, [resources])
 
     const onSetAutotriggerRuleValue = useCallback((index, key, value) => {
-        if(listData) {
-            const newList = cloneDeep(listData);
+        setListData(prev => {
+            if(!prev) return prev;
+            
+            const newList = cloneDeep(prev);
             if(!newList.autotrigger) {
                 newList.autotrigger = {};
             }
             if(!newList.autotrigger.rules) {
                 newList.autotrigger.rules = [];
             }
-            newList.autotrigger.rules[index] ={
+            if(!newList.autotrigger.rules[index]) {
+                newList.autotrigger.rules[index] = {};
+            }
+            newList.autotrigger.rules[index] = {
                 ...newList.autotrigger.rules[index],
                 [key]: value
             };
-            setListData({...newList});
-        }
-    }, [listData])
+            return newList;
+        });
+    }, [])
 
     const onDeleteAutotriggerRule = useCallback((index) => {
-        if(listData) {
-            const newList = cloneDeep(listData);
+        setListData(prev => {
+            if(!prev) return prev;
+            
+            const newList = cloneDeep(prev);
             if(!newList.autotrigger) {
                 newList.autotrigger = {};
             }
             if(!newList.autotrigger.rules) {
                 newList.autotrigger.rules = [];
             }
-            newList.autotrigger.rules.splice(index, 1);
-            setListData({...newList});
-        }
-    }, [listData])
+            if(index >= 0 && index < newList.autotrigger.rules.length) {
+                newList.autotrigger.rules.splice(index, 1);
+            }
+            return newList;
+        });
+    }, [])
 
     const toggleAutomation = useCallback(() => {
         sendData('set-automation-enabled', { flag: !actionsData.automationEnabled })

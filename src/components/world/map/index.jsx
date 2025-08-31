@@ -72,7 +72,7 @@ export const MapWrap = ({ children }) => {
                 listData: payload,
                 isEdit: listDetails.isEdit,
                 isLoading: false,
-                automationUnlocked: listDetails.automationUnlocked,
+                automationUnlocked: listDetails.automationUnlocked ?? false,
             })
         });
         
@@ -100,9 +100,10 @@ export const MapWrap = ({ children }) => {
     }, []);
 
     const setAutotriggerPriority = useCallback((priority) => {
-        const { listData } = listDetails ?? {};
-        if(listData) {
-            const newList = cloneDeep(listData);
+        setListDetails(prev => {
+            if(!prev?.listData) return prev;
+            
+            const newList = cloneDeep(prev.listData);
             if(!newList.autotrigger) {
                 newList.autotrigger = {};
             }
@@ -110,14 +111,15 @@ export const MapWrap = ({ children }) => {
                 newList.autotrigger.rules = [];
             }
             newList.autotrigger.priority = priority;
-            setListDetails({...listDetails, listData: {...newList}});
-        }
-    }, [listDetails]);
+            return { ...prev, listData: newList };
+        });
+    }, []);
 
     const onSetAutotriggerPattern = useCallback(pattern => {
-        const { listData } = listDetails ?? {};
-        if(listData) {
-            const newList = cloneDeep(listData);
+        setListDetails(prev => {
+            if(!prev?.listData) return prev;
+            
+            const newList = cloneDeep(prev.listData);
             if(!newList.autotrigger) {
                 newList.autotrigger = {};
             }
@@ -125,15 +127,16 @@ export const MapWrap = ({ children }) => {
                 newList.autotrigger.rules = [];
             }
             newList.autotrigger.pattern = pattern;
-            setListDetails({...listDetails, listData: {...newList}});
-        }
-    }, [listDetails]);
+            return { ...prev, listData: newList };
+        });
+    }, []);
 
 
     const onAddAutotriggerRule = useCallback(() => {
-        const { listData } = listDetails ?? {};
-        if(listData) {
-            const newList = cloneDeep(listData);
+        setListDetails(prev => {
+            if(!prev?.listData) return prev;
+            
+            const newList = cloneDeep(prev.listData);
             if(!newList.autotrigger) {
                 newList.autotrigger = {};
             }
@@ -146,48 +149,55 @@ export const MapWrap = ({ children }) => {
                 value_type: 'percentage',
                 value: 50,
             });
-            setListDetails({...listDetails, listData: {...newList}});
-        }
-    }, [listDetails])
+            return { ...prev, listData: newList };
+        });
+    }, [])
 
     const onSetAutotriggerRuleValue = useCallback((index, key, value) => {
-        const { listData } = listDetails ?? {};
-        if(listData) {
-            const newList = cloneDeep(listData);
+        setListDetails(prev => {
+            if(!prev?.listData) return prev;
+            
+            const newList = cloneDeep(prev.listData);
             if(!newList.autotrigger) {
                 newList.autotrigger = {};
             }
             if(!newList.autotrigger.rules) {
                 newList.autotrigger.rules = [];
             }
-            newList.autotrigger.rules[index] ={
+            if(!newList.autotrigger.rules[index]) {
+                newList.autotrigger.rules[index] = {};
+            }
+            newList.autotrigger.rules[index] = {
                 ...newList.autotrigger.rules[index],
                 [key]: value
             };
-            setListDetails({...listDetails, listData: {...newList}});
-        }
-    }, [listDetails])
+            return { ...prev, listData: newList };
+        });
+    }, [])
 
     const onDeleteAutotriggerRule = useCallback((index) => {
-        const { listData } = listDetails ?? {};
-
-        if(listData) {
-            const newList = cloneDeep(listData);
+        setListDetails(prev => {
+            if(!prev?.listData) return prev;
+            
+            const newList = cloneDeep(prev.listData);
             if(!newList.autotrigger) {
                 newList.autotrigger = {};
             }
             if(!newList.autotrigger.rules) {
                 newList.autotrigger.rules = [];
             }
-            newList.autotrigger.rules.splice(index);
-            setListDetails({...listDetails, listData: {...newList}});
-        }
-    }, [listDetails])
+            if(index >= 0 && index < newList.autotrigger.rules.length) {
+                newList.autotrigger.rules.splice(index, 1);
+            }
+            return { ...prev, listData: newList };
+        });
+    }, [])
 
     const onToggleAutotrigger = useCallback(() => {
-        const { listData } = listDetails ?? {};
-        if(listData) {
-            const newList = cloneDeep(listData);
+        setListDetails(prev => {
+            if(!prev?.listData) return prev;
+            
+            const newList = cloneDeep(prev.listData);
             if(!newList.autotrigger) {
                 newList.autotrigger = {};
             }
@@ -195,9 +205,9 @@ export const MapWrap = ({ children }) => {
                 newList.autotrigger.rules = [];
             }
             newList.autotrigger.isEnabled = !newList.autotrigger.isEnabled;
-            setListDetails({...listDetails, listData: {...newList}});
-        }
-    }, [listDetails])
+            return { ...prev, listData: newList };
+        });
+    }, [])
 
     const setItemDetails = useCallback((pl) => {
         if(!pl) {
@@ -208,16 +218,26 @@ export const MapWrap = ({ children }) => {
         if(listDetails?.listData && listDetails?.isEdit) {
             if(meta) {
                 if(!listDetails.listData.tiles.find(one => one.id === `${meta.i}:${meta.j}`) && meta.canExplore) {
-                    const newList = cloneDeep(listDetails.listData);
-                    newList.tiles.push({
-                        id: `${meta.i}:${meta.j}`,
-                        name: `Tile ${meta.i}:${meta.j}`,
-                        i: meta.i,
-                        j: meta.j,
-                        time: 1,
-                    })
-                    setListDetails({...listDetails, listData: {...newList}});
-                    sendData('query-map-tile-list-effects', { listData: newList });
+                    setListDetails(prev => {
+                        if(!prev?.listData) return prev;
+                        
+                        const newList = cloneDeep(prev.listData);
+                        newList.tiles.push({
+                            id: `${meta.i}:${meta.j}`,
+                            name: `Tile ${meta.i}:${meta.j}`,
+                            i: meta.i,
+                            j: meta.j,
+                            time: 1,
+                        });
+                        return { ...prev, listData: newList };
+                    });
+                    
+                    // Отримуємо оновлений стан для запиту
+                    setListDetails(prev => {
+                        if(!prev?.listData) return prev;
+                        sendData('query-map-tile-list-effects', { listData: prev.listData });
+                        return prev;
+                    });
                 } else {
                     onDropActionFromList(`${meta.i}:${meta.j}`);
                 }
@@ -237,6 +257,7 @@ export const MapWrap = ({ children }) => {
             setListDetails({
                 isEdit: list.isEdit,
                 isLoading: true,
+                automationUnlocked: list.automationUnlocked ?? false,
             })
             sendData('load-map-tile-list', {
                 id: list.listData?.id,
@@ -259,23 +280,37 @@ export const MapWrap = ({ children }) => {
     }
 
     const onDropActionFromList = (id) => {
-        const { listData } = listDetails ?? {};
-        if(listData) {
-            const newList = listData;
+        setListDetails(prev => {
+            if(!prev?.listData) return prev;
+            
+            const newList = cloneDeep(prev.listData);
             newList.tiles = newList.tiles.filter(a => a.id !== id);
-            setListDetails({...listDetails, listData: {...newList}});
-            sendData('query-map-tile-list-effects', { listData: newList });
-        }
+            return { ...prev, listData: newList };
+        });
+        
+        // Отримуємо оновлений стан для запиту
+        setListDetails(prev => {
+            if(!prev?.listData) return prev;
+            sendData('query-map-tile-list-effects', { listData: prev.listData });
+            return prev;
+        });
     }
 
     const onClearList = () => {
-        const { listData } = listDetails ?? {};
-        if(listData) {
-            const newList = listData;
+        setListDetails(prev => {
+            if(!prev?.listData) return prev;
+            
+            const newList = cloneDeep(prev.listData);
             newList.tiles = [];
-            setListDetails({...listDetails, listData: {...newList}});
-            sendData('query-map-tile-list-effects', { listData: newList });
-        }
+            return { ...prev, listData: newList };
+        });
+        
+        // Отримуємо оновлений стан для запиту
+        setListDetails(prev => {
+            if(!prev?.listData) return prev;
+            sendData('query-map-tile-list-effects', { listData: prev.listData });
+            return prev;
+        });
     }
 
     const onAddTiles = () => {
@@ -284,9 +319,10 @@ export const MapWrap = ({ children }) => {
 
     useEffect(() => {
         onMessage('map-list-highlighted-tiles', (data) => {
-            const { listData } = listDetails ?? {};
-            if(listData) {
-                const newList = listData;
+            setListDetails(prev => {
+                if(!prev?.listData) return prev;
+                
+                const newList = cloneDeep(prev.listData);
                 data.tiles.map(({ iRow, iCol}) => {
                     const oTP = {
                         id: `${iRow}:${iCol}`,
@@ -298,35 +334,49 @@ export const MapWrap = ({ children }) => {
                     if(!newList.tiles.find(o => o.id === oTP.id)) {
                         newList.tiles.push(oTP)
                     }
-                })
-                setListDetails({...listDetails, listData: {...newList}});
-                sendData('query-map-tile-list-effects', { listData: newList });
-            }
+                });
+                return { ...prev, listData: newList };
+            });
+            
+            // Отримуємо оновлений стан для запиту
+            setListDetails(prev => {
+                if(!prev?.listData) return prev;
+                sendData('query-map-tile-list-effects', { listData: prev.listData });
+                return prev;
+            });
         });
         
         return () => {
             removeMessage('map-list-highlighted-tiles');
         };
-    }, [listDetails]);
+    }, []);
 
     const onUpdateActionFromList = (id, key, value) => {
-        const { listData } = listDetails ?? {};
-        if(listData) {
-            const newList = listData;
+        setListDetails(prev => {
+            if(!prev?.listData) return prev;
+            
+            const newList = cloneDeep(prev.listData);
             newList.tiles = newList.tiles.map(a => a.id !== id ? a : {...a, [key]: value});
-            setListDetails({...listDetails, listData: {...newList}});
-            sendData('query-map-tile-list-effects', { listData: newList });
-        }
+            return { ...prev, listData: newList };
+        });
+        
+        // Отримуємо оновлений стан для запиту
+        setListDetails(prev => {
+            if(!prev?.listData) return prev;
+            sendData('query-map-tile-list-effects', { listData: prev.listData });
+            return prev;
+        });
     }
 
     const onUpdateListValue = (key, value) => {
-        const { listData } = listDetails ?? {};
-        if(listData) {
-            const newList = listData;
+        setListDetails(prev => {
+            if(!prev?.listData) return prev;
+            
+            const newList = cloneDeep(prev.listData);
             newList[key] = value;
-            setListDetails({...listDetails, listData: {...newList}});
-            // sendData('query-action-list-effects', { id });
-        }
+            return { ...prev, listData: newList };
+        });
+        // sendData('query-action-list-effects', { id });
     }
 
     const onCloseList = () => {
@@ -606,7 +656,6 @@ export const MapTileListDetails = ({
     const [editing, setEditing] = useState({ tiles: [] })
 
     useEffect(() => {
-        // console.log('SET EDITING LIST MAP: ', listDetails, automationUnlocked);
         setEditing(listDetails);
     }, [listDetails])
 

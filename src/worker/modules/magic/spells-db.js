@@ -843,7 +843,7 @@ export const initSpellsDB1 = () => {
             baseXPCost: 1.e+9,
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_advanced_conjuration') > 0;
+            return gameEntity.getLevel('shop_item_advanced_conjuration') > 0 && gameResources.isResourceUnlocked('inventory_coal');
         },
     })
 

@@ -74,6 +74,13 @@ export const Inventory = ({}) => {
         }
     }, [viewedOpenedId, detailOpenedId])
 
+    // Clear viewedData when viewedOpenedId becomes null
+    useEffect(() => {
+        if (!viewedOpenedId) {
+            setViewedData(null);
+        }
+    }, [viewedOpenedId])
+
     useEffect(() => {
         const interval = setInterval(() => {
             sendData('query-inventory-data', {});
@@ -177,6 +184,7 @@ export const Inventory = ({}) => {
     const setInventoryDetailsEdit = useCallback(({id, name}) => {
         if(id) {
             if(detailOpenedId && isChanged) {
+                console.log('detOpenedId: ', detailOpenedId, id);
                 if(!confirm(`This will discard all your changes to ${detailOpenedId.name}. Are you sure`)) {
                     return;
                 }
@@ -192,19 +200,17 @@ export const Inventory = ({}) => {
     }, [isChanged, detailOpenedId])
 
     const setInventoryDetailsView = useCallback((id) => {
-        setViewedOpenedId(prev => {
-
-            if(!id) {
-                setViewedData(null);
-                return null;
-            }
-            if(id && (id !== viewedOpenedId)) {
-                playSound('selection');
-            }
-            return id;
-        })
-
-    })
+        if (!id) {
+            setViewedOpenedId(null);
+            setViewedData(null);
+            return;
+        }
+        
+        if (viewedOpenedId !== id) {
+            playSound('selection');
+            setViewedOpenedId(id);
+        }
+    }, [viewedOpenedId])
 
     const onSetAutoconsumePattern = useCallback(pattern => {
         if(editData) {
@@ -522,14 +528,14 @@ export const InventoryCard = React.memo(({ isChanged, eta, usages, usagesFor, al
         id={`inventory-item-card-${id}`}
         ref={elementRef}
         className={`icon-card item bigger flashable ${isSelected ? 'selected' : ''} ${isRare ? 'bluish' : ''} ${isRareIngredient ? 'ingredient' : ''}`}
-        onMouseOverCapture={(e) => {
+        onMouseEnter={() => {
             if (!isMobile) {
                 onShowDetails(id);
             }
         }}
-        onMouseOut={(e) => {
-            if (!e.currentTarget.contains(e.relatedTarget)) {
-                if (!isMobile) onShowDetails(null);
+        onMouseLeave={() => {
+            if (!isMobile) {
+                onShowDetails(null);
             }
         }}
         onClick={handleClick}
@@ -705,6 +711,7 @@ export const InventoryDetails = React.memo(({isChanged, editData, viewedData, re
         unlockNextById(11);
     }
 
+    console.log('editData: ', editData, viewedData);
 
     return (
         <>

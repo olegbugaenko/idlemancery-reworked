@@ -6,6 +6,13 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+            <h3>Idle Awakening v0.2.0e</h3>
+                <div className={'features'}>
+                    <p>Fixed bug where changes to lists automations could undo other chabges</p>
+                    <p>Fixed issue where view details of inventory and spells might work incorrect when moving mouse fast</p>
+                    <p>Fixed issues with map lists autotrigger</p>
+                    <p>Fixed bugs with some late game unlocks</p>
+                </div>
                 <h3>Idle Awakening v0.2.0d</h3>
                 <div className={'features'}>
                     <p>Added some attributes to development statistics wraps</p>
