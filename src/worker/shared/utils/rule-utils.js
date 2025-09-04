@@ -120,6 +120,34 @@ export const checkMatchingActionLevelRule = (rule, key) => {
     return false;
 }
 
+export const checkMatchingCurrentSocialEventRule = (rule) => {
+    const socialEventsModule = gameCore.getModule('events');
+    if (!socialEventsModule) return false;
+
+    const eventsData = socialEventsModule.getEventsData();
+    const currentActiveEvent = eventsData.activeEvent;
+    
+    console.log('Checking social event rule:', {
+        rule,
+        currentActiveEvent,
+        eventsData: eventsData.activeEvent,
+        condition: rule.condition,
+        event_id: rule.event_id
+    });
+    
+    if (rule.condition === 'true') {
+        const result = currentActiveEvent === rule.event_id;
+        console.log('Rule result (true):', result);
+        return result;
+    } else if (rule.condition === 'false') {
+        const result = currentActiveEvent !== rule.event_id;
+        console.log('Rule result (false):', result);
+        return result;
+    }
+    
+    return false;
+}
+
 export const checkMatchingAttributeValueRule = (rule) => {
     const attr = gameEffects.getEffect(rule.attribute_id);
 
@@ -172,6 +200,10 @@ export const checkMatchingRule = (rule) => {
     if(rule.compare_type === 'attribute_value') {
         return checkMatchingAttributeValueRule(rule);
     }
+    if(rule.compare_type === 'current_social_event') {
+        return checkMatchingCurrentSocialEventRule(rule);
+    }
+    console.warn(`Unknown rule compare type: ${rule.compare_type}`);
 }
 
 export const checkMatchingRules = (rules, conditionStr = null, bExplain = false) => {
@@ -184,7 +216,6 @@ export const checkMatchingRules = (rules, conditionStr = null, bExplain = false)
     }
 
     const ruleResults = rules.map(rule => checkMatchingRule(rule));
-
     if (!conditionStr) {
         if(!bExplain) {
             return ruleResults.every(result => result === true);

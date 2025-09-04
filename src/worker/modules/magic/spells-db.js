@@ -1,4 +1,4 @@
-import { gameEntity, gameCore, gameEffects } from "game-framework"
+import { gameEntity, gameCore, gameEffects, gameResources } from "game-framework"
 
 export const getMasteryId = id => `${id}_mastery`;
 

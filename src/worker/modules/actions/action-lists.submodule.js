@@ -770,6 +770,7 @@ export class ActionListsSubmodule extends GameModule {
 
            return false;
         });
+        console.log('rg: ', listsBeingAutotrigger, listsBeingAutotriggerAvailable.length);
         this.listsAutotrigger = listsBeingAutotriggerAvailable.map(one => ({
             id: one.id,
             priority: one.autotrigger.priority ?? 0,
@@ -860,10 +861,15 @@ export class ActionListsSubmodule extends GameModule {
     }
 
     tick(game, delta) {
+        if(game.ticksAfterLoad < 2) {
+            this.regenerateListsPriorityMap();
+        }
         // Here we checking autotrigger
         if(this.automationEnabled && this.listsAutotrigger.length && this.autotriggerCD <= 0) {
             this.autotriggerCD = this.autotriggerIntervalSetting || 10;
             const autotrigger = this.getAutotriggerList();
+
+            console.log('AT: ', autotrigger);
 
             if(autotrigger && this.runningList?.id !== autotrigger) {
                 this.runList(autotrigger);

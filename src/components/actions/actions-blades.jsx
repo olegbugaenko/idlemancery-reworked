@@ -236,8 +236,6 @@ export const ListEditor = React.memo(({
       onDragEnd,
   }) => {
 
-    console.log('editList: ', editListId, listData);
-
     const worker = useContext(WorkerContext);
 
     const { onMessage, sendData } = useWorkerClient(worker);
@@ -255,7 +253,6 @@ export const ListEditor = React.memo(({
     useEffect(() => {
         const interval = setInterval(() => {
             const payload = editingRef.current;
-            console.log('editingRef.current', editingRef.current);
             if(payload && Array.isArray(payload.actions) && payload.actions.length > 0) {
                 sendData('query-action-list-effects', { listData: payload });
             }

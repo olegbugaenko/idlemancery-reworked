@@ -11,6 +11,7 @@ import {playSound} from "../../../context/sounds/sound-manager";
 import {EffectsSection} from "../../shared/effects-section.jsx";
 import {TippyWrapper} from "../../shared/tippy-wrapper.jsx";
 import {BreakDown} from "../../layout/sidebar.jsx";
+import {PinResource} from "../../shared/pin-resource.jsx";
 
 export const ExpeditionsWrap = ({ children }) => {
     const worker = useContext(WorkerContext);
@@ -187,6 +188,9 @@ export const ExpeditionsWrap = ({ children }) => {
                                     <span className={`expedition-value ${expeditionEffortData.balance > 1.e-7 ? 'green' : 'yellow'}`}>{formatValue(expeditionEffortData.balance)}/{formatValue(expeditionEffortData.balance + expeditionEffortData.consumption)}</span>
                                 </div>
                             </TippyWrapper>
+                        )}
+                        {expeditionEffortData && (
+                            <PinResource isPinned={expeditionEffortData.isPinned} id={'expedition_effort'} />
                         )}
                     </div>
                 </div>

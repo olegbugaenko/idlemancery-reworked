@@ -37,8 +37,8 @@ export class EventsModule extends GameModule {
         } catch (e) {}
 
         // API handlers
-        this.eventHandler.registerHandler('query-social-events', () => {
-            this.sendEventsData();
+        this.eventHandler.registerHandler('query-social-events', (payload) => {
+            this.sendEventsData(payload);
         });
 
         this.eventHandler.registerHandler('query-social-events-stats', () => {
@@ -251,7 +251,8 @@ export class EventsModule extends GameModule {
                     progress: isActive ? Math.min(1, (gameCore.globalTime - this.eventStartTime) / ((eventEntity.attributes.eventDuration || 1) / 1000)) : 0,
                     timeRemaining: isActive ? Math.max(0, Math.floor(this.eventEndTime - gameCore.globalTime) * 1000) : 0,
                     cooldownRemaining: isOnCooldown ? Math.max(0, Math.floor(this.cooldownEndTime - gameCore.globalTime) * 1000) : 0,
-                    cooldown: eventEntity.attributes.eventCooldown || 30 * 60 * 1000
+                    cooldown: eventEntity.attributes.eventCooldown || 30 * 60 * 1000,
+                    isUnlocked: eventEntity.isUnlocked
                 });
             }
         }
@@ -302,7 +303,11 @@ export class EventsModule extends GameModule {
 
     sendEventsData(options) {
         const data = this.getEventsData();
-        this.eventHandler.sendData(`social-events-data${options?.prefix ? '-'+options.prefix : ''}`, data);
+        let label = 'social-events-data';
+        if(options?.prefix) {
+            label = `${label}-${options.prefix}`;
+        }
+        this.eventHandler.sendData(label, data);
     }
 
     // Збереження/завантаження
@@ -373,5 +378,24 @@ export class EventsModule extends GameModule {
     saveEventHistory() {
         // Історія зберігається в save() методі
         // Цей метод викликається для синхронізації даних
+    }
+
+    regenerateNotifications() {
+        try {
+            const eventEntities = gameEntity.listEntitiesByTags(['event-hall']);
+            eventEntities.forEach(evt => {
+                if (evt.attributes?.isEvent) {
+                    gameCore.getModule('unlock-notifications').registerNewNotification(
+                        'social',
+                        'events',
+                        'all',
+                        evt.id,
+                        evt.isUnlocked && !evt.isCapped
+                    );
+                }
+            });
+        } catch (e) {
+            console.warn('Error regenerating social events notifications:', e);
+        }
     }
 } 

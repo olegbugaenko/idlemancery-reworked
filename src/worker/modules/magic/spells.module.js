@@ -402,6 +402,7 @@ export class SpellModule extends GameModule {
         }
 
         return {
+            id,
             effects,
             potentialEffects: gameEntity.getEffects(id, 0, level, true),
             affordable: resourceCalculators.isAffordable(this.getConsumeAffordable(spell, level).consume),

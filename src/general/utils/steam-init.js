@@ -7,7 +7,7 @@ const log = str => {
 }
 
 function initSteamIfAvailable() {
-    /*if (process.env.IS_STEAM_DEMO === '1' || true) {
+    if (process.env.IS_STEAM_DEMO === '1' && false) {
         try {
             greenworks = require('../../../native/greenworks');
             if (greenworks.init()) {
@@ -29,7 +29,7 @@ function initSteamIfAvailable() {
         }
     } else {
         console.log('Steam not enabled — skipping init');
-    }*/
+    }
     return false;
 }
 

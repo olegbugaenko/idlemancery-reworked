@@ -838,8 +838,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'coins': {
-                        A: 0.6*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_magical'),
-                        B: 5.4*gameEffects.getEffectValue('coins_earned_bonus'),
+                        A: 1*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_magical'),
+                        B: 9*gameEffects.getEffectValue('coins_earned_bonus'),
                         type: 0,
                     }
                 }
@@ -889,8 +889,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'coins': {
-                        A: 1.8*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_magical'),
-                        B: 16.2*gameEffects.getEffectValue('coins_earned_bonus'),
+                        A: 2*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_magical'),
+                        B: 18*gameEffects.getEffectValue('coins_earned_bonus'),
                         type: 0,
                     }
                 }
@@ -941,8 +941,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'coins': {
-                        A: 2.7*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_magical'),
-                        B: 24.3*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_magical'),
+                        A: 3.0*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_magical'),
+                        B: 27.0*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_magical'),
                         type: 0,
                     }
                 }
@@ -993,8 +993,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'coins': {
-                        A: 4.0*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_magical'),
-                        B: 36.0*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_magical'),
+                        A: 5.0*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_magical'),
+                        B: 45.0*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_magical'),
                         type: 0,
                     }
                 }
@@ -1045,8 +1045,8 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 resources: {
                     'coins': {
-                        A: 6.0*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_magical'),
-                        B: 54.0*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_magical'),
+                        A: 9.0*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_magical'),
+                        B: 81.0*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_magical'),
                         type: 0,
                     }
                 }

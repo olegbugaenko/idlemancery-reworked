@@ -146,7 +146,6 @@ export const Actions = ({}) => {
                     if(!prev) return;
 
                     const actions = payload.newTimes ?? prev.actions;
-                    console.log('NAEL: ', actions);
                     
                     return {
                         ...prev,

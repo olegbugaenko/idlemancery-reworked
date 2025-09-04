@@ -64,6 +64,7 @@ export class AttributesModule extends GameModule {
     }
 
     getAttributesUnlocks(showUnlocked) {
+        console.log('Unlocks: ', gameEffects.listEffectsByTags(['attribute'], false, [], { listPrevious: showUnlocked }));
         const items = gameEffects.listEffectsByTags(['attribute'], false, [], { listPrevious: showUnlocked })
             .filter(one => one.isUnlocked && (one.nextUnlocks?.length || (showUnlocked && one.prevUnlocks?.length)))
             .map(one => {

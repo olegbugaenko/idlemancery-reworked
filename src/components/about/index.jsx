@@ -6,7 +6,22 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
-            <h3>Idle Awakening v0.2.0e</h3>
+                <h3>Idle Awakening v0.2.0g</h3>
+                <div className={'features'}>
+                    <p>Fixed bug where ui didn't updated properly on spell level change</p>
+                    <p>Fixed bug where some unlocks could display incorrectly</p>
+                </div>
+                <h3>Idle Awakening v0.2.0f</h3>
+                <div className={'features'}>
+                    <p>Fixed bug where game crashed under some circumstances</p>
+                    <p>Fixed bug where action lists automation might not trigger after game loaded</p>
+                    <p>Added ability to pin Expedition Effort to left sidebar</p>
+                    <p>Fixed NewNotifications status not saving for social events</p>
+                    <p>Rebalanced magical jobs</p>
+                    <p>Added social events rules to lists autotrigger</p>
+                    <p>Fixed some typos and descriptions</p>
+                </div>
+                <h3>Idle Awakening v0.2.0e</h3>
                 <div className={'features'}>
                     <p>Fixed bug where changes to lists automations could undo other chabges</p>
                     <p>Fixed issue where view details of inventory and spells might work incorrect when moving mouse fast</p>

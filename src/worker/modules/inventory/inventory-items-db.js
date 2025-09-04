@@ -107,7 +107,11 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.isEntityUnlocked('action_clay_mining')
         },
-        sellPrice: 800,
+        sellPrice: 75625,
+        get_cost: (amount = 1) => ({
+            coins: amount*5250000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+        }),
+        purchaseRenewRate: 1,
     })
 
     registerInventoryItem('inventory_pot', {

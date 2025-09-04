@@ -246,7 +246,8 @@ export class CraftingModule extends GameModule {
                     copyFromId: id,
                     level: 1,
                     allowedImpacts: ['resources'],
-                    tags: ['running', 'runningCrafting']
+                    tags: ['running', 'runningCrafting'],
+                    unlockedBy: undefined,
                 })
             }
         }

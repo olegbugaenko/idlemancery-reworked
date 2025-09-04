@@ -227,7 +227,7 @@ export const registerCommomEffects = () => {
 
 
     gameEffects.registerEffect('shop_max_stock', {
-        name: 'Shop Max Sell Stock',
+        name: 'Inventory Sell Cap',
         defaultValue: 100,
         minValue: 100,
         description: 'Maximum amount of items of same type that can be sold'
@@ -241,7 +241,7 @@ export const registerCommomEffects = () => {
     })
 
     gameEffects.registerEffect('shop_stock_renew_rate', {
-        name: 'Sell Stock Renew Rate',
+        name: 'Inventory Sell Renew Rate',
         defaultValue: 1,
         minValue: 1,
         description: 'Rate at which possible amount of items can be sold renews'

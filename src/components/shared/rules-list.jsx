@@ -202,6 +202,18 @@ const mapCompareType = {
         unlockCondition: (unlocks) => {
             return unlocks.crafting;
         }
+    },
+    'current_social_event': {
+        label: 'Current Social Event',
+        subject: 'event_id',
+        availableConditions: [
+            'true',
+            'false',
+        ],
+        isHideValue: true,
+        unlockCondition: (unlocks) => {
+            return unlocks.social;
+        }
     }
 };
 
@@ -217,6 +229,7 @@ const RulesList = React.memo(
         const [tags, setTags] = useState([]);
         const [spells, setSpells] = useState([]);
         const [craftingLists, setCraftingLists] = useState([]);
+        const [socialEvents, setSocialEvents] = useState([]);
         const [rulesMatched, setRulesMatched] = useState(null);
         const [unlocks, setUnlocks] = useState();
 
@@ -228,6 +241,7 @@ const RulesList = React.memo(
             sendData('query-actions-lists', { prefix });
             sendData('query-all-spells', { prefix });
             sendData('query-all-crafting-lists', { prefix });
+            sendData('query-social-events', { prefix });
 
             sendData('query-unlocks', { prefix: `automation-${prefix}`})
         }, []);
@@ -280,6 +294,10 @@ const RulesList = React.memo(
             setCraftingLists(payload);
         })
 
+        onMessage(`social-events-data-${prefix}`, (payload) => {
+            setSocialEvents(payload.events || []);
+        })
+
         const checkViolation = (index, compare_type) => {
             const rule = rules[index];
             const sett = mapCompareType[compare_type];
@@ -329,6 +347,8 @@ const RulesList = React.memo(
                             subjectArray = spells;
                         } else if (subject === 'crafting_list_id') {
                             subjectArray = craftingLists;
+                        } else if (subject === 'event_id') {
+                            subjectArray = socialEvents;
                         }
 
                         subjectOptions = subjectArray
@@ -443,15 +463,17 @@ const RulesList = React.memo(
                                                 options={subjectOptions}
                                                 value={subjectValue}
                                                 isMulti={mapCompareType[rule.compare_type]?.allowMultiSubject}
-                                                onChange={(selectedOption) => {
-                                                    setRuleValue(
-                                                        index,
-                                                        subjectName,
-                                                        mapCompareType[rule.compare_type]?.allowMultiSubject
-                                                            ? selectedOption.map(option => option.value)
-                                                            : selectedOption.value
-                                                    )
-                                                }}
+                                                                                                 onChange={(selectedOption) => {
+                                                     const value = mapCompareType[rule.compare_type]?.allowMultiSubject
+                                                         ? selectedOption.map(option => option.value)
+                                                         : selectedOption.value;
+                                                     console.log('Setting event_id:', value, 'for rule:', rule);
+                                                     setRuleValue(
+                                                         index,
+                                                         subjectName,
+                                                         value
+                                                     )
+                                                 }}
                                                 className={`react-select-container ${mapCompareType[rule.compare_type]?.allowMultiSubject ? 'multi' : ''}`}
                                                 classNamePrefix="react-select"
                                                 styles={customStyles}

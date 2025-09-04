@@ -8,7 +8,6 @@ export class RulesModule extends GameModule {
 
         this.eventHandler.registerHandler('check-rule-conditions-matched', ({ prefix, rules, pattern }) => {
             const results = checkMatchingRules(rules, pattern, true);
-
             this.eventHandler.sendData(`rule-conditions-matched-${prefix}`, results);
         })
     }
