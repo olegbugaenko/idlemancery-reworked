@@ -46,6 +46,7 @@ export const AutomationsSettings = () => {
             {unlocks.crafting ? (<CraftingAutomations resources={resources} />) : null}
             {unlocks.alchemy ? (<AlchemyAutomations resources={resources} />) : null}
             {unlocks.spellbook ? (<SpellAutomations resources={resources} />) : null}
+            {unlocks.courses ? (<CoursesAutomations resources={resources} />) : null}
         </PerfectScrollbar>
     </div> )
 }
@@ -757,5 +758,75 @@ export const AutomatedItem = ({
             </div> )}
         </div>
     </div> )
+
+}
+
+export const CoursesAutomations = ({ resources }) => {
+
+    const worker = useContext(WorkerContext);
+    const { onMessage, sendData } = useWorkerClient(worker);
+    const [automations, setAutomations] = useState([]);
+    const [isOpened, setOpened] = useState(true);
+
+    useEffect(() => {
+        sendData('query-course-data', {});
+    }, []);
+
+    onMessage('course-data', (data) => {
+        console.log('data: ', data);
+        // Filter courses with automation enabled
+        const automatedCourses = data.available.filter(course => 
+            course.automation?.isEnabled
+        );
+        setAutomations(automatedCourses);
+    });
+
+    const onSaveCourse = useCallback((id, saveData) => {
+        const prev = automations.find(a => a.id === id);
+        if(!prev) {
+            console.error(`Not found course by id: ${id}`, id, saveData);
+            return;
+        }
+        const toSave = {
+            ...prev.automation,
+            priority: saveData.priority,
+            rules: saveData.rules,
+            pattern: saveData.pattern,
+            isEnabled: saveData.isEnabled
+        };
+        sendData('save-course-automation', { id, automation: toSave });
+    });
+
+    if(!automations || !automations.length || !resources) return null;
+
+    return (<div className={`automations-box ${isOpened ? 'opened' : 'closed'}`}>
+        <div className={'automation-panel-title'} onClick={() => setOpened(!isOpened)}>
+            <h4>Courses Automations</h4>
+            <span className={'arrow-down'}>&#8681;</span>
+        </div>
+        <div className={'automated-list'}>
+            {automations.map(auto => (<AutomatedCourse auto={auto} resources={resources} onSaveCourse={onSaveCourse}/>))}
+        </div>
+    </div> )
+
+}
+
+export const AutomatedCourse = ({ auto, resources, onSaveCourse }) => {
+
+    const onSave = useCallback((id, data) => {
+        onSaveCourse(id, data);
+    });
+
+    return <AutomatedItem
+        prefix={'course-automation'}
+        id={auto.id}
+        name={auto.name}
+        resources={resources}
+        onSave={onSave}
+        rules={auto.automation?.rules || []}
+        pattern={auto.automation?.pattern || ''}
+        priority={auto.automation?.priority || 0}
+        isEnabled={auto.automation?.isEnabled || false}
+    />
 
 }

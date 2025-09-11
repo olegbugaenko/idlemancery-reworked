@@ -49,12 +49,13 @@ export const registerAmplifiersStage1 = () => {
             get_multiplier: ()=>({
                 resources: {
                     'living_space': {
-                        A: 0.0025,
+                        A: 0.0025*gameEffects.getEffectValue('earth_amplifier_efficiency'),
                         B: 1,
                         type: 0,
                     }
                 }
             }),
+            effectDeps: ['earth_amplifier_efficiency'],
         },
         get_cost: () => ({
             'inventory_earth': {
@@ -78,12 +79,13 @@ export const registerAmplifiersStage1 = () => {
             get_multiplier: ()=>({
                 resources: {
                     'crafting_ability': {
-                        A: 0.02,
+                        A: 0.02*gameEffects.getEffectValue('earth_amplifier_efficiency'),
                         B: 1,
                         type: 0,
                     }
                 }
             }),
+            effectDeps: ['earth_amplifier_efficiency'],
         },
         get_cost: () => ({
             'inventory_earth': {
@@ -108,13 +110,14 @@ export const registerAmplifiersStage1 = () => {
             get_multiplier: ()=>({
                 effects: {
                     'physical_actions_discount': {
-                        A: 0.2,
+                        A: 0.2*gameEffects.getEffectValue('air_amplifier_efficiency'),
                         B: 1,
                         C: 1.025,
                         type: 3,
                     }
                 }
             }),
+            effectDeps: ['air_amplifier_efficiency'],
         },
         get_cost: () => ({
             'inventory_air': {
@@ -138,13 +141,14 @@ export const registerAmplifiersStage1 = () => {
             get_multiplier: ()=>({
                 effects: {
                     'mental_actions_discount': {
-                        A: 0.2,
+                        A: 0.2*gameEffects.getEffectValue('air_amplifier_efficiency'),
                         B: 1,
                         C: 1.025,
                         type: 3,
                     }
                 }
             }),
+            effectDeps: ['air_amplifier_efficiency'],
         },
         get_cost: () => ({
             'inventory_air': {
@@ -168,13 +172,14 @@ export const registerAmplifiersStage1 = () => {
             get_multiplier: ()=>({
                 effects: {
                     'social_actions_discount': {
-                        A: 0.2,
+                        A: 0.2*gameEffects.getEffectValue('air_amplifier_efficiency'),
                         B: 1,
                         C: 1.025,
                         type: 3,
                     }
                 }
             }),
+            effectDeps: ['air_amplifier_efficiency'],
         },
         get_cost: () => ({
             'inventory_air': {
@@ -204,13 +209,14 @@ export const registerAmplifiersStage1 = () => {
             get_multiplier: ()=>({
                 effects: {
                     'magical_actions_discount': {
-                        A: 0.2,
+                        A: 0.2*gameEffects.getEffectValue('air_amplifier_efficiency'),
                         B: 1,
                         C: 1.025,
                         type: 3,
                     }
                 }
             }),
+            effectDeps: ['air_amplifier_efficiency']
         },
         get_cost: () => ({
             'inventory_air': {

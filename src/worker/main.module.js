@@ -113,6 +113,7 @@ export class MainModule extends GameModule {
                 'events': gameEntity.getLevel('structure_event_hall') > 0,
                 'social-main': gameEntity.getLevel('structure_event_hall') > 0,
                 'expeditions': gameEntity.isEntityUnlocked('action_expedition'),
+                'amnesia': gameEntity.getLevel('shop_item_alchemy_courses') > 0,
             }
             let label = 'unlocks';
             if(payload?.prefix) {

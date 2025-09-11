@@ -4494,3 +4494,40 @@ body::after {
     height: fit-content; /* Allow content to size naturally */
     min-height: 100%; /* Ensure content fills container */
 }
+
+/* Course automation priority field */
+.priority-line {
+    margin: 10px 0;
+    align-items: center;
+}
+
+.priority-line p {
+    margin-right: 10px;
+}
+
+.priority-line input {
+    width: 80px;
+    padding: 5px;
+    border-radius: 4px;
+}
+
+.priority-line span {
+    padding: 4px 10px;
+}
+
+
+.items-wrap .items-cat.courses {
+    height: calc(100% - 80px);
+}
+
+.courses-automation-panel {
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 5px;
+    border-top: 1px solid #333;
+}
+
+.flex-container.flex-row {
+    justify-content: space-between;
+    align-items: center;
+}

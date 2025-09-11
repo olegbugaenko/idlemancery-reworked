@@ -147,7 +147,7 @@ export class ExpeditionsModule extends GameModule {
             });
         }
 
-        console.log('loot: ', gameEffects.getEffectValue('expedition_resource_amount'), lootResults);
+        // console.log('loot: ', gameEffects.getEffectValue('expedition_resource_amount'), lootResults);
 
         return lootResults;
     }
@@ -391,6 +391,16 @@ export class ExpeditionsModule extends GameModule {
         
         // Use override level if provided, otherwise use expedition level
         const levelToUse = overrideLevel !== null ? overrideLevel : expeditionData.level;
+        
+        // Calculate XP per second for this expedition
+        let xpPerSecond = 0;
+        if (expeditionData.isRunning) {
+            const consumpt = gameResources.getResource('expedition_effort').consumption;
+            if (consumpt > 0 && gameResources.getResource('expedition_effort').income) {
+                const xpRate = gameEffects.getEffectValue('expedition_xp_rate');
+                xpPerSecond = consumpt * xpRate;
+            }
+        }
 
         // Calculate possible loot for the level being viewed
         const possibleLoot = this.calculateLoot(id, levelToUse).map(loot => ({
@@ -414,6 +424,7 @@ export class ExpeditionsModule extends GameModule {
             isRunning: expeditionData.isRunning,
             currentXp: currentXp,
             requiredXp: requiredXp,
+            xpPerSecond: xpPerSecond,
             potentialEffects: gameEntity.getEffects(id, 0, levelToUse, true),
             possibleLoot: possibleLoot,
             discoveredLoot: discoveredLoot,

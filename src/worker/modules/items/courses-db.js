@@ -541,7 +541,7 @@ export const registerCourseItemsStage1 = () => {
         minDemoVersion: 20,
         description: 'Mastering the art of resource management, this course teaches how to minimize material waste and maximize output, making every crafted piece more cost-effective.',
         attributes: {
-            basicDuration: 240,
+            basicDuration: 2400,
         },
         level: 0,
         unlockCondition: () => gameEntity.getLevel('shop_item_advanced_training') > 0 && gameEntity.getLevel('shop_item_training_room') > 0,
@@ -581,7 +581,7 @@ export const registerCourseItemsStage1 = () => {
         minDemoVersion: 20,
         description: 'A deep dive into the refined techniques of potion-making, allowing alchemists to extract the full potential of ingredients while reducing unnecessary expenditure.',
         attributes: {
-            basicDuration: 240,
+            basicDuration: 2400,
         },
         level: 0,
         unlockCondition: () => gameEntity.getLevel('shop_item_advanced_training') > 0 && gameEntity.getLevel('shop_item_training_room') > 0,

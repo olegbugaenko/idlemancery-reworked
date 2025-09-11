@@ -178,16 +178,17 @@ export const registerAccessoriesStage1 = () => {
             return gameEntity.getLevel('shop_item_paper_working') > 0;
         },
         resourceModifier: {
-            income: {
+            get_income: () => ({
                 resources: {
                     'knowledge': {
-                        A: 0.005,
+                        A: 0.005*gameEffects.getEffectValue('artifact_scroll_efficiency'),
                         B: 0,
                         C: 1.01,
                         type: 3,
                     }
                 }
-            },
+            }),
+            effectDeps: ['artifact_scroll_efficiency']
         },
         get_cost: () => ({
             'inventory_paper': {
@@ -213,16 +214,17 @@ export const registerAccessoriesStage1 = () => {
             return gameEntity.getLevel('shop_item_paper_working') > 0;
         },
         resourceModifier: {
-            multiplier: {
+            get_multiplier: () => ({
                 effects: {
                     'recovery_spells_efficiency': {
-                        A: 0.025,
-                        B: 1,
+                        A: 0.025*gameEffects.getEffectValue('artifact_scroll_efficiency'),
+                        B: 1*gameEffects.getEffectValue('artifact_scroll_efficiency'),
                         C: 1.01,
                         type: 3,
                     }
                 }
-            },
+            }),
+            effectDeps: ['artifact_scroll_efficiency']
         },
         get_cost: () => ({
             'inventory_paper': {
@@ -254,16 +256,17 @@ export const registerAccessoriesStage1 = () => {
             return gameEntity.getLevel('shop_item_paper_working') > 0;
         },
         resourceModifier: {
-            multiplier: {
+            get_multiplier: () => ({
                 effects: {
                     'social_training_learning_rate': {
-                        A: 0.05,
-                        B: 1,
+                        A: 0.05*gameEffects.getEffectValue('artifact_scroll_efficiency'),
+                        B: 1*gameEffects.getEffectValue('artifact_scroll_efficiency'),
                         C: 1.01,
                         type: 3,
                     }
                 }
-            },
+            }),
+            effectDeps: ['artifact_scroll_efficiency']
         },
         get_cost: () => ({
             'inventory_paper': {
@@ -581,16 +584,17 @@ export const registerAccessoriesStage1 = () => {
             return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.isEntityUnlocked('craft_green_ink');
         },
         resourceModifier: {
-            multiplier: {
+            get_multiplier: () => ({
                 resources: {
                     'knowledge': {
-                        A: 0.1,
-                        B: 1,
+                        A: 0.1*gameEffects.getEffectValue('artifact_scroll_efficiency'),
+                        B: 1*gameEffects.getEffectValue('artifact_scroll_efficiency'),
                         C: 1.01,
                         type: 3,
                     }
                 }
-            },
+            }),
+            effectDeps: ['artifact_scroll_efficiency']
         },
         get_cost: () => ({
             'inventory_paper': {
@@ -621,15 +625,16 @@ export const registerAccessoriesStage1 = () => {
             return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.isEntityUnlocked('craft_green_ink');
         },
         resourceModifier: {
-            multiplier: {
+            get_multiplier: () => ({
                 resources: {
                     'mana': {
-                        A: 0.025,
-                        B: 1,
+                        A: 0.025*gameEffects.getEffectValue('artifact_scroll_efficiency'),
+                        B: 1*gameEffects.getEffectValue('artifact_scroll_efficiency'),
                         type: 0,
                     }
                 }
-            },
+            }),
+            effectDeps: ['artifact_scroll_efficiency']
         },
         get_cost: () => ({
             'inventory_paper': {
@@ -661,15 +666,16 @@ export const registerAccessoriesStage1 = () => {
                 && gameEntity.isEntityUnlocked('craft_red_ink');
         },
         resourceModifier: {
-            multiplier: {
+            get_multiplier: () => ({
                 effects: {
                     'courses_learning_speed': {
-                        A: 0.05,
-                        B: 1,
+                        A: 0.05*gameEffects.getEffectValue('artifact_scroll_efficiency'),
+                        B: 1*gameEffects.getEffectValue('artifact_scroll_efficiency'),
                         type: 0,
                     }
                 }
-            },
+            }),
+            effectDeps: ['artifact_scroll_efficiency']
         },
         get_cost: () => ({
             'inventory_paper': {
@@ -703,15 +709,16 @@ export const registerAccessoriesStage1 = () => {
         },
         minDemoVersion: 20,
         resourceModifier: {
-            multiplier: {
+            get_multiplier: () => ({
                 effects: {
                     'reductive_courses_power': {
-                        A: 0.05,
-                        B: 1,
+                        A: 0.05*gameEffects.getEffectValue('artifact_scroll_efficiency'),
+                        B: 1*gameEffects.getEffectValue('artifact_scroll_efficiency'),
                         type: 0,
                     }
                 }
-            },
+            }),
+            effectDeps: ['artifact_scroll_efficiency']
         },
         get_cost: () => ({
             'inventory_paper': {
@@ -788,16 +795,17 @@ export const registerAccessoriesStage1 = () => {
                 && gameResources.isResourceUnlocked('mental_energy');
         },
         resourceModifier: {
-            multiplier: {
+            get_multiplier: () => ({
                 resources: {
                     'mental_energy': {
-                        A: 0.05,
-                        B: 1,
+                        A: 0.05*gameEffects.getEffectValue('artifact_scroll_efficiency'),
+                        B: 1*gameEffects.getEffectValue('artifact_scroll_efficiency'),
                         C: 1.01,
                         type: 3,
                     }
                 }
-            },
+            }),
+            effectDeps: ['artifact_scroll_efficiency']
         },
         get_cost: () => ({
             'inventory_paper': {
@@ -1146,6 +1154,64 @@ export const registerAccessoriesStage1 = () => {
                 B: 25/getAccessoryDiscount(),
                 type: 1
             },
+        }),
+    })
+
+    // Earth Resonator — enhances earth amplifiers
+    registerAccessory('accessory_earth_resonator', {
+        tags: ["accessory", "upgrade", "purchaseable", "earth", "elemental", "resonator"],
+        name: 'Earth Resonator',
+        description: 'A powerful resonator that enhances the effectiveness of earth-based magical amplifiers.',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_elemental_resonance') > 0;
+        },
+        resourceModifier: {
+            get_multiplier: ()=>({
+                effects: {
+                    'earth_amplifier_efficiency': {
+                        A: 0.1,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }),
+        },
+        get_cost: () => ({
+            'inventory_earth': {
+                A: 1.2,
+                B: 1000/getAccessoryDiscount(),
+                type: 1
+            }
+        }),
+    })
+
+    // Air Resonator — enhances air amplifiers
+    registerAccessory('accessory_air_resonator', {
+        tags: ["accessory", "upgrade", "purchaseable", "air", "elemental", "resonator"],
+        name: 'Air Resonator',
+        description: 'A powerful resonator that enhances the effectiveness of air-based magical amplifiers.',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_elemental_resonance') > 0;
+        },
+        resourceModifier: {
+            get_multiplier: ()=>({
+                effects: {
+                    'air_amplifier_efficiency': {
+                        A: 0.1,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }),
+        },
+        get_cost: () => ({
+            'inventory_air': {
+                A: 1.2,
+                B: 1000/getAccessoryDiscount(),
+                type: 1
+            }
         }),
     })
 }

@@ -496,6 +496,22 @@ export const registerCommomEffects = () => {
         saveBalanceTree: true,
     })
 
+    gameEffects.registerEffect('earth_amplifier_efficiency', {
+        name: 'Earth Amplifier Efficiency',
+        defaultValue: 1.,
+        minValue: 1.,
+        hasCap: false,
+        saveBalanceTree: true,
+    })
+
+    gameEffects.registerEffect('air_amplifier_efficiency', {
+        name: 'Air Amplifier Efficiency',
+        defaultValue: 1.,
+        minValue: 1.,
+        hasCap: false,
+        saveBalanceTree: true,
+    })
+
     gameEffects.registerEffect('trade_warehouse_coins_cap_bonus', {
         name: 'Trade Warehouse Coins Cap Bonus',
         defaultValue: 0.,
@@ -675,6 +691,14 @@ export const registerCommomEffects = () => {
         defaultValue: 1.,
         minValue: 1,
         description: 'Discount on all accessories purchases',
+        saveBalanceTree: true,
+    })
+
+    gameEffects.registerEffect('artifact_scroll_efficiency', {
+        name: 'Artifact Scroll Efficiency',
+        defaultValue: 1.,
+        minValue: 1,
+        description: 'Increases the effectiveness of artifact scroll accessories',
         saveBalanceTree: true,
     })
 

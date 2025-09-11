@@ -157,7 +157,10 @@ export const Shop = ({}) => {
                     purchaseItem={purchaseResource}
                     newUnlocks={newUnlocks?.['shop']?.items?.['inventory']?.items}
                 />) : null}
-                {selectedTab === 'courses' ? (<CourseItems isMobile={isMobile} setItemDetails={setItemDetails} purchaseItem={purchaseCourse} newUnlocks={newUnlocks?.['shop']?.items?.['courses']?.items}/>) : null}
+                {selectedTab === 'courses' ? (<CourseItems isMobile={isMobile} setItemDetails={setItemDetails} purchaseItem={purchaseCourse} newUnlocks={newUnlocks?.['shop']?.items?.['courses']?.items} toggleEditedItem={(id) =>
+                        setEditOpened(prev => (prev === id ? null : id))
+                    }/>) : null}
+                {selectedTab === 'courses' && unlocks?.courses ? (<CoursesAutomationPanel />) : null}
             </div>
 
             {(!isMobile || isDetailVisible || detailOpened) ? (<div className={'item-detail ingame-box detail-blade'}>
@@ -166,7 +169,7 @@ export const Shop = ({}) => {
                     category={selectedTab}
                     onClose={onCloseDetails}
                     onPurchase={selectedTab === 'items' ? purchaseResource : undefined}
-                    isEditMode={editOpened && (selectedTab === 'items' && editOpened === visibleDetailId)}
+                    isEditMode={editOpened && (['items', 'courses'].includes(selectedTab) && editOpened === visibleDetailId)}
                     editId={editOpened}
                     onCloseEdit={() => setEditOpened(null)}
                 />) : (<GeneralStats setDetailVisible={setDetailVisible}/>)}
@@ -345,7 +348,7 @@ export const ShopItems = ({ setItemDetails, toggleEditedItem, purchaseItem, newU
 }
 
 
-export const CourseItems = ({ setItemDetails, purchaseItem, newUnlocks, isMobile }) => {
+export const CourseItems = ({ setItemDetails, purchaseItem, newUnlocks, isMobile, toggleEditedItem }) => {
 
     const worker = useContext(WorkerContext);
 
@@ -388,11 +391,11 @@ export const CourseItems = ({ setItemDetails, purchaseItem, newUnlocks, isMobile
         sendData('set-course-autopurchase', { id, flag })
     })
 
-    return (<div className={'items-cat'}>
+    return (<div className={'items-cat courses'}>
         <PerfectScrollbar>
             <div className={'flex-container'}>
                 {itemsData.available.map(item => <NewNotificationWrap key={`course_${item.id}`} id={`course_${item.id}`} className={'narrow-wrapper'} isNew={newUnlocks?.all?.items?.[`course_${item.id}`]?.hasNew}>
-                    <CourseCard isMobile={isMobile} onFlash={handleFlash} key={item.id} {...item} onPurchase={purchaseItem} onShowDetails={setItemDetails} toggleAutopurchase={toggleAutopurchase} isAutomationUnlocked={itemsData.isAutomationUnlocked}/>
+                    <CourseCard isMobile={isMobile} onFlash={handleFlash} key={item.id} {...item} onPurchase={purchaseItem} onShowDetails={setItemDetails} toggleAutopurchase={toggleAutopurchase} isAutomationUnlocked={itemsData.isAutomationUnlocked} toggleEditedItem={toggleEditedItem}/>
                 </NewNotificationWrap>)}
                 {overlayPositions.map((position, index) => (
                     <FlashOverlay key={index} position={position} />
@@ -471,7 +474,7 @@ export const ItemResourceCard = ({ id, name, purchaseMultiplier, stock, level, m
 }
 
 
-export const CourseCard = ({ toNext, id, efficiency, isRunning, name, level, progress, maxProgress, max, affordable, isLeveled, onFlash, onPurchase, onShowDetails, isAutoPurchase, toggleAutopurchase, isAutomationUnlocked, isMobile, isFavorite}) => {
+export const CourseCard = ({ toNext, id, efficiency, isRunning, name, level, progress, maxProgress, max, affordable, isLeveled, onFlash, onPurchase, onShowDetails, isAutoPurchase, toggleAutopurchase, isAutomationUnlocked, isMobile, isFavorite, toggleEditedItem}) => {
 
     const elementRef = useRef(null);
 
@@ -487,7 +490,8 @@ export const CourseCard = ({ toNext, id, efficiency, isRunning, name, level, pro
             if(isMobile) {
                 onShowDetails(id)
             } else {
-                onPurchase(id, 1)
+                // onPurchase(id, 1)
+                toggleEditedItem(id);
             }
         }}>
         <div className={'progress-bg'} style={{ width: `${100*Math.min(1., progress/maxProgress)}%`}}></div>
@@ -605,12 +609,13 @@ export const ItemDetails = ({itemId, category, editId, onPurchase, isEditMode, o
     }, []);
 
     useEffect(() => {
-        if(category === 'items' && editId) {
+        if((category === 'items' || category === 'courses') && editId) {
             const ap = item?.autopurchase || {};
             setAutopurchase({
                 rules: ap.rules || [],
                 pattern: ap.pattern,
                 isEnabled: ap.isEnabled || false,
+                priority: ap.priority || 0, // Add priority for courses
                 reserved: ap.reserved ?? 0,
                 purchaseMultiplier: ap.purchaseMultiplier ?? 1,
             });
@@ -618,7 +623,7 @@ export const ItemDetails = ({itemId, category, editId, onPurchase, isEditMode, o
             setAutopurchase(null);
         }
 
-    },[category, editId, item?.autopurchase?.purchaseMultiplier]) // include item so defaults are applied when data arrives
+    },[category, editId, item?.autopurchase?.purchaseMultiplier, item?.autopurchase?.priority]) // include item so defaults are applied when data arrives
 
     if(!itemId || !item) return null;
 
@@ -708,8 +713,21 @@ export const ItemDetails = ({itemId, category, editId, onPurchase, isEditMode, o
         })
     }
 
+    const setAutopurchasePriority = (priority) => {
+        if(isEditMode && autopurchase) {
+            const newAutopurchase = cloneDeep(autopurchase);
+            newAutopurchase.priority = priority;
+            setAutopurchase(newAutopurchase);
+            setChanged(true);
+        }
+    }
+
     const saveAutopurchase = () => {
-        sendData('save-shop-resource-settings', { id: item.id, autopurchase })
+        if(category === 'courses') {
+            sendData('save-course-automation', { id: item.id, automation: autopurchase })
+        } else {
+            sendData('save-shop-resource-settings', { id: item.id, autopurchase })
+        }
     }
 
     if(currentTourId === 'inventory' && itemId === 'inventory_brightleaf') {
@@ -775,13 +793,26 @@ export const ItemDetails = ({itemId, category, editId, onPurchase, isEditMode, o
                         {autopurchaseDisplayed ? (
                             <div className={'autoconsume-setting block'}>
                                     <div className={'rules-header flex-container'}>
-                                        <p>Autopurchase rules: {autopurchaseDisplayed?.rules?.length ? null : 'None'}</p>
+                                        <p>{category === 'courses' ? 'Course automation rules' : 'Autopurchase rules'}: {autopurchaseDisplayed?.rules?.length ? null : 'None'}</p>
                                         <label>
                                             <input type={'checkbox'} checked={autopurchaseDisplayed?.isEnabled ?? undefined} onChange={toggleAutopurchase}/>
                                             {autopurchaseDisplayed?.isEnabled ? ' ON' : ' OFF'}
                                         </label>
                                         {isEditMode ? (<button onClick={addAutopurchaseRule}>Add rule (AND)</button>) : null}
                                     </div>
+                                    
+                                    {/* Priority field for courses only */}
+                                    {category === 'courses' ? (
+                                        <div className={'priority-line flex-container'}>
+                                            <p>Priority: </p>
+                                            {isEditMode ? (
+                                                <input type={'number'} value={autopurchaseDisplayed?.priority || 0}
+                                                       onChange={e => setAutopurchasePriority(+(e.target.value || 0))}/>
+                                            ) : (
+                                                <span>{autopurchaseDisplayed?.priority || 0}</span>
+                                            )}
+                                        </div>
+                                    ) : null}
 
                                     <RulesList
                                         prefix={'autopurchase'}
@@ -794,16 +825,21 @@ export const ItemDetails = ({itemId, category, editId, onPurchase, isEditMode, o
                                         setPattern={setAutopurchasePattern}
                                         isAutoCheck={autopurchaseDisplayed?.isEnabled}
                                     />
-                                    <div className={'autoconsume-amount flex-container'}>
-                                        <p>Reserved Coins:</p>
-                                        {isEditMode ? <input type={'number'} onChange={e => setReservedCoinsValue(+e.target.value)}
-                                                            value={autopurchaseDisplayed?.reserved || 0}/> : <span>{formatValue(autopurchaseDisplayed?.reserved || 0)}</span>}
-                                    </div>
-                                    <div className={'autoconsume-amount flex-container'}>
-                                        <p>Purchase Mult:</p>
-                                        {isEditMode ? <input type={'number'} onChange={e => setPurchaseMultiplierValue(Math.max(+(e.target.value ?? 1), 1))}
-                                                            value={autopurchaseDisplayed?.purchaseMultiplier || 1}/> : <span>{formatValue(autopurchaseDisplayed?.purchaseMultiplier || 1)}</span>}
-                                    </div>
+                                    {/* Show these fields only for non-courses */}
+                                    {category !== 'courses' ? (
+                                        <>
+                                            <div className={'autoconsume-amount flex-container'}>
+                                                <p>Reserved Coins:</p>
+                                                {isEditMode ? <input type={'number'} onChange={e => setReservedCoinsValue(+e.target.value)}
+                                                                    value={autopurchaseDisplayed?.reserved || 0}/> : <span>{formatValue(autopurchaseDisplayed?.reserved || 0)}</span>}
+                                            </div>
+                                            <div className={'autoconsume-amount flex-container'}>
+                                                <p>Purchase Mult:</p>
+                                                {isEditMode ? <input type={'number'} onChange={e => setPurchaseMultiplierValue(Math.max(+(e.target.value ?? 1), 1))}
+                                                                    value={autopurchaseDisplayed?.purchaseMultiplier || 1}/> : <span>{formatValue(autopurchaseDisplayed?.purchaseMultiplier || 1)}</span>}
+                                            </div>
+                                        </>
+                                    ) : null}
                                 </div>
                         ) : null}
                     </div>
@@ -881,3 +917,65 @@ export const GeneralStats = ({ category, setDetailVisible }) => {
         </PerfectScrollbar>
     )
 }
+
+const CoursesAutomationPanel = () => {
+    const worker = useContext(WorkerContext);
+    const { onMessage, sendData } = useWorkerClient(worker);
+    const [automationEnabled, setAutomationEnabled] = useState(false);
+    const [autotriggerIntervalSetting, setAutotriggerIntervalSetting] = useState(10);
+    const [automationUnlocked, setAutomationUnlocked] = useState(false);
+
+    useEffect(() => {
+        sendData('query-courses-automation-settings', {});
+        sendData('query-unlocks', {});
+    }, []);
+
+    onMessage('courses-automation-settings', (data) => {
+        setAutomationEnabled(data.automationEnabled || false);
+        setAutotriggerIntervalSetting(data.autotriggerIntervalSetting || 10);
+    });
+
+    onMessage('unlocks', (unlocks) => {
+        setAutomationUnlocked(unlocks.courses || false);
+    });
+
+    const toggleAutomation = useCallback(() => {
+        const newEnabled = !automationEnabled;
+        setAutomationEnabled(newEnabled);
+        sendData('set-courses-automation-enabled', { enabled: newEnabled });
+    }, [automationEnabled]);
+
+    const changeAutomationInterval = useCallback((interval) => {
+        setAutotriggerIntervalSetting(interval);
+        sendData('set-courses-automation-interval', { interval });
+    }, []);
+
+    if (!automationUnlocked) return null;
+
+    return (
+        <div className={'panel-col courses-automation-panel flex-container'}>
+            <div className={'automation-enabled panel-col'}>
+                <label>
+                    <input type={'checkbox'} checked={!!automationEnabled} onChange={toggleAutomation}/>
+                    Courses automation enabled
+                </label>
+            </div>
+            <div className={'panel-col automation-interval'}>
+                <label>
+                    Switch courses interval:
+                    <select onChange={e => changeAutomationInterval(+e.target.value)} value={autotriggerIntervalSetting}>
+                        <option value={2}>2 seconds</option>
+                        <option value={5}>5 seconds</option>
+                        <option value={10}>10 seconds</option>
+                        <option value={30}>30 seconds</option>
+                        <option value={60}>1 minute</option>
+                        <option value={300}>5 minutes</option>
+                        <option value={900}>15 minutes</option>
+                        <option value={1800}>30 minutes</option>
+                        <option value={3600}>1 hour</option>
+                    </select>
+                </label>
+            </div>
+        </div>
+    );
+};

@@ -2627,7 +2627,7 @@ export const registerShopItemsStage1 = () => {
     })
 
     // Unlock courses reducing crafting and alchemy upkeeps
-    /* gameEntity.registerGameEntity('shop_item_advanced_training', {
+    gameEntity.registerGameEntity('shop_item_advanced_training', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Advanced Training',
         description: 'Learn best practices from best masters. Unlocks new reductive courses',
@@ -2654,7 +2654,7 @@ export const registerShopItemsStage1 = () => {
         })
     })
 
-
+/*
     gameEntity.registerGameEntity('shop_item_advanced_cartography', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Advanced Cartography',
@@ -3560,6 +3560,42 @@ export const registerShopItemsStage1 = () => {
                 B: 750000000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 1
             },
+        }),
+    })
+
+    // Elemental Resonance — unlocks Earth and Air Resonators
+    gameEntity.registerGameEntity('shop_item_elemental_resonance', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Elemental Resonance',
+        description: 'Unlocks the ability to create elemental resonators that enhance magical amplifiers.',
+        level: 0,
+        maxLevel: 1,
+        unlockedBy: [{ type: 'effect', id: 'attribute_magic_ability', level: 40000 }],
+        unlockCondition: () => true,
+        attributes: { isCollectable: false },
+        resourceModifier: {},
+        get_cost: () => ({
+            'inventory_air': { A: 1, B: 20000, type: 1 },
+            'inventory_earth': { A: 1, B: 20000, type: 1 },
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_arcane_sanctum', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Arcane Sanctum',
+        description: 'Unlocks the construction of magical buildings: Magic Library and Magic Globe. These structures provide powerful bonuses to artifact scroll efficiency and expedition experience.',
+        level: 0,
+        maxLevel: 1,
+        unlockedBy: [{ type: 'effect', id: 'attribute_magic_ability', level: 50000 }],
+        unlockCondition: () => true,
+        attributes: { isCollectable: false },
+        resourceModifier: {},
+        get_cost: () => ({
+            'coins': {
+                A: 1,
+                B: 1.e+12*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
         }),
     })
 

@@ -3,6 +3,7 @@ import {GameModule} from "../../shared/game-module";
 import {charismaMod, registerShopItemsStage1} from "./shop-db";
 import {sellPriceMod} from "../inventory/inventory-items-db";
 import {registerCourseItemsStage1} from "./courses-db";
+import {checkMatchingRules} from "../../shared/utils/rule-utils";
 
 export class CoursesModule extends GameModule {
 
@@ -12,14 +13,37 @@ export class CoursesModule extends GameModule {
         this.leveledId = null;
         this.purchaseMultiplier = 1;
         this.runningCourse = null;
+        
+        // Automation fields
+        this.coursesAutotrigger = [];
+        this.automationEnabled = true;
+        this.autotriggerCD = 0;
+        this.autotriggerIntervalSetting = 10;
         this.eventHandler.registerHandler('set-course-autopurchase', ({ id, flag }) => {
-            const entities = gameEntity.listEntitiesByTags(['course']).filter(one => one.isUnlocked && !one.isCapped);
-            entities.forEach(e => {
-                if(!id || id === e.id) {
-                    this.autoPurchase[e.id] = flag;
-                }
-            })
+            if(this.courses[id]) {
+                this.courses[id].automation.isEnabled = flag;
+            }
             this.sendItemsData();
+        })
+        
+        this.eventHandler.registerHandler('save-course-automation', ({ id, automation }) => {
+            if(this.courses[id]) {
+                this.courses[id].automation = automation;
+                this.regenerateCoursesPriorityMap();
+            }
+            this.sendItemsData();
+        })
+        
+        this.eventHandler.registerHandler('set-courses-automation-enabled', ({ enabled }) => {
+            this.automationEnabled = enabled;
+        })
+        
+        this.eventHandler.registerHandler('set-courses-automation-interval', ({ interval }) => {
+            this.autotriggerIntervalSetting = interval;
+        })
+        
+        this.eventHandler.registerHandler('query-courses-automation-settings', () => {
+            this.sendAutomationSettings();
         })
         this.eventHandler.registerHandler('run-course', (payload) => {
             this.runCourse(payload.id);
@@ -43,6 +67,29 @@ export class CoursesModule extends GameModule {
 
         registerCourseItemsStage1();
 
+    }
+
+    regenerateCoursesPriorityMap() {
+        const coursesBeingAutotrigger = Object.entries(this.courses)
+            .filter(([id, course]) => course.automation?.isEnabled)
+            .filter(([id, course]) => {
+                return gameEntity.isEntityUnlocked(id);
+            });
+
+        this.coursesAutotrigger = coursesBeingAutotrigger.map(([id, course]) => ({
+            id: id,
+            priority: course.automation.priority ?? 0,
+        })).sort((a, b) => a.priority - b.priority);
+    }
+
+    getAutotriggerCourse() {
+        for(const course of this.coursesAutotrigger) {
+            const courseData = this.courses[course.id];
+            if(checkMatchingRules(courseData.automation.rules, courseData.automation.pattern)) {
+                return course.id;
+            }
+        }
+        return null;
     }
 
     getDuration(id) {
@@ -78,12 +125,30 @@ export class CoursesModule extends GameModule {
             }
         }
 
+        // Automation logic
+        if(game.ticksAfterLoad < 2) {
+            this.regenerateCoursesPriorityMap();
+        }
+        
+        if(this.automationEnabled && this.coursesAutotrigger.length && this.autotriggerCD <= 0) {
+            this.autotriggerCD = this.autotriggerIntervalSetting || 10;
+            const autotriggerCourse = this.getAutotriggerCourse();
+            
+            if(autotriggerCourse && this.runningCourse !== autotriggerCourse) {
+                this.runCourse(autotriggerCourse);
+            }
+        }
+        
+        this.autotriggerCD -= delta;
+
     }
 
     save() {
         return {
             courses: this.courses,
             runningCourse: this.runningCourse,
+            automationEnabled: this.automationEnabled,
+            autotriggerIntervalSetting: this.autotriggerIntervalSetting,
         }
     }
 
@@ -110,6 +175,9 @@ export class CoursesModule extends GameModule {
             this.runCourse(saveObject.runningCourse);
         }
 
+        this.automationEnabled = saveObject?.automationEnabled || false;
+        this.autotriggerIntervalSetting = saveObject?.autotriggerIntervalSetting || 10;
+
         this.sendItemsData();
     }
 
@@ -123,6 +191,12 @@ export class CoursesModule extends GameModule {
             level: gameEntity.getLevel(itemId),
             progress: course.progress,
             autoResume: course.autoResume,
+            automation: course.automation || {
+                isEnabled: false,
+                priority: 0,
+                rules: [],
+                pattern: ''
+            }
         }
     }
 
@@ -197,6 +271,7 @@ export class CoursesModule extends GameModule {
                 efficiency: gameEntity.entityExists(`learning_${entity.id}`) ? gameEntity.getEntityEfficiency(`learning_${entity.id}`) : 1,
                 toNext: gameEntity.entityExists(`learning_${entity.id}`) ? (this.getDuration(entity.id) - this.courses[entity.id]?.progress)/(gameEntity.getEntityEfficiency(`learning_${entity.id}`) + 1.e-8) : 0,
                 isFavorite: favoritesModule ? favoritesModule.isFavorite('courses', entity.id) : false,
+                automation: this.courses[entity.id]?.automation
             })),
         }
     }
@@ -204,6 +279,13 @@ export class CoursesModule extends GameModule {
     sendItemsData() {
         const data = this.getItemsData();
         this.eventHandler.sendData('course-data', data);
+    }
+
+    sendAutomationSettings() {
+        this.eventHandler.sendData('courses-automation-settings', {
+            automationEnabled: this.automationEnabled,
+            autotriggerIntervalSetting: this.autotriggerIntervalSetting
+        });
     }
 
     getItemDetails(id) {
@@ -225,6 +307,13 @@ export class CoursesModule extends GameModule {
             isRunning: gameEntity.entityExists(`learning_${entity.id}`),
             learningEffects: resourceApi.unpackEffects(entity.learningEntity.resourceModifier || {}, entity.level),
             entityEfficiency: gameEntity.entityExists(`learning_${entity.id}`) ? gameEntity.getEntityEfficiency(`learning_${entity.id}`) : 1,
+            autopurchase: this.courses[entity.id]?.automation || {
+                isEnabled: false,
+                priority: 0,
+                rules: [],
+                pattern: ''
+            },
+            isAutomationUnlocked: true, // TODO: get from actual unlock system
         }
 
         if(entityData.entityEfficiency < 1) {

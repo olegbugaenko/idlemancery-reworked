@@ -574,7 +574,7 @@ export const registerSkillsStage1 = () => {
             multiplier: {
                 effects: {
                     'mental_training_learning_rate': {
-                        A: 0.1,
+                        A: 0.25,
                         B: 1,
                         type: 0,
                     }
@@ -621,7 +621,7 @@ export const registerSkillsStage1 = () => {
             multiplier: {
                 effects: {
                     'physical_training_learn_speed': {
-                        A: 0.1,
+                        A: 0.25,
                         B: 1,
                         type: 0,
                     }

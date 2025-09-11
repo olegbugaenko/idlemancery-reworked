@@ -35,11 +35,13 @@ const SkillTree = () => {
         currentEffects: [],
         drafts: []
     });
+    const [unlocks, setUnlocks] = useState({});
 
     const [detailsShown, setDetailsShown] = useState(null);
 
     useEffect(() => {
         sendData('query-skills-data', {});
+        sendData('query-unlocks', {});
         /*const interval = setInterval(() => {
             sendData('query-skills-data', {});
         }, 100);
@@ -50,6 +52,10 @@ const SkillTree = () => {
 
     onMessage('skills-data', (skills) => {
         setSkillsData(skills);
+    })
+
+    onMessage('unlocks', (unlocks) => {
+        setUnlocks(unlocks);
     })
 
     onMessage('import-skill-draft-error', data => {
@@ -245,6 +251,11 @@ const SkillTree = () => {
                 <TippyWrapper content={(<div className={'hint-popup'}><BreakDown breakDown={skillsData.sp.breakDown} /> </div> )}>
                     <div>
                         Skill points available: {skillsData.sp.total} / {skillsData.sp.max}
+                        {unlocks.amnesia && (
+                            <span className="amnesia-hint" style={{marginLeft: '40px', fontSize: '14px', color: '#cfc'}}>
+                                Craft and drink Amnesia Potion to redistribute skill points
+                            </span>
+                        )}
                     </div>
                 </TippyWrapper>
                 {skillsData.isEditMode ? (<div className={'buttons'}>

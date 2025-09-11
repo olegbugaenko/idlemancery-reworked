@@ -6,6 +6,12 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+            <h3>Idle Awakening v0.2.1</h3>
+                <div className={'features'}>
+                    <p>Added new content</p>
+                    <p>Added automation for courses</p>
+                    <p>Added some additional informations and in-game explanations</p>
+                </div>
                 <h3>Idle Awakening v0.2.0g</h3>
                 <div className={'features'}>
                     <p>Fixed bug where ui didn't updated properly on spell level change</p>

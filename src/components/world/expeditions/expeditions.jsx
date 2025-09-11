@@ -341,9 +341,14 @@ const ExpeditionDetails = ({ expedition, isEditing, isChanged, onChangeLevel, on
                     <div className="block">
                         <p>Level: {expedition.level} / {expedition.maxLevel}</p>
                         <div className="progress-section">
-                            <p>XP: {formatValue(expedition.currentXp || 0)} / {formatValue(expedition.requiredXp || 0)}</p>
+                            <div className="flex-container flex-row">
+                                <p>XP: {formatValue(expedition.currentXp || 0)} / {formatValue(expedition.requiredXp || 0)}</p>
+                                {expedition.isRunning && expedition.xpPerSecond > 0 && (
+                                    <p className="xp-rate">XP/sec: {formatValue(expedition.xpPerSecond)}</p>
+                                )}
+                            </div>
                             <ProgressBar 
-                                progress={expedition.requiredXp > 0 ? (expedition.currentXp / expedition.requiredXp) * 100 : 0} 
+                                percentage={expedition.requiredXp > 0 ? (expedition.currentXp / expedition.requiredXp) : 0} 
                                 height={8}
                                 showPercentage={false}
                             />

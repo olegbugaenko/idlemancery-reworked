@@ -789,7 +789,7 @@ export class MageModule extends GameModule {
         /*if(!this.bankedTime?.current) {
             this.bankedTime.current = 3600*5.72*1000;
         }*/
-        this.bankedTime.current = 3600*15.72*1000;
+        // this.bankedTime.current = 3600*15.72*1000;
         this.tourStatus = obj?.tourStatus;
 
         if(!this.skillUpgrades) {

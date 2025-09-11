@@ -911,4 +911,120 @@ export const registerStructuresStage1 = () => {
             'living_space': { A: 0, B: 2, type: 0 },
         }),
     })
+
+    registerStructure('structure_magic_library', {
+        tags: ["structure", "upgrade", "purchaseable", "magical", "education"],
+        name: 'Magic Library',
+        description: 'A mystical library filled with ancient scrolls and magical tomes. Enhances the effectiveness of artifact scroll accessories.',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_arcane_sanctum') > 0;
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'artifact_scroll_efficiency': {
+                        A: 0.08,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 2,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            },
+            effectDeps: ['artifact_scroll_efficiency']
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1.5,
+                B: 500000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'inventory_stone_brick': {
+                A: 1.5,
+                B: 1600,
+                type: 1
+            },
+            'inventory_wooden_beam': {
+                A: 1.5,
+                B: 2500,
+                type: 1
+            },
+            'inventory_enchanted_paper': {
+                A: 1.5,
+                B: 1250,
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 2,
+                type: 0
+            }
+        }),
+    })
+
+    registerStructure('structure_magic_globe', {
+        tags: ["structure", "upgrade", "purchaseable", "magical", "expedition"],
+        name: 'Magic Globe',
+        description: 'A large magical interactive globe with secret locations marked on it. Increases the rate of experience gained from expeditions.',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_arcane_sanctum') > 0;
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'expedition_xp_rate': {
+                        A: 0.2,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 2,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            },
+            effectDeps: ['expedition_xp_rate']
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1.5,
+                B: 750000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'inventory_red_ink': {
+                A: 1.5,
+                B: 450,
+                type: 1
+            },
+            'inventory_wooden_beam': {
+                A: 1.5,
+                B: 1750,
+                type: 1
+            },
+            'inventory_iron_plate': {
+                A: 1.5,
+                B: 1250,
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 2,
+                type: 0
+            }
+        }),
+    })
 }
