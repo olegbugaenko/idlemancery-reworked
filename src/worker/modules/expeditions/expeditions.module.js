@@ -147,6 +147,8 @@ export class ExpeditionsModule extends GameModule {
             });
         }
 
+        console.log('loot: ', gameEffects.getEffectValue('expedition_resource_amount'), lootResults);
+
         return lootResults;
     }
 

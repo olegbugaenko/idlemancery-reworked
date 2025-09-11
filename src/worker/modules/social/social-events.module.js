@@ -129,6 +129,8 @@ export class EventsModule extends GameModule {
             unlockedBy: undefined,
         });
 
+        gameEntity.setEntityLevel(`active_${eventId}`, 1);
+
         this.sendEventsData();
 
         return { success: true, message: 'Event started successfully' };

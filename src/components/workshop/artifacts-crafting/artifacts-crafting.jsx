@@ -47,10 +47,17 @@ export const ArtifactsCrafting = ({ children }) => {
     }, [sendData, onMessage, removeMessage]);
 
     const handleMaterialClick = (materialId) => {
-        // Find first empty slot
-        const emptySlotIndex = slots.findIndex(slot => !slot || slot.isEmpty);
-        if (emptySlotIndex !== -1) {
-            sendData('place-material', { slotIndex: emptySlotIndex, materialId });
+        // Check if material is already in a slot
+        const existingSlotIndex = slots.findIndex(slot => slot && !slot.isEmpty && slot.materialId === materialId);
+        if (existingSlotIndex !== -1) {
+            // Remove material from slot
+            sendData('remove-material', { slotIndex: existingSlotIndex });
+        } else {
+            // Find first empty slot and add material
+            const emptySlotIndex = slots.findIndex(slot => !slot || slot.isEmpty);
+            if (emptySlotIndex !== -1) {
+                sendData('place-material', { slotIndex: emptySlotIndex, materialId });
+            }
         }
     };
 

@@ -654,5 +654,29 @@ export const registerCommomEffects = () => {
         hasCap: false,
     })
 
+    gameEffects.registerEffect('machinery_efficiency', {
+        name: 'Machinery Efficiency',
+        defaultValue: 1.,
+        minValue: 1,
+        description: 'Increases efficiency of all machinery',
+        saveBalanceTree: true,
+    })
+
+    gameEffects.registerEffect('socio_campaign_efficiency', {
+        name: 'Social Campaign Efficiency',
+        defaultValue: 1.,
+        minValue: 1,
+        description: 'Increases efficiency of social events and campaigns',
+        saveBalanceTree: true,
+    })
+
+    gameEffects.registerEffect('accessories_discount', {
+        name: 'Accessories Discount',
+        defaultValue: 1.,
+        minValue: 1,
+        description: 'Discount on all accessories purchases',
+        saveBalanceTree: true,
+    })
+
 
 }

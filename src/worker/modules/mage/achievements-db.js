@@ -377,7 +377,7 @@ export const achievementsDb = [{
         "You, remembering that fish cannot fly in the air and breathe without water, waited until the fish started suffocating and helplessly fell on its side, then cast a spell that evaporated the illusion.",
         "Coming out alive from the building, you caused incredible admiration among those around you."
     ],
-    completeCondition: () => gameEntity.getLevel('action_learn_languages') >= 5000
+    completeCondition: () => gameEntity.getLevel('action_learn_languages') >= 4000
 },{
     id: 'action_pushup_1',
     title: 'Pushup Prodigy (Sort of)',
@@ -448,6 +448,18 @@ export const achievementsDb = [{
         "Well, at least you reached the 1/8 finals, and understood on your own spine that your magic works."
     ],
     completeCondition: () => gameEntity.getLevel('action_pushup') >= 2000
+},{
+    id: 'action_pushup_8',
+    title: 'The Magical Dumbbell Disaster',
+    text: [
+        "Today you decided that your old light dumbbells could still be of some use. So you decided to experiment and cast a spell on them to increase their weight.",
+        "You tried to lift them to make sure the magic worked. You took the dumbbell in your hand and felt unbearable burning in your hand.",
+        "You screamed from unbearable pain and dropped the dumbbell on your foot. Your shoe instantly caught fire.",
+        "You rushed into the nearby stream with screams and curses.",
+        "After thoroughly cursing, you climbed out of the stream and tried to cool the dumbbell, but every bucket of water poured on it just sizzled and evaporated.",
+        "Finally, disappointed and injured, you went to apply burn ointment. Closer to evening, when you saw that the dumbbell wasn't cooling down, you had a brilliant idea - now you don't need to go for firewood or refuel the stove - you have a free heater for warming your potion ingredients!"
+    ],
+    completeCondition: () => gameEntity.getLevel('action_pushup') >= 4000
 },{
     id: 'action_train_endurance',
     title: 'Jogging with a Purpose',
@@ -580,6 +592,22 @@ export const achievementsDb = [{
     ],
     completeCondition: () => gameEntity.getLevel('action_stamina_training') >= 2000
 },{
+    id: 'action_stamina_training_7',
+    title: 'The Marathon Misadventure',
+    text: [
+        "News reached you about a regional marathon taking place in a distant location. Understanding that you couldn't miss this event, you set off on the journey.",
+        "In the evening, after three nights on the road, you found a tavern for lodging, and in the morning, after sleeping, you headed to the starting point.",
+        "Upon arriving, you saw many people, including children who were actively warming up. Suspecting something was wrong, you turned to the announcement board and realized with horror that the adult race was 2 days ago, and today was the children's marathon.",
+        "Disappointed but not broken, you got the idea to organize your own marathon. So you bought a map, a sleeping bag, and decided to walk back.",
+        "Filled with determination, you walked easily and effortlessly, almost without stops until evening. As soon as it got dark, you lit a fire, warmed your favorite herbal tea, and settled into your sleeping bag.",
+        "In the morning you woke up from strange sounds and jolts. Raising your head, you realized that armed men were taking you somewhere. On the way, you learned that you were arrested for 'poaching'. Any attempt to explain that you didn't even have weapons with you ended in nothing.",
+        "So you decided to take a different approach. Waiting for the guard to turn away, you quietly read a spell. The wagon seat began to smoke. One of the guards suddenly cried out in pain 'below the back' and jumped out while moving.",
+        "The frightened horses broke into an uncontrolled gallop. Some of the guards jumped out themselves, others simply fell out.",
+        "Now you, though free, were racing in a burning wagon to nowhere. All you could do was extinguish the wagon with a spell and wait for the tired horses to fall on the grass.",
+        "Reaching the nearest settlement, you learned about a gang operating nearby that, calling themselves guards, kidnaps people demanding ransom. You went to the local city government, and the next day you were participating in a search operation with the guards. By evening, all the familiar faces were already clanking chains in the local dungeon, and the local chief, learning your story, organized a marathon in your honor."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_stamina_training') >= 4000
+},{
     id: 'action_cardio_training_1',
     title: 'The Heart Rate Challenge',
     text: [
@@ -651,6 +679,19 @@ export const achievementsDb = [{
         "The next day you woke up in the hospital. The doctor, without even asking anything, gave you a pill and sent you away with the words: When will you finally kill yourself..."
     ],
     completeCondition: () => gameEntity.getLevel('action_cardio_training') >= 2000
+},{
+    id: 'action_cardio_training_7',
+    title: 'The Ancient Monks Misunderstanding',
+    text: [
+        "You settled into bed in the evening and took up reading a book that a grateful student had once given you for free yoga lessons.",
+        "As it turned out, the book was about ancient monks who for centuries protected their lands, people, and culture from invaders. You were so fascinated by their endurance and strength that you went to the library the next day in search of books about them.",
+        "You found a book describing the monks' way of life, particularly their habit of hardening their spirit and health by walking on hot coals.",
+        "Without hesitation, you lit a fire, burned several trees into charcoal, and carefully crushed it. You stood for a long time, afraid to dare take a step, when you finally decided to gather courage and jumped into it with a running start.",
+        "A moment later you jumped out and fell on the grass, writhing in unbearable pain.",
+        "In the evening you decided to burn the book, but before doing so you decided to open it and read it again. And then you realized that the monks walked not on hot coals, but on enchanted ones. So the difficulties of translation forced you to use a month's supply of balms and healing herbs.",
+        "The next day you went looking for better dictionaries and translation guides."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_cardio_training') >= 4000
 },{
     id: 'action_yoga_practice_1',
     title: 'Breathless Enlightenment',
@@ -1549,6 +1590,19 @@ export const achievementsDb = [{
     ],
     completeCondition: () => {
         return gameEntity.getLevel('action_yoga_practices') >= 2000
+    }
+},{
+    id: 'action_yoga_practices_2',
+    title: 'The Sneezing Catastrophe',
+    text: [
+        "You caught the flu last week, so you weren't feeling well. Even your alchemy skills couldn't help you recover before your scheduled open yoga classes.",
+        "So during the yoga session, you decided to give your body a little help by carefully using magic. However, while performing the next asana, you sneezed while casting the spell.",
+        "You collapsed to the ground like a sack of potatoes, while your students uncontrollably soared into the sky and began levitating.",
+        "It was already deep night when you removed the last student from the roof of the house, who had gotten his pants caught on the gutter under the roof and was helplessly hanging in the air, shouting all the curses he had ever heard.",
+        "It seems like it won't be safe for you to appear on the street anytime soon."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_yoga_practices') >= 4000
     }
 },{
     id: 'event_self_motivation_art_permanent_bonus_1',

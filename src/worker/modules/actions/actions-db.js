@@ -2905,6 +2905,56 @@ export const registerActionsStage1 = () => {
         }
     })
 
+    registerGameAction('action_learn_mechanics', {
+        tags: ["action", "activity", "mental", "book"],
+        name: 'Learn Mechanics',
+        category: ACTION_CATS.MENTAL,
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Study the mechanics guide to understand how to improve machine efficiency. This knowledge increases your ability to maintain and optimize mechanical devices.',
+        level: 1,
+        discountEffects: ['mental_actions_discount'],
+        getLearnRate: () => {
+            return 1
+        },
+        learningEffects: ['books_learning_rate', 'mental_activities_learn_rate'],
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'machinery_efficiency': {
+                        A: 0.002*gameEffects.getEffectValue(getRankId('action_learn_mechanics')),
+                        B: 0.098*gameEffects.getEffectValue(getRankId('action_learn_mechanics')),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 150000,
+                        type: 0,
+                    },
+                    'knowledge': {
+                        A: 0.0,
+                        B: 2000,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['read_books_efficiency']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_mechanics_guide') > 0
+        },
+        attributes: {
+            baseXPCost: 7500000000,
+            isRankAvailable: true,
+            isTraining: true,
+            displayPerLevel: 1,
+        }
+    })
+
     registerGameAction('action_linguistic_practices', {
         tags: ["action", "training", "mental"],
         name: 'Linguistic Drills',

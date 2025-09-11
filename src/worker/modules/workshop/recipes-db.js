@@ -928,6 +928,7 @@ export const registerCraftingRecipes = () => {
     })
 
 
+
     registerCraftingRecipe('craft_perseverance_potion', {
         tags: ["recipe", "crafting", "alchemy", "physical"],
         name: 'Perseverance Potion',
@@ -1119,6 +1120,247 @@ export const registerCraftingRecipes = () => {
         attributes: {
             baseXPCost: 10,
             isRare: true
+        },
+    })
+
+    
+    registerCraftingRecipe('craft_craftmasters_elixir', {
+        tags: ["recipe", "crafting", "alchemy", "physical"],
+        name: 'Craftmaster\'s Elixir',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Create a powerful elixir that permanently enhances crafting capabilities',
+        level: 1,
+        resourceId: 'inventory_craftmasters_elixir',
+        resourceModifier: {
+            get_income: ()=>({
+                resources: {
+                    'inventory_craftmasters_elixir': {
+                        A: 1.0,
+                        B: 0.05*gameEffects.getEffectValue('alchemy_effort')*gameEffects.getEffectValue('alchemy_efficiency'),
+                        type: 1,
+                    }
+                }
+            }),
+            get_consumption: ()=>({
+                resources: {
+                    'inventory_titans_potion': {
+                        A: 1.0,
+                        B: 100*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    },
+                    'inventory_insight_potion': {
+                        A: 1.0,
+                        B: 100*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    },
+                    'health': {
+                        A: 1.0,
+                        B: 50000*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    }
+                }
+            }),
+            effectDeps: ['alchemy_efficiency','alchemy_materials_discount', 'alchemy_effort']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_advanced_alchemy') > 0 && gameResources.isResourceUnlocked('inventory_titans_potion') && gameResources.isResourceUnlocked('inventory_insight_potion')
+        },
+        attributes: {
+            baseXPCost: 50,
+            isRare: true,
+        },
+    })
+
+    registerCraftingRecipe('craft_herbalists_elixir', {
+        tags: ["recipe", "crafting", "alchemy", "physical"],
+        name: 'Herbalist\'s Elixir',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Create a powerful elixir that permanently enhances herb gathering abilities',
+        level: 1,
+        resourceId: 'inventory_herbalists_elixir',
+        resourceModifier: {
+            get_income: ()=>({
+                resources: {
+                    'inventory_herbalists_elixir': {
+                        A: 1.0,
+                        B: 0.05*gameEffects.getEffectValue('alchemy_effort')*gameEffects.getEffectValue('alchemy_efficiency'),
+                        type: 1,
+                    }
+                }
+            }),
+            get_consumption: ()=>({
+                resources: {
+                    'inventory_perseverance_potion': {
+                        A: 1.0,
+                        B: 100*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    },
+                    'inventory_insight_potion': {
+                        A: 1.0,
+                        B: 100*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    },
+                    'energy': {
+                        A: 1.0,
+                        B: 50000*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    }
+                }
+            }),
+            effectDeps: ['alchemy_efficiency','alchemy_materials_discount', 'alchemy_effort']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_advanced_alchemy') > 0 && gameResources.isResourceUnlocked('inventory_perseverance_potion') && gameResources.isResourceUnlocked('inventory_insight_potion')
+        },
+        attributes: {
+            baseXPCost: 50,
+            isRare: true,
+        },
+    })
+
+    registerCraftingRecipe('craft_alchemists_elixir', {
+        tags: ["recipe", "crafting", "alchemy", "mental"],
+        name: 'Alchemist\'s Elixir',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Create a powerful elixir that permanently enhances alchemy effort capacity',
+        level: 1,
+        resourceId: 'inventory_alchemists_elixir',
+        resourceModifier: {
+            get_income: ()=>({
+                resources: {
+                    'inventory_alchemists_elixir': {
+                        A: 1.0,
+                        B: 0.05*gameEffects.getEffectValue('alchemy_effort')*gameEffects.getEffectValue('alchemy_efficiency'),
+                        type: 1,
+                    }
+                }
+            }),
+            get_consumption: ()=>({
+                resources: {
+                    'inventory_mental_potion': {
+                        A: 1.0,
+                        B: 100*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    },
+                    'inventory_insight_potion': {
+                        A: 1.0,
+                        B: 100*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    },
+                    'knowledge': {
+                        A: 1.0,
+                        B: 50000*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    }
+                }
+            }),
+            effectDeps: ['alchemy_efficiency','alchemy_materials_discount', 'alchemy_effort']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_advanced_alchemy') > 0 && gameResources.isResourceUnlocked('inventory_mental_potion') && gameResources.isResourceUnlocked('inventory_insight_potion')
+        },
+        attributes: {
+            baseXPCost: 50,
+            isRare: true,
+        },
+    })
+
+    registerCraftingRecipe('craft_elementalists_elixir', {
+        tags: ["recipe", "crafting", "alchemy", "magical"],
+        name: 'Elementalist\'s Elixir',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Create a powerful elixir that permanently enhances elemental spell efficiency',
+        level: 1,
+        resourceId: 'inventory_elementalists_elixir',
+        resourceModifier: {
+            get_income: ()=>({
+                resources: {
+                    'inventory_elementalists_elixir': {
+                        A: 1.0,
+                        B: 0.05*gameEffects.getEffectValue('alchemy_effort')*gameEffects.getEffectValue('alchemy_efficiency'),
+                        type: 1,
+                    }
+                }
+            }),
+            get_consumption: ()=>({
+                resources: {
+                    'inventory_spirit_potion': {
+                        A: 1.0,
+                        B: 100*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    },
+                    'inventory_insight_potion': {
+                        A: 1.0,
+                        B: 100*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    },
+                    'mana': {
+                        A: 1.0,
+                        B: 50000*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    }
+                }
+            }),
+            effectDeps: ['alchemy_efficiency','alchemy_materials_discount', 'alchemy_effort']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_advanced_alchemy') > 0 && gameResources.isResourceUnlocked('inventory_spirit_potion') && gameResources.isResourceUnlocked('inventory_insight_potion')
+        },
+        attributes: {
+            baseXPCost: 50,
+            isRare: true,
+        },
+    })
+
+    registerCraftingRecipe('craft_diplomats_elixir', {
+        tags: ["recipe", "crafting", "alchemy", "social"],
+        name: 'Diplomat\'s Elixir',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Create a powerful elixir that permanently enhances social campaign efficiency',
+        level: 1,
+        resourceId: 'inventory_diplomats_elixir',
+        resourceModifier: {
+            get_income: ()=>({
+                resources: {
+                    'inventory_diplomats_elixir': {
+                        A: 1.0,
+                        B: 0.05*gameEffects.getEffectValue('alchemy_effort')*gameEffects.getEffectValue('alchemy_efficiency'),
+                        type: 1,
+                    }
+                }
+            }),
+            get_consumption: ()=>({
+                resources: {
+                    'inventory_charisma_potion': {
+                        A: 1.0,
+                        B: 100*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    },
+                    'inventory_insight_potion': {
+                        A: 1.0,
+                        B: 100*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    },
+                    'coins': {
+                        A: 1.0,
+                        B: 50000000*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    }
+                }
+            }),
+            effectDeps: ['alchemy_efficiency','alchemy_materials_discount', 'alchemy_effort']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_advanced_alchemy') > 0 && gameResources.isResourceUnlocked('inventory_charisma_potion') && gameResources.isResourceUnlocked('inventory_insight_potion')
+        },
+        attributes: {
+            baseXPCost: 50,
+            isRare: true,
         },
     })
 

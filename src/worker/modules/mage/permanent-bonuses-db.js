@@ -446,4 +446,124 @@ export const registerPermanentBonuses = () => {
         }
     })*/
 
+    gameEntity.registerGameEntity('rare_craftmasters_elixir_effect', {
+        tags: ["bonus", "permanent", "herbal"],
+        name: 'Craftmaster\'s Elixir',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_advanced_alchemy') > 0;
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'crafting_effort': {
+                        A: 100,
+                        B: 1,
+                        C: 0.05,
+                        type: 5,
+                    }
+                }
+            }
+        }
+    })
+
+    gameEntity.registerGameEntity('rare_herbalists_elixir_effect', {
+        tags: ["bonus", "permanent", "herbal"],
+        name: 'Herbalist\'s Elixir',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_advanced_alchemy') > 0;
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'gathering_herbs_amount': {
+                        A: 100,
+                        B: 1,
+                        C: 0.02,
+                        type: 5,
+                    }
+                }
+            }
+        }
+    })
+
+    gameEntity.registerGameEntity('rare_alchemists_elixir_effect', {
+        tags: ["bonus", "permanent", "herbal"],
+        name: 'Alchemist\'s Elixir',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_advanced_alchemy') > 0;
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'alchemy_effort': {
+                        A: 100,
+                        B: 1,
+                        C: 0.05,
+                        type: 5,
+                    }
+                }
+            }
+        }
+    })
+
+    gameEntity.registerGameEntity('rare_elementalists_elixir_effect', {
+        tags: ["bonus", "permanent", "herbal"],
+        name: 'Elementalist\'s Elixir',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_advanced_alchemy') > 0;
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'elemental_spells_efficiency': {
+                        A: 100,
+                        B: 1,
+                        C: 0.05,
+                        type: 5,
+                    }
+                }
+            }
+        }
+    })
+
+    gameEntity.registerGameEntity('rare_diplomats_elixir_effect', {
+        tags: ["bonus", "permanent", "herbal"],
+        name: 'Diplomat\'s Elixir',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_advanced_alchemy') > 0;
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'socio_campaign_efficiency': {
+                        A: 100,
+                        B: 1,
+                        C: 0.02,
+                        type: 5,
+                    }
+                }
+            }
+        }
+    })
+
 }

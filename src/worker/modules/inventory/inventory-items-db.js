@@ -1547,7 +1547,6 @@ export const registerInventoryItems = () => {
         sellPrice: 522500,
     })
 
-
     registerInventoryItem('inventory_perseverance_potion', {
         name: 'Perseverance Potion',
         hasCap: false,
@@ -1665,6 +1664,153 @@ export const registerInventoryItems = () => {
         },
         sellPrice: 522500,
     })
+
+    
+    registerInventoryItem('inventory_craftmasters_elixir', {
+        name: 'Craftmaster\'s Elixir',
+        hasCap: false,
+        tags: ['inventory', 'consumable', 'potion', 'rare'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+            updateLevelBy('rare_craftmasters_elixir_effect', amount)
+        },
+        getUsageCooldown: () => {
+            return 0.1;
+        },
+        attributes: {
+            isRare: true,
+            entityEffect: 'rare_craftmasters_elixir_effect',
+            allowMultiConsume: true,
+        },
+        resourceModifier: {
+
+        },
+        usageGain: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_advanced_alchemy') > 0
+        },
+        sellPrice: 1500000000,
+    })
+
+    registerInventoryItem('inventory_herbalists_elixir', {
+        name: 'Herbalist\'s Elixir',
+        hasCap: false,
+        tags: ['inventory', 'consumable', 'potion', 'rare'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+            updateLevelBy('rare_herbalists_elixir_effect', amount)
+        },
+        getUsageCooldown: () => {
+            return 0.1;
+        },
+        attributes: {
+            isRare: true,
+            entityEffect: 'rare_herbalists_elixir_effect',
+            allowMultiConsume: true,
+        },
+        resourceModifier: {
+
+        },
+        usageGain: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_advanced_alchemy') > 0
+        },
+        sellPrice: 1500000000,
+    })
+
+    registerInventoryItem('inventory_alchemists_elixir', {
+        name: 'Alchemist\'s Elixir',
+        hasCap: false,
+        tags: ['inventory', 'consumable', 'potion', 'rare'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+            updateLevelBy('rare_alchemists_elixir_effect', amount)
+        },
+        getUsageCooldown: () => {
+            return 0.1;
+        },
+        attributes: {
+            isRare: true,
+            entityEffect: 'rare_alchemists_elixir_effect',
+            allowMultiConsume: true,
+        },
+        resourceModifier: {
+
+        },
+        usageGain: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_advanced_alchemy') > 0
+        },
+        sellPrice: 1500000000,
+    })
+
+    registerInventoryItem('inventory_elementalists_elixir', {
+        name: 'Elementalist\'s Elixir',
+        hasCap: false,
+        tags: ['inventory', 'consumable', 'potion', 'rare'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+            updateLevelBy('rare_elementalists_elixir_effect', amount)
+        },
+        getUsageCooldown: () => {
+            return 0.1;
+        },
+        attributes: {
+            isRare: true,
+            entityEffect: 'rare_elementalists_elixir_effect',
+            allowMultiConsume: true,
+        },
+        resourceModifier: {
+
+        },
+        usageGain: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_advanced_alchemy') > 0
+        },
+        sellPrice: 1500000000,
+    })
+
+    registerInventoryItem('inventory_diplomats_elixir', {
+        name: 'Diplomat\'s Elixir',
+        hasCap: false,
+        tags: ['inventory', 'consumable', 'potion', 'rare'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+            updateLevelBy('rare_diplomats_elixir_effect', amount)
+        },
+        getUsageCooldown: () => {
+            return 0.1;
+        },
+        attributes: {
+            isRare: true,
+            entityEffect: 'rare_diplomats_elixir_effect',
+            allowMultiConsume: true,
+        },
+        resourceModifier: {
+
+        },
+        usageGain: {
+
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_advanced_alchemy') > 0
+        },
+        sellPrice: 1500000000,
+    })
+
 
     // Rare
 

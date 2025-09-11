@@ -290,6 +290,18 @@ export class ShopModule extends GameModule {
                 value: charismaMod(gameEffects.getEffectValue('attribute_charisma'))
             })
         }
+        if(Math.abs(gameEffects.getEffectValue('land_purchase_discount') - 1) > SMALL_NUMBER) {
+            stats.push(gameEffects.getEffect('land_purchase_discount'));
+        }
+        if(Math.abs(gameEffects.getEffectValue('courses_knowledge_discount') - 1) > SMALL_NUMBER) {
+            stats.push(gameEffects.getEffect('courses_knowledge_discount'));
+        }
+        if(Math.abs(gameEffects.getEffectValue('courses_learning_speed') - 1) > SMALL_NUMBER) {
+            stats.push(gameEffects.getEffect('courses_learning_speed'));
+        }
+        if(Math.abs(gameEffects.getEffectValue('reductive_courses_power') - 1) > SMALL_NUMBER) {
+            stats.push(gameEffects.getEffect('reductive_courses_power'));
+        }
 
         this.eventHandler.sendData('general-shop-stats', { stats })
     }

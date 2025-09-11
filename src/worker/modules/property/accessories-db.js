@@ -35,6 +35,8 @@ export const registerAccessory = (id, options) => {
     gameEntity.registerGameEntity(id, options);
 }
 
+export const getAccessoryDiscount = () => gameEffects.getEffectValue('accessories_discount');
+
 export const registerAccessoriesStage1 = () => {
 
     registerAccessory('accessory_wooden_casket', {
@@ -60,7 +62,7 @@ export const registerAccessoriesStage1 = () => {
         get_cost: () => ({
             'inventory_refined_wood': {
                 A: 1.15,
-                B: 1,
+                B: 1/getAccessoryDiscount(),
                 type: 1
             }
         }),
@@ -90,12 +92,12 @@ export const registerAccessoriesStage1 = () => {
         get_cost: () => ({
             'inventory_refined_wood': {
                 A: 1.15,
-                B: 1,
+                B: 1/getAccessoryDiscount(),
                 type: 1
             },
             'knowledge': {
                 A: 1.1,
-                B: 20,
+                B: 20/getAccessoryDiscount(),
                 type: 1
             }
         }),
@@ -125,7 +127,7 @@ export const registerAccessoriesStage1 = () => {
         get_cost: () => ({
             'inventory_refined_wood': {
                 A: 1.15,
-                B: 1,
+                B: 1/getAccessoryDiscount(),
                 type: 1
             }
         }),
@@ -155,12 +157,12 @@ export const registerAccessoriesStage1 = () => {
         get_cost: () => ({
             'inventory_herbal_fibers': {
                 A: 1.15,
-                B: 1,
+                B: 1/getAccessoryDiscount(),
                 type: 1
             },
             'mana': {
                 A: 1.1,
-                B: 3,
+                B: 3/getAccessoryDiscount(),
                 type: 1
             }
         }),
@@ -190,12 +192,12 @@ export const registerAccessoriesStage1 = () => {
         get_cost: () => ({
             'inventory_paper': {
                 A: 1.1,
-                B: 2,
+                B: 2/getAccessoryDiscount(),
                 type: 1
             },
             'mana': {
                 A: 1.1,
-                B: 2,
+                B: 2/getAccessoryDiscount(),
                 type: 1
             }
         }),
@@ -225,17 +227,17 @@ export const registerAccessoriesStage1 = () => {
         get_cost: () => ({
             'inventory_paper': {
                 A: 1.1,
-                B: 2,
+                B: 2/getAccessoryDiscount(),
                 type: 1
             },
             'knowledge': {
                 A: 1.1,
-                B: 2,
+                B: 2/getAccessoryDiscount(),
                 type: 1
             },
             'inventory_aloe_vera': {
                 A: 1.1,
-                B: 20,
+                B: 20/getAccessoryDiscount(),
                 type: 1
             }
         }),
@@ -266,17 +268,17 @@ export const registerAccessoriesStage1 = () => {
         get_cost: () => ({
             'inventory_paper': {
                 A: 1.1,
-                B: 2,
+                B: 2/getAccessoryDiscount(),
                 type: 1
             },
             'inventory_knowledge_moss': {
                 A: 1.1,
-                B: 20,
+                B: 20/getAccessoryDiscount(),
                 type: 1
             },
             'inventory_nightshade': {
                 A: 1.1,
-                B: 12,
+                B: 12/getAccessoryDiscount(),
                 type: 1
             }
         }),
@@ -311,17 +313,17 @@ export const registerAccessoriesStage1 = () => {
         get_cost: () => ({
             'inventory_paper': {
                 A: 1.1,
-                B: 20,
+                B: 20/getAccessoryDiscount(),
                 type: 1
             },
             'inventory_herbal_fibers': {
                 A: 1.1,
-                B: 10,
+                B: 10/getAccessoryDiscount(),
                 type: 1
             },
             'inventory_core_duckweed': {
                 A: 1.1,
-                B: 200,
+                B: 200/getAccessoryDiscount(),
                 type: 1
             }
         }),
@@ -353,17 +355,17 @@ export const registerAccessoriesStage1 = () => {
         get_cost: () => ({
             'inventory_enchanted_paper': {
                 A: 1.1,
-                B: 2,
+                B: 2/getAccessoryDiscount(),
                 type: 1
             },
             'knowledge': {
                 A: 1.1,
-                B: 2,
+                B: 2/getAccessoryDiscount(),
                 type: 1
             },
             'inventory_herbal_fibers': {
                 A: 1.1,
-                B: 20,
+                B: 20/getAccessoryDiscount(),
                 type: 1
             }
         }),
@@ -395,17 +397,17 @@ export const registerAccessoriesStage1 = () => {
         get_cost: () => ({
             'inventory_enchanted_paper': {
                 A: 1.1,
-                B: 2,
+                B: 2/getAccessoryDiscount(),
                 type: 1
             },
             'knowledge': {
                 A: 1.1,
-                B: 2,
+                B: 2/getAccessoryDiscount(),
                 type: 1
             },
             'inventory_nightshade': {
                 A: 1.1,
-                B: 20,
+                B: 20/getAccessoryDiscount(),
                 type: 1
             }
         }),
@@ -435,7 +437,7 @@ export const registerAccessoriesStage1 = () => {
         get_cost: () => ({
             'inventory_ruby': {
                 A: 1.1,
-                B: 1,
+                B: 1/getAccessoryDiscount(),
                 type: 1
             }
         }),
@@ -471,7 +473,7 @@ export const registerAccessoriesStage1 = () => {
         get_cost: () => ({
             'inventory_ruby': {
                 A: 1.1,
-                B: 1,
+                B: 1/getAccessoryDiscount(),
                 type: 1
             }
         }),
@@ -501,7 +503,7 @@ export const registerAccessoriesStage1 = () => {
         get_cost: () => ({
             'inventory_sapphire': {
                 A: 1.1,
-                B: 1,
+                B: 1/getAccessoryDiscount(),
                 type: 1
             }
         }),
@@ -531,7 +533,7 @@ export const registerAccessoriesStage1 = () => {
         get_cost: () => ({
             'inventory_sapphire': {
                 A: 1.1,
-                B: 1,
+                B: 1/getAccessoryDiscount(),
                 type: 1
             }
         }),
@@ -562,7 +564,7 @@ export const registerAccessoriesStage1 = () => {
         get_cost: () => ({
             'inventory_iron_plate': {
                 A: 1.1,
-                B: 1,
+                B: 1/getAccessoryDiscount(),
                 type: 1
             }
         }),
@@ -593,17 +595,17 @@ export const registerAccessoriesStage1 = () => {
         get_cost: () => ({
             'inventory_paper': {
                 A: 1.1,
-                B: 15,
+                B: 15/getAccessoryDiscount(),
                 type: 1
             },
             'inventory_green_ink': {
                 A: 1.1,
-                B: 5,
+                B: 5/getAccessoryDiscount(),
                 type: 1
             },
             'knowledge': {
                 A: 1.1,
-                B: 25,
+                B: 25/getAccessoryDiscount(),
                 type: 1
             }
         }),
@@ -632,17 +634,17 @@ export const registerAccessoriesStage1 = () => {
         get_cost: () => ({
             'inventory_paper': {
                 A: 1.1,
-                B: 15,
+                B: 15/getAccessoryDiscount(),
                 type: 1
             },
             'inventory_green_ink': {
                 A: 1.1,
-                B: 5,
+                B: 5/getAccessoryDiscount(),
                 type: 1
             },
             'mana': {
                 A: 1.1,
-                B: 25,
+                B: 25/getAccessoryDiscount(),
                 type: 1
             }
         }),
@@ -672,17 +674,17 @@ export const registerAccessoriesStage1 = () => {
         get_cost: () => ({
             'inventory_paper': {
                 A: 1.1,
-                B: 150,
+                B: 150/getAccessoryDiscount(),
                 type: 1
             },
             'inventory_red_ink': {
                 A: 1.1,
-                B: 50,
+                B: 50/getAccessoryDiscount(),
                 type: 1
             },
             'inventory_green_ink': {
                 A: 1.1,
-                B: 100,
+                B: 100/getAccessoryDiscount(),
                 type: 1
             },
         }),
@@ -714,17 +716,17 @@ export const registerAccessoriesStage1 = () => {
         get_cost: () => ({
             'inventory_paper': {
                 A: 1.1,
-                B: 150,
+                B: 150/getAccessoryDiscount(),
                 type: 1
             },
             'inventory_red_ink': {
                 A: 1.1,
-                B: 50,
+                B: 50/getAccessoryDiscount(),
                 type: 1
             },
             'knowledge': {
                 A: 1.1,
-                B: 250,
+                B: 250/getAccessoryDiscount(),
                 type: 1
             }
         }),
@@ -756,7 +758,7 @@ export const registerAccessoriesStage1 = () => {
         get_cost: () => ({
             'inventory_paper': {
                 A: 1.1,
-                B: 15,
+                B: 15/getAccessoryDiscount(),
                 type: 1
             },
             'inventory_red_ink': {
@@ -800,17 +802,17 @@ export const registerAccessoriesStage1 = () => {
         get_cost: () => ({
             'inventory_paper': {
                 A: 1.1,
-                B: 150,
+                B: 150/getAccessoryDiscount(),
                 type: 1
             },
             'inventory_red_ink': {
                 A: 1.1,
-                B: 50,
+                B: 50/getAccessoryDiscount(),
                 type: 1
             },
             'knowledge': {
                 A: 1.1,
-                B: 250,
+                B: 250/getAccessoryDiscount(),
                 type: 1
             }
         }),
@@ -843,17 +845,17 @@ export const registerAccessoriesStage1 = () => {
         get_cost: () => ({
             'inventory_obsidian_shard': {
                 A: 1.1,
-                B: 15,
+                B: 15/getAccessoryDiscount(),
                 type: 1
             },
             'inventory_green_ink': {
                 A: 1.1,
-                B: 5,
+                B: 5/getAccessoryDiscount(),
                 type: 1
             },
             'energy': {
                 A: 1.1,
-                B: 25,
+                B: 25/getAccessoryDiscount(),
                 type: 1
             }
         }),
@@ -885,17 +887,17 @@ export const registerAccessoriesStage1 = () => {
         get_cost: () => ({
             'inventory_obsidian_shard': {
                 A: 1.1,
-                B: 15,
+                B: 15/getAccessoryDiscount(),
                 type: 1
             },
             'inventory_sapphire': {
                 A: 1.1,
-                B: 50,
+                B: 50/getAccessoryDiscount(),
                 type: 1
             },
             'energy': {
                 A: 1.1,
-                B: 25,
+                B: 25/getAccessoryDiscount(),
                 type: 1
             }
         }),
@@ -928,17 +930,17 @@ export const registerAccessoriesStage1 = () => {
         get_cost: () => ({
             'inventory_forged_steel': {
                 A: 1.1,
-                B: 2,
+                B: 2/getAccessoryDiscount(),
                 type: 1
             },
             'inventory_red_ink': {
                 A: 1.1,
-                B: 5,
+                B: 5/getAccessoryDiscount(),
                 type: 1
             },
             'energy': {
                 A: 1.1,
-                B: 40,
+                B: 40/getAccessoryDiscount(),
                 type: 1
             }
         }),
@@ -981,12 +983,12 @@ export const registerAccessoriesStage1 = () => {
         get_cost: () => ({
             'inventory_forged_steel': {
                 A: 1.1,
-                B: 2,
+                B: 2/getAccessoryDiscount(),
                 type: 1
             },
             'inventory_refined_wood': {
                 A: 1.1,
-                B: 50,
+                B: 50/getAccessoryDiscount(),
                 type: 1
             }
         }),
@@ -1022,7 +1024,7 @@ export const registerAccessoriesStage1 = () => {
         get_cost: () => ({
             'inventory_paper': {
                 A: 1.1,
-                B: 2000,
+                B: 2000/getAccessoryDiscount(),
                 type: 1
             },
             'inventory_forged_steel': {
@@ -1061,12 +1063,12 @@ export const registerAccessoriesStage1 = () => {
         get_cost: () => ({
             'inventory_amber': {
                 A: 1.5,
-                B: 100,
+                B: 100/getAccessoryDiscount(),
                 type: 1
             },
             'inventory_forged_steel': {
                 A: 1.5,
-                B: 500,
+                B: 500/getAccessoryDiscount(),
                 type: 1
             },
         }),
@@ -1095,12 +1097,12 @@ export const registerAccessoriesStage1 = () => {
         get_cost: () => ({
             'inventory_amber': {
                 A: 1.1,
-                B: 100,
+                B: 100/getAccessoryDiscount(),
                 type: 1
             },
             'inventory_obsidian_shard': {
                 A: 1.1,
-                B: 500,
+                B: 500/getAccessoryDiscount(),
                 type: 1
             },
         }),
@@ -1136,12 +1138,12 @@ export const registerAccessoriesStage1 = () => {
         get_cost: () => ({
             'inventory_enchanted_paper': {
                 A: 1.5,
-                B: 50,
+                B: 50/getAccessoryDiscount(),
                 type: 1
             },
             'inventory_green_ink': {
                 A: 1.5,
-                B: 25,
+                B: 25/getAccessoryDiscount(),
                 type: 1
             },
         }),

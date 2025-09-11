@@ -1,4 +1,4 @@
-import { gameEntity, gameResources } from "game-framework";
+import { gameEntity, gameResources, gameEffects } from "game-framework";
 
 // Helper: build searchable metadata same way as structures
 const getResourceModifierDataSearchable = (rs) => {
@@ -46,11 +46,11 @@ export const registerMachineryStage1 = () => {
             manualLoad: 1,
         },
         resourceModifier: {
-            income: {
+            get_income: () => ({
                 resources: {
-                    'inventory_stone': { A: 0.05, B: 0.0, C: 1.02, type: 3 },
+                    'inventory_stone': { A: 5 * gameEffects.getEffectValue('machinery_efficiency'), B: 0.0, C: 1.02, type: 3 },
                 }
-            },
+            }),
             consumption: {
                 resources: {
                     'inventory_coal': { A: 1.0, B: 0.0, C: 1.02, type: 3 },
@@ -60,6 +60,7 @@ export const registerMachineryStage1 = () => {
             getCustomAmplifier: () => gameEntity.getAttribute('machine_auto_quarry', 'manualLoad') ?? 1,
             customAmplifierApplyTypes: ['resources'],
             customAmplifierApplyScopes: ['income','consumption'],
+            effectDeps: ['machinery_efficiency'],
         },
         get_cost: () => ({
             'inventory_wooden_beam': { A: 1.2, B: 40000, type: 1 },
@@ -81,11 +82,11 @@ export const registerMachineryStage1 = () => {
             manualLoad: 1,
         },
         resourceModifier: {
-            income: {
+            get_income: () => ({
                 resources: {
-                    'inventory_refined_wood': { A: 10.0, B: 0.0, C: 1.02, type: 3 },
+                    'inventory_refined_wood': { A: 10.0 * gameEffects.getEffectValue('machinery_efficiency'), B: 0.0, C: 1.02, type: 3 },
                 }
-            },
+            }),
             consumption: {
                 resources: {
                     'inventory_coal': { A: 1.0, B: 0.0, C: 1.02, type: 3 },
@@ -96,6 +97,7 @@ export const registerMachineryStage1 = () => {
             getCustomAmplifier: () => gameEntity.getAttribute('machine_auto_lumbermill', 'manualLoad') ?? 1,
             customAmplifierApplyTypes: ['resources'],
             customAmplifierApplyScopes: ['income','consumption'],
+            effectDeps: ['machinery_efficiency'],
         },
         get_cost: () => ({
             'inventory_stone_brick': { A: 1.2, B: 20000, type: 1 },

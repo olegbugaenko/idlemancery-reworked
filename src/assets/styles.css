@@ -2631,6 +2631,15 @@ span.highlighted-span.yellow {
     border-bottom: 1px solid #333333;
 }
 
+.breakdown .box .sub-box {
+    border-top: 1px solid #333333;
+    margin-top: 8px;
+}
+
+.breakdown .box .sub-box span {
+    font-size: 15px;
+}
+
 .breakdown .box.unbordered {
     border-bottom: none;
 }

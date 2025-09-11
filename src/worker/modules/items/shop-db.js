@@ -3511,5 +3511,57 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+    gameEntity.registerGameEntity('shop_item_mechanics_guide', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Mechanics Guide',
+        description: 'A comprehensive manual detailing the principles of mechanical engineering and maintenance. Unlock the ability to study mechanical systems and improve machinery efficiency.',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_coal')
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 35000,
+        }],
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2.0,
+                B: 500000000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_advanced_alchemy', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Advanced Alchemy',
+        description: 'Unlock the secrets of creating even more permanent enhancement flasks that provide lasting benefits to your abilities.',
+        level: 0,
+        maxLevel: 1,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 35000
+        }],
+        unlockCondition: () => {
+            return gameEffects.getEffectValue('attribute_patience') >= 35000
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2.0,
+                B: 750000000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+        }),
+    })
+
 
 }

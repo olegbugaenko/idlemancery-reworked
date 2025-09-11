@@ -746,7 +746,7 @@ export const initSpellsDB1 = () => {
         name: 'Conjure Stone',
         description: 'Condense raw earth essence into solid stone.',
         hasCap: false,
-        tags: ['spell', 'magic', 'conjuration_magic', 'elemental'],
+        tags: ['spell', 'magic', 'conjuration_magic'],
         defaultCap: 0,
         isAbstract: true,
         level: 1,
@@ -757,7 +757,7 @@ export const initSpellsDB1 = () => {
                 resources: {
                     inventory_stone: {
                         A: 1.2,
-                        B: 600*gameEffects.getEffectValue('conjuration_spells_efficiency')*gameEffects.getEffectValue('elemental_spells_efficiency'),
+                        B: 600*gameEffects.getEffectValue('conjuration_spells_efficiency'),
                         type: 1,
                     }
                 }
@@ -771,7 +771,7 @@ export const initSpellsDB1 = () => {
                     }
                 }
             }),
-            effectDeps: ['conjuration_spells_efficiency','elemental_spells_efficiency']
+            effectDeps: ['conjuration_spells_efficiency']
         },
         usageGain: {
             get_consumption: () => ({
@@ -799,7 +799,7 @@ export const initSpellsDB1 = () => {
         name: 'Conjure Coal',
         description: 'Compress elemental essence into combustible coal.',
         hasCap: false,
-        tags: ['spell', 'magic', 'conjuration_magic', 'elemental'],
+        tags: ['spell', 'magic', 'conjuration_magic'],
         defaultCap: 0,
         isAbstract: true,
         level: 1,
@@ -810,7 +810,7 @@ export const initSpellsDB1 = () => {
                 resources: {
                     inventory_coal: {
                         A: 1.2,
-                        B: 10*gameEffects.getEffectValue('conjuration_spells_efficiency')*gameEffects.getEffectValue('elemental_spells_efficiency'),
+                        B: 10*gameEffects.getEffectValue('conjuration_spells_efficiency'),
                         type: 1,
                     }
                 }
@@ -824,7 +824,7 @@ export const initSpellsDB1 = () => {
                     }
                 }
             }),
-            effectDeps: ['conjuration_spells_efficiency','elemental_spells_efficiency']
+            effectDeps: ['conjuration_spells_efficiency']
         },
         usageGain: {
             get_consumption: () => ({

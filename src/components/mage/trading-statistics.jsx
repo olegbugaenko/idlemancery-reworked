@@ -83,7 +83,7 @@ const TradingStatistics = () => {
                                         <RawResource id={item.id} name={item.name} />
                                     </div>
                                     <div className="resource-info">
-                                        <span className="resource-name">{item.name} ({formatValue(item.amount)})</span>
+                                        <span className="resource-name">({formatValue(item.amount)})</span>
                                         <span className="resource-total">+ {formatValue(item.totalEarnings)} coins</span>
                                     </div>
                                 </div>

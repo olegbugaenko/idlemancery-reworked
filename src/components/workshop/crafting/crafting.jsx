@@ -90,10 +90,16 @@ export const Crafting = ({ setItemDetails, setItemLevel, filterId, newUnlocks, o
                     <p className={'hint'}>Shows the amount of available effort you can use for crafting.</p>
                     {craftingData.efforts.usingRecipes?.length ? (<div className={'block breakdown'}>
                         <div className={'box unbordered'}>
-                            {craftingData.efforts.usingRecipes.map(one => (<div className={'flex-row flex-container'}>
+                            {craftingData.efforts.usingRecipes.map(one => (<div key={one.name} className={'flex-row flex-container'}>
                                 <span>{one.name}</span>
                                 <span>{formatValue(one.effort*100)}%</span>
                             </div> ))}
+                            <div className="sub-box">
+                                <div className={'flex-row flex-container'}>
+                                    <span>Unused Effort</span>
+                                    <span>{formatValue((1 - craftingData.efforts.usingRecipes.reduce((acc, recipe) => acc + recipe.effort, 0)) * 100)}%</span>
+                                </div>
+                            </div>
                         </div>
                     </div> ) : null}
                     {/*<BreakDown breakDown={craftingData.efforts.breakDown} />*/}

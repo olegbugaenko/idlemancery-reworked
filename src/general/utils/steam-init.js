@@ -7,7 +7,7 @@ const log = str => {
 }
 
 function initSteamIfAvailable() {
-    if (process.env.IS_STEAM_DEMO === '1' && false) {
+    if ( false) {
         try {
             greenworks = require('../../../native/greenworks');
             if (greenworks.init()) {

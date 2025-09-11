@@ -351,12 +351,13 @@ export const registerEventsStage1 = () => {
             get_multiplier: () => ({
                 effects: {
                     courses_learning_speed: {
-                        A: 0.05,
+                        A: 0.05 * gameEffects.getEffectValue('socio_campaign_efficiency'),
                         B: 1,
                         type: 0,
                     }
                 }
-            })
+            }),
+            effectDeps: ['socio_campaign_efficiency']
         },
         get_cost: () => ({
             'coins': { A: 0, B: 2500000000, type: 0 },
@@ -389,16 +390,95 @@ export const registerEventsStage1 = () => {
             get_multiplier: () => ({
                 effects: {
                     gathering_herbs_amount: {
-                        A: 0.04,
+                        A: 0.04* gameEffects.getEffectValue('socio_campaign_efficiency'),
                         B: 1,
                         type: 0,
                     }
                 }
-            })
+            }),
+            effectDeps: ['socio_campaign_efficiency']
         },
         get_cost: () => ({
             'coins': { A: 0, B: 2500000000, type: 0 },
             'inventory_herbal_fibers': { A: 0, B: 20000, type: 0 },
+        })
+    })
+
+    // Charity Auction — boosts accessories discount
+    registerGameSocialEvent('event_charity_auction', {
+        name: 'Amateur Craftsmen Contest',
+        description: 'Organize a hilarious contest where self-proclaimed "master craftsmen" showcase their "innovative" techniques. While judging their questionable methods, you accidentally discover some surprisingly useful tricks that actually reduce material waste when making accessories.',
+        permanentEffect: 'accessories_discount',
+        temporaryEffect: 'accessories_discount',
+        category: 'social',
+        tags: ["socio_campaign", "social"],
+        unlockCondition: () => true,
+        unlockedBy: [{ type: 'effect', id: 'attribute_charisma', level: 40000 }],
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    crafting_efficiency: {
+                        A: 0.25,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+        },
+        permanentResourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    accessories_discount: {
+                        A: 0.01* gameEffects.getEffectValue('socio_campaign_efficiency'),
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['socio_campaign_efficiency']
+        },
+        get_cost: () => ({
+            'coins': { A: 0, B: 5000000000, type: 0 },
+            'inventory_refined_wood': { A: 0, B: 30000, type: 0 },
+        })
+    })
+
+    // Archaeological Excavations — boosts expedition resource amount
+    registerGameSocialEvent('event_archaeological_excavations', {
+        name: 'Archaeological Excavations',
+        description: 'Participate in archaeological excavations to discover ancient artifacts and treasures. Learn about history while finding valuable items.',
+        permanentEffect: 'expedition_resource_amount',
+        temporaryEffect: 'expedition_resource_amount',
+        category: 'exploration',
+        tags: ["socio_campaign", "social"],
+        unlockCondition: () => true,
+        unlockedBy: [{ type: 'effect', id: 'attribute_charisma', level: 40000 }],
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    expedition_resource_amount: {
+                        A: 0.5,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+        },
+        permanentResourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    expedition_resource_amount: {
+                        A: 0.02* gameEffects.getEffectValue('socio_campaign_efficiency'),
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['socio_campaign_efficiency']
+        },
+        get_cost: () => ({
+            'coins': { A: 0, B: 6000000000, type: 0 },
+            'inventory_herbal_fibers': { A: 0, B: 35000, type: 0 },
         })
     })
 } 
