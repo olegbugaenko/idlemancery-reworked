@@ -283,6 +283,7 @@ export class EventsModule extends GameModule {
             id: eventId,
             name: eventEntity.name,
             description: eventEntity.description,
+            tags: eventEntity.tags || [],
             cost: eventEntity.get_cost(),
             category: eventEntity.category,
             duration: eventEntity.attributes.eventDuration,

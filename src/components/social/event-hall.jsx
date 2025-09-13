@@ -348,6 +348,14 @@ export const EventDetails = React.memo(({eventId, setItemDetails}) => {
                     </div>
                 </div>
                 
+                {event.tags && event.tags.length > 0 && (
+                    <div className={'block'}>
+                        <div className={'tags-container'}>
+                            {event.tags.map(tag => (<div key={tag} className={'tag'}>{tag}</div> ))}
+                        </div>
+                    </div>
+                )}
+                
                 {event.affordable ? (<div className={'block'}>
                     <p>Cost:</p>
                     <div className={'costs-wrap'}>
