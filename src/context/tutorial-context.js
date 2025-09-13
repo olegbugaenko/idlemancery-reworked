@@ -3,10 +3,12 @@ import Joyride from 'react-joyride';
 import WorkerContext from "./worker-context";
 import {useWorkerClient} from "../general/client";
 import {tutorials} from "./tutorials";
+import {useModal} from "../general/components/modal/index.jsx";
 
 const TutorialContext = createContext(null);
 
 function MyTooltip({ step, closeProps, primaryProps, isNextAllowed, isLastStep, cantBeRetried }) {
+    const { confirm } = useModal();
 
     const handleSkip = (e) => {
 
@@ -15,9 +17,15 @@ function MyTooltip({ step, closeProps, primaryProps, isNextAllowed, isLastStep, 
                 closeProps.onClick(e);
                 return;
             }
-            if(confirm('Are you sure you want to skip tutorial? If you do so, you won\'t be able to restart it.')) {
-                closeProps.onClick(e);
-            }
+            confirm({
+                title: "Skip Tutorial",
+                message: "Are you sure you want to skip tutorial? If you do so, you won't be able to restart it.",
+                onConfirm: () => {
+                    closeProps.onClick(e);
+                },
+                confirmText: "Skip",
+                cancelText: "Continue"
+            });
         }
     };
 

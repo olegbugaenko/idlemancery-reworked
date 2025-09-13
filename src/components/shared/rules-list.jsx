@@ -179,6 +179,20 @@ const mapCompareType = {
             'exact'
         ],
     },
+    'course_level': {
+        label: 'Course Level',
+        subject: 'course_id',
+        availableConditions: [
+            'less',
+            'less_or_eq',
+            'eq',
+            'grt_or_eq',
+            'grt',
+        ],
+        availableValueTypes: [
+            'exact'
+        ],
+    },
     'spell_running': {
         label: 'Spell Running',
         subject: 'spell_id',
@@ -229,6 +243,7 @@ const RulesList = React.memo(
         const [tags, setTags] = useState([]);
         const [spells, setSpells] = useState([]);
         const [craftingLists, setCraftingLists] = useState([]);
+        const [courses, setCourses] = useState([]);
         const [socialEvents, setSocialEvents] = useState([]);
         const [rulesMatched, setRulesMatched] = useState(null);
         const [unlocks, setUnlocks] = useState();
@@ -241,6 +256,7 @@ const RulesList = React.memo(
             sendData('query-actions-lists', { prefix });
             sendData('query-all-spells', { prefix });
             sendData('query-all-crafting-lists', { prefix });
+            sendData('query-all-courses', { prefix });
             sendData('query-social-events', { prefix });
 
             sendData('query-unlocks', { prefix: `automation-${prefix}`})
@@ -292,6 +308,10 @@ const RulesList = React.memo(
 
         onMessage(`all-crafting-lists-${prefix}`, (payload) => {
             setCraftingLists(payload);
+        })
+
+        onMessage(`all-courses-${prefix}`, (payload) => {
+            setCourses(payload);
         })
 
         onMessage(`social-events-data-${prefix}`, (payload) => {
@@ -347,6 +367,8 @@ const RulesList = React.memo(
                             subjectArray = spells;
                         } else if (subject === 'crafting_list_id') {
                             subjectArray = craftingLists;
+                        } else if (subject === 'course_id') {
+                            subjectArray = courses;
                         } else if (subject === 'event_id') {
                             subjectArray = socialEvents;
                         }

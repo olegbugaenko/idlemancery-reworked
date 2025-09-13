@@ -126,6 +126,7 @@ button.primary-action {
             rgb(35, 40, 50) 100%
     );
     border-color: rgb(40, 80, 110);
+    color: white;
 }
 
 button.primary-action:hover {
@@ -153,6 +154,7 @@ button.warning-action {
             #502110 100%
     );
     border-color: #731;
+    color: white;
 }
 
 button.warning-action:hover {
@@ -4530,4 +4532,94 @@ body::after {
 .flex-container.flex-row {
     justify-content: space-between;
     align-items: center;
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10001;
+}
+
+.modal-content {
+    min-width: 300px;
+    max-width: 500px;
+    margin: 20px;
+    animation: modalSlideIn 0.2s ease-out;
+}
+
+.modal-header {
+    border-bottom: 1px solid #333;
+    padding: 15px 20px;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #fff;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.modal-body p {
+    margin: 0 0 15px 0;
+    color: #ccc;
+    line-height: 1.4;
+}
+
+.modal-input {
+    width: 100%;
+    padding: 8px 12px;
+    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 14px;
+}
+
+.modal-input:focus {
+    outline: none;
+    border-color: #666;
+}
+
+.modal-footer {
+    border-top: 1px solid #333;
+    padding: 15px 20px;
+    gap: 10px;
+}
+
+.modal-footer .flex-container.flex-row {
+    justify-content: flex-end;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
 }

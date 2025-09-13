@@ -20,17 +20,40 @@ export class CoursesModule extends GameModule {
         this.autotriggerCD = 0;
         this.autotriggerIntervalSetting = 10;
         this.eventHandler.registerHandler('set-course-autopurchase', ({ id, flag }) => {
-            if(this.courses[id]) {
-                this.courses[id].automation.isEnabled = flag;
+            if(!this.courses[id]) {
+                this.courses[id] = {
+                    level: gameEntity.getLevel(id),
+                    progress: 0,
+                    autoResume: false,
+                    automation: {
+                        isEnabled: false,
+                        priority: 0,
+                        rules: [],
+                        pattern: ''
+                    }
+                };
             }
+            this.courses[id].automation.isEnabled = flag;
             this.sendItemsData();
         })
         
         this.eventHandler.registerHandler('save-course-automation', ({ id, automation }) => {
-            if(this.courses[id]) {
-                this.courses[id].automation = automation;
-                this.regenerateCoursesPriorityMap();
+            if(!this.courses[id]) {
+                this.courses[id] = {
+                    level: gameEntity.getLevel(id),
+                    progress: 0,
+                    autoResume: false,
+                    automation: {
+                        isEnabled: false,
+                        priority: 0,
+                        rules: [],
+                        pattern: ''
+                    }
+                };
             }
+            console.log('SetAuto: ', id, automation);
+            this.courses[id].automation = automation;
+            this.regenerateCoursesPriorityMap();
             this.sendItemsData();
         })
         
@@ -57,6 +80,10 @@ export class CoursesModule extends GameModule {
 
         this.eventHandler.registerHandler('query-course-details', (payload) => {
             this.sendItemDetails(payload.id)
+        })
+
+        this.eventHandler.registerHandler('query-all-courses', (payload) => {
+            this.sendAllCoursesData(payload.prefix);
         })
 
 
@@ -117,6 +144,7 @@ export class CoursesModule extends GameModule {
                         progress: 0,
                         level: this.courses[this.runningCourse].level + 1,
                         autoResume: this.courses[this.runningCourse].autoResume,
+                        automation: this.courses[this.runningCourse].automation,
                     },
                     true
                 );
@@ -326,6 +354,18 @@ export class CoursesModule extends GameModule {
     sendItemDetails(id) {
         const data = this.getItemDetails(id);
         this.eventHandler.sendData('item-details', data);
+    }
+
+    sendAllCoursesData(prefix) {
+        const courses = gameEntity.listEntitiesByTags(['course'])
+            .map(entity => ({
+                id: entity.id,
+                name: entity.name,
+                level: this.courses[entity.id]?.level || 0,
+                isUnlocked: gameEntity.isEntityUnlocked(entity.id)
+            }));
+        
+        this.eventHandler.sendData(`all-courses-${prefix}`, courses);
     }
 
 

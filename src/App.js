@@ -11,6 +11,7 @@ import './assets/styles.css';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 import {DndProvider} from "./custom-libs/dnd/index.js";
 import WorkerContext from "./context/worker-context.js";
+import {ModalProvider} from "./general/components/modal/index.jsx";
 
 function App() {
     const worker = window.worker || new Worker();
@@ -85,11 +86,13 @@ function App() {
                 <SoundProvider>
                     <TutorialProvider>
                         <TippyProvider>
-                            <DndProvider>
-                                <div className="App">
-                                    <Main readyToGo={readyToGo} isLoading={isLoading}/>
-                                </div>
-                            </DndProvider>
+                            <ModalProvider>
+                                <DndProvider>
+                                    <div className="App">
+                                        <Main readyToGo={readyToGo} isLoading={isLoading}/>
+                                    </div>
+                                </DndProvider>
+                            </ModalProvider>
                         </TippyProvider>
                     </TutorialProvider>
                 </SoundProvider>

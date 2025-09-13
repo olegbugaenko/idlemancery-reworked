@@ -1027,4 +1027,70 @@ export const registerStructuresStage1 = () => {
             }
         }),
     })
+
+
+
+    registerStructure('structure_coal_refinery', {
+        tags: ["structure", "upgrade", "purchaseable", "industrial", "refinery"],
+        name: 'Coal Refinery',
+        description: 'An advanced industrial facility that processes coal more efficiently. Reduces coal consumption by all machinery and industrial equipment.',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_industrial_revolution') > 0;
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'coal_consumption_discount': {
+                        A: 0.15,
+                        B: 1,
+                        C: 1.02,
+                        type: 3,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 5,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            },
+            effectDeps: ['coal_consumption_discount']
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1.25,
+                B: 2000000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'inventory_stone_brick': {
+                A: 1.25,
+                B: 200000,
+                type: 1
+            },
+            'inventory_forged_steel': {
+                A: 1.25,
+                B: 50000,
+                type: 1
+            },
+            'inventory_wooden_beam': {
+                A: 1.25,
+                B: 300000,
+                type: 1
+            },
+            'inventory_coal': {
+                A: 1.25,
+                B: 1000,
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 5,
+                type: 0
+            }
+        }),
+    })
 }

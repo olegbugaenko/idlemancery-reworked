@@ -2654,7 +2654,7 @@ export const registerShopItemsStage1 = () => {
         })
     })
 
-/*
+
     gameEntity.registerGameEntity('shop_item_advanced_cartography', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Advanced Cartography',
@@ -2676,7 +2676,7 @@ export const registerShopItemsStage1 = () => {
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_patience',
-            level: 60000
+            level: 50000
         }],
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_cartography') > 0
@@ -2693,7 +2693,7 @@ export const registerShopItemsStage1 = () => {
             }
         }),
     })
-
+/*
     gameEntity.registerGameEntity('shop_item_advanced_negotiations', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Advanced Negotiations',
@@ -3594,6 +3594,44 @@ export const registerShopItemsStage1 = () => {
             'coins': {
                 A: 1,
                 B: 1.e+12*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_industrial_revolution', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Advanced Machinery',
+        description: 'Unlocks the construction of automated mining machines: Automatic Ore Mine and Automatic Clay Mine. These machines provide continuous resource production.',
+        level: 0,
+        maxLevel: 1,
+        unlockedBy: [{ type: 'effect', id: 'attribute_strength', level: 50000 }],
+        unlockCondition: () => true,
+        attributes: { isCollectable: false },
+        resourceModifier: {},
+        get_cost: () => ({
+            'coins': {
+                A: 1,
+                B: 2.e+12*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_manufacturing_revolution', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Manufacturing Revolution',
+        description: 'Unlocks advanced manufacturing machines: Automated Papermill and Automated Brickworks. These machines automate the production of essential materials.',
+        level: 0,
+        maxLevel: 1,
+        unlockedBy: [{ type: 'effect', id: 'attribute_strength', level: 60000 }],
+        unlockCondition: () => true,
+        attributes: { isCollectable: false },
+        resourceModifier: {},
+        get_cost: () => ({
+            'coins': {
+                A: 1,
+                B: 3.e+12*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 0
             }
         }),

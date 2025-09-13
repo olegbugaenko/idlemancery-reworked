@@ -18,6 +18,7 @@ import {SearchField} from "../shared/search-field.jsx";
 import {useAppContext} from "../../context/ui-context";
 import {PinResource} from "../shared/pin-resource.jsx";
 import {CustomButton} from "../shared/buttons/custom-button.jsx";
+import {useModal} from "../../general/components/modal/index.jsx";
 import {HowToSign} from "../shared/how-to-sign.jsx";
 import {useTutorial} from "../../context/tutorial-context";
 import {playSound} from "../../context/sounds/sound-manager";
@@ -45,6 +46,7 @@ export const Inventory = ({}) => {
     const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
 
     const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
+    const { confirm } = useModal();
     const [inventoryData, setItemsData] = useState({
         available: [],
         current: undefined,
@@ -185,9 +187,27 @@ export const Inventory = ({}) => {
         if(id) {
             if(detailOpenedId && isChanged) {
                 console.log('detOpenedId: ', detailOpenedId, id);
-                if(!confirm(`This will discard all your changes to ${detailOpenedId.name}. Are you sure`)) {
-                    return;
-                }
+                confirm({
+                    title: "Switch Item",
+                    message: `You have unsaved changes to ${detailOpenedId.name}. Do you want to continue to the new item (losing current changes) or stay here?`,
+                    onConfirm: () => {
+                        // Continue with the action - discard changes and proceed
+                        setEditData(null);
+                        setViewedOpenedId(null);
+                        setDetailOpenedId({id, name});
+                        setChanged(false);
+                        if(detailOpenedId !== id) {
+                            playSound('click');
+                        }
+                    },
+                    onCancel: () => {
+                        // User cancelled - stay in edit mode for current item
+                        // Do nothing, just return
+                    },
+                    confirmText: "Continue",
+                    cancelText: "Stay Here"
+                });
+                return;
             }
             setEditData(null);
             setViewedOpenedId(null);

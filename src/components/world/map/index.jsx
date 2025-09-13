@@ -12,6 +12,7 @@ import StatRow from "../../shared/stat-row.jsx";
 import {useAppContext} from "../../../context/ui-context";
 import {useTutorial} from "../../../context/tutorial-context";
 import {TippyWrapper} from "../../shared/tippy-wrapper.jsx";
+import {useModal} from "../../../general/components/modal/index.jsx";
 
 export const MapWrap = ({ children }) => {
 
@@ -449,6 +450,7 @@ export const GeneralStats = ({ setDetailVisible }) => {
     const { isMobile } = useAppContext();
 
     const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
+    const { confirm } = useModal();
 
     useEffect(() => {
         sendData('map-query-general-data', {})
@@ -481,10 +483,15 @@ export const GeneralStats = ({ setDetailVisible }) => {
     }
 
     const purchaseMap = () => {
-        if(confirm('This action will re-set all your map tiles and map lists, so you will have to re-create them and update all automation referring to them. Are you sure you want to do this?')) {
-            sendData('map-generate-map', { });
-        }
-
+        confirm({
+            title: "Regenerate Map",
+            message: "This action will re-set all your map tiles and map lists, so you will have to re-create them and update all automation referring to them. Are you sure you want to do this?",
+            onConfirm: () => {
+                sendData('map-generate-map', { });
+            },
+            confirmText: "Regenerate",
+            cancelText: "Cancel"
+        });
     }
 
     return (

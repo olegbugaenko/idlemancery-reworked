@@ -120,6 +120,29 @@ export const checkMatchingActionLevelRule = (rule, key) => {
     return false;
 }
 
+export const checkMatchingCourseLevelRule = (rule, key) => {
+    const course = gameEntity.getEntity(rule.course_id);
+
+    if(!course) return false;
+
+    let compare = course.level;
+
+    switch (rule.condition) {
+        case 'less':
+            return compare < +rule.value;
+        case 'less_or_eq':
+            return  compare <= +rule.value;
+        case 'eq':
+            return compare == +rule.value;
+        case 'grt_or_eq':
+            return compare >= +rule.value;
+        case 'grt':
+            return compare > +rule.value;
+    }
+
+    return false;
+}
+
 export const checkMatchingCurrentSocialEventRule = (rule) => {
     const socialEventsModule = gameCore.getModule('events');
     if (!socialEventsModule) return false;
@@ -187,6 +210,9 @@ export const checkMatchingRule = (rule) => {
     }
     if(rule.compare_type === 'action_level') {
         return checkMatchingActionLevelRule(rule);
+    }
+    if(rule.compare_type === 'course_level') {
+        return checkMatchingCourseLevelRule(rule);
     }
     if(rule.compare_type === 'running_action_list') {
         return checkMatchingActionListRule(rule);

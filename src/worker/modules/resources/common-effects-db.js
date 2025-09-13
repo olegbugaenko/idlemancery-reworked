@@ -702,5 +702,13 @@ export const registerCommomEffects = () => {
         saveBalanceTree: true,
     })
 
+    gameEffects.registerEffect('coal_consumption_discount', {
+        name: 'Coal Consumption Discount',
+        defaultValue: 1.,
+        minValue: 0.1,
+        description: 'Reduces coal consumption by machinery and industrial equipment',
+        saveBalanceTree: true,
+    })
+
 
 }

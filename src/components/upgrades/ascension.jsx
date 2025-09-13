@@ -7,11 +7,13 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import {IconButton} from "../shared/icon-button.jsx";
 import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
 import {EffectsSection} from "../shared/effects-section.jsx";
+import {useModal} from "../../general/components/modal/index.jsx";
 
 export const Ascension = () => {
     const worker = useContext(WorkerContext);
 
     const { onMessage, sendData } = useWorkerClient(worker);
+    const { confirm } = useModal();
 
     const [upgradesData, setJobsData] = useState({
         upgrades: [],
@@ -38,9 +40,15 @@ export const Ascension = () => {
     })
 
     const ascendNow = () => {
-        if(confirm('You will loose all your progress, but receive dragon eggs. Are you sure?')) {
-            sendData('do-ascend', {})
-        }
+        confirm({
+            title: "Ascend",
+            message: "You will lose all your progress, but receive dragon eggs. Are you sure?",
+            onConfirm: () => {
+                sendData('do-ascend', {});
+            },
+            confirmText: "Ascend",
+            cancelText: "Cancel"
+        });
     }
 
     return (

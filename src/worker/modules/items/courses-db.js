@@ -549,7 +549,7 @@ export const registerCourseItemsStage1 = () => {
             get_multiplier: () =>({
                 effects: {
                     'crafting_materials_discount': {
-                        A: 0.025*gameEffects.getEffectValue('reductive_courses_power'),
+                        A: 0.002*gameEffects.getEffectValue('reductive_courses_power'),
                         B: 1,
                         C: 1.01,
                         type: 3,
@@ -568,7 +568,7 @@ export const registerCourseItemsStage1 = () => {
                 },*/
                 'mental_energy': {
                     A: 1.1,
-                    B: 100,
+                    B: 1000,
                     type: 1,
                 }
             }
@@ -589,7 +589,7 @@ export const registerCourseItemsStage1 = () => {
             get_multiplier: () =>({
                 effects: {
                     'alchemy_materials_discount': {
-                        A: 0.025*gameEffects.getEffectValue('reductive_courses_power'),
+                        A: 0.002*gameEffects.getEffectValue('reductive_courses_power'),
                         B: 1,
                         C: 1.01,
                         type: 3,
@@ -608,7 +608,7 @@ export const registerCourseItemsStage1 = () => {
                 },*/
                 'mental_energy': {
                     A: 1.1,
-                    B: 100,
+                    B: 1000,
                     type: 1,
                 }
             }

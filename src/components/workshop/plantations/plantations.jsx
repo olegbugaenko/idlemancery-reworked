@@ -11,6 +11,7 @@ import {Balances} from "../shared.jsx";
 import {useAppContext} from "../../../context/ui-context";
 import {CustomButton} from "../../shared/buttons/custom-button.jsx";
 import {AutomationIcon} from "../../shared/buttons/automation-checkbox.jsx";
+import {useModal} from "../../../general/components/modal/index.jsx";
 
 export const Plantations = ({ setItemDetails, newUnlocks }) => {
 
@@ -19,6 +20,7 @@ export const Plantations = ({ setItemDetails, newUnlocks }) => {
     const { isMobile } = useAppContext();
 
     const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
+    const { confirm } = useModal();
     const [plantationsData, setItemsData] = useState({
         available: [],
         slots: {
@@ -52,9 +54,15 @@ export const Plantations = ({ setItemDetails, newUnlocks }) => {
     })
 
     const onDemolish = useCallback((id) => {
-        if(confirm('Are you sure? This action cant be undone.')) {
-            sendData(`remove-plantation`, { id })
-        }
+        confirm({
+            title: "Delete Plantation",
+            message: "Are you sure? This action can't be undone.",
+            onConfirm: () => {
+                sendData(`remove-plantation`, { id });
+            },
+            confirmText: "Delete",
+            cancelText: "Cancel"
+        });
     })
 
     const setWateringLevel = useCallback((id, level) => {

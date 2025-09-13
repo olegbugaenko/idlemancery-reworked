@@ -11,6 +11,7 @@ import {ResourceCost} from "../shared/resource-cost.jsx";
 import {useFlashOnLevelUp} from "../../general/hooks/flash";
 import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
 import {BreakDown} from "../layout/sidebar.jsx";
+import {useModal} from "../../general/components/modal/index.jsx";
 
 const SkillTree = () => {
     const [scale, setScale] = useState(80);
@@ -26,6 +27,7 @@ const SkillTree = () => {
     const { isMobile } = useAppContext();
 
     const { onMessage, sendData } = useWorkerClient(worker);
+    const { prompt } = useModal();
     const [skillsData, setSkillsData] = useState({
         available: {},
         sp: {
@@ -187,8 +189,19 @@ const SkillTree = () => {
     }, [scale]);
 
     const saveDraft = () => {
-        const name = prompt("Enter draft name:");
-        if (name) sendData('save-skill-draft', { name });
+        prompt({
+            title: "Save Draft",
+            message: "Enter draft name:",
+            defaultValue: "",
+            placeholder: "Enter draft name...",
+            onConfirm: (name) => {
+                if (name && name.trim()) {
+                    sendData('save-skill-draft', { name: name.trim() });
+                }
+            },
+            confirmText: "Save",
+            cancelText: "Cancel"
+        });
     };
 
     const loadDraft = (id) => {

@@ -160,7 +160,7 @@ export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, op
         <div className={'craftables-cat'}>
             <PerfectScrollbar>
                 <div className={'flex-container'}>
-                    {craftingData.available.map(craftable => <NewNotificationWrap id={`alchemy_${craftable.id}`} key={`alchemy_${craftable.id}`} className={'narrow-wrapper'} isNew={newUnlocks?.all?.items?.[`alchemy_${craftable.id}`]?.hasNew}>
+                    {craftingData.available.map(craftable => <NewNotificationWrap id={`crafting_${craftable.id}`} key={`crafting_${craftable.id}`} className={'narrow-wrapper'} isNew={newUnlocks?.all?.items?.[`crafting_${craftable.id}`]?.hasNew}>
                         <ItemCard addItemToList={addItemToList} key={craftable.id} {...craftable} onSetLevel={setItemLevel} onShowDetails={setItemDetails} isMobile={isMobile} isEditList={isEditList} showNumericInputs={showNumericInputs}/>
                     </NewNotificationWrap>)}
                 </div>

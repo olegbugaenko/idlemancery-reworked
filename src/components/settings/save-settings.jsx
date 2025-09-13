@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import WorkerContext from "../../context/worker-context";
 import { useWorkerClient } from "../../general/client";
 import {isElectron, quitApp} from "../../general/utils/electron-checks";
+import {useModal} from "../../general/components/modal/index.jsx";
 
 function fromBase64Unicode(str) {
     return decodeURIComponent(escape(atob(str)));
@@ -10,6 +11,7 @@ function fromBase64Unicode(str) {
 export const SaveSettings = () => {
     const worker = useContext(WorkerContext);
     const { onMessage, sendData } = useWorkerClient(worker);
+    const { confirm } = useModal();
 
     const [saveString, setSaveString] = useState("");
     const [importString, setImportString] = useState("");
@@ -106,9 +108,15 @@ export const SaveSettings = () => {
     });
 
     const resetGame = () => {
-        if(confirm('Are you sure you want to reset game? It will remove all your progress!')) {
-            sendData('reset-game', {})
-        }
+        confirm({
+            title: "Reset Game",
+            message: "Are you sure you want to reset game? It will remove all your progress!",
+            onConfirm: () => {
+                sendData('reset-game', {});
+            },
+            confirmText: "Reset",
+            cancelText: "Cancel"
+        });
     }
 
     const closeGame = () => {

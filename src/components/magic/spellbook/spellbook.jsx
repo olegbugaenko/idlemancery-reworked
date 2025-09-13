@@ -18,6 +18,7 @@ import {CustomButton} from "../../shared/buttons/custom-button.jsx";
 import {HowToSign} from "../../shared/how-to-sign.jsx";
 import {useTutorial} from "../../../context/tutorial-context";
 import {playSound} from "../../../context/sounds/sound-manager";
+import {useModal} from "../../../general/components/modal/index.jsx";
 
 export const SpellbookWrap = ({ children }) => {
 
@@ -28,6 +29,7 @@ export const SpellbookWrap = ({ children }) => {
 
 
     const { onMessage, sendData } = useWorkerClient(worker);
+    const { confirm } = useModal();
     const [spellData, setItemsData] = useState({
         available: [],
         current: undefined
@@ -125,10 +127,26 @@ export const SpellbookWrap = ({ children }) => {
         sendData('set-monitored', { scope: 'effects', type: 'spell', id });
         if(id) {
             if(detailOpenedId && isChanged) {
-                if(!confirm(`This will discard all your changes to ${detailOpenedId.name}. Are you sure`)) {
-                    // User cancelled - stay in edit mode for current spell
-                    return;
-                }
+                confirm({
+                    title: "Switch Item",
+                    message: `You have unsaved changes to ${detailOpenedId.name}. Do you want to continue to the new item (losing current changes) or stay here?`,
+                    onConfirm: () => {
+                        // Continue with the action - discard changes and proceed
+                        setViewedOpenedId(null);
+                        setDetailOpenedId({id, name});
+                        setChanged(false);
+                        if(id !== detailOpenedId) {
+                            playSound('click');
+                        }
+                    },
+                    onCancel: () => {
+                        // User cancelled - stay in edit mode for current spell
+                        // Do nothing, just return
+                    },
+                    confirmText: "Continue",
+                    cancelText: "Stay Here"
+                });
+                return;
             }
             setViewedOpenedId(null);
             setDetailOpenedId({id, name});

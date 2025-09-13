@@ -1,4 +1,5 @@
 import { gameEntity, gameResources, gameEffects } from "game-framework";
+import { charismaMod } from "../items/shop-db";
 
 // Helper: build searchable metadata same way as structures
 const getResourceModifierDataSearchable = (rs) => {
@@ -32,6 +33,10 @@ const registerMachine = (id, options) => {
     gameEntity.registerGameEntity(id, options);
 }
 
+const getCoalDiscount = () => {
+    return gameEffects.getEffectValue('coal_consumption_discount');
+}
+
 export const registerMachineryStage1 = () => {
     // Automated Quarry — consumes coal, produces stone
     registerMachine('machine_auto_quarry', {
@@ -48,12 +53,12 @@ export const registerMachineryStage1 = () => {
         resourceModifier: {
             get_income: () => ({
                 resources: {
-                    'inventory_stone': { A: 5 * gameEffects.getEffectValue('machinery_efficiency'), B: 0.0, C: 1.02, type: 3 },
+                    'inventory_stone': { A: 500 * gameEffects.getEffectValue('machinery_efficiency'), B: 0.0, C: 1.03, type: 3 },
                 }
             }),
             consumption: {
                 resources: {
-                    'inventory_coal': { A: 1.0, B: 0.0, C: 1.02, type: 3 },
+                    'inventory_coal': { A: 1.0/getCoalDiscount(), B: 0.0, C: 1.03, type: 3 },
                     'living_space': { A: 1, B: 0, type: 0 },
                 }
             },
@@ -84,25 +89,179 @@ export const registerMachineryStage1 = () => {
         resourceModifier: {
             get_income: () => ({
                 resources: {
-                    'inventory_refined_wood': { A: 10.0 * gameEffects.getEffectValue('machinery_efficiency'), B: 0.0, C: 1.02, type: 3 },
+                    'inventory_refined_wood': { A: 500.0 * gameEffects.getEffectValue('machinery_efficiency'), B: 0.0, C: 1.03, type: 3 },
                 }
             }),
-            consumption: {
+            get_consumption: () => ({
                 resources: {
-                    'inventory_coal': { A: 1.0, B: 0.0, C: 1.02, type: 3 },
-                    'inventory_wood': { A: 1000.0, B: 0.0, C: 1.02, type: 3 },
+                    'inventory_coal': { A: 1.0/getCoalDiscount(), B: 0.0, C: 1.03, type: 3 },
+                    'inventory_wood': { A: 5000.0/gameEffects.getEffectValue('crafting_materials_discount'), B: 0.0, C: 1.03, type: 3 },
                     'living_space': { A: 1, B: 0, type: 0 },
                 }
-            },
+            }),
             getCustomAmplifier: () => gameEntity.getAttribute('machine_auto_lumbermill', 'manualLoad') ?? 1,
             customAmplifierApplyTypes: ['resources'],
             customAmplifierApplyScopes: ['income','consumption'],
-            effectDeps: ['machinery_efficiency'],
+            effectDeps: ['machinery_efficiency', 'crafting_materials_discount'],
         },
         get_cost: () => ({
             'inventory_stone_brick': { A: 1.2, B: 20000, type: 1 },
             'inventory_forged_steel': { A: 1.2, B: 10000, type: 1 },
             'living_space': { A: 0, B: 1, type: 0 },
+        }),
+    });
+
+    // Automatic Ore Mine — consumes coal, produces ore
+    registerMachine('machine_automatic_ore_mine', {
+        tags: ['machinery', 'upgrade', 'purchaseable', 'industrial', 'mining'],
+        name: 'Automatic Ore Mine',
+        description: 'An automated mining machine that continuously extracts ore from deep underground. Consumes coal to operate.',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_industrial_revolution') > 0;
+        },
+        attributes: {
+            manualLoad: 1,
+        },
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'inventory_iron_ore': { A: 200 * gameEffects.getEffectValue('machinery_efficiency'), B: 0.0, C: 1.02, type: 3 },
+                }
+            }),
+            consumption: {
+                resources: {
+                    'inventory_coal': { A: 1.0/getCoalDiscount(), B: 0.0, C: 1.02, type: 3 },
+                    'living_space': { A: 4, B: 0, type: 0 },
+                }
+            },
+            getCustomAmplifier: () => gameEntity.getAttribute('machine_automatic_ore_mine', 'manualLoad') ?? 1,
+            customAmplifierApplyTypes: ['resources'],
+            customAmplifierApplyScopes: ['income','consumption'],
+            effectDeps: ['machinery_efficiency'],
+        },
+        get_cost: () => ({
+            'coins': { A: 1.5, B: 1000000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')), type: 1 },
+            'inventory_stone_brick': { A: 1.5, B: 1500, type: 1 },
+            'inventory_forged_steel': { A: 1.5, B: 3000, type: 1 },
+            'inventory_wooden_beam': { A: 1.5, B: 2000, type: 1 },
+            'living_space': { A: 0, B: 4, type: 0 },
+        }),
+    });
+
+    // Automatic Clay Mine — consumes coal, produces clay
+    registerMachine('machine_automatic_clay_mine', {
+        tags: ['machinery', 'upgrade', 'purchaseable', 'industrial', 'mining'],
+        name: 'Automatic Clay Mine',
+        description: 'An automated mining machine that continuously extracts clay from underground deposits. Consumes coal to operate.',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_industrial_revolution') > 0;
+        },
+        attributes: {
+            manualLoad: 1,
+        },
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'inventory_clay': { A: 50 * gameEffects.getEffectValue('machinery_efficiency'), B: 0.0, C: 1.02, type: 3 },
+                }
+            }),
+            consumption: {
+                resources: {
+                    'inventory_coal': { A: 1.0/getCoalDiscount(), B: 0.0, C: 1.02, type: 3 },
+                    'living_space': { A: 4, B: 0, type: 0 },
+                }
+            },
+            getCustomAmplifier: () => gameEntity.getAttribute('machine_automatic_clay_mine', 'manualLoad') ?? 1,
+            customAmplifierApplyTypes: ['resources'],
+            customAmplifierApplyScopes: ['income','consumption'],
+            effectDeps: ['machinery_efficiency'],
+        },
+        get_cost: () => ({
+            'coins': { A: 1.5, B: 1000000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')), type: 1 },
+            'inventory_stone_brick': { A: 1.5, B: 1500, type: 1 },
+            'inventory_forged_steel': { A: 1.5, B: 3000, type: 1 },
+            'inventory_wooden_beam': { A: 1.5, B: 2000, type: 1 },
+            'living_space': { A: 0, B: 4, type: 0 },
+        }),
+    });
+
+    // Automated Papermill — consumes wood and coal, produces paper
+    registerMachine('machine_automated_papermill', {
+        tags: ['machinery', 'upgrade', 'purchaseable', 'industrial', 'manufacturing'],
+        name: 'Automated Papermill',
+        description: 'An automated manufacturing machine that converts wood into paper. Consumes wood and coal to operate.',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_manufacturing_revolution') > 0;
+        },
+        attributes: {
+            manualLoad: 1,
+        },
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'inventory_paper': { A: 10 * gameEffects.getEffectValue('machinery_efficiency'), B: 0.0, C: 1.02, type: 3 },
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'inventory_wood': { A: 2000.0/gameEffects.getEffectValue('crafting_materials_discount'), B: 0.0, C: 1.02, type: 3 },
+                    'inventory_coal': { A: 1.0/getCoalDiscount(), B: 0.0, C: 1.02, type: 3 },
+                    'living_space': { A: 4, B: 0, type: 0 },
+                }
+            }),
+            getCustomAmplifier: () => gameEntity.getAttribute('machine_automated_papermill', 'manualLoad') ?? 1,
+            customAmplifierApplyTypes: ['resources'],
+            customAmplifierApplyScopes: ['income','consumption'],
+            effectDeps: ['machinery_efficiency', 'crafting_materials_discount'],
+        },
+        get_cost: () => ({
+            'coins': { A: 1.5, B: 1500000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')), type: 1 },
+            'inventory_stone_brick': { A: 1.5, B: 40000, type: 1 },
+            'inventory_forged_steel': { A: 1.5, B: 20000, type: 1 },
+            'inventory_wooden_beam': { A: 1.5, B: 40000, type: 1 },
+            'living_space': { A: 0, B: 4, type: 0 },
+        }),
+    });
+
+    // Automated Brickworks — consumes stone and coal, produces stone bricks
+    registerMachine('machine_automated_brickworks', {
+        tags: ['machinery', 'upgrade', 'purchaseable', 'industrial', 'manufacturing'],
+        name: 'Automated Brickworks',
+        description: 'An automated manufacturing machine that converts stone into stone bricks. Consumes stone and coal to operate.',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_manufacturing_revolution') > 0;
+        },
+        attributes: {
+            manualLoad: 1,
+        },
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'inventory_stone_brick': { A: 20 * gameEffects.getEffectValue('machinery_efficiency'), B: 0.0, C: 1.02, type: 3 },
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'inventory_stone': { A: 500.0/gameEffects.getEffectValue('crafting_materials_discount'), B: 0.0, C: 1.02, type: 3 },
+                    'inventory_coal': { A: 1.0/getCoalDiscount(), B: 0.0, C: 1.02, type: 3 },
+                    'living_space': { A: 4, B: 0, type: 0 },
+                }
+            }),
+            getCustomAmplifier: () => gameEntity.getAttribute('machine_automated_brickworks', 'manualLoad') ?? 1,
+            customAmplifierApplyTypes: ['resources'],
+            customAmplifierApplyScopes: ['income','consumption'],
+            effectDeps: ['machinery_efficiency', 'crafting_materials_discount'],
+        },
+        get_cost: () => ({
+            'coins': { A: 1.5, B: 1500000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')), type: 1 },
+            'inventory_stone_brick': { A: 1.5, B: 10000, type: 1 },
+            'inventory_forged_steel': { A: 1.5, B: 40000, type: 1 },
+            'inventory_wooden_beam': { A: 1.5, B: 30000, type: 1 },
+            'living_space': { A: 0, B: 4, type: 0 },
         }),
     });
 }
