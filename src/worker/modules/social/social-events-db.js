@@ -282,7 +282,7 @@ export const registerEventsStage1 = () => {
         permanentEffect: 'event_training_efficiency_permanent_bonus',
         temporaryEffect: 'training_social_effects_efficiency',
         category: 'educational',
-        tags: ["training"],
+        tags: ["educational"],
         unlockCondition: () => {
             return gameResources.isResourceUnlocked('inventory_red_ink')
         },
@@ -390,7 +390,7 @@ export const registerEventsStage1 = () => {
             get_multiplier: () => ({
                 effects: {
                     gathering_herbs_amount: {
-                        A: 0.04* gameEffects.getEffectValue('socio_campaign_efficiency'),
+                        A: 0.02* gameEffects.getEffectValue('socio_campaign_efficiency'),
                         B: 1,
                         type: 0,
                     }

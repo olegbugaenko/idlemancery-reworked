@@ -23,10 +23,13 @@ export const SoundProvider = ({ children }) => {
     const currentMusicIndexRef = useRef(0);
     const currentSourceRef = useRef(null);
     const [soundsLoaded, setSoundsLoaded] = useState(false);
+    const [settingsLoaded, setSettingsLoaded] = useState(false);
+    const initializeCalledRef = useRef(false);
 
 
     useEffect(() => {
-        if (!tracks.length || !soundsLoaded) return;
+        console.log('Music useEffect - soundsLoaded:', soundsLoaded, 'settingsLoaded:', settingsLoaded);
+        if (!tracks.length || !soundsLoaded || !settingsLoaded) return;
 
         const startTrack = (index) => {
             const source = playMusic(tracks[index]);
@@ -49,7 +52,7 @@ export const SoundProvider = ({ children }) => {
                 currentSourceRef.current.stop();
             }
         };
-    }, [soundsLoaded]);
+    }, [soundsLoaded, settingsLoaded]);
 
     useEffect(() => {
         applyToAudioContext(volumes); // оновлює всі volumeNodes, в т.ч. music
@@ -74,10 +77,17 @@ export const SoundProvider = ({ children }) => {
     }, []);
 
     const initializeVolumes = () => {
+        console.log('initializeVolumes called - sending query-settings');
         sendData('query-settings', { prefix: 'sounds' });
     };
 
+    const manualInitializeVolumes = () => {
+        console.log('Manual initializeVolumes called');
+        initializeVolumes();
+    };
+
     onMessage('settings-sounds', (data) => {
+        console.log('Received settings-sounds:', data);
         const sounds = {};
         ['master', 'sounds', 'music'].forEach((key) => {
             const keyInPr = `${key}Volume`;
@@ -95,7 +105,19 @@ export const SoundProvider = ({ children }) => {
             applyToAudioContext(newState);
             return newState;
         });
+        
+        console.log('Setting settingsLoaded to true');
+        setSettingsLoaded(true);
     });
+
+    // Auto-initialize volumes when sounds are loaded and handlers are ready
+    useEffect(() => {
+        if (soundsLoaded && !initializeCalledRef.current) {
+            console.log('Auto-initializing volumes after sounds loaded');
+            initializeCalledRef.current = true;
+            initializeVolumes();
+        }
+    }, [soundsLoaded]);
 
     onMessage('play-sound', ({ key }) => {
         playSound(key);
@@ -112,7 +134,7 @@ export const SoundProvider = ({ children }) => {
     };
 
     return (
-        <SoundContext.Provider value={{ volumes, setVolume, initializeVolumes }}>
+        <SoundContext.Provider value={{ volumes, setVolume, initializeVolumes: manualInitializeVolumes }}>
             {children}
         </SoundContext.Provider>
     );

@@ -36,7 +36,6 @@ export const LoadedMain = () => {
     useEffect(() => {
         const handleFirstInput = () => {
             resumeAudioContext();
-            initializeVolumes();
             window.removeEventListener('pointerdown', handleFirstInput);
         };
 

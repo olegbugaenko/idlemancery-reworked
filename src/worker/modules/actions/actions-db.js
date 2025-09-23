@@ -556,6 +556,58 @@ export const registerActionsStage1 = () => {
         }
     })
 
+    registerGameAction('action_diplomatic_envoy', {
+        tags: ["action", "job", "social"],
+        name: 'Diplomatic Envoy',
+        isAbstract: false,
+        category: ACTION_CATS.COINS,
+        allowedImpacts: ['effects'],
+        description: 'Represent your nation in diplomatic missions, negotiating treaties and trade agreements while earning substantial diplomatic fees',
+        level: 1,
+        minDemoVersion: 20,
+        discountEffects: ['social_actions_discount'],
+        jobType: 'social',
+        getLearnRate: () => {
+            return 1;
+        },
+        learningEffects: ['job_learning_rate'],
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'coins': {
+                        A: 6.0*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_social'),
+                        B: 54.0*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_social'),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 220,
+                        type: 0,
+                    },
+                    'mental_energy': {
+                        A: 0.0,
+                        B: 20,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['coins_earned_bonus', 'job_efficiency_social']
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_charisma',
+            level: 75000,
+        }],
+        attributes: {
+            baseXPCost: 20,
+            primaryAttribute: 'attribute_charisma'
+        }
+    })
+
     registerGameAction('action_clean_stable', {
         tags: ["action", "job", "physical"],
         name: 'Clean Stable',
@@ -767,6 +819,58 @@ export const registerActionsStage1 = () => {
         }
     })
 
+    registerGameAction('action_construction_foreman', {
+        tags: ["action", "job", "physical"],
+        name: 'Construction Foreman',
+        isAbstract: false,
+        category: ACTION_CATS.COINS,
+        allowedImpacts: ['effects'],
+        description: 'Lead large construction crews on massive building projects, coordinating heavy labor and earning premium wages for your leadership and physical prowess',
+        level: 1,
+        minDemoVersion: 20,
+        discountEffects: ['physical_actions_discount'],
+        jobType: 'physical',
+        getLearnRate: () => {
+            return 1;
+        },
+        learningEffects: ['job_learning_rate'],
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'coins': {
+                        A: 8.0*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_physical'),
+                        B: 72.0*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_physical'),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 100,
+                        type: 0,
+                    },
+                    'health': {
+                        A: 0.0,
+                        B: 48,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['coins_earned_bonus', 'job_efficiency_physical']
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 75000,
+        }],
+        attributes: {
+            baseXPCost: 20,
+            primaryAttribute: 'attribute_strength'
+        }
+    })
+
 /*
     registerGameAction('action_foreman', {
         tags: ["action", "job", "physical"],
@@ -879,7 +983,7 @@ export const registerActionsStage1 = () => {
         allowedImpacts: ['effects'],
         description: 'Create simple magical illusions to amaze audiences and earn more coins than basic tricks',
         level: 1,
-        discountEffects: ['physical_actions_discount'],
+        discountEffects: ['magical_actions_discount'],
         jobType: 'magical',
         getLearnRate: () => {
             return 1;
@@ -931,7 +1035,7 @@ export const registerActionsStage1 = () => {
         allowedImpacts: ['effects'],
         description: 'Conduct research on magical phenomena and sell your findings',
         level: 1,
-        discountEffects: ['physical_actions_discount'],
+        discountEffects: ['magical_actions_discount'],
         jobType: 'magical',
         getLearnRate: () => {
             return 1;
@@ -983,7 +1087,7 @@ export const registerActionsStage1 = () => {
         allowedImpacts: ['effects'],
         description: 'Provide expert advice on spell casting and magical theory',
         level: 1,
-        discountEffects: ['physical_actions_discount'],
+        discountEffects: ['magical_actions_discount'],
         jobType: 'magical',
         getLearnRate: () => {
             return 1;
@@ -1035,7 +1139,7 @@ export const registerActionsStage1 = () => {
         allowedImpacts: ['effects'],
         description: 'Design and implement magical systems and enchantments',
         level: 1,
-        discountEffects: ['physical_actions_discount'],
+        discountEffects: ['magical_actions_discount'],
         jobType: 'magical',
         getLearnRate: () => {
             return 1;
@@ -1071,6 +1175,58 @@ export const registerActionsStage1 = () => {
             type: 'effect',
             id: 'attribute_magic_ability',
             level: 15000,
+        }],
+        attributes: {
+            baseXPCost: 20,
+            primaryAttribute: 'attribute_magic_capability'
+        }
+    })
+
+    registerGameAction('action_archmage_consultant', {
+        tags: ["action", "job", "magical"],
+        name: 'Archmage Consultant',
+        isAbstract: false,
+        category: ACTION_CATS.COINS,
+        minDemoVersion: 20,
+        allowedImpacts: ['effects'],
+        description: 'Provide expert magical consultation to kingdoms and empires, solving complex arcane problems and earning legendary compensation',
+        level: 1,
+        discountEffects: ['magical_actions_discount'],
+        jobType: 'magical',
+        getLearnRate: () => {
+            return 1;
+        },
+        learningEffects: ['job_learning_rate'],
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'coins': {
+                        A: 14.0*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_magical'),
+                        B: 126.0*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_magical'),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 90,
+                        type: 0,
+                    },
+                    'mana': {
+                        A: 0.0,
+                        B: 35,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['coins_earned_bonus', 'job_efficiency_magical']
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_magic_ability',
+            level: 75000,
         }],
         attributes: {
             baseXPCost: 20,
@@ -1329,7 +1485,7 @@ export const registerActionsStage1 = () => {
     registerGameAction('action_coal_mining', {
         tags: ["action", "activity", "physical", "manual-labor"],
         name: 'Coal Mining',
-        category: ACTION_CATS.PHYSICAL,
+        category: ACTION_CATS.OTHER,
         isAbstract: false,
         allowedImpacts: ['effects'],
         discountEffects: ['physical_actions_discount'],

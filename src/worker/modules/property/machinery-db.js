@@ -56,12 +56,12 @@ export const registerMachineryStage1 = () => {
                     'inventory_stone': { A: 500 * gameEffects.getEffectValue('machinery_efficiency'), B: 0.0, C: 1.03, type: 3 },
                 }
             }),
-            consumption: {
+            get_consumption: () => ({
                 resources: {
                     'inventory_coal': { A: 1.0/getCoalDiscount(), B: 0.0, C: 1.03, type: 3 },
                     'living_space': { A: 1, B: 0, type: 0 },
                 }
-            },
+            }),
             getCustomAmplifier: () => gameEntity.getAttribute('machine_auto_quarry', 'manualLoad') ?? 1,
             customAmplifierApplyTypes: ['resources'],
             customAmplifierApplyScopes: ['income','consumption'],
@@ -129,12 +129,12 @@ export const registerMachineryStage1 = () => {
                     'inventory_iron_ore': { A: 200 * gameEffects.getEffectValue('machinery_efficiency'), B: 0.0, C: 1.02, type: 3 },
                 }
             }),
-            consumption: {
+            get_consumption: () => ({
                 resources: {
                     'inventory_coal': { A: 1.0/getCoalDiscount(), B: 0.0, C: 1.02, type: 3 },
                     'living_space': { A: 4, B: 0, type: 0 },
                 }
-            },
+            }),
             getCustomAmplifier: () => gameEntity.getAttribute('machine_automatic_ore_mine', 'manualLoad') ?? 1,
             customAmplifierApplyTypes: ['resources'],
             customAmplifierApplyScopes: ['income','consumption'],
@@ -167,12 +167,12 @@ export const registerMachineryStage1 = () => {
                     'inventory_clay': { A: 50 * gameEffects.getEffectValue('machinery_efficiency'), B: 0.0, C: 1.02, type: 3 },
                 }
             }),
-            consumption: {
+            get_consumption: () => ({
                 resources: {
                     'inventory_coal': { A: 1.0/getCoalDiscount(), B: 0.0, C: 1.02, type: 3 },
                     'living_space': { A: 4, B: 0, type: 0 },
                 }
-            },
+            }),
             getCustomAmplifier: () => gameEntity.getAttribute('machine_automatic_clay_mine', 'manualLoad') ?? 1,
             customAmplifierApplyTypes: ['resources'],
             customAmplifierApplyScopes: ['income','consumption'],

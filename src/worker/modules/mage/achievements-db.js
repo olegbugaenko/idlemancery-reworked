@@ -851,6 +851,20 @@ export const achievementsDb = [{
     ],
     completeCondition: () => gameEntity.getLevel('action_meditate') >= 2000
 },{
+    id: 'action_meditate_8',
+    title: 'The Chicken Farm Meditation',
+    text: [
+        "You decided to experiment with meditation locations once again and chose to do it at a nearby poultry farm. You spread out your meditation mat near the chickens. The chickens around clucked and pecked at grain, creating a very interesting and calming atmosphere for you.",
+        "You came to your senses when a chicken was sitting on your shoulder and pecking at your ear as if trying to wake you up.",
+        "You had a wild desire to try grain. You ate grain after grain, realizing that something had gone wrong. When you involuntarily dug up a worm from the ground and put it in your mouth, you understood that you had somehow adopted the chickens' food preferences.",
+        "Remembering the correct incantation, you tried to speak it, but your throat produced nothing but 'clucking'. Trying to curse, nothing but 'cock-a-doodle-doo' came out.",
+        "In despair, you looked at the chicken, who gave you a disapproving look and said: 'Now it's your turn to lay eggs, friend!'",
+        "Having laughed heartily, she muttered something.",
+        "You woke up and began to feel yourself in horror. Having made sure that you hadn't grown feathers or developed a comb, you muttered a few swear words to yourself.",
+        "You try not to look at your hands, all covered in dirt, and not pay attention to the strange aftertaste in your mouth, convincing yourself that it was just a dream."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_meditate') >= 4000
+},{
     id: 'action_home_errands_1',
     title: 'The Relic of Cleaning',
     text: [
@@ -1299,6 +1313,39 @@ export const achievementsDb = [{
     ],
     completeCondition: () => {
         return gameEntity.getLevel('action_spiritual_alignment') >= 1000
+    }
+},{
+    id: 'action_spiritual_alignment_5',
+    title: 'The Vineyard Catastrophe',
+    text: [
+        "Yesterday you tasted the first harvest from your vineyard, which you had so diligently tended, and for which you had to burn more than one cauldron while brewing growth potions for it.",
+        "The result exceeded all your expectations. The fruits turned out to be so sweet and aromatic that you ate half the harvest at once. Realizing that you had found a recipe for growing perfect grapes, you set about going through your entire home library in search of spells that could accelerate plant growth.",
+        "Finally, having found one, you triumphantly read the incantation, and within minutes new plant shoots began to sprout before your eyes. Satisfied with yourself, you went to sleep.",
+        "In the morning, as usual, you gathered for morning meditation. You confidently grabbed the door handle and tried to open it. The door began to put up fierce resistance. No matter how hard you pushed it, you couldn't open it more than a centimeter. You stood for several minutes wondering what was wrong, when grapevine shoots began to break through the cracks toward you.",
+        "Here you realized that it seemed your magic had rebelled against you. You tried cutting the shoots with scissors, removing the growth spell... To no avail. The plant, as if gone mad, was capturing room after room.",
+        "Finally, when the plant began to encroach on the last thing that remained free from its embrace - your throat, you realized you had no other choice.",
+        "With tears in your eyes, choking, you muttered the incantation. The vineyard's expansion stopped. The leaves instantly turned yellow and fell.",
+        "Barely making your way through the already dead, but still mighty branches to the street, you realized the scale of the catastrophe. The vineyard had swallowed not only all your possessions, but also a helpless neighbor's cow, which was roaring with its last strength, calling for help.",
+        "The entire settlement gathered to look at the giant vineyard. Having admired the result of your magical might, everyone began to help you clean up. So by evening the yard was clean, and the street smelled of barbecue and loud cheerful songs. Even the elder came to the party and solemnly proclaimed that from today the settlement would celebrate 'Grape Day' on this day."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_spiritual_alignment') >= 2000
+    }
+},{
+    id: 'action_spiritual_alignment_6',
+    title: 'The Cabbage Rain Disaster',
+    text: [
+        "You were sitting on the couch eating cabbage salad when a concerned neighbor came to visit. You poured him tea, generously served salad and double portions of pies.",
+        "Over tea, the neighbor complained about the terrible zucchini harvest - everything had dried up. Indeed, there was terrible heat outside, and not a drop of rain had fallen for several weeks.",
+        "You were just taking a spoonful of cabbage salad when an idea struck you! You instantly, without chewing properly, jumped to your feet and tried to shout out an incantation to create local rain. However, attempting to read this incantation with a full mouth played a cruel joke on you, and you choked.",
+        "The frightened neighbor remembered everything he had ever learned in first aid courses. Finally, after half an hour of coughing and torment, after what was probably the twentieth glass of water and the third heart attack in the frightened neighbor, you finally came to your senses. Sighing with relief, you and your neighbor went outside and saw something incredible - cabbage rain!",
+        "Excited and beside himself with happiness, the neighbor, without thinking, ran to collect free delicacies for his cow 'Marquise'. However, the cabbage rain quickly brought the neighbor to his senses - after receiving several treats directly to the head, he quickly ran back to you, under the roof.",
+        "While you were remembering the incantation to stop the rain, cabbage was everywhere. And what was especially terrible - it completely crushed your harvest and the neighbor's harvest!",
+        "Realizing the scale of the catastrophe, you and your neighbor almost burst into tears. And only the cow was contentedly crunching cabbage leaves, enjoying the 'buffet'.",
+        "News about unlimited cabbage quickly spread throughout the settlement, so by evening your yards were clean. Now you are jokingly called the 'Cabbage Lord', and the neighbor's Marquise greets you like a faithful grateful dog at every meeting, licking you from head to toe."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_spiritual_alignment') >= 4000
     }
 },{
     id: 'thinkroot_plantation_1',

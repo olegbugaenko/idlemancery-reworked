@@ -83,7 +83,11 @@ export const ArtifactUpgrades = ({ setItemDetails, purchaseItem, deleteItem, new
     }, [sendData]);
 
     const toggleHiddenItem = useCallback((id, flag) => {
-        sendData('set-furniture-hidden', { id, flag, filterId: 'artifact' });
+        sendData('toggle-furniture-hidden', { id, flag, filterId: 'artifact' });
+    }, [sendData]);
+
+    const setShowHidden = useCallback((showHidden) => {
+        sendData('set-furniture-show-hidden', { showHidden, filterId: 'artifact' });
     }, [sendData]);
 
     return (
@@ -91,6 +95,12 @@ export const ArtifactUpgrades = ({ setItemDetails, purchaseItem, deleteItem, new
             <div className={'sub-heading'}>
                 <div className={'complete'}>
                     <p>Artifacts: {artifactsData.available ? artifactsData.available.filter(item => item.level > 0).length : 0} / {artifactsData.available ? artifactsData.available.length : 0}</p>
+                </div>
+                <div className={'filters'}>
+                    <label>
+                        Show Hidden
+                        <input type={'checkbox'} checked={artifactsData.showHidden} onChange={e => setShowHidden(!artifactsData.showHidden)}/>
+                    </label>
                 </div>
             </div>
             <div className={'items-cat'}>

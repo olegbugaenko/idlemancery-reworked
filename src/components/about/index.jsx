@@ -6,6 +6,20 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+            <h3>Idle Awakening v0.2.1c</h3>
+                <div className={'features'}>
+                    <p>Changed alchemy and crafting effort precision</p>
+                    <p>Added possibility to lock recipes efforts, preventing them from scaling during normalization</p>
+                    <p>Some rebalances</p>
+                    <p>Fixed bug when sounds were unintentionally unmuted on game startup</p>
+                    <p>Few minor UI bugfixes</p>
+                </div>
+                <h3>Idle Awakening v0.2.1b</h3>
+                <div className={'features'}>
+                    <p>Changed alchemy and crafting effort precision</p>
+                    <p>Fixed some actions discount effects</p>
+                    <p>Added few missing stories</p>
+                </div>
                 <h3>Idle Awakening v0.2.1a</h3>
                 <div className={'features'}>
                     <p>Added new machines and re-balanced old ones</p>

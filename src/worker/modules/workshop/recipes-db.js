@@ -1058,7 +1058,7 @@ export const registerCraftingRecipes = () => {
                     },
                     'mana': {
                         A: 1.5,
-                        B: 4*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        B: 3*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
                         type: 1
                     }
                 }
@@ -1300,7 +1300,7 @@ export const registerCraftingRecipes = () => {
                     },
                     'mana': {
                         A: 1.0,
-                        B: 50000*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        B: 2000*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
                         type: 1
                     }
                 }

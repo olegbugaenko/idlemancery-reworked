@@ -77,6 +77,11 @@ export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, op
         openListDetails({ listData });
     }, []);
 
+    const onToggleLock = useCallback((id, isLocked) => {
+        console.log('Frontend alchemy onToggleLock:', { id, isLocked, filterId });
+        sendData('toggle-effort-lock', { id, isLocked, filterId });
+    }, [sendData, filterId]);
+
     /*if(currentTourId === 'alchemy') {
         if(craftingData.available?.length) {
             unlockNextById(8);
@@ -161,7 +166,7 @@ export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, op
             <PerfectScrollbar>
                 <div className={'flex-container'}>
                     {craftingData.available.map(craftable => <NewNotificationWrap id={`crafting_${craftable.id}`} key={`crafting_${craftable.id}`} className={'narrow-wrapper'} isNew={newUnlocks?.all?.items?.[`crafting_${craftable.id}`]?.hasNew}>
-                        <ItemCard addItemToList={addItemToList} key={craftable.id} {...craftable} onSetLevel={setItemLevel} onShowDetails={setItemDetails} isMobile={isMobile} isEditList={isEditList} showNumericInputs={showNumericInputs}/>
+                        <ItemCard addItemToList={addItemToList} key={craftable.id} {...craftable} onSetLevel={setItemLevel} onShowDetails={setItemDetails} isMobile={isMobile} isEditList={isEditList} showNumericInputs={showNumericInputs} onToggleLock={onToggleLock}/>
                     </NewNotificationWrap>)}
                 </div>
             </PerfectScrollbar>
@@ -184,7 +189,7 @@ export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, op
     </div>)
 }
 
-export const ItemCard = ({ id, icon_id, isRunning, resourceAmount, resourceBalance, breakDown, isLowerEfficiency, name, effort, maxLevel, onSetLevel, onShowDetails, addItemToList, isMobile, isEditList, isRebalanced, isRebalancedBeneficial, showNumericInputs }) => {
+export const ItemCard = ({ id, icon_id, isRunning, resourceAmount, resourceBalance, breakDown, isLowerEfficiency, name, effort, isLocked, maxLevel, onSetLevel, onShowDetails, addItemToList, isMobile, isEditList, isRebalanced, isRebalancedBeneficial, showNumericInputs, onToggleLock }) => {
 
     const [inputValue, setInputValue] = useState(effort);
 
@@ -195,7 +200,7 @@ export const ItemCard = ({ id, icon_id, isRunning, resourceAmount, resourceBalan
     const handleInputChange = (e) => {
         const value = parseFloat(e.target.value);
         if (!isNaN(value) && value >= 0 && value <= 1) {
-            const roundedValue = Math.round(value * 1000) / 1000;
+            const roundedValue = Math.round(value * 1000000) / 1000000;
             setInputValue(roundedValue);
             onSetLevel(id, roundedValue);
         }
@@ -244,7 +249,7 @@ export const ItemCard = ({ id, icon_id, isRunning, resourceAmount, resourceBalan
                                 className="level-set numeric-input"
                                 min={0}
                                 max={1}
-                                step={0.001}
+                                step={0.000001}
                                 value={inputValue}
                                 onChange={handleInputChange}
                                 onBlur={handleInputBlur}
@@ -257,7 +262,7 @@ export const ItemCard = ({ id, icon_id, isRunning, resourceAmount, resourceBalan
                                 className="level-set"
                                 min={0}
                                 max={1}
-                                step={0.001}
+                                step={0.000001}
                                 value={inputValue}
                                 onChange={handleInputChange}
                             />
@@ -269,6 +274,17 @@ export const ItemCard = ({ id, icon_id, isRunning, resourceAmount, resourceBalan
                         }}>
                             <img src={"icons/interface/maximize.png"}/>
                         </div>
+                        <TippyWrapper content={<div className={'hint-popup'}>
+                            <p className={'hint'}>Lock effort - prevents this recipe's effort from being changed when normalizing other efforts</p>
+                        </div>}>
+                            <div className={`icon-content interface-icon tiny ${isLocked ? 'locked' : 'unlocked'}`} onClick={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                onToggleLock && onToggleLock(id, !isLocked)
+                            }}>
+                                <img src={isLocked ? "icons/interface/lock.png" : "icons/interface/unlock.png"}/>
+                            </div>
+                        </TippyWrapper>
                     </div>
                 </TippyWrapper>
             </div>

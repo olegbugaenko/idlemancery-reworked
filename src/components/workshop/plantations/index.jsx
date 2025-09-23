@@ -114,7 +114,7 @@ export const ItemDetails = ({itemId, category, setItemDetails}) => {
                         {item.description}
                     </div>
                 </div>
-                {item.bottleNeck ? (<div className={'block'}>
+                {item.bottleNeck && item.efficiency < 1 ? (<div className={'block'}>
                     <p className={'hint'}>This activity running at {formatValue(item.efficiency*100)}% due to missing {item.bottleNeck.name}</p>
                 </div> ) : null}
                 <div className={'block'}>
