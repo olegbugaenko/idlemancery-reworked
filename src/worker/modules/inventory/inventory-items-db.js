@@ -1429,7 +1429,7 @@ export const registerInventoryItems = () => {
             get_income: () => ({
                 resources: {
                     'mage-xp': {
-                        A: 25000*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
+                        A: 125000*metabolismIntensityMod(gameEffects.getEffectValue('metabolism_rate')),
                         B: 0,
                         type: 0,
                     }

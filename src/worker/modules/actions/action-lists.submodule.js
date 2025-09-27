@@ -113,6 +113,8 @@ export class ActionListsSubmodule extends GameModule {
 
             const proportionsBar = this.getProportionsBar(listData)
 
+            const blockedDynamicActions = this.getBlockedDynamicActions(listData);
+
             this.eventHandler.sendData('action-list-effects', {
                 potentialEffects: data,
                 resourcesEffects,
@@ -120,6 +122,7 @@ export class ActionListsSubmodule extends GameModule {
                 effectEffects: data.filter(one => one.type === 'effects' || ['capMult','rawCap'].includes(one.scope)),
                 proportionsBar,
                 newTimes: listData.actions,
+                blockedDynamicActions,
             });
         })
     }
@@ -1197,5 +1200,116 @@ export class ActionListsSubmodule extends GameModule {
         });
 
         return totalEffects.map(eff => eff.scope === 'income' && eff.value < 0 ? {...eff, scope: 'consumption', value: -eff.value} : eff);
+    }
+
+    getActionResourceBreakdown(action, totalTime) {
+        const result = { incomes: [], consumptions: [] };
+
+        const isAvailable = gameEntity.isEntityUnlocked(action.id) && !gameEntity.isCapped(action.id);
+        if(!isAvailable) {
+            return result;
+        }
+
+        const isEffectChanneling = gameEntity.getAttribute(action.id, 'isEffectChanneling', false);
+        const isTraining = gameEntity.getAttribute(action.id, 'isTraining');
+        const level = isTraining ? 1 : gameEntity.getLevel(action.id);
+        const trainingStage = isTraining ? 1 : 0;
+        const timeFraction = totalTime > 0 ? (action.time || 0) / totalTime : 0;
+
+        const effects = gameEntity.getEffects(action.id, trainingStage, level, true, 1, timeFraction);
+
+        const learnRateFactor = gameCore.getModule('actions').getLearningRate(action.id) / gameCore.getModule('actions').getActionXPMax(action.id);
+
+        effects.forEach(effect => {
+            const effToAdd = { ...effect };
+
+            if(effToAdd.scope === 'income' && effToAdd.type === 'resources') {
+                effToAdd.value *= gameResources.getResource(effToAdd.id).multiplier;
+            }
+
+            if(effToAdd.scope === 'multiplier' && effToAdd.type === 'effects' && !isEffectChanneling) {
+                effToAdd.value = 1 + learnRateFactor*(effToAdd.value - 1);
+            }
+
+            if(effToAdd.scope === 'income' && effToAdd.type === 'effects' && !isEffectChanneling) {
+                effToAdd.value *= learnRateFactor;
+            }
+
+            if((effToAdd.scope === 'rawCap' || effToAdd.scope === 'capMult') && effToAdd.type === 'resources') {
+                if(effToAdd.scope === 'capMult') {
+                    effToAdd.value = 1 + learnRateFactor*(effToAdd.value - 1);
+                } else {
+                    effToAdd.value *= learnRateFactor;
+                }
+            }
+
+            const normalized = { ...effToAdd };
+            if(normalized.scope === 'income' && normalized.value < 0) {
+                normalized.scope = 'consumption';
+                normalized.value = -normalized.value;
+            }
+            if(normalized.scope === 'consumption' && normalized.value < 0) {
+                normalized.value = Math.abs(normalized.value);
+            }
+
+            if(normalized.type === 'resources') {
+                if(normalized.scope === 'income' && normalized.value > SMALL_NUMBER) {
+                    result.incomes.push({ id: normalized.id, value: normalized.value });
+                } else if(normalized.scope === 'consumption' && normalized.value > SMALL_NUMBER) {
+                    result.consumptions.push({ id: normalized.id, value: normalized.value });
+                }
+            }
+        });
+
+        return result;
+    }
+
+    getBlockedDynamicActions(listData) {
+        const blocked = {};
+
+        if(!listData?.actions?.length) return blocked;
+
+        const availableActions = listData.actions.filter(action => gameEntity.isEntityUnlocked(action.id) && !gameEntity.isCapped(action.id));
+        const totalTime = availableActions.reduce((acc, item) => acc + (item.time || 0), 0) || 1;
+
+        const resourceIncomeTotals = {};
+        const actionIncomeMap = {};
+        const actionConsumptionMap = {};
+
+        listData.actions.forEach(action => {
+            const breakdown = this.getActionResourceBreakdown(action, totalTime);
+            actionIncomeMap[action.id] = breakdown.incomes;
+            actionConsumptionMap[action.id] = breakdown.consumptions;
+
+            breakdown.incomes.forEach(({ id, value }) => {
+                resourceIncomeTotals[id] = (resourceIncomeTotals[id] || 0) + value;
+            });
+        });
+
+        listData.actions.forEach(action => {
+            if(!action.isDynamicTime) return;
+            const consumptions = actionConsumptionMap[action.id] || [];
+
+            consumptions.forEach(({ id: resourceId }) => {
+                const baseState = resourceCalculators.assertResource(resourceId, false, ['runningActions'], {
+                    targetEfficiency: 1,
+                }) || {};
+
+                const passiveBalance = baseState.balance || ((baseState.income || 0) * (baseState.multiplier || 1) - (baseState.consumption || 0));
+
+                const incomeFromList = (resourceIncomeTotals[resourceId] || 0) - ((actionIncomeMap[action.id] || []).find(entry => entry.id === resourceId)?.value || 0);
+
+                if(passiveBalance <= SMALL_NUMBER && incomeFromList <= SMALL_NUMBER) {
+                    const resource = gameResources.getResource(resourceId);
+                    blocked[action.id] = {
+                        reason: 'resource',
+                        id: resourceId,
+                        name: resource?.name || resourceId,
+                    };
+                }
+            });
+        });
+
+        return blocked;
     }
 }

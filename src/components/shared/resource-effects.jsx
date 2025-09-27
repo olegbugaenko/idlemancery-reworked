@@ -3,13 +3,13 @@ import {formatValue} from "../../general/utils/strings";
 import {mapEffect} from "../../general/utils/resource-utils";
 import {RawResource} from "./raw-resource.jsx";
 
-export const ResourceEffects = ({ effect, isShowBalance }) => {
+export const ResourceEffects = ({ effect, isShowBalance, isAvailable = true }) => {
 
     const { title, value, id, type, balance } = mapEffect(effect);
 
     return (<div className={'effect-line'}>
         {type === 'resources' ? (<RawResource name={title} id={id} className={'fixed-width-sidebar'} />) : (<span className={'title'}>{title}</span>)}
-        <span className={'value'}>{value}</span>
+        <span className={`value ${!isAvailable ? 'yellow' : ''}`}>{value}</span>
         {isShowBalance ? (<span className={'secondary-value'}>({formatValue(balance)})</span> ) : null}
     </div> )
 

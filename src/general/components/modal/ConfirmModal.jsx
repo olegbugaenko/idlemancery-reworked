@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { CustomButton } from '../../../components/shared/buttons/custom-button.jsx';
 
-const ConfirmModal = ({ title, message, onConfirm, onCancel, confirmText, cancelText, onHide }) => {
+const ConfirmModal = ({ title, message, onConfirm, onCancel, confirmText, cancelText, confirmClassName, cancelClassName, onHide }) => {
     const confirmButtonRef = useRef(null);
 
     useEffect(() => {
@@ -46,13 +46,13 @@ const ConfirmModal = ({ title, message, onConfirm, onCancel, confirmText, cancel
                     <CustomButton
                         ref={confirmButtonRef}
                         onClick={handleConfirm}
-                        className="primary-action"
+                        className={confirmClassName || "primary-action"}
                     >
                         {confirmText}
                     </CustomButton>
                     <CustomButton
                         onClick={handleCancel}
-                        className="warning-action"
+                        className={cancelClassName || "warning-action"}
                     >
                         {cancelText}
                     </CustomButton>

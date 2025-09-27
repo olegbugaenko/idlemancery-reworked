@@ -23,6 +23,10 @@ export class SpellModule extends GameModule {
             this.sendSpellDetails(payload.id, payload.prefix)
         })
 
+        this.eventHandler.registerHandler('query-resource-balances-for-spell', payload => {
+            this.sendResourceBalancesForSpell(payload.id);
+        })
+
         this.eventHandler.registerHandler('save-spell-settings', payload => {
             this.saveSettings(payload)
         })
@@ -454,6 +458,25 @@ export class SpellModule extends GameModule {
             label = `${prefix}-${label}`;
         }
         this.eventHandler.sendData(label, data);
+    }
+
+    sendResourceBalancesForSpell(id) {
+        const spell = gameEntity.getEntity(id);
+        if (!spell || !spell.usageGain) {
+            this.eventHandler.sendData('resource-balances-for-spell', {});
+            return;
+        }
+
+        const effects = resourceApi.unpackEffects(spell.usageGain, spell.level);
+        const balances = {};
+        
+        effects.forEach(effect => {
+            if (effect.type === 'resources' && effect.scope === 'consumption') {
+                balances[effect.id] = gameResources.getResource(effect.id)?.amount || 0;
+            }
+        });
+
+        this.eventHandler.sendData('resource-balances-for-spell', balances);
     }
 
     getAllSpellsData() {

@@ -145,7 +145,12 @@ export const Actions = ({}) => {
                 setListData(prev =>{
                     if(!prev) return;
 
-                    const actions = payload.newTimes ?? prev.actions;
+                    const actions = (payload.newTimes ?? prev.actions).map(action => ({
+                        ...action,
+                        isBlocked: payload.blockedDynamicActions?.[action.id] ?? null,
+                    }));
+
+                    console.log('BLK: ', payload.blockedDynamicActions);
                     
                     return {
                         ...prev,
@@ -154,6 +159,7 @@ export const Actions = ({}) => {
                         effectEffects: payload.effectEffects,
                         prevEffects: payload.prevEffects,
                         proportionsBar: payload.proportionsBar,
+                        blockedDynamicActions: payload.blockedDynamicActions,
                         actions,
                     }
                 })

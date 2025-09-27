@@ -171,7 +171,7 @@ export const Shop = ({}) => {
                     onPurchase={selectedTab === 'items' ? purchaseResource : undefined}
                     isEditMode={editOpened && (['items', 'courses'].includes(selectedTab) && editOpened === visibleDetailId)}
                     editId={editOpened}
-                    onCloseEdit={() => setEditOpened(null)}
+                    onCloseEdit={() => {console.log('onCloseEdit', isDetailVisible, detailOpened); setEditOpened(null); setDetailOpened(null);}}
                 />) : (<GeneralStats setDetailVisible={setDetailVisible}/>)}
             </div>) : null}
         </div>
@@ -451,7 +451,11 @@ export const ItemResourceCard = ({ id, name, purchaseMultiplier, stock, level, m
         onMouseEnter={() => isMobile ? null : onShowDetails(id)}
         onMouseLeave={() => isMobile ? null : onShowDetails(null)}
         onClick={(e) => {
-            toggleEditedItem(id)
+            if(isMobile) {
+                onShowDetails(id);
+            } else {
+                toggleEditedItem(id);
+            }
         }}
         onContextMenu={(e) => {
             e.preventDefault();

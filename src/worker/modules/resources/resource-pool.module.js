@@ -308,6 +308,8 @@ export class ResourcePoolModule extends GameModule {
             isCapped: resource.amount >= resource.cap - SMALL_NUMBER,
             eta: gameResources.assertToCapOrEmpty(resource.id),
             monitor: this.monitoredData[resource.id] ?? null,
+            isConsumable: resource.tags.includes('consumable'),
+            allowMultiConsume: resource.attributes?.allowMultiConsume,
             // affData: monitoredResources[resource.id] || undefined
         }))
     }

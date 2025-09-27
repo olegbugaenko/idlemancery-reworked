@@ -1278,7 +1278,7 @@ export class ActionsModule extends GameModule {
             xp: this.actions[entity.id]?.xp || 0,
             maxXP: this.getActionXPMax(entity.id),
             isActive: this.isRunningAction(entity.id),
-            xpRate: this.isRunningAction(entity.id) ? this.getLearningRate(`runningAction_${entity.id}`)*this.isRunningAction(entity.id).effort : this.getLearningRate(entity.id, 1),
+            xpRate: this.isRunningAction(entity.id) ? this.getLearningRate(`runningAction_${entity.id}`) : this.getLearningRate(entity.id, 1),
             isLeveled: this.actions[entity.id]?.isLeveled,
             tags: entity.tags,
             primaryAttribute: entity.attributes?.primaryAttribute && gameEffects.isEffectUnlocked(entity.attributes?.primaryAttribute) ? gameEffects.getEffect(entity.attributes.primaryAttribute) : null,

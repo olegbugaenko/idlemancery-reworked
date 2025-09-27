@@ -20,7 +20,7 @@ export const ModalProvider = ({ children }) => {
         setModals([]);
     };
 
-    const showConfirm = ({ title, message, onConfirm, onCancel, confirmText = 'OK', cancelText = 'Cancel' }) => {
+    const showConfirm = ({ title, message, onConfirm, onCancel, confirmText = 'OK', cancelText = 'Cancel', confirmClassName, cancelClassName }) => {
         return showModal({
             type: 'confirm',
             title,
@@ -28,7 +28,9 @@ export const ModalProvider = ({ children }) => {
             onConfirm,
             onCancel,
             confirmText,
-            cancelText
+            cancelText,
+            confirmClassName,
+            cancelClassName
         });
     };
 

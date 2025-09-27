@@ -52,6 +52,8 @@ module.exports = {
     plugins: [
         new HtmlWebpackPlugin({
             template: './src/index.html',
+            filename: 'index.html',
+            inject: 'body',
         }),
         new CopyWebpackPlugin({
             patterns: [
@@ -64,12 +66,21 @@ module.exports = {
         }),
     ],
     devServer: {
-        static: {
-            directory: path.join(__dirname, 'public'),
-        },
+        static: [
+            {
+                directory: path.join(__dirname, 'public'),
+                publicPath: '/',
+            },
+            {
+                directory: path.join(__dirname, 'dist'),
+                publicPath: '/',
+            }
+        ],
         compress: true,
         port: 9000,
         hot: true,
+        historyApiFallback: true,
+        open: true,
     },
     resolve: {
         fallback: {

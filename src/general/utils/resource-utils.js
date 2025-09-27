@@ -38,3 +38,41 @@ export const mapEffect = (effect) => {
         balance: effect.balance
     }
 }
+
+/**
+ * Checks if breakdown has any meaningful data to display
+ * @param {Object} breakdown - The breakdown object
+ * @returns {boolean} - True if breakdown has income, consumption, or multipliers
+ */
+export const isBreakdownHasData = (breakdown) => {
+    return isBreakdownHasIncome(breakdown) || 
+           isBreakdownHasConsumption(breakdown) || 
+           isBreakdownHasMultiplier(breakdown);
+};
+
+/**
+ * Checks if breakdown has income data
+ * @param {Object} breakdown - The breakdown object
+ * @returns {boolean} - True if breakdown has income
+ */
+export const isBreakdownHasIncome = (breakdown) => {
+    return breakdown?.income && Object.keys(breakdown.income).length > 0;
+};
+
+/**
+ * Checks if breakdown has consumption data
+ * @param {Object} breakdown - The breakdown object
+ * @returns {boolean} - True if breakdown has consumption
+ */
+export const isBreakdownHasConsumption = (breakdown) => {
+    return breakdown?.consumption && Object.keys(breakdown.consumption).length > 0;
+};
+
+/**
+ * Checks if breakdown has multiplier data
+ * @param {Object} breakdown - The breakdown object
+ * @returns {boolean} - True if breakdown has multipliers
+ */
+export const isBreakdownHasMultiplier = (breakdown) => {
+    return breakdown?.multiplier && Object.keys(breakdown.multiplier).length > 0;
+};

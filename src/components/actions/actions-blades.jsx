@@ -245,6 +245,19 @@ export const ListEditor = React.memo(({
     const { stepIndex, unlockNextById, jumpOver, currentTourId, setNextAllowedById } = useTutorial();
 
     const editingRef = useRef(editing);
+    const hoveredResourceRef = useRef(null);
+
+    const setMonitoredResource = useCallback((resourceId) => {
+        if(hoveredResourceRef.current === resourceId) return;
+        hoveredResourceRef.current = resourceId;
+        sendData('set-monitored', { scope: 'actions', type: 'resource', id: resourceId });
+    }, [sendData]);
+
+    useEffect(() => {
+        return () => {
+            sendData('set-monitored', { scope: 'actions', type: 'resource', id: null });
+        };
+    }, [sendData]);
 
     useEffect(() => {
         editingRef.current = editing;
@@ -376,9 +389,24 @@ export const ListEditor = React.memo(({
                             </div>
                         </div>
                         <div id={'action-editor-wrap'} className={'action-items-list'}>
-                            {editing.actions.length ? editing.actions.map((action, index) => (
-                                <DraggableActionItem key={`list-${action.id}-${index}`} id={action.id} index={index}>
-                                    <div className={`action-row flex-container ${!action.isAvailable ? 'unavailable' : ''}`}>
+                            {editing.actions.length ? editing.actions.map((action, index) => {
+                                const blockedInfo = editing.blockedDynamicActions?.[action.id] || action.isBlocked;
+                                const rowClass = `action-row flex-container ${!action.isAvailable ? 'unavailable' : ''} ${blockedInfo ? 'blocked-dynamic-action' : ''}`;
+
+                                const actionRowContent = (
+                                    <div
+                                        className={rowClass}
+                                        onMouseEnter={() => {
+                                            if(blockedInfo?.id) {
+                                                setMonitoredResource(blockedInfo.id);
+                                            }
+                                        }}
+                                        onMouseLeave={() => {
+                                            if(blockedInfo?.id) {
+                                                setMonitoredResource(null);
+                                            }
+                                        }}
+                                    >
                                         {editing.proportionsBar ? (<div style={{width: editing.proportionsBar?.[index]?.displayPercentage, backgroundColor: editing.proportionsBar[index]?.color}} className={'prop-bg'}></div> ) : null}
                                         <div className={'col title'}>
                                             <span>{action.name}</span>
@@ -411,8 +439,18 @@ export const ListEditor = React.memo(({
                                             {isEditing ? (<span className={'close'} onClick={() => onDropActionFromList(action.id)}>X</span>) : null}
                                         </div>
                                     </div>
-                                </DraggableActionItem>
-                            )) : <p className={'hint'}>Click on actions or drag & drop them to add</p>}
+                                );
+
+                                return (
+                                    <DraggableActionItem key={`list-${action.id}-${index}`} id={action.id} index={index}>
+                                        {blockedInfo ? (
+                                            <TippyWrapper content={<div className={'hint-popup'}>This action cannot be auto-rebalanced because there are no income sources for {blockedInfo.name}.</div>}>
+                                                {actionRowContent}
+                                            </TippyWrapper>
+                                        ) : actionRowContent}
+                                    </DraggableActionItem>
+                                );
+                            }) : <p className={'hint'}>Click on actions or drag & drop them to add</p>}
                         </div>
                     </div>
                     <div className={'effects-wrap'}>

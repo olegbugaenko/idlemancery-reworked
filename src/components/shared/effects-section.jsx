@@ -2,7 +2,7 @@ import {ResourceEffects} from "./resource-effects.jsx";
 import React from "react";
 import {TippyWrapper} from "./tippy-wrapper.jsx";
 
-export const EffectsSection = ({ effects, maxDisplay = 3, isShowBalance = false }) => {
+export const EffectsSection = ({ effects, maxDisplay = 3, isShowBalance = false, useAvailabilityCheck = false }) => {
 
     const fullList = Object.entries(effects || {}).map(([key, value]) => ({ key, ...value }));
     let hidden = [];
@@ -12,9 +12,9 @@ export const EffectsSection = ({ effects, maxDisplay = 3, isShowBalance = false 
 
     return (<div className={'effects-section'}>
         {fullList.map(aff => {
-            return (<ResourceEffects key={aff.key ?? (aff.id ?? aff.name)} effect={aff} isShowBalance={isShowBalance}/>)
+            return (<ResourceEffects key={aff.key ?? (aff.id ?? aff.name)} effect={aff} isShowBalance={isShowBalance} isAvailable={aff.isAvailable || !useAvailabilityCheck} />)
         })}
-        {hidden.length ? (<TippyWrapper content={<div className={'hint-popup'}>{hidden.map(aff => <ResourceEffects effect={aff} isShowBalance={isShowBalance}/>)}</div> }><span className={'show-more'}>Show {hidden.length} more effects</span></TippyWrapper>) : null}
+        {hidden.length ? (<TippyWrapper content={<div className={'hint-popup'}>{hidden.map(aff => <ResourceEffects effect={aff} isShowBalance={isShowBalance} isAvailable={aff.isAvailable || !useAvailabilityCheck}/>)}</div> }><span className={'show-more'}>Show {hidden.length} more effects</span></TippyWrapper>) : null}
     </div>)
 
 }

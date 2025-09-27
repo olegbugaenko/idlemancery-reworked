@@ -24,7 +24,9 @@ function MyTooltip({ step, closeProps, primaryProps, isNextAllowed, isLastStep, 
                     closeProps.onClick(e);
                 },
                 confirmText: "Skip",
-                cancelText: "Continue"
+                cancelText: "Continue",
+                confirmClassName: "warning-action",
+                cancelClassName: "primary-action"
             });
         }
     };

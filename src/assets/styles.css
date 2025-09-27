@@ -1396,6 +1396,15 @@ h4 {
     font-style: italic;
 }
 
+.list-editor .actions-list-wrap .action-row.blocked-dynamic-action {
+    background: rgba(218, 138, 17, 0.15);
+    border-left: 3px solid var(--yellow);
+}
+
+.list-editor .actions-list-wrap .action-row.blocked-dynamic-action .col.title span {
+    color: var(--yellow);
+}
+
 .list-editor .actions-list-wrap .action-row .col {
     z-index: 1;
 }
@@ -3464,6 +3473,22 @@ ul.menu .add-custom-filter .add-wrap {
     .detail-blade .blade-inner {
         overflow-x: hidden;
         margin-bottom: 16px;
+    }
+
+    .detail-blade .main-buttons {
+        position: relative;
+        z-index: 10;
+        background: var(--boxbg);
+        border-top: 1px solid #777777;
+        padding: 8px;
+        height: auto;
+        min-height: 50px;
+    }
+
+    .detail-blade .main-buttons button {
+        min-height: 44px;
+        font-size: 16px;
+        touch-action: manipulation;
     }
 
     .detail-blade.forced-bottom {

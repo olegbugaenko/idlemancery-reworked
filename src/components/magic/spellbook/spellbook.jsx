@@ -427,12 +427,13 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
     }
 
     const [spellDetails, setSpellDetails] = useState(null);
+    const [resourceBalances, setResourceBalances] = useState({});
 
     const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
 
     const worker = useContext(WorkerContext);
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
 
 
     const toggleViewLasting = () => {
@@ -451,6 +452,22 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
         }
     }, [item?.id]);
 
+    // Separate interval for resource balances to update availability
+    useEffect(() => {
+        if (!item?.id) return;
+        
+        const updateResourceBalances = () => {
+            sendData('query-resource-balances-for-spell', { id: item.id });
+        };
+        
+        updateResourceBalances();
+        const interval = setInterval(updateResourceBalances, 500);
+
+        return () => {
+            clearInterval(interval);
+        }
+    }, [item?.id]);
+
     useEffect(() => {
         if(currentTourId === 'spellbook' && item.id === 'spell_magic_insight') {
             unlockNextById(5)
@@ -465,15 +482,43 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
             setSpellDetails(data);
         };
         
+        const handleResourceBalances = (data) => {
+            setResourceBalances(data);
+        };
+        
         onMessage('detail-spell-details', handleDetailSpellDetails);
+        onMessage('resource-balances-for-spell', handleResourceBalances);
         
         return () => {
-            // Cleanup message handler
+            removeMessage('detail-spell-details', handleDetailSpellDetails);
+            removeMessage('resource-balances-for-spell', handleResourceBalances);
         };
     }, []);
 
 
     if(!item) return null;
+
+    // Update effects with current resource availability
+    const updateEffectsAvailability = (effects, balances) => {
+        if (!effects || !balances) return effects;
+        
+        const updatedEffects = {};
+        for (const [key, effect] of Object.entries(effects)) {
+            updatedEffects[key] = {
+                ...effect,
+                isAvailable: effect.type === 'resources' && 
+                           effect.scope === 'consumption'
+                    ? (balances[effect.id] >= Math.abs(effect.value))
+                    : true
+            };
+
+            // console.log('Effects: ', effect, balances[effect.id], balances);
+        }
+       
+        return updatedEffects;
+    };
+
+    const effectsWithAvailability = updateEffectsAvailability(item.effects, resourceBalances);
 
     const addAutoconsumeRule = () => {
         onAddAutoconsumeRule()
@@ -572,7 +617,7 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
                         <div className={'block spell-effects-on-usage-block'}>
                             <p>Effects on usage:</p>
                             <div className={'effects'}>
-                                <EffectsSection effects={item.effects} />
+                                <EffectsSection effects={effectsWithAvailability} useAvailabilityCheck={true}/>
                             </div>
                         </div>
                         {item.duration ? (

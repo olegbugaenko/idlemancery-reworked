@@ -6,7 +6,17 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
-            <h3>Idle Awakening v0.2.1c</h3>
+                <h3>Idle Awakening v0.2.1d</h3>
+                <div className={'features'}>
+                    <p>Fixed critical bug where under some resolutions popup in shop could not be closed</p>
+                    <p>Fixed bug where action XP/s was double-counting effort factor in details view</p>
+                    <p>Fixed bug where empty tooltips were shown for resources without breakdown data</p>
+                    <p>Re-balance: Insight potion is now stronger</p>
+                    <p>QoL: added possibility to consume items pinned to left sidebar by right-clicking them</p>
+                    <p>QoL: added visual indication of action that can't be auto-rebalanced in list</p>
+                    <p>QoL: mana is now highlighted in yellow once you don't have sufficient to trigger spell</p>
+                </div>
+                <h3>Idle Awakening v0.2.1c</h3>
                 <div className={'features'}>
                     <p>Changed alchemy and crafting effort precision</p>
                     <p>Added possibility to lock recipes efforts, preventing them from scaling during normalization</p>
