@@ -30,6 +30,11 @@ export class CraftingModule extends GameModule {
         this.rebalanceReasons = {};
         this.alchemyRebalanceReasons = {};
 
+        this.recipeResourceCache = {
+            resourceToProducers: {},
+            perRecipe: {}
+        };
+
         this.filters = [{
             id: 'crafting',
             name: 'Crafting',
@@ -126,6 +131,8 @@ export class CraftingModule extends GameModule {
 
 
         registerCraftingRecipes()
+
+        this.initializeRecipeResourceCache();
     }
 
     tick(game, delta) {
@@ -754,12 +761,14 @@ export class CraftingModule extends GameModule {
                 // Get the bottleneck resource that caused this inefficiency
                 const bottleNeck = currentEntity.modifier?.bottleNeck ? gameResources.getResource(currentEntity.modifier.bottleNeck) : null;
                 const missingResourceName = bottleNeck?.name || 'resources';
-                
-                recipesToRebalance.push({ 
-                    recipeId, 
-                    unusedEffort, 
-                    efficiency, 
-                    missingResourceName 
+                const missingResourceId = currentEntity.modifier?.bottleNeck || null;
+
+                recipesToRebalance.push({
+                    recipeId,
+                    unusedEffort,
+                    efficiency,
+                    missingResourceName,
+                    missingResourceId
                 });
             }
         }
@@ -850,9 +859,9 @@ export class CraftingModule extends GameModule {
         // Get potential targets that can accept more effort (no bottlenecks)
         const availableRecipes = this.getPotentialAllocateTargets(category);
 
-        
+
         // Filter out recipes that were just rebalanced
-        const filteredAvailableRecipes = availableRecipes.filter(recipe => 
+        const filteredAvailableRecipes = availableRecipes.filter(recipe =>
             !recipesToRebalance.some(r => r.recipeId === recipe.recipeId)
         );
 
@@ -861,14 +870,64 @@ export class CraftingModule extends GameModule {
         // Calculate total effort of available recipes for proportional distribution
         const totalAvailableEffort = filteredAvailableRecipes.reduce((sum, recipe) => sum + recipe.currentEffort, 0);
 
-        // Redistribute unused effort proportionally to available recipes
-        for (const availableRecipe of filteredAvailableRecipes) {
-            const proportion = availableRecipe.currentEffort / totalAvailableEffort;
+        if (totalAvailableEffort <= SMALL_NUMBER) {
+            return;
+        }
+
+        const plannedDistributions = filteredAvailableRecipes.map(recipe => {
+            const proportion = recipe.currentEffort / totalAvailableEffort;
             const additionalEffort = totalUnusedEffort * proportion;
-            
-            const newEffort = availableRecipe.currentEffort + additionalEffort;
+            return {
+                ...recipe,
+                proportion,
+                additionalEffort,
+                newEffort: recipe.currentEffort + additionalEffort
+            };
+        });
+
+        const missingResourceIds = new Set(
+            recipesToRebalance
+                .map(({ missingResourceId }) => missingResourceId)
+                .filter(Boolean)
+        );
+
+        let projectedResourceDeltas = {};
+        if (missingResourceIds.size > 0) {
+            projectedResourceDeltas = this.computeProjectedResourceDeltas(plannedDistributions, missingResourceIds);
+        }
+
+        let remainingUnusedEffort = totalUnusedEffort;
+
+        if (missingResourceIds.size > 0 && Object.keys(projectedResourceDeltas).length > 0) {
+            const restoredEffort = this.restoreRebalancedRecipes(
+                recipesToRebalance,
+                projectedResourceDeltas,
+                category,
+                remainingUnusedEffort
+            );
+            remainingUnusedEffort = Math.max(0, remainingUnusedEffort - restoredEffort);
+        }
+
+        if (remainingUnusedEffort <= SMALL_NUMBER) {
+            return;
+        }
+
+        const scalingFactor = totalUnusedEffort > SMALL_NUMBER
+            ? remainingUnusedEffort / totalUnusedEffort
+            : 0;
+
+        if (scalingFactor <= SMALL_NUMBER) {
+            return;
+        }
+
+        // Redistribute unused effort proportionally to available recipes
+        for (const plan of plannedDistributions) {
+            const adjustedAdditionalEffort = plan.additionalEffort * scalingFactor;
+            if (adjustedAdditionalEffort <= SMALL_NUMBER) continue;
+
+            const newEffort = plan.currentEffort + adjustedAdditionalEffort;
             this.setCraftingEffort({
-                id: availableRecipe.recipeId,
+                id: plan.recipeId,
                 effort: newEffort,
                 isForce: true,
                 filterId: category
@@ -881,6 +940,152 @@ export class CraftingModule extends GameModule {
         
         // Send updated data to UI
         this.sendCraftingData({ filterId: category });
+    }
+
+    initializeRecipeResourceCache() {
+        this.recipeResourceCache = {
+            resourceToProducers: {},
+            perRecipe: {}
+        };
+
+        const recipeEntities = gameEntity.listEntitiesByTags(['recipe']);
+
+        recipeEntities.forEach(recipe => {
+            const effects = gameEntity.getEffects(recipe.id, 0, 1, true, 1, 1, 1) || [];
+            const resourceEffects = this.extractResourceEffects(effects);
+
+            this.recipeResourceCache.perRecipe[recipe.id] = resourceEffects;
+
+            Object.entries(resourceEffects.income).forEach(([resourceId, value]) => {
+                if (value <= SMALL_NUMBER) return;
+                if (!this.recipeResourceCache.resourceToProducers[resourceId]) {
+                    this.recipeResourceCache.resourceToProducers[resourceId] = new Set();
+                }
+                this.recipeResourceCache.resourceToProducers[resourceId].add(recipe.id);
+            });
+        });
+
+    }
+
+    extractResourceEffects(effects) {
+        const result = {
+            income: {},
+            consumption: {},
+            net: {}
+        };
+
+        if (!Array.isArray(effects)) {
+            return result;
+        }
+
+        effects.forEach(effect => {
+            if (effect.type !== 'resources') return;
+
+            const resourceId = effect.id;
+            if (!result.net[resourceId]) {
+                result.net[resourceId] = 0;
+            }
+
+            if (effect.scope === 'income') {
+                result.income[resourceId] = (result.income[resourceId] || 0) + effect.value;
+                result.net[resourceId] += effect.value;
+            } else if (effect.scope === 'consumption') {
+                result.consumption[resourceId] = (result.consumption[resourceId] || 0) + effect.value;
+                result.net[resourceId] -= effect.value;
+            }
+        });
+
+        return result;
+    }
+
+    getResourceNetEffectsForEffort(recipeId, effort) {
+        if (effort <= SMALL_NUMBER) {
+            return {};
+        }
+
+        const effects = gameEntity.getEffects(recipeId, 0, 1, true, 1, 1, effort) || [];
+        const { net } = this.extractResourceEffects(effects);
+        return net;
+    }
+
+    computeProjectedResourceDeltas(plannedDistributions, missingResourceIds) {
+        const resourceDeltas = {};
+        const trackedResourceIds = Array.from(missingResourceIds);
+
+        plannedDistributions.forEach(plan => {
+            if (plan.additionalEffort <= SMALL_NUMBER) {
+                return;
+            }
+
+            const producesTrackedResource = trackedResourceIds.some(resourceId => {
+                const producerSet = this.recipeResourceCache.resourceToProducers[resourceId];
+                if (!producerSet) return false;
+                if (producerSet instanceof Set) {
+                    return producerSet.has(plan.recipeId);
+                }
+                return Array.isArray(producerSet) ? producerSet.includes(plan.recipeId) : false;
+            });
+
+            if (!producesTrackedResource) {
+                return;
+            }
+
+            const beforeNet = this.getResourceNetEffectsForEffort(plan.recipeId, plan.currentEffort);
+            const afterNet = this.getResourceNetEffectsForEffort(plan.recipeId, plan.newEffort);
+
+            trackedResourceIds.forEach(resourceId => {
+                const delta = (afterNet[resourceId] || 0) - (beforeNet[resourceId] || 0);
+                if (delta > SMALL_NUMBER) {
+                    resourceDeltas[resourceId] = (resourceDeltas[resourceId] || 0) + delta;
+                }
+            });
+        });
+
+        return resourceDeltas;
+    }
+
+    getRecipeResourceConsumptionRate(recipeId, resourceId) {
+        const recipeData = this.recipeResourceCache.perRecipe[recipeId];
+        if (!recipeData) return 0;
+        return recipeData.consumption[resourceId] || 0;
+    }
+
+    restoreRebalancedRecipes(recipesToRebalance, resourceDeltas, category, availableEffortPool) {
+        let restoredEffortTotal = 0;
+
+        for (const recipeData of recipesToRebalance) {
+            if (!recipeData.missingResourceId) continue;
+
+            const availableDelta = resourceDeltas[recipeData.missingResourceId] || 0;
+            if (availableDelta <= SMALL_NUMBER) continue;
+
+            const consumptionRate = this.getRecipeResourceConsumptionRate(recipeData.recipeId, recipeData.missingResourceId);
+            if (consumptionRate <= SMALL_NUMBER) continue;
+
+            const potentialEffortRestore = availableDelta / consumptionRate;
+            if (potentialEffortRestore <= SMALL_NUMBER) continue;
+
+            const remainingEffortCapacity = availableEffortPool - restoredEffortTotal;
+            if (remainingEffortCapacity <= SMALL_NUMBER) break;
+
+            const effortToRestore = Math.min(recipeData.unusedEffort, potentialEffortRestore, remainingEffortCapacity);
+            if (effortToRestore <= SMALL_NUMBER) continue;
+
+            const currentEffort = this.craftingSlots[recipeData.recipeId]?.effort || 0;
+            const newEffort = currentEffort + effortToRestore;
+
+            this.setCraftingEffort({
+                id: recipeData.recipeId,
+                effort: newEffort,
+                isForce: true,
+                filterId: category
+            });
+
+            restoredEffortTotal += effortToRestore;
+            resourceDeltas[recipeData.missingResourceId] = Math.max(0, availableDelta - effortToRestore * consumptionRate);
+        }
+
+        return restoredEffortTotal;
     }
 
     regenerateNotifications() {
