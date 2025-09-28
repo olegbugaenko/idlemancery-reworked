@@ -585,77 +585,298 @@ export class CraftingModule extends GameModule {
     checkAndRebalance(category) {
         const isEnabled = category === 'crafting' ? this.autoRebalanceEnabled : this.alchemyAutoRebalanceEnabled;
         if (!isEnabled) return;
-        
-        // Try to restore individual recipes that can be restored
-        this.tryRestoreIndividualRecipes(category);
 
-        // Check for recipes that need rebalancing
-        this.rebalanceInefficientRecipes(category);
+        const state = this.collectCategoryRebalanceState(category);
+        if (state.recipes.length === 0) {
+            return;
+        }
+
+        const adjustments = new Map();
+        const queueAdjustment = (recipe, newEffort) => {
+            const clampedEffort = Math.max(0, Math.min(1, newEffort));
+            adjustments.set(recipe.id, clampedEffort);
+            recipe.currentEffort = clampedEffort;
+        };
+
+        const rebalanceReasons = category === 'crafting' ? this.rebalanceReasons : this.alchemyRebalanceReasons;
+
+        let effortPool = this.reduceBottleneckedRecipes(state, queueAdjustment, rebalanceReasons);
+        effortPool = this.restoreRecipesTowardsOriginal(state, queueAdjustment, effortPool, rebalanceReasons);
+
+        if (effortPool > SMALL_NUMBER) {
+            this.distributeEffortToEfficientRecipes(state, queueAdjustment, effortPool);
+            effortPool = 0;
+        }
+
+        for (const [recipeId, newEffort] of adjustments.entries()) {
+            this.setCraftingEffort({
+                id: recipeId,
+                effort: newEffort,
+                isForce: true,
+                filterId: category,
+                isAutoRestore: true,
+            });
+        }
+
+        for (const reasonId of Object.keys(rebalanceReasons)) {
+            const recipe = state.recipesById.get(reasonId);
+            if (!recipe) {
+                delete rebalanceReasons[reasonId];
+                continue;
+            }
+
+            if (recipe.currentEffort >= (recipe.originalEffort ?? recipe.currentEffort) - SMALL_NUMBER &&
+                recipe.efficiency >= 0.99) {
+                delete rebalanceReasons[reasonId];
+            }
+        }
 
         this.normalizeTotalEffort(category);
         this.updateActiveRecipes(category);
-        
-        // Send updated data to UI
         this.sendCraftingData({ filterId: category });
     }
 
-    tryRestoreIndividualRecipes(category) {
+    collectCategoryRebalanceState(category) {
+        const tagToCat = {
+            'crafting': 'material',
+            'alchemy': 'alchemy'
+        };
+
         const allocations = category === 'crafting' ? this.originalAllocations : this.alchemyOriginalAllocations;
-        const rebalanceReasons = category === 'crafting' ? this.rebalanceReasons : this.alchemyRebalanceReasons;
-        
-        for (const [recipeId, originalEffort] of Object.entries(allocations)) {
-            if (!this.craftingSlots[recipeId]) continue;
-            
-            const currentEffort = this.craftingSlots[recipeId]?.effort || 0;
-            
-            // If current effort is already close to original, skip
-            if (Math.abs(currentEffort - originalEffort) < 0.01) continue;
 
-            // dont restore in case its profitable
-            if(currentEffort > originalEffort) continue;
-            
-            // Check if we can run this specific recipe at original effort level for at least 3 seconds
-            if (this.canRunRecipeAtEffortForDuration(recipeId, originalEffort, 3)) {
-                // Restore this specific recipe
-                this.setCraftingEffort({
-                    id: recipeId,
-                    effort: originalEffort,
-                    isForce: false,
-                    filterId: category,
-                    isAutoRestore: true
-                });
+        const recipes = [];
+        const recipesById = new Map();
 
-                // Don't remove from allocations for auto-restored recipes
-                // (Auto-restored recipes should remain in allocations for future restoration)
-                // They will be removed only when user manually changes the effort
+        for (const [recipeId, slot] of Object.entries(this.craftingSlots)) {
+            const recipeEntity = gameEntity.getEntity(recipeId);
+            if (!recipeEntity) continue;
+
+            const recipeTags = recipeEntity.tags || [];
+            if (!recipeTags.includes(tagToCat[category])) continue;
+
+            const currentEffort = slot.effort || 0;
+            const hasStoredOriginal = allocations[recipeId] !== undefined;
+
+            if (!hasStoredOriginal && currentEffort > 0) {
+                allocations[recipeId] = currentEffort;
             }
+
+            const originalEffort = allocations[recipeId];
+            const baseEffort = originalEffort !== undefined ? originalEffort : currentEffort;
+
+            const isActive = gameEntity.entityExists(`activeCrafting_${recipeId}`);
+            const activeEntity = isActive ? gameEntity.getEntity(`activeCrafting_${recipeId}`) : null;
+            const efficiency = activeEntity?.modifier?.efficiency ?? 1;
+            const bottleNeck = activeEntity?.modifier?.bottleNeck ?? null;
+
+            const recipeState = {
+                id: recipeId,
+                slot,
+                currentEffort,
+                originalEffort,
+                baseEffort,
+                efficiency,
+                bottleNeck,
+                isLocked: !!slot.isLocked,
+            };
+
+            recipes.push(recipeState);
+            recipesById.set(recipeId, recipeState);
+        }
+
+        return { recipes, recipesById, allocations };
+    }
+
+    reduceBottleneckedRecipes(state, queueAdjustment, rebalanceReasons) {
+        let effortPool = 0;
+
+        for (const recipe of state.recipes) {
+            if (recipe.isLocked) continue;
+
+            const efficiency = recipe.efficiency ?? 1;
+            if (efficiency >= 0.99 - SMALL_NUMBER) {
+                continue;
+            }
+
+            const targetEffort = this.calculateEffortForTargetEfficiency(recipe.currentEffort, efficiency, 0.99);
+
+            if (targetEffort < recipe.currentEffort - SMALL_NUMBER) {
+                const freedEffort = recipe.currentEffort - targetEffort;
+                effortPool += freedEffort;
+
+                queueAdjustment(recipe, targetEffort);
+
+                const bottleNeckResource = recipe.bottleNeck ? gameResources.getResource(recipe.bottleNeck) : null;
+                rebalanceReasons[recipe.id] = bottleNeckResource?.name || 'resources';
+            }
+        }
+
+        return effortPool;
+    }
+
+    restoreRecipesTowardsOriginal(state, queueAdjustment, initialPool, rebalanceReasons) {
+        let effortPool = initialPool;
+
+        const takeEffortFromPool = (amount) => {
+            let remaining = amount;
+            let taken = 0;
+
+            if (remaining <= SMALL_NUMBER) {
+                return 0;
+            }
+
+            const fromPool = Math.min(remaining, effortPool);
+            if (fromPool > 0) {
+                effortPool -= fromPool;
+                remaining -= fromPool;
+                taken += fromPool;
+            }
+
+            if (remaining <= SMALL_NUMBER) {
+                return taken;
+            }
+
+            let safety = 0;
+            while (remaining > SMALL_NUMBER && safety < 5) {
+                safety += 1;
+                let totalExtra = 0;
+
+                for (const donor of state.recipes) {
+                    if (donor.isLocked) continue;
+                    const extra = Math.max(0, donor.currentEffort - (donor.baseEffort ?? 0));
+                    totalExtra += extra;
+                }
+
+                if (totalExtra <= SMALL_NUMBER) {
+                    break;
+                }
+
+                for (const donor of state.recipes) {
+                    if (donor.isLocked) continue;
+
+                    const extra = Math.max(0, donor.currentEffort - (donor.baseEffort ?? 0));
+                    if (extra <= SMALL_NUMBER) continue;
+
+                    const share = (extra / totalExtra) * remaining;
+                    const delta = Math.min(extra, share);
+                    if (delta <= SMALL_NUMBER) continue;
+
+                    queueAdjustment(donor, donor.currentEffort - delta);
+                    remaining -= delta;
+                    taken += delta;
+
+                    if (remaining <= SMALL_NUMBER) {
+                        break;
+                    }
+                }
+            }
+
+            return taken;
+        };
+
+        for (const recipe of state.recipes) {
+            if (recipe.isLocked) continue;
+
+            const originalEffort = recipe.originalEffort;
+            if (originalEffort === undefined) continue;
+
+            if (recipe.currentEffort >= originalEffort - SMALL_NUMBER) {
+                continue;
+            }
+
+            let canRestore = false;
+
+            if (gameEntity.entityExists(`activeCrafting_${recipe.id}`)) {
+                const activeEntity = gameEntity.getEntity(`activeCrafting_${recipe.id}`);
+                canRestore = (activeEntity?.modifier?.efficiency ?? 1) >= 0.999;
+            } else {
+                canRestore = this.canRunRecipeAtEffortForDuration(recipe.id, originalEffort, 3);
+            }
+
+            if (!canRestore) {
+                continue;
+            }
+
+            const required = originalEffort - recipe.currentEffort;
+            const taken = takeEffortFromPool(required);
+
+            if (taken > SMALL_NUMBER) {
+                queueAdjustment(recipe, recipe.currentEffort + taken);
+
+                if (recipe.currentEffort >= originalEffort - SMALL_NUMBER) {
+                    if (rebalanceReasons[recipe.id]) {
+                        delete rebalanceReasons[recipe.id];
+                    }
+                }
+            }
+        }
+
+        return effortPool;
+    }
+
+    distributeEffortToEfficientRecipes(state, queueAdjustment, effortPool) {
+        if (effortPool <= SMALL_NUMBER) {
+            return;
+        }
+
+        const eligible = state.recipes.filter(recipe => {
+            if (recipe.isLocked) return false;
+            if (recipe.efficiency < 0.99 - SMALL_NUMBER) return false;
+            return true;
+        });
+
+        if (!eligible.length) {
+            return;
+        }
+
+        const totalWeight = eligible.reduce((sum, recipe) => {
+            const weight = recipe.originalEffort ?? recipe.currentEffort;
+            return sum + (weight || 0);
+        }, 0);
+
+        if (totalWeight <= SMALL_NUMBER) {
+            return;
+        }
+
+        for (const recipe of eligible) {
+            const weight = recipe.originalEffort ?? recipe.currentEffort;
+            if (!weight || weight <= SMALL_NUMBER) continue;
+
+            const portion = effortPool * (weight / totalWeight);
+            if (portion <= SMALL_NUMBER) continue;
+
+            queueAdjustment(recipe, recipe.currentEffort + portion);
         }
     }
 
     canRestoreOriginalAllocations(category) {
         const allocations = category === 'crafting' ? this.originalAllocations : this.alchemyOriginalAllocations;
-        
+
         for (const [recipeId, originalEffort] of Object.entries(allocations)) {
             if (!this.craftingSlots[recipeId]) continue;
 
-            // console.log('check: ', recipeId, gameEntity.entityExists(`activeCrafting_${recipeId}`));
-            
-            if (!gameEntity.entityExists(`activeCrafting_${recipeId}`)) continue;
-            
-            const currentEntity = gameEntity.getEntity(`activeCrafting_${recipeId}`);
-            if (!currentEntity) continue;
-            
             const currentEffort = this.craftingSlots[recipeId]?.effort || 0;
-            
-            // If current effort is already close to original, don't restore
-            if (Math.abs(currentEffort - originalEffort) < 0.01) continue;
-            
-            // Check if we can run this recipe at original effort level for at least 3 seconds
+            if (currentEffort >= originalEffort - SMALL_NUMBER) continue;
+
             if (!this.canRunRecipeAtEffortForDuration(recipeId, originalEffort, 3)) {
                 return false;
             }
         }
+
         return Object.keys(allocations).length > 0;
+    }
+
+    calculateEffortForTargetEfficiency(currentEffort, efficiency, targetEfficiency) {
+        if (currentEffort <= 0) {
+            return 0;
+        }
+
+        if (efficiency <= SMALL_NUMBER) {
+            return 0;
+        }
+
+        const desired = currentEffort * (efficiency / targetEfficiency);
+        return Math.max(0, Math.min(currentEffort, desired));
     }
 
     canRunRecipeAtEffortForDuration(recipeId, effort, durationSeconds) {
