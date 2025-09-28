@@ -764,9 +764,14 @@ export class CraftingModule extends GameModule {
             }
         }
 
+        console.log('RBeffB: ', JSON.parse(JSON.stringify(this.craftingSlots)), recipesToRebalance, totalUnusedEffort);
+
         if (totalUnusedEffort > 0.01) { // Only rebalance if there's significant unused effort
             this.redistributeUnusedEffort(recipesToRebalance, totalUnusedEffort, category);
         }
+
+        console.log('RBeffA: ', JSON.parse(JSON.stringify(this.craftingSlots)), totalUnusedEffort);
+
     }
 
     getPotentialAllocateTargets(category) {
