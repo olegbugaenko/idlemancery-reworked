@@ -698,7 +698,7 @@ export class CraftingModule extends GameModule {
                 continue;
             }
 
-            const targetEffort = this.calculateEffortForTargetEfficiency(recipe.currentEffort, efficiency, 0.99);
+            const targetEffort = this.calculateEffortForTargetEfficiency(recipe, 0.99);
 
             if (targetEffort < recipe.currentEffort - SMALL_NUMBER) {
                 const freedEffort = recipe.currentEffort - targetEffort;
@@ -784,14 +784,7 @@ export class CraftingModule extends GameModule {
                 continue;
             }
 
-            let canRestore = false;
-
-            if (gameEntity.entityExists(`activeCrafting_${recipe.id}`)) {
-                const activeEntity = gameEntity.getEntity(`activeCrafting_${recipe.id}`);
-                canRestore = (activeEntity?.modifier?.efficiency ?? 1) >= 0.999;
-            } else {
-                canRestore = this.canRunRecipeAtEffortForDuration(recipe.id, originalEffort, 3);
-            }
+            const canRestore = this.canRunRecipeAtEffortForDuration(recipe.id, originalEffort, 3);
 
             if (!canRestore) {
                 continue;
@@ -866,17 +859,26 @@ export class CraftingModule extends GameModule {
         return Object.keys(allocations).length > 0;
     }
 
-    calculateEffortForTargetEfficiency(currentEffort, efficiency, targetEfficiency) {
-        if (currentEffort <= 0) {
+    calculateEffortForTargetEfficiency(recipe, targetEfficiency) {
+        const { id, currentEffort } = recipe;
+        if (currentEffort <= SMALL_NUMBER) {
             return 0;
         }
 
-        if (efficiency <= SMALL_NUMBER) {
+        const hasOriginal = typeof recipe.originalEffort === 'number';
+        const referenceEffort = hasOriginal ? recipe.originalEffort : currentEffort;
+        const upperBound = Math.max(
+            SMALL_NUMBER,
+            Math.min(currentEffort, referenceEffort, 1)
+        );
+
+        const sustainableEffort = this.findSustainableEffort(id, upperBound);
+        if (sustainableEffort <= SMALL_NUMBER) {
             return 0;
         }
 
-        const desired = currentEffort * (efficiency / targetEfficiency);
-        return Math.max(0, Math.min(currentEffort, desired));
+        const bufferedEffort = sustainableEffort * targetEfficiency;
+        return Math.max(0, Math.min(currentEffort, bufferedEffort));
     }
 
     canRunRecipeAtEffortForDuration(recipeId, effort, durationSeconds) {
@@ -917,6 +919,37 @@ export class CraftingModule extends GameModule {
         }
         
         return true;
+    }
+
+    findSustainableEffort(recipeId, upperBound) {
+        if (upperBound <= SMALL_NUMBER) {
+            return 0;
+        }
+
+        let low = 0;
+        let high = Math.min(upperBound, 1);
+        let best = 0;
+
+        for (let i = 0; i < 12; i += 1) {
+            const mid = (low + high) / 2;
+
+            if (mid <= SMALL_NUMBER) {
+                break;
+            }
+
+            if (this.canRunRecipeAtEffortForDuration(recipeId, mid, 3)) {
+                best = mid;
+                low = mid;
+            } else {
+                high = mid;
+            }
+
+            if (high - low <= 0.0005) {
+                break;
+            }
+        }
+
+        return best;
     }
 
     restoreOriginalAllocations(category) {
