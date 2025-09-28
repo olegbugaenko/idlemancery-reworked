@@ -586,49 +586,177 @@ export class CraftingModule extends GameModule {
         const isEnabled = category === 'crafting' ? this.autoRebalanceEnabled : this.alchemyAutoRebalanceEnabled;
         if (!isEnabled) return;
 
-        const state = this.collectCategoryRebalanceState(category);
-        if (state.recipes.length === 0) {
+        const state = this.collectCategoryAutoRebalanceState(category);
+        if (!state.recipes.length) {
             return;
         }
 
-        const adjustments = new Map();
-        const queueAdjustment = (recipe, newEffort) => {
-            const clampedEffort = Math.max(0, Math.min(1, newEffort));
-            adjustments.set(recipe.id, clampedEffort);
-            recipe.currentEffort = clampedEffort;
-        };
-
         const rebalanceReasons = category === 'crafting' ? this.rebalanceReasons : this.alchemyRebalanceReasons;
 
-        let effortPool = this.reduceBottleneckedRecipes(state, queueAdjustment, rebalanceReasons);
-        effortPool = this.restoreRecipesTowardsOriginal(state, queueAdjustment, effortPool, rebalanceReasons);
+        const adjustments = new Map();
+        const queueAdjustment = (recipe, newEffort) => {
+            const clamped = Math.max(0, Math.min(1, newEffort));
+            adjustments.set(recipe.id, clamped);
+            recipe.currentEffort = clamped;
+        };
 
-        if (effortPool > SMALL_NUMBER) {
-            this.distributeEffortToEfficientRecipes(state, queueAdjustment, effortPool);
-            effortPool = 0;
+        let freedEffort = 0;
+        let hasShortage = false;
+
+        for (const recipe of state.recipes) {
+            if (recipe.isLocked || recipe.currentEffort <= SMALL_NUMBER) continue;
+
+            if (recipe.efficiency < 0.99 - SMALL_NUMBER) {
+                hasShortage = true;
+
+                const targetEffort = this.calculateEffortForEfficiency(recipe, 0.99);
+                const clampedTarget = Math.min(recipe.currentEffort, targetEffort);
+
+                if (clampedTarget < recipe.currentEffort - SMALL_NUMBER) {
+                    const freed = recipe.currentEffort - clampedTarget;
+                    freedEffort += freed;
+                    queueAdjustment(recipe, clampedTarget);
+
+                    const bottleneckName = recipe.bottleNeck ? gameResources.getResource(recipe.bottleNeck)?.name : null;
+                    rebalanceReasons[recipe.id] = bottleneckName || 'resources';
+                }
+            }
         }
 
-        for (const [recipeId, newEffort] of adjustments.entries()) {
+        if (freedEffort > SMALL_NUMBER) {
+            const recipients = state.recipes.filter((recipe) => {
+                if (recipe.isLocked) return false;
+                if (recipe.efficiency < 0.99 - SMALL_NUMBER) return false;
+                return recipe.currentEffort > SMALL_NUMBER;
+            });
+
+            const totalWeight = recipients.reduce((sum, recipe) => {
+                const weight = recipe.originalEffort ?? recipe.currentEffort;
+                return weight > SMALL_NUMBER ? sum + weight : sum;
+            }, 0);
+
+            if (totalWeight > SMALL_NUMBER) {
+                for (const recipe of recipients) {
+                    const weight = recipe.originalEffort ?? recipe.currentEffort;
+                    if (weight <= SMALL_NUMBER) continue;
+
+                    const share = freedEffort * (weight / totalWeight);
+                    if (share <= SMALL_NUMBER) continue;
+
+                    queueAdjustment(recipe, recipe.currentEffort + share);
+                }
+
+                freedEffort = 0;
+            }
+        }
+
+        const borrowEffort = (amount, excludeId = null) => {
+            let remaining = amount;
+            let taken = 0;
+
+            if (freedEffort > SMALL_NUMBER) {
+                const used = Math.min(freedEffort, remaining);
+                freedEffort -= used;
+                remaining -= used;
+                taken += used;
+            }
+
+            let guard = 0;
+            while (remaining > SMALL_NUMBER && guard < 5) {
+                guard += 1;
+
+                const donors = state.recipes.filter((recipe) => {
+                    if (recipe.isLocked) return false;
+                    if (excludeId && recipe.id === excludeId) return false;
+                    const baseline = recipe.originalEffort ?? recipe.baseEffort ?? 0;
+                    return recipe.currentEffort - baseline > SMALL_NUMBER;
+                });
+
+                if (!donors.length) {
+                    break;
+                }
+
+                const totalExtra = donors.reduce((sum, recipe) => {
+                    const baseline = recipe.originalEffort ?? recipe.baseEffort ?? 0;
+                    return sum + Math.max(0, recipe.currentEffort - baseline);
+                }, 0);
+
+                if (totalExtra <= SMALL_NUMBER) {
+                    break;
+                }
+
+                for (const donor of donors) {
+                    const baseline = donor.originalEffort ?? donor.baseEffort ?? 0;
+                    const extra = Math.max(0, donor.currentEffort - baseline);
+                    if (extra <= SMALL_NUMBER) continue;
+
+                    const portion = Math.min(extra, (extra / totalExtra) * remaining);
+                    if (portion <= SMALL_NUMBER) continue;
+
+                    queueAdjustment(donor, donor.currentEffort - portion);
+                    remaining -= portion;
+                    taken += portion;
+
+                    if (remaining <= SMALL_NUMBER) {
+                        break;
+                    }
+                }
+            }
+
+            return taken;
+        };
+
+        for (const recipe of state.recipes) {
+            if (recipe.isLocked) continue;
+            if (recipe.originalEffort === undefined) continue;
+            if (recipe.currentEffort >= recipe.originalEffort - SMALL_NUMBER) continue;
+            if (recipe.efficiency < 0.999) continue;
+
+            const sustainable = this.findSustainableEffort(recipe.id, recipe.originalEffort);
+            if (sustainable <= recipe.currentEffort + SMALL_NUMBER) {
+                continue;
+            }
+
+            const target = Math.min(recipe.originalEffort, sustainable);
+            if (target <= recipe.currentEffort + SMALL_NUMBER) {
+                continue;
+            }
+
+            const needed = target - recipe.currentEffort;
+            const obtained = borrowEffort(needed, recipe.id);
+
+            if (obtained > SMALL_NUMBER) {
+                queueAdjustment(recipe, recipe.currentEffort + obtained);
+
+                if (recipe.currentEffort >= recipe.originalEffort - SMALL_NUMBER) {
+                    delete rebalanceReasons[recipe.id];
+                }
+            }
+        }
+
+        if (!hasShortage) {
+            for (const recipe of state.recipes) {
+                if (!rebalanceReasons[recipe.id]) continue;
+
+                if (recipe.originalEffort === undefined) {
+                    delete rebalanceReasons[recipe.id];
+                    continue;
+                }
+
+                if (recipe.currentEffort >= recipe.originalEffort - SMALL_NUMBER && recipe.efficiency >= 0.99) {
+                    delete rebalanceReasons[recipe.id];
+                }
+            }
+        }
+
+        for (const [recipeId, effort] of adjustments.entries()) {
             this.setCraftingEffort({
                 id: recipeId,
-                effort: newEffort,
+                effort,
                 isForce: true,
                 filterId: category,
                 isAutoRestore: true,
             });
-        }
-
-        for (const reasonId of Object.keys(rebalanceReasons)) {
-            const recipe = state.recipesById.get(reasonId);
-            if (!recipe) {
-                delete rebalanceReasons[reasonId];
-                continue;
-            }
-
-            if (recipe.currentEffort >= (recipe.originalEffort ?? recipe.currentEffort) - SMALL_NUMBER &&
-                recipe.efficiency >= 0.99) {
-                delete rebalanceReasons[reasonId];
-            }
         }
 
         this.normalizeTotalEffort(category);
@@ -636,7 +764,7 @@ export class CraftingModule extends GameModule {
         this.sendCraftingData({ filterId: category });
     }
 
-    collectCategoryRebalanceState(category) {
+    collectCategoryAutoRebalanceState(category) {
         const tagToCat = {
             'crafting': 'material',
             'alchemy': 'alchemy'
@@ -645,7 +773,6 @@ export class CraftingModule extends GameModule {
         const allocations = category === 'crafting' ? this.originalAllocations : this.alchemyOriginalAllocations;
 
         const recipes = [];
-        const recipesById = new Map();
 
         for (const [recipeId, slot] of Object.entries(this.craftingSlots)) {
             const recipeEntity = gameEntity.getEntity(recipeId);
@@ -681,165 +808,9 @@ export class CraftingModule extends GameModule {
             };
 
             recipes.push(recipeState);
-            recipesById.set(recipeId, recipeState);
         }
 
-        return { recipes, recipesById, allocations };
-    }
-
-    reduceBottleneckedRecipes(state, queueAdjustment, rebalanceReasons) {
-        let effortPool = 0;
-
-        for (const recipe of state.recipes) {
-            if (recipe.isLocked) continue;
-
-            const efficiency = recipe.efficiency ?? 1;
-            if (efficiency >= 0.99 - SMALL_NUMBER) {
-                continue;
-            }
-
-            const targetEffort = this.calculateEffortForTargetEfficiency(recipe, 0.99);
-
-            if (targetEffort < recipe.currentEffort - SMALL_NUMBER) {
-                const freedEffort = recipe.currentEffort - targetEffort;
-                effortPool += freedEffort;
-
-                queueAdjustment(recipe, targetEffort);
-
-                const bottleNeckResource = recipe.bottleNeck ? gameResources.getResource(recipe.bottleNeck) : null;
-                rebalanceReasons[recipe.id] = bottleNeckResource?.name || 'resources';
-            }
-        }
-
-        return effortPool;
-    }
-
-    restoreRecipesTowardsOriginal(state, queueAdjustment, initialPool, rebalanceReasons) {
-        let effortPool = initialPool;
-
-        const takeEffortFromPool = (amount) => {
-            let remaining = amount;
-            let taken = 0;
-
-            if (remaining <= SMALL_NUMBER) {
-                return 0;
-            }
-
-            const fromPool = Math.min(remaining, effortPool);
-            if (fromPool > 0) {
-                effortPool -= fromPool;
-                remaining -= fromPool;
-                taken += fromPool;
-            }
-
-            if (remaining <= SMALL_NUMBER) {
-                return taken;
-            }
-
-            let safety = 0;
-            while (remaining > SMALL_NUMBER && safety < 5) {
-                safety += 1;
-                let totalExtra = 0;
-
-                for (const donor of state.recipes) {
-                    if (donor.isLocked) continue;
-                    const extra = Math.max(0, donor.currentEffort - (donor.baseEffort ?? 0));
-                    totalExtra += extra;
-                }
-
-                if (totalExtra <= SMALL_NUMBER) {
-                    break;
-                }
-
-                for (const donor of state.recipes) {
-                    if (donor.isLocked) continue;
-
-                    const extra = Math.max(0, donor.currentEffort - (donor.baseEffort ?? 0));
-                    if (extra <= SMALL_NUMBER) continue;
-
-                    const share = (extra / totalExtra) * remaining;
-                    const delta = Math.min(extra, share);
-                    if (delta <= SMALL_NUMBER) continue;
-
-                    queueAdjustment(donor, donor.currentEffort - delta);
-                    remaining -= delta;
-                    taken += delta;
-
-                    if (remaining <= SMALL_NUMBER) {
-                        break;
-                    }
-                }
-            }
-
-            return taken;
-        };
-
-        for (const recipe of state.recipes) {
-            if (recipe.isLocked) continue;
-
-            const originalEffort = recipe.originalEffort;
-            if (originalEffort === undefined) continue;
-
-            if (recipe.currentEffort >= originalEffort - SMALL_NUMBER) {
-                continue;
-            }
-
-            const canRestore = this.canRunRecipeAtEffortForDuration(recipe.id, originalEffort, 3);
-
-            if (!canRestore) {
-                continue;
-            }
-
-            const required = originalEffort - recipe.currentEffort;
-            const taken = takeEffortFromPool(required);
-
-            if (taken > SMALL_NUMBER) {
-                queueAdjustment(recipe, recipe.currentEffort + taken);
-
-                if (recipe.currentEffort >= originalEffort - SMALL_NUMBER) {
-                    if (rebalanceReasons[recipe.id]) {
-                        delete rebalanceReasons[recipe.id];
-                    }
-                }
-            }
-        }
-
-        return effortPool;
-    }
-
-    distributeEffortToEfficientRecipes(state, queueAdjustment, effortPool) {
-        if (effortPool <= SMALL_NUMBER) {
-            return;
-        }
-
-        const eligible = state.recipes.filter(recipe => {
-            if (recipe.isLocked) return false;
-            if (recipe.efficiency < 0.99 - SMALL_NUMBER) return false;
-            return true;
-        });
-
-        if (!eligible.length) {
-            return;
-        }
-
-        const totalWeight = eligible.reduce((sum, recipe) => {
-            const weight = recipe.originalEffort ?? recipe.currentEffort;
-            return sum + (weight || 0);
-        }, 0);
-
-        if (totalWeight <= SMALL_NUMBER) {
-            return;
-        }
-
-        for (const recipe of eligible) {
-            const weight = recipe.originalEffort ?? recipe.currentEffort;
-            if (!weight || weight <= SMALL_NUMBER) continue;
-
-            const portion = effortPool * (weight / totalWeight);
-            if (portion <= SMALL_NUMBER) continue;
-
-            queueAdjustment(recipe, recipe.currentEffort + portion);
-        }
+        return { recipes, allocations };
     }
 
     canRestoreOriginalAllocations(category) {
@@ -859,7 +830,7 @@ export class CraftingModule extends GameModule {
         return Object.keys(allocations).length > 0;
     }
 
-    calculateEffortForTargetEfficiency(recipe, targetEfficiency) {
+    calculateEffortForEfficiency(recipe, targetEfficiency) {
         const { id, currentEffort } = recipe;
         if (currentEffort <= SMALL_NUMBER) {
             return 0;
@@ -867,10 +838,7 @@ export class CraftingModule extends GameModule {
 
         const hasOriginal = typeof recipe.originalEffort === 'number';
         const referenceEffort = hasOriginal ? recipe.originalEffort : currentEffort;
-        const upperBound = Math.max(
-            SMALL_NUMBER,
-            Math.min(currentEffort, referenceEffort, 1)
-        );
+        const upperBound = Math.max(SMALL_NUMBER, Math.min(referenceEffort, 1));
 
         const sustainableEffort = this.findSustainableEffort(id, upperBound);
         if (sustainableEffort <= SMALL_NUMBER) {
@@ -976,427 +944,10 @@ export class CraftingModule extends GameModule {
         }
     }
 
-    rebalanceInefficientRecipes(category) {
-        const tagToCat = {
-            'crafting': 'material',
-            alchemy: 'alchemy'
-        };
-
-        let totalUnusedEffort = 0;
-        const recipesToRebalance = [];
-
-        // Check each recipe for inefficiency (only for the specific category)
-        for (const [recipeId, slot] of Object.entries(this.craftingSlots)) {
-            if (!slot.effort || slot.effort <= 0) continue;
-
-            if (!gameEntity.entityExists(`activeCrafting_${recipeId}`)) continue;
-
-            const currentEntity = gameEntity.getEntity(`activeCrafting_${recipeId}`);
-            if (!currentEntity) continue;
-
-            // Only process recipes for the specific category
-            const recipeTags = gameEntity.getEntity(recipeId)?.tags || [];
-            if (!recipeTags.includes(tagToCat[category])) continue;
-
-            const efficiency = currentEntity.modifier?.efficiency ?? 1;
-            
-            if (efficiency < 0.98) { // Recipe is running inefficiently
-                const unusedEffort = slot.effort * (1 - efficiency);
-                totalUnusedEffort += unusedEffort;
-                
-                // Get the bottleneck resource that caused this inefficiency
-                const bottleNeck = currentEntity.modifier?.bottleNeck ? gameResources.getResource(currentEntity.modifier.bottleNeck) : null;
-                const missingResourceName = bottleNeck?.name || 'resources';
-                
-                recipesToRebalance.push({ 
-                    recipeId, 
-                    unusedEffort, 
-                    efficiency, 
-                    missingResourceName 
-                });
-            }
-        }
-
-        console.log('RBeffB: ', JSON.parse(JSON.stringify(this.craftingSlots)), recipesToRebalance, totalUnusedEffort);
-
-        if (totalUnusedEffort > 0.01) { // Only rebalance if there's significant unused effort
-            this.redistributeUnusedEffort(recipesToRebalance, totalUnusedEffort, category);
-        }
-
-        console.log('RBeffA: ', JSON.parse(JSON.stringify(this.craftingSlots)), totalUnusedEffort);
-
-    }
-
-    getPotentialAllocateTargets(category) {
-        const tagToCat = {
-            'crafting': 'material',
-            alchemy: 'alchemy'
-        };
-        
-        const allocations = category === 'crafting' ? this.originalAllocations : this.alchemyOriginalAllocations;
-        const potentialTargets = [];
-        
-        for (const [recipeId, slot] of Object.entries(this.craftingSlots)) {
-            if (!slot.effort || slot.effort <= 0) continue;
-
-            if (!gameEntity.entityExists(`activeCrafting_${recipeId}`)) continue;
-
-            // Only process recipes for the specific category
-            const recipeTags = gameEntity.getEntity(recipeId)?.tags || [];
-            if (!recipeTags.includes(tagToCat[category])) continue;
-
-            const currentEntity = gameEntity.getEntity(`activeCrafting_${recipeId}`);
-            if (!currentEntity) continue;
-
-            const efficiency = currentEntity.modifier?.efficiency ?? 1;
-            
-            // Check if this recipe was rebalanced down (current effort < original effort)
-            const originalEffort = allocations[recipeId];
-            const wasRebalancedDown = originalEffort !== undefined && slot.effort < originalEffort;
-            
-            // Only add recipes that are running efficiently (no bottlenecks) AND were not rebalanced down
-            if (efficiency > 0.98 && !wasRebalancedDown) {
-                potentialTargets.push({ recipeId, currentEffort: slot.effort });
-            }
-        }
-        
-        return potentialTargets;
-    }
-
-    redistributeUnusedEffort(recipesToRebalance, totalUnusedEffort, category) {
-        const tagToCat = {
-            'crafting': 'material',
-            alchemy: 'alchemy'
-        };
-        
-        const allocations = category === 'crafting' ? this.originalAllocations : this.alchemyOriginalAllocations;
-
-        // Store original allocations if not already stored
-        if (Object.keys(allocations).length === 0) {
-            for (const [recipeId, slot] of Object.entries(this.craftingSlots)) {
-                if (slot.effort > 0) {
-                    const recipeTags = gameEntity.getEntity(recipeId)?.tags || [];
-                    if (recipeTags.includes(tagToCat[category])) {
-                        allocations[recipeId] = slot.effort;
-                    }
-                }
-            }
-        }
-
-        // First, reduce effort on inefficient recipes
-        for (const { recipeId, unusedEffort, missingResourceName } of recipesToRebalance) {
-            const currentEffort = this.craftingSlots[recipeId]?.effort || 0;
-            const newEffort = Math.max(0, currentEffort - unusedEffort);
-            
-            // Store the reason for rebalancing this recipe
-            const rebalanceReasons = category === 'crafting' ? this.rebalanceReasons : this.alchemyRebalanceReasons;
-            rebalanceReasons[recipeId] = missingResourceName;
-            
-            this.setCraftingEffort({
-                id: recipeId,
-                effort: newEffort,
-                isForce: true,
-                filterId: category
-            });
-        }
-
-        // Get potential targets that can accept more effort (no bottlenecks)
-        const availableRecipes = this.getPotentialAllocateTargets(category);
-
-        
-        // Filter out recipes that were just rebalanced
-        const filteredAvailableRecipes = availableRecipes.filter(recipe => 
-            !recipesToRebalance.some(r => r.recipeId === recipe.recipeId)
-        );
-
-        if (filteredAvailableRecipes.length === 0) return;
-
-        // Calculate total effort of available recipes for proportional distribution
-        const totalAvailableEffort = filteredAvailableRecipes.reduce((sum, recipe) => sum + recipe.currentEffort, 0);
-
-        // Redistribute unused effort proportionally to available recipes
-        for (const availableRecipe of filteredAvailableRecipes) {
-            const proportion = availableRecipe.currentEffort / totalAvailableEffort;
-            const additionalEffort = totalUnusedEffort * proportion;
-            
-            const newEffort = availableRecipe.currentEffort + additionalEffort;
-            this.setCraftingEffort({
-                id: availableRecipe.recipeId,
-                effort: newEffort,
-                isForce: true,
-                filterId: category
-            });
-        }
-
-        // Safety check after redistribution
-        this.normalizeTotalEffort(category);
-        this.updateActiveRecipes(category);
-
-        // Recalculate optimal allocations after redistribution to account for new possibilities
-        this.recalculateOptimalAllocations(category);
-
-        // Check for cascading effects - if we increased some recipes, their dependents might now be able to run more
-        this.checkForCascadingEffects(category);
-
-        // Send updated data to UI
-        this.sendCraftingData({ filterId: category });
-    }
-
-    /**
-     * Check for cascading effects after redistribution
-     * If we increased production of some recipes, their dependents might now be able to run more efficiently
-     */
-    checkForCascadingEffects(category) {
-        const tagToCat = {
-            'crafting': 'material',
-            'alchemy': 'alchemy'
-        };
-
-        // Find recipes that were increased compared to their original allocations
-        const increasedRecipes = [];
-        for (const [recipeId, slot] of Object.entries(this.craftingSlots)) {
-            const recipeTags = gameEntity.getEntity(recipeId)?.tags || [];
-            if (!recipeTags.includes(tagToCat[category])) continue;
-
-            const originalEffort = (category === 'crafting' ? this.originalAllocations : this.alchemyOriginalAllocations)[recipeId];
-            if (originalEffort && (slot.effort || 0) > originalEffort + 0.01) {
-                increasedRecipes.push({
-                    recipeId,
-                    originalEffort,
-                    currentEffort: slot.effort || 0,
-                    effortIncrease: (slot.effort || 0) - originalEffort
-                });
-            }
-        }
-
-        if (increasedRecipes.length === 0) return;
-
-        console.log(`Checking cascading effects for increased recipes:`, increasedRecipes.map(r => r.recipeId));
-
-        // For each increased recipe, check if dependent recipes can now run more
-        for (const increasedRecipe of increasedRecipes) {
-            this.checkDependentRecipes(category, increasedRecipe);
-        }
-
-        // After cascading changes, normalize efforts
-        this.normalizeTotalEffort(category);
-        this.updateActiveRecipes(category);
-
-        // Update optimal allocations to reflect cascading changes
-        this.recalculateOptimalAllocations(category);
-    }
-
-    /**
-     * Check if dependent recipes can be increased when a producer recipe is increased
-     */
-    checkDependentRecipes(category, increasedRecipe) {
-        const producerEntity = gameEntity.getEntity(increasedRecipe.recipeId);
-        if (!producerEntity) return;
-
-        // Get what this recipe produces (with current effort)
-        const currentEffort = this.craftingSlots[increasedRecipe.recipeId]?.effort || 0;
-        const productionEffects = gameEntity.getEffects(increasedRecipe.recipeId, 0, 1, true, 1, 1, currentEffort);
-
-        const resourceProductions = productionEffects.filter(effect =>
-            effect.scope === 'resources' && effect.value > 0
-        );
-
-        if (resourceProductions.length === 0) return;
-
-        console.log(`Recipe ${increasedRecipe.recipeId} produces:`, resourceProductions.map(e => `${e.id}: ${e.value}`));
-
-        // Find recipes that consume these resources
-        for (const production of resourceProductions) {
-            const resourceId = production.id;
-
-            // Check all active recipes to see if they consume this resource
-            for (const [recipeId, slot] of Object.entries(this.craftingSlots)) {
-                if (!slot.effort || slot.effort <= 0) continue;
-                if (recipeId === increasedRecipe.recipeId) continue; // Don't check the producer itself
-
-                const consumerEntity = gameEntity.getEntity(recipeId);
-                if (!consumerEntity) continue;
-
-                // Check if this recipe consumes the produced resource
-                const consumerEffects = gameEntity.getEffects(recipeId, 0, 1, true, 1, 1, slot.effort);
-                const consumptionEffects = consumerEffects.filter(effect =>
-                    effect.scope === 'consumption' && effect.type === 'resources' && effect.id === resourceId
-                );
-
-                if (consumptionEffects.length > 0) {
-                    console.log(`Recipe ${recipeId} consumes ${resourceId} - checking if it can be increased`);
-
-                    // Try to increase this consumer recipe
-                    const currentEffort = slot.effort || 0;
-                    const maxIncrease = 0.1; // Try 10% increase
-                    const testEffort = Math.min(currentEffort + maxIncrease, 1.0);
-
-                    if (this.canRunRecipeAtEffortForDuration(recipeId, testEffort, 3)) {
-                        console.log(`Can increase ${recipeId} from ${currentEffort} to ${testEffort}`);
-
-                        this.setCraftingEffort({
-                            id: recipeId,
-                            effort: testEffort,
-                            isForce: true,
-                            filterId: category
-                        });
-
-                        // Recursively check if this increase enables other recipes
-                        this.checkDependentRecipes(category, {
-                            recipeId,
-                            originalEffort: currentEffort,
-                            currentEffort: testEffort,
-                            effortIncrease: testEffort - currentEffort
-                        });
-                    }
-                }
-            }
-        }
-    }
-
     /**
      * Recalculates optimal effort allocations after redistribution
      * This accounts for new production possibilities that may have opened up
      */
-    recalculateOptimalAllocations(category) {
-        const tagToCat = {
-            'crafting': 'material',
-            'alchemy': 'alchemy'
-        };
-
-        const allocations = category === 'crafting' ? this.originalAllocations : this.alchemyOriginalAllocations;
-        const rebalanceReasons = category === 'crafting' ? this.rebalanceReasons : this.alchemyRebalanceReasons;
-
-        // Find recipes that are currently running efficiently
-        const efficientRecipes = [];
-        for (const [recipeId, slot] of Object.entries(this.craftingSlots)) {
-            if (!slot.effort || slot.effort <= 0) continue;
-
-            if (!gameEntity.entityExists(`activeCrafting_${recipeId}`)) continue;
-
-            const recipeTags = gameEntity.getEntity(recipeId)?.tags || [];
-            if (!recipeTags.includes(tagToCat[category])) continue;
-
-            const currentEntity = gameEntity.getEntity(`activeCrafting_${recipeId}`);
-            if (!currentEntity) continue;
-
-            const efficiency = currentEntity.modifier?.efficiency ?? 1;
-
-            // Only consider recipes running at high efficiency
-            if (efficiency > 0.95) {
-                efficientRecipes.push({
-                    recipeId,
-                    currentEffort: slot.effort,
-                    efficiency,
-                    entity: currentEntity
-                });
-            }
-        }
-
-        if (efficientRecipes.length === 0) return;
-
-        // Try to optimize each efficient recipe
-        const newAllocations = {};
-        let totalEffort = 0;
-
-        for (const recipe of efficientRecipes) {
-            // Calculate optimal effort for this recipe
-            const optimalEffort = this.calculateOptimalEffortForRecipe(recipe, category);
-
-            // Check if increasing this recipe's effort would benefit the overall system
-            if (optimalEffort > recipe.currentEffort) {
-                const effortIncrease = optimalEffort - recipe.currentEffort;
-
-                // Check if we have space for this increase
-                const availableSpace = 1.0 - totalEffort;
-                const actualIncrease = Math.min(effortIncrease, availableSpace);
-
-                if (actualIncrease > 0.01) { // Only if meaningful increase
-                    newAllocations[recipe.recipeId] = recipe.currentEffort + actualIncrease;
-                    totalEffort += recipe.currentEffort + actualIncrease;
-
-                    // Check if this increase would enable other recipes to run more efficiently
-                    this.checkForEnabledRecipes(category, recipe, actualIncrease);
-                } else {
-                    newAllocations[recipe.recipeId] = recipe.currentEffort;
-                    totalEffort += recipe.currentEffort;
-                }
-            } else {
-                newAllocations[recipe.recipeId] = recipe.currentEffort;
-                totalEffort += recipe.currentEffort;
-            }
-        }
-
-        // If we found better allocations, update them
-        if (Object.keys(newAllocations).length > 0) {
-            // Merge with existing allocations for recipes we didn't analyze
-            for (const [recipeId, effort] of Object.entries(allocations)) {
-                if (!newAllocations[recipeId]) {
-                    const recipeTags = gameEntity.getEntity(recipeId)?.tags || [];
-                    if (recipeTags.includes(tagToCat[category])) {
-                        newAllocations[recipeId] = effort;
-                    }
-                }
-            }
-
-            // Update allocations
-            Object.assign(allocations, newAllocations);
-
-            console.log(`Recalculated optimal allocations for ${category}:`, newAllocations);
-        }
-    }
-
-    /**
-     * Calculate the optimal effort for a specific recipe
-     */
-    calculateOptimalEffortForRecipe(recipe, category) {
-        const { recipeId, currentEffort, efficiency } = recipe;
-
-        // If efficiency is already < 95%, don't try to increase
-        if (efficiency < 0.95) return currentEffort;
-
-        // Try to increase effort by up to 50% to see if it's beneficial
-        const maxIncrease = currentEffort * 0.5;
-        const testEffort = Math.min(currentEffort + maxIncrease, 1.0);
-
-        // Check if this recipe can run at the increased effort for at least 3 seconds
-        if (this.canRunRecipeAtEffortForDuration(recipeId, testEffort, 3)) {
-            return testEffort;
-        }
-
-        return currentEffort;
-    }
-
-    /**
-     * Check if increasing one recipe's effort enables other recipes to run more efficiently
-     */
-    checkForEnabledRecipes(category, increasedRecipe, effortIncrease) {
-        const tagToCat = {
-            'crafting': 'material',
-            'alchemy': 'alchemy'
-        };
-
-        // This is where we would analyze production chains
-        // For now, we'll implement a simple heuristic
-
-        const increasedRecipeEntity = gameEntity.getEntity(increasedRecipe.recipeId);
-        if (!increasedRecipeEntity) return;
-
-        // Get what this recipe produces (with updated effort)
-        const productionEffects = gameEntity.getEffects(increasedRecipe.recipeId, 0, 1, true, 1, 1, increasedRecipe.currentEffort + effortIncrease);
-
-        // Look for production effects
-        const resourceProductions = productionEffects.filter(effect =>
-            effect.scope === 'resources' && effect.value > 0
-        );
-
-        if (resourceProductions.length > 0) {
-            console.log(`Recipe ${increasedRecipe.recipeId} produces:`, resourceProductions.map(e => `${e.id}: ${e.value}`));
-            // Here we could analyze which other recipes consume these resources
-            // and potentially increase their optimal efforts
-        }
-    }
-
     regenerateNotifications() {
 
         this.filters.forEach(filter => {
