@@ -593,6 +593,8 @@ export class CraftingModule extends GameModule {
 
         const rebalanceReasons = category === 'crafting' ? this.rebalanceReasons : this.alchemyRebalanceReasons;
 
+        const flowContext = this.buildResourceFlowContext(state.recipes);
+
         const adjustments = new Map();
         const queueAdjustment = (recipe, newEffort) => {
             const clamped = Math.max(0, Math.min(1, newEffort));
@@ -609,7 +611,7 @@ export class CraftingModule extends GameModule {
             if (recipe.efficiency < 0.99 - SMALL_NUMBER) {
                 hasShortage = true;
 
-                const targetEffort = this.calculateEffortForEfficiency(recipe, 0.99);
+                const targetEffort = this.calculateEffortForEfficiency(recipe, 0.99, flowContext);
                 const clampedTarget = Math.min(recipe.currentEffort, targetEffort);
 
                 if (clampedTarget < recipe.currentEffort - SMALL_NUMBER) {
@@ -712,7 +714,7 @@ export class CraftingModule extends GameModule {
             if (recipe.currentEffort >= recipe.originalEffort - SMALL_NUMBER) continue;
             if (recipe.efficiency < 0.999) continue;
 
-            const sustainable = this.findSustainableEffort(recipe.id, recipe.originalEffort);
+            const sustainable = this.findSustainableEffort(recipe, recipe.originalEffort, flowContext);
             if (sustainable <= recipe.currentEffort + SMALL_NUMBER) {
                 continue;
             }
@@ -816,22 +818,118 @@ export class CraftingModule extends GameModule {
     canRestoreOriginalAllocations(category) {
         const allocations = category === 'crafting' ? this.originalAllocations : this.alchemyOriginalAllocations;
 
+        if (!Object.keys(allocations).length) {
+            return false;
+        }
+
+        const state = this.collectCategoryAutoRebalanceState(category);
+        if (!state.recipes.length) {
+            return false;
+        }
+
+        const flowContext = this.buildResourceFlowContext(state.recipes);
+
         for (const [recipeId, originalEffort] of Object.entries(allocations)) {
-            if (!this.craftingSlots[recipeId]) continue;
+            const recipe = state.recipes.find((entry) => entry.id === recipeId);
+            if (!recipe) {
+                continue;
+            }
 
-            const currentEffort = this.craftingSlots[recipeId]?.effort || 0;
-            if (currentEffort >= originalEffort - SMALL_NUMBER) continue;
+            if (originalEffort <= SMALL_NUMBER) {
+                continue;
+            }
 
-            if (!this.canRunRecipeAtEffortForDuration(recipeId, originalEffort, 3)) {
+            const sustainable = this.findSustainableEffort(recipe, originalEffort, flowContext);
+            if (sustainable + SMALL_NUMBER < originalEffort) {
                 return false;
             }
         }
 
-        return Object.keys(allocations).length > 0;
+        return true;
     }
 
-    calculateEffortForEfficiency(recipe, targetEfficiency) {
-        const { id, currentEffort } = recipe;
+    buildResourceFlowContext(recipes) {
+        const resourceMap = new Map();
+        const recipeEffects = new Map();
+        const resourceIds = new Set();
+
+        for (const recipe of recipes) {
+            const effects = this.getRecipeResourceEffects(recipe.id);
+            recipeEffects.set(recipe.id, effects);
+
+            for (const [resourceId, amount] of effects.consumption.entries()) {
+                let entry = resourceMap.get(resourceId);
+                if (!entry) {
+                    entry = { producers: [], consumers: [] };
+                    resourceMap.set(resourceId, entry);
+                }
+
+                entry.consumers.push({
+                    recipeId: recipe.id,
+                    recipeRef: recipe,
+                    consumptionPerEffort: amount,
+                });
+
+                resourceIds.add(resourceId);
+            }
+
+            for (const [resourceId, amount] of effects.production.entries()) {
+                let entry = resourceMap.get(resourceId);
+                if (!entry) {
+                    entry = { producers: [], consumers: [] };
+                    resourceMap.set(resourceId, entry);
+                }
+
+                entry.producers.push({
+                    recipeId: recipe.id,
+                    recipeRef: recipe,
+                    productionPerEffort: amount,
+                });
+
+                resourceIds.add(resourceId);
+            }
+        }
+
+        const baseBalances = new Map();
+        for (const resourceId of resourceIds) {
+            const resourceState = resourceCalculators.assertResource(resourceId, false, ['runningCrafting']);
+            baseBalances.set(resourceId, resourceState?.balance ?? 0);
+        }
+
+        return { resourceMap, recipeEffects, baseBalances };
+    }
+
+    getRecipeResourceEffects(recipeId) {
+        const effects = gameEntity.getEffects(recipeId, 0, 1, true, 1, 1, 1);
+        const consumption = new Map();
+        const production = new Map();
+
+        for (const effect of effects) {
+            if (effect.type !== 'resources') continue;
+
+            const resourceId = effect.id;
+            if (!resourceId) continue;
+
+            const multiplier = gameResources.getResource(resourceId)?.multiplier ?? 1;
+            const value = (effect.value || 0) * multiplier;
+            const amount = Math.abs(value);
+
+            if (amount <= SMALL_NUMBER) continue;
+
+            if (effect.scope === 'consumption') {
+                const existing = consumption.get(resourceId) ?? 0;
+                consumption.set(resourceId, existing + amount);
+            } else if (effect.scope === 'production') {
+                const existing = production.get(resourceId) ?? 0;
+                production.set(resourceId, existing + amount);
+            }
+        }
+
+        return { consumption, production };
+    }
+
+    calculateEffortForEfficiency(recipe, targetEfficiency, flowContext) {
+        const { currentEffort } = recipe;
         if (currentEffort <= SMALL_NUMBER) {
             return 0;
         }
@@ -840,7 +938,7 @@ export class CraftingModule extends GameModule {
         const referenceEffort = hasOriginal ? recipe.originalEffort : currentEffort;
         const upperBound = Math.max(SMALL_NUMBER, Math.min(referenceEffort, 1));
 
-        const sustainableEffort = this.findSustainableEffort(id, upperBound);
+        const sustainableEffort = this.findSustainableEffort(recipe, upperBound, flowContext);
         if (sustainableEffort <= SMALL_NUMBER) {
             return 0;
         }
@@ -849,47 +947,7 @@ export class CraftingModule extends GameModule {
         return Math.max(0, Math.min(currentEffort, bufferedEffort));
     }
 
-    canRunRecipeAtEffortForDuration(recipeId, effort, durationSeconds) {
-        // Get the recipe entity
-        const recipeEntity = gameEntity.getEntity(recipeId);
-        if (!recipeEntity) return false;
-        
-        // Get effects at original effort level
-        const effects = gameEntity.getEffects(recipeId, 0, 1, true, 1, 1, effort);
-         
-        // Filter for consumption effects that are resources
-        const consumptionEffects = effects.filter(effect => 
-            effect.scope === 'consumption' && 
-            effect.type === 'resources'
-        );
-        
-        // Check each consumption effect
-        for (const effect of consumptionEffects) {
-            const resourceId = effect.id;
-            const resource = gameResources.getResource(resourceId);
-            if (!resource) continue;
-
-            // Calculate consumption per second at test effort
-            const consumptionPerSecond = Math.abs(effect.value || 0);
-            if (consumptionPerSecond <= 0) continue;
-
-            // Calculate how much we need for the duration
-            const requiredForDuration = consumptionPerSecond * durationSeconds;
-
-            // Check if we have enough resource considering the consumption effect
-            // We need to check if: current_balance - consumption_per_second >= 0
-            // This ensures the resource won't go negative when this recipe runs
-            const projectedBalance = resource.balance - consumptionPerSecond;
-
-            if (resource.amount < requiredForDuration || projectedBalance < 0) {
-                return false;
-            }
-        }
-        
-        return true;
-    }
-
-    findSustainableEffort(recipeId, upperBound) {
+    findSustainableEffort(recipe, upperBound, flowContext) {
         if (upperBound <= SMALL_NUMBER) {
             return 0;
         }
@@ -905,7 +963,7 @@ export class CraftingModule extends GameModule {
                 break;
             }
 
-            if (this.canRunRecipeAtEffortForDuration(recipeId, mid, 3)) {
+            if (this.canRunWithPositiveBalance(recipe, mid, upperBound, flowContext)) {
                 best = mid;
                 low = mid;
             } else {
@@ -918,6 +976,65 @@ export class CraftingModule extends GameModule {
         }
 
         return best;
+    }
+
+    canRunWithPositiveBalance(recipe, effort, upperBound, flowContext) {
+        const { resourceMap, recipeEffects, baseBalances } = flowContext;
+        const recipeEffect = recipeEffects.get(recipe.id);
+        if (!recipeEffect) {
+            return true;
+        }
+
+        let remainingFreed = Math.max(0, upperBound - effort);
+
+        for (const [resourceId, consumptionPerEffort] of recipeEffect.consumption.entries()) {
+            const entry = resourceMap.get(resourceId);
+            const baseBalance = baseBalances.get(resourceId) ?? 0;
+            let netBalance = baseBalance;
+
+            if (entry) {
+                for (const consumer of entry.consumers) {
+                    const expectedEffort = consumer.recipeId === recipe.id
+                        ? effort
+                        : (consumer.recipeRef.currentEffort || 0);
+                    netBalance -= consumer.consumptionPerEffort * expectedEffort;
+                }
+
+                for (const producer of entry.producers) {
+                    const expectedEffort = producer.recipeId === recipe.id
+                        ? effort
+                        : (producer.recipeRef.currentEffort || 0);
+                    netBalance += producer.productionPerEffort * expectedEffort;
+                }
+
+                if (netBalance < -SMALL_NUMBER && remainingFreed > SMALL_NUMBER) {
+                    const potentialProducers = entry.producers.filter((producer) => {
+                        if (producer.recipeId === recipe.id) return false;
+                        if (producer.recipeRef.isLocked) return false;
+                        if ((producer.recipeRef.currentEffort || 0) <= SMALL_NUMBER) return false;
+                        return producer.recipeRef.efficiency >= 0.99 - SMALL_NUMBER;
+                    });
+
+                    if (potentialProducers.length) {
+                        const bestRate = potentialProducers.reduce((max, producer) => Math.max(max, producer.productionPerEffort), 0);
+
+                        if (bestRate > SMALL_NUMBER) {
+                            const neededEffort = Math.min(remainingFreed, Math.max(0, (-netBalance) / bestRate));
+                            netBalance += neededEffort * bestRate;
+                            remainingFreed -= neededEffort;
+                        }
+                    }
+                }
+            } else {
+                netBalance -= consumptionPerEffort * effort;
+            }
+
+            if (netBalance < -SMALL_NUMBER) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     restoreOriginalAllocations(category) {
