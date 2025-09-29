@@ -137,6 +137,7 @@ export class CraftingModule extends GameModule {
             if (this.lastRebalanceCheck >= this.rebalanceCheckInterval) {
                 this.lastRebalanceCheck = 0;
                 this.checkAndRebalance('crafting');
+                console.log('this.originalEffort', JSON.parse(JSON.stringify(this.originalAllocations)), JSON.parse(JSON.stringify(this.rebalanceReasons)));
             }
         }
         
@@ -194,7 +195,8 @@ export class CraftingModule extends GameModule {
         }
 
         // Safety check: normalize efforts if total exceeds 100% after loading
-        this.validateAndNormalizeAllEfforts();
+        // Also update originalEffort to normalized values to prevent bugs
+        this.validateAndNormalizeAllEfforts(true);
 
         // Update active recipes after normalization
         this.updateActiveRecipes('crafting');
@@ -205,15 +207,15 @@ export class CraftingModule extends GameModule {
         }
     }
 
-    validateAndNormalizeAllEfforts() {
+    validateAndNormalizeAllEfforts(updateOriginals = false) {
         // Check crafting category
-        this.validateAndNormalizeCategoryEfforts('crafting');
+        this.validateAndNormalizeCategoryEfforts('crafting', updateOriginals);
 
         // Check alchemy category
-        this.validateAndNormalizeCategoryEfforts('alchemy');
+        this.validateAndNormalizeCategoryEfforts('alchemy', updateOriginals);
     }
 
-    validateAndNormalizeCategoryEfforts(category) {
+    validateAndNormalizeCategoryEfforts(category, updateOriginals = false) {
         const tagToCat = {
             'crafting': 'material',
             alchemy: 'alchemy'
@@ -257,20 +259,63 @@ export class CraftingModule extends GameModule {
                         this.craftingSlots[recipeId].effort = normalizedEffort;
                     }
                 }
-            }
-
-            // Additional safety check - ensure no locked recipe exceeds available space
-            for (const [recipeId, slot] of Object.entries(this.craftingSlots)) {
-                if (!slot.isLocked || !slot.effort || slot.effort <= 0) continue;
-
-                const recipeTags = gameEntity.getEntity(recipeId)?.tags || [];
-                if (!recipeTags.includes(tagToCat[category])) continue;
-
-                const availableForLocked = this.getAvailableEffortForLockedRecipe(recipeId, category);
-                if (slot.effort > availableForLocked) {
-                    console.warn(`Loaded locked recipe ${recipeId} effort ${slot.effort} exceeds available space ${availableForLocked}. Limiting.`);
-                    this.craftingSlots[recipeId].effort = availableForLocked;
+                
+                // Update originalEffort if requested (e.g., after loading)
+                if (updateOriginals) {
+                    const allocations = category === 'crafting' ? this.originalAllocations : this.alchemyOriginalAllocations;
+                    
+                    for (const { recipeId } of unlockedSlots) {
+                        // Update originalEffort to normalized value if it was previously stored
+                        if (allocations[recipeId] !== undefined && !this.craftingSlots[recipeId].isLocked) {
+                            const newOriginal = this.craftingSlots[recipeId].effort;
+                            console.log(`Updating loaded originalEffort for ${recipeId}: ${allocations[recipeId]} -> ${newOriginal}`);
+                            allocations[recipeId] = newOriginal;
+                        }
+                    }
                 }
+            }
+        }
+
+        // Normalize originalEffort if requested (e.g., after loading)
+        // This ensures originalEffort sum equals 1.0, preventing future rebalance issues
+        if (updateOriginals) {
+            const allocations = category === 'crafting' ? this.originalAllocations : this.alchemyOriginalAllocations;
+            
+            // Calculate total originalEffort for this category
+            let totalOriginalEffort = 0;
+            const categoryOriginals = [];
+            
+            for (const [recipeId, originalEffort] of Object.entries(allocations)) {
+                const recipeTags = gameEntity.getEntity(recipeId)?.tags || [];
+                if (recipeTags.includes(tagToCat[category])) {
+                    totalOriginalEffort += originalEffort;
+                    categoryOriginals.push({ recipeId, originalEffort });
+                }
+            }
+            
+            // Normalize originalEfforts to sum to 1.0
+            if (totalOriginalEffort > 1.001) {
+                console.log(`Normalizing originalEfforts for ${category}: total ${totalOriginalEffort} -> 1.0`);
+                
+                for (const { recipeId, originalEffort } of categoryOriginals) {
+                    const normalizedOriginal = originalEffort / totalOriginalEffort;
+                    console.log(`Normalizing originalEffort for ${recipeId}: ${originalEffort} -> ${normalizedOriginal}`);
+                    allocations[recipeId] = normalizedOriginal;
+                }
+            }
+        }
+
+        // Additional safety check - ensure no locked recipe exceeds available space
+        for (const [recipeId, slot] of Object.entries(this.craftingSlots)) {
+            if (!slot.isLocked || !slot.effort || slot.effort <= 0) continue;
+
+            const recipeTags = gameEntity.getEntity(recipeId)?.tags || [];
+            if (!recipeTags.includes(tagToCat[category])) continue;
+
+            const availableForLocked = this.getAvailableEffortForLockedRecipe(recipeId, category);
+            if (slot.effort > availableForLocked) {
+                console.warn(`Loaded locked recipe ${recipeId} effort ${slot.effort} exceeds available space ${availableForLocked}. Limiting.`);
+                this.craftingSlots[recipeId].effort = availableForLocked;
             }
         }
     }
@@ -337,10 +382,16 @@ export class CraftingModule extends GameModule {
 
         if(!isForce) {
             this.recalculateRemaining(id, currentFilterId, 1 - effort)
+            
+            // Update originalEffort for all recipes affected by recalculateRemaining
+            if (!isAutoRestore) {
+                this.updateOriginalAllocationsAfterRecalculate(currentFilterId);
+            }
         }
 
         // Safety check: ensure total effort doesn't exceed 100%
-        this.normalizeTotalEffort(currentFilterId);
+        // Update originalEffort if this is a user action (not auto-restore or force)
+        this.normalizeTotalEffort(currentFilterId, !isAutoRestore && !isForce);
 
         const allocations = currentFilterId === 'crafting' ? this.originalAllocations : this.alchemyOriginalAllocations;
         const isEmpty = effort === 0; // Recipe should be inactive if effort is 0, regardless of allocations
@@ -441,6 +492,33 @@ export class CraftingModule extends GameModule {
         this.sendCraftingData({ filterId: category });
     }
 
+    /**
+     * Update originalAllocations to match current efforts after recalculateRemaining
+     * This ensures originalEffort reflects the actual redistributed efforts
+     */
+    updateOriginalAllocationsAfterRecalculate(category) {
+        const tagToCat = {
+            'crafting': 'material',
+            'alchemy': 'alchemy'
+        };
+
+        const allocations = category === 'crafting' ? this.originalAllocations : this.alchemyOriginalAllocations;
+
+        for (const [recipeId, slot] of Object.entries(this.craftingSlots)) {
+            const recipeTags = gameEntity.getEntity(recipeId)?.tags || [];
+            if (!recipeTags.includes(tagToCat[category])) continue;
+
+            // Update originalEffort to current effort if it was previously stored
+            if (allocations[recipeId] !== undefined && !slot.isLocked) {
+                const currentEffort = slot.effort || 0;
+                if (currentEffort > 0) {
+                    console.log(`Updating originalEffort after recalculate for ${recipeId}: ${allocations[recipeId]} -> ${currentEffort}`);
+                    allocations[recipeId] = currentEffort;
+                }
+            }
+        }
+    }
+
     applyCraftingIntensities() {
 
         const resourceModifier = {
@@ -473,7 +551,7 @@ export class CraftingModule extends GameModule {
         gameEntity.setEntityLevel('crafting_intensities', 1, true);
     }
 
-    normalizeTotalEffort(category) {
+    normalizeTotalEffort(category, updateOriginals = false) {
         const tagToCat = {
             'crafting': 'material',
             alchemy: 'alchemy'
@@ -493,10 +571,10 @@ export class CraftingModule extends GameModule {
             totalEffort += slot.effort;
             
             if (slot.isLocked) {
-                console.log(`Recipe ${recipeId} is LOCKED with effort ${slot.effort}`);
+                // console.log(`Recipe ${recipeId} is LOCKED with effort ${slot.effort}`);
                 lockedEffort += slot.effort;
             } else {
-                console.log(`Recipe ${recipeId} is UNLOCKED with effort ${slot.effort}`);
+                // console.log(`Recipe ${recipeId} is UNLOCKED with effort ${slot.effort}`);
                 unlockedSlots.push({ recipeId, slot });
             }
         }
@@ -520,6 +598,20 @@ export class CraftingModule extends GameModule {
                         this.craftingSlots[recipeId].effort = normalizedEffort;
                     } else {
                         console.log(`Skipping locked recipe ${recipeId} with effort ${slot.effort}`);
+                    }
+                }
+                
+                // Update originalEffort ONLY if this is after user actions
+                if (updateOriginals) {
+                    const allocations = category === 'crafting' ? this.originalAllocations : this.alchemyOriginalAllocations;
+                    
+                    for (const { recipeId } of unlockedSlots) {
+                        // Update originalEffort to normalized value if it was previously stored
+                        if (allocations[recipeId] !== undefined && !this.craftingSlots[recipeId].isLocked) {
+                            const newOriginal = this.craftingSlots[recipeId].effort;
+                            console.log(`Updating originalEffort for ${recipeId}: ${allocations[recipeId]} -> ${newOriginal}`);
+                            allocations[recipeId] = newOriginal;
+                        }
                     }
                 }
             }
@@ -656,11 +748,24 @@ export class CraftingModule extends GameModule {
             let remaining = amount;
             let taken = 0;
 
+            // First, use any already freed effort
             if (freedEffort > SMALL_NUMBER) {
                 const used = Math.min(freedEffort, remaining);
                 freedEffort -= used;
                 remaining -= used;
                 taken += used;
+            }
+
+            // Second, use available free effort from the total pool
+            if (remaining > SMALL_NUMBER) {
+                const totalUsedEffort = state.recipes.reduce((sum, r) => sum + r.currentEffort, 0);
+                const availableFreeEffort = Math.max(0, 1.0 - totalUsedEffort);
+                
+                if (availableFreeEffort > SMALL_NUMBER) {
+                    const usedFree = Math.min(availableFreeEffort, remaining);
+                    remaining -= usedFree;
+                    taken += usedFree;
+                }
             }
 
             let guard = 0;
@@ -673,6 +778,8 @@ export class CraftingModule extends GameModule {
                     const baseline = recipe.originalEffort ?? recipe.baseEffort ?? 0;
                     return recipe.currentEffort - baseline > SMALL_NUMBER;
                 });
+
+                console.log('donors: ', donors);
 
                 if (!donors.length) {
                     break;
@@ -715,6 +822,7 @@ export class CraftingModule extends GameModule {
             if (recipe.efficiency < 0.999) continue;
 
             const sustainable = this.findSustainableEffort(recipe, recipe.originalEffort, flowContext);
+            console.log(`Sustainable for ${recipe.id} is`, sustainable, recipe.originalEffort, flowContext);
             if (sustainable <= recipe.currentEffort + SMALL_NUMBER) {
                 continue;
             }
@@ -727,6 +835,7 @@ export class CraftingModule extends GameModule {
             const needed = target - recipe.currentEffort;
             const obtained = borrowEffort(needed, recipe.id);
 
+            console.log(`target for ${recipe.id} is`, target, needed, obtained);
             if (obtained > SMALL_NUMBER) {
                 queueAdjustment(recipe, recipe.currentEffort + obtained);
 
@@ -855,6 +964,7 @@ export class CraftingModule extends GameModule {
 
         for (const recipe of recipes) {
             const effects = this.getRecipeResourceEffects(recipe.id);
+            // console.log(`Got effects for ${recipe.id}`, effects);
             recipeEffects.set(recipe.id, effects);
 
             for (const [resourceId, amount] of effects.consumption.entries()) {
@@ -919,9 +1029,9 @@ export class CraftingModule extends GameModule {
             if (effect.scope === 'consumption') {
                 const existing = consumption.get(resourceId) ?? 0;
                 consumption.set(resourceId, existing + amount);
-            } else if (effect.scope === 'production') {
+            } else if (effect.scope === 'income') {
                 const existing = production.get(resourceId) ?? 0;
-                production.set(resourceId, existing + amount);
+                production.set(resourceId, (existing + amount)*gameResources.getResource(resourceId).multiplier);
             }
         }
 
@@ -1005,8 +1115,10 @@ export class CraftingModule extends GameModule {
                         ? effort
                         : (producer.recipeRef.currentEffort || 0);
                     netBalance += producer.productionPerEffort * expectedEffort;
+                    // console.log(`Expected effort for ${producer.recipeId} is ${expectedEffort}`);
                 }
 
+                // console.log('Producers And Consumers of '+recipe.id + `(${resourceId})`, entry, netBalance);
                 if (netBalance < -SMALL_NUMBER && remainingFreed > SMALL_NUMBER) {
                     const potentialProducers = entry.producers.filter((producer) => {
                         if (producer.recipeId === recipe.id) return false;
