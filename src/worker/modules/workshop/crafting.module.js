@@ -259,20 +259,6 @@ export class CraftingModule extends GameModule {
                         this.craftingSlots[recipeId].effort = normalizedEffort;
                     }
                 }
-                
-                // Update originalEffort if requested (e.g., after loading)
-                if (updateOriginals) {
-                    const allocations = category === 'crafting' ? this.originalAllocations : this.alchemyOriginalAllocations;
-                    
-                    for (const { recipeId } of unlockedSlots) {
-                        // Update originalEffort to normalized value if it was previously stored
-                        if (allocations[recipeId] !== undefined && !this.craftingSlots[recipeId].isLocked) {
-                            const newOriginal = this.craftingSlots[recipeId].effort;
-                            console.log(`Updating loaded originalEffort for ${recipeId}: ${allocations[recipeId]} -> ${newOriginal}`);
-                            allocations[recipeId] = newOriginal;
-                        }
-                    }
-                }
             }
         }
 
@@ -601,17 +587,26 @@ export class CraftingModule extends GameModule {
                     }
                 }
                 
-                // Update originalEffort ONLY if this is after user actions
-                if (updateOriginals) {
-                    const allocations = category === 'crafting' ? this.originalAllocations : this.alchemyOriginalAllocations;
-                    
-                    for (const { recipeId } of unlockedSlots) {
-                        // Update originalEffort to normalized value if it was previously stored
-                        if (allocations[recipeId] !== undefined && !this.craftingSlots[recipeId].isLocked) {
-                            const newOriginal = this.craftingSlots[recipeId].effort;
-                            console.log(`Updating originalEffort for ${recipeId}: ${allocations[recipeId]} -> ${newOriginal}`);
-                            allocations[recipeId] = newOriginal;
-                        }
+                
+            }
+        }
+
+        // If requested, renormalize original allocations so their sum <= 1 (category-scoped)
+        if (updateOriginals) {
+            const allocations = category === 'crafting' ? this.originalAllocations : this.alchemyOriginalAllocations;
+            let sum = 0;
+            for (const [rid, val] of Object.entries(allocations)) {
+                const tags = gameEntity.getEntity(rid)?.tags || [];
+                if (tags.includes(tagToCat[category])) {
+                    sum += (val || 0);
+                }
+            }
+            if (sum > 1 + 1e-9) {
+                const k = 1 / sum;
+                for (const [rid, val] of Object.entries(allocations)) {
+                    const tags = gameEntity.getEntity(rid)?.tags || [];
+                    if (tags.includes(tagToCat[category])) {
+                        allocations[rid] = (val || 0) * k;
                     }
                 }
             }
@@ -696,6 +691,7 @@ export class CraftingModule extends GameModule {
 
         let freedEffort = 0;
         let hasShortage = false;
+        const reduced = new Set();
 
         for (const recipe of state.recipes) {
             if (recipe.isLocked || recipe.currentEffort <= SMALL_NUMBER) continue;
@@ -710,6 +706,7 @@ export class CraftingModule extends GameModule {
                     const freed = recipe.currentEffort - clampedTarget;
                     freedEffort += freed;
                     queueAdjustment(recipe, clampedTarget);
+                    reduced.add(recipe.id);
 
                     const bottleneckName = recipe.bottleNeck ? gameResources.getResource(recipe.bottleNeck)?.name : null;
                     rebalanceReasons[recipe.id] = bottleneckName || 'resources';
@@ -717,29 +714,39 @@ export class CraftingModule extends GameModule {
             }
         }
 
-        if (freedEffort > SMALL_NUMBER) {
-            const recipients = state.recipes.filter((recipe) => {
-                if (recipe.isLocked) return false;
-                if (recipe.efficiency < 0.99 - SMALL_NUMBER) return false;
-                return recipe.currentEffort > SMALL_NUMBER;
-            });
-
-            const totalWeight = recipients.reduce((sum, recipe) => {
-                const weight = recipe.originalEffort ?? recipe.currentEffort;
-                return weight > SMALL_NUMBER ? sum + weight : sum;
-            }, 0);
-
-            if (totalWeight > SMALL_NUMBER) {
-                for (const recipe of recipients) {
-                    const weight = recipe.originalEffort ?? recipe.currentEffort;
+        // Distribute freed effort plus any free pool up to 100%
+        {
+            const totalUsedEffort = state.recipes.reduce((sum, r) => sum + (r.currentEffort || 0), 0);
+            let toDistribute = freedEffort + Math.max(0, 1 - totalUsedEffort);
+            if (toDistribute > SMALL_NUMBER) {
+                // Build recipient list: not locked, efficient, not just reduced
+                const recipients = [];
+                for (const r of state.recipes) {
+                    if (r.isLocked) continue;
+                    if (reduced.has(r.id)) continue;
+                    if ((r.efficiency ?? 1) < 0.99 - SMALL_NUMBER) continue;
+                    // sustainable headroom
+                    const s = this.findSustainableEffort(r, 1, flowContext);
+                    const headroom = Math.max(0, s - (r.currentEffort || 0));
+                    if (headroom <= SMALL_NUMBER) continue;
+                    const weight = (r.originalEffort ?? r.currentEffort ?? 0);
                     if (weight <= SMALL_NUMBER) continue;
-
-                    const share = freedEffort * (weight / totalWeight);
-                    if (share <= SMALL_NUMBER) continue;
-
-                    queueAdjustment(recipe, recipe.currentEffort + share);
+                    recipients.push({ r, weight, headroom });
                 }
 
+                const totalWeight = recipients.reduce((sum, x) => sum + x.weight, 0);
+                if (totalWeight > SMALL_NUMBER) {
+                    for (const { r, weight, headroom } of recipients) {
+                        if (toDistribute <= SMALL_NUMBER) break;
+                        const share = toDistribute * (weight / totalWeight);
+                        const give = Math.min(share, headroom);
+                        if (give > SMALL_NUMBER) {
+                            queueAdjustment(r, (r.currentEffort || 0) + give);
+                            toDistribute -= give;
+                        }
+                    }
+                }
+                // consumed freedEffort implicitly
                 freedEffort = 0;
             }
         }
