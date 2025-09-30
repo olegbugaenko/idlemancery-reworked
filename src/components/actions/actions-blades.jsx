@@ -285,6 +285,14 @@ export const ListEditor = React.memo(({
         }
     }, [listData])
 
+    
+    const [nameLocal, setNameLocal] = useState(editing?.name || '');
+
+    useEffect(() => {
+        // Оновлюємо локальне ім'я лише коли відкрили інший список
+        setNameLocal(editing?.name || '');
+    }, [editing?.id, editing?.name == null]);
+
     const saveAndClose = (isClose) => {
         if(!isClose) {
             editing.isReopenEdit = true;
@@ -347,10 +355,11 @@ export const ListEditor = React.memo(({
                     <div className={'main-wrap'}>
                         <div className={'main-row'}>
                             <span>Name</span>
-                            {isEditing ? (<input className={'action-list-name-input'} type={'text'} value={editing.name ?? ''} onChange={(e) => {
+                            {isEditing ? (<input className={'action-list-name-input'} type={'text'} value={nameLocal ?? ''} onChange={(e) => {
                                 if(currentTourId === 'action-lists') {
                                     setNextAllowedById(2)
                                 }
+                                setNameLocal(e.target.value);
                                 onUpdateListValue('name', e.target.value)
                             }}/>) : (<span>{editing.name}</span>)}
                             <HowToSign scope={'action-lists'} />

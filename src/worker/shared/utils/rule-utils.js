@@ -83,7 +83,8 @@ export const checkMatchingActionTagRule = (rule) => {
 }
 
 export const checkMatchingCraftingListRule = (rule) => {
-    const listRunning = gameCore.getModule('crafting').lists.runningList?.crafting?.id == rule.crafting_list_id;
+    const listRunning = gameCore.getModule('crafting').lists.runningList?.crafting?.id == rule.crafting_list_id
+        || gameCore.getModule('crafting').lists.runningList?.alchemy?.id == rule.crafting_list_id;
 
     // console.log('CraftingList: ', gameCore.getModule('crafting').lists.runningList?.crafting, rule);
 

@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, webContents } = require('electron');
 const fs = require("fs");
 const { initSteamIfAvailable } = require('../src/general/utils/steam-init');
 const { saveToCloud, loadFromCloud } = require('../src/general/utils/steam-cloud-save');
@@ -8,6 +8,7 @@ const path = require('path');
 const {saveWindowState, loadWindowState} = require("../src/general/utils/window-settings");
 
 let mainWindow;
+let currentZoomFactor = 1;
 
 
 ipcMain.handle('cloud-save', (event, saveData) => {
@@ -35,6 +36,19 @@ ipcMain.on('toggle-fullscreen', (event) => {
     }
 });
 
+ipcMain.on('set-zoom-factor', (event, factor) => {
+    try {
+        const f = Math.max(0.5, Math.min(3, Number(factor) || 1));
+        currentZoomFactor = f;
+        const wc = mainWindow?.webContents;
+        if (wc) {
+            wc.setZoomFactor(f);
+        }
+    } catch (e) {
+        // noop
+    }
+});
+
 app.commandLine.appendSwitch('--in-process-gpu', '--disable-direct-composition');
 
 app.on('ready', () => {
@@ -56,6 +70,13 @@ app.on('ready', () => {
 
     mainWindow.setMenuBarVisibility(false);
 
+    // Apply saved zoom
+    try {
+        const f = Math.max(0.5, Math.min(3, Number(windowState?.zoomFactor) || 1));
+        currentZoomFactor = f;
+        mainWindow.webContents.setZoomFactor(f);
+    } catch (e) {}
+
     // Завантажуємо React-додаток
     mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
 
@@ -66,7 +87,7 @@ app.on('ready', () => {
     }, 500);
 
     mainWindow.on('close', () => {
-        saveWindowState(app, mainWindow);
+        saveWindowState(app, mainWindow, currentZoomFactor);
     })
 
     mainWindow.on('closed', () => {

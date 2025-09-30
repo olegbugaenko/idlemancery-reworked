@@ -677,6 +677,14 @@ export const MapTileListDetails = ({
         }
     }
 
+    
+    const [nameLocal, setNameLocal] = useState(editing?.name || '');
+
+    useEffect(() => {
+        // Оновлюємо локальне ім'я лише коли відкрили інший список
+        setNameLocal(editing?.name || '');
+    }, [editing?.id, editing?.name == null]);
+
     const addAutotriggerRule = () => {
         onAddAutotriggerRule()
     }
@@ -707,7 +715,11 @@ export const MapTileListDetails = ({
                         <div className={'block'}>
                             <div className={'main-row main-wrap map'}>
                                 <span>Name</span>
-                                {isEditing ? (<input type={'text'} value={editing.name} onChange={(e) => onUpdateListValue('name', e.target.value)}/>) : (<span>{editing.name}</span>)}
+                                {isEditing ? (<input type={'text'} value={nameLocal} onChange={(e) => {
+                                    onUpdateListValue('name', e.target.value);
+                                    setNameLocal(e.target.value);
+                                    }
+                                }/>) : (<span>{editing.name}</span>)}
                             </div>
                         </div>
                         <div className={'block'}>

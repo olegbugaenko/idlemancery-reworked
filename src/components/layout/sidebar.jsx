@@ -2,7 +2,7 @@ import React, {useEffect, useState, useContext, useCallback} from "react";
 import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
 import {formatInt, formatValue, secondsToString} from "../../general/utils/strings";
-import {isBreakdownHasData} from "../../general/utils/resource-utils";
+import {isBreakdownHasConsumption, isBreakdownHasData} from "../../general/utils/resource-utils";
 import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
 import {ActiveEffects} from "../shared/active-effects.jsx";
 import {RandomEventSnippet} from "../shared/random-events.jsx";
@@ -162,7 +162,7 @@ export const ResourcesBar = () => {
                             <div className={'resource-label'}>
                                 <RawResource name={res.name} id={res.id} />
                             </div>
-                            {res.hasCap ? (
+                            {res.hasCap || res.balance < 0 ? (
                                 <TippyWrapper content={<div className={'hint-popup'}><BreakDown category={'cap'} breakDown={res.storageBreakdown}/>{res.eta >= 0 ? `${secondsToString(res.eta)} to full` : `${secondsToString(-res.eta)} to empty`}</div> }>
                                     <span className={`resource-amount ${res.hasCap && res.isCapped ? 'capped' : ''}`}>{formatValue(res.amount || 0)}{res.hasCap || res.isService ? ` / ${formatValue(res.isService ? (res.total || 0) : (res.cap || 0))}` : ''}</span>
                                 </TippyWrapper>

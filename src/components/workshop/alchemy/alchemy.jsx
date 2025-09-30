@@ -182,6 +182,7 @@ export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, op
                     onEditList({ id });
                 }}
                 viewListToDetails={(id) => {
+                    console.log('setViewList: ', id);
                     onViewList({ id });
                 }}
             />
@@ -304,6 +305,12 @@ export const ActionListsPopup = ({ lists, isOpened, setOpenedFor, onSelect, onHo
         return lists.filter(l => l.name.includes(search));
     }, [lists, search])
 
+    useEffect(() => {
+        if (!isOpened) {
+            onHover && onHover(null);
+        }
+    }, [isOpened])
+
     return (<div className={'list-selector'}>
         <div className={'list-selector-inner'}>
             <div clallName={'search-wrap'}>
@@ -316,8 +323,8 @@ export const ActionListsPopup = ({ lists, isOpened, setOpenedFor, onSelect, onHo
             </div>
             <div className={'lists-wrap'}>
                 <PerfectScrollbar>
-                    <div className={'list-inner'}>
-                        {listsDisplayed.map(list => (<div className={'item'} onMouseEnter={() => onHover(list.id)} onMouseLeave={() => onHover(null)}>
+                    <div className={'list-inner'} onMouseLeave={() => onHover && onHover(null)}>
+                        {listsDisplayed.map(list => (<div key={list.id} className={'item'} onMouseEnter={() => onHover(list.id)} onMouseLeave={() => onHover(null)}>
                             <div className={'list-item-row flex-container'}>
                                 <span className={'list-name'}>{list.name}</span>
                                 <FavoriteButton type="alchemyLists" id={list.id} isFavorite={list.isFavorite} className="list-favorite-btn icon-content interface-icon small" />

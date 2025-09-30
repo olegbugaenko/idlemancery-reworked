@@ -1,4 +1,4 @@
-import React, {useCallback, useContext, useEffect, useState, createContext} from "react";
+import React, {useCallback, useContext, useEffect, useRef, useState, createContext} from "react";
 import WorkerContext from "../../../context/worker-context";
 import {useWorkerClient} from "../../../general/client";
 import PerfectScrollbar from "react-perfect-scrollbar";
@@ -37,12 +37,26 @@ export const CraftingWrap = ({ children }) => {
     const [newUnlocks, setNewUnlocks] = useState({});
 
     const [listDetails, setListDetails] = useState(null)
-
     const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
 
     const handleShowNumericInputsChange = useCallback((value) => {
         setShowNumericInputs(value);
         localStorage.setItem('crafting-show-numeric-inputs', JSON.stringify(value));
+    }, []);
+
+    const currentListIdRef = useRef(null);
+
+    const ensureListDataShape = useCallback((rawListData = {}) => {
+        const listData = { ...rawListData };
+        listData.recipes = Array.isArray(listData.recipes) ? listData.recipes.map(recipe => ({ ...recipe })) : [];
+        const auto = listData.autotrigger || {};
+        listData.autotrigger = {
+            priority: auto.priority ?? 10,
+            rules: Array.isArray(auto.rules) ? auto.rules.map(rule => ({ ...rule })) : [],
+            pattern: auto.pattern ?? '',
+            isEnabled: auto.isEnabled ?? false,
+        };
+        return listData;
     }, []);
 
 
@@ -85,249 +99,332 @@ export const CraftingWrap = ({ children }) => {
     })
 
     useEffect(() => {
-        onMessage('crafting-list-data', (payload) => {
-            if(!listDetails) return;
-
-            setListDetails({
-                ...listDetails,
-                listData: payload,
-                isEdit: listDetails.isEdit,
-                isLoading: false,
+        const handler = (payload) => {
+            if(!payload) return;
+            if (currentListIdRef.current && payload.id !== currentListIdRef.current) return;
+            setListDetails((prev) => {
+                if (!prev) return prev;
+                return {
+                    ...prev,
+                    listData: ensureListDataShape(payload),
+                    isEdit: prev.isEdit,
+                    isLoading: false,
+                };
             })
-        });
+        };
+        
+        onMessage('crafting-list-data', handler);
         
         return () => {
             removeMessage('crafting-list-data');
         };
-    }, [listDetails]);
+    }, [onMessage, removeMessage, ensureListDataShape]);
 
     useEffect(() => {
-        onMessage('crafting-list-effects', (payload) => {
-            const prev = listDetails.listData;
-            if(payload.assumedDistribution) {
-                prev.recipes = payload.assumedDistribution;
-            }
-            setListDetails({
-                ...listDetails,
-                listData: {
-                    ...prev,
+        const handler = (payload) => {
+            if(!payload) return;
+            if (currentListIdRef.current && payload.id !== currentListIdRef.current) return;
+            setListDetails((prev) => {
+                if (!prev) return prev;
+                const prevData = ensureListDataShape(prev.listData);
+                const nextData = ensureListDataShape({
+                    ...prevData,
                     potentialEffects: payload.potentialEffects,
                     resourcesEffects: payload.resourcesEffects,
                     effectEffects: payload.effectEffects,
                     prevEffects: payload.prevEffects,
                     assumedDistribution: payload.assumedDistribution,
-                }
-            })
-        });
+                    recipes: payload.assumedDistribution || prevData.recipes,
+                });
+                return {
+                    ...prev,
+                    listData: nextData,
+                };
+            });
+        };
+
+        onMessage('crafting-list-effects', handler);
         
         return () => {
             removeMessage('crafting-list-effects');
         };
-    }, [listDetails]);
+    }, [onMessage, removeMessage, ensureListDataShape]);
 
     const setAutotriggerPriority = useCallback((priority) => {
-        const { listData } = listDetails ?? {};
-        if(listData) {
-            const newList = cloneDeep(listData);
-            if(!newList.autotrigger) {
-                newList.autotrigger = {};
-            }
-            if(!newList.autotrigger.rules) {
-                newList.autotrigger.rules = [];
-            }
-            newList.autotrigger.priority = priority;
-            setListDetails({...listDetails, listData: {...newList}});
-        }
-    }, [listDetails]);
+        setListDetails(prev => {
+            if (!prev) return prev;
+            const listData = ensureListDataShape(prev.listData);
+            return {
+                ...prev,
+                listData: {
+                    ...listData,
+                    autotrigger: {
+                        ...listData.autotrigger,
+                        priority,
+                    }
+                }
+            };
+        });
+    }, [ensureListDataShape]);
 
     const onSetAutotriggerPattern = useCallback(pattern => {
-        const { listData } = listDetails ?? {};
-        if(listData) {
-            const newList = cloneDeep(listData);
-            if(!newList.autotrigger) {
-                newList.autotrigger = {};
-            }
-            if(!newList.autotrigger.rules) {
-                newList.autotrigger.rules = [];
-            }
-            newList.autotrigger.pattern = pattern;
-            setListDetails({...listDetails, listData: {...newList}});
-        }
-    }, [listDetails]);
+        setListDetails(prev => {
+            if (!prev) return prev;
+            const listData = ensureListDataShape(prev.listData);
+            return {
+                ...prev,
+                listData: {
+                    ...listData,
+                    autotrigger: {
+                        ...listData.autotrigger,
+                        pattern,
+                    }
+                }
+            };
+        });
+    }, [ensureListDataShape]);
 
 
     const onAddAutotriggerRule = useCallback(() => {
-        const { listData } = listDetails ?? {};
-        if(listData) {
-            const newList = cloneDeep(listData);
-            if(!newList.autotrigger) {
-                newList.autotrigger = {};
-            }
-            if(!newList.autotrigger.rules) {
-                newList.autotrigger.rules = [];
-            }
-            newList.autotrigger.rules.push({
-                resource_id: 'mage_xp',
-                condition: 'less_or_eq',
-                value_type: 'percentage',
-                value: 50,
-            });
-            setListDetails({...listDetails, listData: {...newList}});
-        }
-    }, [listDetails])
+        setListDetails(prev => {
+            if (!prev) return prev;
+            const listData = ensureListDataShape(prev.listData);
+            return {
+                ...prev,
+                listData: {
+                    ...listData,
+                    autotrigger: {
+                        ...listData.autotrigger,
+                        rules: [...listData.autotrigger.rules, {
+                            resource_id: 'mage_xp',
+                            condition: 'less_or_eq',
+                            value_type: 'percentage',
+                            value: 50,
+                        }]
+                    }
+                }
+            };
+        });
+    }, [ensureListDataShape])
 
     const onSetAutotriggerRuleValue = useCallback((index, key, value) => {
-        const { listData } = listDetails ?? {};
-        if(listData) {
-            const newList = cloneDeep(listData);
-            if(!newList.autotrigger) {
-                newList.autotrigger = {};
-            }
-            if(!newList.autotrigger.rules) {
-                newList.autotrigger.rules = [];
-            }
-            newList.autotrigger.rules[index] ={
-                ...newList.autotrigger.rules[index],
-                [key]: value
+        setListDetails(prev => {
+            if (!prev) return prev;
+            const listData = ensureListDataShape(prev.listData);
+            if (index < 0 || index >= listData.autotrigger.rules.length) return prev;
+            const rules = listData.autotrigger.rules.map((rule, idx) => idx === index ? {
+                ...rule,
+                [key]: value,
+            } : rule);
+            return {
+                ...prev,
+                listData: {
+                    ...listData,
+                    autotrigger: {
+                        ...listData.autotrigger,
+                        rules,
+                    }
+                }
             };
-            setListDetails({...listDetails, listData: {...newList}});
-        }
-    }, [listDetails])
+        });
+    }, [ensureListDataShape])
 
     const onDeleteAutotriggerRule = useCallback((index) => {
-        const { listData } = listDetails ?? {};
-
-        if(listData) {
-            const newList = cloneDeep(listData);
-            if(!newList.autotrigger) {
-                newList.autotrigger = {};
-            }
-            if(!newList.autotrigger.rules) {
-                newList.autotrigger.rules = [];
-            }
-            newList.autotrigger.rules.splice(index);
-            setListDetails({...listDetails, listData: {...newList}});
-        }
-    }, [listDetails])
+        setListDetails(prev => {
+            if (!prev) return prev;
+            const listData = ensureListDataShape(prev.listData);
+            if (index < 0 || index >= listData.autotrigger.rules.length) return prev;
+            const rules = listData.autotrigger.rules.filter((_, idx) => idx !== index);
+            return {
+                ...prev,
+                listData: {
+                    ...listData,
+                    autotrigger: {
+                        ...listData.autotrigger,
+                        rules,
+                    }
+                }
+            };
+        });
+    }, [ensureListDataShape])
 
     const onToggleAutotrigger = useCallback(() => {
-        const { listData } = listDetails ?? {};
-        if(listData) {
-            const newList = cloneDeep(listData);
-            if(!newList.autotrigger) {
-                newList.autotrigger = {};
-            }
-            if(!newList.autotrigger.rules) {
-                newList.autotrigger.rules = [];
-            }
-            newList.autotrigger.isEnabled = !newList.autotrigger.isEnabled;
-            setListDetails({...listDetails, listData: {...newList}});
-        }
-    }, [listDetails])
+        setListDetails(prev => {
+            if (!prev) return prev;
+            const listData = ensureListDataShape(prev.listData);
+            return {
+                ...prev,
+                listData: {
+                    ...listData,
+                    autotrigger: {
+                        ...listData.autotrigger,
+                        isEnabled: !listData.autotrigger.isEnabled,
+                    }
+                }
+            };
+        });
+    }, [ensureListDataShape])
 
     /*useEffect(() => {
         // console.log('Called select list', listDetails);
     }, [listDetails])*/
 
     const addItemToList = useCallback(({id, name}) => {
-        if(listDetails?.listData && listDetails?.isEdit) {
-            if(id) {
-                if(!listDetails.listData.recipes.find(one => one.id === id)) {
-                    const newList = cloneDeep(listDetails.listData);
-                    newList.recipes.push({
-                        id,
-                        name,
-                        effort: 1,
-                    })
-                    setListDetails({...listDetails, listData: {...newList}});
-                    sendData('query-crafting-list-effects', { listData: newList });
-                }
-            }
-        }
-    }, [listDetails]);
+        setListDetails(prev => {
+            if(!prev?.isEdit || !prev.listData || !id) return prev;
+            const listData = ensureListDataShape(prev.listData);
+            if(listData.recipes.find(one => one.id === id)) return prev;
 
-    const openListDetails = (list) => {
+            const currentTotalEffort = listData.recipes.reduce((sum, recipe) => sum + (recipe.effort || 0), 0);
+            const defaultEffort = 0.25;
+
+            let recipes = [...listData.recipes];
+            if (currentTotalEffort + defaultEffort > 1.0 && currentTotalEffort > 0) {
+                const scaleFactor = (1.0 - defaultEffort) / currentTotalEffort;
+                recipes = recipes.map(recipe => ({
+                    ...recipe,
+                    effort: (recipe.effort || 0) * scaleFactor,
+                }));
+            }
+
+            const newList = {
+                ...listData,
+                recipes: [...recipes, {
+                    id,
+                    name,
+                    effort: defaultEffort,
+                }]
+            };
+
+            sendData('query-crafting-list-effects', { listData: newList });
+
+            return {
+                ...prev,
+                listData: newList,
+            };
+        });
+    }, [ensureListDataShape, sendData]);
+
+    const openListDetails = useCallback((list) => {
         if(list.listData?.id) {
-            setListDetails({
+            const id = list.listData.id;
+            currentListIdRef.current = id;
+            setListDetails(prev => ({
                 isEdit: list.isEdit,
                 isLoading: true,
-            })
+                listData: ensureListDataShape({
+                    id,
+                    ...(list.listData || {}),
+                    category: list.listData?.category ?? 'crafting',
+                }),
+            }))
             sendData('load-crafting-list', {
-                id: list.listData?.id,
+                id,
             })
         } else {
+            currentListIdRef.current = null;
             if(!list.isEdit) {
                 setListDetails(null);
                 return;
             }
             setListDetails({
                 ...(list || {}),
-                listData: {
+                isEdit: true,
+                isLoading: false,
+                listData: ensureListDataShape({
                     ...(list.listData || {}),
-                    recipes: [],
                     category: 'crafting',
-                    autotrigger: {
-                        priority: 10,
-                        rules: [],
-                        pattern: ''
-                    }
-                }
+                })
             });
         }
 
-    }
+    }, [ensureListDataShape, sendData])
 
-    const onDropActionFromList = (id) => {
-        const { listData } = listDetails ?? {};
-        if(listData) {
-            const newList = listData;
-            newList.recipes = newList.recipes.filter(a => a.id !== id);
-            setListDetails({...listDetails, listData: {...newList}});
+    const onDropActionFromList = useCallback((id) => {
+        setListDetails(prev => {
+            if (!prev?.listData) return prev;
+            const listData = ensureListDataShape(prev.listData);
+            const recipes = listData.recipes.filter(recipe => recipe.id !== id);
+            const newList = {
+                ...listData,
+                recipes,
+            };
             sendData('query-crafting-list-effects', { listData: newList });
-        }
-    }
+            return {
+                ...prev,
+                listData: newList,
+            };
+        });
+    }, [ensureListDataShape, sendData])
 
-    const onUpdateActionFromList = (id, key, value) => {
-        const { listData } = listDetails ?? {};
-        if(listData) {
-            const newList = listData;
-            newList.recipes = newList.recipes.map(a => a.id !== id ? a : {...a, [key]: value});
-            setListDetails({...listDetails, listData: {...newList}});
+    const onUpdateActionFromList = useCallback((id, key, value) => {
+        setListDetails(prev => {
+            if (!prev?.listData) return prev;
+            const listData = ensureListDataShape(prev.listData);
+            const recipes = listData.recipes.map(recipe => recipe.id !== id ? recipe : {
+                ...recipe,
+                [key]: value,
+            });
+            const newList = {
+                ...listData,
+                recipes,
+            };
             sendData('query-crafting-list-effects', { listData: newList });
-        }
-    }
+            return {
+                ...prev,
+                listData: newList,
+            };
+        });
+    }, [ensureListDataShape, sendData])
 
-    const onUpdateListValue = (key, value) => {
-        const { listData } = listDetails ?? {};
-        if(listData) {
-            const newList = listData;
-            newList[key] = value;
-            setListDetails({...listDetails, listData: {...newList}});
-            // sendData('query-action-list-effects', { id });
-        }
-    }
+    const onUpdateListValue = useCallback((key, value) => {
+        setListDetails(prev => {
+            if (!prev?.listData) return prev;
+            const listData = ensureListDataShape(prev.listData);
+            const newList = {
+                ...listData,
+                [key]: value,
+            };
+            return {
+                ...prev,
+                listData: newList,
+            };
+        });
+    }, [ensureListDataShape])
 
-    const onApplyCurrent = () => {
-        sendData('query-running-craft-for-list', { category: 'crafting' });
-    }
+    const onApplyCurrent = useCallback(() => {
+        const category = listDetails?.listData?.category ?? 'crafting';
+        sendData('query-running-craft-for-list', { category });
+    }, [listDetails, sendData])
 
     useEffect(() => {
-        onMessage('running-craft-for-list', recipes => {
-            const { listData } = listDetails ?? {};
-            const newList = listData;
-            listData.recipes = recipes;
-            setListDetails({...listDetails, listData: {...newList}});
-            sendData('query-crafting-list-effects', { listData: newList });
-        });
+        const handler = (recipes) => {
+            // if (!currentListIdRef.current) return;
+            setListDetails(prev => {
+                if (!prev?.listData) return prev;
+                const listData = ensureListDataShape(prev.listData);
+                const newList = {
+                    ...listData,
+                    recipes,
+                };
+                sendData('query-crafting-list-effects', { listData: newList });
+                return {
+                    ...prev,
+                    listData: newList,
+                };
+            });
+        };
+        onMessage('running-craft-for-list', handler);
         
         return () => {
             removeMessage('running-craft-for-list');
         };
-    }, [listDetails]);
+    }, [ensureListDataShape, onMessage, removeMessage, sendData]);
 
-    const onCloseList = () => {
+    const onCloseList = useCallback(() => {
+        currentListIdRef.current = null;
         setListDetails(null);
-    }
+    }, [])
 
     return (<div className={'items-wrap crafting-workshop-wrap'}>
         <InterfaceSettingsContext.Provider value={{ showNumericInputs, setShowNumericInputs: handleShowNumericInputsChange }}>
@@ -538,6 +635,14 @@ export const CraftingListDetails = ({
     const [editing, setEditing] = useState({ recipes: []
     })
 
+    const [nameLocal, setNameLocal] = useState(listDetails?.name || '');
+
+    useEffect(() => {
+        console.log('lD: ', listDetails);
+        // Оновлюємо локальне ім'я лише коли відкрили інший список
+        setNameLocal(listDetails?.name || '');
+    }, [listDetails?.id, listDetails.name == null]);
+
     useEffect(() => {
         // console.log('SET EDITING LIST: ', listDetails);
         setEditing(listDetails);
@@ -588,7 +693,7 @@ export const CraftingListDetails = ({
                         <div className={'block main-wrap'}>
                             <div className={'main-row'}>
                                 <span>Name</span>
-                                {isEditing ? (<input type={'text'} value={editing.name} onChange={(e) => onUpdateListValue('name', e.target.value)}/>) : (<span>{editing.name}</span>)}
+                                {isEditing ? (<input type={'text'} value={nameLocal} onChange={(e) => {setNameLocal(e.target.value); onUpdateListValue('name', e.target.value)}}/>) : (<span>{editing.name}</span>)}
                             </div>
                         </div>
                         <div className={'block'}>

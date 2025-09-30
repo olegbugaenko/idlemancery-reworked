@@ -2,7 +2,7 @@ import React, { useCallback, useContext, useEffect, useState } from "react";
 import WorkerContext from "../../context/worker-context";
 import { useWorkerClient } from "../../general/client";
 import PerfectScrollbar from "react-perfect-scrollbar";
-import {isElectron} from "../../general/utils/electron-checks";
+import { isElectron } from "../../general/utils/electron-checks";
 
 const automatedList = [{
     id: 'select_action_tab',
@@ -112,6 +112,10 @@ export const InterfaceSettings = () => {
 
     onMessage("settings", settings => {
         setSettings(settings);
+        if (isElectron() && window?.zoomAPI?.set && typeof settings?.uiScalePercent !== 'undefined') {
+            const factor = Math.max(0.5, Math.min(3, Number(settings.uiScalePercent) / 100));
+            window.zoomAPI.set(factor);
+        }
     })
 
     onMessage("all-hotkeys", (payload) => {
@@ -183,6 +187,30 @@ export const InterfaceSettings = () => {
                             </label>
                         </div>
                     </div>) : null}
+                    <div className={"row flex-container"}>
+                        <div className={"col"}>
+                            <label>
+                                UI Scale: {Math.round((settings?.uiScalePercent ?? 100))}%
+                                <input
+                                    type={'range'}
+                                    min={50}
+                                    max={300}
+                                    step={5}
+                                    value={settings?.uiScalePercent ?? 100}
+                                    onChange={(e) => {
+                                        const val = Number(e.target.value);
+                                        if (isElectron() && window?.zoomAPI?.set) {
+                                            window.zoomAPI.set(Math.max(0.5, Math.min(3, val / 100)));
+                                        }
+                                        setSettingChanged('uiScalePercent', val);
+                                    }}
+                                />
+                            </label>
+                        </div>
+                        <div className={'col'}>
+                            <p className={'hint'}>Adjust interface scale. Default: 100%.</p>
+                        </div>
+                    </div>
                     <div className={"row flex-container"}>
                         <div className={"col"}>
                             <button onClick={clearAllNotifications}>

@@ -46,7 +46,33 @@ export const MainMenu = () => {
     }
 
     useEffect(() => {
+        const isEditableTarget = (el) => {
+            if (!el || !(el instanceof Element)) return false;
+            // Allow opting-out via attribute/class
+            if (el.closest('[data-ignore-hotkeys], .ignore-hotkeys')) return true;
+            // Editable elements
+            if (el.closest('[contenteditable="true"]')) return true;
+            const inputEl = el.closest('input, textarea');
+            if (inputEl) {
+                const tag = inputEl.tagName?.toLowerCase();
+                if (tag === 'textarea') return true;
+                if (tag === 'input') {
+                    const type = (inputEl.getAttribute('type') || 'text').toLowerCase();
+                    const nonTypingTypes = new Set(['checkbox','radio','button','submit','range','color','file','date','datetime-local','month','time','week','hidden']);
+                    const isTypingInput = !nonTypingTypes.has(type);
+                    const isInteractive = !inputEl.disabled && !inputEl.readOnly;
+                    return isTypingInput && isInteractive;
+                }
+            }
+            return false;
+        };
+
         const handleKeyDown = (event) => {
+            // Suspend hotkeys when composing IME or when focus is in editable field
+            if (event.isComposing || event.keyCode === 229) return;
+            if (document.body.classList?.contains('hotkeys-suspended')) return;
+            if (isEditableTarget(event.target)) return;
+
             const keys = [];
             if (event.ctrlKey) keys.push("Ctrl");
             if (event.shiftKey) keys.push("Shift");
@@ -57,8 +83,8 @@ export const MainMenu = () => {
             triggerHotkey(combination); // Call triggerHotkey when a combination is pressed
         };
 
-        window.addEventListener("keydown", handleKeyDown);
-        return () => window.removeEventListener("keydown", handleKeyDown);
+        window.addEventListener("keydown", handleKeyDown, { capture: true });
+        return () => window.removeEventListener("keydown", handleKeyDown, { capture: true });
     }, [hotkeys]);
 
     onMessage('all-hotkeys-all', payload => {

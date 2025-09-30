@@ -591,18 +591,18 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
                         {item.isSpellLevelingAvailable ? (<div className={'block spell-xp-container'}>
                             <div className={'bottom'}>
                                 <div className={'xp-box'}>
-                                    <span className={'xp-text'}>XP: {formatInt(item.xp)}/{formatInt(item.maxXP)}</span>
-                                    <span className={'xp-income'}>+{formatValue(item.xpRate)} / Cast</span>
+                                    <span className={'xp-text'}>XP: {formatInt((spellDetails || item)?.xp)}/{formatInt((spellDetails || item)?.maxXP)}</span>
+                                    <span className={'xp-income'}>+{formatValue((spellDetails || item)?.xpRate)} / Cast</span>
                                 </div>
                                 <div className={'progress-bar'}>
-                                    <ProgressBar className={'action-progress'} percentage={item.xp/item.maxXP}></ProgressBar>
+                                    <ProgressBar className={'action-progress'} percentage={(spellDetails || item)?.xp/(spellDetails || item)?.maxXP}></ProgressBar>
                                 </div>
                             </div>
                             <div className={'set-level flex-container flex-row'}>
                                 <div className={'setter'}>
                                     <span>Set level to </span>
-                                    <input type={'number'} value={item.actualLevel} min={1} max={item.maxLevel} onChange={e => changeLevel(Math.floor(+e.target.value))}/>
-                                    <span>of {item.maxLevel}</span>
+                                    <input type={'number'} value={item.actualLevel} min={1} max={(spellDetails || item)?.maxLevel} onChange={e => changeLevel(Math.floor(+e.target.value))}/>
+                                    <span>of {(spellDetails || item)?.maxLevel}</span>
                                 </div>
                                 <div>
                                     <HowToSign scope={'spellLevels'}/>

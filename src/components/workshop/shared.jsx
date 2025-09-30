@@ -1,6 +1,7 @@
 import {formatValue} from "../../general/utils/strings";
 import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
 import {BreakDown} from "../layout/sidebar.jsx";
+import {isBreakdownHasData} from "../../general/utils/resource-utils";
 import React from "react";
 
 export const Balances = ({ resourceAmount, resourceBalance, breakDown }) => {
@@ -10,7 +11,7 @@ export const Balances = ({ resourceAmount, resourceBalance, breakDown }) => {
 
     if(!breakDown || !Object.values(breakDown).length) return content;
 
-    if(Math.abs(resourceBalance) < 1.e-8) return content;
+    if(!isBreakdownHasData(breakDown)) return content;
 
     return (<TippyWrapper content={<div className={'hint-popup'}>
         <BreakDown breakDown={breakDown} />

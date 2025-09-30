@@ -1273,6 +1273,30 @@ export class CraftingModule extends GameModule {
         }
     }
 
+    getRecipeEffectsWithMultipliers(id, calculatedEffort, isRunning, isWithMultipliers = false) {
+        const effects = isRunning
+            ? gameEntity.getEffects(`activeCrafting_${id}`, 0, this.craftingSlots[id]?.level || 1, false, 1)
+            : gameEntity.getEffects(id, 0, 1, true, 1, 1, calculatedEffort);
+
+        if (!isWithMultipliers) {
+            return effects;
+        }
+
+        // Apply resource multipliers to income effects
+        return effects.map(effect => {
+            if (effect?.scope === 'income' && effect?.type === 'resources' && effect?.id) {
+                const resource = gameResources.getResource(effect.id);
+                const multiplier = resource?.multiplier || 1;
+                
+                return {
+                    ...effect,
+                    value: effect.value * multiplier
+                };
+            }
+            return effect;
+        });
+    }
+
     getCraftingDetails(id) {
         const entity = gameEntity.getEntity(id);
 
@@ -1320,9 +1344,7 @@ export class CraftingModule extends GameModule {
             efficiency,
             bottleNeck,
             rebalanceInfo,
-            effects: isRunning
-                ? gameEntity.getEffects(`activeCrafting_${id}`, 0, this.craftingSlots[entity.id]?.level || 1, false, 1)
-                : gameEntity.getEffects(entity.id, 0, 1, true, 1, 1,  calculatedEffort),
+            effects: this.getRecipeEffectsWithMultipliers(id, calculatedEffort, isRunning, true),
             affordable: gameEntity.getAffordable(entity.id),
             level: this.craftingSlots[entity.id]?.level || 0,
             maxLevel: 1

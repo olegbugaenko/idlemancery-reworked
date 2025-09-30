@@ -45,6 +45,8 @@ export const LoadedMain = () => {
 
     useEffect(() => {
         sendData('query_tour_status', {})
+        // Ensure we fetch settings early to apply zoom on Electron
+        sendData('query-settings', { prefix: 'ui' });
         // startTutorial();
     }, [])
 
@@ -54,6 +56,15 @@ export const LoadedMain = () => {
             if(payload?.skipStep) {
                 setStepIndex(payload.skipStep);
             }
+        }
+    })
+
+    onMessage('settings', (s) => {
+        // Apply Electron zoom if available
+        const percent = Number(s?.uiScalePercent ?? 100);
+        const factor = Math.max(0.5, Math.min(3, (Number.isFinite(percent) ? percent : 100) / 100));
+        if (window?.zoomAPI?.set) {
+            window.zoomAPI.set(factor);
         }
     })
 
