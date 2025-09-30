@@ -137,7 +137,7 @@ export class CraftingModule extends GameModule {
             if (this.lastRebalanceCheck >= this.rebalanceCheckInterval) {
                 this.lastRebalanceCheck = 0;
                 this.checkAndRebalance('crafting');
-                console.log('this.originalEffort', JSON.parse(JSON.stringify(this.originalAllocations)), JSON.parse(JSON.stringify(this.rebalanceReasons)));
+                // console.log('this.originalEffort', JSON.parse(JSON.stringify(this.originalAllocations)), JSON.parse(JSON.stringify(this.rebalanceReasons)));
             }
         }
         
@@ -852,7 +852,7 @@ export class CraftingModule extends GameModule {
             if (recipe.efficiency < 0.999) continue;
 
             const sustainable = this.findSustainableEffort(recipe, recipe.originalEffort, flowContext);
-            console.log(`Sustainable for ${recipe.id} is`, sustainable, recipe.originalEffort, flowContext);
+            // console.log(`Sustainable for ${recipe.id} is`, sustainable, recipe.originalEffort, flowContext);
             if (sustainable <= recipe.currentEffort + SMALL_NUMBER) {
                 continue;
             }
