@@ -190,12 +190,8 @@ export const InterfaceSettings = () => {
                     <div className={"row flex-container"}>
                         <div className={"col"}>
                             <label>
-                                UI Scale: {Math.round((settings?.uiScalePercent ?? 100))}%
-                                <input
-                                    type={'range'}
-                                    min={50}
-                                    max={300}
-                                    step={5}
+                                UI Scale
+                                <select
                                     value={settings?.uiScalePercent ?? 100}
                                     onChange={(e) => {
                                         const val = Number(e.target.value);
@@ -204,7 +200,21 @@ export const InterfaceSettings = () => {
                                         }
                                         setSettingChanged('uiScalePercent', val);
                                     }}
-                                />
+                                >
+                                    <option value={50}>50%</option>
+                                    <option value={60}>60%</option>
+                                    <option value={70}>70%</option>
+                                    <option value={80}>80%</option>
+                                    <option value={90}>90%</option>
+                                    <option value={100}>100%</option>
+                                    <option value={110}>110%</option>
+                                    <option value={125}>125%</option>
+                                    <option value={150}>150%</option>
+                                    <option value={175}>175%</option>
+                                    <option value={200}>200%</option>
+                                    <option value={250}>250%</option>
+                                    <option value={300}>300%</option>
+                                </select>
                             </label>
                         </div>
                         <div className={'col'}>

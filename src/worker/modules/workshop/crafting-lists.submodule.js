@@ -149,8 +149,25 @@ export class CraftingListsSubmodule extends GameModule {
 
         const distributions = this.getRealListLevelsDistribution(id);
 
+        // First, clear all originalEffort for this category
+        const craftingModule = gameCore.getModule('crafting');
+        const allocations = category === 'crafting' ? craftingModule.originalAllocations : craftingModule.alchemyOriginalAllocations;
+        
+        // Clear all originalEffort for this category
+        for (const [recipeId, slot] of Object.entries(craftingModule.craftingSlots)) {
+            const recipeTags = gameEntity.getEntity(recipeId)?.tags || [];
+            const tagToCat = {
+                'crafting': 'material',
+                'alchemy': 'alchemy'
+            };
+            if (recipeTags.includes(tagToCat[category])) {
+                delete allocations[recipeId];
+            }
+        }
+
+        // Then set originalEffort for recipes in the list
         distributions.forEach(item => {
-            gameCore.getModule('crafting').setCraftingEffort({ id: item.id, effort: item.effort, isForce: true })
+            craftingModule.setCraftingEffort({ id: item.id, effort: item.effort, isForce: true, bSetOriginal: true })
         })
         gameCore.getModule('crafting').sendCraftingData({ filterId: this.craftingLists[id].category });
     }

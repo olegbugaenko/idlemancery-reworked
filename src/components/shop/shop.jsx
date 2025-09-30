@@ -633,7 +633,8 @@ export const ItemDetails = ({itemId, category, editId, onPurchase, isEditMode, o
 
     const setAutopurchasePattern = (pattern) => {
         setAutopurchase(prev => {
-            const newAutopurchase = cloneDeep(prev);
+            const newAutopurchase = cloneDeep(prev) || {};
+            
             if(!newAutopurchase.rules) {
                 newAutopurchase.rules = [];
             }
@@ -645,7 +646,7 @@ export const ItemDetails = ({itemId, category, editId, onPurchase, isEditMode, o
 
     const addAutopurchaseRule = () => {
         setAutopurchase(prev => {
-            const newAutopurchase = cloneDeep(prev);
+            const newAutopurchase = cloneDeep(prev) || {};
             if(!newAutopurchase.rules) {
                 newAutopurchase.rules = [];
             }
@@ -662,7 +663,7 @@ export const ItemDetails = ({itemId, category, editId, onPurchase, isEditMode, o
 
     const setAutopurchaseRuleValue = (index, key, value) => {
         setAutopurchase(prev => {
-            const newAutopurchase = cloneDeep(prev);
+            const newAutopurchase = cloneDeep(prev) || {};
             if (!newAutopurchase.rules?.[index]) {
                 return newAutopurchase;
             }
@@ -674,7 +675,7 @@ export const ItemDetails = ({itemId, category, editId, onPurchase, isEditMode, o
 
     const deleteAutopurchaseRule = (index) => {
         setAutopurchase(prev => {
-            const newEdit = cloneDeep(prev);
+            const newEdit = cloneDeep(prev) || {};
             newEdit.rules.splice(index, 1)
             setChanged(true);
             return newEdit
@@ -683,7 +684,7 @@ export const ItemDetails = ({itemId, category, editId, onPurchase, isEditMode, o
 
     const setPurchaseMultiplierValue = (purchaseMultiplier) => {
         setAutopurchase(prev => {
-            const newAutopurchase = cloneDeep(prev);
+            const newAutopurchase = cloneDeep(prev) || {};
             if(!newAutopurchase.rules) {
                 newAutopurchase.rules = [];
             }
@@ -695,7 +696,7 @@ export const ItemDetails = ({itemId, category, editId, onPurchase, isEditMode, o
 
     const setReservedCoinsValue = (reserved) => {
         setAutopurchase(prev => {
-            const newAutopurchase = cloneDeep(prev);
+            const newAutopurchase = cloneDeep(prev) || {};
             if(!newAutopurchase.rules) {
                 newAutopurchase.rules = [];
             }
@@ -707,7 +708,7 @@ export const ItemDetails = ({itemId, category, editId, onPurchase, isEditMode, o
 
     const toggleAutopurchase = () => {
         setAutopurchase(prev => {
-            const newAutopurchase = cloneDeep(prev);
+            const newAutopurchase = cloneDeep(prev) || {};
             if(!newAutopurchase.rules) {
                 newAutopurchase.rules = [];
             }
@@ -719,7 +720,7 @@ export const ItemDetails = ({itemId, category, editId, onPurchase, isEditMode, o
 
     const setAutopurchasePriority = (priority) => {
         if(isEditMode && autopurchase) {
-            const newAutopurchase = cloneDeep(autopurchase);
+            const newAutopurchase = cloneDeep(autopurchase) || {};
             newAutopurchase.priority = priority;
             setAutopurchase(newAutopurchase);
             setChanged(true);
@@ -855,7 +856,7 @@ export const ItemDetails = ({itemId, category, editId, onPurchase, isEditMode, o
                     {item.purchaseMultiplier > 1 ? (<button onClick={() => onPurchase(item.id, item.purchaseMultiplier)}>Purchase
                         x{formatInt(item.purchaseMultiplier)}</button>) : <button onClick={() => onPurchase(item.id)}>Purchase</button>}
                     </>) : null}
-                <button className={'warning-action'} onClick={onCloseEdit}>Cancel</button>
+                <button className={'warning-action'} onClick={onCloseEdit}>Close</button>
             </div>) : null}
         </>
     )

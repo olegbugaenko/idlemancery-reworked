@@ -327,7 +327,8 @@ export class MapTileListsSubmodule extends GameModule {
                     .mapTilesProcessed[tile.i][tile.j].r?.includes(index))
                 .map(d => ({
                     ...d,
-                    // rarityTier: gameResources.getResource(d.id)?.tags?.includes('rare') ? 'rare' : 'common',
+                    rarityTier: gameResources.getResource(d.id)?.tags?.includes('rare') ? 'rare' : 'common',
+                    ingredient: gameResources.getResource(d.id)?.tags?.includes('ingredient'),
                     probability: d.probability * weight,
                     weightedAmountMin: d.probability * weight * d.amountMin,
                     weightedAmountMax: d.probability * weight * d.amountMax,
@@ -338,6 +339,7 @@ export class MapTileListsSubmodule extends GameModule {
                     totalEffects[drop.id] = {
                         id: drop.id,
                         rarityTier: drop.rarityTier,
+                        ingredient: drop.ingredient,
                         probability: 0,
                         amountMin: 0,
                         amountMax: 0,

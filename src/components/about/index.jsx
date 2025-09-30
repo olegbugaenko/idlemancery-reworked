@@ -6,6 +6,21 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+                <h3>Idle Awakening v0.2.1e</h3>
+                <div className={'features'}>
+                    <p>Fixed a bug where crafting efforts didn't restored during auto-rebalance enabled</p>
+                    <p>Fixed a bug where automation rule for running alchemy didn't worked</p>
+                    <p>Fixed a bug where time to empty didn't shown up on howering over resource in left sidebar</p>
+                    <p>Fixed alchemy/crafting list effects not updating with default effort when adding new items</p>
+                    <p>Fixed a bug where crafting efforts might exceed 100% total effort under some circumstances</p>
+                    <p>Fixed bug where cursor was jumping to the end of input while editing lists names</p>
+                    <p>Fixed bug where hotkeys unintentionally triggered during editing text inputs</p>
+                    <p>Fixed bug where spell details might update inconsistently</p>
+                    <p>Fixed bug where some important herbs might not appear at the map</p>
+                    <p>QoL: Crafting details effects now showing numbers, taking into account bonuses and multipliers</p>
+                    <p>QoL: Added option under interface settings to change overall UI scale</p>
+                    
+                </div>
                 <h3>Idle Awakening v0.2.1d</h3>
                 <div className={'features'}>
                     <p>Fixed critical bug where under some resolutions popup in shop could not be closed</p>

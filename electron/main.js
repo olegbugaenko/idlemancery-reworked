@@ -70,7 +70,7 @@ app.on('ready', () => {
 
     mainWindow.setMenuBarVisibility(false);
 
-    // Apply saved zoom
+    // Apply saved zoom early
     try {
         const f = Math.max(0.5, Math.min(3, Number(windowState?.zoomFactor) || 1));
         currentZoomFactor = f;
@@ -88,6 +88,13 @@ app.on('ready', () => {
 
     mainWindow.on('close', () => {
         saveWindowState(app, mainWindow, currentZoomFactor);
+    })
+
+    // Re-apply zoom after load to guard against any resets
+    mainWindow.webContents.on('did-finish-load', () => {
+        try {
+            mainWindow.webContents.setZoomFactor(currentZoomFactor || 1);
+        } catch (e) {}
     })
 
     mainWindow.on('closed', () => {

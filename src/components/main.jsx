@@ -68,6 +68,15 @@ export const LoadedMain = () => {
         }
     })
 
+    // Apply zoom when settings are received with prefix label from the early request
+    onMessage('settings-ui', (s) => {
+        const percent = Number(s?.uiScalePercent ?? 100);
+        const factor = Math.max(0.5, Math.min(3, (Number.isFinite(percent) ? percent : 100) / 100));
+        if (window?.zoomAPI?.set) {
+            window.zoomAPI.set(factor);
+        }
+    })
+
     return (<div className={'page-wrap'}>
         <Content />
     </div>)

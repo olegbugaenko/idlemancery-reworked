@@ -43,6 +43,7 @@ export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, op
             canRestore: false
         }
     });
+    const [dataVersion, setDataVersion] = useState(0);
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -56,6 +57,7 @@ export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, op
     useEffect(() => {
         onMessage(`crafting-data-${filterId}`, (craftables) => {
             setItemsData(craftables);
+            setDataVersion(v => v + 1);
         });
         
         return () => {
@@ -166,7 +168,7 @@ export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, op
             <PerfectScrollbar>
                 <div className={'flex-container'}>
                     {craftingData.available.map(craftable => <NewNotificationWrap id={`crafting_${craftable.id}`} key={`crafting_${craftable.id}`} className={'narrow-wrapper'} isNew={newUnlocks?.all?.items?.[`crafting_${craftable.id}`]?.hasNew}>
-                        <ItemCard addItemToList={addItemToList} key={craftable.id} {...craftable} onSetLevel={setItemLevel} onShowDetails={setItemDetails} isMobile={isMobile} isEditList={isEditList} showNumericInputs={showNumericInputs} onToggleLock={onToggleLock}/>
+                        <ItemCard addItemToList={addItemToList} key={craftable.id} {...craftable} dataVersion={dataVersion} onSetLevel={setItemLevel} onShowDetails={setItemDetails} isMobile={isMobile} isEditList={isEditList} showNumericInputs={showNumericInputs} onToggleLock={onToggleLock}/>
                     </NewNotificationWrap>)}
                 </div>
             </PerfectScrollbar>
@@ -190,13 +192,13 @@ export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, op
     </div>)
 }
 
-export const ItemCard = ({ id, icon_id, isRunning, resourceAmount, resourceBalance, breakDown, isLowerEfficiency, name, effort, isLocked, maxLevel, onSetLevel, onShowDetails, addItemToList, isMobile, isEditList, isRebalanced, isRebalancedBeneficial, showNumericInputs, onToggleLock }) => {
+export const ItemCard = ({ id, icon_id, isRunning, resourceAmount, resourceBalance, breakDown, isLowerEfficiency, name, effort, isLocked, maxLevel, onSetLevel, onShowDetails, addItemToList, isMobile, isEditList, isRebalanced, isRebalancedBeneficial, showNumericInputs, onToggleLock, dataVersion }) => {
 
     const [inputValue, setInputValue] = useState(effort);
 
     useEffect(() => {
         setInputValue(effort);
-    }, [effort]);
+    }, [effort, dataVersion]);
 
     const handleInputChange = (e) => {
         const value = parseFloat(e.target.value);

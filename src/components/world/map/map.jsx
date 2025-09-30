@@ -511,7 +511,7 @@ export const TileDetailsPopup = ({itemId}) => {
 
                 {item.drops ? (<div className={'block'}>
                     <p>Drops:</p>
-                    {item.drops.map(drop => (<p className={`drop-row ${drop.rarityTier ?? ''}`}>
+                    {item.drops.map(drop => (<p className={`drop-row ${drop.rarityTier} ${drop.ingredient ? 'ingredient' : ''}`}>
                         <span className={'name'}>{drop.resource.name}</span>
                         <span className={'probability'}>{formatValue(drop.probability*100)}%</span>
                         <span className={'amounts'}>{formatInt(drop.amountMin)} - {formatInt(drop.amountMax)}</span>

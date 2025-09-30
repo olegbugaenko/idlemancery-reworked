@@ -2006,7 +2006,7 @@ export const registerInventoryItems = () => {
     registerInventoryItem('inventory_rare_heartroot', {
         name: 'Heartroot',
         hasCap: false,
-        tags: ['inventory', 'consumable', 'rare', 'gatherable', 'herb'],
+        tags: ['inventory', 'consumable', 'rare', 'herb'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -2038,7 +2038,7 @@ export const registerInventoryItems = () => {
     registerInventoryItem('inventory_rare_energloom', {
         name: 'Energloom',
         hasCap: false,
-        tags: ['inventory', 'consumable', 'rare', 'gatherable', 'herb'],
+        tags: ['inventory', 'consumable', 'rare', 'herb'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {
@@ -2070,7 +2070,7 @@ export const registerInventoryItems = () => {
     registerInventoryItem('inventory_rare_lifebloom', {
         name: 'Lifebloom',
         hasCap: false,
-        tags: ['inventory', 'consumable', 'rare', 'gatherable', 'herb'],
+        tags: ['inventory', 'consumable', 'rare', 'herb'],
         defaultCap: 0,
         isAbstract: true,
         onUse: (amount) => {

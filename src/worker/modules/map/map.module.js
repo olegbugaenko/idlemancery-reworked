@@ -119,6 +119,7 @@ export class MapModule extends GameModule {
         this.currentMapVersion = this.relevantMapVersion;
         this.mapTier = tier;
         this.processTiles();
+        this.checkMissingLowRarityResources();
     }
 
     generateRandomTile(i, j, tier) {
@@ -425,6 +426,7 @@ export class MapModule extends GameModule {
                 }
             }
             this.processTiles();
+            this.checkMissingLowRarityResources();
         } else {
             this.generateMap(obj?.mapTier || 0);
         }
@@ -696,6 +698,110 @@ export class MapModule extends GameModule {
         return {
             ...minCoords,
             minDistance
+        }
+    }
+
+    checkMissingLowRarityResources() {
+        // Get all gatherable resources with rarity <= 1
+        const gatherableResources = gameResources.listResourcesByTags(['gatherable']);
+        const lowRarityResources = gatherableResources.filter(resource => resource.rarity <= 1);
+        
+        // Collect all resource IDs found in radius 3 from center (7,7)
+        const foundResources = {};
+        const maxDistance = 2.4;
+        const totalDrops = [];
+        for (let i = 0; i < this.mapTilesProcessed.length; i++) {
+            for (let j = 0; j < this.mapTilesProcessed[i].length; j++) {
+                const distance = Math.sqrt((i - 7) ** 2 + (j - 7) ** 2);
+                if (distance <= maxDistance && distance > 0) {
+                    const tile = this.mapTilesProcessed[i][j];
+                    
+                    console.log(`FND: ${i}:${j}: ${tile.drops.map(o => o.id).join(',')}`);
+                    tile.drops.forEach(drop => {
+                        foundResources[drop.id] = true;
+                    });
+                    totalDrops.push({ i, j, drops: tile.drops });
+                }
+            }
+        }
+        // console.log('FND: ', foundResources, lowRarityResources, gatherableResources);
+        // Check which low rarity resources are missing
+        const missingResources = lowRarityResources.filter(resource => !foundResources[resource.id]);
+        
+        if (missingResources.length > 0) {
+            console.log('Missing low rarity resources (rarity <= 1) in radius 3:', missingResources.map(r => `${r.name} (${r.id})`));
+            
+            // Sort tiles by number of drops (ascending)
+            totalDrops.sort((a, b) => a.drops.length - b.drops.length);
+            
+            // Distribute missing resources to tiles with least drops
+            missingResources.forEach((resource, index) => {
+                const targetTile = totalDrops[index % totalDrops.length];
+                const { i, j } = targetTile;
+                
+                // Add missing resource to the tile's drops
+                const newDrop = {
+                    id: resource.id,
+                    amountMult: 1, // Default multiplier
+                    probabilityMult: 1, // Default probability multiplier
+                };
+                
+                // Add to both processed and original tiles
+                this.mapTilesProcessed[i][j].drops.push(newDrop);
+                this.mapTiles[i][j].drops.push(newDrop);
+                
+                console.log(`Added missing resource ${resource.name} (${resource.id}) to tile ${i}:${j}`);
+            });
+        } else {
+            console.log('All low rarity resources (rarity <= 1) are present in radius 3');
+        }
+        
+        // Check for medium rarity resources (rarity <= 5) within distance 5
+        const mediumRarityResources = gatherableResources.filter(resource => resource.rarity <= 5);
+        const foundMediumResources = {};
+        const mediumDistanceTiles = [];
+        
+        for (let i = 0; i < this.mapTilesProcessed.length; i++) {
+            for (let j = 0; j < this.mapTilesProcessed[i].length; j++) {
+                const distance = Math.sqrt((i - 7) ** 2 + (j - 7) ** 2);
+                if (distance <= 5 && distance > 0) {
+                    const tile = this.mapTilesProcessed[i][j];
+                    tile.drops.forEach(drop => {
+                        foundMediumResources[drop.id] = true;
+                    });
+                    mediumDistanceTiles.push({ i, j, drops: tile.drops });
+                }
+            }
+        }
+        
+        const missingMediumResources = mediumRarityResources.filter(resource => !foundMediumResources[resource.id]);
+        
+        if (missingMediumResources.length > 0) {
+            console.log('Missing medium rarity resources (rarity <= 5) in radius 5:', missingMediumResources.map(r => `${r.name} (${r.id})`));
+            
+            // Sort tiles by number of drops (ascending)
+            mediumDistanceTiles.sort((a, b) => a.drops.length - b.drops.length);
+            
+            // Distribute missing resources to tiles with least drops
+            missingMediumResources.forEach((resource, index) => {
+                const targetTile = mediumDistanceTiles[index % mediumDistanceTiles.length];
+                const { i, j } = targetTile;
+                
+                // Add missing resource to the tile's drops
+                const newDrop = {
+                    id: resource.id,
+                    amountMult: 1, // Default multiplier
+                    probabilityMult: 1, // Default probability multiplier
+                };
+                
+                // Add to both processed and original tiles
+                this.mapTilesProcessed[i][j].drops.push(newDrop);
+                this.mapTiles[i][j].drops.push(newDrop);
+                
+                console.log(`Added missing medium rarity resource ${resource.name} (${resource.id}) to tile ${i}:${j}`);
+            });
+        } else {
+            console.log('All medium rarity resources (rarity <= 5) are present in radius 5');
         }
     }
 }

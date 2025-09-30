@@ -321,7 +321,7 @@ export class CraftingModule extends GameModule {
         }
     }
 
-    setCraftingEffort({ id, effort, isForce = false, filterId = null, isAutoRestore = false }) {
+    setCraftingEffort({ id, effort, isForce = false, filterId = null, isAutoRestore = false, bSetOriginal = false }) {
         if(!this.craftingSlots[id]) {
             this.craftingSlots[id] = {
                 effort: 0,
@@ -336,7 +336,7 @@ export class CraftingModule extends GameModule {
         // For locked recipes, limit effort to available space (100% - other locked efforts)
         const isLocked = this.craftingSlots[id].isLocked;
         if (isLocked && !isForce) {
-            const availableEffort = this.getAvailableEffortForLockedRecipe(id, currentFilterId);
+            const availableEffort = this.getAvailableEffortForLockedRecipe(id, filterId);
             if (effort > availableEffort) {
                 console.log(`Limiting locked recipe ${id} effort from ${effort} to ${availableEffort} (max available: ${availableEffort})`);
                 effort = availableEffort;
@@ -352,6 +352,8 @@ export class CraftingModule extends GameModule {
         }
 
         this.craftingSlots[id].effort = effort;
+
+        console.log('NewEffort: ',  this.craftingSlots[id].effort);
 
         const catToTag = tags => {
             if(tags.includes('material')) return 'crafting';
@@ -382,8 +384,13 @@ export class CraftingModule extends GameModule {
         const allocations = currentFilterId === 'crafting' ? this.originalAllocations : this.alchemyOriginalAllocations;
         const isEmpty = effort === 0; // Recipe should be inactive if effort is 0, regardless of allocations
 
+        // If bSetOriginal is true, set originalEffort to current effort
+        if (bSetOriginal) {
+            allocations[id] = effort;
+        }
+
         // If this is not auto-restore and not force, check if we should remove from originalAllocations
-        if (!isAutoRestore && !isForce && allocations[id] !== undefined) {
+        if (!isAutoRestore && !isForce && !bSetOriginal && allocations[id] !== undefined) {
             const originalEffort = allocations[id];
             // If user manually changed effort (not auto-restore), remove from originalAllocations
             if (Math.abs(effort - originalEffort) > 0.01) {
@@ -625,6 +632,7 @@ export class CraftingModule extends GameModule {
             if (id === recipeId || !slot.effort || slot.effort <= 0) continue;
 
             const recipeTags = gameEntity.getEntity(id)?.tags || [];
+            console.log('slot: ', id, slot, totalLockedEffort, recipeTags, category, tagToCat[category]);
             if (!recipeTags.includes(tagToCat[category])) continue;
 
             if (slot.isLocked) {
@@ -692,6 +700,7 @@ export class CraftingModule extends GameModule {
         let freedEffort = 0;
         let hasShortage = false;
         const reduced = new Set();
+        const toPrioritize = new Map();
 
         for (const recipe of state.recipes) {
             if (recipe.isLocked || recipe.currentEffort <= SMALL_NUMBER) continue;
@@ -707,6 +716,14 @@ export class CraftingModule extends GameModule {
                     freedEffort += freed;
                     queueAdjustment(recipe, clampedTarget);
                     reduced.add(recipe.id);
+                    if(flowContext.resourceMap.has(recipe.bottleNeck)) {
+                        flowContext.resourceMap.get(recipe.bottleNeck).producers.forEach(prod => {
+                            toPrioritize.set(
+                                prod.recipeId, 
+                                1/Math.max(targetEffort, 1.e-3)
+                            )
+                        })
+                    }
 
                     const bottleneckName = recipe.bottleNeck ? gameResources.getResource(recipe.bottleNeck)?.name : null;
                     rebalanceReasons[recipe.id] = bottleneckName || 'resources';
@@ -729,7 +746,11 @@ export class CraftingModule extends GameModule {
                     const s = this.findSustainableEffort(r, 1, flowContext);
                     const headroom = Math.max(0, s - (r.currentEffort || 0));
                     if (headroom <= SMALL_NUMBER) continue;
-                    const weight = (r.originalEffort ?? r.currentEffort ?? 0);
+                    // need 
+                    let weight = (r.originalEffort ?? r.currentEffort ?? 0)*(toPrioritize.has(r.id) ? toPrioritize.get(r.id) : 1);
+                    if(weight < SMALL_NUMBER && toPrioritize.has(r.id)) {
+                        weight = 1;
+                    }
                     if (weight <= SMALL_NUMBER) continue;
                     recipients.push({ r, weight, headroom });
                 }
@@ -748,8 +769,10 @@ export class CraftingModule extends GameModule {
                 }
                 // consumed freedEffort implicitly
                 freedEffort = 0;
+                console.log('toDistribute: ', toDistribute, freedEffort, totalUsedEffort, recipients, flowContext, toPrioritize);
             }
         }
+            
 
         const borrowEffort = (amount, excludeId = null) => {
             let remaining = amount;

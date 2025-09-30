@@ -610,6 +610,7 @@ export const ItemDetails = ({itemId, setItemDetails}) => {
                         <span className={'amounts'}>{formatInt(drop.amountMin)} - {formatInt(drop.amountMax)}</span>
                     </p> ))}
                     {item.unlockedUnrevealedAmount > 0 ? (<p className={'hint pot-finds'}>{formatInt(item.unlockedUnrevealedAmount)} more items can be found</p> ) : null}
+                    {item.drops.length ? (<p className="hint small">The percentages above represent the chances of finding the corresponding loot per second.</p> ) : null}             
                 </div> ) : null}
                 <div className={'block map-exploration-upkeep'}>
                     <p>Costs:</p>
@@ -780,7 +781,7 @@ export const MapTileListDetails = ({
                         </div>) : null}
                         {editing.drops ? (<div className={'block'}>
                             <p>Drops:</p>
-                            {editing.drops.map(drop => (<p className={`drop-row ${drop.rarityTier}`}>
+                            {editing.drops.map(drop => (<p className={`drop-row ${drop.rarityTier} ${drop.ingredient ? 'ingredient' : ''}`}>
                                 <span className={'name'}>{drop.resource.name}</span>
                                 <span className={'probability'}>{formatValue(drop.probability*100)}%</span>
                                 <span className={'amounts'}>{formatInt(drop.amountMin)} - {formatInt(drop.amountMax)}</span>
