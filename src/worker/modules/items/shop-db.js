@@ -1055,6 +1055,7 @@ export const registerShopItemsStage1 = () => {
         description: 'After a long argument with the shopkeeper about being a real mage, you accidentally cast a spell during your demonstration. The resulting tornado scattered books everywhere, but now the shopkeeper is afraid of you and lets you access the magical accessories section.',
         level: 0,
         maxLevel: 1,
+        minDemoVersion: 20,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_magic_ability',
@@ -1086,6 +1087,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Enchanted gloves that enhance your gathering abilities with magical assistance.',
         level: 0,
         maxLevel: 1,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_magic_accessories_access') > 0
         },
@@ -1119,6 +1121,7 @@ export const registerShopItemsStage1 = () => {
         description: 'A precision tool enhanced with magical properties that improves your crafting efficiency.',
         level: 0,
         maxLevel: 1,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_magic_accessories_access') > 0
         },
@@ -1156,6 +1159,7 @@ export const registerShopItemsStage1 = () => {
         description: 'A specially enchanted mat that enhances your yoga practice and learning speed.',
         level: 0,
         maxLevel: 1,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_magic_accessories_access') > 0
         },
@@ -1193,6 +1197,7 @@ export const registerShopItemsStage1 = () => {
         description: 'An enchanted flask that enhances your alchemy work with magical properties.',
         level: 0,
         maxLevel: 1,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_magic_accessories_access') > 0
         },
@@ -1230,6 +1235,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Enchanted tools specifically designed for magical plant care and cultivation.',
         level: 0,
         maxLevel: 1,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_magic_accessories_access') > 0 && 
                    gameEntity.getLevel('shop_item_herbalists_handbook') > 0
@@ -1268,6 +1274,7 @@ export const registerShopItemsStage1 = () => {
         description: 'An enchanted hatchet that enhances your crafting capabilities with magical precision.',
         level: 0,
         maxLevel: 1,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_magic_accessories_access') > 0 && 
                    gameEntity.isEntityUnlocked('action_mining')
@@ -1306,6 +1313,7 @@ export const registerShopItemsStage1 = () => {
         description: 'A magically enhanced knife that improves your gathering perception and precision.',
         level: 0,
         maxLevel: 1,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_magic_accessories_access') > 0
         },
@@ -1343,6 +1351,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Magically enhanced scissors specifically designed for paper crafting and enchanted paper production.',
         level: 0,
         maxLevel: 1,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_magic_accessories_access') > 0 && 
                    gameEntity.getLevel('shop_item_paper_working') > 0
@@ -1392,6 +1401,7 @@ export const registerShopItemsStage1 = () => {
         attributes: {
             isCollectable: false,
         },
+        minDemoVersion: 20,
         resourceModifier: {
             multiplier: {
                 effects: {
@@ -1893,6 +1903,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Learn the ancient art of pottery making. Unlocks the ability to craft pots and build pottery cellars.',
         level: 0,
         maxLevel: 1,
+        minDemoVersion: 20,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_strength',
@@ -2153,6 +2164,7 @@ export const registerShopItemsStage1 = () => {
         description: 'High-quality tools that significantly improve your crafting efficiency',
         level: 0,
         maxLevel: 5,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_constructing') > 0
         },
@@ -2185,6 +2197,7 @@ export const registerShopItemsStage1 = () => {
         description: 'A sturdy iron hammer that enhances your crafting capabilities',
         level: 0,
         maxLevel: 1,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return gameEntity.isEntityUnlocked('action_mining')
         },
@@ -2872,6 +2885,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Learn to extract precious gems from stone, unlocking ruby and sapphire production',
         level: 0,
         maxLevel: 1,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.isEntityUnlocked('action_quarrying')
         },
@@ -2893,6 +2907,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Learn the art of self-organization to increase your coin storage capacity',
         level: 0,
         maxLevel: 1,
+        minDemoVersion: 20,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_patience',
@@ -2924,6 +2939,7 @@ export const registerShopItemsStage1 = () => {
         description: 'A finely crafted mortar and pestle set for grinding ingredients to perfect consistency, improving alchemy efficiency',
         level: 0,
         maxLevel: 1,
+        minDemoVersion: 20,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_patience',
@@ -2961,6 +2977,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Exact measuring instruments for perfect ingredient proportions in alchemical recipes',
         level: 0,
         maxLevel: 1,
+        minDemoVersion: 20,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_patience',
@@ -2998,6 +3015,7 @@ export const registerShopItemsStage1 = () => {
         description: 'A quality saw for cutting wood more efficiently, increasing production of all wooden resources',
         level: 0,
         maxLevel: 1,
+        minDemoVersion: 20,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_strength',
@@ -3040,6 +3058,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Advanced mechanical systems that enable the operation of industrial facilities like the Lumbermill. Unlocks the ability to build and operate large-scale production buildings.',
         level: 0,
         maxLevel: 1,
+        minDemoVersion: 20,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_strength',
@@ -3078,6 +3097,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Mastery of mechanical pressing allows higher throughput for compression and shaping. Unlocks the Press vice furniture.',
         level: 0,
         maxLevel: 1,
+        minDemoVersion: 20,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_strength',
@@ -3098,6 +3118,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Blueprints and protocols for autonomous machinery. Opens the path to industrial automation.',
         level: 0,
         maxLevel: 1,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return gameEntity.isEntityUnlocked('action_coal_mining');
         },
@@ -3115,6 +3136,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Unlocks advanced conjuration practices including conjuring stone and coal.',
         level: 0,
         maxLevel: 1,
+        minDemoVersion: 20,
         unlockedBy: [{ type: 'effect', id: 'attribute_magic_ability', level: 30000 }],
         unlockCondition: () => true,
         attributes: { isCollectable: false },
@@ -3131,6 +3153,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Advanced techniques and equipment specifically designed to maximize the efficiency of your lumbermill operations.',
         level: 0,
         maxLevel: 5,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_machinery') > 0
         },
@@ -3163,6 +3186,7 @@ export const registerShopItemsStage1 = () => {
         description: 'A sturdy iron pickaxe that significantly improves mining efficiency and iron ore production.',
         level: 0,
         maxLevel: 1,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return gameEntity.isEntityUnlocked('action_mining')
         },
@@ -3195,6 +3219,7 @@ export const registerShopItemsStage1 = () => {
         description: 'A high-quality steel pickaxe that provides even greater mining efficiency than the iron pickaxe.',
         level: 0,
         maxLevel: 1,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_pickaxe') > 0
         },
@@ -3227,6 +3252,7 @@ export const registerShopItemsStage1 = () => {
         description: 'An official license that allows you to build trading structures on your land. Unlocks the ability to construct Trade Stalls and Trade Warehouses.',
         level: 0,
         maxLevel: 1,
+        minDemoVersion: 20,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_charisma',
@@ -3253,6 +3279,7 @@ export const registerShopItemsStage1 = () => {
         description: 'A network of information exchange that allows your trade stalls to facilitate social learning and knowledge sharing.',
         level: 0,
         maxLevel: 1,
+        minDemoVersion: 20,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_charisma',
@@ -3290,6 +3317,7 @@ export const registerShopItemsStage1 = () => {
         description: 'A specialized trading license that allows your trade stalls to also trade in books and knowledge, providing bonuses to knowledge gain.',
         level: 0,
         maxLevel: 1,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_market_license') > 0 && gameEntity.getLevel('structure_library') > 0
         },
@@ -3322,6 +3350,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Advanced construction techniques that allow you to build more sophisticated stone structures. Increases the maximum level of Stone Hut.',
         level: 0,
         maxLevel: 5,
+        minDemoVersion: 20,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_strength',
@@ -3359,6 +3388,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Advanced techniques that reduce the amount of materials needed for alchemy processes.',
         level: 0,
         maxLevel: 5,
+        minDemoVersion: 20,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_patience',
@@ -3396,6 +3426,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Secrets of creating compact and reliable metal products. Now Tool Workshop will also increase the efficiency of Master\'s Table furniture.',
         level: 0,
         maxLevel: 1,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return gameResources.isResourceUnlocked('inventory_forged_steel')
         },
@@ -3428,6 +3459,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Advanced manual that reveals the secrets of steel processing and industrial techniques. Unlocks metalworking furniture.',
         level: 0,
         maxLevel: 1,
+        minDemoVersion: 20,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_strength',
@@ -3454,6 +3486,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Establish barter contracts that increase the maximum coin capacity of trade warehouses.',
         level: 0,
         maxLevel: 1,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_pottery_secrets_handbook') > 0
         },
@@ -3491,6 +3524,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Master advanced construction techniques. Unlocks masonry cottage and alchemist laboratory.',
         level: 0,
         maxLevel: 1,
+        minDemoVersion: 20,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_strength',
@@ -3517,6 +3551,7 @@ export const registerShopItemsStage1 = () => {
         description: 'A comprehensive manual detailing the principles of mechanical engineering and maintenance. Unlock the ability to study mechanical systems and improve machinery efficiency.',
         level: 0,
         maxLevel: 1,
+        minDemoVersion: 20,
         unlockCondition: () => {
             return gameResources.isResourceUnlocked('inventory_coal')
         },
@@ -3543,6 +3578,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Unlock the secrets of creating even more permanent enhancement flasks that provide lasting benefits to your abilities.',
         level: 0,
         maxLevel: 1,
+        minDemoVersion: 20,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_patience',
@@ -3570,6 +3606,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Unlocks the ability to create elemental resonators that enhance magical amplifiers.',
         level: 0,
         maxLevel: 1,
+        minDemoVersion: 20,
         unlockedBy: [{ type: 'effect', id: 'attribute_magic_ability', level: 40000 }],
         unlockCondition: () => true,
         attributes: { isCollectable: false },
@@ -3586,6 +3623,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Unlocks the construction of magical buildings: Magic Library and Magic Globe. These structures provide powerful bonuses to artifact scroll efficiency and expedition experience.',
         level: 0,
         maxLevel: 1,
+        minDemoVersion: 20,
         unlockedBy: [{ type: 'effect', id: 'attribute_magic_ability', level: 50000 }],
         unlockCondition: () => true,
         attributes: { isCollectable: false },
@@ -3605,6 +3643,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Unlocks the construction of automated mining machines: Automatic Ore Mine and Automatic Clay Mine. These machines provide continuous resource production.',
         level: 0,
         maxLevel: 1,
+        minDemoVersion: 20,
         unlockedBy: [{ type: 'effect', id: 'attribute_strength', level: 50000 }],
         unlockCondition: () => true,
         attributes: { isCollectable: false },
@@ -3624,6 +3663,7 @@ export const registerShopItemsStage1 = () => {
         description: 'Unlocks advanced manufacturing machines: Automated Papermill and Automated Brickworks. These machines automate the production of essential materials.',
         level: 0,
         maxLevel: 1,
+        minDemoVersion: 20,
         unlockedBy: [{ type: 'effect', id: 'attribute_strength', level: 60000 }],
         unlockCondition: () => true,
         attributes: { isCollectable: false },

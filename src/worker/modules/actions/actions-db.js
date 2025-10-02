@@ -330,6 +330,7 @@ export const registerActionsStage1 = () => {
         allowedImpacts: ['effects'],
         description: 'Proclaim official announcements, public notices, and the latest news on behalf of the city. Loud voice preferred, political opinions optional',
         level: 1,
+        minDemoVersion: 20,
         jobType: 'social',
         getLearnRate: () => {
             return 1;
@@ -983,6 +984,7 @@ export const registerActionsStage1 = () => {
         allowedImpacts: ['effects'],
         description: 'Create simple magical illusions to amaze audiences and earn more coins than basic tricks',
         level: 1,
+        minDemoVersion: 20,
         discountEffects: ['magical_actions_discount'],
         jobType: 'magical',
         getLearnRate: () => {
@@ -1434,6 +1436,7 @@ export const registerActionsStage1 = () => {
         name: 'Clay Mining',
         category: ACTION_CATS.OTHER,
         isAbstract: false,
+        minDemoVersion: 20,
         allowedImpacts: ['effects'],
         discountEffects: ['physical_actions_discount'],
         description: 'Extract clay from the earth for construction and pottery. Clay provides better wall treatment and thermal insulation.',
@@ -1487,6 +1490,7 @@ export const registerActionsStage1 = () => {
         name: 'Coal Mining',
         category: ACTION_CATS.OTHER,
         isAbstract: false,
+        minDemoVersion: 20,
         allowedImpacts: ['effects'],
         discountEffects: ['physical_actions_discount'],
         description: 'Mine coal and get access to new automations',
@@ -4663,6 +4667,7 @@ export const registerActionsStage1 = () => {
         discountEffects: ['physical_actions_discount'],
         description: 'Intense physical training that improves your crafting efficiency through better control and strength',
         level: 1,
+        minDemoVersion: 20,
         getLearnRate: () => {
             return 1
         },
@@ -4717,6 +4722,7 @@ export const registerActionsStage1 = () => {
         discountEffects: ['mental_actions_discount'],
         description: 'Mental exercises that enhance your alchemy efficiency through improved focus and understanding',
         level: 1,
+        minDemoVersion: 20,
         getLearnRate: () => {
             return 1
         },
@@ -4807,6 +4813,7 @@ export const registerActionsStage1 = () => {
         allowedImpacts: ['effects'],
         description: 'Embark on expeditions to discover ancient artifacts, mystical scrolls, and hidden treasures. This action generates expedition effort needed for launching expeditions.',
         level: 1,
+        minDemoVersion: 20,
         discountEffects: ["routine_actions_discount"],
         getLearnRate: () => {
             return 1.

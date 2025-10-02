@@ -656,6 +656,7 @@ export const registerStructuresStage1 = () => {
         description: 'A large industrial smelter for processing iron ore into iron plates. Significantly boosts iron plate production.',
         level: 0,
         maxLevel: 4,
+        minDemoVersion: 20,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_strength',
@@ -715,6 +716,7 @@ export const registerStructuresStage1 = () => {
             id: 'attribute_charisma',
             level: 2000,
         }],
+        minDemoVersion: 20,
         unlockCondition: () => {
             return gameEffects.getEffectValue('attribute_charisma') >= 2000;
         },

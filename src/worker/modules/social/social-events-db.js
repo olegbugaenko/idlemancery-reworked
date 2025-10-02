@@ -335,6 +335,7 @@ export const registerEventsStage1 = () => {
         category: 'educational',
         tags: ["socio_campaign", "courses"],
         unlockCondition: charismaUnlock,
+        minDemoVersion: 20,
         unlockedBy: [{ type: 'effect', id: 'attribute_charisma', level: 30000 }],
         resourceModifier: {
             multiplier: {
@@ -374,6 +375,7 @@ export const registerEventsStage1 = () => {
         category: 'gathering',
         tags: ["socio_campaign", "herbalism"],
         unlockCondition: charismaUnlock,
+        minDemoVersion: 20,
         unlockedBy: [{ type: 'effect', id: 'attribute_charisma', level: 30000 }],
         resourceModifier: {
             multiplier: {
@@ -413,6 +415,7 @@ export const registerEventsStage1 = () => {
         category: 'social',
         tags: ["socio_campaign", "social"],
         unlockCondition: () => true,
+        minDemoVersion: 20,
         unlockedBy: [{ type: 'effect', id: 'attribute_charisma', level: 40000 }],
         resourceModifier: {
             multiplier: {
@@ -452,6 +455,7 @@ export const registerEventsStage1 = () => {
         category: 'exploration',
         tags: ["socio_campaign", "social"],
         unlockCondition: () => true,
+        minDemoVersion: 20,
         unlockedBy: [{ type: 'effect', id: 'attribute_charisma', level: 40000 }],
         resourceModifier: {
             multiplier: {

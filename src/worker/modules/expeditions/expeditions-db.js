@@ -74,6 +74,7 @@ export const initExpeditionsDB = () => {
         isAbstract: true,
         level: 0,
         baseXp: 500,
+        minDemoVersion: 20,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_magic_ability',

@@ -1122,6 +1122,7 @@ export const registerAccessoriesStage1 = () => {
         name: 'Magical Atlas',
         description: 'A magical atlas that glows red to warn of dangers ahead. Your patience allows you to carefully study its maps and plan safe routes, making your resource gathering more efficient.',
         level: 0,
+        minDemoVersion: 20,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_patience',

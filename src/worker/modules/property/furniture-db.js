@@ -1217,6 +1217,7 @@ export const registerFurnitureStage1 = () => {
         description: 'Improves your nature magic efficiency',
         level: 0,
         maxLevel: 4,
+        minDemoVersion: 20,
         unlockedBy: [{
             type: 'effect',
             id: 'attribute_magic_ability',
