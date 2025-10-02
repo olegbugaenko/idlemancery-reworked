@@ -65,7 +65,7 @@ export const registerMachineryStage1 = () => {
             getCustomAmplifier: () => gameEntity.getAttribute('machine_auto_quarry', 'manualLoad') ?? 1,
             customAmplifierApplyTypes: ['resources'],
             customAmplifierApplyScopes: ['income','consumption'],
-            effectDeps: ['machinery_efficiency'],
+            effectDeps: ['machinery_efficiency', 'coal_consumption_discount'],
         },
         get_cost: () => ({
             'inventory_wooden_beam': { A: 1.2, B: 40000, type: 1 },
@@ -102,7 +102,7 @@ export const registerMachineryStage1 = () => {
             getCustomAmplifier: () => gameEntity.getAttribute('machine_auto_lumbermill', 'manualLoad') ?? 1,
             customAmplifierApplyTypes: ['resources'],
             customAmplifierApplyScopes: ['income','consumption'],
-            effectDeps: ['machinery_efficiency', 'crafting_materials_discount'],
+            effectDeps: ['machinery_efficiency', 'crafting_materials_discount', 'coal_consumption_discount'],
         },
         get_cost: () => ({
             'inventory_stone_brick': { A: 1.2, B: 20000, type: 1 },
@@ -138,7 +138,7 @@ export const registerMachineryStage1 = () => {
             getCustomAmplifier: () => gameEntity.getAttribute('machine_automatic_ore_mine', 'manualLoad') ?? 1,
             customAmplifierApplyTypes: ['resources'],
             customAmplifierApplyScopes: ['income','consumption'],
-            effectDeps: ['machinery_efficiency'],
+            effectDeps: ['machinery_efficiency', 'coal_consumption_discount'],
         },
         get_cost: () => ({
             'coins': { A: 1.5, B: 1000000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')), type: 1 },
@@ -176,7 +176,7 @@ export const registerMachineryStage1 = () => {
             getCustomAmplifier: () => gameEntity.getAttribute('machine_automatic_clay_mine', 'manualLoad') ?? 1,
             customAmplifierApplyTypes: ['resources'],
             customAmplifierApplyScopes: ['income','consumption'],
-            effectDeps: ['machinery_efficiency'],
+            effectDeps: ['machinery_efficiency', 'coal_consumption_discount'],
         },
         get_cost: () => ({
             'coins': { A: 1.5, B: 1000000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')), type: 1 },
@@ -215,7 +215,7 @@ export const registerMachineryStage1 = () => {
             getCustomAmplifier: () => gameEntity.getAttribute('machine_automated_papermill', 'manualLoad') ?? 1,
             customAmplifierApplyTypes: ['resources'],
             customAmplifierApplyScopes: ['income','consumption'],
-            effectDeps: ['machinery_efficiency', 'crafting_materials_discount'],
+            effectDeps: ['machinery_efficiency', 'crafting_materials_discount', 'coal_consumption_discount'],
         },
         get_cost: () => ({
             'coins': { A: 1.5, B: 1500000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')), type: 1 },
@@ -254,7 +254,7 @@ export const registerMachineryStage1 = () => {
             getCustomAmplifier: () => gameEntity.getAttribute('machine_automated_brickworks', 'manualLoad') ?? 1,
             customAmplifierApplyTypes: ['resources'],
             customAmplifierApplyScopes: ['income','consumption'],
-            effectDeps: ['machinery_efficiency', 'crafting_materials_discount'],
+            effectDeps: ['machinery_efficiency', 'crafting_materials_discount', 'coal_consumption_discount'],
         },
         get_cost: () => ({
             'coins': { A: 1.5, B: 1500000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')), type: 1 },

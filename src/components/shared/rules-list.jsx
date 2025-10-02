@@ -193,6 +193,18 @@ const mapCompareType = {
             'exact'
         ],
     },
+    'running_course': {
+        label: 'Running Course',
+        subject: 'course_id',
+        availableConditions: [
+            'true',
+            'false',
+        ],
+        isHideValue: true,
+        unlockCondition: (unlocks) => {
+            return unlocks.courses;
+        }
+    },
     'spell_running': {
         label: 'Spell Running',
         subject: 'spell_id',
@@ -248,6 +260,23 @@ const RulesList = React.memo(
         const [rulesMatched, setRulesMatched] = useState(null);
         const [unlocks, setUnlocks] = useState();
 
+        const [localPattern, setLocalPattern] = useState(pattern || '');
+        const [localValues, setLocalValues] = useState({});
+
+        // Sync local pattern with prop when it changes externally
+        useEffect(() => {
+            setLocalPattern(pattern || '');
+        }, [pattern]);
+
+        // Sync local values with rules when they change externally
+        useEffect(() => {
+            const newLocalValues = {};
+            rules.forEach((rule, index) => {
+                newLocalValues[index] = rule.value || '';
+            });
+            setLocalValues(newLocalValues);
+        }, [rules]);
+
         useEffect(() => {
             sendData('query-all-resources', { prefix });
             sendData('query-all-actions', { prefix });
@@ -257,7 +286,7 @@ const RulesList = React.memo(
             sendData('query-all-spells', { prefix });
             sendData('query-all-crafting-lists', { prefix });
             sendData('query-all-courses', { prefix });
-            sendData('query-social-events', { prefix });
+            sendData('query-social-events-automation', { prefix });
 
             sendData('query-unlocks', { prefix: `automation-${prefix}`})
         }, []);
@@ -314,7 +343,7 @@ const RulesList = React.memo(
             setCourses(payload);
         })
 
-        onMessage(`social-events-data-${prefix}`, (payload) => {
+        onMessage(`social-events-data-automation`, (payload) => {
             setSocialEvents(payload.events || []);
         })
 
@@ -560,10 +589,15 @@ const RulesList = React.memo(
                                         {isEditing ? (
                                             <input
                                                 type="number"
-                                                onChange={(e) =>
-                                                    setRuleValue(index, 'value', e.target.value)
-                                                }
-                                                value={rule.value}
+                                                onChange={(e) => {
+                                                    const newValue = e.target.value;
+                                                    setLocalValues(prev => ({
+                                                        ...prev,
+                                                        [index]: newValue
+                                                    }));
+                                                    setRuleValue(index, 'value', newValue);
+                                                }}
+                                                value={localValues[index] || ''}
                                                 max={
                                                     rule.value_type === 'percentage' ? 100 : undefined
                                                 }
@@ -586,9 +620,13 @@ const RulesList = React.memo(
                     <div className={'pattern-wrap flex-container'}>
                         <span className={'pattern-label'}>Rules Condition: </span>
                         {isEditing ? (<input
-                            value={pattern}
+                            value={localPattern}
                             placeholder={Array.from({ length: rules.length }).map((a, i) => i+1).join(' AND ')}
-                            onChange={(e) => setPattern(e.target.value?.toUpperCase())}
+                            onChange={(e) => {
+                                const newValue = e.target.value?.toUpperCase();
+                                setLocalPattern(newValue);
+                                setPattern(newValue);
+                            }}
                         />) : (<span>
                         {pattern || Array.from({ length: rules.length }).map((a, i) => i+1).join(' AND ')}
                     </span>)}

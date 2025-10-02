@@ -1,8 +1,9 @@
 import {GameModule} from "../../shared/game-module";
 import {registerCraftingRecipes} from "./recipes-db";
-import {gameCore, gameEffects, gameEntity, gameResources, resourceCalculators} from "game-framework";
+import {gameCore, gameEffects, gameEntity, gameResources, resourceCalculators, resourceApi} from "game-framework";
 import {CraftingListsSubmodule} from "./crafting-lists.submodule";
 import {SMALL_NUMBER} from "game-framework/src/utils/consts";
+import {packEffects} from "../../shared/utils/objects";
 
 export class CraftingModule extends GameModule {
 
@@ -147,6 +148,7 @@ export class CraftingModule extends GameModule {
             if (this.alchemyLastRebalanceCheck >= this.rebalanceCheckInterval) {
                 this.alchemyLastRebalanceCheck = 0;
                 this.checkAndRebalance('alchemy');
+                // console.log('this.originalEffort', JSON.parse(JSON.stringify(this.alchemyOriginalAllocations)), JSON.parse(JSON.stringify(this.alchemyRebalanceReasons)));
             }
         }
     }
@@ -702,6 +704,8 @@ export class CraftingModule extends GameModule {
         const reduced = new Set();
         const toPrioritize = new Map();
 
+        // console.log('recipes states: ', JSON.parse(JSON.stringify(state.recipes)));
+
         for (const recipe of state.recipes) {
             if (recipe.isLocked || recipe.currentEffort <= SMALL_NUMBER) continue;
 
@@ -710,6 +714,7 @@ export class CraftingModule extends GameModule {
 
                 const targetEffort = this.calculateEffortForEfficiency(recipe, 0.99, flowContext);
                 const clampedTarget = Math.min(recipe.currentEffort, targetEffort);
+                console.log(`Clumping recipe ${recipe.id}: target = ${targetEffort}, clumped = ${clampedTarget}, curr = ${recipe.currentEffort}`);
 
                 if (clampedTarget < recipe.currentEffort - SMALL_NUMBER) {
                     const freed = recipe.currentEffort - clampedTarget;
@@ -730,6 +735,7 @@ export class CraftingModule extends GameModule {
                 }
             }
         }
+        console.log('rebalanceR: ', JSON.parse(JSON.stringify(rebalanceReasons)));
 
         // Distribute freed effort plus any free pool up to 100%
         {
@@ -745,6 +751,7 @@ export class CraftingModule extends GameModule {
                     // sustainable headroom
                     const s = this.findSustainableEffort(r, 1, flowContext);
                     const headroom = Math.max(0, s - (r.currentEffort || 0));
+                    // console.log(`SusFor: ${r.id} is ${s}, h = ${headroom}`);
                     if (headroom <= SMALL_NUMBER) continue;
                     // need 
                     let weight = (r.originalEffort ?? r.currentEffort ?? 0)*(toPrioritize.has(r.id) ? toPrioritize.get(r.id) : 1);
@@ -844,6 +851,8 @@ export class CraftingModule extends GameModule {
 
             return taken;
         };
+        
+        // console.log('rebalanceReasonsP: ', JSON.parse(JSON.stringify(rebalanceReasons)));
 
         for (const recipe of state.recipes) {
             if (recipe.isLocked) continue;
@@ -865,7 +874,7 @@ export class CraftingModule extends GameModule {
             const needed = target - recipe.currentEffort;
             const obtained = borrowEffort(needed, recipe.id);
 
-            console.log(`target for ${recipe.id} is`, target, needed, obtained);
+            // console.log(`target for ${recipe.id} is`, target, needed, obtained);
             if (obtained > SMALL_NUMBER) {
                 queueAdjustment(recipe, recipe.currentEffort + obtained);
 
@@ -874,6 +883,8 @@ export class CraftingModule extends GameModule {
                 }
             }
         }
+        
+        // console.log('rebalanceReasonsN: ', JSON.parse(JSON.stringify(rebalanceReasons)));
 
         if (!hasShortage) {
             for (const recipe of state.recipes) {
@@ -889,6 +900,8 @@ export class CraftingModule extends GameModule {
                 }
             }
         }
+        
+        // console.log('rebalanceReasonsA: ', JSON.parse(JSON.stringify(rebalanceReasons)));
 
         for (const [recipeId, effort] of adjustments.entries()) {
             this.setCraftingEffort({
@@ -903,6 +916,8 @@ export class CraftingModule extends GameModule {
         this.normalizeTotalEffort(category);
         this.updateActiveRecipes(category);
         this.sendCraftingData({ filterId: category });
+        // console.log('rebalanceReasonsF: ', JSON.parse(JSON.stringify(rebalanceReasons)));
+
     }
 
     collectCategoryAutoRebalanceState(category) {
@@ -1103,7 +1118,14 @@ export class CraftingModule extends GameModule {
                 break;
             }
 
+            if (this.canRunForSeconds(recipe, mid, upperBound, flowContext, 20)) {
+                best = mid;
+                low = mid;
+            } else
             if (this.canRunWithPositiveBalance(recipe, mid, upperBound, flowContext)) {
+                best = mid;
+                low = mid;
+            } else if (this.canRunForSeconds(recipe, mid, upperBound, flowContext, 2)) {
                 best = mid;
                 low = mid;
             } else {
@@ -1116,6 +1138,69 @@ export class CraftingModule extends GameModule {
         }
 
         return best;
+    }
+
+    canRunForSeconds(recipe, effort, upperBound, flowContext, durationRequired) {
+        const { resourceMap, recipeEffects, baseBalances } = flowContext;
+        const recipeEffect = recipeEffects.get(recipe.id);
+        if (!recipeEffect) {
+            return true;
+        }
+
+        let remainingFreed = Math.max(0, upperBound - effort);
+        let potentialDuration = durationRequired;
+
+        for (const [resourceId, consumptionPerEffort] of recipeEffect.consumption.entries()) {
+            const entry = resourceMap.get(resourceId);
+            const baseBalance = baseBalances.get(resourceId) ?? 0;
+            let netBalance = baseBalance;
+            const amount = gameResources.getResource(resourceId).amount;
+
+            if (entry) {
+                for (const consumer of entry.consumers) {
+                    const expectedEffort = consumer.recipeId === recipe.id
+                        ? effort
+                        : (consumer.recipeRef.currentEffort || 0);
+                    netBalance -= consumer.consumptionPerEffort * expectedEffort;
+                }
+
+                for (const producer of entry.producers) {
+                    const expectedEffort = producer.recipeId === recipe.id
+                        ? effort
+                        : (producer.recipeRef.currentEffort || 0);
+                    netBalance += producer.productionPerEffort * expectedEffort;
+                    // console.log(`Expected effort for ${producer.recipeId} is ${expectedEffort}`);
+                }
+
+                // console.log('Producers And Consumers of '+recipe.id + `(${resourceId})`, entry, netBalance);
+                if (netBalance < -SMALL_NUMBER && remainingFreed > SMALL_NUMBER) {
+                    const potentialProducers = entry.producers.filter((producer) => {
+                        if (producer.recipeId === recipe.id) return false;
+                        if (producer.recipeRef.isLocked) return false;
+                        if ((producer.recipeRef.currentEffort || 0) <= SMALL_NUMBER) return false;
+                        return producer.recipeRef.efficiency >= 0.99 - SMALL_NUMBER;
+                    });
+
+                    if (potentialProducers.length) {
+                        const bestRate = potentialProducers.reduce((max, producer) => Math.max(max, producer.productionPerEffort), 0);
+
+                        if (bestRate > SMALL_NUMBER) {
+                            const neededEffort = Math.min(remainingFreed, Math.max(0, (-netBalance) / bestRate));
+                            netBalance += neededEffort * bestRate;
+                            remainingFreed -= neededEffort;
+                        }
+                    }
+                }
+            } else {
+                netBalance -= consumptionPerEffort * effort;
+            }
+
+            if (netBalance < -SMALL_NUMBER) {
+                potentialDuration = Math.min(potentialDuration, -amount/netBalance);
+            }
+        }
+
+        return potentialDuration >= durationRequired;
     }
 
     canRunWithPositiveBalance(recipe, effort, upperBound, flowContext) {
@@ -1243,39 +1328,58 @@ export class CraftingModule extends GameModule {
 
         const eff_key =  filterId === 'crafting' ? 'crafting_effort' : 'alchemy_effort';
 
-        const available = entities.map(recipe => ({
-            ...recipe,
-            icon_id: recipe.resourceId,
-            effort: this.craftingSlots[recipe.id]?.effort || 0,
-            isLocked: this.craftingSlots[recipe.id]?.isLocked || false,
-            resourceAmount: gameResources.getResource(recipe.resourceId)?.amount,
-            resourceBalance: gameResources.getResource(recipe.resourceId)?.balance,
-            breakDown: gameResources.getResource(recipe.resourceId)?.breakDown,
-            isRunning: gameEntity.entityExists(`activeCrafting_${recipe.id}`) && this.craftingSlots[recipe.id]?.effort,
-            isLowerEfficiency: gameEntity.entityExists(`activeCrafting_${recipe.id}`) && gameEntity.getEntity(`activeCrafting_${recipe.id}`).modifier?.efficiency < 1 - SMALL_NUMBER,
-            isRebalanced: filterId === 'crafting' ? 
-                         this.autoRebalanceEnabled && 
-                         Object.keys(this.originalAllocations).length > 0 && 
-                         this.originalAllocations[recipe.id] !== undefined && 
-                         this.originalAllocations[recipe.id] !== this.craftingSlots[recipe.id]?.effort &&
-                         gameEntity.entityExists(`activeCrafting_${recipe.id}`) :
-                         filterId === 'alchemy' &&
-                         this.alchemyAutoRebalanceEnabled &&
-                         Object.keys(this.alchemyOriginalAllocations).length > 0 &&
-                         this.alchemyOriginalAllocations[recipe.id] !== undefined &&
-                         this.alchemyOriginalAllocations[recipe.id] !== this.craftingSlots[recipe.id]?.effort &&
-                         gameEntity.entityExists(`activeCrafting_${recipe.id}`),
-            isRebalancedBeneficial: filterId === 'crafting' ?
-                                  this.autoRebalanceEnabled &&
-                                  Object.keys(this.originalAllocations).length > 0 &&
-                                  this.originalAllocations[recipe.id] !== undefined &&
-                                  this.originalAllocations[recipe.id] < this.craftingSlots[recipe.id]?.effort :
-                                  filterId === 'alchemy' &&
-                                  this.alchemyAutoRebalanceEnabled &&
-                                  Object.keys(this.alchemyOriginalAllocations).length > 0 &&
-                                  this.alchemyOriginalAllocations[recipe.id] !== undefined &&
-                                  this.alchemyOriginalAllocations[recipe.id] < this.craftingSlots[recipe.id]?.effort
-        }));
+        const available = entities.map(recipe => {
+            const baseRecipe = {
+                ...recipe,
+                icon_id: recipe.resourceId,
+                effort: this.craftingSlots[recipe.id]?.effort || 0,
+                isLocked: this.craftingSlots[recipe.id]?.isLocked || false,
+                resourceAmount: gameResources.getResource(recipe.resourceId)?.amount,
+                resourceBalance: gameResources.getResource(recipe.resourceId)?.balance,
+                breakDown: gameResources.getResource(recipe.resourceId)?.breakDown,
+                isRunning: gameEntity.entityExists(`activeCrafting_${recipe.id}`) && this.craftingSlots[recipe.id]?.effort,
+                isLowerEfficiency: gameEntity.entityExists(`activeCrafting_${recipe.id}`) && gameEntity.getEntity(`activeCrafting_${recipe.id}`).modifier?.efficiency < 1 - SMALL_NUMBER,
+                isRebalanced: filterId === 'crafting' ? 
+                             this.autoRebalanceEnabled && 
+                             Object.keys(this.originalAllocations).length > 0 && 
+                             this.originalAllocations[recipe.id] !== undefined && 
+                             this.originalAllocations[recipe.id] !== this.craftingSlots[recipe.id]?.effort &&
+                             (gameEntity.entityExists(`activeCrafting_${recipe.id}`) || this.originalAllocations[recipe.id] > SMALL_NUMBER) :
+                             filterId === 'alchemy' &&
+                             this.alchemyAutoRebalanceEnabled &&
+                             Object.keys(this.alchemyOriginalAllocations).length > 0 &&
+                             this.alchemyOriginalAllocations[recipe.id] !== undefined &&
+                             this.alchemyOriginalAllocations[recipe.id] !== this.craftingSlots[recipe.id]?.effort &&
+                             (gameEntity.entityExists(`activeCrafting_${recipe.id}`) || this.alchemyOriginalAllocations[recipe.id] > SMALL_NUMBER),
+                isRebalancedBeneficial: filterId === 'crafting' ?
+                                      this.autoRebalanceEnabled &&
+                                      Object.keys(this.originalAllocations).length > 0 &&
+                                      this.originalAllocations[recipe.id] !== undefined &&
+                                      this.originalAllocations[recipe.id] < this.craftingSlots[recipe.id]?.effort :
+                                      filterId === 'alchemy' &&
+                                      this.alchemyAutoRebalanceEnabled &&
+                                      Object.keys(this.alchemyOriginalAllocations).length > 0 &&
+                                      this.alchemyOriginalAllocations[recipe.id] !== undefined &&
+                                      this.alchemyOriginalAllocations[recipe.id] < this.craftingSlots[recipe.id]?.effort
+            };
+            const resource = gameResources.getResource(recipe.resourceId);
+            // Додаємо bonusesDetails для consumable рецептів
+            if (resource && resource.tags.includes('consumable') && recipe.resourceId) {
+                    baseRecipe.bonusesDetails = {
+                        title: resource.name,
+                        effects: resource.usageGain ? resourceApi.unpackEffects(resource.usageGain, 1) : [],
+                        potentialEffects: resource.resourceModifier ? resourceApi.unpackEffects(resource.resourceModifier, 1) : [],
+                        permanentEffects: resource.attributes?.entityEffect ? packEffects(gameEntity.getEffects(resource.attributes.entityEffect)) : null,
+                        potentialPermanentEffects: resource.attributes?.entityEffect ? packEffects(gameEntity.getEffects(resource.attributes.entityEffect, 1)) : null,
+                        duration: resource.attributes?.duration || 0,
+                        cooldown: resource.getUsageCooldown ? resource.getUsageCooldown() : 0,
+                        hasBonuses: !!(resource.usageGain || resource.resourceModifier || resource.attributes?.entityEffect)
+                    };
+                
+            }
+
+            return baseRecipe;
+        });
 
         return {
             available,

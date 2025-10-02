@@ -20,7 +20,7 @@ export class SpellModule extends GameModule {
         })
 
         this.eventHandler.registerHandler('query-spell-details', (payload) => {
-            this.sendSpellDetails(payload.id, payload.prefix)
+            this.sendSpellDetails(payload.id, payload.prefix, payload.targetLevel)
         })
 
         this.eventHandler.registerHandler('query-resource-balances-for-spell', payload => {
@@ -414,7 +414,7 @@ export class SpellModule extends GameModule {
         }
     }
 
-    getSpellDetails(id) {
+    getSpellDetails(id, targetLevel) {
         if(!id) return null;
         const spell =  gameEntity.getEntity(id);
         let effects = [];
@@ -431,8 +431,8 @@ export class SpellModule extends GameModule {
             effects,
             duration: gameEntity.getAttribute(id, 'duration'),
             currentDuration: this.spells[id]?.duration,
-            potentialEffects: gameEntity.getEffects(id, 0, spell.level, true),
-            affordable: resourceCalculators.isAffordable(this.getConsumeAffordable(spell).consume),
+            potentialEffects: gameEntity.getEffects(id, 0, targetLevel ?? spell.level, true),
+            affordable: resourceCalculators.isAffordable(this.getConsumeAffordable(spell, targetLevel).consume),
             tags: spell.tags || [],
             autocast: this.spells[id]?.autocast ?? { rules: [] },
             isCasted: this.spells[id]?.isCasted,
@@ -441,7 +441,7 @@ export class SpellModule extends GameModule {
             maxLevelCostReduction: getCostReduction(id),
             maxXP: this.getMaxXP(id),
             xp: this.spells[id]?.xp || 0,
-            xpRate: this.getXPPerCast(id),
+            xpRate: this.getXPPerCast(id, targetLevel),
             actualLevel: spell.level,
             isSpellLevelingAvailable: this.isSpellLevelingAvailable(),
             cooldown: spell.getUsageCooldown(),
@@ -451,8 +451,8 @@ export class SpellModule extends GameModule {
         }
     }
 
-    sendSpellDetails(id, prefix) {
-        const data = this.getSpellDetails(id);
+    sendSpellDetails(id, prefix, targetLevel) {
+        const data = this.getSpellDetails(id, targetLevel);
         let label = 'spell-details';
         if(prefix) {
             label = `${prefix}-${label}`;

@@ -29,8 +29,9 @@ export class MonitoringModule extends GameModule {
                             skippedIds.push(gameEntity.getEntity(id).satelliteEntityId);
                             console.log('satelliteLevel: ', gameEntity.getLevel(gameEntity.getEntity(id).satelliteEntityId));
                         }
-                        const data = gameEntity.getEffects(id, 0, gameCore.getModule('actions').actions[id]?.level || 1, true);
-                        const nlvData = gameEntity.getEffects(id, 1, gameCore.getModule('actions').actions[id]?.level || 1, true);
+                        const lvl = gameCore.getModule('actions').actions[id]?.level;
+                        const data = gameEntity.getEffects(id, 0, lvl || 1, true);
+                        const nlvData = gameEntity.getEffects(id, 1, lvl || 1, true);
                         const effects = data.filter(one => one.type === 'effects');
                         const resources = data.filter(one => one.type === 'resources').map(r => {
                             if(['rawCap', 'capMult'].includes(r.scope)) {

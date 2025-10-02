@@ -141,17 +141,19 @@ export const Actions = ({}) => {
         });
 
         onMessage('action-list-effects', (payload) => {
-
                 setListData(prev =>{
-                    if(!prev) return;
+                    if(!prev) return prev;
+
+                    // Ignore updates not related to the currently edited list
+                    if(payload?.id != null && prev?.id != null && payload.id !== prev.id) {
+                        return prev;
+                    }
 
                     const actions = (payload.newTimes ?? prev.actions).map(action => ({
                         ...action,
                         isBlocked: payload.blockedDynamicActions?.[action.id] ?? null,
                     }));
 
-                    console.log('BLK: ', payload.blockedDynamicActions);
-                    
                     return {
                         ...prev,
                         potentialEffects: payload.potentialEffects,
@@ -252,10 +254,10 @@ export const Actions = ({}) => {
         }
     }
 
-    const onDropActionFromList = (id) => {
+    const onDropActionFromList = (index) => {
         if(listData) {
             const newList = cloneDeep(listData);
-            newList.actions = newList.actions.filter(a => a.id !== id);
+            newList.actions.splice(index, 1); // Видаляємо по індексу замість фільтрації по id
             setListData({...newList});
             sendData('query-action-list-effects', { listData: newList });
         }

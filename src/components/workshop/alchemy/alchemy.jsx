@@ -13,6 +13,7 @@ import {PinResource} from "../../shared/pin-resource.jsx";
 import {useTutorial} from "../../../context/tutorial-context";
 import {FavoriteButton} from "../../shared/favorite-button.jsx";
 import { InterfaceSettingsContext } from "./index.jsx";
+import {RecipeTitleWithTooltip} from "./recipe-title-with-tooltip.jsx";
 
 export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, openListDetails, addItemToList, isEditList, setShowNumericInputs }) => {
 
@@ -148,10 +149,10 @@ export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, op
                             </label>
                         </TippyWrapper>
                     </div>
-                    {craftingData.autoRebalance.hasOriginalAllocations && !craftingData.autoRebalance.canRestore && !craftingData.autoRebalance.canRestore && (
+                    {craftingData.autoRebalance.enabled && craftingData.autoRebalance.hasOriginalAllocations && !craftingData.autoRebalance.canRestore && !craftingData.autoRebalance.canRestore && (
                                         <TippyWrapper content={<div className={'hint-popup'}>
-                    <p className={'hint'}>Some of your recipes don't have enough ingredients. Since you enabled automatic rebalancing, your efforts have been redirected to other available recipes.</p>
-                </div>}>
+                                            <p className={'hint'}>Some of your recipes don't have enough ingredients. Since you enabled automatic rebalancing, your efforts have been redirected to other available recipes.</p>
+                                        </div>}>
                             <div className={'space-item rebalance-status'}>
                                 {craftingData.autoRebalance.canRestore ? (
                                     <span className={'status-restore'}>Using original allocation</span>
@@ -192,7 +193,7 @@ export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, op
     </div>)
 }
 
-export const ItemCard = ({ id, icon_id, isRunning, resourceAmount, resourceBalance, breakDown, isLowerEfficiency, name, effort, isLocked, maxLevel, onSetLevel, onShowDetails, addItemToList, isMobile, isEditList, isRebalanced, isRebalancedBeneficial, showNumericInputs, onToggleLock, dataVersion }) => {
+export const ItemCard = ({ id, icon_id, isRunning, resourceAmount, resourceBalance, breakDown, isLowerEfficiency, name, effort, isLocked, maxLevel, onSetLevel, onShowDetails, addItemToList, isMobile, isEditList, isRebalanced, isRebalancedBeneficial, showNumericInputs, onToggleLock, dataVersion, bonusesDetails }) => {
 
     const [inputValue, setInputValue] = useState(effort);
 
@@ -222,11 +223,15 @@ export const ItemCard = ({ id, icon_id, isRunning, resourceAmount, resourceBalan
     >
         <div className={'flex-container two-side-card'}>
             <div className={'left'}>
-                <img src={`icons/resources/${icon_id}.png`} className={'resource big'}/>
+                <RecipeTitleWithTooltip bonusesDetails={bonusesDetails}>
+                    <img src={`icons/resources/${icon_id}.png`} className={'resource big'}/>
+                </RecipeTitleWithTooltip>
             </div>
             <div className={'right'}>
                 <div className={'head'}>
-                    <p className={'title'}>{name}</p>
+                    <RecipeTitleWithTooltip bonusesDetails={bonusesDetails}>
+                        <p className={'title'}>{name}</p>
+                    </RecipeTitleWithTooltip>
                 </div>
                 <Balances resourceAmount={resourceAmount} resourceBalance={resourceBalance} breakDown={breakDown} />
             </div>

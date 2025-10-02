@@ -176,7 +176,11 @@ export const ResourcesBar = () => {
                         <span className={`resource-amount ${res.hasCap && res.isCapped ? 'capped' : ''}`}>{formatValue(res.amount || 0)}{res.hasCap || res.isService ? ` / ${formatValue(res.isService ? (res.total || 0) : (res.cap || 0))}` : ''}</span>
                     )}
                     {isBreakdownHasData(res.breakDown) ? (
-                        <TippyWrapper content={<div className={'hint-popup'}><BreakDown breakDown={res.breakDown}/></div> }>
+                        <TippyWrapper content={<div className={'hint-popup'}><BreakDown breakDown={res.breakDown}/><div className="block">
+                                {res.income > 0 ? (<p>Total Income: {formatValue(res.income*res.multiplier)}</p>) : null}
+                                {res.consumption > 0 ? (<p>Total Consumption: {formatValue(res.consumption)}</p>) : null}
+                                <p>Net Income: {formatValue(res.balance)}</p>
+                            </div></div> }>
                             <span className={`resource-balance ${res.isNegative ? 'red' : ''} ${res.isPositive ? 'green' : ''}`}>{formatValue(res.balance || 0)}</span>
                         </TippyWrapper>
                     ) : (

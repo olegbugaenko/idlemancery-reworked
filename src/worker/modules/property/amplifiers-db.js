@@ -67,9 +67,9 @@ export const registerAmplifiersStage1 = () => {
     })
 
     registerAmplifier('amplifier_blacksmiths_amplifier', {
-        tags: ["amplifier", "upgrade", "purchaseable", "earth", "crafting"],
-        name: 'Blacksmiths Amplifier',
-        description: 'Infuse your crafting with Earth’s stability, amplifying crafting efficiency and precision.',
+        tags: ["amplifier", "upgrade", "purchaseable", "earth", "plantations"],
+        name: 'Soil Amplifier',
+        description: 'Enhance the fertility of your plantations with Earth\'s nurturing power, boosting plantation efficiency.',
         level: 0,
         minDemoVersion: 20,
         unlockCondition: () => {
@@ -77,8 +77,8 @@ export const registerAmplifiersStage1 = () => {
         },
         resourceModifier: {
             get_multiplier: ()=>({
-                resources: {
-                    'crafting_ability': {
+                effects: {
+                    'plantations_efficiency': {
                         A: 0.02*gameEffects.getEffectValue('earth_amplifier_efficiency'),
                         B: 1,
                         type: 0,

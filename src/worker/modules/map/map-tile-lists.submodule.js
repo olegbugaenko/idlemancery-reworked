@@ -360,6 +360,23 @@ export class MapTileListsSubmodule extends GameModule {
                 effect.amountMin /= effect.probability;
                 effect.amountMax /= effect.probability;
             }
+            
+            // Add usages and usagesFor like in inventory.module.js
+            const usages = gameEntity.getUsingEntities(effect.id);
+            const usagesFor = gameEntity.getUsedForEntities(effect.id).filter(one => {
+                // Для артефактів не показуємо, поки рецепт не відкрито в модулі крафту артефактів
+                const isArtifact = gameEntity.getEntity(one.id)?.tags?.includes('artifact');
+                if (!isArtifact) return true;
+                try {
+                    return gameCore.getModule('artifacts-crafting')?.isRecipeUnlocked(one.id) || false;
+                } catch (e) {
+                    return false;
+                }
+            });
+            
+            effect.usages = usages;
+            effect.usagesFor = usagesFor;
+            effect.avgFindPerSec = effect.probability * (effect.amountMin + effect.amountMax) / 2;
         });
 
         return Object.values(totalEffects);

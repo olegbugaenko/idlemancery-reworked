@@ -270,6 +270,15 @@ p {
     border: 1px solid #333333;
 }
 
+.hint-popup.wider {
+    min-width: 280px;
+}
+
+.hint-popup.intensive {
+    border-radius: 4px;
+    border: 1px solid #777;
+}
+
 .hint-popup * {
     color: #fff;
 }
@@ -4333,10 +4342,36 @@ body::after {
     transition: all 0.2s ease;
     width: 260px;
     flex: 0 0 auto;
+    margin: 8px;
+}
+
+.quick-access-item.active {
+    border: 1px solid #777;
+    box-shadow: 0 0 12px #fff;
 }
 
 .quick-access-item .item-actions {
     margin-left: 8px;
+}
+
+.quick-access-item .icon-content.icon-container img {
+    height: 40px;
+    object-fit: contain;
+}
+
+.quick-access-item .icon-content.icon-container {
+    position: relative;
+}
+
+.quick-access-item .icon-content .level {
+    position: absolute;
+    background-color: #111;
+    padding: 2px;
+    top: -4px;
+    right: -4px;
+    border-radius: 3px;
+    border: 1px solid #777;
+    font-size: 12px;
 }
 
 .quick-access-item:hover {

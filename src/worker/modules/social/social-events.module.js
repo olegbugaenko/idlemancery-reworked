@@ -45,6 +45,10 @@ export class EventsModule extends GameModule {
             this.sendEventsData({prefix: 'stats'});
         });
 
+        this.eventHandler.registerHandler('query-social-events-automation', () => {
+            this.sendEventsDataForAutomation();
+        });
+
         this.eventHandler.registerHandler('start-event', (payload) => {
             const result = this.startEvent(payload.eventId);
             this.eventHandler.sendData('event-result', result);
@@ -311,6 +315,32 @@ export class EventsModule extends GameModule {
             label = `${label}-${options.prefix}`;
         }
         this.eventHandler.sendData(label, data);
+    }
+
+    sendEventsDataForAutomation() {
+        const data = this.getEventsData();
+        
+        // Add "None" option at the beginning for automation rules
+        data.events.unshift({
+            id: 'none',
+            name: 'None',
+            description: 'No social event is running',
+            category: 'other',
+            isActive: false,
+            isOnCooldown: false,
+            canStart: false,
+            hasEnoughResources: true,
+            timesCompleted: 0,
+            isAutoEnabled: false,
+            isFavorite: false,
+            progress: 0,
+            timeRemaining: 0,
+            cooldownRemaining: 0,
+            cooldown: 0,
+            isUnlocked: true
+        });
+        
+        this.eventHandler.sendData('social-events-data-automation', data);
     }
 
     // Збереження/завантаження

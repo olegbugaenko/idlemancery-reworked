@@ -515,9 +515,6 @@ export class InventoryModule extends GameModule {
             effects = resourceApi.unpackEffects(resource.usageGain, 1)
         }
 
-        // const currentEffects = resource.attributes?.entityEffect ? gameEntity.getEffects(resource.attributes?.entityEffect) : null;
-        // let potentialEffects = resource.resourceModifier ? resourceApi.unpackEffects(resource.resourceModifier, 1) : [];
-
         let permanentEffects;
         let potentialPermanentEffects;
 

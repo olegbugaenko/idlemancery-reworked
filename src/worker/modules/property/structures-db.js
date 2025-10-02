@@ -428,7 +428,7 @@ export const registerStructuresStage1 = () => {
         description: 'A specialized workbench for crafting and maintaining tools. Works in synergy with your Tinker\'s Shed.',
         level: 0,
         unlockCondition: () => {
-            return gameEntity.getLevel('structure_tinkers_shed') > 0 && gameEntity.getLevel('shop_item_machinery') > 0;
+            return gameEntity.isEntityUnlocked('structure_tinkers_shed') && gameEntity.getLevel('shop_item_machinery') > 0;
         },
         resourceModifier: {
             get_multiplier: () => ({

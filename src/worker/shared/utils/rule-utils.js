@@ -151,22 +151,45 @@ export const checkMatchingCurrentSocialEventRule = (rule) => {
     const eventsData = socialEventsModule.getEventsData();
     const currentActiveEvent = eventsData.activeEvent;
     
-    console.log('Checking social event rule:', {
-        rule,
-        currentActiveEvent,
-        eventsData: eventsData.activeEvent,
-        condition: rule.condition,
-        event_id: rule.event_id
-    });
+    if (rule.event_id === 'none') {
+        // Спеціальний випадок для "None"
+        if (rule.condition === 'true') {
+            return !currentActiveEvent; // true якщо ніяка подія не запущена
+        } else if (rule.condition === 'false') {
+            return !!currentActiveEvent; // true якщо хоч якась подія запущена
+        }
+    } else {
+        // Звичайна логіка для конкретної події
+        if (rule.condition === 'true') {
+            return currentActiveEvent === rule.event_id;
+        } else if (rule.condition === 'false') {
+            return currentActiveEvent !== rule.event_id;
+        }
+    }
     
-    if (rule.condition === 'true') {
-        const result = currentActiveEvent === rule.event_id;
-        console.log('Rule result (true):', result);
-        return result;
-    } else if (rule.condition === 'false') {
-        const result = currentActiveEvent !== rule.event_id;
-        console.log('Rule result (false):', result);
-        return result;
+    return false;
+}
+
+export const checkMatchingRunningCourseRule = (rule) => {
+    const coursesModule = gameCore.getModule('courses');
+    if (!coursesModule) return false;
+
+    const runningCourseId = coursesModule.runningCourse;
+    
+    if (rule.course_id === 'none') {
+        // Спеціальний випадок для "None"
+        if (rule.condition === 'true') {
+            return !runningCourseId; // true якщо ніякий не запущений
+        } else if (rule.condition === 'false') {
+            return !!runningCourseId; // true якщо хоч якийсь запущений
+        }
+    } else {
+        // Звичайна логіка для конкретного курсу
+        if (rule.condition === 'true') {
+            return runningCourseId === rule.course_id;
+        } else if (rule.condition === 'false') {
+            return runningCourseId !== rule.course_id;
+        }
     }
     
     return false;
@@ -229,6 +252,9 @@ export const checkMatchingRule = (rule) => {
     }
     if(rule.compare_type === 'current_social_event') {
         return checkMatchingCurrentSocialEventRule(rule);
+    }
+    if(rule.compare_type === 'running_course') {
+        return checkMatchingRunningCourseRule(rule);
     }
     console.warn(`Unknown rule compare type: ${rule.compare_type}`);
 }

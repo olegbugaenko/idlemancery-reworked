@@ -6,6 +6,27 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+                <h3>Idle Awakening v0.2.1g</h3>
+                <div className={'features'}>
+                    <p>Fixed a bug where courses where not displayed properly in quick access panel</p>
+                    <p>Fixed a bug where cursor automatically jumped to the end of value input in automation rules</p>
+                    <p>Fixed a bug where coal discount wasn't applied correctly to some machinery</p>
+                    <p>Fixed a bug where in some cases action list sidebar might not update properly</p>
+                    <p>Fixed a bug where max XP might not update properly when changing spell level input</p>
+                    <p>Rebalance: replaced broken Blacksmiths amplifier with Soil Amplifier</p>
+                    <p>Rebalance: reduced positive effect of Diplomats Elixir</p>
+                </div>
+                <h3>Idle Awakening v0.2.1f</h3>
+                <div className={'features'}>
+                    <p>Fixed a bug where alchemy auto-rebalance inconsistently worked with lists</p>
+                    <p>Fixed some issues with search and automation inputs</p>
+                    <p>Fixed a bug where Self-Organization displayed wrong number of potential benefit in left sidebar</p>
+                    <p>Fixed a bug where spell XP gain sometimes didn't update when different spell level was selected</p>
+                    <p>QoL: Now you can hower potential loot to see some more useful information</p>
+                    <p>QoL: Added new automation rules for running course</p>
+                    <p>QoL: Howering over resource in left sidebar will show both gross and net income</p>
+                    <p>QoL: Howering over alchemy recipe icon or name now show tooltip</p>
+                </div>
                 <h3>Idle Awakening v0.2.1e</h3>
                 <div className={'features'}>
                     <p>Fixed a bug where crafting efforts didn't restored during auto-rebalance enabled</p>

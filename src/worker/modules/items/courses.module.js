@@ -365,6 +365,14 @@ export class CoursesModule extends GameModule {
                 isUnlocked: gameEntity.isEntityUnlocked(entity.id)
             }));
         
+        // Додаємо опцію "None" для правил автоматизації
+        courses.unshift({
+            id: 'none',
+            name: 'None',
+            level: 0,
+            isUnlocked: true
+        });
+        
         this.eventHandler.sendData(`all-courses-${prefix}`, courses);
     }
 

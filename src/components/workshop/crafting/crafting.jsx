@@ -147,7 +147,7 @@ export const Crafting = ({ setItemDetails, setItemLevel, filterId, newUnlocks, o
                         </label>
                     </TippyWrapper>
                 </div>
-                {craftingData.autoRebalance.hasOriginalAllocations && !craftingData.autoRebalance.canRestore && (
+                {craftingData.autoRebalance.enabled && craftingData.autoRebalance.hasOriginalAllocations && !craftingData.autoRebalance.canRestore && (
                                     <TippyWrapper content={<div className={'hint-popup'}>
                     <p className={'hint'}>Some of your recipes don't have enough ingredients. Since you enabled automatic rebalancing, your efforts have been redirected to other available recipes.</p>
                 </div>}>

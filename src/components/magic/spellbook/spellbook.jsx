@@ -159,7 +159,7 @@ export const SpellbookWrap = ({ children }) => {
 
     const setSpellDetailsView = useCallback((id) => {
         sendData('set-monitored', { scope: 'effects', type: 'spell', id });
-        if(!id) {
+        if(!id || id === editData?.id) {
             setViewedOpenedId(null);
             setViewedData(null);
             return;
@@ -169,7 +169,7 @@ export const SpellbookWrap = ({ children }) => {
             playSound('selection');
         }
 
-    })
+    }, [editData?.id])
 
     const onChangeLevel = useCallback((level) => {
         if(editData) {
@@ -415,6 +415,14 @@ export const SpellCard = React.memo(({ id, level, maxLevel, monitored, name, isC
 export const SpellDetails = React.memo(({isChanged, editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onSetAutocastPattern, onChangeLevel, onSave, onCancel, onToggleAutotrigger, automationUnlocked, isMobile, onPurchase, onToggleViewLasting}) => {
 
     const item = cloneDeep(viewedData ? viewedData : editData);
+    const [inputLevel, setInputLevel] = useState(item?.actualLevel || 1);
+
+    // Sync inputLevel with actualLevel when item changes
+    useEffect(() => {
+        if (item?.actualLevel !== undefined) {
+            setInputLevel(item.actualLevel);
+        }
+    }, [item?.id, item?.actualLevel]);
 
     let isEditing = !!editData && !viewedData;
 
@@ -442,15 +450,15 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
 
     useEffect(() => {
         if(!item) return ;
-        sendData('query-spell-details', { id: item.id, prefix: 'detail' })
+        sendData('query-spell-details', { id: item.id, prefix: 'detail', targetLevel: inputLevel })
         const timeout = setInterval(() => {
-            sendData('query-spell-details', { id: item.id, prefix: 'detail' })
+            sendData('query-spell-details', { id: item.id, prefix: 'detail', targetLevel: inputLevel })
         }, 500)
 
         return () => {
             clearInterval(timeout);
         }
-    }, [item?.id]);
+    }, [item?.id, inputLevel]);
 
     // Separate interval for resource balances to update availability
     useEffect(() => {
@@ -544,6 +552,7 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
         if(currentTourId === 'spellLevels') {
             unlockNextById(5);
         }
+        setInputLevel(level);
         onChangeLevel(level);
     }
 
@@ -570,7 +579,7 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
         }
     }
 
-
+    // console.log(`spellDet: ${spellDetails?.xpRate}, itemDet: ${item?.xpRate}`);
 
     return (
         <>
@@ -601,7 +610,7 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
                             <div className={'set-level flex-container flex-row'}>
                                 <div className={'setter'}>
                                     <span>Set level to </span>
-                                    <input type={'number'} value={item.actualLevel} min={1} max={(spellDetails || item)?.maxLevel} onChange={e => changeLevel(Math.floor(+e.target.value))}/>
+                                    <input type={'number'} value={inputLevel} min={1} max={(spellDetails || item)?.maxLevel} onChange={e => changeLevel(Math.floor(+e.target.value))}/>
                                     <span>of {(spellDetails || item)?.maxLevel}</span>
                                 </div>
                                 <div>

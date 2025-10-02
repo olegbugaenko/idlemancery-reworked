@@ -116,6 +116,7 @@ export class ActionListsSubmodule extends GameModule {
             const blockedDynamicActions = this.getBlockedDynamicActions(listData);
 
             this.eventHandler.sendData('action-list-effects', {
+                id: (listData && listData.id) != null ? listData.id : (id != null ? id : null),
                 potentialEffects: data,
                 resourcesEffects,
                 prevEffects: this.packEffects(prevEffects),

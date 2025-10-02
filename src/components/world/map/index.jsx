@@ -14,6 +14,37 @@ import {useTutorial} from "../../../context/tutorial-context";
 import {TippyWrapper} from "../../shared/tippy-wrapper.jsx";
 import {useModal} from "../../../general/components/modal/index.jsx";
 
+// Component for drop tooltip with stats and usages
+const DropTooltip = ({ drop }) => {
+    return (
+        <div className={'hint-popup'}>
+            <div className={'block'}>
+                <p>Average Find per sec: {formatValue(drop.avgFindPerSec)}</p>
+            </div>
+            {drop.usages?.length ? (
+                <div className={'block'}>
+                    <p>Used By:</p>
+                    <div className={'sub-items'}>
+                        {drop.usages.map(one => (
+                            <p key={one.id} className={'padded-left'}>{one.name}</p>
+                        ))}
+                    </div>
+                </div>
+            ) : null}
+            {drop.usagesFor?.length ? (
+                <div className={'block'}>
+                    <p>Used For:</p>
+                    <div className={'sub-items'}>
+                        {drop.usagesFor.map(one => (
+                            <p key={one.id} className={'padded-left'}>{one.name}</p>
+                        ))}
+                    </div>
+                </div>
+            ) : null}
+        </div>
+    );
+};
+
 export const MapWrap = ({ children }) => {
 
     const { isMobile } = useAppContext();
@@ -604,13 +635,17 @@ export const ItemDetails = ({itemId, setItemDetails}) => {
                 {item.drops ? (<div className={'block map-exploration-loot'}>
                     <p>Drops:</p>
                     {item.unlockedUnrevealedAmount > 0 ? (<p className={'hint'}>Discoverable as you explore</p> ) : null}
-                    {item.drops.map(drop => (<p className={`drop-row ${drop.rarityTier} ${drop.ingredient ? 'ingredient' : ''}`}>
-                        <span className={'name'}>{drop.resource.name}</span>
-                        <span className={'probability'}>{formatValue(drop.probability*100)}%</span>
-                        <span className={'amounts'}>{formatInt(drop.amountMin)} - {formatInt(drop.amountMax)}</span>
-                    </p> ))}
+                    {item.drops.map(drop => (
+                        <TippyWrapper key={drop.id} content={<DropTooltip drop={drop} />}>
+                            <p className={`drop-row ${drop.rarityTier} ${drop.ingredient ? 'ingredient' : ''}`}>
+                                <span className={'name'}>{drop.resource.name}</span>
+                                <span className={'probability'}>{formatValue(drop.probability*100)}%</span>
+                                <span className={'amounts'}>{formatInt(drop.amountMin)} - {formatInt(drop.amountMax)}</span>
+                            </p>
+                        </TippyWrapper>
+                    ))}
                     {item.unlockedUnrevealedAmount > 0 ? (<p className={'hint pot-finds'}>{formatInt(item.unlockedUnrevealedAmount)} more items can be found</p> ) : null}
-                    {item.drops.length ? (<p className="hint small">The percentages above represent the chances of finding the corresponding loot per second.</p> ) : null}             
+                    {item.drops.length ? (<p className="hint small">The percentages above represent the chances of finding the corresponding loot per second. Hower over specific loot to see more details</p> ) : null}             
                 </div> ) : null}
                 <div className={'block map-exploration-upkeep'}>
                     <p>Costs:</p>
@@ -781,11 +816,15 @@ export const MapTileListDetails = ({
                         </div>) : null}
                         {editing.drops ? (<div className={'block'}>
                             <p>Drops:</p>
-                            {editing.drops.map(drop => (<p className={`drop-row ${drop.rarityTier} ${drop.ingredient ? 'ingredient' : ''}`}>
-                                <span className={'name'}>{drop.resource.name}</span>
-                                <span className={'probability'}>{formatValue(drop.probability*100)}%</span>
-                                <span className={'amounts'}>{formatInt(drop.amountMin)} - {formatInt(drop.amountMax)}</span>
-                            </p> ))}
+                            {editing.drops.map(drop => (
+                                <TippyWrapper key={drop.id} content={<DropTooltip drop={drop} />}>
+                                    <p className={`drop-row ${drop.rarityTier} ${drop.ingredient ? 'ingredient' : ''}`}>
+                                        <span className={'name'}>{drop.resource.name}</span>
+                                        <span className={'probability'}>{formatValue(drop.probability*100)}%</span>
+                                        <span className={'amounts'}>{formatInt(drop.amountMin)} - {formatInt(drop.amountMax)}</span>
+                                    </p>
+                                </TippyWrapper>
+                            ))}
                             {editing.unlockedUnrevealedAmount > 0 ? (<p className={'hint pot-finds'}>{formatInt(editing.unlockedUnrevealedAmount)} more items can be found</p> ) : null}
                         </div> ) : null}
                         {editing.costs ? (<div className={'block'}>

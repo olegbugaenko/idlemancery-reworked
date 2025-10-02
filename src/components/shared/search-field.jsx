@@ -1,18 +1,27 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useLayoutEffect, useState, useRef } from "react";
 
 export const SearchField = ({ value, onSetValue, scopes, placeholder }) => {
-    const [search, setSearch] = useState(value?.search);
-    const [selectedScopes, setSelectedScopes] = useState(null);
+    const [search, setSearch] = useState(value?.search || '');
+    const [selectedScopes, setSelectedScopes] = useState(() => Array.isArray(value?.selectedScopes) ? value.selectedScopes : []);
     const [isScopesOpened, setScopesOpened] = useState(false);
 
     const popupRef = useRef(null);
+    const inputRef = useRef(null);
+    const caretPositionRef = useRef(null);
 
     useEffect(() => {
-        if(!selectedScopes && value.selectedScopes && Array.isArray(value.selectedScopes)) {
-            setSelectedScopes(value.selectedScopes)
+        if (Array.isArray(value?.selectedScopes)) {
+            setSelectedScopes((prev) => {
+                if (prev?.length === value.selectedScopes.length && prev.every((id, index) => id === value.selectedScopes[index])) {
+                    return prev;
+                }
+                return [...value.selectedScopes];
+            });
         }
-        setSearch(value?.search);
-    }, [value?.search, value?.selectedScopes ? JSON.stringify(value?.selectedScopes ?? []) : '']);
+
+        const nextSearch = value?.search ?? '';
+        setSearch((prev) => (prev === nextSearch ? prev : nextSearch));
+    }, [value?.search, value?.selectedScopes]);
 
     useEffect(() => {
         // skip set data c
@@ -47,15 +56,27 @@ export const SearchField = ({ value, onSetValue, scopes, placeholder }) => {
     }
 
     const onChangeSearch = (e) => {
-
+        const newValue = e.target.value.toLowerCase();
+        caretPositionRef.current = e.target.selectionStart;
+        setSearch(newValue);
+        
+        // Update parent component with debounced approach
         onSetValue({
-            search: e.target.value.toLowerCase(),
+            search: newValue,
             selectedScopes,
         });
 
         console.log('OPening')
         setScopesOpened(true);
     };
+
+    useLayoutEffect(() => {
+        if (caretPositionRef.current !== null && inputRef.current) {
+            const position = caretPositionRef.current;
+            caretPositionRef.current = null;
+            inputRef.current.setSelectionRange(position, position);
+        }
+    }, [search]);
 
     const handleClickOutside = (event) => {
         if (popupRef.current && !popupRef.current.contains(event.target)) {
@@ -78,6 +99,7 @@ export const SearchField = ({ value, onSetValue, scopes, placeholder }) => {
                     type="text"
                     placeholder={placeholder}
                     value={search}
+                    ref={inputRef}
                     onChange={onChangeSearch}
                     onClick={() => setScopesOpened(true)}
                 />

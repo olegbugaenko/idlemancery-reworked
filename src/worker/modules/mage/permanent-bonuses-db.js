@@ -464,6 +464,7 @@ export const registerPermanentBonuses = () => {
                         B: 1,
                         C: 0.05,
                         type: 5,
+                        diminishStep: 1000,
                     }
                 }
             }
@@ -488,6 +489,7 @@ export const registerPermanentBonuses = () => {
                         B: 1,
                         C: 0.02,
                         type: 5,
+                        diminishStep: 1000,
                     }
                 }
             }
@@ -512,6 +514,7 @@ export const registerPermanentBonuses = () => {
                         B: 1,
                         C: 0.05,
                         type: 5,
+                        diminishStep: 1000,
                     }
                 }
             }
@@ -536,6 +539,7 @@ export const registerPermanentBonuses = () => {
                         B: 1,
                         C: 0.05,
                         type: 5,
+                        diminishStep: 1000,
                     }
                 }
             }
@@ -560,6 +564,8 @@ export const registerPermanentBonuses = () => {
                         B: 1,
                         C: 0.02,
                         type: 5,
+                        diminishStep: 1000,
+                        diminish: 0.85,
                     }
                 }
             }

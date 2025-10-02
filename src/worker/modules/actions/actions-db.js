@@ -2925,7 +2925,7 @@ export const registerActionsStage1 = () => {
                 resources: {
                     'coins': {
                         A: 0.02,
-                        B: 1,
+                        B: 0.98,
                         type: 0,
                     }
                 }
@@ -4418,7 +4418,7 @@ export const registerActionsStage1 = () => {
             level: 500,
         }],
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_metaphysics_handbook') > 0
+            return true;
         },
         attributes: {
             baseXPCost: 1000,

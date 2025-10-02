@@ -445,7 +445,7 @@ export const ListEditor = React.memo(({
                                             }
                                         </div>
                                         <div className={'col delete'}>
-                                            {isEditing ? (<span className={'close'} onClick={() => onDropActionFromList(action.id)}>X</span>) : null}
+                                            {isEditing ? (<span className={'close'} onClick={() => onDropActionFromList(index)}>X</span>) : null}
                                         </div>
                                     </div>
                                 );

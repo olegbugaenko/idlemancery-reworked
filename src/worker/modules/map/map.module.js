@@ -606,11 +606,32 @@ export class MapModule extends GameModule {
             ...tile,
             name: tile.metaData.name,
             unlockedUnrevealedAmount: tile.drops.filter((drop, index) => (!tile.r?.includes(index)) && gameResources.isResourceUnlocked(drop.id)).length,
-            drops: tile.drops.map((drop, index) => ({
-                ...drop,
-                resource: gameResources.getResource(drop.id),
-                isRevealed: tile.r?.includes(index) && gameResources.isResourceUnlocked(drop.id)
-            })).filter(one => one.isRevealed),
+            drops: tile.drops.map((drop, index) => {
+                const isRevealed = tile.r?.includes(index) && gameResources.isResourceUnlocked(drop.id);
+                const resource = gameResources.getResource(drop.id);
+                
+                // Get usages and usagesFor like in inventory.module.js
+                const usages = gameEntity.getUsingEntities(drop.id);
+                const usagesFor = gameEntity.getUsedForEntities(drop.id).filter(one => {
+                    // Для артефактів не показуємо, поки рецепт не відкрито в модулі крафту артефактів
+                    const isArtifact = gameEntity.getEntity(one.id)?.tags?.includes('artifact');
+                    if (!isArtifact) return true;
+                    try {
+                        return gameCore.getModule('artifacts-crafting')?.isRecipeUnlocked(one.id) || false;
+                    } catch (e) {
+                        return false;
+                    }
+                });
+
+                return {
+                    ...drop,
+                    resource,
+                    isRevealed,
+                    usages,
+                    usagesFor,
+                    avgFindPerSec: drop.probability * (drop.amountMin + drop.amountMax) / 2
+                };
+            }).filter(one => one.isRevealed),
             canExplore: !(i === 7 && j === 7),
             isProducingGathering: gameResources.getResource('gathering_effort').income > SMALL_NUMBER
         }

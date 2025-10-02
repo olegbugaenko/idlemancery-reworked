@@ -36,7 +36,8 @@ export const QuickAccessPanel = () => {
 
         const interval = setInterval(() => {
             sendData('query-favorites', {});
-        }, 1000);
+            sendData('query-favorite-items', {});
+        }, 500);
 
         return () => clearInterval(interval);
     }, []);
@@ -70,7 +71,7 @@ export const QuickAccessPanel = () => {
     };
 
     const renderActionItem = (action) => (
-        <div key={action.id} className="quick-access-item">
+        <div key={action.id} className={`quick-access-item ${action.isActive ? 'active' : ''}`}>
             <div className="item-content">
                 <span className="item-name">{action.name}</span>
                 <span className="level">{formatValue(action.level)}</span>
@@ -125,9 +126,9 @@ export const QuickAccessPanel = () => {
     );
 
     const renderCourseItem = (course) => (
-        <div key={course.id} className="quick-access-item">
+        <div key={course.id} className={`quick-access-item ${course.isRunning ? 'active' : ''}`}>
             <div className="item-content">
-                <div className="icon-content">
+                <div className="icon-content icon-container">
                     <img src={`icons/courses/${course.id}.png`} className="resource" />
                     <span className="level">{formatValue(course.level)}</span>
                 </div>
@@ -199,17 +200,14 @@ export const QuickAccessPanel = () => {
                     )}
 
                     {favorites.courses.length > 0 && (
-                        <div className={'favorites-section'}>
+                        <div className="quick-access-section">
                             <h4>Favorite Courses</h4>
-                            {favorites.courses.map(id => {
-                                const course = favoritesData.courses[id];
-                                return course ? (
-                                    <div key={id} className={'favorite-item'}>
-                                        <span className="item-name">{course.name}</span>
-                                        <span onClick={() => removeFavorite('courses', id)} className="remove-btn">×</span>
-                                    </div>
-                                ) : null;
-                            })}
+                            <div className="items-list">
+                                {favorites.courses.map(id => {
+                                    const course = favoritesData.courses[id];
+                                    return course ? renderCourseItem(course) : null;
+                                })}
+                            </div>
                         </div>
                     )}
 
