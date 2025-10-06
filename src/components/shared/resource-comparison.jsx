@@ -1,8 +1,9 @@
 import React from "react";
 import {mapEffect} from "../../general/utils/resource-utils";
 import {RawResource} from "./raw-resource.jsx";
+import {TippyWrapper} from "./tippy-wrapper.jsx";
 
-export const ResourceComparison = ({ effects1, effects2 }) => {
+export const ResourceComparison = ({ effects1, effects2, description }) => {
 
     const compareKeysUnique = [...new Set([...Object.keys(effects1),...Object.keys(effects2)])];
 
@@ -41,13 +42,19 @@ export const ResourceComparison = ({ effects1, effects2 }) => {
 
 
 
-    return (<div className={'effects-table comparison'}>
+    const content = (<div className={'effects-table comparison'}>
         {table.map(({ id, title, type, prevValue, nextValue, isImprovement, isWorse, key}) => (<div key={key} className={'effect-line'}>
             {type === 'resources' ? (<RawResource className={'title'} id={id} name={title} />) : (<span className={'title'}>{title}</span>)}
             <span className={'prevVal'}>{prevValue}</span>
             <span className={'arrow'}>&rarr;</span>
             <span className={`nextVal${isImprovement ? ' green' : ''}${isWorse ? ' red' : ''}`}>{nextValue}</span>
         </div>))}
-    </div>  )
+    </div>);
+
+    return description ? (
+        <TippyWrapper content={<div className={'hint-popup'}>{description}</div>}>
+            {content}
+        </TippyWrapper>
+    ) : content;
 
 }

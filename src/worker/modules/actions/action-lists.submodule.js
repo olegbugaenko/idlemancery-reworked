@@ -371,432 +371,267 @@ export class ActionListsSubmodule extends GameModule {
         });
 
 
-        const potentialConsumption = new Set();
-
-        for (const act of dynamicActions) {
-            const oneActionEffects = this.getListEffects(null, { actions: [act] });
-            for (const effect of oneActionEffects) {
-                if (effect.type === 'resources' && effect.scope === 'consumption') {
-                    potentialConsumption.add(effect.id);
+        const computeActionNetPerFullTime = (action) => {
+            const breakdown = this.getActionResourceBreakdown({ ...action, time: 1 }, 1) || { incomes: [], consumptions: [] };
+            const net = {};
+            breakdown.incomes.forEach(({ id, value }) => {
+                if (value > SMALL_NUMBER) {
+                    net[id] = (net[id] || 0) + value;
                 }
-            }
-        }
-
-        for (const [id, val] of Object.entries(initialResourceBalance)) {
-            const net = val.current + val.income - val.consumption;
-            if (net < 0 || potentialConsumption.has(id) || val.current < 0) {
-                keysToTrack.push(id);
-            }
-        }
-
-        const maxIncomes = {};
-        const minConsumptions = {};
-
-        // 2. Аналіз кожної динамічної дії — чи вона впливає на ключові ресурси
-        for (const act of dynamicActions) {
-            fallbackTimes[act.id] = act.time ?? 0.001;
-
-            const oneActionEffects = this.getListEffects(null, { actions: [act] });
-            const incomeEffects = oneActionEffects.filter(e => e.type === 'resources' && e.scope === 'income');
-            actionContributions[act.id] = incomeEffects.map(e => ({ id: e.id, value: e.value }));
-            const consumptions = oneActionEffects
-                .filter(e => e.type === 'resources' && e.scope === 'consumption')
-                .map(e => ({ id: e.id, value: e.value }));
-
-            actionConsumptions[act.id] = consumptions/*.reduce((acc, item) => ({...acc, [item.id]: item.value}), {})*/;
-
-            let contributesToDeficit = false;
-            for (const { id, value } of incomeEffects) {
-                if (!resourceToActions[id]) resourceToActions[id] = new Set();
-                resourceToActions[id].add(act.id);
-                if (keysToTrack.includes(id)) {
-                    contributesToDeficit = true;
-                    maxIncomes[id] = Math.max(maxIncomes[id] ?? 0, value)
+            });
+            breakdown.consumptions.forEach(({ id, value }) => {
+                if (value > SMALL_NUMBER) {
+                    net[id] = (net[id] || 0) - value;
                 }
-            }
-
-            for (const { id, value } of consumptions) {
-                if (keysToTrack.includes(id)) {
-                    minConsumptions[id] = Math.min(minConsumptions[id] ?? 1.e+100, value)
-                }
-            }
-
-            for(const key of keysToTrack) {
-                if(!consumptions.find(o => o.id === key)) {
-                    minConsumptions[key] = 0;
-                }
-            }
-
-            if (!contributesToDeficit) {
-                skipDynamicActions.add(act.id);
-            }
-        }
-
-        // 2.1 Аналіз фіксованих дій
-
-
-        const fixedActionEffects = this.getListEffects(null, { actions: fixedActions });
-        const incomeEffects = fixedActionEffects.filter(e => e.type === 'resources' && e.scope === 'income' && keysToTrack.includes(e.id));
-
-        const consumptions = fixedActionEffects
-            .filter(e => e.type === 'resources' && e.scope === 'consumption' && keysToTrack.includes(e.id))
-            .map(e => ({ id: e.id, value: e.value }));
-
-        for (const { id, value } of incomeEffects) {
-            maxIncomes[id] = Math.max(maxIncomes[id] ?? 0, value)
-        }
-
-        for (const { id, value } of consumptions) {
-            minConsumptions[id] = Math.min(minConsumptions[id] ?? 1.e+100, value)
-        }
-
-
-        // Temporarily commented out
-
-        keysToTrack = keysToTrack.filter(key => {
-            if(initialResourceBalance[key].current < 0 && ((maxIncomes[key] ?? 0) < -initialResourceBalance[key].current)) {
-                console.log('Unable to balance '+key, initialResourceBalance[key].current, maxIncomes[key])
-                return false;
-            }
-            if(initialResourceBalance[key].current > 0 && ((minConsumptions[key] ?? 0) > initialResourceBalance[key].current)) {
-                console.log('Unable to balance '+key+' due to minConsumption', initialResourceBalance[key].current, minConsumptions, fixedActionEffects)
-                return false;
-            }
-            return true;
-        })
-
-        const forecastedActionsEfficiencies = {};
-        let finalDeficites = {};
-
-        let dynamicValues = Object.fromEntries(dynamicActions.filter(one => !skipDynamicActions.has(one.id)).map(a => [a.id, 0]));
-        let previousDeficits = {};
-
-        const bst = performance.now();
-
-        let stable = false;
-
-        const solveLeastSquares = (matrix, rhs, lambda = 1e-6) => {
-            const m = matrix.length;
-            if (!m) return [];
-            const n = matrix[0].length;
-            if (!n) return [];
-
-            const ata = Array.from({ length: n }, () => Array(n).fill(0));
-            const atb = Array(n).fill(0);
-
-            for (let i = 0; i < n; i++) {
-                for (let j = i; j < n; j++) {
-                    let sum = 0;
-                    for (let k = 0; k < m; k++) {
-                        sum += matrix[k][i] * matrix[k][j];
-                    }
-                    if (i === j) sum += lambda;
-                    ata[i][j] = ata[j][i] = sum;
-                }
-            }
-
-            for (let i = 0; i < n; i++) {
-                let sum = 0;
-                for (let k = 0; k < m; k++) {
-                    sum += matrix[k][i] * rhs[k];
-                }
-                atb[i] = sum;
-            }
-
-            for (let i = 0; i < n; i++) {
-                let pivot = i;
-                for (let r = i + 1; r < n; r++) {
-                    if (Math.abs(ata[r][i]) > Math.abs(ata[pivot][i])) pivot = r;
-                }
-                if (Math.abs(ata[pivot][i]) < 1e-12) continue;
-                if (pivot !== i) {
-                    [ata[pivot], ata[i]] = [ata[i], ata[pivot]];
-                    [atb[pivot], atb[i]] = [atb[i], atb[pivot]];
-                }
-
-                const diag = ata[i][i];
-                for (let j = i; j < n; j++) ata[i][j] /= diag;
-                atb[i] /= diag;
-
-                for (let r = i + 1; r < n; r++) {
-                    const factor = ata[r][i];
-                    if (Math.abs(factor) < 1e-12) continue;
-                    for (let c = i; c < n; c++) ata[r][c] -= factor * ata[i][c];
-                    atb[r] -= factor * atb[i];
-                }
-            }
-
-            const x = Array(n).fill(0);
-            for (let i = n - 1; i >= 0; i--) {
-                let sum = atb[i];
-                for (let j = i + 1; j < n; j++) sum -= ata[i][j] * x[j];
-                x[i] = sum;
-            }
-            return x;
+            });
+            return net;
         };
 
-        const applyAdjustmentsHelper = (actionsArr, deltas, gamma = 1, clampRatioDown = 0.5, clampRatioUp = 0.5) => {
-            if (!actionsArr?.length || !deltas?.length) return;
-            for (let idx = 0; idx < actionsArr.length; idx++) {
-                const actionId = actionsArr[idx];
-                if (skipDynamicActions.has(actionId)) continue;
-                let deltaTime = gamma * deltas[idx];
-                if (!isFinite(deltaTime)) continue;
-                const current = dynamicValues[actionId] || 0;
-                const maxUp = clampRatioUp * Math.max(current, 1e-3);
-                const maxDown = clampRatioDown * current;
-                deltaTime = Math.max(-maxDown, Math.min(maxUp, deltaTime));
-                dynamicValues[actionId] = Math.max(0, current + deltaTime);
-            }
-        };
+        const attemptExactDynamicSolve = () => {
+            if (!dynamicActions.length) return {};
+            if (dynamicActions.length > 8) return null;
 
-        const computeAdjustment = (resourceIds, deficitsMap, proficitsMap, efficiencies) => {
-            const relevantResources = resourceIds.filter(id => (deficitsMap[id] || 0) > SMALL_NUMBER);
-            if (!relevantResources.length) return null;
+            const dynamicNetEffects = dynamicActions.map(action => computeActionNetPerFullTime(action));
+            const fixedNetEffects = fixedActions.map(action => computeActionNetPerFullTime(action));
 
-            const actionsArr = Array.from(new Set(relevantResources.flatMap(rid => Array.from(resourceToActions[rid] || []))));
-            if (!actionsArr.length) return null;
-
-            const rows = relevantResources.length;
-            const cols = actionsArr.length;
-            const A = Array.from({ length: rows }, () => Array(cols).fill(0));
-            const b = relevantResources.map(id => deficitsMap[id] || 0);
-
-            let maxCoeff = 0;
-            for (let i = 0; i < rows; i++) {
-                const resourceId = relevantResources[i];
-                for (let j = 0; j < cols; j++) {
-                    const actionId = actionsArr[j];
-                    if (skipDynamicActions.has(actionId)) {
-                        A[i][j] = 0;
-                        continue;
-                    }
-                    const contrib = actionContributions[actionId].find(c => c.id === resourceId)?.value || 0;
-                    const eff = efficiencies[actionId] ?? 1;
-                    const coeff = contrib * eff;
-                    A[i][j] = coeff;
-                    maxCoeff = Math.max(maxCoeff, Math.abs(coeff));
-                }
-            }
-
-            if (maxCoeff < SMALL_NUMBER) return null;
-
-            const deltas = Array(cols).fill(0);
-            const residuals = Array(rows).fill(0);
-            const gradients = Array(cols).fill(0);
-            const step = 0.8 / (maxCoeff * maxCoeff * cols);
-
-            for (let iter = 0; iter < 40; iter++) {
-                let maxResidual = 0;
-                for (let i = 0; i < rows; i++) {
-                    let sum = 0;
-                    for (let j = 0; j < cols; j++) {
-                        sum += A[i][j] * deltas[j];
-                    }
-                    residuals[i] = sum - b[i];
-                    maxResidual = Math.max(maxResidual, Math.abs(residuals[i]));
-                }
-
-                if (maxResidual < 1e-5) break;
-
-                gradients.fill(0);
-                for (let j = 0; j < cols; j++) {
-                    let grad = 0;
-                    for (let i = 0; i < rows; i++) {
-                        grad += A[i][j] * residuals[i];
-                    }
-                    gradients[j] = grad;
-                }
-
-                let changed = false;
-                for (let j = 0; j < cols; j++) {
-                    if (skipDynamicActions.has(actionsArr[j])) continue;
-                    const newVal = Math.max(0, deltas[j] - step * gradients[j]);
-                    if (Math.abs(newVal - deltas[j]) > 1e-8) changed = true;
-                    deltas[j] = newVal;
-                }
-
-                if (!changed) break;
-            }
-
-            return { actionsArr, deltas };
-        };
-
-        for (let iter = 0; iter < MAX_ITER; iter++) {
-            const actions = baseActions.map(one =>
-                one.isDynamicTime && !skipDynamicActions.has(one.id)
-                    ? { ...one, time: dynamicValues[one.id] || 0.001 }
-                    : one
-            );
-
-            const dynamicTotal = dynamicActions.reduce((acc, one) =>
-                    skipDynamicActions.has(one.id)
-                        ? acc + (fallbackTimes[one.id] || 0.001)
-                        : acc + (dynamicValues[one.id] || 0.001)
-                , 0);
-
-            const totalListTime = fixedTotal + dynamicTotal;
-
-            const allEffects = this.getListEffects(null, { ...listData, actions });
-
-            // console.log('AllEff: ', allEffects, actions, dynamicValues);
-
-            const resourceBalanceMap = {};
-            allEffects.forEach(effect => {
-                if (effect.type !== 'resources') return;
-
-                const base = resourceCalculators.assertResource(effect.id, false, ['runningActions'], {
-                    targetEfficiency: 1,
-                });
-
-                const currentIncome = base.balance;
-
-                if (!resourceBalanceMap[effect.id]) {
-                    resourceBalanceMap[effect.id] = { income: 0, consumption: 0, current: currentIncome };
-                }
-
-                // console.log('Effect: ', effect);
-
-                const group = resourceBalanceMap[effect.id];
-                const grossIncome = effect.grossIncome ?? (effect.scope === 'income' ? effect.value : 0);
-                const grossConsumption = effect.grossConsumption ?? (effect.scope === 'consumption' ? effect.value : 0);
-                if (grossIncome) group.income += grossIncome;
-                if (grossConsumption) group.consumption += grossConsumption;
-
-                if(group.consumption) {
-                    const projectedIncome = (base.income*base.multiplier) + (group.income || 0);
-                    const projectedConsumption = (group.consumption + base.consumption) || SMALL_NUMBER;
-                    const ratio = projectedIncome / projectedConsumption;
-                    if(ratio <= 0) {
-                        console.warn(`Projected ${ratio}:(${effect.id}) `, projectedIncome, projectedConsumption, group, dynamicValues);
-                    }
-                    group.forecastedEfficiency = Math.max(0, Math.min(1, ratio));
-                } else {
-                    group.forecastedEfficiency = 1;
+            const fixedEffectsTotals = {};
+            fixedActions.forEach((action, idx) => {
+                const net = fixedNetEffects[idx];
+                const time = action.time || 0;
+                for (const resId in net) {
+                    fixedEffectsTotals[resId] = (fixedEffectsTotals[resId] || 0) + net[resId] * time;
                 }
             });
 
-            const potentialEfficiencies = {};
-            for(const actId in actionConsumptions) {
-                potentialEfficiencies[actId] = 1;
-                for(const consumption of actionConsumptions[actId]) {
-                    if(resourceBalanceMap[consumption.id].forecastedEfficiency < 1 - SMALL_NUMBER) {
-                        potentialEfficiencies[actId] = Math.min(potentialEfficiencies[actId], resourceBalanceMap[consumption.id].forecastedEfficiency)
-                    }
+            const resourceSet = new Set(Object.keys(initialResourceBalance));
+            dynamicNetEffects.forEach(net => Object.keys(net).forEach(id => resourceSet.add(id)));
+            Object.keys(fixedEffectsTotals).forEach(id => resourceSet.add(id));
+
+            const ensureBalance = (resId) => {
+                if (!initialResourceBalance[resId]) {
+                    const base = resourceCalculators.assertResource(resId, false, ['runningActions'], {
+                        targetEfficiency: 1,
+                    }) || {};
+                    initialResourceBalance[resId] = {
+                        income: 0,
+                        consumption: 0,
+                        current: base.balance || 0,
+                        currentConsumption: base.consumption || 0,
+                    };
                 }
+            };
+
+            const constraints = [];
+            const resourcePassive = {};
+            let impossible = false;
+
+            resourceSet.forEach(resId => {
+                ensureBalance(resId);
+                const passive = initialResourceBalance[resId]?.current ?? 0;
+                resourcePassive[resId] = passive;
+                const coeffs = dynamicActions.map((_, idx) => (dynamicNetEffects[idx][resId] || 0) + passive);
+                const rhs = - (passive * fixedTotal + (fixedEffectsTotals[resId] || 0));
+                const hasInfluence = coeffs.some(val => Math.abs(val) > SMALL_NUMBER);
+                if (!hasInfluence) {
+                    if (rhs > SMALL_NUMBER) {
+                        impossible = true;
+                    }
+                    return;
+                }
+                constraints.push({ resId, coeffs, rhs });
+            });
+
+            if (impossible) return null;
+
+            if (!constraints.length) {
+                return {};
             }
 
-            // console.log(`Iter${iter} balance map: `, resourceBalanceMap, potentialEfficiencies, dynamicValues, keysToTrack);
+            const constraintCount = constraints.length;
+            const actionCount = dynamicActions.length;
+            const MAX_COMBINATIONS = 50000;
 
-            const currentDeficits = {};
-            const currentProficits = {};
-            for (const [id, val] of Object.entries(resourceBalanceMap)) {
-                if(!keysToTrack.includes(id)) {
+            const generateCombinations = (n, k) => {
+                const result = [];
+                const combo = [];
+                let aborted = false;
+                const backtrack = (start, depth) => {
+                    if (aborted) return;
+                    if (depth === k) {
+                        result.push([...combo]);
+                        if (result.length > MAX_COMBINATIONS) {
+                            aborted = true;
+                        }
+                        return;
+                    }
+                    for (let i = start; i < n; i++) {
+                        combo.push(i);
+                        backtrack(i + 1, depth + 1);
+                        combo.pop();
+                        if (aborted) return;
+                    }
+                };
+                backtrack(0, 0);
+                return aborted ? null : result;
+            };
+
+            const solveLinearSystem = (matrix, vector) => {
+                const size = matrix.length;
+                if (!size) return [];
+                const augmented = matrix.map((row, idx) => [...row, vector[idx]]);
+
+                for (let i = 0; i < size; i++) {
+                    let pivot = i;
+                    for (let r = i + 1; r < size; r++) {
+                        if (Math.abs(augmented[r][i]) > Math.abs(augmented[pivot][i])) {
+                            pivot = r;
+                        }
+                    }
+                    if (Math.abs(augmented[pivot][i]) < SMALL_NUMBER) {
+                        return null;
+                    }
+                    if (pivot !== i) {
+                        [augmented[pivot], augmented[i]] = [augmented[i], augmented[pivot]];
+                    }
+
+                    const pivotVal = augmented[i][i];
+                    for (let c = i; c <= size; c++) {
+                        augmented[i][c] /= pivotVal;
+                    }
+
+                    for (let r = 0; r < size; r++) {
+                        if (r === i) continue;
+                        const factor = augmented[r][i];
+                        if (Math.abs(factor) < SMALL_NUMBER) continue;
+                        for (let c = i; c <= size; c++) {
+                            augmented[r][c] -= factor * augmented[i][c];
+                        }
+                    }
+                }
+
+                return augmented.map(row => row[size]);
+            };
+
+            const resourceList = Array.from(resourceSet);
+            const fixedEffectByResource = id => fixedEffectsTotals[id] || 0;
+
+            const checkFeasible = (times) => {
+                const totalDynamic = times.reduce((acc, val) => acc + val, 0);
+                return resourceList.every(resId => {
+                    const passive = resourcePassive[resId] || 0;
+                    let total = passive * (fixedTotal + totalDynamic) + fixedEffectByResource(resId);
+                    for (let i = 0; i < actionCount; i++) {
+                        total += (dynamicNetEffects[i][resId] || 0) * times[i];
+                    }
+                    return total >= -1e-6;
+                });
+            };
+
+            const combosCache = {};
+            const getCombos = (k) => {
+                if (!combosCache[k]) {
+                    const generated = generateCombinations(constraintCount, k);
+                    if (!generated) {
+                        combosCache[k] = null;
+                    } else {
+                        combosCache[k] = generated;
+                    }
+                }
+                return combosCache[k];
+            };
+
+            let bestSolution = null;
+            let bestSum = Infinity;
+
+            const evaluateTimes = (times) => {
+                const sanitized = times.map(val => (val < SMALL_NUMBER ? (val < -SMALL_NUMBER ? val : 0) : val));
+                if (sanitized.some(val => val < -SMALL_NUMBER)) return;
+                if (!constraints.every(({ coeffs, rhs }) => {
+                    const lhs = coeffs.reduce((acc, coeff, idx) => acc + coeff * sanitized[idx], 0);
+                    return lhs >= rhs - 1e-6;
+                })) return;
+                if (!checkFeasible(sanitized)) return;
+                const sum = sanitized.reduce((acc, val) => acc + val, 0);
+                if (sum < bestSum - 1e-6) {
+                    bestSum = sum;
+                    bestSolution = sanitized;
+                }
+            };
+
+            const totalMasks = 1 << actionCount;
+            for (let mask = 0; mask < totalMasks; mask++) {
+                const activeIndices = [];
+                for (let i = 0; i < actionCount; i++) {
+                    if ((mask & (1 << i)) === 0) {
+                        activeIndices.push(i);
+                    }
+                }
+
+                const activeCount = activeIndices.length;
+                if (!activeCount) {
+                    evaluateTimes(Array(actionCount).fill(0));
                     continue;
                 }
-                const net = val.current + val.income - val.consumption;
-                if (net < 0) {
-                    currentDeficits[id] = Math.abs(net);
-                } else if (net > 0 && keysToTrack.includes(id)) {
-                    currentProficits[id] = net;
+                if (constraintCount < activeCount) continue;
+
+                const combos = getCombos(activeCount);
+                if (!combos) {
+                    return null;
+                }
+                for (const combo of combos) {
+                    const matrix = combo.map(index => {
+                        const row = constraints[index].coeffs;
+                        return activeIndices.map(idx => row[idx]);
+                    });
+                    const rhs = combo.map(index => constraints[index].rhs);
+                    const solution = solveLinearSystem(matrix, rhs);
+                    if (!solution) continue;
+                    const times = Array(actionCount).fill(0);
+                    solution.forEach((val, idx) => {
+                        times[activeIndices[idx]] = val;
+                    });
+                    evaluateTimes(times);
                 }
             }
 
-            const isAllDeficitsSmall = Object.values(currentDeficits).every(val => val < TOLERANCE * 0.5);
-            if (!isAllDeficitsSmall || iter === 0) {
-                const deficitIds = Object.keys(currentDeficits).filter(id => currentDeficits[id] > 0);
-                const proficitIds = Object.keys(currentProficits).filter(id => currentProficits[id] > 0);
-                const resourceIdsForSolve = iter === 0 ? deficitIds : [...new Set([...deficitIds, ...proficitIds])];
+            if (!bestSolution) return null;
 
-                const adjustment = computeAdjustment(resourceIdsForSolve, currentDeficits, currentProficits, potentialEfficiencies);
-                if (adjustment) {
-                    applyAdjustmentsHelper(adjustment.actionsArr, adjustment.deltas, 1, 0.0, 1.5);
-                }
-                console.log(`Iter${iter} values: `, dynamicValues, previousDeficits, currentDeficits, adjustment);
+            return bestSolution;
+        };
+
+        const exactDynamicTimes = attemptExactDynamicSolve();
+
+        console.log('exactDynamicTimes: ', exactDynamicTimes);
+        if (exactDynamicTimes !== null) {
+            if (!Array.isArray(exactDynamicTimes)) {
+                return exactDynamicTimes;
             }
-
-            // Recompute balances AFTER applying corrections to avoid premature convergence
-            // Additionally, keep the total dynamic time budget stable to reduce oscillations
-            const targetDynamicTotal = dynamicActions.reduce((acc, one) => acc + (skipDynamicActions.has(one.id) ? (fallbackTimes[one.id] || 0.001) : (dynamicValues[one.id] || 0)), 0);
-            const sumDynNow = dynamicActions.reduce((acc, one) => acc + (skipDynamicActions.has(one.id) ? (fallbackTimes[one.id] || 0.001) : (dynamicValues[one.id] || 0)), 0);
-            if(sumDynNow > SMALL_NUMBER) {
-                const scaleK = targetDynamicTotal / sumDynNow;
-                if(Math.abs(scaleK - 1) > 1e-6) {
-                    for(const act of dynamicActions) {
-                        if(skipDynamicActions.has(act.id)) continue;
-                        dynamicValues[act.id] = Math.max(0, (dynamicValues[act.id] || 0) * scaleK);
-                    }
+            const dynamicResult = {};
+            dynamicActions.forEach((action, idx) => {
+                const val = exactDynamicTimes[idx];
+                if (val > SMALL_NUMBER) {
+                    dynamicResult[action.id] = val;
                 }
-            }
-
-            const actionsAfter = baseActions.map(one =>
-                one.isDynamicTime && !skipDynamicActions.has(one.id)
-                    ? { ...one, time: dynamicValues[one.id] || 0.001 }
-                    : one
-            );
-
-            const allEffectsAfter = this.getListEffects(null, { ...listData, actions: actionsAfter });
-
-            const resourceBalanceMapAfter = {};
-            allEffectsAfter.forEach(effect => {
-                if (effect.type !== 'resources') return;
-                const base = resourceCalculators.assertResource(effect.id, false, ['runningActions'], {
-                    targetEfficiency: 1,
-                });
-                const currentIncome = base.balance;
-                if (!resourceBalanceMapAfter[effect.id]) {
-                    resourceBalanceMapAfter[effect.id] = { income: 0, consumption: 0, current: currentIncome };
-                }
-                const group = resourceBalanceMapAfter[effect.id];
-                if (effect.scope === 'income') group.income += effect.value;
-                else if (effect.scope === 'consumption') group.consumption += effect.value;
             });
-
-            const currentDeficitsAfter = {};
-            for (const [id, val] of Object.entries(resourceBalanceMapAfter)) {
-                if(!keysToTrack.includes(id)) continue;
-                const net = val.current + val.income - val.consumption;
-                if (net < 0) currentDeficitsAfter[id] = Math.abs(net);
-            }
-
-            // Decide stability based on updated deficits
-            stable = true;
-            for (const [resId, def] of Object.entries(currentDeficitsAfter)) {
-                if (def > TOLERANCE) {
-                    stable = false;
-                    break;
-                }
-            }
-
-            previousDeficits = { ...currentDeficitsAfter };
-            finalDeficites = { ...currentDeficitsAfter };
-
-            if (stable) break;
-        }
-
-        console.log('currentDeficites: ', finalDeficites, actionContributions, actionConsumptions, performance.now() - bst, stable);
-
-        if(!stable) {
-            const st = performance.now();
-            const guessedMinimized = this.optimizeDynamicEfforts({
-                dynamicActions,
-                fixedTotal,
-                initialResourceBalance,
-                actionContributions,
-                actionConsumptions,
-                maxIterations: 30,
-                learningRate: 0.1,
-                tolerance: 0.0001,
-            });
-            console.log('guessedMinimized: ', guessedMinimized, performance.now() - st);
-
-            return guessedMinimized;
+            return dynamicResult;
         }
 
 
+        const st = performance.now();
+        const guessedMinimized = this.optimizeDynamicEfforts({
+            dynamicActions,
+            fixedTotal,
+            initialResourceBalance,
+            actionContributions,
+            actionConsumptions,
+            maxIterations: 30,
+            learningRate: 0.1,
+            tolerance: 0.0001,
+        });
+        console.log('guessedMinimized: ', guessedMinimized, performance.now() - st);
 
-
-        return dynamicValues;
+        return guessedMinimized;
+        
     }
 
     canAutoSetTime(action) {

@@ -679,10 +679,10 @@ export const registerCommomEffects = () => {
     })
 
     gameEffects.registerEffect('socio_campaign_efficiency', {
-        name: 'Social Campaign Efficiency',
+        name: 'Social Campaign Permanent Bonus',
         defaultValue: 1.,
         minValue: 1,
-        description: 'Increases efficiency of social events and campaigns',
+        description: 'Increases passive bonus of event hall events tagged "socio_campaign"',
         saveBalanceTree: true,
     })
 
