@@ -371,6 +371,250 @@ export class ActionListsSubmodule extends GameModule {
         });
 
 
+        const computeActionNetPerFullTime = (action) => {
+            const breakdown = this.getActionResourceBreakdown({ ...action, time: 1 }, 1) || { incomes: [], consumptions: [] };
+            const net = {};
+            breakdown.incomes.forEach(({ id, value }) => {
+                if (value > SMALL_NUMBER) {
+                    net[id] = (net[id] || 0) + value;
+                }
+            });
+            breakdown.consumptions.forEach(({ id, value }) => {
+                if (value > SMALL_NUMBER) {
+                    net[id] = (net[id] || 0) - value;
+                }
+            });
+            return net;
+        };
+
+        const attemptExactDynamicSolve = () => {
+            if (!dynamicActions.length) return {};
+            if (dynamicActions.length > 8) return null;
+
+            const dynamicNetEffects = dynamicActions.map(action => computeActionNetPerFullTime(action));
+            const fixedNetEffects = fixedActions.map(action => computeActionNetPerFullTime(action));
+
+            const fixedEffectsTotals = {};
+            fixedActions.forEach((action, idx) => {
+                const net = fixedNetEffects[idx];
+                const time = action.time || 0;
+                for (const resId in net) {
+                    fixedEffectsTotals[resId] = (fixedEffectsTotals[resId] || 0) + net[resId] * time;
+                }
+            });
+
+            const resourceSet = new Set(Object.keys(initialResourceBalance));
+            dynamicNetEffects.forEach(net => Object.keys(net).forEach(id => resourceSet.add(id)));
+            Object.keys(fixedEffectsTotals).forEach(id => resourceSet.add(id));
+
+            const ensureBalance = (resId) => {
+                if (!initialResourceBalance[resId]) {
+                    const base = resourceCalculators.assertResource(resId, false, ['runningActions'], {
+                        targetEfficiency: 1,
+                    }) || {};
+                    initialResourceBalance[resId] = {
+                        income: 0,
+                        consumption: 0,
+                        current: base.balance || 0,
+                        currentConsumption: base.consumption || 0,
+                    };
+                }
+            };
+
+            const constraints = [];
+            const resourcePassive = {};
+            let impossible = false;
+
+            resourceSet.forEach(resId => {
+                ensureBalance(resId);
+                const passive = initialResourceBalance[resId]?.current ?? 0;
+                resourcePassive[resId] = passive;
+                const coeffs = dynamicActions.map((_, idx) => (dynamicNetEffects[idx][resId] || 0) + passive);
+                const rhs = - (passive * fixedTotal + (fixedEffectsTotals[resId] || 0));
+                const hasInfluence = coeffs.some(val => Math.abs(val) > SMALL_NUMBER);
+                if (!hasInfluence) {
+                    if (rhs > SMALL_NUMBER) {
+                        impossible = true;
+                    }
+                    return;
+                }
+                constraints.push({ resId, coeffs, rhs });
+            });
+
+            if (impossible) return null;
+
+            if (!constraints.length) {
+                return {};
+            }
+
+            const constraintCount = constraints.length;
+            const actionCount = dynamicActions.length;
+            const MAX_COMBINATIONS = 50000;
+
+            const generateCombinations = (n, k) => {
+                const result = [];
+                const combo = [];
+                let aborted = false;
+                const backtrack = (start, depth) => {
+                    if (aborted) return;
+                    if (depth === k) {
+                        result.push([...combo]);
+                        if (result.length > MAX_COMBINATIONS) {
+                            aborted = true;
+                        }
+                        return;
+                    }
+                    for (let i = start; i < n; i++) {
+                        combo.push(i);
+                        backtrack(i + 1, depth + 1);
+                        combo.pop();
+                        if (aborted) return;
+                    }
+                };
+                backtrack(0, 0);
+                return aborted ? null : result;
+            };
+
+            const solveLinearSystem = (matrix, vector) => {
+                const size = matrix.length;
+                if (!size) return [];
+                const augmented = matrix.map((row, idx) => [...row, vector[idx]]);
+
+                for (let i = 0; i < size; i++) {
+                    let pivot = i;
+                    for (let r = i + 1; r < size; r++) {
+                        if (Math.abs(augmented[r][i]) > Math.abs(augmented[pivot][i])) {
+                            pivot = r;
+                        }
+                    }
+                    if (Math.abs(augmented[pivot][i]) < SMALL_NUMBER) {
+                        return null;
+                    }
+                    if (pivot !== i) {
+                        [augmented[pivot], augmented[i]] = [augmented[i], augmented[pivot]];
+                    }
+
+                    const pivotVal = augmented[i][i];
+                    for (let c = i; c <= size; c++) {
+                        augmented[i][c] /= pivotVal;
+                    }
+
+                    for (let r = 0; r < size; r++) {
+                        if (r === i) continue;
+                        const factor = augmented[r][i];
+                        if (Math.abs(factor) < SMALL_NUMBER) continue;
+                        for (let c = i; c <= size; c++) {
+                            augmented[r][c] -= factor * augmented[i][c];
+                        }
+                    }
+                }
+
+                return augmented.map(row => row[size]);
+            };
+
+            const resourceList = Array.from(resourceSet);
+            const fixedEffectByResource = id => fixedEffectsTotals[id] || 0;
+
+            const checkFeasible = (times) => {
+                const totalDynamic = times.reduce((acc, val) => acc + val, 0);
+                return resourceList.every(resId => {
+                    const passive = resourcePassive[resId] || 0;
+                    let total = passive * (fixedTotal + totalDynamic) + fixedEffectByResource(resId);
+                    for (let i = 0; i < actionCount; i++) {
+                        total += (dynamicNetEffects[i][resId] || 0) * times[i];
+                    }
+                    return total >= -1e-6;
+                });
+            };
+
+            const combosCache = {};
+            const getCombos = (k) => {
+                if (!combosCache[k]) {
+                    const generated = generateCombinations(constraintCount, k);
+                    if (!generated) {
+                        combosCache[k] = null;
+                    } else {
+                        combosCache[k] = generated;
+                    }
+                }
+                return combosCache[k];
+            };
+
+            let bestSolution = null;
+            let bestSum = Infinity;
+
+            const evaluateTimes = (times) => {
+                const sanitized = times.map(val => (val < SMALL_NUMBER ? (val < -SMALL_NUMBER ? val : 0) : val));
+                if (sanitized.some(val => val < -SMALL_NUMBER)) return;
+                if (!constraints.every(({ coeffs, rhs }) => {
+                    const lhs = coeffs.reduce((acc, coeff, idx) => acc + coeff * sanitized[idx], 0);
+                    return lhs >= rhs - 1e-6;
+                })) return;
+                if (!checkFeasible(sanitized)) return;
+                const sum = sanitized.reduce((acc, val) => acc + val, 0);
+                if (sum < bestSum - 1e-6) {
+                    bestSum = sum;
+                    bestSolution = sanitized;
+                }
+            };
+
+            const totalMasks = 1 << actionCount;
+            for (let mask = 0; mask < totalMasks; mask++) {
+                const activeIndices = [];
+                for (let i = 0; i < actionCount; i++) {
+                    if ((mask & (1 << i)) === 0) {
+                        activeIndices.push(i);
+                    }
+                }
+
+                const activeCount = activeIndices.length;
+                if (!activeCount) {
+                    evaluateTimes(Array(actionCount).fill(0));
+                    continue;
+                }
+                if (constraintCount < activeCount) continue;
+
+                const combos = getCombos(activeCount);
+                if (!combos) {
+                    return null;
+                }
+                for (const combo of combos) {
+                    const matrix = combo.map(index => {
+                        const row = constraints[index].coeffs;
+                        return activeIndices.map(idx => row[idx]);
+                    });
+                    const rhs = combo.map(index => constraints[index].rhs);
+                    const solution = solveLinearSystem(matrix, rhs);
+                    if (!solution) continue;
+                    const times = Array(actionCount).fill(0);
+                    solution.forEach((val, idx) => {
+                        times[activeIndices[idx]] = val;
+                    });
+                    evaluateTimes(times);
+                }
+            }
+
+            if (!bestSolution) return null;
+
+            return bestSolution;
+        };
+
+        const exactDynamicTimes = attemptExactDynamicSolve();
+        if (exactDynamicTimes !== null) {
+            if (!Array.isArray(exactDynamicTimes)) {
+                return exactDynamicTimes;
+            }
+            const dynamicResult = {};
+            dynamicActions.forEach((action, idx) => {
+                const val = exactDynamicTimes[idx];
+                if (val > SMALL_NUMBER) {
+                    dynamicResult[action.id] = val;
+                }
+            });
+            return dynamicResult;
+        }
+
+
         const potentialConsumption = new Set();
 
         for (const act of dynamicActions) {
