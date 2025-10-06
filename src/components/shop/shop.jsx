@@ -613,7 +613,7 @@ export const ItemDetails = ({itemId, category, editId, onPurchase, isEditMode, o
     }, []);
 
     useEffect(() => {
-        if((category === 'items' || category === 'courses') && editId) {
+        if((category === 'items' || category === 'courses') && (editId || isMobile)) {
             const ap = item?.autopurchase || {};
             setAutopurchase({
                 rules: ap.rules || [],
@@ -627,7 +627,7 @@ export const ItemDetails = ({itemId, category, editId, onPurchase, isEditMode, o
             setAutopurchase(null);
         }
 
-    },[category, editId, item?.autopurchase?.purchaseMultiplier, item?.autopurchase?.priority]) // include item so defaults are applied when data arrives
+    },[category, editId, isMobile, item?.autopurchase?.purchaseMultiplier, item?.autopurchase?.priority]) // include item so defaults are applied when data arrives
 
     if(!itemId || !item) return null;
 
@@ -708,11 +708,15 @@ export const ItemDetails = ({itemId, category, editId, onPurchase, isEditMode, o
 
     const toggleAutopurchase = () => {
         setAutopurchase(prev => {
-            const newAutopurchase = cloneDeep(prev) || {};
+            const base = prev || {};
+            const newAutopurchase = cloneDeep(base) || {};
             if(!newAutopurchase.rules) {
                 newAutopurchase.rules = [];
             }
-            newAutopurchase.isEnabled = !prev.isEnabled;
+            const currentEnabled = (prev && typeof prev.isEnabled === 'boolean')
+                ? prev.isEnabled
+                : (item?.autopurchase?.isEnabled || false);
+            newAutopurchase.isEnabled = !currentEnabled;
             setChanged(true);
             return newAutopurchase;
         })
@@ -739,7 +743,7 @@ export const ItemDetails = ({itemId, category, editId, onPurchase, isEditMode, o
         unlockNextById(5);
     }
 
-    const autopurchaseDisplayed = item?.isAutomationUnlocked ? (isEditMode ? autopurchase : item?.autopurchase) : null;
+    const autopurchaseDisplayed = item?.isAutomationUnlocked ? ((isEditMode || isMobile) ? autopurchase : item?.autopurchase) : null;
 
     return (
         <>

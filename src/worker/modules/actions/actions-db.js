@@ -184,7 +184,7 @@ export const registerActionsStage1 = () => {
     })
 
     registerGameAction('action_beggar', {
-        tags: ["action", "job", "social", "social"],
+        tags: ["action", "job", "social"],
         name: 'Beggar',
         category: ACTION_CATS.COINS,
         isAbstract: false,

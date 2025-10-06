@@ -327,7 +327,7 @@ export class ActionListsSubmodule extends GameModule {
     }
 
     getListDynamicValues(listData) {
-        const MAX_ITER = 10;
+        const MAX_ITER = 15;
         const TOLERANCE = 0.001;
         const SMALL_NUMBER = 1e-6;
 
@@ -459,7 +459,7 @@ export class ActionListsSubmodule extends GameModule {
                 return false;
             }
             if(initialResourceBalance[key].current > 0 && ((minConsumptions[key] ?? 0) > initialResourceBalance[key].current)) {
-                console.log('Unable to balance '+key+' due to minConsumption', initialResourceBalance[key].current, minConsumptions)
+                console.log('Unable to balance '+key+' due to minConsumption', initialResourceBalance[key].current, minConsumptions, fixedActionEffects)
                 return false;
             }
             return true;
@@ -468,12 +468,159 @@ export class ActionListsSubmodule extends GameModule {
         const forecastedActionsEfficiencies = {};
         let finalDeficites = {};
 
-        let dynamicValues = Object.fromEntries(dynamicActions.filter(one => !skipDynamicActions.has(one.id)).map(a => [a.id, 0.001]));
+        let dynamicValues = Object.fromEntries(dynamicActions.filter(one => !skipDynamicActions.has(one.id)).map(a => [a.id, 0]));
         let previousDeficits = {};
 
         const bst = performance.now();
 
         let stable = false;
+
+        const solveLeastSquares = (matrix, rhs, lambda = 1e-6) => {
+            const m = matrix.length;
+            if (!m) return [];
+            const n = matrix[0].length;
+            if (!n) return [];
+
+            const ata = Array.from({ length: n }, () => Array(n).fill(0));
+            const atb = Array(n).fill(0);
+
+            for (let i = 0; i < n; i++) {
+                for (let j = i; j < n; j++) {
+                    let sum = 0;
+                    for (let k = 0; k < m; k++) {
+                        sum += matrix[k][i] * matrix[k][j];
+                    }
+                    if (i === j) sum += lambda;
+                    ata[i][j] = ata[j][i] = sum;
+                }
+            }
+
+            for (let i = 0; i < n; i++) {
+                let sum = 0;
+                for (let k = 0; k < m; k++) {
+                    sum += matrix[k][i] * rhs[k];
+                }
+                atb[i] = sum;
+            }
+
+            for (let i = 0; i < n; i++) {
+                let pivot = i;
+                for (let r = i + 1; r < n; r++) {
+                    if (Math.abs(ata[r][i]) > Math.abs(ata[pivot][i])) pivot = r;
+                }
+                if (Math.abs(ata[pivot][i]) < 1e-12) continue;
+                if (pivot !== i) {
+                    [ata[pivot], ata[i]] = [ata[i], ata[pivot]];
+                    [atb[pivot], atb[i]] = [atb[i], atb[pivot]];
+                }
+
+                const diag = ata[i][i];
+                for (let j = i; j < n; j++) ata[i][j] /= diag;
+                atb[i] /= diag;
+
+                for (let r = i + 1; r < n; r++) {
+                    const factor = ata[r][i];
+                    if (Math.abs(factor) < 1e-12) continue;
+                    for (let c = i; c < n; c++) ata[r][c] -= factor * ata[i][c];
+                    atb[r] -= factor * atb[i];
+                }
+            }
+
+            const x = Array(n).fill(0);
+            for (let i = n - 1; i >= 0; i--) {
+                let sum = atb[i];
+                for (let j = i + 1; j < n; j++) sum -= ata[i][j] * x[j];
+                x[i] = sum;
+            }
+            return x;
+        };
+
+        const applyAdjustmentsHelper = (actionsArr, deltas, gamma = 1, clampRatioDown = 0.5, clampRatioUp = 0.5) => {
+            if (!actionsArr?.length || !deltas?.length) return;
+            for (let idx = 0; idx < actionsArr.length; idx++) {
+                const actionId = actionsArr[idx];
+                if (skipDynamicActions.has(actionId)) continue;
+                let deltaTime = gamma * deltas[idx];
+                if (!isFinite(deltaTime)) continue;
+                const current = dynamicValues[actionId] || 0;
+                const maxUp = clampRatioUp * Math.max(current, 1e-3);
+                const maxDown = clampRatioDown * current;
+                deltaTime = Math.max(-maxDown, Math.min(maxUp, deltaTime));
+                dynamicValues[actionId] = Math.max(0, current + deltaTime);
+            }
+        };
+
+        const computeAdjustment = (resourceIds, deficitsMap, proficitsMap, efficiencies) => {
+            const relevantResources = resourceIds.filter(id => (deficitsMap[id] || 0) > SMALL_NUMBER);
+            if (!relevantResources.length) return null;
+
+            const actionsArr = Array.from(new Set(relevantResources.flatMap(rid => Array.from(resourceToActions[rid] || []))));
+            if (!actionsArr.length) return null;
+
+            const rows = relevantResources.length;
+            const cols = actionsArr.length;
+            const A = Array.from({ length: rows }, () => Array(cols).fill(0));
+            const b = relevantResources.map(id => deficitsMap[id] || 0);
+
+            let maxCoeff = 0;
+            for (let i = 0; i < rows; i++) {
+                const resourceId = relevantResources[i];
+                for (let j = 0; j < cols; j++) {
+                    const actionId = actionsArr[j];
+                    if (skipDynamicActions.has(actionId)) {
+                        A[i][j] = 0;
+                        continue;
+                    }
+                    const contrib = actionContributions[actionId].find(c => c.id === resourceId)?.value || 0;
+                    const eff = efficiencies[actionId] ?? 1;
+                    const coeff = contrib * eff;
+                    A[i][j] = coeff;
+                    maxCoeff = Math.max(maxCoeff, Math.abs(coeff));
+                }
+            }
+
+            if (maxCoeff < SMALL_NUMBER) return null;
+
+            const deltas = Array(cols).fill(0);
+            const residuals = Array(rows).fill(0);
+            const gradients = Array(cols).fill(0);
+            const step = 0.8 / (maxCoeff * maxCoeff * cols);
+
+            for (let iter = 0; iter < 40; iter++) {
+                let maxResidual = 0;
+                for (let i = 0; i < rows; i++) {
+                    let sum = 0;
+                    for (let j = 0; j < cols; j++) {
+                        sum += A[i][j] * deltas[j];
+                    }
+                    residuals[i] = sum - b[i];
+                    maxResidual = Math.max(maxResidual, Math.abs(residuals[i]));
+                }
+
+                if (maxResidual < 1e-5) break;
+
+                gradients.fill(0);
+                for (let j = 0; j < cols; j++) {
+                    let grad = 0;
+                    for (let i = 0; i < rows; i++) {
+                        grad += A[i][j] * residuals[i];
+                    }
+                    gradients[j] = grad;
+                }
+
+                let changed = false;
+                for (let j = 0; j < cols; j++) {
+                    if (skipDynamicActions.has(actionsArr[j])) continue;
+                    const newVal = Math.max(0, deltas[j] - step * gradients[j]);
+                    if (Math.abs(newVal - deltas[j]) > 1e-8) changed = true;
+                    deltas[j] = newVal;
+                }
+
+                if (!changed) break;
+            }
+
+            return { actionsArr, deltas };
+        };
 
         for (let iter = 0; iter < MAX_ITER; iter++) {
             const actions = baseActions.map(one =>
@@ -492,6 +639,8 @@ export class ActionListsSubmodule extends GameModule {
 
             const allEffects = this.getListEffects(null, { ...listData, actions });
 
+            // console.log('AllEff: ', allEffects, actions, dynamicValues);
+
             const resourceBalanceMap = {};
             allEffects.forEach(effect => {
                 if (effect.type !== 'resources') return;
@@ -506,12 +655,22 @@ export class ActionListsSubmodule extends GameModule {
                     resourceBalanceMap[effect.id] = { income: 0, consumption: 0, current: currentIncome };
                 }
 
+                // console.log('Effect: ', effect);
+
                 const group = resourceBalanceMap[effect.id];
-                if (effect.scope === 'income') group.income += effect.value;
-                else if (effect.scope === 'consumption') group.consumption += effect.value;
+                const grossIncome = effect.grossIncome ?? (effect.scope === 'income' ? effect.value : 0);
+                const grossConsumption = effect.grossConsumption ?? (effect.scope === 'consumption' ? effect.value : 0);
+                if (grossIncome) group.income += grossIncome;
+                if (grossConsumption) group.consumption += grossConsumption;
 
                 if(group.consumption) {
-                    group.forecastedEfficiency = (base.income*base.multiplier) / (group.consumption + base.consumption);
+                    const projectedIncome = (base.income*base.multiplier) + (group.income || 0);
+                    const projectedConsumption = (group.consumption + base.consumption) || SMALL_NUMBER;
+                    const ratio = projectedIncome / projectedConsumption;
+                    if(ratio <= 0) {
+                        console.warn(`Projected ${ratio}:(${effect.id}) `, projectedIncome, projectedConsumption, group, dynamicValues);
+                    }
+                    group.forecastedEfficiency = Math.max(0, Math.min(1, ratio));
                 } else {
                     group.forecastedEfficiency = 1;
                 }
@@ -527,7 +686,7 @@ export class ActionListsSubmodule extends GameModule {
                 }
             }
 
-            //console.log(`Iter${iter} balance map: `, resourceBalanceMap, potentialEfficiencies, dynamicValues);
+            // console.log(`Iter${iter} balance map: `, resourceBalanceMap, potentialEfficiencies, dynamicValues, keysToTrack);
 
             const currentDeficits = {};
             const currentProficits = {};
@@ -543,73 +702,76 @@ export class ActionListsSubmodule extends GameModule {
                 }
             }
 
-            if (iter === 0) {
-                for (const [resourceId, deficit] of Object.entries(currentDeficits)) {
-                    const actionsThatContribute = resourceToActions[resourceId];
-                    if (!actionsThatContribute) continue;
+            const isAllDeficitsSmall = Object.values(currentDeficits).every(val => val < TOLERANCE * 0.5);
+            if (!isAllDeficitsSmall || iter === 0) {
+                const deficitIds = Object.keys(currentDeficits).filter(id => currentDeficits[id] > 0);
+                const proficitIds = Object.keys(currentProficits).filter(id => currentProficits[id] > 0);
+                const resourceIdsForSolve = iter === 0 ? deficitIds : [...new Set([...deficitIds, ...proficitIds])];
 
-                    const totalValuePerSec = Array.from(actionsThatContribute).reduce((sum, actionId) => {
-                        const contrib = actionContributions[actionId].find(c => c.id === resourceId);
-                        return sum + (contrib?.value || 0)*((actionId in potentialEfficiencies) ? potentialEfficiencies[actionId] : 1);
-                    }, 0);
-
-                    if (totalValuePerSec <= 0) continue;
-
-                    const totalNeededTime = deficit * totalListTime / totalValuePerSec;
-
-                    for (const actionId of actionsThatContribute) {
-                        const contrib = actionContributions[actionId].find(c => c.id === resourceId);
-                        const portion = (contrib?.value || 0) / totalValuePerSec;
-                        const timeToAdd = totalNeededTime * portion;
-                        dynamicValues[actionId] = (dynamicValues[actionId] || 0) + timeToAdd;
-                    }
-                    //console.log('Iter0: ', resourceId, deficit, dynamicValues);
-
+                const adjustment = computeAdjustment(resourceIdsForSolve, currentDeficits, currentProficits, potentialEfficiencies);
+                if (adjustment) {
+                    applyAdjustmentsHelper(adjustment.actionsArr, adjustment.deltas, 1, 0.0, 1.5);
                 }
-            } else {
-                for (const [resourceId, prevDeficit] of Object.entries(previousDeficits)) {
-                    const current = currentDeficits[resourceId] || -currentProficits[resourceId] || 0;
-                    const delta = current;
-
-                    const actionsThatContribute = resourceToActions[resourceId];
-                    if (!actionsThatContribute) continue;
-
-                    const totalValuePerSec = Array.from(actionsThatContribute).reduce((sum, actionId) => {
-                        const contrib = actionContributions[actionId].find(c => c.id === resourceId);
-                        return sum + (contrib?.value || 0)*((actionId in potentialEfficiencies) ? potentialEfficiencies[actionId] : 1);
-                    }, 0);
-
-                    if (totalValuePerSec <= 0) continue;
-
-                    const timeCorrection = delta * totalListTime / totalValuePerSec;
-
-                    for (const actionId of actionsThatContribute) {
-                        const contrib = actionContributions[actionId].find(c => c.id === resourceId);
-                        const portion = (contrib?.value || 0) / totalValuePerSec;
-                        const deltaTime = timeCorrection * portion;
-                        const newTime = Math.max(0, (dynamicValues[actionId] || 0) + deltaTime);
-                        dynamicValues[actionId] = newTime;
-                    }
-                }
-                //console.log(`Iter${iter} values: `, dynamicValues, previousDeficits, currentDeficits);
+                console.log(`Iter${iter} values: `, dynamicValues, previousDeficits, currentDeficits, adjustment);
             }
 
-            stable = true;
-            for (const [resId, def] of Object.entries(currentDeficits)) {
-                const prev = previousDeficits[resId] ?? 0;
-                if (Math.abs(prev - def) > TOLERANCE || (def > TOLERANCE)) {
+            // Recompute balances AFTER applying corrections to avoid premature convergence
+            // Additionally, keep the total dynamic time budget stable to reduce oscillations
+            const targetDynamicTotal = dynamicActions.reduce((acc, one) => acc + (skipDynamicActions.has(one.id) ? (fallbackTimes[one.id] || 0.001) : (dynamicValues[one.id] || 0)), 0);
+            const sumDynNow = dynamicActions.reduce((acc, one) => acc + (skipDynamicActions.has(one.id) ? (fallbackTimes[one.id] || 0.001) : (dynamicValues[one.id] || 0)), 0);
+            if(sumDynNow > SMALL_NUMBER) {
+                const scaleK = targetDynamicTotal / sumDynNow;
+                if(Math.abs(scaleK - 1) > 1e-6) {
+                    for(const act of dynamicActions) {
+                        if(skipDynamicActions.has(act.id)) continue;
+                        dynamicValues[act.id] = Math.max(0, (dynamicValues[act.id] || 0) * scaleK);
+                    }
+                }
+            }
 
+            const actionsAfter = baseActions.map(one =>
+                one.isDynamicTime && !skipDynamicActions.has(one.id)
+                    ? { ...one, time: dynamicValues[one.id] || 0.001 }
+                    : one
+            );
+
+            const allEffectsAfter = this.getListEffects(null, { ...listData, actions: actionsAfter });
+
+            const resourceBalanceMapAfter = {};
+            allEffectsAfter.forEach(effect => {
+                if (effect.type !== 'resources') return;
+                const base = resourceCalculators.assertResource(effect.id, false, ['runningActions'], {
+                    targetEfficiency: 1,
+                });
+                const currentIncome = base.balance;
+                if (!resourceBalanceMapAfter[effect.id]) {
+                    resourceBalanceMapAfter[effect.id] = { income: 0, consumption: 0, current: currentIncome };
+                }
+                const group = resourceBalanceMapAfter[effect.id];
+                if (effect.scope === 'income') group.income += effect.value;
+                else if (effect.scope === 'consumption') group.consumption += effect.value;
+            });
+
+            const currentDeficitsAfter = {};
+            for (const [id, val] of Object.entries(resourceBalanceMapAfter)) {
+                if(!keysToTrack.includes(id)) continue;
+                const net = val.current + val.income - val.consumption;
+                if (net < 0) currentDeficitsAfter[id] = Math.abs(net);
+            }
+
+            // Decide stability based on updated deficits
+            stable = true;
+            for (const [resId, def] of Object.entries(currentDeficitsAfter)) {
+                if (def > TOLERANCE) {
                     stable = false;
                     break;
                 }
             }
 
-            previousDeficits = { ...currentDeficits };
-            finalDeficites = {...currentDeficits};
+            previousDeficits = { ...currentDeficitsAfter };
+            finalDeficites = { ...currentDeficitsAfter };
 
-            if (stable) {
-                break;
-            }
+            if (stable) break;
         }
 
         console.log('currentDeficites: ', finalDeficites, actionContributions, actionConsumptions, performance.now() - bst, stable);
@@ -1144,6 +1306,7 @@ export class ActionListsSubmodule extends GameModule {
             .reduce((acc, item) => acc += item.time, 0);
 
         const totalEffects = [];
+        const resourceAgg = {}; // id -> { grossIncome, grossConsumption }
 
         list.actions.forEach(action => {
             let isAvailable = gameEntity.isEntityUnlocked(action.id) && !gameEntity.isCapped(action.id);
@@ -1184,6 +1347,17 @@ export class ActionListsSubmodule extends GameModule {
                     }
                 }
 
+                // Track gross parts WITHOUT changing existing merge logic
+                if(effToAdd.type === 'resources') {
+                    const id = effToAdd.id;
+                    if(!resourceAgg[id]) resourceAgg[id] = { grossIncome: 0, grossConsumption: 0 };
+                    if(effToAdd.scope === 'income') {
+                        resourceAgg[id].grossIncome += Math.max(0, effToAdd.value);
+                    } else if(effToAdd.scope === 'consumption') {
+                        resourceAgg[id].grossConsumption += Math.max(0, effToAdd.value);
+                    }
+                }
+
                 if(foundId < 0) {
                     totalEffects.push(effToAdd);
                 } else {
@@ -1199,8 +1373,16 @@ export class ActionListsSubmodule extends GameModule {
                 }
             })
         });
-
-        return totalEffects.map(eff => eff.scope === 'income' && eff.value < 0 ? {...eff, scope: 'consumption', value: -eff.value} : eff);
+        // Keep original output, but annotate resource entries with gross parts
+        return totalEffects.map(eff => {
+            const normalized = (eff.scope === 'income' && eff.value < 0) ? { ...eff, scope: 'consumption', value: -eff.value } : eff;
+            if(normalized.type === 'resources') {
+                const agg = resourceAgg[normalized.id] || { grossIncome: 0, grossConsumption: 0 };
+                normalized.grossIncome = agg.grossIncome;
+                normalized.grossConsumption = agg.grossConsumption;
+            }
+            return normalized;
+        });
     }
 
     getActionResourceBreakdown(action, totalTime) {

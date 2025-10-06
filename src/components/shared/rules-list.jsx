@@ -361,11 +361,12 @@ const RulesList = React.memo(
             if(sett.availableValueTypes && !sett.availableValueTypes.includes(rule.value_type)) {
                 setRuleValue(index, 'value_type', sett.availableValueTypes[0]);
             }
-        }
+        }                    
 
         return (
             <div className={`rules ${isAutoCheck ? 'autocheck' : ''} ${rulesMatched?.result ? 'matched' : 'unmatched'}`}>
                 {rules.map((rule, index) => {
+                    if(!rule) return null;
                     const compareTypeOptions = Object.keys(mapCompareType).filter(one => !one.unlockCondition || one.unlockCondition(unlocks)).map((key) => ({
                         value: key,
                         label: mapCompareType[key].label,
@@ -373,6 +374,7 @@ const RulesList = React.memo(
 
                     const selectedCompareType = mapCompareType[rule.compare_type];
 
+                    
                     let subjectOptions = [];
                     let subjectValue = null;
                     let subjectName = '';
@@ -426,12 +428,12 @@ const RulesList = React.memo(
                                     option.value === rule[subjectName]?.toString()
                             );
 
-                            if(!subjectValue && subjectOptions?.length) {
-                                subjectValue = {...subjectOptions[0]};
-                                if(subjectValue) {
-                                    setRuleValue(index, mapCompareType[rule.compare_type].subject, subjectValue.value)
-                                }
+                        if(!subjectValue && subjectOptions?.length) {
+                            subjectValue = {...subjectOptions[0]};
+                            if(subjectValue && isEditing) {
+                                setRuleValue(index, mapCompareType[rule.compare_type].subject, subjectValue.value)
                             }
+                        }
                         }
 
                     }
@@ -447,7 +449,7 @@ const RulesList = React.memo(
 
                     if(!conditionOptions.find(c => c.value === selectedCondition)) {
                         selectedCondition = conditionOptions[0]?.value;
-                        setRuleValue(index, 'condition', selectedCondition)
+                        if(isEditing) setRuleValue(index, 'condition', selectedCondition)
                     }
 
                     const valueTypeOptions =
@@ -461,7 +463,7 @@ const RulesList = React.memo(
 
                     if(selectedCompareType && selectedCompareType.availableValueTypes) {
                         if(!selectedCompareType.availableValueTypes.includes(rule.value_type)) {
-                            setRuleValue(index, 'value_type', selectedCompareType.availableValueTypes[0])
+                            if(isEditing) setRuleValue(index, 'value_type', selectedCompareType.availableValueTypes[0])
                         }
                     }
 
