@@ -698,6 +698,20 @@ export class MageModule extends GameModule {
             type: 'effects',
             description: effect.description,
         }));
+
+        const rs = gameResources.listAllResources(['resource']);
+        console.log('rs: ', rs);
+        const filtered = rs.filter(one => gameResources.resourceExists(one.id) && one.isUnlocked && !['mage-xp','skill-points'].includes(one.id)).map(resource => ({
+            ...resource,
+            isNegative: resource.balance < 0,
+            isPositive: resource.balance > 0 && resource.amount < resource.cap - SMALL_NUMBER,
+            isCapped: resource.amount >= resource.cap - SMALL_NUMBER,
+            eta: gameResources.assertToCapOrEmpty(resource.id),
+            // affData: monitoredResources[resource.id] || undefined
+        }))
+
+        result.resources = filtered;
+
         return result;
     }
 

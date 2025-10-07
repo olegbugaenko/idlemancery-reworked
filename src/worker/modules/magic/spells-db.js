@@ -151,7 +151,7 @@ export const initSpellsDB1 = () => {
                 }
             })
         },
-        usageGain: {
+        /*usageGain: {
             get_consumption: () => ({
                 resources: {
                     mana: {
@@ -161,7 +161,7 @@ export const initSpellsDB1 = () => {
                     }
                 }
             })
-        },
+        },*/
         attributes: {
             duration: 10,
             xpOnCast: 20,
@@ -206,7 +206,7 @@ export const initSpellsDB1 = () => {
                 }
             })
         },
-        usageGain: {
+        /*usageGain: {
             get_consumption: () => ({
                 resources: {
                     mana: {
@@ -216,7 +216,7 @@ export const initSpellsDB1 = () => {
                     }
                 }
             })
-        },
+        },*/
         attributes: {
             duration: 10,
             xpOnCast: 20,
@@ -310,7 +310,7 @@ export const initSpellsDB1 = () => {
             }),
             effectDeps: ['restoration_spells_efficiency','recovery_spells_efficiency']
         },
-        usageGain: {
+        /*usageGain: {
             get_consumption: () => ({
                 resources: {
                     mana: {
@@ -320,7 +320,7 @@ export const initSpellsDB1 = () => {
                     }
                 }
             })
-        },
+        },*/
         attributes: {
             duration: 10,
             xpOnCast: 20,
@@ -366,7 +366,7 @@ export const initSpellsDB1 = () => {
             }),
             effectDeps: ['restoration_spells_efficiency']
         },
-        usageGain: {
+        /*usageGain: {
             get_consumption: () => ({
                 resources: {
                     mana: {
@@ -376,7 +376,7 @@ export const initSpellsDB1 = () => {
                     }
                 }
             })
-        },
+        },*/
         attributes: {
             duration: 20,
             xpOnCast: 50,
@@ -422,7 +422,7 @@ export const initSpellsDB1 = () => {
             }),
             effectDeps: ['illusion_spells_efficiency']
         },
-        usageGain: {
+        /*usageGain: {
             get_consumption: () => ({
                 resources: {
                     mana: {
@@ -432,7 +432,7 @@ export const initSpellsDB1 = () => {
                     }
                 }
             })
-        },
+        },*/
         attributes: {
             duration: 20,
             xpOnCast: 50,
@@ -478,7 +478,7 @@ export const initSpellsDB1 = () => {
             }),
             effectDeps: ['illusion_spells_efficiency']
         },
-        usageGain: {
+        /*usageGain: {
             get_consumption: () => ({
                 resources: {
                     mana: {
@@ -488,7 +488,7 @@ export const initSpellsDB1 = () => {
                     }
                 }
             })
-        },
+        },*/
         attributes: {
             duration: 20,
             xpOnCast: 50,
@@ -536,7 +536,7 @@ export const initSpellsDB1 = () => {
             }),
             effectDeps: ['illusion_spells_efficiency']
         },
-        usageGain: {
+        /*usageGain: {
             get_consumption: () => ({
                 resources: {
                     mana: {
@@ -546,7 +546,7 @@ export const initSpellsDB1 = () => {
                     }
                 }
             })
-        },
+        },*/
         attributes: {
             duration: 20,
             xpOnCast: 50,
@@ -594,7 +594,7 @@ export const initSpellsDB1 = () => {
             }),
             effectDeps: ['illusion_spells_efficiency']
         },
-        usageGain: {
+        /*usageGain: {
             get_consumption: () => ({
                 resources: {
                     mana: {
@@ -604,7 +604,7 @@ export const initSpellsDB1 = () => {
                     }
                 }
             })
-        },
+        },*/
         attributes: {
             duration: 20,
             xpOnCast: 50,
@@ -656,7 +656,7 @@ export const initSpellsDB1 = () => {
             }),
             effectDeps: ['conjuration_spells_efficiency','elemental_spells_efficiency']
         },
-        usageGain: {
+        /*usageGain: {
             get_consumption: () => ({
                 resources: {
                     mana: {
@@ -666,7 +666,7 @@ export const initSpellsDB1 = () => {
                     }
                 }
             })
-        },
+        },*/
         attributes: {
             duration: 20,
             xpOnCast: 50,
@@ -719,7 +719,7 @@ export const initSpellsDB1 = () => {
             }),
             effectDeps: ['conjuration_spells_efficiency']
         },
-        usageGain: {
+        /*usageGain: {
             get_consumption: () => ({
                 resources: {
                     mana: {
@@ -729,7 +729,7 @@ export const initSpellsDB1 = () => {
                     }
                 }
             })
-        },
+        },*/
         attributes: {
             duration: 20,
             xpOnCast: 50,
@@ -773,7 +773,7 @@ export const initSpellsDB1 = () => {
             }),
             effectDeps: ['conjuration_spells_efficiency']
         },
-        usageGain: {
+        /*usageGain: {
             get_consumption: () => ({
                 resources: {
                     mana: {
@@ -783,7 +783,7 @@ export const initSpellsDB1 = () => {
                     }
                 }
             })
-        },
+        },*/
         attributes: {
             duration: 20,
             xpOnCast: 50,
@@ -826,7 +826,7 @@ export const initSpellsDB1 = () => {
             }),
             effectDeps: ['conjuration_spells_efficiency']
         },
-        usageGain: {
+        /*usageGain: {
             get_consumption: () => ({
                 resources: {
                     mana: {
@@ -836,7 +836,7 @@ export const initSpellsDB1 = () => {
                     }
                 }
             })
-        },
+        },*/
         attributes: {
             duration: 20,
             xpOnCast: 50,
@@ -888,7 +888,7 @@ export const initSpellsDB1 = () => {
             }),
             effectDeps: ['conjuration_spells_efficiency','elemental_spells_efficiency']
         },
-        usageGain: {
+        /*usageGain: {
             get_consumption: () => ({
                 resources: {
                     mana: {
@@ -898,7 +898,7 @@ export const initSpellsDB1 = () => {
                     }
                 }
             })
-        },
+        },*/
         attributes: {
             duration: 20,
             xpOnCast: 50,
@@ -951,7 +951,7 @@ export const initSpellsDB1 = () => {
             }),
             effectDeps: ['conjuration_spells_efficiency','elemental_spells_efficiency']
         },
-        usageGain: {
+        /*usageGain: {
             get_consumption: () => ({
                 resources: {
                     mana: {
@@ -961,7 +961,7 @@ export const initSpellsDB1 = () => {
                     }
                 }
             })
-        },
+        },*/
         attributes: {
             duration: 20,
             xpOnCast: 50,
@@ -1196,7 +1196,7 @@ export const initSpellsDB1 = () => {
             }),
             effectDeps: ['nature_spells_efficiency']
         },
-        usageGain: {
+        /*usageGain: {
             get_consumption: () => ({
                 resources: {
                     mana: {
@@ -1206,7 +1206,7 @@ export const initSpellsDB1 = () => {
                     }
                 }
             })
-        },
+        },*/
         attributes: {
             duration: 10,
             xpOnCast: 4,
@@ -1251,7 +1251,7 @@ export const initSpellsDB1 = () => {
             }),
             effectDeps: ['nature_spells_efficiency']
         },
-        usageGain: {
+        /*usageGain: {
             get_consumption: () => ({
                 resources: {
                     mana: {
@@ -1261,7 +1261,7 @@ export const initSpellsDB1 = () => {
                     }
                 }
             })
-        },
+        },*/
         attributes: {
             duration: 15,
             xpOnCast: 6,

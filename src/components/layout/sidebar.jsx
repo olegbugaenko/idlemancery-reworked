@@ -105,96 +105,131 @@ export const ResourcesBar = () => {
     }, [consumeResource]);
 
     return (<div className={'resources'} id={'tutorial-resources'}>
-        {resourceData.map(res => {
+        {resourceData.map(res => (
+            <ResourceRow
+                key={res.id}
+                resource={res}
+                onMouseEnter={() => setMonitoredAttribute(res.id)}
+                onMouseLeave={() => setMonitoredAttribute(null)}
+                onContextMenu={(event, resource) => handleResourceContextMenu(event, resource)}
+            />
+        ))}
+    </div> )
+}
 
-            const aff = res.monitor;
+export const ResourceRow = ({ resource, onMouseEnter, onMouseLeave, onContextMenu, showCapProgress = true }) => {
 
-            let affClassData = ''
-            if(aff) {
-                affClassData = ` monitored ${aff?.bShow ? 'show-potential' : ''} ${aff.isAffordable ? 'affordable' : (aff.hardLocked ? 'locked' : 'unavailable')}`
-            }
+    const aff = resource.monitor;
 
-            const isAffected = aff?.direction;
-            const newBalance = aff?.newBalance;
-            const newStorage = aff?.newStorage;
+    let affClassData = '';
+    if(aff) {
+        affClassData = ` monitored ${aff?.bShow ? 'show-potential' : ''} ${aff.isAffordable ? 'affordable' : (aff.hardLocked ? 'locked' : 'unavailable')}`;
+    }
 
-            let addClass = '';
-            if(isAffected) {
-                addClass = isAffected < 0 ? ' negative' : ' positive';
-            }
+    const isAffected = aff?.direction;
+    const newBalance = aff?.newBalance;
+    const newStorage = aff?.newStorage;
 
-            if(res.targetEfficiency < 1) {
-                addClass += ' missing-blocker';
-            }
-            let directionClass = '';
-            let displayValue = '';
-            if(aff) {
-                let displayType = 'balance';
-                if(newStorage && (!newBalance || newBalance === res.balance)) {
-                    displayType = 'store';
-                }
+    let addClass = '';
+    if(isAffected) {
+        addClass = isAffected < 0 ? ' negative' : ' positive';
+    }
 
-                if(displayType === 'store') {
-                    displayValue = `↑${formatValue(aff.newStorage)}`;
-                    directionClass = aff.newStorage > res.cap ? 'plus' : (aff.newStorage < res.cap ? 'minus' : 'neutral');
-                } else {
-                    displayValue = `${formatValue(aff.newBalance)}`;
-                    directionClass = aff.newBalance > res.balance ? 'plus' : (aff.newBalance < res.balance ? 'minus' : 'neutral');
-                }
-            }
+    if(resource.targetEfficiency < 1) {
+        addClass += ' missing-blocker';
+    }
+    let directionClass = '';
+    let displayValue = '';
+    if(aff) {
+        let displayType = 'balance';
+        if(newStorage && (!newBalance || newBalance === resource.balance)) {
+            displayType = 'store';
+        }
 
+        if(displayType === 'store') {
+            displayValue = `↑${formatValue(aff.newStorage)}`;
+            directionClass = aff.newStorage > resource.cap ? 'plus' : (aff.newStorage < resource.cap ? 'minus' : 'neutral');
+        } else {
+            displayValue = `${formatValue(aff.newBalance)}`;
+            directionClass = aff.newBalance > resource.balance ? 'plus' : (aff.newBalance < resource.balance ? 'minus' : 'neutral');
+        }
+    }
 
-            return (<div key={res.id} className={`holder ${aff ? 'monitored' : ''} ${aff?.bShow ? 'show-potential' : ''} ${addClass}`} onMouseEnter={() => setMonitoredAttribute(res.id)} onMouseLeave={() => setMonitoredAttribute(null)}>
-                <div 
-                    className={`resource-item ${affClassData}`}
-                    onContextMenu={(e) => handleResourceContextMenu(e, res)}
-                >
-                    {res.isConsumable ? (
-                        <TippyWrapper content={
-                            <div className={'hint-popup'}>
-                                <p>Right click to consume</p>
-                                {res.amount > 10 && res.allowMultiConsume && (
-                                    <p>Right click + CTRL to consume {formatInt(0.1 * res.amount)}</p>
-                                )}
-                                {res.allowMultiConsume ? (<p>Right click + SHIFT to consume all</p>) : null}
-                            </div>
-                        }>
-                            <div className={'resource-label'}>
-                                <RawResource name={res.name} id={res.id} />
-                            </div>
-                        </TippyWrapper>
-                    ) : (
-                        <div className={'resource-label'}>
-                            <RawResource name={res.name} id={res.id} />
-                        </div>
-                    )}
-                    {res.hasCap || res.balance < 0 ? (
-                        <TippyWrapper content={<div className={'hint-popup'}><BreakDown category={'cap'} breakDown={res.storageBreakdown}/>{res.eta >= 0 ? `${secondsToString(res.eta)} to full` : `${secondsToString(-res.eta)} to empty`}</div> }>
-                            <span className={`resource-amount ${res.hasCap && res.isCapped ? 'capped' : ''}`}>{formatValue(res.amount || 0)}{res.hasCap || res.isService ? ` / ${formatValue(res.isService ? (res.total || 0) : (res.cap || 0))}` : ''}</span>
-                        </TippyWrapper>
-                    ) : (
-                        <span className={`resource-amount ${res.hasCap && res.isCapped ? 'capped' : ''}`}>{formatValue(res.amount || 0)}{res.hasCap || res.isService ? ` / ${formatValue(res.isService ? (res.total || 0) : (res.cap || 0))}` : ''}</span>
-                    )}
-                    {isBreakdownHasData(res.breakDown) ? (
-                        <TippyWrapper content={<div className={'hint-popup'}><BreakDown breakDown={res.breakDown}/><div className="block">
-                                {res.income > 0 ? (<p>Total Income: {formatValue(res.income*res.multiplier)}</p>) : null}
-                                {res.consumption > 0 ? (<p>Total Consumption: {formatValue(res.consumption)}</p>) : null}
-                                <p>Net Income: {formatValue(res.balance)}</p>
-                            </div></div> }>
-                            <span className={`resource-balance ${res.isNegative ? 'red' : ''} ${res.isPositive ? 'green' : ''}`}>{formatValue(res.balance || 0)}</span>
-                        </TippyWrapper>
-                    ) : (
-                        <span className={`resource-balance ${res.isNegative ? 'red' : ''} ${res.isPositive ? 'green' : ''}`}>{formatValue(res.balance || 0)}</span>
-                    )}
-                    {aff && aff?.bShow ? (<div className={`appendix ${directionClass}`}>
-                        <span>{displayValue}</span>
-                    </div> ) : null}
+    const handleMouseEnter = () => {
+        if(onMouseEnter) {
+            onMouseEnter(resource);
+        }
+    };
+
+    const handleMouseLeave = () => {
+        if(onMouseLeave) {
+            onMouseLeave(resource);
+        }
+    };
+
+    const handleContextMenu = (event) => {
+        if(onContextMenu) {
+            onContextMenu(event, resource);
+        }
+    };
+
+    const resourceAmount = (<span className={`resource-amount ${resource.hasCap && resource.isCapped ? 'capped' : ''}`}>
+        {formatValue(resource.amount || 0)}
+        {resource.hasCap || resource.isService ? ` / ${formatValue(resource.isService ? (resource.total || 0) : (resource.cap || 0))}` : ''}
+    </span>);
+
+    const resourceBalance = (<span className={`resource-balance ${resource.isNegative ? 'red' : ''} ${resource.isPositive ? 'green' : ''}`}>
+        {formatValue(resource.balance || 0)}
+    </span>);
+
+    return (<div className={`holder ${aff ? 'monitored' : ''} ${aff?.bShow ? 'show-potential' : ''} ${addClass}`}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+    >
+        <div
+            className={`resource-item ${affClassData}`}
+            onContextMenu={onContextMenu ? handleContextMenu : undefined}
+        >
+            {resource.isConsumable && onContextMenu ? (
+                <TippyWrapper content={
+                    <div className={'hint-popup'}>
+                        <p>Right click to consume</p>
+                        {resource.amount > 10 && resource.allowMultiConsume && (
+                            <p>Right click + CTRL to consume {formatInt(0.1 * resource.amount)}</p>
+                        )}
+                        {resource.allowMultiConsume ? (<p>Right click + SHIFT to consume all</p>) : null}
+                    </div>
+                }>
+                    <div className={'resource-label'}>
+                        <RawResource name={resource.name} id={resource.id} />
+                    </div>
+                </TippyWrapper>
+            ) : (
+                <div className={'resource-label'}>
+                    <RawResource name={resource.name} id={resource.id} />
                 </div>
-                {res.capProgress ? (<div className={'next-unlock-holder resource'}>
-                    <div className={'next-unlock-bar'} style={{ width: `${res.capProgress*100}%`}}></div>
-                </div>) : null}
-            </div>)
-        })}
+            )}
+            {resource.hasCap || resource.balance < 0 ? (
+                <TippyWrapper content={<div className={'hint-popup'}><BreakDown category={'cap'} breakDown={resource.storageBreakdown}/>{resource.eta >= 0 ? `${secondsToString(resource.eta)} to full` : `${secondsToString(-resource.eta)} to empty`}</div> }>
+                    {resourceAmount}
+                </TippyWrapper>
+            ) : resourceAmount}
+            {isBreakdownHasData(resource.breakDown) ? (
+                <TippyWrapper content={<div className={'hint-popup'}><BreakDown breakDown={resource.breakDown}/><div className="block">
+                        {resource.income > 0 ? (<p>Total Income: {formatValue(resource.income*resource.multiplier)}</p>) : null}
+                        {resource.consumption > 0 ? (<p>Total Consumption: {formatValue(resource.consumption)}</p>) : null}
+                        <p>Net Income: {formatValue(resource.balance)}</p>
+                    </div></div> }>
+                    {resourceBalance}
+                </TippyWrapper>
+            ) : resourceBalance}
+            {aff && aff?.bShow ? (<div className={`appendix ${directionClass}`}>
+                <span>{displayValue}</span>
+            </div> ) : null}
+        </div>
+        {showCapProgress && resource.capProgress ? (<div className={'next-unlock-holder resource'}>
+            <div className={'next-unlock-bar'} style={{ width: `${resource.capProgress*100}%`}}></div>
+        </div>) : null}
     </div> )
 }
 

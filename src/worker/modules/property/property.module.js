@@ -450,7 +450,10 @@ export class PropertyModule extends GameModule {
             tags: ['living', 'secondary'],
             name: 'Living Space',
             isService: true,
-            saveBalanceTree: true
+            saveBalanceTree: true,
+            unlockCondition: () => {
+                gameEntity.getLevel('shop_item_tent') > 0
+            }
         })
 
         registerFurnitureStage1();

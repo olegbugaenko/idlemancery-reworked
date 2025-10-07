@@ -13,7 +13,6 @@ export const EffectsSection = ({ effects, maxDisplay = 3, isShowBalance = false,
     return (<div className={'effects-section'}>
         {fullList.map(aff => {
             const titleElement = (<ResourceEffects key={aff.key ?? (aff.id ?? aff.name)} effect={aff} isShowBalance={isShowBalance} isAvailable={aff.isAvailable || !useAvailabilityCheck} />);
-            console.log('aff: ', aff);
             return aff.description ? (
                 <TippyWrapper key={aff.key ?? (aff.id ?? aff.name)} content={<div className={'hint-popup'}>{aff.description}</div>}>
                     <div>

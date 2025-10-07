@@ -295,28 +295,29 @@ export class SpellModule extends GameModule {
             for(const key in aff.consume) {
                 gameResources.addResource(key, -aff.consume[key]);
             }
-
-            if(gameEntity.getAttribute(spell.id, 'duration')) {
-                gameEntity.registerGameEntity(`active_${id}`, {
-                    copyFromId: id,
-                    isAbstract: false,
-                    level: spell.level,
-                    tags: ['active_spell', 'active_effect'],
-                    scope: 'spells',
-                    unlockedBy: undefined,
-                });
-
-                gameEntity.setEntityLevel(`active_${id}`, spell?.level ?? 1);
-                this.spells[id].duration = gameEntity.getAttribute(spell.id, 'duration');
-            }
-
-            if(!this.spells[id]) {
-                this.spells[id] = {};
-            }
-            this.spells[id].isCasted = true;
-            this.spells[id].numCasted = (this.spells[id].numCasted || 0) + 1;
-            // this.eventHandler.playSound('cast_spell');
         }
+
+        if(gameEntity.getAttribute(spell.id, 'duration')) {
+            gameEntity.registerGameEntity(`active_${id}`, {
+                copyFromId: id,
+                isAbstract: false,
+                level: spell.level,
+                tags: ['active_spell', 'active_effect'],
+                scope: 'spells',
+                unlockedBy: undefined,
+            });
+
+            gameEntity.setEntityLevel(`active_${id}`, spell?.level ?? 1);
+            this.spells[id].duration = gameEntity.getAttribute(spell.id, 'duration');
+        }
+
+        if(!this.spells[id]) {
+            this.spells[id] = {};
+        }
+        this.spells[id].isCasted = true;
+        this.spells[id].numCasted = (this.spells[id].numCasted || 0) + 1;
+            // this.eventHandler.playSound('cast_spell');
+        
         this.sendSpellData();
     }
 
