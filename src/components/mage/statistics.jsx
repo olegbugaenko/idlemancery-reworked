@@ -9,6 +9,7 @@ import TradingStatistics from "./trading-statistics.jsx";
 import EconomicMetrics from "./economic-metrics.jsx";
 import {SearchField} from "../shared/search-field.jsx";
 import {EffectsSection} from "../shared/effects-section.jsx";
+import {ResourceRow} from "../layout/sidebar.jsx";
 
 const COLORS = ['#6088FE', '#00C49F', '#FFBB28', '#FF8042',
                 '#1019FE', '#30309F', '#AD09AD', '#FE66FE',
@@ -45,6 +46,8 @@ export const Statistics = () => {
     const [stats, setStats] = useState({});
     const [activeTab, setActiveTab] = useState('general');
     const [multipliersFilter, setMultipliersFilter] = useState({ search: '' });
+    const [resourcesData, setResourcesData] = useState([]);
+    const [resourcesFilter, setResourcesFilter] = useState({ search: '' });
 
     const filteredMultipliers = useMemo(() => {
         const source = stats.multipliers || [];
@@ -71,9 +74,46 @@ export const Statistics = () => {
         sendData('query-statistics', {});
     }, []);
 
+    useEffect(() => {
+        if(activeTab !== 'resources') {
+            return;
+        }
+
+        const fetchResources = () => {
+            sendData('query-resources-data', { includePinned: true });
+        };
+
+        fetchResources();
+
+        const interval = setInterval(fetchResources, 2000);
+        return () => clearInterval(interval);
+    }, [activeTab, sendData]);
+
     onMessage('statistics', (stats) => {
         setStats(stats);
     })
+
+    onMessage('resources-data', (resources) => {
+        const seen = new Set();
+        const deduped = [];
+        (resources || []).forEach((res) => {
+            if(!seen.has(res.id)) {
+                seen.add(res.id);
+                deduped.push(res);
+            }
+        });
+        setResourcesData(deduped);
+    });
+
+    const filteredResources = useMemo(() => {
+        const searchValue = (resourcesFilter?.search || '').trim().toLowerCase();
+
+        if(!searchValue) {
+            return resourcesData;
+        }
+
+        return resourcesData.filter(resource => (resource?.name || '').toLowerCase().includes(searchValue));
+    }, [resourcesData, resourcesFilter]);
 
     return (
         <div className={'statistics'}>
@@ -103,6 +143,12 @@ export const Statistics = () => {
                         onClick={() => setActiveTab('multipliers')}
                     >
                         Multipliers
+                    </button>
+                    <button
+                        className={`tab-button ${activeTab === 'resources' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('resources')}
+                    >
+                        Resources
                     </button>
                 </div>
             </div>
@@ -166,6 +212,30 @@ export const Statistics = () => {
                                         maxDisplay={stats.multipliers?.length ?? 0}
                                         isShowBalance={false}
                                     />
+                                </div>
+                            </PerfectScrollbar>
+                        </div>
+                    </div>
+                )}
+                {activeTab === 'resources' && (
+                    <div className={'resources-tab'}>
+                        <div className={'search-rel-wrap'}>
+                            <SearchField
+                                value={resourcesFilter}
+                                onSetValue={setResourcesFilter}
+                                scopes={[]}
+                                placeholder={'Search resources...'}
+                            />
+                        </div>
+                        <div className={'height-minus-row'}>
+                            <PerfectScrollbar>
+                                <div className={'resources'}>
+                                    {filteredResources.length ? filteredResources.map(resource => (
+                                        <ResourceRow
+                                            key={resource.id}
+                                            resource={resource}
+                                        />
+                                    )) : (<div className={'no-data'}>No resources unlocked yet.</div>)}
                                 </div>
                             </PerfectScrollbar>
                         </div>
