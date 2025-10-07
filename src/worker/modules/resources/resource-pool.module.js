@@ -103,6 +103,7 @@ export class ResourcePoolModule extends GameModule {
             tags: ['crafting', 'secondary'],
             name: 'Crafting Effort',
             isService: true,
+            unlockCondition: () => false,
         })
 
         gameResources.registerResource('crafting_slots', {
@@ -116,6 +117,7 @@ export class ResourcePoolModule extends GameModule {
             tags: ['alchemy', 'secondary'],
             name: 'Alchemy Effort',
             isService: true,
+            unlockCondition: () => false,
         })
 
         gameResources.registerResource('alchemy_slots', {
@@ -129,18 +131,27 @@ export class ResourcePoolModule extends GameModule {
             tags: ['alchemy', 'secondary'],
             name: 'Plantation Slots',
             isService: true,
+            unlockCondition: () => {
+                return gameEntity.getLevel('shop_item_herbalists_handbook') > 0
+            }
         })
 
         gameResources.registerResource('gathering_effort', {
             tags: ['exploration', 'secondary'],
             name: 'Gathering Effort',
             isService: true,
+            unlockCondition: () => {
+                return gameEntity.getLevel('shop_item_map') > 0
+            }
         })
 
         gameResources.registerResource('expedition_effort', {
             tags: ['exploration', 'secondary'],
             name: 'Expedition Effort',
             isService: true,
+            unlockCondition: () => {
+                return gameEntity.isEntityUnlocked('action_expedition')
+            }
         })
 
         gameResources.registerResource('hunting_effort', {
@@ -149,14 +160,18 @@ export class ResourcePoolModule extends GameModule {
             isService: true,
             unlockCondition: () => {
                 return gameEntity.getLevel('shop_item_hunting') > 0
-            }
+            },
+            unlockCondition: () => false,
         })
 
         gameResources.registerResource('gathering_perception', {
             tags: ['exploration', 'secondary'],
             name: 'Gathering Perception',
             isService: true,
-            description: 'Determines how much efficient you are at gathering, boosting probability to find any loot'
+            description: 'Determines how much efficient you are at gathering, boosting probability to find any loot',
+            unlockCondition: () => {
+                return gameEntity.getLevel('shop_item_map') > 0
+            }
         })
 
         gameResources.registerResource('mental_energy', {
@@ -185,7 +200,8 @@ export class ResourcePoolModule extends GameModule {
             name: 'Metabolism Rate',
             defaultValue: 1,
             minValue: 1,
-            description: 'Increase effect from herbs, food and potions consumption (Affect both positive and negative effects)'
+            description: 'Increase effect from herbs, food and potions consumption (Affect both positive and negative effects)',
+            isUnlocked: () => false,
         })
 
         registerInventoryItems();

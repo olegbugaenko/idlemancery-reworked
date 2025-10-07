@@ -46,7 +46,6 @@ export const Statistics = () => {
     const [stats, setStats] = useState({});
     const [activeTab, setActiveTab] = useState('general');
     const [multipliersFilter, setMultipliersFilter] = useState({ search: '' });
-    const [resourcesData, setResourcesData] = useState([]);
     const [resourcesFilter, setResourcesFilter] = useState({ search: '' });
 
     const filteredMultipliers = useMemo(() => {
@@ -93,27 +92,15 @@ export const Statistics = () => {
         setStats(stats);
     })
 
-    onMessage('resources-data', (resources) => {
-        const seen = new Set();
-        const deduped = [];
-        (resources || []).forEach((res) => {
-            if(!seen.has(res.id)) {
-                seen.add(res.id);
-                deduped.push(res);
-            }
-        });
-        setResourcesData(deduped);
-    });
-
     const filteredResources = useMemo(() => {
         const searchValue = (resourcesFilter?.search || '').trim().toLowerCase();
 
         if(!searchValue) {
-            return resourcesData;
+            return stats.resources;
         }
 
-        return resourcesData.filter(resource => (resource?.name || '').toLowerCase().includes(searchValue));
-    }, [resourcesData, resourcesFilter]);
+        return stats.resources.filter(resource => (resource?.name || '').toLowerCase().includes(searchValue));
+    }, [stats.resources, resourcesFilter]);
 
     return (
         <div className={'statistics'}>

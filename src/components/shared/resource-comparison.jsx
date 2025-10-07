@@ -45,7 +45,6 @@ export const ResourceComparison = ({ effects1, effects2 }) => {
 
     return (<div className={'effects-table comparison'}>
         {table.map(({ id, title, type, prevValue, nextValue, isImprovement, isWorse, key, description: effectDescription}) => {
-            console.log('EffD: ', id, effectDescription)
             const titleElement = type === 'resources' ? 
                 (<RawResource className={'title'} id={id} name={title} />) : 
                 (<span className={'title'}>{title}</span>);

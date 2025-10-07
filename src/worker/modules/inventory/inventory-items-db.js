@@ -311,7 +311,7 @@ export const registerInventoryItems = () => {
             })
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_backpack') > 0
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_map') > 0
         },
         sellPrice: 180,
         rarity: 0.2,
@@ -344,7 +344,7 @@ export const registerInventoryItems = () => {
             })
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_backpack') > 0
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_map') > 0
         },
         sellPrice: 350,
         rarity: 0.2,
@@ -378,7 +378,7 @@ export const registerInventoryItems = () => {
             })
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_backpack') > 0
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_map') > 0
         },
         sellPrice: 350,
         rarity: 0.25,
@@ -413,7 +413,7 @@ export const registerInventoryItems = () => {
             })
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_backpack') > 0
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_map') > 0
         },
         sellPrice: 350,
         rarity: 0.25,
@@ -448,7 +448,7 @@ export const registerInventoryItems = () => {
             })
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_backpack') > 0
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_map') > 0
         },
         sellPrice: 350,
         rarity: 0.25,

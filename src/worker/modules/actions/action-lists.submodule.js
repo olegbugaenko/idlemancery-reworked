@@ -287,11 +287,12 @@ export class ActionListsSubmodule extends GameModule {
 
             const gradient = {};
 
+            
             for (const id of dynamicIds) {
                 gradient[id] = 0;
                 const contribs = actionContributions[id] || [];
                 const consumes = actionConsumptions[id] || [];
-
+                console.log('CCSS: ', contribs, consumes, actionConsumptions);
                 for (const resId of resourceIds) {
                     const d = deficits[resId] || 0;
                     const c = contribs.find(e => e.id === resId)?.value || 0;
@@ -303,11 +304,13 @@ export class ActionListsSubmodule extends GameModule {
 
                     const normNet = (c ? ((c - avgC) / maxC) : 0) - (s ? ((s - avgS) / maxS) : 0);
                     gradient[id] += normNet * d;
-                    //if(id === 'action_read_books') {
-                    //    console.log(`|-| ${gradient[id]}: ${resId} delta = ${normNet*d}: (${c} - ${avgC})/${maxC} - (${s} - ${avgS})/${maxS}`);
-                    //}
+                    if(id === 'action_read_books') {
+                        console.log(`|-| ${id} ${gradient[id]}: ${resId} delta = ${normNet*d}: (${c} - ${avgC})/${maxC} - (${s} - ${avgS})/${maxS}`);
+                    }
                 }
             }
+            console.log(`Guessing Iter${iter}`, deficits, averageContribs, averageConsumes, gradient);
+
 
             const totalDynamic = Object.values(T).reduce((a, b) => a + b, 0);
             const totalTime = fixedTotal + totalDynamic;
@@ -349,6 +352,8 @@ export class ActionListsSubmodule extends GameModule {
             one.isDynamicTime ? { ...one, time: SMALL_NUMBER*Math.max(1, fixedTotal) } : one
         );
         const effects0 = this.getListEffects(null, { ...listData, actions: actions0 });
+
+        console.log('eff0', effects0);
 
         const initialResourceBalance = {};
         /*if(gameEntity.entityExists(`activeCrafting_craft_refined_wood`)) {
@@ -394,6 +399,7 @@ export class ActionListsSubmodule extends GameModule {
             const dynamicNetEffects = dynamicActions.map(action => computeActionNetPerFullTime(action));
             const fixedNetEffects = fixedActions.map(action => computeActionNetPerFullTime(action));
 
+            
             const fixedEffectsTotals = {};
             fixedActions.forEach((action, idx) => {
                 const net = fixedNetEffects[idx];
@@ -434,6 +440,7 @@ export class ActionListsSubmodule extends GameModule {
                 const hasInfluence = coeffs.some(val => Math.abs(val) > SMALL_NUMBER);
                 if (!hasInfluence) {
                     if (rhs > SMALL_NUMBER) {
+                        console.log('Impossible due to ' + resId);
                         impossible = true;
                     }
                     return;
@@ -601,7 +608,7 @@ export class ActionListsSubmodule extends GameModule {
 
         const exactDynamicTimes = attemptExactDynamicSolve();
 
-        console.log('exactDynamicTimes: ', exactDynamicTimes);
+        console.log('exactDynamicTimes: ', exactDynamicTimes, initialResourceBalance);
         if (exactDynamicTimes !== null) {
             if (!Array.isArray(exactDynamicTimes)) {
                 return exactDynamicTimes;
@@ -616,6 +623,67 @@ export class ActionListsSubmodule extends GameModule {
             return dynamicResult;
         }
 
+        const potentialConsumption = new Set();
+
+        for (const act of dynamicActions) {
+            const oneActionEffects = this.getListEffects(null, { actions: [act] });
+            for (const effect of oneActionEffects) {
+                if (effect.type === 'resources' && effect.scope === 'consumption') {
+                    potentialConsumption.add(effect.id);
+                }
+            }
+        }
+
+        for (const [id, val] of Object.entries(initialResourceBalance)) {
+            const net = val.current + val.income - val.consumption;
+            if (net < 0 || potentialConsumption.has(id) || val.current < 0) {
+                keysToTrack.push(id);
+            }
+        }
+
+        const maxIncomes = {};
+        const minConsumptions = {};
+
+        // 2. Аналіз кожної динамічної дії — чи вона впливає на ключові ресурси
+        for (const act of dynamicActions) {
+            fallbackTimes[act.id] = act.time ?? 0.001;
+
+            const oneActionEffects = this.getListEffects(null, { actions: [act] });
+            const incomeEffects = oneActionEffects.filter(e => e.type === 'resources' && e.scope === 'income');
+            actionContributions[act.id] = incomeEffects.map(e => ({ id: e.id, value: e.value }));
+            const consumptions = oneActionEffects
+                .filter(e => e.type === 'resources' && e.scope === 'consumption')
+                .map(e => ({ id: e.id, value: e.value }));
+
+            actionConsumptions[act.id] = consumptions/*.reduce((acc, item) => ({...acc, [item.id]: item.value}), {})*/;
+
+            let contributesToDeficit = false;
+            for (const { id, value } of incomeEffects) {
+                if (!resourceToActions[id]) resourceToActions[id] = new Set();
+                resourceToActions[id].add(act.id);
+                if (keysToTrack.includes(id)) {
+                    contributesToDeficit = true;
+                    maxIncomes[id] = Math.max(maxIncomes[id] ?? 0, value)
+                }
+            }
+
+            for (const { id, value } of consumptions) {
+                if (keysToTrack.includes(id)) {
+                    minConsumptions[id] = Math.min(minConsumptions[id] ?? 1.e+100, value)
+                }
+            }
+
+            for(const key of keysToTrack) {
+                if(!consumptions.find(o => o.id === key)) {
+                    minConsumptions[key] = 0;
+                }
+            }
+
+            if (!contributesToDeficit) {
+                skipDynamicActions.add(act.id);
+            }
+        }
+
 
         const st = performance.now();
         const guessedMinimized = this.optimizeDynamicEfforts({
@@ -628,7 +696,7 @@ export class ActionListsSubmodule extends GameModule {
             learningRate: 0.1,
             tolerance: 0.0001,
         });
-        console.log('guessedMinimized: ', guessedMinimized, performance.now() - st);
+        console.log('guessedMinimized: ', guessedMinimized, performance.now() - st, actionContributions, actionConsumptions);
 
         return guessedMinimized;
         
@@ -1237,7 +1305,7 @@ export class ActionListsSubmodule extends GameModule {
         const effects = gameEntity.getEffects(action.id, trainingStage, level, true, 1, timeFraction);
 
         const learnRateFactor = gameCore.getModule('actions').getLearningRate(action.id) / gameCore.getModule('actions').getActionXPMax(action.id);
-
+        console.log(`Effects for ${action.id}[${level}] (${action.time}/${totalTime}): `, JSON.parse(JSON.stringify(effects)));
         effects.forEach(effect => {
             const effToAdd = { ...effect };
 
@@ -1269,6 +1337,7 @@ export class ActionListsSubmodule extends GameModule {
             if(normalized.scope === 'consumption' && normalized.value < 0) {
                 normalized.value = Math.abs(normalized.value);
             }
+            
 
             if(normalized.type === 'resources') {
                 if(normalized.scope === 'income' && normalized.value > SMALL_NUMBER) {

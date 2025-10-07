@@ -4684,10 +4684,16 @@ body::after {
     }
 }
 
-.multipliers-tab {
+.multipliers-tab, .resources-tab {
     height: 100%;
 }
 
 .height-minus-row {
     height: calc(100% - 40px);
+}
+
+.statistics-content .resources-tab .resource-item  {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
