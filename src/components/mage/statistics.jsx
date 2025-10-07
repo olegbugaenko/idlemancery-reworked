@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, useEffect, useState, useMemo} from "react";
 import {formatInt, formatValue, secondsToString} from "../../general/utils/strings";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import WorkerContext from "../../context/worker-context";
@@ -7,6 +7,8 @@ import {Cell, Pie, PieChart, ResponsiveContainer} from "recharts";
 import {Tooltip} from "react-tippy";
 import TradingStatistics from "./trading-statistics.jsx";
 import EconomicMetrics from "./economic-metrics.jsx";
+import {SearchField} from "../shared/search-field.jsx";
+import {EffectsSection} from "../shared/effects-section.jsx";
 
 const COLORS = ['#6088FE', '#00C49F', '#FFBB28', '#FF8042',
                 '#1019FE', '#30309F', '#AD09AD', '#FE66FE',
@@ -40,8 +42,30 @@ export const Statistics = () => {
     const worker = useContext(WorkerContext);
     const { onMessage, sendData } = useWorkerClient(worker);
 
-    const [stats, setStats] = useState([]);
+    const [stats, setStats] = useState({});
     const [activeTab, setActiveTab] = useState('general');
+    const [multipliersFilter, setMultipliersFilter] = useState({ search: '' });
+
+    const filteredMultipliers = useMemo(() => {
+        const source = stats.multipliers || [];
+        const searchValue = (multipliersFilter?.search || '').trim().toLowerCase();
+
+        if (!searchValue) {
+            return source;
+        }
+
+        return source.filter(({ name, id }) => {
+            const title = (name || id || '').toLowerCase();
+            return title.includes(searchValue);
+        });
+    }, [stats.multipliers, multipliersFilter]);
+
+    const multipliersMap = useMemo(() => {
+        return Object.fromEntries((filteredMultipliers || []).map(effect => {
+            const key = effect.id || effect.key || effect.name;
+            return [key, effect];
+        }));
+    }, [filteredMultipliers]);
 
     useEffect(() => {
         sendData('query-statistics', {});
@@ -73,6 +97,12 @@ export const Statistics = () => {
                         onClick={() => setActiveTab('economic')}
                     >
                         Development Metrics
+                    </button>
+                    <button
+                        className={`tab-button ${activeTab === 'multipliers' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('multipliers')}
+                    >
+                        Multipliers
                     </button>
                 </div>
             </div>
@@ -118,6 +148,29 @@ export const Statistics = () => {
                 )}
                 {activeTab === 'trading' && <TradingStatistics />}
                 {activeTab === 'economic' && <EconomicMetrics />}
+                {activeTab === 'multipliers' && (
+                    <div className={'multipliers-tab'}>
+                        <div className={'search-rel-wrap'}>
+                            <SearchField
+                                value={multipliersFilter}
+                                onSetValue={setMultipliersFilter}
+                                scopes={[]}
+                                placeholder={'Search multipliers...'}
+                            />
+                        </div>
+                        <div className = {'height-minus-row'}>
+                            <PerfectScrollbar>
+                                <div className={'multipliers-list'}>
+                                    <EffectsSection
+                                        effects={multipliersMap}
+                                        maxDisplay={stats.multipliers?.length ?? 0}
+                                        isShowBalance={false}
+                                    />
+                                </div>
+                            </PerfectScrollbar>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     )

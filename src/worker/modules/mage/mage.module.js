@@ -685,6 +685,19 @@ export class MageModule extends GameModule {
         result.xpEarned = gameResources.getResource('mage-xp').earned;
         result.coinsEarned = gameResources.getResource('coins').earned;
         result.coinsSpent = gameResources.getResource('coins').spent;
+
+        const allEffectsDB = gameEffects.listEffectsByTags(['multiplier']);
+
+        const allEffects = allEffectsDB.filter(effect => effect.isUnlocked && effect.value !== null && effect.value !== undefined && effect.value > 1);
+
+        result.multipliers = allEffects.map(effect => ({
+            id: effect.id,
+            name: effect.name,
+            value: effect.value,
+            scope: effect.scope || 'multiplier',
+            type: 'effects',
+            description: effect.description,
+        }));
         return result;
     }
 

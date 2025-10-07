@@ -33,6 +33,7 @@ export const mapEffect = (effect) => {
         value,
         type: effect.type,
         id: effect.id,
+        description: effect.description,
         direction,
         originalValue: effect.value,
         balance: effect.balance
