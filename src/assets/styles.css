@@ -4697,3 +4697,7 @@ body::after {
     align-items: center;
     justify-content: space-between;
 }
+
+.statistics-content .resources-tab .resource-item .resource-label {
+    width: 40%;
+}

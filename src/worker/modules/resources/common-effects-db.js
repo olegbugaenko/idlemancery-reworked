@@ -118,7 +118,7 @@ export const registerCommomEffects = () => {
     gameEffects.registerEffect('plain_learn_rate', {
         name: 'Plain Learn Bonus',
         tags: ['multiplier'],
-        description: 'Flat bonus to XP gained from any action (additive, not multiplicative)',
+        description: 'Flat bonus to XP gained while running any action (additive, not multiplicative)',
         defaultValue: 0,
         minValue: 0,
     })
