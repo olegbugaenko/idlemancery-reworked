@@ -1,4 +1,4 @@
-import React, {useCallback, useContext, useEffect, useState} from "react";
+import React, {useCallback, useContext, useEffect, useRef, useState} from "react";
 import WorkerContext from "../../../context/worker-context";
 import {useWorkerClient} from "../../../general/client";
 import PerfectScrollbar from "react-perfect-scrollbar";
@@ -47,7 +47,7 @@ const DropTooltip = ({ drop }) => {
 
 export const MapWrap = ({ children }) => {
 
-    const { isMobile } = useAppContext();
+    const { isMobile, setOpenedTab, togglePopup } = useAppContext();
     const [isDetailVisible, setDetailVisible] = useState(!isMobile);
 
     const [mapTileDetails, setMapTileDetails] = useState(null)
@@ -57,6 +57,71 @@ export const MapWrap = ({ children }) => {
     const worker = useContext(WorkerContext);
 
     const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
+    const { confirm } = useModal();
+    const pauseModalIdRef = useRef(null);
+
+    const handleExitToSkills = useCallback(() => {
+        pauseModalIdRef.current = null;
+        setOpenedTab('spellbook');
+        togglePopup('skills');
+    }, [setOpenedTab, togglePopup]);
+
+    const showPauseModal = useCallback(() => {
+        if(pauseModalIdRef.current) {
+            return;
+        }
+
+        pauseModalIdRef.current = confirm({
+            title: 'Pause Exploration',
+            message: 'Do you want to continue exploring or exit to the Skills screen?',
+            confirmText: 'Continue',
+            cancelText: 'Exit to Skills',
+            confirmClassName: 'primary-action',
+            cancelClassName: 'warning-action',
+            onConfirm: () => {
+                pauseModalIdRef.current = null;
+            },
+            onCancel: handleExitToSkills,
+        });
+    }, [confirm, handleExitToSkills]);
+
+    useEffect(() => {
+        const isEditableTarget = (el) => {
+            if (!el || !(el instanceof Element)) return false;
+            if (el.closest('[data-ignore-hotkeys], .ignore-hotkeys')) return true;
+            if (el.closest('[contenteditable="true"]')) return true;
+            const inputEl = el.closest('input, textarea');
+            if (inputEl) {
+                const tag = inputEl.tagName?.toLowerCase();
+                if (tag === 'textarea') return true;
+                if (tag === 'input') {
+                    const type = (inputEl.getAttribute('type') || 'text').toLowerCase();
+                    const nonTypingTypes = new Set(['checkbox','radio','button','submit','range','color','file','date','datetime-local','month','time','week','hidden']);
+                    const isTypingInput = !nonTypingTypes.has(type);
+                    const isInteractive = !inputEl.disabled && !inputEl.readOnly;
+                    return isTypingInput && isInteractive;
+                }
+            }
+            return false;
+        };
+
+        const handleKeyDown = (event) => {
+            if(event.key === 'Escape') {
+                if(isEditableTarget(event.target)) {
+                    return;
+                }
+                if(pauseModalIdRef.current) {
+                    return;
+                }
+                showPauseModal();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown, true);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown, true);
+        };
+    }, [showPauseModal]);
 
     const [unlocks, setUnlocksData] = useState({});
 
