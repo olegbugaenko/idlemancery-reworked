@@ -8,6 +8,8 @@ import {TippyWrapper} from "../../shared/tippy-wrapper.jsx";
 import Select from "react-select";
 import {PinResource} from "../../shared/pin-resource.jsx";
 import {useTutorial} from "../../../context/tutorial-context";
+import {useAppContext} from "../../../context/ui-context";
+import {ResourceRow} from "../../layout/sidebar.jsx";
 
 const customStyles = {
     control: (provided, state) => ({
@@ -72,6 +74,7 @@ export const Map = ({ setItemDetails, openListDetails, isEditList }) => {
 
     const worker = useContext(WorkerContext);
     const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
+    const { isMobile } = useAppContext();
 
     const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const [mapData, setMapTiles] = useState({
@@ -96,6 +99,21 @@ export const Map = ({ setItemDetails, openListDetails, isEditList }) => {
     const [selectedTile, setSelectedTile] = useState(null)
 
     const [hintForTileShown, setHintShown] = useState(null);
+
+    const discoveredResources = useMemo(() => {
+        const list = mapData.filterableLoot || [];
+        if(!list.length) {
+            return [];
+        }
+
+        return [...list]
+            .map(resource => ({
+                ...resource,
+                // Ensure consistency with sidebar rows
+                isHidden: false,
+            }))
+            .sort((a, b) => (b.amount || 0) - (a.amount || 0));
+    }, [mapData.filterableLoot]);
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -222,18 +240,38 @@ export const Map = ({ setItemDetails, openListDetails, isEditList }) => {
                 </label>
             </div>
         </div>
-        <div className={'map-cat'}>
-            <PerfectScrollbar>
-                <div className={'map-container'}>
-                    {mapData.mapTiles.map((row, i) => {
-                        return (<div className={'map-row'}>
-                            {row.map((tile, j) => {
-                                return <MapTile i={i} j={j} canExplore={tile.canExplore} isSelected={selectedTile && selectedTile?.i === i && selectedTile?.j === j} icon={tile.metaData.icon} setItemDetails={setItemDetailsCb} isExploring={tile.isRunning} isHighlight={tile.isHighlight} isEditList={isEditList} hintForTileShown={hintForTileShown} setHintShown={setHintShown}/>
-                            })}
-                        </div> )
-                    })}
+        <div className={'map-content'}>
+            {!isMobile ? (
+                <div className={'map-earned-resources ingame-box'}>
+                    <div className={'panel-title'}>Discovered Resources</div>
+                    <div className={'resources-scroll'}>
+                        <PerfectScrollbar>
+                            <div className={'resources'}>
+                                {discoveredResources.length ? discoveredResources.map(resource => (
+                                    <ResourceRow
+                                        key={resource.id}
+                                        resource={resource}
+                                        showCapProgress={false}
+                                    />
+                                )) : (<div className={'no-data'}>Nothing discovered yet.</div>)}
+                            </div>
+                        </PerfectScrollbar>
+                    </div>
                 </div>
-            </PerfectScrollbar>
+            ) : null}
+            <div className={'map-cat'}>
+                <PerfectScrollbar>
+                    <div className={'map-container'}>
+                        {mapData.mapTiles.map((row, i) => {
+                            return (<div className={'map-row'}>
+                                {row.map((tile, j) => {
+                                    return <MapTile i={i} j={j} canExplore={tile.canExplore} isSelected={selectedTile && selectedTile?.i === i && selectedTile?.j === j} icon={tile.metaData.icon} setItemDetails={setItemDetailsCb} isExploring={tile.isRunning} isHighlight={tile.isHighlight} isEditList={isEditList} hintForTileShown={hintForTileShown} setHintShown={setHintShown}/>
+                                })}
+                            </div> )
+                        })}
+                    </div>
+                </PerfectScrollbar>
+            </div>
         </div>
         <div className={'map-lists-wrap'}>
             <MapListsPanel
