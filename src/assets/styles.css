@@ -4701,3 +4701,87 @@ body::after {
 .statistics-content .resources-tab .resource-item .resource-label {
     width: 40%;
 }
+
+.statistics-content .search-and-toggle {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.statistics-content .search-and-toggle .show-hidden-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #ccc;
+}
+
+.statistics-content .search-and-toggle .show-hidden-toggle input {
+    margin: 0;
+}
+
+.statistics-content .multipliers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-right: 4px;
+}
+
+.statistics-content .multipliers-list .multiplier-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.statistics-content .multipliers-list .multiplier-row.is-hidden {
+    opacity: 0.55;
+}
+
+.statistics-content .multipliers-list .multiplier-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.statistics-content .multipliers-list .multiplier-name {
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.statistics-content .multipliers-list .multiplier-scope {
+    font-size: 11px;
+    text-transform: capitalize;
+    opacity: 0.7;
+}
+
+.statistics-content .multipliers-list .multiplier-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.statistics-content .multipliers-list .multiplier-value {
+    font-weight: 600;
+}
+
+.statistics-content .multipliers-list .toggle-hidden {
+    cursor: pointer;
+}
+
+.statistics-content .resources .resource-item.is-hidden {
+    opacity: 0.55;
+}
+
+.statistics-content .resources .resource-item {
+    gap: 8px;
+}
+
+.statistics-content .resources .resource-toggle-hidden {
+    margin-left: 8px;
+    cursor: pointer;
+}

@@ -117,7 +117,7 @@ export const ResourcesBar = () => {
     </div> )
 }
 
-export const ResourceRow = ({ resource, onMouseEnter, onMouseLeave, onContextMenu, showCapProgress = true }) => {
+export const ResourceRow = ({ resource, onMouseEnter, onMouseLeave, onContextMenu, showCapProgress = true, onToggleHidden }) => {
 
     const aff = resource.monitor;
 
@@ -182,12 +182,22 @@ export const ResourceRow = ({ resource, onMouseEnter, onMouseLeave, onContextMen
         {formatValue(resource.balance || 0)}
     </span>);
 
+    const handleToggleHiddenClick = (event) => {
+        if(!onToggleHidden) {
+            return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+        onToggleHidden(resource);
+    };
+
     return (<div className={`holder ${aff ? 'monitored' : ''} ${aff?.bShow ? 'show-potential' : ''} ${addClass}`}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
     >
         <div
-            className={`resource-item ${affClassData}`}
+            className={`resource-item ${affClassData} ${resource.isHidden ? 'is-hidden' : ''}`}
             onContextMenu={onContextMenu ? handleContextMenu : undefined}
         >
             {resource.isConsumable && onContextMenu ? (
@@ -226,6 +236,13 @@ export const ResourceRow = ({ resource, onMouseEnter, onMouseLeave, onContextMen
             {aff && aff?.bShow ? (<div className={`appendix ${directionClass}`}>
                 <span>{displayValue}</span>
             </div> ) : null}
+            {onToggleHidden ? (
+                <TippyWrapper content={<div className={'hint-popup'}>{resource.isHidden ? 'Show Resource' : 'Hide Resource'}</div> }>
+                    <div className={'icon-content interface-icon medium-sm resource-toggle-hidden'} onClick={handleToggleHiddenClick}>
+                        {resource.isHidden ? (<img src={"icons/interface/icon_show.png"} alt={'Show resource'}/>) : (<img src={"icons/interface/icon_hide.png"} alt={'Hide resource'}/>)}
+                    </div>
+                </TippyWrapper>
+            ) : null}
         </div>
         {showCapProgress && resource.capProgress ? (<div className={'next-unlock-holder resource'}>
             <div className={'next-unlock-bar'} style={{ width: `${resource.capProgress*100}%`}}></div>

@@ -30,6 +30,12 @@ export class MageModule extends GameModule {
         this.isViewMode = false;
         this.settings = {};
         this.activeEffectsFiltered = {};
+        this.hiddenMultipliers = {};
+        this.hiddenResources = {};
+        this.statisticsShowHidden = {
+            multipliers: false,
+            resources: false,
+        };
 
 
         this.skillGroupsCached = {};
@@ -112,6 +118,44 @@ export class MageModule extends GameModule {
         })
 
         this.eventHandler.registerHandler('query-statistics', () => {
+            const data = this.getStatistics();
+            this.eventHandler.sendData('statistics', data);
+        })
+
+        this.eventHandler.registerHandler('toggle-statistics-hidden', ({ scope, id }) => {
+            if(!scope || !id) {
+                return;
+            }
+
+            if(scope === 'multipliers') {
+                this.hiddenMultipliers[id] = !this.hiddenMultipliers[id];
+            }
+
+            if(scope === 'resources') {
+                this.hiddenResources[id] = !this.hiddenResources[id];
+            }
+
+            const data = this.getStatistics();
+            this.eventHandler.sendData('statistics', data);
+        })
+
+        this.eventHandler.registerHandler('set-statistics-show-hidden', ({ scope, flag }) => {
+            if(!scope) {
+                return;
+            }
+
+            if(!this.statisticsShowHidden) {
+                this.statisticsShowHidden = {};
+            }
+
+            if(scope === 'multipliers') {
+                this.statisticsShowHidden.multipliers = !!flag;
+            }
+
+            if(scope === 'resources') {
+                this.statisticsShowHidden.resources = !!flag;
+            }
+
             const data = this.getStatistics();
             this.eventHandler.sendData('statistics', data);
         })
@@ -697,20 +741,25 @@ export class MageModule extends GameModule {
             scope: effect.scope || 'multiplier',
             type: 'effects',
             description: effect.description,
+            isHidden: !!this.hiddenMultipliers?.[effect.id],
         }));
 
         const rs = gameResources.listAllResources(['resource']);
-        console.log('rs: ', rs);
         const filtered = rs.filter(one => gameResources.resourceExists(one.id) && one.isUnlocked && !['mage-xp','skill-points'].includes(one.id)).map(resource => ({
             ...resource,
             isNegative: resource.balance < 0,
             isPositive: resource.balance > 0 && resource.amount < resource.cap - SMALL_NUMBER,
             isCapped: resource.amount >= resource.cap - SMALL_NUMBER,
             eta: gameResources.assertToCapOrEmpty(resource.id),
+            isHidden: !!this.hiddenResources?.[resource.id],
             // affData: monitoredResources[resource.id] || undefined
         }))
 
         result.resources = filtered;
+        result.preferences = {
+            multipliersShowHidden: !!this.statisticsShowHidden?.multipliers,
+            resourcesShowHidden: !!this.statisticsShowHidden?.resources,
+        };
 
         return result;
     }
@@ -765,6 +814,9 @@ export class MageModule extends GameModule {
             drafts: this.skillDrafts,
             settings: this.settings,
             activeEffectsFiltered: this.activeEffectsFiltered,
+            statisticsHiddenMultipliers: this.hiddenMultipliers,
+            statisticsHiddenResources: this.hiddenResources,
+            statisticsShowHidden: this.statisticsShowHidden,
         }
     }
 
@@ -836,6 +888,13 @@ export class MageModule extends GameModule {
         this.getSkillTreeEffects(this.skillUpgrades);
 
         this.settings = obj?.settings || {};
+
+        this.hiddenMultipliers = obj?.statisticsHiddenMultipliers || {};
+        this.hiddenResources = obj?.statisticsHiddenResources || {};
+        this.statisticsShowHidden = {
+            multipliers: obj?.statisticsShowHidden?.multipliers || false,
+            resources: obj?.statisticsShowHidden?.resources || false,
+        };
     }
 
     setSkill(skillId, amount, bForce = false) {
