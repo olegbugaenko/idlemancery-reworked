@@ -656,7 +656,6 @@ export const SpellDetails = React.memo(({isChanged, editData, viewedData, resour
                                 </label>
                                 {isEditing ? (<button onClick={addAutoconsumeRule}>Add rule (AND)</button>) : null}
                             </div>
-                            {console.log(`Item ${item.id}: `, JSON.parse(JSON.stringify(item)), JSON.parse(JSON.stringify(spellDetails)))}
                             <RulesList
                                 key={`${item.id}-${isEditing}-${item.autocast?.rules?.length || 0}`}
                                 isEditing={isEditing}

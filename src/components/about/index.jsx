@@ -6,6 +6,14 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+                <h3>Idle Awakening v0.2.2</h3>
+                <div className={'features'}>
+                    <p>Fixed auto-effort behavour in lists</p>
+                    <p>Fixed game crashes when removing automation rules and switcjing between lists</p>
+                    <p>Fixed game crases in shop screen on smaller window</p>
+                    <p>Rebalance: Magic that consumes mana over time no longer require additional mana to cast</p>
+                    <p>QoL: Added separate multipliers and resources tabs in statistics</p>
+                </div>
                 <h3>Idle Awakening v0.2.1g</h3>
                 <div className={'features'}>
                     <p>Fixed a bug where courses where not displayed properly in quick access panel</p>
