@@ -730,7 +730,7 @@ export class ActionListsSubmodule extends GameModule {
         return {
             ...listData,
             actions: preparedActions.map(action => {
-                const updated = action.isDynamicTime && dynamic[action.id]
+                const updated = action.isDynamicTime && (dynamic[action.id] || dynamic[action.id] === 0)
                     ? { ...action, time: dynamic[action.id] }
                     : action;
                 return {
