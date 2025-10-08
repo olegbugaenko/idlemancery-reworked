@@ -452,7 +452,7 @@ export class PropertyModule extends GameModule {
             isService: true,
             saveBalanceTree: true,
             unlockCondition: () => {
-                gameEntity.getLevel('shop_item_tent') > 0
+                return gameEntity.getLevel('shop_item_tent') > 0
             }
         })
 

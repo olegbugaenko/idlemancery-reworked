@@ -695,7 +695,7 @@ export class ActionListsSubmodule extends GameModule {
             learningRate: 0.1,
             tolerance: 0.0001,
         });
-        console.log('guessedMinimized: ', guessedMinimized, performance.now() - st, actionContributions, actionConsumptions);
+        // console.log('guessedMinimized: ', guessedMinimized, performance.now() - st, actionContributions, actionConsumptions);
 
         return guessedMinimized;
         
@@ -937,7 +937,7 @@ export class ActionListsSubmodule extends GameModule {
             this.autotriggerCD = this.autotriggerIntervalSetting || 10;
             const autotrigger = this.getAutotriggerList();
 
-            console.log('AT: ', autotrigger);
+            // console.log('AT: ', autotrigger);
 
             if(autotrigger && this.runningList?.id !== autotrigger) {
                 this.runList(autotrigger);
@@ -1241,7 +1241,7 @@ export class ActionListsSubmodule extends GameModule {
                 }
 
                 if((effToAdd.scope === 'rawCap' || effToAdd.scope === 'capMult') && effToAdd.type === 'resources') {
-                    console.log('origEff: ', {...effToAdd}, learnRateFactor);
+                    // console.log('origEff: ', {...effToAdd}, learnRateFactor);
                     if(effToAdd.scope === 'capMult') {
                         effToAdd.value = 1 + learnRateFactor*(effToAdd.value - 1);
                     } else {
@@ -1304,7 +1304,7 @@ export class ActionListsSubmodule extends GameModule {
         const effects = gameEntity.getEffects(action.id, trainingStage, level, true, 1, timeFraction);
 
         const learnRateFactor = gameCore.getModule('actions').getLearningRate(action.id) / gameCore.getModule('actions').getActionXPMax(action.id);
-        console.log(`Effects for ${action.id}[${level}] (${action.time}/${totalTime}): `, JSON.parse(JSON.stringify(effects)));
+        // console.log(`Effects for ${action.id}[${level}] (${action.time}/${totalTime}): `, JSON.parse(JSON.stringify(effects)));
         effects.forEach(effect => {
             const effToAdd = { ...effect };
 
