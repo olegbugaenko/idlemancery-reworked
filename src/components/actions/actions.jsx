@@ -10,6 +10,7 @@ import {useFlashOnLevelUp} from "../../general/hooks/flash";
 import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
 import {ResourceComparison} from "../shared/resource-comparison.jsx";
 import {cloneDeep, debounce, throttle} from "lodash";
+import isEqual from "lodash/isEqual";
 import {ActionXPBreakdown} from "./action-xp-breakdown.jsx";
 import {NewNotificationWrap} from "../shared/new-notification-wrap.jsx";
 import {SearchField} from "../shared/search-field.jsx";
@@ -99,6 +100,9 @@ export const Actions = ({}) => {
     const [isCustomFilterOpened, setCustomFilterOpened] = useState(false);
     const [editingCustomFilter, setEditingCustomFilter] = useState(null);
 
+    const availableActionsRef = useRef(availableActions);
+    const customFiltersRef = useRef(customFilters);
+
     // const [filterId, setFilterId] = useState('all');
 
     useEffect(() => {
@@ -120,6 +124,8 @@ export const Actions = ({}) => {
     useEffect(() => { viewingListRef.current = viewingList; }, [viewingList]);
     useEffect(() => { listDataRef.current = listData; }, [listData]);
     useEffect(() => { viewedDataRef.current = viewedData; }, [viewedData]);
+    useEffect(() => { availableActionsRef.current = availableActions; }, [availableActions]);
+    useEffect(() => { customFiltersRef.current = customFilters; }, [customFilters]);
 
     useEffect(() => {
         const id = viewingListRef.current ?? editingListRef.current;
@@ -200,12 +206,12 @@ export const Actions = ({}) => {
         }
     }, [listData?.copyId])
 
-    const activateAction = (id) => {
+    const activateAction = useCallback((id) => {
         if(currentTourId === 'map' && ['action_gather_carefully', 'action_gather_normal', 'action_hunt_carefully', 'action_hunt_normal'].includes(id)) {
             unlockNextById(9);
         }
         sendData('run-action', { id, isForce: true })
-    }
+    }, [currentTourId, unlockNextById, sendData]);
 
     const throttledSetActionsFilter = useMemo(() => throttle((filterId) => {
         sendData('apply-actions-custom-filter', { id: filterId });
@@ -221,20 +227,23 @@ export const Actions = ({}) => {
         throttledSetActionsFilter(filterId);
     }, [throttledSetActionsFilter]);
 
-    const setActionDetails = (id) => {
+    const setActionDetails = useCallback((id) => {
         // Additionally send signal to highlight action
         sendData('set-monitored', { scope: 'effects', type: 'action', id });
         if(!id) {
             setDetailOpened(null);
-        } else {
-            if(id !== detailOpened) {
+            return;
+        }
+
+        setDetailOpened(prev => {
+            if(id !== prev) {
                 playSound('selection');
             }
-            setDetailOpened(id);
-        }
-    }
+            return id;
+        });
+    }, [sendData]);
 
-    const editListToDetails = (id, options = {}) => {
+    const editListToDetails = useCallback((id, options = {}) => {
         if(id) {
             setViewingList(null);
             if(!options?.clone) {
@@ -249,20 +258,22 @@ export const Actions = ({}) => {
             setEditingList(null);
             setListData({ name: '', actions: []})
         }
-    }
+    }, []);
 
-    const viewListToDetails = (id) => {
+    const viewListToDetails = useCallback((id) => {
         if(!id) {
             setViewedData(null);
         }
         setViewingList(id)
 
-    }
+    }, []);
 
-    const onSelectAction = ({id, name, level}) => {
+    const onSelectAction = useCallback(({id, name}) => {
         playSound('click');
-        if(listData) {
+        if(listDataRef.current) {
             setListData(prev => {
+                if(!prev) return prev;
+
                 const newList = cloneDeep(prev);
                 newList.actions.push({
                     id,
@@ -274,50 +285,50 @@ export const Actions = ({}) => {
                 return newList;
             });
         } else {
-            if(selectedAction === id) {
-                setSelectedAction(null)
-            } else {
-                setSelectedAction(id)
-            }
+            setSelectedAction(prev => (prev === id ? null : id));
         }
-    }
+    }, [sendData]);
 
-    const onDropActionFromList = (index) => {
-        if(listData) {
-            const newList = cloneDeep(listData);
-            newList.actions.splice(index, 1); // Видаляємо по індексу замість фільтрації по id
-            setListData({...newList});
-            sendData('query-action-list-effects', { listData: newList });
-        }
-    }
-
-    const onUpdateActionFromList = (id, key, value) => {
-        if(listData) {
-            const newList = cloneDeep(listData);
-            newList.actions = newList.actions.map(a => a.id !== id ? a : {...a, [key]: value});
-            setListData({...newList});
-            sendData('query-action-list-effects', { listData: newList });
-        }
-    }
-
-    const onUpdateListValue = (key, value) => {
+    const onDropActionFromList = useCallback((index) => {
         setListData(prev => {
             if(!prev) return prev;
-            
+
+            const newList = cloneDeep(prev);
+            newList.actions.splice(index, 1); // Видаляємо по індексу замість фільтрації по id
+            sendData('query-action-list-effects', { listData: newList });
+            return newList;
+        });
+    }, [sendData]);
+
+    const onUpdateActionFromList = useCallback((id, key, value) => {
+        setListData(prev => {
+            if(!prev) return prev;
+
+            const newList = cloneDeep(prev);
+            newList.actions = newList.actions.map(a => a.id !== id ? a : {...a, [key]: value});
+            sendData('query-action-list-effects', { listData: newList });
+            return newList;
+        });
+    }, [sendData]);
+
+    const onUpdateListValue = useCallback((key, value) => {
+        setListData(prev => {
+            if(!prev) return prev;
+
             const newList = cloneDeep(prev);
             newList[key] = value;
             return newList;
         });
         // sendData('query-action-list-effects', { id });
-    }
+    }, []);
 
-    const onCloseList = () => {
+    const onCloseList = useCallback(() => {
         setEditingList(null);
         setListData(null);
         playSound('click');
-    }
+    }, []);
 
-    const onDragEndDnD = (result) => {
+    const onDragEndDnD = useCallback((result) => {
         const { source, destination, draggableId } = result;
 
         if (!destination) return;
@@ -333,10 +344,9 @@ export const Actions = ({}) => {
                 sendData('actions-change-custom-filters-order', { sourceIndex: source.index, destinationIndex: destination.index })
             }
         }
+    }, [sendData]);
 
-    };
-
-    const onDragEnd = (dragData, dropData) => {
+    const onDragEnd = useCallback((dragData, dropData) => {
         const { type, data, sourceId, index: sourceIndex } = dragData;
 
         if (!type || !data) return; // не дропнули ні на що
@@ -346,13 +356,13 @@ export const Actions = ({}) => {
 
         if (sourceId === 'actions-list' && targetId === 'action-editor-wrap') {
             // Гравець перетягнув нову дію з "available" в список
-            const action = availableActions.find(a => a.id === id);
+            const action = availableActionsRef.current?.find(a => a.id === id);
             if (!action) return;
 
             setListData(prev => {
                 if (!prev) return prev;
-                
-                const newList = { ...prev };
+
+                const newList = cloneDeep(prev);
                 newList.actions.push({
                     id: action.id,
                     name: action.name,
@@ -360,14 +370,8 @@ export const Actions = ({}) => {
                     isAvailable: true,
                     isDynamicTime: false,
                 });
+                sendData('query-action-list-effects', { listData: newList });
                 return newList;
-            });
-            
-            // Отримуємо оновлений стан для запиту
-            setListData(prev => {
-                if (!prev) return prev;
-                sendData('query-action-list-effects', { listData: prev });
-                return prev;
             });
         }
 
@@ -379,23 +383,17 @@ export const Actions = ({}) => {
             if (oldIndex !== newIndex) {
                 setListData(prev => {
                     if (!prev) return prev;
-                    
+
                     const updated = [...prev.actions];
                     const [moved] = updated.splice(oldIndex, 1);
                     updated.splice(newIndex, 0, moved);
                     const newList = { ...prev, actions: updated };
+                    sendData('query-action-list-effects', { listData: newList });
                     return newList;
-                });
-                
-                // Отримуємо оновлений стан для запиту
-                setListData(prev => {
-                    if (!prev) return prev;
-                    sendData('query-action-list-effects', { listData: prev });
-                    return prev;
                 });
             }
         }
-    };
+    }, [sendData]);
 
     const setAutotriggerPriority = useCallback((priority) => {
         setListData(prev => {
@@ -561,43 +559,41 @@ export const Actions = ({}) => {
         }
     }, [currentTourId, unlockNextById, setEditingCustomFilter]);
 
-    const handlePinToggle = (id, newFlag) => {
+    const handlePinToggle = useCallback((id, newFlag) => {
         sendData('toggle-actions-custom-filter-pinned', { id, flag: newFlag });
-    };
+    }, [sendData]);
 
-    const handleApplyFilter = (id) => {
+    const handleApplyFilter = useCallback((id) => {
         sendData('apply-actions-custom-filter', { id });
-    };
+    }, [sendData]);
 
-    const handleEditFilter = (id) => {
-        // знаходите фільтр, відкриваєте форму редагування
-        // наприклад:
-        const filterData = customFilters[id];
-        setEditingCustomFilter({ ...filterData });
-    };
+    const handleEditFilter = useCallback((id) => {
+        const filterData = customFiltersRef.current?.[id];
+        setEditingCustomFilter(filterData ? { ...filterData } : null);
+    }, []);
 
     const handleSaveCustomFilter = useCallback((data) => {
         sendData('save-actions-custom-filter', data);
     }, [sendData]);
 
-    const handleDeleteFilter = (id) => {
+    const handleDeleteFilter = useCallback((id) => {
         sendData('delete-actions-custom-filter', { id });
-    };
+    }, [sendData]);
 
-    const handleAddFilter = () => {
+    const handleAddFilter = useCallback(() => {
         if(currentTourId === 'actions') {
             unlockNextById(14);
         }
         setEditingCustomFilter({ rules: [], condition: '', category: 'action', name: '' });
-    };
+    }, [currentTourId, unlockNextById]);
 
-    const handleClose = () => {
+    const handleClose = useCallback(() => {
         if(currentTourId === 'actions') {
             unlockNextById(23);
         }
         setEditingCustomFilter(null);
         setCustomFilterOpened(false);
-    };
+    }, [currentTourId, unlockNextById]);
 
     if(currentTourId === 'actions') {
         if(actionCategories.find(one => one.isSelected)?.id === 'all' && stepIndex === 1) {
@@ -996,25 +992,19 @@ const AvailableActionsList = React.memo(({
                 <div>
                     <div className="flex-container inner-actions-wrap">
                         {available.map((action, index) => (
-                            <NewNotificationWrap
+                            <ActionListItem
                                 key={action.id}
-                                id={action.id}
-                                className={'narrow-wrapper'}
+                                action={action}
+                                index={index}
+                                isEditingList={!!listData}
                                 isNew={newUnlocks.actions?.items?.all?.items?.[selectedCategory]?.items?.[action.id]?.hasNew}
-                            >
-                                <DraggableActionCard
-                                    isEditingList={!!listData}
-                                    index={index}
-                                    key={action.id}
-                                    {...action}
-                                    onFlash={handleFlash}
-                                    onActivate={onActivate}
-                                    onShowDetails={onShowDetails}
-                                    onSelect={onSelect}
-                                    toggleHiddenAction={toggleHiddenAction}
-                                    isSelected={selectedAction && (selectedAction === action.id)}
-                                />
-                            </NewNotificationWrap>
+                                onFlash={handleFlash}
+                                onActivate={onActivate}
+                                onShowDetails={onShowDetails}
+                                onSelect={onSelect}
+                                toggleHiddenAction={toggleHiddenAction}
+                                isSelected={selectedAction === action.id}
+                            />
                         ))}
 
                     </div>
@@ -1028,16 +1018,103 @@ const AvailableActionsList = React.memo(({
     );
 });
 
-const DraggableActionCard = ({ id, index, ...props }) => {
+const ActionListItemComponent = ({
+    action,
+    index,
+    isEditingList,
+    isNew,
+    onActivate,
+    onFlash,
+    onSelect,
+    onShowDetails,
+    toggleHiddenAction,
+    isSelected,
+}) => {
+    return (
+        <NewNotificationWrap
+            id={action.id}
+            className={'narrow-wrapper'}
+            isNew={isNew}
+        >
+            <DraggableActionCard
+                action={action}
+                index={index}
+                isEditingList={isEditingList}
+                onActivate={onActivate}
+                onFlash={onFlash}
+                onSelect={onSelect}
+                onShowDetails={onShowDetails}
+                toggleHiddenAction={toggleHiddenAction}
+                isSelected={isSelected}
+            />
+        </NewNotificationWrap>
+    );
+};
 
+const areActionListItemPropsEqual = (prev, next) => {
+    return (
+        prev.index === next.index &&
+        prev.isEditingList === next.isEditingList &&
+        prev.isNew === next.isNew &&
+        prev.isSelected === next.isSelected &&
+        prev.onActivate === next.onActivate &&
+        prev.onFlash === next.onFlash &&
+        prev.onSelect === next.onSelect &&
+        prev.onShowDetails === next.onShowDetails &&
+        prev.toggleHiddenAction === next.toggleHiddenAction &&
+        isEqual(prev.action, next.action)
+    );
+};
+
+const ActionListItem = React.memo(ActionListItemComponent, areActionListItemPropsEqual);
+
+const DraggableActionCardComponent = ({
+    action,
+    index,
+    isEditingList,
+    onActivate,
+    onFlash,
+    onSelect,
+    onShowDetails,
+    toggleHiddenAction,
+    isSelected,
+}) => {
+    const { id } = action;
     const {ref, props: dragProps} = useDrag({ type: 'action', id: `action_card_${id}`, sourceId: 'actions-list', data: { id } });
 
     return (
         <div ref={ref} {...dragProps}>
-            <ActionCard {...props} id={id} index={index} />
+            <ActionCard
+                {...action}
+                id={id}
+                index={index}
+                isEditingList={isEditingList}
+                onActivate={onActivate}
+                onFlash={onFlash}
+                onSelect={onSelect}
+                onShowDetails={onShowDetails}
+                toggleHiddenAction={toggleHiddenAction}
+                isSelected={isSelected}
+            />
         </div>
     );
 };
+
+const areDraggablePropsEqual = (prev, next) => {
+    return (
+        prev.index === next.index &&
+        prev.isEditingList === next.isEditingList &&
+        prev.isSelected === next.isSelected &&
+        prev.onActivate === next.onActivate &&
+        prev.onFlash === next.onFlash &&
+        prev.onSelect === next.onSelect &&
+        prev.onShowDetails === next.onShowDetails &&
+        prev.toggleHiddenAction === next.toggleHiddenAction &&
+        isEqual(prev.action, next.action)
+    );
+};
+
+const DraggableActionCard = React.memo(DraggableActionCardComponent, areDraggablePropsEqual);
 
 export const ActionCard = React.memo(({ id, category, isFavorite, monitored, entityEfficiency, isEditingList, index, isCapped, name, level, max, xp, maxXP, xpRate, isActive, effort, isLeveled, focused, isTraining, actionEffect, currentEffects, potentialEffects, isHidden, onFlash, onSelect, onActivate, onShowDetails, toggleHiddenAction, missingResourceId, isSelected, tags, ...props}) => {
     const elementRef = useRef(null);
