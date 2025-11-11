@@ -13,6 +13,7 @@ import {BankedTimeWrap} from "./banked-time-wrap.jsx";
 import {useAppContext} from "../../context/ui-context";
 import {ActiveActions} from "../shared/active-actions.jsx";
 import {ActiveAchievement} from "../shared/achievements.jsx";
+import {updateSidebarState, useSidebarData} from "../../state/sidebar-store";
 
 export const Sidebar = () => {
 
@@ -67,26 +68,42 @@ export const Sidebar = () => {
 export const ResourcesBar = () => {
     const worker = useContext(WorkerContext);
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
 
-    const [resourceData, setResourceData] = useState([]);
+    const resourceData = useSidebarData(state => state.resources);
 
     useEffect(() => {
+        if (!worker) {
+            return undefined;
+        }
+
+        const handleResources = (resources) => {
+            updateSidebarState({ resources });
+        };
+
+        onMessage('resources-data', handleResources);
+        sendData('query-resources-data', { includePinned: true });
         const interval = setInterval(() => {
             sendData('query-resources-data', { includePinned: true });
         }, 200);
+
         return () => {
             clearInterval(interval);
-        }
-    }, [])
-
-    onMessage('resources-data', (resources) => {
-        setResourceData(resources);
-    })
+            removeMessage('resources-data');
+        };
+    }, [worker, onMessage, sendData, removeMessage]);
 
     const setMonitoredAttribute = useCallback((id) => {
         sendData('set-monitored', { scope: 'actions', type: 'resource', id });
-    }, []);
+    }, [sendData]);
+
+    const handleMouseEnter = useCallback((resource) => {
+        setMonitoredAttribute(resource?.id ?? null);
+    }, [setMonitoredAttribute]);
+
+    const handleMouseLeave = useCallback(() => {
+        setMonitoredAttribute(null);
+    }, [setMonitoredAttribute]);
 
     const consumeResource = useCallback((id, amount = 1) => {
         sendData('consume-inventory', { id, amount, sendDetails: true });
@@ -95,7 +112,7 @@ export const ResourcesBar = () => {
     const handleResourceContextMenu = useCallback((e, resource) => {
         e.preventDefault();
         if (!resource.isConsumable) return;
-        
+
         let amount = 1;
         if(resource.allowMultiConsume) {
             if (e.shiftKey) amount = resource.amount;
@@ -109,15 +126,15 @@ export const ResourcesBar = () => {
             <ResourceRow
                 key={res.id}
                 resource={res}
-                onMouseEnter={() => setMonitoredAttribute(res.id)}
-                onMouseLeave={() => setMonitoredAttribute(null)}
-                onContextMenu={(event, resource) => handleResourceContextMenu(event, resource)}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+                onContextMenu={handleResourceContextMenu}
             />
         ))}
     </div> )
 }
 
-export const ResourceRow = ({ resource, onMouseEnter, onMouseLeave, onContextMenu, showCapProgress = true, onToggleHidden }) => {
+export const ResourceRow = React.memo(({ resource, onMouseEnter, onMouseLeave, onContextMenu, showCapProgress = true, onToggleHidden }) => {
 
     const aff = resource.monitor;
 
@@ -248,33 +265,41 @@ export const ResourceRow = ({ resource, onMouseEnter, onMouseLeave, onContextMen
             <div className={'next-unlock-bar'} style={{ width: `${resource.capProgress*100}%`}}></div>
         </div>) : null}
     </div> )
-}
+});
+
+ResourceRow.displayName = 'ResourceRow';
 
 export const AttributesBar = () => {
     const worker = useContext(WorkerContext);
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
 
-    const [attributesData, setAttributesData] = useState({
-        list: []
-    });
+    const attributesData = useSidebarData(state => state.attributes);
 
     useEffect(() => {
+        if (!worker) {
+            return undefined;
+        }
+
+        const handleAttributes = (attributes) => {
+            updateSidebarState({ attributes });
+        };
+
+        onMessage('attributes-data', handleAttributes);
+        sendData('query-attributes-data', {});
         const interval = setInterval(() => {
             sendData('query-attributes-data', {});
         }, 200);
+
         return () => {
             clearInterval(interval);
-        }
-    }, [])
-
-    onMessage('attributes-data', (attributes) => {
-        setAttributesData(attributes);
-    })
+            removeMessage('attributes-data');
+        };
+    }, [worker, onMessage, sendData, removeMessage]);
 
     const setMonitoredAttribute = useCallback((id, target) => {
         sendData('set-monitored', { scope: 'actions', type: 'attribute', id });
-    }, []);
+    }, [sendData]);
 
     return (<div className={'attributes-panel'} id={'tutorial-attributes'}>
         {attributesData.list.map(res => {

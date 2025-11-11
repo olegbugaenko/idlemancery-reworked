@@ -1,29 +1,38 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, useEffect} from "react";
 import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
 import CircularProgress from "./circular-progress.jsx";
 import {formatInt, secondsToString} from "../../general/utils/strings";
 import {EffectsSection} from "./effects-section.jsx";
 import {TippyWrapper} from "./tippy-wrapper.jsx";
+import {updateSidebarState, useSidebarData} from "../../state/sidebar-store";
 
 export const ActiveEffects = () => {
     const worker = useContext(WorkerContext);
 
-    const { onMessage, sendData } = useWorkerClient(worker);
-    const [effectsData, setEffectsData] = useState({ list: [] });
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
+    const effectsData = useSidebarData(state => state.activeEffects);
 
     useEffect(() => {
+        if (!worker) {
+            return undefined;
+        }
+
+        const handleActiveEffects = (payload) => {
+            updateSidebarState({ activeEffects: payload });
+        };
+
+        onMessage('active-effects', handleActiveEffects);
+        sendData('query-active-effects', {  });
         const interval = setInterval(() => {
             sendData('query-active-effects', {  });
         }, 200);
+
         return () => {
             clearInterval(interval);
-        }
-    }, []);
-
-    onMessage('active-effects', (pl) => {
-        setEffectsData(pl);
-    })
+            removeMessage('active-effects');
+        };
+    }, [worker, onMessage, sendData, removeMessage]);
 
     return (<div className={'active-effects-wrap'}>
         {effectsData.list.map(one => (<ActiveEffectItem key={one.id} {...one} />))}
