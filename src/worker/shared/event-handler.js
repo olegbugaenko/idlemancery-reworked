@@ -19,9 +19,9 @@ export class EventHandler {
     processEvent(event) {
         if(!event.data) return;
 
-        const parsed = JSON.parse(event.data);
+        const parsed = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
 
-        if(!parsed.event || !this.handlers[parsed.event] ) {
+        if(!parsed || !parsed.event || !this.handlers[parsed.event] ) {
             throw new Error(`Invalid event: ${parsed.event}`)
         }
 
@@ -29,7 +29,7 @@ export class EventHandler {
     }
 
     sendData(event, payload) {
-        postMessage(JSON.stringify({ event, payload }))
+        postMessage({ event, payload })
     }
 
     // some generic keys
