@@ -60,7 +60,6 @@ const selectActionListsUnlocked = state => !!state?.actionListsUnlocked;
 const selectSelectedCategory = state => state?.selectedCategory ?? 'all';
 const selectStats = state => state?.stats ?? {};
 const selectAspects = state => state?.aspects ?? { isUnlocked: false, list: [] };
-const selectCurrentAction = state => state?.current ?? null;
 
 const MemoizedActionListsPanel = React.memo(ActionListsPanel);
 
@@ -234,10 +233,6 @@ export const Actions = ({}) => {
             setDetailOpened(id);
         }
     }
-
-    const toggleDetailVisibility = useCallback(() => {
-        setDetailVisible(prev => !prev);
-    }, []);
 
     const editListToDetails = (id, options = {}) => {
         if(id) {
@@ -667,14 +662,6 @@ export const Actions = ({}) => {
     return (
                 <div className={'actions-wrap'}>
                     <div className={'ingame-box actions'}>
-                        <ActionsHeader
-                            availableSelector={selectAvailableActions}
-                            currentSelector={selectCurrentAction}
-                            automationSelector={selectAutomationEnabled}
-                            isMobile={isMobile}
-                            isDetailVisible={isDetailVisible}
-                            onToggleDetails={toggleDetailVisibility}
-                        />
                         <ActionsFilters
                             selectors={{
                                 categories: selectActionCategories,
@@ -701,6 +688,8 @@ export const Actions = ({}) => {
                             onToggleShowHidden={toggleShowHidden}
                             onToggleShowMaxed={toggleShowMaxed}
                             onDragEndFilters={onDragEndDnD}
+                            isMobile={isMobile}
+                            onShowDetails={() => setDetailVisible(true)}
                         />
                         <AvailableActionsList
                             selectors={{
@@ -857,30 +846,6 @@ const DetailBladeComponent = ({
 
 export const DetailBlade = React.memo(DetailBladeComponent);
 
-const ActionsHeader = React.memo(({ availableSelector, currentSelector, automationSelector, isMobile, isDetailVisible, onToggleDetails }) => {
-    const available = useActionsData(availableSelector);
-    const current = useActionsData(currentSelector);
-    const automation = useActionsData(automationSelector);
-
-    return (
-        <div className={'actions-header'}>
-            <div className={'header-main'}>
-                <h2>Actions</h2>
-                <span className={'actions-counter'}>Available: {formatInt(available.length, 0)}</span>
-            </div>
-            <div className={'header-meta'}>
-                <span className={'automation-state'}>Automation: {automation ? 'On' : 'Off'}</span>
-                <span className={'current-action'}>Current: {current?.name ?? 'None'}</span>
-                {isMobile ? (
-                    <button type={'button'} className={'actions-info-btn'} onClick={onToggleDetails}>
-                        {isDetailVisible ? 'Hide Info' : 'Info'}
-                    </button>
-                ) : null}
-            </div>
-        </div>
-    );
-});
-
 const ActionsFilters = React.memo(({
     selectors,
     newUnlocks,
@@ -900,6 +865,8 @@ const ActionsFilters = React.memo(({
     onToggleShowHidden,
     onToggleShowMaxed,
     onDragEndFilters,
+    isMobile,
+    onShowDetails,
 }) => {
     const categories = useActionsData(selectors.categories);
     const customFilters = useActionsData(selectors.customFilters);
@@ -991,6 +958,11 @@ const ActionsFilters = React.memo(({
                     <input type={'checkbox'} checked={!!showMaxed} onChange={onToggleShowMaxed}/>
                     Show completed
                 </label>
+                {isMobile ? (
+                    <div>
+                        <span className={'highlighted-span'} onClick={onShowDetails}>Info</span>
+                    </div>
+                ) : null}
                 <HowToSign scope={'actions'} />
             </div>
         </div>
