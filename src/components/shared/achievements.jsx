@@ -4,6 +4,7 @@ import {useWorkerClient} from "../../general/client";
 import {useAppContext} from "../../context/ui-context";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import {dateToString} from "../../general/utils/strings";
+import {useTutorial} from "../../context/tutorial-context";
 
 export const ActiveAchievement = () => {
 
@@ -11,6 +12,7 @@ export const ActiveAchievement = () => {
     const { onMessage, sendData } = useWorkerClient(worker);
     const [viewedAchievement, setViewedAchievement] = useState(null);;
     const { activePopup, togglePopup } = useAppContext();
+    const { run } = useTutorial();
 
 
     useEffect(() => {
@@ -28,11 +30,18 @@ export const ActiveAchievement = () => {
     })
 
     useEffect(() => {
-        if(activePopup && activePopup !== 'achievement') return; // dont show
-        if(activePopup === 'achievement') {
+        if (run) {
+            if (activePopup === 'achievement') {
+                togglePopup(null);
+            }
+            return; // suppress achievements while tutorial is running
+        }
+
+        if (activePopup && activePopup !== 'achievement') return; // dont show over other popups
+        if (activePopup === 'achievement') {
             togglePopup(null);
         }
-        if(viewedAchievement) {
+        if (viewedAchievement) {
             togglePopup(
                 'achievement',
                 () => {
@@ -46,7 +55,7 @@ export const ActiveAchievement = () => {
                 }
             )
         }
-    }, [viewedAchievement?.id, activePopup])
+    }, [viewedAchievement?.id, activePopup, run])
 
 }
 

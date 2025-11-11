@@ -75,7 +75,7 @@ export const ActionListsPanel = ({ automationUnlocked, runningList, editListToDe
                     if(currentTourId === 'action-lists') {
                         unlockNextById(12)
                     }
-                }}>Pick list</button>
+                }}>Pick List</button>
                 <ActionListsPopup lists={lists} isOpened={openedFor === 'edit'} setOpenedFor={setOpenedFor} onSelect={editList} onClone={cloneList} onRun={runList} onHover={viewListToDetails} onDelete={onDelete} setActionListOrder={setActionListOrder}/>
             </div>
             {automationUnlocked ? (<>

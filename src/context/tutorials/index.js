@@ -465,7 +465,7 @@ const stepsActionsLists = [
     },
     {
         target: '#pick-action-list',
-        content: 'Now click the "Pick list" button.',
+        content: 'Now click the "Pick List" button.',
         disableBeacon: true,
         disableOverlayClose: true,
         placement: 'left',

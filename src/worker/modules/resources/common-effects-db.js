@@ -104,7 +104,7 @@ export const registerCommomEffects = () => {
         tags: ['multiplier'],
         defaultValue: 1.,
         minValue: 1,
-        description: 'Increases leveling speed and resource gain by book reading actions (ones tagged with "book")'
+        description: 'Increases output of "Read Books" action'
     })
 
     gameEffects.registerEffect('learn_languages_efficiency', {
@@ -236,6 +236,7 @@ export const registerCommomEffects = () => {
         defaultValue: 1.,
         minValue: 1,
         saveBalanceTree: true,
+        description: 'Increasing output of all crafting recipes.'
     })
 
     gameEffects.registerEffect('alchemy_efficiency', {
@@ -536,6 +537,7 @@ export const registerCommomEffects = () => {
         defaultValue: 1.,
         minValue: 1,
         hasCap: false,
+        description: 'Increase amount of coins that can be stored in your urns'
     })
 
     gameEffects.registerEffect('drying_rack_efficiency', {

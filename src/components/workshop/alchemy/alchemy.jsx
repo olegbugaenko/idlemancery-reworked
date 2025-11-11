@@ -428,7 +428,7 @@ export const CraftingListsPanel = ({ runningList, editListToDetails, lists, view
                 <button onClick={() => editListToDetails()}>Create New</button>
             </div>
             <div className={'lists-editor panel-col'}>
-                <button onClick={(e) => { e.stopPropagation(); setOpenedFor('edit')}}>Pick list</button>
+                <button onClick={(e) => { e.stopPropagation(); setOpenedFor('edit')}}>Pick List</button>
                 <ActionListsPopup lists={lists} isOpened={openedFor === 'edit'} setOpenedFor={setOpenedFor} onSelect={editList} onRun={runList} onHover={viewListToDetails} onDelete={onDelete}/>
             </div>
             <div className={'automation-enabled panel-col'}>

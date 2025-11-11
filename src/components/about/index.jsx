@@ -6,6 +6,15 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+                <h3>Idle Awakening v0.2.2a</h3>
+                <div className={'features'}>
+                    <p>Fixed a bug where in some cases living space might not display in costs</p>
+                    <p>Fixed some descriptions</p>
+                    <p>Fixed a bug where auto-effort didn't handled properly case when action with auto-effort is not required at all</p>
+                    <p>Fixed a bug where story popup might prevent people from being able to finish the tour</p>
+                    <p>Improved auto-effort behavour in case when list can't be balanced to avoid deficites</p>
+                    <p>QoL: Resources and multipliers under statistics now can be shown/hidden, and are updated every second</p>
+                </div>
                 <h3>Idle Awakening v0.2.2</h3>
                 <div className={'features'}>
                     <p>Fixed auto-effort behavour in lists</p>

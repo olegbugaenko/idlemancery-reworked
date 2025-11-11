@@ -480,7 +480,7 @@ export const registerArtifactsStage1 = () => {
         resourceModifier: {
             get_multiplier: () => ({
                 effects: {
-                    'read_books_efficiency': {
+                    'books_learning_rate': {
                         A: 0.15,
                         B: 1,
                         C: 1.02,

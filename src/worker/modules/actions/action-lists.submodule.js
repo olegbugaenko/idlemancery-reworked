@@ -615,6 +615,8 @@ export class ActionListsSubmodule extends GameModule {
                 const val = exactDynamicTimes[idx];
                 if (val > SMALL_NUMBER) {
                     dynamicResult[action.id] = val;
+                } else {
+                    dynamicResult[action.id] = 0;
                 }
             });
             return dynamicResult;
@@ -726,6 +728,16 @@ export class ActionListsSubmodule extends GameModule {
         if (!dynamicActions.length) return preparedList;
 
         const dynamic = this.getListDynamicValues(preparedList);
+
+        console.log('dynFinal: ', dynamic, preparedActions.map(action => {
+            const updated = action.isDynamicTime && (dynamic[action.id] || dynamic[action.id] === 0)
+                ? { ...action, time: dynamic[action.id] }
+                : action;
+            return {
+                ...updated,
+                isAutoTimeEnabled: action.isAutoTimeEnabled // завжди повертати явно
+            };
+        }))
 
         return {
             ...listData,
