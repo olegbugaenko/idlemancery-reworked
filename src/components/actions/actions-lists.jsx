@@ -9,7 +9,7 @@ import {useTutorial} from "../../context/tutorial-context";
 import {useUICache} from "../../general/hooks/local-cache";
 import {FavoriteButton} from "../shared/favorite-button.jsx";
 
-export const ActionListsPanel = ({ automationUnlocked, runningList, editListToDetails, lists, viewListToDetails, automationEnabled, toggleAutomation, autotriggerIntervalSetting, changeAutomationInterval }) => {
+const ActionListsPanelComponent = ({ automationUnlocked, runningList, editListToDetails, lists, viewListToDetails, automationEnabled, toggleAutomation, autotriggerIntervalSetting, changeAutomationInterval }) => {
 
     const worker = useContext(WorkerContext);
 
@@ -107,6 +107,8 @@ export const ActionListsPanel = ({ automationUnlocked, runningList, editListToDe
         </div>
     </div>)
 }
+
+export const ActionListsPanel = React.memo(ActionListsPanelComponent);
 
 export const ActionListsPopup = ({ lists, isOpened, setOpenedFor, onSelect, onHover, onRun, onDelete, setActionListOrder, onClone }) => {
 
