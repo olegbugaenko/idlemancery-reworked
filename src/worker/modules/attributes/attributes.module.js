@@ -4,6 +4,7 @@ import {registerAttributes} from "./attributes-db";
 import {gameUnlocks} from "game-framework/src/utils/unlocks";
 import {calculateTimeToLevelUp} from "../../shared/utils/math";
 import {getScope} from "../../shared/utils/scopes";
+import { effectResponse } from "../../shared/utils/transform/effects";
 
 export class AttributesModule extends GameModule {
 
@@ -90,7 +91,7 @@ export class AttributesModule extends GameModule {
                 }
 
                 return {
-                    ...one,
+                    ...effectResponse(one),
                     prevUnlocks: (one.prevUnlocks ?? []).map(unlock => {
                         let data = {};
                         let meta = {};
@@ -122,7 +123,7 @@ export class AttributesModule extends GameModule {
     getAttributesData() {
         const effects = gameEffects.listEffectsByTags(['attribute']);
         const list = effects.filter(one => one.isUnlocked).map(effect => ({
-            ...effect,
+            ...effectResponse(effect),
             nextProgress: effect.nextUnlocks?.length ? effect.value / effect.nextUnlocks[0].level : 0,
             monitor: this.monitoredData[effect.id] ?? null,
         }))
@@ -134,7 +135,7 @@ export class AttributesModule extends GameModule {
     getAllAttributesData() {
         const effects = gameEffects.listEffectsByTags(['attribute']);
         const list = effects.map(effect => ({
-            ...effect,
+            ...effectResponse(effect),
             monitor: this.monitoredData[effect.id] ?? null,
             isUnlocked: effect.isUnlocked,
         }))

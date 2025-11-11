@@ -41,7 +41,7 @@ export function useWorkerClient(worker) {
     const handleMessage = useCallback((event) => {
         if (!event.data) return;
 
-        const parsed = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+        const parsed = event.data;
 
         if (!parsed || !parsed.event || !globalEventHandlers[parsed.event]) {
             // console.warn('Invalid event or handler not registered', parsed);

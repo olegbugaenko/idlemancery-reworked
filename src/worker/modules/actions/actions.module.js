@@ -7,7 +7,9 @@ import {SMALL_NUMBER} from "game-framework/src/utils/consts";
 import {registerAspects} from "./aspect-db";
 import {cloneDeep} from "lodash";
 import {getScope} from "../../shared/utils/scopes";
-
+import { entityResponse } from "../../shared/utils/transform/entities";
+import { effectResponse } from "../../shared/utils/transform/effects";
+import { resourceResponse } from "../../shared/utils/transform/resources";
 const DEFAULT_FILTERS = {
     'all': {
         id: 'all',
@@ -1132,7 +1134,7 @@ export class ActionsModule extends GameModule {
                     .filter(one => this.filtersCache[filter.id][one.id] && one.isUnlocked && (!one.isCapped || this.showMaxed)
                         && (options?.showHidden || this.showHidden || !this.actions?.[one.id]?.isHidden)
                         && this.matchActionSearch(one, options.searchData)
-                    ),
+                    ).map(one => entityResponse(one)),
                 isSelected: filterId === filter.id
             }
 
@@ -1207,21 +1209,21 @@ export class ActionsModule extends GameModule {
             customFiltersOrder: this.customFiltersOrder,
             stats: {
                 learnMults: {
-                    learningRate: gameEffects.getEffect('learning_rate'),
-                    physicalLearningRate: gameEffects.getEffect('physical_training_learn_speed'),
-                    mentalLearningRate: gameEffects.getEffect('mental_training_learning_rate'),
-                    socialLearningRate: gameEffects.getEffect('social_training_learning_rate'),
-                    routineLearningRate: gameEffects.getEffect('routine_learning_speed'),
-                    spiritualLearningRate: gameEffects.getEffect('spiritual_learning_rate'),
-                    booksLearningRate: gameEffects.getEffect('books_learning_rate'),
-                    mentalActivitiesLearningRate: gameEffects.getEffect('mental_activities_learn_rate')
+                    learningRate: effectResponse(gameEffects.getEffect('learning_rate')),
+                    physicalLearningRate: effectResponse(gameEffects.getEffect('physical_training_learn_speed')),
+                    mentalLearningRate: effectResponse(gameEffects.getEffect('mental_training_learning_rate')),
+                    socialLearningRate: effectResponse(gameEffects.getEffect('social_training_learning_rate')),
+                    routineLearningRate: effectResponse(gameEffects.getEffect('routine_learning_speed')),
+                    spiritualLearningRate: effectResponse(gameEffects.getEffect('spiritual_learning_rate')),
+                    booksLearningRate: effectResponse(gameEffects.getEffect('books_learning_rate')),
+                    mentalActivitiesLearningRate: effectResponse(gameEffects.getEffect('mental_activities_learn_rate'))
                 },
                 xpDiscounts: {
-                    physical_actions_discount: gameEffects.getEffect('physical_actions_discount'),
-                    social_actions_discount: gameEffects.getEffect('social_actions_discount'),
-                    mental_actions_discount: gameEffects.getEffect('mental_actions_discount'),
-                    magical_actions_discount: gameEffects.getEffect('magical_actions_discount'),
-                    routine_actions_discount: gameEffects.getEffect('routine_actions_discount'),
+                    physical_actions_discount: effectResponse(gameEffects.getEffect('physical_actions_discount')),
+                    social_actions_discount: effectResponse(gameEffects.getEffect('social_actions_discount')),
+                    mental_actions_discount: effectResponse(gameEffects.getEffect('mental_actions_discount')),
+                    magical_actions_discount: effectResponse(gameEffects.getEffect('magical_actions_discount')),
+                    routine_actions_discount: effectResponse(gameEffects.getEffect('routine_actions_discount')),
                 }
             },
             aspects: {
@@ -1232,7 +1234,7 @@ export class ActionsModule extends GameModule {
                     level: one.level,
                     effects: gameEntity.getEffects(one.id),
                     maxLevel: this.getAspectMaxLevel(one.attributes.keyAttribute),
-                    attributeData: gameEffects.getEffect(one.attributes.keyAttribute),
+                    attributeData: effectResponse(gameEffects.getEffect(one.attributes.keyAttribute)),
                     nextPoint: Math.ceil((gameEffects.getEffectValue(one.attributes.keyAttribute) + SMALL_NUMBER) / this.getAttributeAspectReq(one.attributes.keyAttribute))*this.getAttributeAspectReq(one.attributes.keyAttribute),
                     progress: (gameEffects.getEffectValue(one.attributes.keyAttribute) - this.getAttributeAspectReq(one.attributes.keyAttribute)*Math.floor(gameEffects.getEffectValue(one.attributes.keyAttribute) / this.getAttributeAspectReq(one.attributes.keyAttribute)))/this.getAttributeAspectReq(one.attributes.keyAttribute),
                     color: one.attributes.color,
@@ -1281,7 +1283,7 @@ export class ActionsModule extends GameModule {
             xpRate: this.isRunningAction(entity.id) ? this.getLearningRate(`runningAction_${entity.id}`) : this.getLearningRate(entity.id, 1),
             isLeveled: this.actions[entity.id]?.isLeveled,
             tags: entity.tags,
-            primaryAttribute: entity.attributes?.primaryAttribute && gameEffects.isEffectUnlocked(entity.attributes?.primaryAttribute) ? gameEffects.getEffect(entity.attributes.primaryAttribute) : null,
+            primaryAttribute: entity.attributes?.primaryAttribute && gameEffects.isEffectUnlocked(entity.attributes?.primaryAttribute) ? effectResponse(gameEffects.getEffect(entity.attributes.primaryAttribute)) : null,
             primaryAttributeEffect: entity.attributes?.primaryAttribute && gameEffects.isEffectUnlocked(entity.attributes?.primaryAttribute) ? entity.getPrimaryEffect() : 1,
             isTraining: gameEntity.getAttribute(entity.id, 'isTraining'),
             nextUnlock: entity.nextUnlock,
@@ -1290,7 +1292,7 @@ export class ActionsModule extends GameModule {
             etas: this.getEtas(entity.id),
             aspect: entity.attributes?.primaryAttribute && gameEffects.isEffectUnlocked(entity.attributes?.primaryAttribute) && gameEntity.getLevel('shop_item_aspects_focus') > 0 ? {
                 intensity: entity.getIntensityAspect(),
-                aspect: gameEntity.getEntity(`${entity.attributes?.primaryAttribute}_aspect`),
+                aspect: entityResponse(gameEntity.getEntity(`${entity.attributes?.primaryAttribute}_aspect`)),
             } : null,
             entityEfficiency: this.isRunningAction(entity.id) ? gameEntity.getEntityEfficiency(`runningAction_${entity.id}`) : 1,
         };
@@ -1308,7 +1310,7 @@ export class ActionsModule extends GameModule {
         }
 
         if(entityData.entityEfficiency < 1) {
-            entityData.missingResource = gameResources.getResource(gameEntity.getEntity(`runningAction_${entity.id}`)?.modifier?.bottleNeck);
+            entityData.missingResource = resourceResponse(gameResources.getResource(gameEntity.getEntity(`runningAction_${entity.id}`)?.modifier?.bottleNeck));
         }
         return entityData;
     }
@@ -1338,7 +1340,7 @@ export class ActionsModule extends GameModule {
 
     getAllActions() {
         return gameEntity.listEntitiesByTags(['action']).map(one => ({
-            ...one,
+            ...entityResponse(one),
             isUnlocked: one.isUnlocked && !one.isCapped
         }))
     }

@@ -1,0 +1,18 @@
+export const effectResponse = (effectData) => ({
+    id: effectData.id,
+    name: effectData.name,
+    description: effectData.description,
+    value: effectData.value,
+    saveBalanceTree: effectData.saveBalanceTree,
+    tags: effectData.tags,
+    breakDown: effectData.breakDown,
+    cap: effectData.cap,
+    capMult: effectData.capMult,
+    consumption: effectData.consumption,
+    defaultCap: effectData.defaultCap,
+    defaultValue: effectData.defaultValue,
+    income: effectData.income,
+    multiplier: effectData.multiplier,
+    rawCap: effectData.rawCap,
+    tags: effectData.tags,
+})

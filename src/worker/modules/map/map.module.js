@@ -3,6 +3,8 @@ import {registerTileTypesDB} from "./tile-db";
 import {gameCore, gameEffects, gameEntity, gameResources, resourceApi, resourceCalculators} from "game-framework";
 import {MapTileListsSubmodule} from "./map-tile-lists.submodule";
 import {SMALL_NUMBER} from "game-framework/src/utils/consts";
+import { resourceResponse } from "../../shared/utils/transform/resources";
+import { effectResponse } from "../../shared/utils/transform/effects";
 
 export class MapModule extends GameModule {
 
@@ -540,7 +542,7 @@ export class MapModule extends GameModule {
 
     getData() {
         const filterableLoot = Object.keys(this.filterableLoots).map(one => ({
-            ...gameResources.getResource(one),
+            ...resourceResponse(gameResources.getResource(one)),
             isSelected: this.highlightResources[one]
         }));
         return {
@@ -551,14 +553,14 @@ export class MapModule extends GameModule {
                     ...col,
                     drops: col.drops.map((drop, index) => ({
                         ...drop,
-                        resource: gameResources.getResource(drop.id),
+                        resource: resourceResponse(gameResources.getResource(drop.id)),
                     })),
                     isHighlight: isHighlighted,
                     canExplore: !(iRow === 7 && iCol === 7)
                 }
             })),
             explorationPoints: {
-                ...gameResources.getResource('gathering_effort'),
+                ...resourceResponse(gameResources.getResource('gathering_effort')),
                 isPinned: !!gameCore.getModule('resource-pool').pinnedResources?.['gathering_effort']
             },
             mapLists: this.lists.getLists(),
@@ -580,13 +582,13 @@ export class MapModule extends GameModule {
             stats: {
                 effects: [
                     {id: 'map_level', name: 'Map Level', value: this.mapTier},
-                    {...gameEffects.getEffect('gathering_low_chance'), isMultiplier: true},
-                    {...gameEffects.getEffect('gathering_herbs_amount'), isMultiplier: true},
-                    {...gameResources.getResource('gathering_perception'), isMultiplier: false, value: gameResources.getResource('gathering_perception').amount},
+                    {...effectResponse(gameEffects.getEffect('gathering_low_chance')), isMultiplier: true},
+                    {...effectResponse(gameEffects.getEffect('gathering_herbs_amount') ), isMultiplier: true},
+                    {...resourceResponse(gameResources.getResource('gathering_perception')), isMultiplier: false, value: gameResources.getResource('gathering_perception').amount},
                     {id: 'perception_effect', name: 'Gathering Perception Effect', value: this.getGatheringPerceptionEffect(), description: 'Multiplier to find probabilities provided by Gathering Perception', isMultiplier: true},
-                    {...gameResources.getResource('hunting_effort'), isMultiplier: false, value: gameResources.getResource('hunting_effort').amount},
-                    {...gameEffects.getEffect('hunting_amount_multiplier'), isMultiplier: true},
-                    {...gameEffects.getEffect('map_generation_discount'), isMultiplier: true}
+                    {...resourceResponse(gameResources.getResource('hunting_effort')), isMultiplier: false, value: gameResources.getResource('hunting_effort').amount},
+                    {...effectResponse(gameEffects.getEffect('hunting_amount_multiplier')), isMultiplier: true},
+                    {...effectResponse(gameEffects.getEffect('map_generation_discount')), isMultiplier: true}
                 ].filter(one => ((!one.isMultiplier && (one.value > SMALL_NUMBER)) || (one.isMultiplier && (Math.abs(one.value - 1) > SMALL_NUMBER))))
             },
             isAutoinvestigationEnabled: this.isAutoinvestigationEnabled,
@@ -625,7 +627,7 @@ export class MapModule extends GameModule {
 
                 return {
                     ...drop,
-                    resource,
+                    resource: resourceResponse(resource),
                     isRevealed,
                     usages,
                     usagesFor,

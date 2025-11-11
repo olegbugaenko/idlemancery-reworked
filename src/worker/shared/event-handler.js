@@ -35,7 +35,9 @@ export class EventHandler {
             postMessage(message);
         } catch (error) {
             if (error && error.name === 'DataCloneError') {
-                postMessage(JSON.stringify(message));
+                console.warn(`DataCloneError on event: ${event}`, { message, error });
+                throw Error('DataCloneError');
+                // postMessage(JSON.stringify(message));
                 return;
             }
             throw error;
