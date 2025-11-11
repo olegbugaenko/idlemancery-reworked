@@ -22,8 +22,18 @@ export function useWorkerClient(worker) {
 
     // Function to send data to the worker
     const sendData = useCallback((event, payload) => {
-        if (worker) {
-            worker.postMessage({ event, payload: { ...(payload || {}), is_demo: window.IS_DEMO } });
+        if (!worker) return;
+
+        const message = { event, payload: { ...(payload || {}), is_demo: window.IS_DEMO } };
+
+        try {
+            worker.postMessage(message);
+        } catch (error) {
+            if (error && error.name === 'DataCloneError') {
+                worker.postMessage(JSON.stringify(message));
+                return;
+            }
+            throw error;
         }
     }, [worker]);
 

@@ -29,7 +29,17 @@ export class EventHandler {
     }
 
     sendData(event, payload) {
-        postMessage({ event, payload })
+        const message = { event, payload };
+
+        try {
+            postMessage(message);
+        } catch (error) {
+            if (error && error.name === 'DataCloneError') {
+                postMessage(JSON.stringify(message));
+                return;
+            }
+            throw error;
+        }
     }
 
     // some generic keys
