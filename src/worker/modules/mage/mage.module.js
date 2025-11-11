@@ -5,6 +5,7 @@ import {registerPermanentBonuses} from "./permanent-bonuses-db";
 import {cloneDeep} from "lodash";
 import {unlocksApi} from "game-framework/src/general/unlocks-api";
 import {SMALL_NUMBER} from "game-framework/src/utils/consts";
+import { entityResponse } from "../../shared/utils/transform/entities";
 // import {initMageRanks} from "./mage-ranks-db";
 
 export class MageModule extends GameModule {
@@ -999,7 +1000,7 @@ export class MageModule extends GameModule {
         // const presentSpells = items.filter(item => item.isUnlocked);
         return {
             list: items.filter(item => !this.activeEffectsFiltered[item.originalId] && !this.activeEffectsFiltered[item.copyFromId] && (item.efficiency)).map(item => ({
-                ...item,
+                ...entityResponse(item),
                 originalId: item.originalId ?? item.copyFromId,
                 effects: gameEntity.getEffects(item.id, item.level, 0, false, 1, item.modifier.efficiency),
                 duration: gameEntity.getAttribute(item.id, 'current_duration'),

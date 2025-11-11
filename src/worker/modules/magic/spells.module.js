@@ -4,6 +4,7 @@ import {getCostReduction, getMasteryId, getMaxId, initSpellsDB1} from "./spells-
 import {checkMatchingRules} from "../../shared/utils/rule-utils";
 import {SMALL_NUMBER} from "game-framework/src/utils/consts";
 import {charismaMod} from "../items/shop-db";
+import { entityResponse } from "../../shared/utils/transform/entities";
 
 export class SpellModule extends GameModule {
 
@@ -376,7 +377,7 @@ export class SpellModule extends GameModule {
         
         return {
             available: presentSpells.map(spell => ({
-                ...spell,
+                ...entityResponse(spell),
                 currentDuration: this.spells[spell.id]?.duration,
                 isActive: this.spells[spell.id]?.duration > 0,
                 isCasted: this.spells[spell.id]?.isCasted,
@@ -484,7 +485,7 @@ export class SpellModule extends GameModule {
         const items = gameEntity.listEntitiesByTags(['spell']);
 
         return items.map(spell => ({
-            ...spell,
+            ...entityResponse(spell),
             // monitor: this.monitoredData[effect.id] ?? null, // Will need it in nearest future
             isUnlocked: spell.isUnlocked,
         }))

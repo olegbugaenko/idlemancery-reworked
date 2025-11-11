@@ -2,6 +2,7 @@ import {gameEntity, gameResources, resourceApi, resourceCalculators, gameEffects
 import {GameModule} from "../../shared/game-module";
 import {initExpeditionsDB} from "./expeditions-db";
 import {SMALL_NUMBER} from "game-framework/src/utils/consts";
+import { resourceResponse } from "../../shared/utils/transform/resources";
 
 export class ExpeditionsModule extends GameModule {
 
@@ -364,7 +365,7 @@ export class ExpeditionsModule extends GameModule {
                 };
             }),
             expeditionEffort: {
-                ...gameResources.getResource('expedition_effort'),
+                ...resourceResponse(gameResources.getResource('expedition_effort')),
                 isPinned: !!gameCore.getModule('resource-pool').pinnedResources?.['expedition_effort']
             }
         };

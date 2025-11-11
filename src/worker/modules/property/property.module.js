@@ -9,6 +9,9 @@ import {charismaMod} from "../items/shop-db";
 import {registerStructuresStage1} from "./structures-db";
 import {registerArtifactsStage1} from "./artifacts-db";
 import {registerMachineryStage1} from "./machinery-db";
+import { entityResponse } from "../../shared/utils/transform/entities";
+import { resourceResponse } from "../../shared/utils/transform/resources";
+import { effectResponse } from "../../shared/utils/transform/effects";
 
 const DEFAULT_PROPERTY_FILTERS = {
     'all': {
@@ -891,7 +894,7 @@ export class PropertyModule extends GameModule {
                         && !one.isUnpurchaseable
                         && this.matchSearch(one, options.searchData)
                         && (payload.filterId !== 'artifact' || gameCore.getModule('artifacts-crafting').isRecipeUnlocked(one.id))
-                    ),
+                    ).map(one => entityResponse(one)),
                 isSelected: this.selectedFilterId[payload.filterId] === filter.id
             }
 
@@ -1062,7 +1065,7 @@ export class PropertyModule extends GameModule {
 
         const shopStats = [];
         if(Math.abs(gameEffects.getEffectValue('prices_discount') - 1) > SMALL_NUMBER) {
-            shopStats.push({...gameEffects.getEffect('prices_discount'), isMultiplier: true});
+            shopStats.push({...effectResponse(gameEffects.getEffect('prices_discount')), isMultiplier: true});
         }
         if(Math.abs(charismaMod(gameEffects.getEffectValue('attribute_charisma')) - 1) > SMALL_NUMBER) {
             shopStats.push({

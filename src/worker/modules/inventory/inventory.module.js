@@ -4,6 +4,7 @@ import {metabolismIntensityMod, metabolismMod, registerInventoryItems, sellPrice
 import {checkMatchingRules} from "../../shared/utils/rule-utils";
 import {SMALL_NUMBER} from "game-framework/src/utils/consts";
 import {packEffects} from "../../shared/utils/objects";
+import { resourceResponse } from "../../shared/utils/transform/resources";
 
 
 export class InventoryModule extends GameModule {
@@ -410,7 +411,8 @@ export class InventoryModule extends GameModule {
                         || this.inventoryItems[one.id]?.autoconsume?.isEnabled
                         || this.inventoryItems[one.id]?.autosell?.rules?.length
                         || this.inventoryItems[one.id]?.autosell?.isEnabled
-                    ) && this.matchInventorySearch(one, pl.searchData)),
+                    ) && this.matchInventorySearch(one, pl.searchData))
+                    .map(one => resourceResponse(one)),
                 isSelected: filterId === filter.id
             }
 
@@ -433,7 +435,7 @@ export class InventoryModule extends GameModule {
         }
         if(pl?.includeAutomations) {
             presentItems = presentItems.map(item => ({
-                ...item,
+                ...resourceResponse(item),
                 autoconsume: this.inventoryItems[item.id]?.autoconsume ?? { rules: [] },
                 autosell: this.inventoryItems[item.id]?.autosell ?? { rules: [] },
             }))
@@ -443,7 +445,7 @@ export class InventoryModule extends GameModule {
 
         return {
             available: presentItems.map(resource => ({
-                ...resource,
+                ...resourceResponse(resource),
                 isRare: resource.attributes?.isRare,
                 isRareIngredient: resource.attributes?.isRare && resource.tags.includes('ingredient'),
                 isConsumable: resource.tags.includes('consumable'),

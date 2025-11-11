@@ -19,9 +19,9 @@ export class EventHandler {
     processEvent(event) {
         if(!event.data) return;
 
-        const parsed = JSON.parse(event.data);
+        const parsed = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
 
-        if(!parsed.event || !this.handlers[parsed.event] ) {
+        if(!parsed || !parsed.event || !this.handlers[parsed.event] ) {
             throw new Error(`Invalid event: ${parsed.event}`)
         }
 
@@ -29,7 +29,19 @@ export class EventHandler {
     }
 
     sendData(event, payload) {
-        postMessage(JSON.stringify({ event, payload }))
+        const message = { event, payload };
+
+        try {
+            postMessage(message);
+        } catch (error) {
+            if (error && error.name === 'DataCloneError') {
+                console.warn(`DataCloneError on event: ${event}`, { message, error });
+                throw Error('DataCloneError');
+                // postMessage(JSON.stringify(message));
+                return;
+            }
+            throw error;
+        }
     }
 
     // some generic keys

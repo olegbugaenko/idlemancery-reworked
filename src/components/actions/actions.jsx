@@ -9,7 +9,8 @@ import {FlashOverlay} from "../layout/flash-overlay.jsx";
 import {useFlashOnLevelUp} from "../../general/hooks/flash";
 import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
 import {ResourceComparison} from "../shared/resource-comparison.jsx";
-import {cloneDeep} from "lodash";
+import {cloneDeep, debounce, throttle} from "lodash";
+import isEqual from "lodash/isEqual";
 import {ActionXPBreakdown} from "./action-xp-breakdown.jsx";
 import {NewNotificationWrap} from "../shared/new-notification-wrap.jsx";
 import {SearchField} from "../shared/search-field.jsx";
@@ -25,6 +26,7 @@ import {useDrag} from "../../custom-libs/dnd";
 import {CustomButton} from "../shared/buttons/custom-button.jsx";
 import {playSound} from "../../context/sounds/sound-manager";
 import {FavoriteButton} from "../shared/favorite-button.jsx";
+import {useActionsData, updateActionsState} from "../../state/actions-store";
 
 const ACTIONS_SEARCH_SCOPES = [{
     id: 'name',
@@ -43,6 +45,25 @@ const ACTIONS_SEARCH_SCOPES = [{
     label: 'effects'
 }]
 
+const selectAvailableActions = state => state?.available ?? [];
+const selectActionCategories = state => state?.actionCategories ?? [];
+const selectSearchData = state => state?.searchData ?? { search: '', selectedScopes: ['name', 'tags'] };
+const selectShowHidden = state => !!state?.showHidden;
+const selectShowMaxed = state => !!state?.showMaxed;
+const selectCustomFilters = state => state?.customFilters ?? {};
+const selectCustomFiltersOrder = state => state?.customFiltersOrder ?? [];
+const selectAutomationUnlocked = state => !!state?.automationUnlocked;
+const selectAutomationEnabled = state => !!state?.automationEnabled;
+const selectAutotriggerInterval = state => state?.autotriggerIntervalSetting ?? 0;
+const selectRunningList = state => state?.runningList ?? null;
+const selectActionLists = state => state?.actionLists ?? [];
+const selectActionListsUnlocked = state => !!state?.actionListsUnlocked;
+const selectSelectedCategory = state => state?.selectedCategory ?? 'all';
+const selectStats = state => state?.stats ?? {};
+const selectAspects = state => state?.aspects ?? { isUnlocked: false, list: [] };
+
+const MemoizedActionListsPanel = React.memo(ActionListsPanel);
+
 export const Actions = ({}) => {
 
     const worker = useContext(WorkerContext);
@@ -51,37 +72,36 @@ export const Actions = ({}) => {
     const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const { isMobile } = useAppContext();
     const [isDetailVisible, setDetailVisible] = useState(!isMobile);
-    const [actionsData, setActionsData] = useState({
-        available: [],
-        current: undefined,
-        actionCategories: [],
-        actionLists: [],
-        automationEnabled: false,
-        automationUnlocked: false,
-        searchData: {
-            search: '',
-        },
-        selectedCategory: 'all',
-        stats: {},
-        aspects: {
-            isUnlocked: false,
-            list: [],
-        },
-        customFilters: {},
-        customFiltersOrder: [],
-    });
+    const availableActions = useActionsData(selectAvailableActions);
+    const actionCategories = useActionsData(selectActionCategories);
+    const showHidden = useActionsData(selectShowHidden);
+    const showMaxed = useActionsData(selectShowMaxed);
+    const customFilters = useActionsData(selectCustomFilters);
+    const automationUnlocked = useActionsData(selectAutomationUnlocked);
+    const automationEnabled = useActionsData(selectAutomationEnabled);
+    const autotriggerIntervalSetting = useActionsData(selectAutotriggerInterval);
+    const runningList = useActionsData(selectRunningList);
+    const actionLists = useActionsData(selectActionLists);
+    const actionListsUnlocked = useActionsData(selectActionListsUnlocked);
+    const stats = useActionsData(selectStats);
+    const aspects = useActionsData(selectAspects);
     const [detailOpened, setDetailOpened] = useState(null);
     const [editingList, setEditingList] = useState(null);
     const [viewingList, setViewingList] = useState(null);
     const editingListRef = useRef(editingList);
     const viewingListRef = useRef(viewingList);
     const [listData, setListData] = useState(null);
+    const listDataRef = useRef(listData);
     const [viewedData, setViewedData] = useState(null);
+    const viewedDataRef = useRef(viewedData);
     const [selectedAction, setSelectedAction] = useState(null);
     const [resources, setResources] = useState(null);
     const [newUnlocks, setNewUnlocks] = useState({});
     const [isCustomFilterOpened, setCustomFilterOpened] = useState(false);
     const [editingCustomFilter, setEditingCustomFilter] = useState(null);
+
+    const availableActionsRef = useRef(availableActions);
+    const customFiltersRef = useRef(customFilters);
 
     // const [filterId, setFilterId] = useState('all');
 
@@ -102,6 +122,10 @@ export const Actions = ({}) => {
 
     useEffect(() => { editingListRef.current = editingList; }, [editingList]);
     useEffect(() => { viewingListRef.current = viewingList; }, [viewingList]);
+    useEffect(() => { listDataRef.current = listData; }, [listData]);
+    useEffect(() => { viewedDataRef.current = viewedData; }, [viewedData]);
+    useEffect(() => { availableActionsRef.current = availableActions; }, [availableActions]);
+    useEffect(() => { customFiltersRef.current = customFilters; }, [customFilters]);
 
     useEffect(() => {
         const id = viewingListRef.current ?? editingListRef.current;
@@ -120,11 +144,11 @@ export const Actions = ({}) => {
         });
 
         onMessage('actions-data', (actions) => {
-            setActionsData(actions);
+            updateActionsState(actions);
         });
 
         onMessage('action-list-data', (payload) => {
-            console.log('LIST DATA', payload, listData);
+            const currentListData = listDataRef.current;
             if(viewingListRef.current) {
                 setViewedData(payload);
             } else if(editingListRef.current || payload.bForceOpen) {
@@ -133,7 +157,7 @@ export const Actions = ({}) => {
                 }
                 setListData(payload);
                 setViewedData(null);
-            } else if(listData?.copyId || payload.copyId) {
+            } else if(currentListData?.copyId || payload.copyId) {
                 setEditingList(null);
                 setViewingList(null);
                 setListData(payload);
@@ -169,7 +193,7 @@ export const Actions = ({}) => {
 
         return () => {
             removeMessage('new-unlocks-notifications-actions');
-            removeMessage('all-resources');
+            removeMessage('all-resources-inventory');
             removeMessage('actions-data');
             removeMessage('action-list-data');
             removeMessage('action-list-effects');
@@ -182,31 +206,44 @@ export const Actions = ({}) => {
         }
     }, [listData?.copyId])
 
-    const activateAction = (id) => {
+    const activateAction = useCallback((id) => {
         if(currentTourId === 'map' && ['action_gather_carefully', 'action_gather_normal', 'action_hunt_carefully', 'action_hunt_normal'].includes(id)) {
             unlockNextById(9);
         }
         sendData('run-action', { id, isForce: true })
-    }
+    }, [currentTourId, unlockNextById, sendData]);
 
-    const setActionsFilter = (filterId) => {
-        sendData('apply-actions-custom-filter', { id: filterId })
-    }
+    const throttledSetActionsFilter = useMemo(() => throttle((filterId) => {
+        sendData('apply-actions-custom-filter', { id: filterId });
+    }, 200, { leading: true, trailing: true }), [sendData]);
 
-    const setActionDetails = (id) => {
+    useEffect(() => {
+        return () => {
+            throttledSetActionsFilter.cancel();
+        };
+    }, [throttledSetActionsFilter]);
+
+    const setActionsFilter = useCallback((filterId) => {
+        throttledSetActionsFilter(filterId);
+    }, [throttledSetActionsFilter]);
+
+    const setActionDetails = useCallback((id) => {
         // Additionally send signal to highlight action
         sendData('set-monitored', { scope: 'effects', type: 'action', id });
         if(!id) {
             setDetailOpened(null);
-        } else {
-            if(id !== detailOpened) {
+            return;
+        }
+
+        setDetailOpened(prev => {
+            if(id !== prev) {
                 playSound('selection');
             }
-            setDetailOpened(id);
-        }
-    }
+            return id;
+        });
+    }, [sendData]);
 
-    const editListToDetails = (id, options = {}) => {
+    const editListToDetails = useCallback((id, options = {}) => {
         if(id) {
             setViewingList(null);
             if(!options?.clone) {
@@ -221,20 +258,22 @@ export const Actions = ({}) => {
             setEditingList(null);
             setListData({ name: '', actions: []})
         }
-    }
+    }, []);
 
-    const viewListToDetails = (id) => {
+    const viewListToDetails = useCallback((id) => {
         if(!id) {
             setViewedData(null);
         }
         setViewingList(id)
 
-    }
+    }, []);
 
-    const onSelectAction = ({id, name, level}) => {
+    const onSelectAction = useCallback(({id, name}) => {
         playSound('click');
-        if(listData) {
+        if(listDataRef.current) {
             setListData(prev => {
+                if(!prev) return prev;
+
                 const newList = cloneDeep(prev);
                 newList.actions.push({
                     id,
@@ -246,59 +285,50 @@ export const Actions = ({}) => {
                 return newList;
             });
         } else {
-            if(selectedAction === id) {
-                setSelectedAction(null)
-            } else {
-                setSelectedAction(id)
-            }
+            setSelectedAction(prev => (prev === id ? null : id));
         }
-    }
+    }, [sendData]);
 
-    const onDropActionFromList = (index) => {
-        if(listData) {
-            const newList = cloneDeep(listData);
-            newList.actions.splice(index, 1); // Видаляємо по індексу замість фільтрації по id
-            setListData({...newList});
-            sendData('query-action-list-effects', { listData: newList });
-        }
-    }
-
-    const onUpdateActionFromList = (id, key, value) => {
-        if(listData) {
-            const newList = cloneDeep(listData);
-            newList.actions = newList.actions.map(a => a.id !== id ? a : {...a, [key]: value});
-            setListData({...newList});
-            sendData('query-action-list-effects', { listData: newList });
-        }
-    }
-
-    const onUpdateListValue = (key, value) => {
+    const onDropActionFromList = useCallback((index) => {
         setListData(prev => {
             if(!prev) return prev;
-            
+
+            const newList = cloneDeep(prev);
+            newList.actions.splice(index, 1); // Видаляємо по індексу замість фільтрації по id
+            sendData('query-action-list-effects', { listData: newList });
+            return newList;
+        });
+    }, [sendData]);
+
+    const onUpdateActionFromList = useCallback((id, key, value) => {
+        setListData(prev => {
+            if(!prev) return prev;
+
+            const newList = cloneDeep(prev);
+            newList.actions = newList.actions.map(a => a.id !== id ? a : {...a, [key]: value});
+            sendData('query-action-list-effects', { listData: newList });
+            return newList;
+        });
+    }, [sendData]);
+
+    const onUpdateListValue = useCallback((key, value) => {
+        setListData(prev => {
+            if(!prev) return prev;
+
             const newList = cloneDeep(prev);
             newList[key] = value;
             return newList;
         });
         // sendData('query-action-list-effects', { id });
-    }
+    }, []);
 
-    const onCloseList = () => {
+    const onCloseList = useCallback(() => {
         setEditingList(null);
         setListData(null);
         playSound('click');
-    }
+    }, []);
 
-    const [overlayPositions, setOverlayPositions] = useState([]);
-
-    const handleFlash = (position) => {
-        setOverlayPositions((prev) => [...prev, position]);
-        setTimeout(() => {
-            setOverlayPositions((prev) => prev.filter((p) => p !== position));
-        }, 1000);
-    };
-
-    const onDragEndDnD = (result) => {
+    const onDragEndDnD = useCallback((result) => {
         const { source, destination, draggableId } = result;
 
         if (!destination) return;
@@ -314,10 +344,9 @@ export const Actions = ({}) => {
                 sendData('actions-change-custom-filters-order', { sourceIndex: source.index, destinationIndex: destination.index })
             }
         }
+    }, [sendData]);
 
-    };
-
-    const onDragEnd = (dragData, dropData) => {
+    const onDragEnd = useCallback((dragData, dropData) => {
         const { type, data, sourceId, index: sourceIndex } = dragData;
 
         if (!type || !data) return; // не дропнули ні на що
@@ -327,13 +356,13 @@ export const Actions = ({}) => {
 
         if (sourceId === 'actions-list' && targetId === 'action-editor-wrap') {
             // Гравець перетягнув нову дію з "available" в список
-            const action = actionsData.available.find(a => a.id === id);
+            const action = availableActionsRef.current?.find(a => a.id === id);
             if (!action) return;
 
             setListData(prev => {
                 if (!prev) return prev;
-                
-                const newList = { ...prev };
+
+                const newList = cloneDeep(prev);
                 newList.actions.push({
                     id: action.id,
                     name: action.name,
@@ -341,14 +370,8 @@ export const Actions = ({}) => {
                     isAvailable: true,
                     isDynamicTime: false,
                 });
+                sendData('query-action-list-effects', { listData: newList });
                 return newList;
-            });
-            
-            // Отримуємо оновлений стан для запиту
-            setListData(prev => {
-                if (!prev) return prev;
-                sendData('query-action-list-effects', { listData: prev });
-                return prev;
             });
         }
 
@@ -360,23 +383,17 @@ export const Actions = ({}) => {
             if (oldIndex !== newIndex) {
                 setListData(prev => {
                     if (!prev) return prev;
-                    
+
                     const updated = [...prev.actions];
                     const [moved] = updated.splice(oldIndex, 1);
                     updated.splice(newIndex, 0, moved);
                     const newList = { ...prev, actions: updated };
+                    sendData('query-action-list-effects', { listData: newList });
                     return newList;
-                });
-                
-                // Отримуємо оновлений стан для запиту
-                setListData(prev => {
-                    if (!prev) return prev;
-                    sendData('query-action-list-effects', { listData: prev });
-                    return prev;
                 });
             }
         }
-    };
+    }, [sendData]);
 
     const setAutotriggerPriority = useCallback((priority) => {
         setListData(prev => {
@@ -494,64 +511,92 @@ export const Actions = ({}) => {
     }, [])
 
     const toggleAutomation = useCallback(() => {
-        sendData('set-automation-enabled', { flag: !actionsData.automationEnabled })
-    })
+        sendData('set-automation-enabled', { flag: !automationEnabled });
+    }, [sendData, automationEnabled]);
 
     const changeAutomationInterval = useCallback((interval) => {
-        sendData('set-autotrigger-interval', { interval })
-    })
+        sendData('set-autotrigger-interval', { interval });
+    }, [sendData]);
 
     const toggleShowHidden = useCallback(() => {
-        sendData('toggle-show-hidden', { flag: !actionsData.showHidden })
-    }, [actionsData.showHidden]);
+        sendData('toggle-show-hidden', { flag: !showHidden });
+    }, [sendData, showHidden]);
 
     const toggleShowMaxed = useCallback(() => {
-        sendData('toggle-show-maxed', { flag: !actionsData.showMaxed })
-    }, [actionsData.showMaxed]);
+        sendData('toggle-show-maxed', { flag: !showMaxed });
+    }, [sendData, showMaxed]);
 
     const toggleHiddenAction = useCallback((id, flag) => {
         sendData('toggle-hidden-action', { id, flag });
-    })
+    }, [sendData]);
 
-    const setSearch = (searchData) => {
-        sendData('set-actions-search', { searchData });
-    }
+    const debouncedSearchUpdate = useMemo(() => debounce((value) => {
+        sendData('set-actions-search', { searchData: value });
+    }, 200), [sendData]);
 
-    const handlePinToggle = (id, newFlag) => {
+    useEffect(() => {
+        return () => {
+            debouncedSearchUpdate.cancel();
+        };
+    }, [debouncedSearchUpdate]);
+
+    const setSearch = useCallback((nextSearchData) => {
+        debouncedSearchUpdate(nextSearchData);
+    }, [debouncedSearchUpdate]);
+
+    const onCategorySelect = useCallback((categoryId) => {
+        setActionsFilter(categoryId);
+        if(currentTourId === 'actions') {
+            unlockNextById(1);
+        }
+    }, [setActionsFilter, currentTourId, unlockNextById]);
+
+    const openCustomFilters = useCallback(() => {
+        setEditingCustomFilter(null);
+        setCustomFilterOpened(true);
+        if(currentTourId === 'actions') {
+            unlockNextById(12);
+        }
+    }, [currentTourId, unlockNextById, setEditingCustomFilter]);
+
+    const handlePinToggle = useCallback((id, newFlag) => {
         sendData('toggle-actions-custom-filter-pinned', { id, flag: newFlag });
-    };
+    }, [sendData]);
 
-    const handleApplyFilter = (id) => {
+    const handleApplyFilter = useCallback((id) => {
         sendData('apply-actions-custom-filter', { id });
-    };
+    }, [sendData]);
 
-    const handleEditFilter = (id) => {
-        // знаходите фільтр, відкриваєте форму редагування
-        // наприклад:
-        const filterData = actionsData.customFilters[id];
-        setEditingCustomFilter({ ...filterData });
-    };
+    const handleEditFilter = useCallback((id) => {
+        const filterData = customFiltersRef.current?.[id];
+        setEditingCustomFilter(filterData ? { ...filterData } : null);
+    }, []);
 
-    const handleDeleteFilter = (id) => {
+    const handleSaveCustomFilter = useCallback((data) => {
+        sendData('save-actions-custom-filter', data);
+    }, [sendData]);
+
+    const handleDeleteFilter = useCallback((id) => {
         sendData('delete-actions-custom-filter', { id });
-    };
+    }, [sendData]);
 
-    const handleAddFilter = () => {
+    const handleAddFilter = useCallback(() => {
         if(currentTourId === 'actions') {
             unlockNextById(14);
         }
         setEditingCustomFilter({ rules: [], condition: '', category: 'action', name: '' });
-    };
+    }, [currentTourId, unlockNextById]);
 
-    const handleClose = () => {
+    const handleClose = useCallback(() => {
         if(currentTourId === 'actions') {
             unlockNextById(23);
         }
+        setEditingCustomFilter(null);
         setCustomFilterOpened(false);
-    };
+    }, [currentTourId, unlockNextById]);
 
     if(currentTourId === 'actions') {
-        if(actionsData.actionCategories.find(one => one.isSelected)?.id === 'all' && stepIndex === 1) {
+        if(actionCategories.find(one => one.isSelected)?.id === 'all' && stepIndex === 1) {
             jumpOver(2);
         }
 
@@ -586,7 +631,7 @@ export const Actions = ({}) => {
             clearInterval(interval);
         }
 
-    }, [currentTourId, stepIndex, actionsData?.runningList?.id])
+    }, [currentTourId, stepIndex, runningList?.id])
 
     onMessage('actions-running-for-craft-tour', (data) => {
         if(data.effects.some(one => one.id === 'inventory_wood')) {
@@ -613,127 +658,61 @@ export const Actions = ({}) => {
     return (
                 <div className={'actions-wrap'}>
                     <div className={'ingame-box actions'}>
-
-                        <div className={'categories flex-container'}>
-                            <ul className={'menu actions-menu'}>
-                                {actionsData.actionCategories.filter(one => one.isPinned || one.isSelected).map(category => (<li key={category.id} id={`actions-menu-${category.id}`} className={`category ${category.isSelected ? 'active' : ''}`} onClick={
-                                    () => {
-                                        setActionsFilter(category.id);
-                                        if(currentTourId === 'actions') {
-                                            unlockNextById(1);
-                                        }
-                                    }
-                                }>
-                                    <NewNotificationWrap isNew={newUnlocks.actions?.items?.all?.items?.[category.id]?.hasNew}>
-                                        <span>{category.name}({category.items.length})</span>
-                                    </NewNotificationWrap>
-                                </li> ))}
-                                <li className={'add-custom-filter additional'}>
-                                    <div className={'add-wrap button-like'} onClick={(e) => {
-                                        setCustomFilterOpened(true);
-                                        if(currentTourId === 'actions') {
-                                            unlockNextById(12);
-                                        }
-                                        // setEditingCustomFilter({ rules: [], condition: '', category: 'action', name: ''})
-                                    }}>
-                                        <div className={'icon-content edit-icon interface-icon tiny'}>
-                                            <img src={"icons/interface/edit-icon.png"}/>
-                                        </div>
-                                        <span className={'create-custom'} >Edit Filters</span>
-                                    </div>
-
-                                    {isCustomFilterOpened ? (<div className={'custom-filter-edit-wrap'}>
-                                        {editingCustomFilter ? (
-                                            <CustomFilter
-                                                prefix={'actions-filter'}
-                                                category={'action'}
-                                                id={editingCustomFilter?.id}
-                                                name={editingCustomFilter?.name}
-                                                rules={editingCustomFilter?.rules}
-                                                condition={editingCustomFilter?.condition}
-                                                onCancel={() => {
-                                                    setEditingCustomFilter(null);
-                                                }}
-                                                onSave={(data) => {
-                                                    sendData('save-actions-custom-filter', data);
-                                                    setEditingCustomFilter(null);
-                                                }}
-                                            />)
-                                        : (<CustomFiltersList
-                                            filterOrder={actionsData.customFiltersOrder}
-                                            filters={actionsData.customFilters}
-                                            onPinToggle={handlePinToggle}
-                                            onApply={handleApplyFilter}
-                                            onEdit={handleEditFilter}
-                                            onDelete={handleDeleteFilter}
-                                            showAddButton
-                                            onAdd={handleAddFilter}
-                                            showCloseButton
-                                            onClose={handleClose}
-                                            onDragEnd={onDragEndDnD}
-                                        />)}
-                                    </div> ) : null}
-
-                                </li>
-                            </ul>
-                            <div className={'additional-filters'}>
-                                <label>
-                                    <SearchField
-                                        placeholder={'Search'}
-                                        value={{
-                                            ...(actionsData.searchData || {
-                                                search: '',
-                                                selectedScopes: ['name', 'tags']
-                                            })
-                                        }}
-                                        onSetValue={val => setSearch(val)}
-                                        scopes={ACTIONS_SEARCH_SCOPES}
-                                    />
-                                </label>
-                                <label>
-                                    <input type={"checkbox"} checked={!!actionsData.showHidden} onChange={toggleShowHidden}/>
-                                    Show hidden
-                                </label>
-                                <label>
-                                    <input type={"checkbox"} checked={!!actionsData.showMaxed} onChange={toggleShowMaxed}/>
-                                    Show completed
-                                </label>
-                                {isMobile ? (<div>
-                                    <span className={'highlighted-span'} onClick={() => setDetailVisible(true)}>Info</span>
-                                </div>) : null}
-                                <HowToSign scope={'actions'} />
-                            </div>
-                        </div>
-                        <div className={'list-wrap'} id={'actions-list-wrap'}>
-                            <PerfectScrollbar>
-                                <div>
-                                    <div className="flex-container inner-actions-wrap">
-                                        {actionsData.available.map((action, index) =>
-                                            <NewNotificationWrap key={action.id} id={action.id} className={'narrow-wrapper'} isNew={newUnlocks.actions?.items?.all?.items?.[actionsData.selectedCategory]?.items?.[action.id]?.hasNew}>
-                                                <DraggableActionCard
-                                                    isEditingList={!!listData}
-                                                    index={index}
-                                                    key={action.id}
-                                                    {...action}
-                                                    onFlash={handleFlash}
-                                                    onActivate={activateAction}
-                                                    onShowDetails={setActionDetails}
-                                                    onSelect={onSelectAction}
-                                                    toggleHiddenAction={toggleHiddenAction}
-                                                    isSelected={selectedAction && (selectedAction === action.id)}
-                                                />
-                                            </NewNotificationWrap>)}
-
-                                    </div>
-
-                                    {overlayPositions.map((position, index) => (
-                                            <FlashOverlay key={index} position={position} />
-                                    ))}
-                                </div>
-                            </PerfectScrollbar>
-                        </div>
-
-                        {actionsData.actionListsUnlocked ? (<ActionListsPanel automationUnlocked={actionsData.automationUnlocked} editListToDetails={editListToDetails} lists={actionsData.actionLists} viewListToDetails={viewListToDetails} runningList={actionsData.runningList} automationEnabled={actionsData.automationEnabled} toggleAutomation={toggleAutomation} autotriggerIntervalSetting={actionsData.autotriggerIntervalSetting} changeAutomationInterval={changeAutomationInterval}/>) : null}
+                        <ActionsFilters
+                            selectors={{
+                                categories: selectActionCategories,
+                                customFilters: selectCustomFilters,
+                                customFiltersOrder: selectCustomFiltersOrder,
+                                search: selectSearchData,
+                                showHidden: selectShowHidden,
+                                showMaxed: selectShowMaxed,
+                            }}
+                            newUnlocks={newUnlocks}
+                            isCustomFilterOpened={isCustomFilterOpened}
+                            onOpenCustomFilters={openCustomFilters}
+                            onCloseCustomFilters={handleClose}
+                            editingCustomFilter={editingCustomFilter}
+                            setEditingCustomFilter={setEditingCustomFilter}
+                            onSaveCustomFilter={handleSaveCustomFilter}
+                            onApplyFilter={handleApplyFilter}
+                            onEditFilter={handleEditFilter}
+                            onDeleteFilter={handleDeleteFilter}
+                            onAddFilter={handleAddFilter}
+                            onPinToggle={handlePinToggle}
+                            onSelectCategory={onCategorySelect}
+                            onSearchChange={setSearch}
+                            onToggleShowHidden={toggleShowHidden}
+                            onToggleShowMaxed={toggleShowMaxed}
+                            onDragEndFilters={onDragEndDnD}
+                            isMobile={isMobile}
+                            onShowDetails={() => setDetailVisible(true)}
+                        />
+                        <AvailableActionsList
+                            selectors={{
+                                available: selectAvailableActions,
+                                selectedCategory: selectSelectedCategory,
+                            }}
+                            listData={listData}
+                            newUnlocks={newUnlocks}
+                            onActivate={activateAction}
+                            onShowDetails={setActionDetails}
+                            onSelect={onSelectAction}
+                            toggleHiddenAction={toggleHiddenAction}
+                            selectedAction={selectedAction}
+                        />
+                        {actionListsUnlocked ? (
+                            <MemoizedActionListsPanel
+                                automationUnlocked={automationUnlocked}
+                                editListToDetails={editListToDetails}
+                                lists={actionLists}
+                                viewListToDetails={viewListToDetails}
+                                runningList={runningList}
+                                automationEnabled={automationEnabled}
+                                toggleAutomation={toggleAutomation}
+                                autotriggerIntervalSetting={autotriggerIntervalSetting}
+                                changeAutomationInterval={changeAutomationInterval}
+                            />
+                        ) : null}
                     </div>
                     {(!isMobile || isDetailVisible || listData || viewedData || selectedAction) ? (<div className={`action-detail ingame-box detail-blade ${listData ? 'wide-blade' : ''} ${viewedData || listData ? 'forced-bottom' : ''}`}>
                         <DetailBlade
@@ -754,11 +733,11 @@ export const Actions = ({}) => {
                             onSetAutotriggerPattern={onSetAutotriggerPattern}
                             onToggleAutotrigger={onToggleAutotrigger}
                             resources={resources}
-                            automationUnlocked={actionsData.automationUnlocked}
-                            stats={actionsData.stats}
-                            aspects={actionsData.aspects}
+                            automationUnlocked={automationUnlocked}
+                            stats={stats}
+                            aspects={aspects}
                             onCloseDetails={() => setSelectedAction(null)}
-                            setDetailVisible = {setDetailVisible}
+                            setDetailVisible={setDetailVisible}
                             onDragEnd={onDragEnd}
                         />
                     </div>) : null}
@@ -767,7 +746,7 @@ export const Actions = ({}) => {
 
 }
 
-export const DetailBlade = ({
+const DetailBladeComponent = ({
     actionId,
     isSelected,
     viewListId,
@@ -861,16 +840,281 @@ export const DetailBlade = ({
     return (<GeneralStats stats={stats} aspects={aspects} setDetailVisible={setDetailVisible}/>);
 }
 
-const DraggableActionCard = ({ id, index, ...props }) => {
+export const DetailBlade = React.memo(DetailBladeComponent);
 
+const ActionsFilters = React.memo(({
+    selectors,
+    newUnlocks,
+    isCustomFilterOpened,
+    onOpenCustomFilters,
+    onCloseCustomFilters,
+    editingCustomFilter,
+    setEditingCustomFilter,
+    onSaveCustomFilter,
+    onApplyFilter,
+    onEditFilter,
+    onDeleteFilter,
+    onAddFilter,
+    onPinToggle,
+    onSelectCategory,
+    onSearchChange,
+    onToggleShowHidden,
+    onToggleShowMaxed,
+    onDragEndFilters,
+    isMobile,
+    onShowDetails,
+}) => {
+    const categories = useActionsData(selectors.categories);
+    const customFilters = useActionsData(selectors.customFilters);
+    const customFiltersOrder = useActionsData(selectors.customFiltersOrder);
+    const searchValue = useActionsData(selectors.search);
+    const showHidden = useActionsData(selectors.showHidden);
+    const showMaxed = useActionsData(selectors.showMaxed);
+
+    return (
+        <div className={'categories flex-container'}>
+            <ul className={'menu actions-menu'}>
+                {categories.filter(one => one.isPinned || one.isSelected).map(category => (
+                    <li
+                        key={category.id}
+                        id={`actions-menu-${category.id}`}
+                        className={`category ${category.isSelected ? 'active' : ''}`}
+                        onClick={() => onSelectCategory(category.id)}
+                    >
+                        <NewNotificationWrap isNew={newUnlocks.actions?.items?.all?.items?.[category.id]?.hasNew}>
+                            <span>{category.name}({category.items.length})</span>
+                        </NewNotificationWrap>
+                    </li>
+                ))}
+                <li className={'add-custom-filter additional'}>
+                    <div className={'add-wrap button-like'} onClick={onOpenCustomFilters}>
+                        <div className={'icon-content edit-icon interface-icon tiny'}>
+                            <img src={"icons/interface/edit-icon.png"}/>
+                        </div>
+                        <span className={'create-custom'}>Edit Filters</span>
+                    </div>
+
+                    {isCustomFilterOpened ? (
+                        <div className={'custom-filter-edit-wrap'}>
+                            {editingCustomFilter ? (
+                                <CustomFilter
+                                    prefix={'actions-filter'}
+                                    category={'action'}
+                                    id={editingCustomFilter?.id}
+                                    name={editingCustomFilter?.name}
+                                    rules={editingCustomFilter?.rules}
+                                    condition={editingCustomFilter?.condition}
+                                    onCancel={() => {
+                                        setEditingCustomFilter(null);
+                                    }}
+                                    onSave={(data) => {
+                                        onSaveCustomFilter(data);
+                                        setEditingCustomFilter(null);
+                                    }}
+                                />
+                            ) : (
+                                <CustomFiltersList
+                                    filterOrder={customFiltersOrder}
+                                    filters={customFilters}
+                                    onPinToggle={onPinToggle}
+                                    onApply={onApplyFilter}
+                                    onEdit={onEditFilter}
+                                    onDelete={onDeleteFilter}
+                                    showAddButton
+                                    onAdd={onAddFilter}
+                                    showCloseButton
+                                    onClose={onCloseCustomFilters}
+                                    onDragEnd={onDragEndFilters}
+                                />
+                            )}
+                        </div>
+                    ) : null}
+
+                </li>
+            </ul>
+            <div className={'additional-filters'}>
+                <label>
+                    <SearchField
+                        placeholder={'Search'}
+                        value={{
+                            ...(searchValue || {
+                                search: '',
+                                selectedScopes: ['name', 'tags'],
+                            }),
+                        }}
+                        onSetValue={onSearchChange}
+                        scopes={ACTIONS_SEARCH_SCOPES}
+                    />
+                </label>
+                <label>
+                    <input type={'checkbox'} checked={!!showHidden} onChange={onToggleShowHidden}/>
+                    Show hidden
+                </label>
+                <label>
+                    <input type={'checkbox'} checked={!!showMaxed} onChange={onToggleShowMaxed}/>
+                    Show completed
+                </label>
+                {isMobile ? (
+                    <div>
+                        <span className={'highlighted-span'} onClick={onShowDetails}>Info</span>
+                    </div>
+                ) : null}
+                <HowToSign scope={'actions'} />
+            </div>
+        </div>
+    );
+});
+
+const AvailableActionsList = React.memo(({
+    selectors,
+    listData,
+    newUnlocks,
+    onActivate,
+    onShowDetails,
+    onSelect,
+    toggleHiddenAction,
+    selectedAction,
+}) => {
+    const available = useActionsData(selectors.available);
+    const selectedCategory = useActionsData(selectors.selectedCategory);
+    const [overlayPositions, setOverlayPositions] = useState([]);
+
+    const handleFlash = useCallback((position) => {
+        setOverlayPositions((prev) => [...prev, position]);
+        setTimeout(() => {
+            setOverlayPositions((prev) => prev.filter((p) => p !== position));
+        }, 1000);
+    }, []);
+
+    return (
+        <div className={'list-wrap'} id={'actions-list-wrap'}>
+            <PerfectScrollbar>
+                <div>
+                    <div className="flex-container inner-actions-wrap">
+                        {available.map((action, index) => (
+                            <ActionListItem
+                                key={action.id}
+                                action={action}
+                                index={index}
+                                isEditingList={!!listData}
+                                isNew={newUnlocks.actions?.items?.all?.items?.[selectedCategory]?.items?.[action.id]?.hasNew}
+                                onFlash={handleFlash}
+                                onActivate={onActivate}
+                                onShowDetails={onShowDetails}
+                                onSelect={onSelect}
+                                toggleHiddenAction={toggleHiddenAction}
+                                isSelected={selectedAction === action.id}
+                            />
+                        ))}
+
+                    </div>
+
+                    {overlayPositions.map((position, index) => (
+                        <FlashOverlay key={index} position={position} />
+                    ))}
+                </div>
+            </PerfectScrollbar>
+        </div>
+    );
+});
+
+const ActionListItemComponent = ({
+    action,
+    index,
+    isEditingList,
+    isNew,
+    onActivate,
+    onFlash,
+    onSelect,
+    onShowDetails,
+    toggleHiddenAction,
+    isSelected,
+}) => {
+    return (
+        <NewNotificationWrap
+            id={action.id}
+            className={'narrow-wrapper'}
+            isNew={isNew}
+        >
+            <DraggableActionCard
+                action={action}
+                index={index}
+                isEditingList={isEditingList}
+                onActivate={onActivate}
+                onFlash={onFlash}
+                onSelect={onSelect}
+                onShowDetails={onShowDetails}
+                toggleHiddenAction={toggleHiddenAction}
+                isSelected={isSelected}
+            />
+        </NewNotificationWrap>
+    );
+};
+
+const areActionListItemPropsEqual = (prev, next) => {
+    return (
+        prev.index === next.index &&
+        prev.isEditingList === next.isEditingList &&
+        prev.isNew === next.isNew &&
+        prev.isSelected === next.isSelected &&
+        prev.onActivate === next.onActivate &&
+        prev.onFlash === next.onFlash &&
+        prev.onSelect === next.onSelect &&
+        prev.onShowDetails === next.onShowDetails &&
+        prev.toggleHiddenAction === next.toggleHiddenAction &&
+        isEqual(prev.action, next.action)
+    );
+};
+
+const ActionListItem = React.memo(ActionListItemComponent, areActionListItemPropsEqual);
+
+const DraggableActionCardComponent = ({
+    action,
+    index,
+    isEditingList,
+    onActivate,
+    onFlash,
+    onSelect,
+    onShowDetails,
+    toggleHiddenAction,
+    isSelected,
+}) => {
+    const { id } = action;
     const {ref, props: dragProps} = useDrag({ type: 'action', id: `action_card_${id}`, sourceId: 'actions-list', data: { id } });
 
     return (
         <div ref={ref} {...dragProps}>
-            <ActionCard {...props} id={id} index={index} />
+            <ActionCard
+                {...action}
+                id={id}
+                index={index}
+                isEditingList={isEditingList}
+                onActivate={onActivate}
+                onFlash={onFlash}
+                onSelect={onSelect}
+                onShowDetails={onShowDetails}
+                toggleHiddenAction={toggleHiddenAction}
+                isSelected={isSelected}
+            />
         </div>
     );
 };
+
+const areDraggablePropsEqual = (prev, next) => {
+    return (
+        prev.index === next.index &&
+        prev.isEditingList === next.isEditingList &&
+        prev.isSelected === next.isSelected &&
+        prev.onActivate === next.onActivate &&
+        prev.onFlash === next.onFlash &&
+        prev.onSelect === next.onSelect &&
+        prev.onShowDetails === next.onShowDetails &&
+        prev.toggleHiddenAction === next.toggleHiddenAction &&
+        isEqual(prev.action, next.action)
+    );
+};
+
+const DraggableActionCard = React.memo(DraggableActionCardComponent, areDraggablePropsEqual);
 
 export const ActionCard = React.memo(({ id, category, isFavorite, monitored, entityEfficiency, isEditingList, index, isCapped, name, level, max, xp, maxXP, xpRate, isActive, effort, isLeveled, focused, isTraining, actionEffect, currentEffects, potentialEffects, isHidden, onFlash, onSelect, onActivate, onShowDetails, toggleHiddenAction, missingResourceId, isSelected, tags, ...props}) => {
     const elementRef = useRef(null);

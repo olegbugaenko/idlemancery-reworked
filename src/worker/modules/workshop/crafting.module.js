@@ -4,6 +4,7 @@ import {gameCore, gameEffects, gameEntity, gameResources, resourceCalculators, r
 import {CraftingListsSubmodule} from "./crafting-lists.submodule";
 import {SMALL_NUMBER} from "game-framework/src/utils/consts";
 import {packEffects} from "../../shared/utils/objects";
+import { entityResponse } from "../../shared/utils/transform/entities";
 
 export class CraftingModule extends GameModule {
 
@@ -1330,7 +1331,7 @@ export class CraftingModule extends GameModule {
 
         const available = entities.map(recipe => {
             const baseRecipe = {
-                ...recipe,
+                ...entityResponse(recipe),
                 icon_id: recipe.resourceId,
                 effort: this.craftingSlots[recipe.id]?.effort || 0,
                 isLocked: this.craftingSlots[recipe.id]?.isLocked || false,
@@ -1467,7 +1468,7 @@ export class CraftingModule extends GameModule {
         }
 
         return {
-            ...entity,
+            ...entityResponse(entity),
             efficiency,
             bottleNeck,
             rebalanceInfo,

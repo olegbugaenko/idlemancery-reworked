@@ -3,6 +3,7 @@ import {gameResources, gameEntity, gameCore, gameEffects, resourceCalculators} f
 import {registerInventoryItems} from "../inventory/inventory-items-db";
 import {registerCommomEffects} from "./common-effects-db";
 import {SMALL_NUMBER} from "game-framework/src/utils/consts";
+import { resourceResponse } from "../../shared/utils/transform/resources";
 
 export class ResourcePoolModule extends GameModule {
     constructor() {
@@ -19,7 +20,7 @@ export class ResourcePoolModule extends GameModule {
 
         this.eventHandler.registerHandler('query-resources-data', (pl) => {
             const data = this.getResourcesData(pl).map(one => ({
-                ...one,
+                ...resourceResponse(one),
                 capProgress: one.isService ? Math.min(one.targetEfficiency || 0, 1) : (one.hasCap ? one.amount / Math.max(1.e-8, one.cap) : 0),
                 total: one.isService ? one.balance + one.consumption : one.cap,
             }));

@@ -1,6 +1,8 @@
 import {gameEntity, gameResources, resourceCalculators, resourceApi, gameEffects, gameCore} from "game-framework"
 import {GameModule} from "../../shared/game-module";
 import {getWateringEffectId, registerPlantations} from "./plantation-db";
+import { effectResponse } from "../../shared/utils/transform/effects";
+import { resourceResponse } from "../../shared/utils/transform/resources";
 
 export class PlantationsModule extends GameModule {
 
@@ -198,8 +200,8 @@ export class PlantationsModule extends GameModule {
             })),
             slots,
             isWateringUnlocked: gameResources.isResourceUnlocked('inventory_water'),
-            maxWatering: gameEffects.getEffect('plantations_max_watering'),
-            waterResource: gameResources.getResource('inventory_water'),
+            maxWatering: effectResponse(gameEffects.getEffect('plantations_max_watering')),
+            waterResource: resourceResponse(gameResources.getResource('inventory_water')),
             isAutomationUnlocked: gameEntity.getLevel('shop_item_purchase_manager') > 0,
         }
     }
@@ -226,8 +228,8 @@ export class PlantationsModule extends GameModule {
             purchaseMultiplier: 1,
             wateringMult: gameEffects.getEffectValue(getWateringEffectId(entity.id)),
             isWateringUnlocked: gameResources.isResourceUnlocked('inventory_water'),
-            maxWatering: gameEffects.getEffect('plantations_max_watering'),
-            waterResource: gameResources.getResource('inventory_water'),
+            maxWatering: effectResponse(gameEffects.getEffect('plantations_max_watering')),
+            waterResource: resourceResponse(gameResources.getResource('inventory_water')),
             wateringEffects: gameEntity.getEffects(`${id}_watering_bonus`),
             nextWateringEffects: gameEntity.getEffects(`${id}_watering_bonus`, 1),
         }

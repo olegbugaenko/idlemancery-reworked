@@ -22,8 +22,18 @@ export function useWorkerClient(worker) {
 
     // Function to send data to the worker
     const sendData = useCallback((event, payload) => {
-        if (worker) {
-            worker.postMessage(JSON.stringify({ event, payload: {...(payload || {}), is_demo: window.IS_DEMO } }));
+        if (!worker) return;
+
+        const message = { event, payload: { ...(payload || {}), is_demo: window.IS_DEMO } };
+
+        try {
+            worker.postMessage(message);
+        } catch (error) {
+            if (error && error.name === 'DataCloneError') {
+                worker.postMessage(JSON.stringify(message));
+                return;
+            }
+            throw error;
         }
     }, [worker]);
 
@@ -31,9 +41,9 @@ export function useWorkerClient(worker) {
     const handleMessage = useCallback((event) => {
         if (!event.data) return;
 
-        const parsed = JSON.parse(event.data);
+        const parsed = event.data;
 
-        if (!parsed.event || !globalEventHandlers[parsed.event]) {
+        if (!parsed || !parsed.event || !globalEventHandlers[parsed.event]) {
             // console.warn('Invalid event or handler not registered', parsed);
             // console.warn(globalEventHandlers);
             // console.warn(parsed)
