@@ -1,4 +1,4 @@
-import {useSyncExternalStoreWithSelector} from 'react';
+import {useEffect, useRef, useState} from 'react';
 
 const defaultState = {
     available: [],
@@ -75,14 +75,61 @@ export const resetActionsState = () => {
 
 const identity = (value) => value;
 
+const ensureSelector = (selector) => {
+    if (typeof selector === 'function') {
+        return selector;
+    }
+
+    return identity;
+};
+
+const ensureEqualityFn = (isEqual) => {
+    if (typeof isEqual === 'function') {
+        return isEqual;
+    }
+
+    return Object.is;
+};
+
 export const useActionsData = (selector = identity, isEqual = Object.is) => {
-    return useSyncExternalStoreWithSelector(
-        subscribeActionsStore,
-        getSnapshot,
-        getSnapshot,
-        selector,
-        isEqual
-    );
+    const latestSelectionRef = useRef();
+    const selectorRef = useRef(() => state);
+    const equalityFnRef = useRef(Object.is);
+
+    selectorRef.current = ensureSelector(selector);
+    equalityFnRef.current = ensureEqualityFn(isEqual);
+
+    const [selection, setSelection] = useState(() => {
+        const currentSelector = selectorRef.current;
+        const value = currentSelector(getSnapshot());
+        latestSelectionRef.current = value;
+        return value;
+    });
+
+    useEffect(() => {
+        const nextSelection = selectorRef.current(getSnapshot());
+        if (!equalityFnRef.current(latestSelectionRef.current, nextSelection)) {
+            latestSelectionRef.current = nextSelection;
+            setSelection(nextSelection);
+        }
+    }, [selector, isEqual]);
+
+    useEffect(() => {
+        const handleChange = () => {
+            const nextSelection = selectorRef.current(getSnapshot());
+            if (!equalityFnRef.current(latestSelectionRef.current, nextSelection)) {
+                latestSelectionRef.current = nextSelection;
+                setSelection(nextSelection);
+            }
+        };
+
+        const unsubscribe = subscribeActionsStore(handleChange);
+        return () => {
+            unsubscribe?.();
+        };
+    }, []);
+
+    return selection;
 };
 
 export const getDefaultActionsState = () => defaultState;
