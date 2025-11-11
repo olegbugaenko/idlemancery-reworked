@@ -9,7 +9,7 @@ import {FlashOverlay} from "../layout/flash-overlay.jsx";
 import {useFlashOnLevelUp} from "../../general/hooks/flash";
 import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
 import {ResourceComparison} from "../shared/resource-comparison.jsx";
-import {cloneDeep} from "lodash";
+import {cloneDeep, isEqual} from "lodash";
 import {ActionXPBreakdown} from "./action-xp-breakdown.jsx";
 import {NewNotificationWrap} from "../shared/new-notification-wrap.jsx";
 import {SearchField} from "../shared/search-field.jsx";
@@ -25,6 +25,123 @@ import {useDrag} from "../../custom-libs/dnd";
 import {CustomButton} from "../shared/buttons/custom-button.jsx";
 import {playSound} from "../../context/sounds/sound-manager";
 import {FavoriteButton} from "../shared/favorite-button.jsx";
+
+const ACTION_PRIMITIVE_KEYS = [
+    'id',
+    'index',
+    'isFavorite',
+    'isEditingList',
+    'isSelected',
+    'level',
+    'xp',
+    'maxXP',
+    'entityEfficiency',
+    'isLeveled',
+    'isHidden',
+    'xpRate',
+];
+
+const ACTION_COMPLEX_KEYS = ['isActive', 'monitored', 'focused'];
+
+const areActionPropsStable = (prevAction = {}, nextAction = {}) => {
+    for (const key of ACTION_PRIMITIVE_KEYS) {
+        if (prevAction[key] !== nextAction[key]) {
+            return false;
+        }
+    }
+
+    for (const key of ACTION_COMPLEX_KEYS) {
+        const prevValue = prevAction[key];
+        const nextValue = nextAction[key];
+
+        if (prevValue === nextValue) {
+            continue;
+        }
+
+        if (!isEqual(prevValue, nextValue)) {
+            return false;
+        }
+    }
+
+    return true;
+};
+
+const reuseIfEqual = (prevValue, nextValue) => {
+    if (prevValue === nextValue) {
+        return prevValue;
+    }
+
+    if (prevValue == null || nextValue == null) {
+        return nextValue;
+    }
+
+    if (typeof prevValue !== 'object' || typeof nextValue !== 'object') {
+        return nextValue;
+    }
+
+    return isEqual(prevValue, nextValue) ? prevValue : nextValue;
+};
+
+const stabiliseAvailableActions = (prevAvailable = [], nextAvailable = []) => {
+    if (!prevAvailable.length) {
+        return nextAvailable;
+    }
+
+    const prevById = new Map(prevAvailable.map((action) => [action.id, action]));
+    const stabilised = nextAvailable.map((action) => {
+        const prevAction = prevById.get(action.id);
+
+        if (!prevAction) {
+            return action;
+        }
+
+        if (!areActionPropsStable(prevAction, action)) {
+            return action;
+        }
+
+        return prevAction;
+    });
+
+    if (
+        stabilised.length === prevAvailable.length &&
+        stabilised.every((action, idx) => action === prevAvailable[idx])
+    ) {
+        return prevAvailable;
+    }
+
+    return stabilised;
+};
+
+const stabiliseActionsPayload = (prevState, nextState) => {
+    if (!prevState) {
+        return nextState;
+    }
+
+    const available = stabiliseAvailableActions(prevState.available, nextState.available);
+
+    const stabilised = {
+        ...nextState,
+        available,
+        current: reuseIfEqual(prevState.current, nextState.current),
+        stats: reuseIfEqual(prevState.stats, nextState.stats),
+        aspects: reuseIfEqual(prevState.aspects, nextState.aspects),
+        actionCategories: reuseIfEqual(prevState.actionCategories, nextState.actionCategories),
+        actionLists: reuseIfEqual(prevState.actionLists, nextState.actionLists),
+        customFilters: reuseIfEqual(prevState.customFilters, nextState.customFilters),
+        customFiltersOrder: reuseIfEqual(prevState.customFiltersOrder, nextState.customFiltersOrder),
+        searchData: reuseIfEqual(prevState.searchData, nextState.searchData),
+    };
+
+    const prevKeys = Object.keys(prevState);
+    if (
+        prevKeys.length === Object.keys(stabilised).length &&
+        prevKeys.every((key) => prevState[key] === stabilised[key])
+    ) {
+        return prevState;
+    }
+
+    return stabilised;
+};
 
 const ACTIONS_SEARCH_SCOPES = [{
     id: 'name',
@@ -120,7 +237,7 @@ export const Actions = ({}) => {
         });
 
         onMessage('actions-data', (actions) => {
-            setActionsData(actions);
+            setActionsData((prev) => stabiliseActionsPayload(prev, actions));
         });
 
         onMessage('action-list-data', (payload) => {
