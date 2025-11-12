@@ -23,7 +23,7 @@ import CustomFiltersList from "../shared/custom-filter-list.jsx";
 import {useAppContext} from "../../context/ui-context";
 
 import {useDrag} from "../../custom-libs/dnd";
-import {CustomButton} from "../shared/buttons/custom-button.jsx";
+import {CustomButtonMemoized} from "../shared/buttons/custom-button.jsx";
 import {playSound} from "../../context/sounds/sound-manager";
 import {FavoriteButton} from "../shared/favorite-button.jsx";
 import {useActionsData, updateActionsState} from "../../state/actions-store";
@@ -1137,6 +1137,54 @@ export const ActionCard = React.memo(({ id, category, isFavorite, monitored, ent
 
     const [isXpVisible, setIsXpVisible] = useState(false);
 
+    const handleStopAction = useCallback((e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onActivate();
+        playSound('click');
+    }, [onActivate]);
+
+    const handleRunAction = useCallback((e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if(currentTourId === 'initial') {
+            unlockNextById(8);
+        }
+        if(currentTourId === 'actions') {
+            unlockNextById(7);
+        }
+        onActivate(id);
+        playSound('click');
+    }, [id, currentTourId, unlockNextById, onActivate]);
+
+    const handleToggleHidden = useCallback((e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleHiddenAction(id, !isHidden);
+        playSound('click');
+    }, [id, isHidden, toggleHiddenAction]);
+
+    const handleMouseEnter = useCallback(() => {
+        onShowDetails(id);
+    }, [id, onShowDetails]);
+
+    const handleMouseLeave = useCallback(() => {
+        if((stepIndex !== 6) || currentTourId !== 'initial') {
+            onShowDetails(null);
+        }
+    }, [stepIndex, currentTourId, onShowDetails]);
+
+    const handleCardClick = useCallback(() => {
+        onSelect({
+            id,
+            name,
+            level
+        });
+        if(currentTourId === 'actions' && stepIndex === 2) {
+            unlockNextById(2);
+        }
+    }, [id, name, level, currentTourId, stepIndex, unlockNextById, onSelect]);
+
     if(currentTourId === 'initial') {
         if(id === 'action_visit_city') {
             if(level < 2) {
@@ -1168,27 +1216,10 @@ export const ActionCard = React.memo(({ id, category, isFavorite, monitored, ent
                     id={`item_${id}`}
                     ref={elementRef}
                     className={`card ${category} ${tags.includes('training') ? 'training' : ''} action ${isSelected ? 'selected' : ''} ${isActive ? 'active' : ''} ${entityEfficiency < 1 ? ' efficiency-dropped' : ''} flashable ${monitored ?? ''}`}
-                    onMouseEnter={() => {
-                        onShowDetails(id)
-                    }}
-                    onMouseOver={() => {
-                        onShowDetails(id)
-                    }}
-                    onMouseLeave={() => {
-                        if((stepIndex !== 6) || currentTourId !== 'initial') {
-                            onShowDetails(null)
-                        }
-                    }}
-                    onClick={() => {
-                        onSelect({
-                            id,
-                            name,
-                            level
-                        })
-                        if(currentTourId === 'actions' && stepIndex === 2) {
-                            unlockNextById(2);
-                        }
-                    }}>
+                    onMouseEnter={handleMouseEnter}
+                    onMouseOver={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                    onClick={handleCardClick}>
                     <div className={'head'}>
                         <p className={'title'}>{name}</p>
                         <span className={'level'}>{formatInt(level)}{max ? `/${formatInt(max)}` : ''}</span>
@@ -1219,49 +1250,29 @@ export const ActionCard = React.memo(({ id, category, isFavorite, monitored, ent
                         <div className={'buttons'}>
                             <div className={'buttons-inner-wrap'}>
                                 {!isCapped ? (<>{isActive ?
-                                        <CustomButton
+                                        <CustomButtonMemoized
                                             className={'icon-content interface-icon small clickable-icon'}
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                e.stopPropagation();
-                                                onActivate();
-                                                playSound('click');
-                                            }}
+                                            onClick={handleStopAction}
                                             iconId={'pause'}
                                         >
                                             Stop Action
-                                        </CustomButton> :
-                                        <CustomButton
+                                        </CustomButtonMemoized> :
+                                        <CustomButtonMemoized
                                             id={`activate_${id}`}
                                             className={'icon-content interface-icon small clickable-icon'}
                                             iconId={'run'}
-                                            onClick={(e) => {
-                                              e.preventDefault();
-                                              e.stopPropagation();
-                                              if(currentTourId === 'initial') {
-                                                  unlockNextById(8);
-                                              }
-                                              if(currentTourId === 'actions') {
-                                                  unlockNextById(7);
-                                              }
-                                              onActivate(id);
-                                              playSound('click');
-                                            }} >
+                                            onClick={handleRunAction}
+                                        >
                                             Run Action
-                                        </CustomButton>}</>) : null}
+                                        </CustomButtonMemoized>}</>) : null}
                                 <FavoriteButton type="actions" id={id} isFavorite={isFavorite} className="action-favorite-btn icon-content interface-icon small clickable-icon" />
-                                <CustomButton
+                                <CustomButtonMemoized
                                     className={'icon-content interface-icon small clickable-icon'}
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        toggleHiddenAction(id, !isHidden);
-                                        playSound('click');
-                                    }}
+                                    onClick={handleToggleHidden}
                                     iconId={isHidden ? 'icon_show' : 'icon_hide'}
                                 >
                                     {isHidden ? 'Show Action' : 'Hide Action'}
-                                </CustomButton>
+                                </CustomButtonMemoized>
                             </div>
                             {focused && focused.isFocused ? (
                                 <TippyWrapper content={<div className={'hint-popup'}>

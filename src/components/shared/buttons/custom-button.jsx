@@ -50,3 +50,5 @@ export const CustomButton = ({ children, iconId, onClick, ...props }) => {
         </TippyWrapper>
     );
 };
+
+export const CustomButtonMemoized = React.memo(CustomButton);

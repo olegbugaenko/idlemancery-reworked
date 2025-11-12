@@ -453,6 +453,7 @@ export class PropertyModule extends GameModule {
             tags: ['living', 'secondary'],
             name: 'Living Space',
             isService: true,
+            isConstantEfficiency: true,
             saveBalanceTree: true,
             unlockCondition: () => {
                 return gameEntity.getLevel('shop_item_tent') > 0
@@ -965,7 +966,7 @@ export class PropertyModule extends GameModule {
             currentEffects: gameEntity.getEffects(entity.id),
             tags: entity.tags,
             efficiency: gameEntity.getEntityEfficiency(entity.id) ?? 1,
-            missingResource: gameEntity.getEntity(entity.id)?.modifier?.bottleNeck ? gameResources.getResource(gameEntity.getEntity(entity.id)?.modifier?.bottleNeck) : null
+            missingResource: gameEntity.getEntity(entity.id)?.modifier?.bottleNeck ? resourceResponse(gameResources.getResource(gameEntity.getEntity(entity.id)?.modifier?.bottleNeck)) : null
         }
     }
 
