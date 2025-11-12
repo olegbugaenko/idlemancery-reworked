@@ -8,7 +8,7 @@ import {useAppContext} from "../../context/ui-context";
 export const BankedTimeWrap = () => {
 
     const worker = useContext(WorkerContext);
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const { togglePopup } = useAppContext();
     const [mageData, setMageData] = useState({});
 
@@ -26,9 +26,17 @@ export const BankedTimeWrap = () => {
         sendData('toggle-speedup', {});
     }
 
-    onMessage('mage-data-banked', (data) => {
-        setMageData(data);
-    });
+    useEffect(() => {
+        const handleMageData = (data) => {
+            setMageData(data);
+        };
+
+        onMessage('mage-data-banked', handleMageData);
+
+        return () => {
+            removeMessage('mage-data-banked');
+        };
+    }, [onMessage, removeMessage]);
 
     return (
         <div className={'banked-time-wrap'}>

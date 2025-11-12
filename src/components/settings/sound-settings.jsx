@@ -6,7 +6,7 @@ import {useSound} from "../../context/sounds/sound-context.jsx";
 
 export const SoundSettings = () => {
     const worker = useContext(WorkerContext);
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const { setVolume } = useSound();
 
     const [settings, setSettings] = useState({
@@ -19,9 +19,17 @@ export const SoundSettings = () => {
         sendData("query-settings", { prefix: "sound-settings" });
     }, []);
 
-    onMessage("settings-sound-settings", (newSettings) => {
-        setSettings((prev) => ({ ...prev, ...newSettings }));
-    });
+    useEffect(() => {
+        const handleSettings = (newSettings) => {
+            setSettings((prev) => ({ ...prev, ...newSettings }));
+        };
+
+        onMessage("settings-sound-settings", handleSettings);
+
+        return () => {
+            removeMessage('settings-sound-settings');
+        };
+    }, [onMessage, removeMessage]);
 
     /*const setSettingChanged = (key, value) => {
         setSettings((prev) => ({ ...prev, [key]: value }));

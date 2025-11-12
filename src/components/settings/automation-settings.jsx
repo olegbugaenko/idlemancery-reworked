@@ -9,7 +9,7 @@ export const AutomationsSettings = () => {
 
     const worker = useContext(WorkerContext);
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
 
     const [resources, setResources] = useState(null);
 
@@ -21,13 +21,23 @@ export const AutomationsSettings = () => {
 
     }, [])
 
-    onMessage('all-resources-automation', (payload) => {
-        setResources(payload);
-    })
+    useEffect(() => {
+        const handleResources = (payload) => {
+            setResources(payload);
+        };
 
-    onMessage('unlocks', (unlocks) => {
-        setUnlocksData(unlocks);
-    })
+        const handleUnlocks = (nextUnlocks) => {
+            setUnlocksData(nextUnlocks);
+        };
+
+        onMessage('all-resources-automation', handleResources);
+        onMessage('unlocks', handleUnlocks);
+
+        return () => {
+            removeMessage('all-resources-automation');
+            removeMessage('unlocks');
+        };
+    }, [onMessage, removeMessage]);
 
     if(!unlocks.automations || (!unlocks.actionLists && !unlocks.inventory && !unlocks.spellbook)) {
         return (<div className={'inner-settings-wrap automations-wrap'}>
@@ -54,7 +64,7 @@ export const AutomationsSettings = () => {
 export const ActionsAutomations = ({ resources }) => {
 
     const worker = useContext(WorkerContext);
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const [automations, setAutomations] = useState([]);
     const [isOpened, setOpened] = useState(true);
 
@@ -62,9 +72,17 @@ export const ActionsAutomations = ({ resources }) => {
         sendData('query-actions-lists', { filterAutomated: true })
     }, []);
 
-    onMessage('actions-lists', (data) => {
-        setAutomations(data);
-    })
+    useEffect(() => {
+        const handleActionsLists = (data) => {
+            setAutomations(data);
+        };
+
+        onMessage('actions-lists', handleActionsLists);
+
+        return () => {
+            removeMessage('actions-lists');
+        };
+    }, [onMessage, removeMessage]);
 
     const onSaveAction = useCallback((id, saveData) => {
         const prev = automations.find(a => a.id === id);
@@ -124,7 +142,7 @@ export const AutomatedAction = ({ auto, resources, onSaveAction }) => {
 export const PurchaseAutomations = ({ resources }) => {
 
     const worker = useContext(WorkerContext);
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const [automations, setAutomations] = useState([]);
     const [isOpened, setOpened] = useState(false);
 
@@ -132,11 +150,19 @@ export const PurchaseAutomations = ({ resources }) => {
         sendData('query-items-resources-data', { filterAutomatedPurchase: true, includeAutomations: true, prefix: 'autopurchase' })
     }, []);
 
-    onMessage('items-resources-data-autopurchase', (data) => {
-        if(data.payload.filterAutomatedPurchase) {
-            setAutomations(data.available);
-        }
-    })
+    useEffect(() => {
+        const handleAutoPurchase = (data) => {
+            if(data.payload.filterAutomatedPurchase) {
+                setAutomations(data.available);
+            }
+        };
+
+        onMessage('items-resources-data-autopurchase', handleAutoPurchase);
+
+        return () => {
+            removeMessage('items-resources-data-autopurchase');
+        };
+    }, [onMessage, removeMessage]);
 
     const onSaveConsume = useCallback((id, saveData) => {
         const prev = automations.find(a => a.id === id);
@@ -192,7 +218,7 @@ export const AutomatedPurchase = ({ auto, resources, onSaveConsume }) => {
 export const ConsumeAutomations = ({ resources }) => {
 
     const worker = useContext(WorkerContext);
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const [automations, setAutomations] = useState([]);
     const [isOpened, setOpened] = useState(false);
 
@@ -200,11 +226,19 @@ export const ConsumeAutomations = ({ resources }) => {
         sendData('query-inventory-data', { filterAutomatedConsume: true, includeAutomations: true, prefix: 'autoconsume' })
     }, []);
 
-    onMessage('inventory-data-autoconsume', (data) => {
-        if(data.payload.filterAutomatedConsume) {
-            setAutomations(data.available);
-        }
-    })
+    useEffect(() => {
+        const handleAutoConsume = (data) => {
+            if(data.payload.filterAutomatedConsume) {
+                setAutomations(data.available);
+            }
+        };
+
+        onMessage('inventory-data-autoconsume', handleAutoConsume);
+
+        return () => {
+            removeMessage('inventory-data-autoconsume');
+        };
+    }, [onMessage, removeMessage]);
 
     const onSaveConsume = useCallback((id, saveData) => {
         const prev = automations.find(a => a.id === id);
@@ -258,7 +292,7 @@ export const AutomatedConsumption = ({ auto, resources, onSaveConsume }) => {
 export const SellAutomations = ({ resources }) => {
 
     const worker = useContext(WorkerContext);
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const [automations, setAutomations] = useState([]);
     const [isOpened, setOpened] = useState(false);
 
@@ -266,11 +300,19 @@ export const SellAutomations = ({ resources }) => {
         sendData('query-inventory-data', { filterAutomatedSell: true, includeAutomations: true, prefix: 'autosell' })
     }, []);
 
-    onMessage('inventory-data-autosell', (data) => {
-        if(data.payload.filterAutomatedSell) {
-            setAutomations(data.available);
-        }
-    })
+    useEffect(() => {
+        const handleAutoSell = (data) => {
+            if(data.payload.filterAutomatedSell) {
+                setAutomations(data.available);
+            }
+        };
+
+        onMessage('inventory-data-autosell', handleAutoSell);
+
+        return () => {
+            removeMessage('inventory-data-autosell');
+        };
+    }, [onMessage, removeMessage]);
 
     const onSaveSell = useCallback((id, saveData) => {
         const prev = automations.find(a => a.id === id);
@@ -323,7 +365,7 @@ export const AutomatedSell = ({ auto, resources, onSaveSell }) => {
 export const MapTilesAutomations = ({ resources }) => {
 
     const worker = useContext(WorkerContext);
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const [automations, setAutomations] = useState([]);
     const [isOpened, setOpened] = useState(true);
 
@@ -331,9 +373,17 @@ export const MapTilesAutomations = ({ resources }) => {
         sendData('query-map-tile-lists', { filterAutomated: true })
     }, []);
 
-    onMessage('map-tile-lists', (data) => {
-        setAutomations(data.lists);
-    })
+    useEffect(() => {
+        const handleMapTileLists = (data) => {
+            setAutomations(data.lists);
+        };
+
+        onMessage('map-tile-lists', handleMapTileLists);
+
+        return () => {
+            removeMessage('map-tile-lists');
+        };
+    }, [onMessage, removeMessage]);
 
     const onSaveAction = useCallback((id, saveData) => {
         const prev = automations.find(a => a.id === id);
@@ -393,7 +443,7 @@ export const AutomatedMapTile = ({ auto, resources, onSaveAction }) => {
 export const CraftingAutomations = ({ resources }) => {
 
     const worker = useContext(WorkerContext);
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const [automations, setAutomations] = useState([]);
     const [isOpened, setOpened] = useState(true);
 
@@ -401,9 +451,17 @@ export const CraftingAutomations = ({ resources }) => {
         sendData('query-crafting-lists', { filterAutomated: true, category: 'crafting' })
     }, []);
 
-    onMessage('crafting-lists-crafting', (data) => {
-        setAutomations(data.lists);
-    })
+    useEffect(() => {
+        const handleCraftingLists = (data) => {
+            setAutomations(data.lists);
+        };
+
+        onMessage('crafting-lists-crafting', handleCraftingLists);
+
+        return () => {
+            removeMessage('crafting-lists-crafting');
+        };
+    }, [onMessage, removeMessage]);
 
     const onSaveAction = useCallback((id, saveData) => {
         const prev = automations.find(a => a.id === id);
@@ -462,7 +520,7 @@ export const AutomatedCrafting = ({ auto, resources, onSaveAction }) => {
 export const AlchemyAutomations = ({ resources }) => {
 
     const worker = useContext(WorkerContext);
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const [automations, setAutomations] = useState([]);
     const [isOpened, setOpened] = useState(true);
 
@@ -470,10 +528,17 @@ export const AlchemyAutomations = ({ resources }) => {
         sendData('query-crafting-lists', { filterAutomated: true, category: 'alchemy' })
     }, []);
 
-    onMessage('crafting-lists-alchemy', (data) => {
-        console.log('automated-crafting: ', data);
-        setAutomations(data.lists);
-    })
+    useEffect(() => {
+        const handleAlchemyLists = (data) => {
+            setAutomations(data.lists);
+        };
+
+        onMessage('crafting-lists-alchemy', handleAlchemyLists);
+
+        return () => {
+            removeMessage('crafting-lists-alchemy');
+        };
+    }, [onMessage, removeMessage]);
 
     const onSaveAction = useCallback((id, saveData) => {
         const prev = automations.find(a => a.id === id);
@@ -533,7 +598,7 @@ export const AutomatedAlchemy = ({ auto, resources, onSaveAction }) => {
 export const SpellAutomations = ({ resources }) => {
 
     const worker = useContext(WorkerContext);
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const [automations, setAutomations] = useState([]);
     const [isOpened, setOpened] = useState(false);
 
@@ -541,12 +606,17 @@ export const SpellAutomations = ({ resources }) => {
         sendData('query-spell-data', { filterAutomated: true, includeAutomations: true, prefix: 'autocast' })
     }, []);
 
-    onMessage('spell-data-autocast', (data) => {
-        console.log('SPELLS: ', data);
+    useEffect(() => {
+        const handleSpellData = (data) => {
+            setAutomations(data.available);
+        };
 
-        setAutomations(data.available);
+        onMessage('spell-data-autocast', handleSpellData);
 
-    })
+        return () => {
+            removeMessage('spell-data-autocast');
+        };
+    }, [onMessage, removeMessage]);
 
     const onSaveSpell = useCallback((id, saveData) => {
         const prev = automations.find(a => a.id === id);
@@ -764,7 +834,7 @@ export const AutomatedItem = ({
 export const CoursesAutomations = ({ resources }) => {
 
     const worker = useContext(WorkerContext);
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const [automations, setAutomations] = useState([]);
     const [isOpened, setOpened] = useState(true);
 
@@ -772,14 +842,20 @@ export const CoursesAutomations = ({ resources }) => {
         sendData('query-course-data', {});
     }, []);
 
-    onMessage('course-data', (data) => {
-        console.log('data: ', data);
-        // Filter courses with automation enabled
-        const automatedCourses = data.available.filter(course => 
-            course.automation?.isEnabled
-        );
-        setAutomations(automatedCourses);
-    });
+    useEffect(() => {
+        const handleCourseData = (data) => {
+            const automatedCourses = data.available.filter(course =>
+                course.automation?.isEnabled
+            );
+            setAutomations(automatedCourses);
+        };
+
+        onMessage('course-data', handleCourseData);
+
+        return () => {
+            removeMessage('course-data');
+        };
+    }, [onMessage, removeMessage]);
 
     const onSaveCourse = useCallback((id, saveData) => {
         const prev = automations.find(a => a.id === id);

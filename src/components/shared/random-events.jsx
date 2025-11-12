@@ -9,17 +9,24 @@ import {TippyWrapper} from "./tippy-wrapper.jsx";
 
 export const RandomEventSnippet = () => {
     const worker = useContext(WorkerContext);
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const { togglePopup } = useAppContext();
 
     const [eventData, setEventData] = useState({});
     const [showMore, setShowMore] = useState(false);
     const popupRef = useRef(null); // Reference for the popup
 
-    // Listen for random events data
-    onMessage('random-events-data', (event) => {
-        setEventData(event);
-    });
+    useEffect(() => {
+        const handleEventData = (event) => {
+            setEventData(event);
+        };
+
+        onMessage('random-events-data', handleEventData);
+
+        return () => {
+            removeMessage('random-events-data');
+        };
+    }, [onMessage, removeMessage]);
 
     const openEvent = (eventId) => {
         togglePopup('event', (a) => {
@@ -116,7 +123,7 @@ export const RandomEventPopup = () => {
 
     const worker = useContext(WorkerContext);
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
 
     const [eventData, setEventData] = useState({});
 
@@ -129,10 +136,17 @@ export const RandomEventPopup = () => {
         }
     }, [])
 
-    onMessage('random-events-data-popup', (data) => {
-        // console.log('Received data', data);
-        setEventData(data);
-    })
+    useEffect(() => {
+        const handlePopupData = (data) => {
+            setEventData(data);
+        };
+
+        onMessage('random-events-data-popup', handlePopupData);
+
+        return () => {
+            removeMessage('random-events-data-popup');
+        };
+    }, [onMessage, removeMessage]);
 
     const selectOption = (eventId, optionId) => {
         sendData('select-event-option', {eventId, optionId});

@@ -8,7 +8,7 @@ import { formatInt, secondsToString } from "../../general/utils/strings";
 
 export const PersonageLevel = () => {
     const worker = useContext(WorkerContext);
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const { togglePopup } = useAppContext();
     const [mageData, setMageData] = useState({});
     const elementRef = useRef(null);
@@ -17,7 +17,13 @@ export const PersonageLevel = () => {
         sendData('query-mage-data', {});
     }, []);
 
-    onMessage('mage-data', setMageData);
+    useEffect(() => {
+        onMessage('mage-data', setMageData);
+
+        return () => {
+            removeMessage('mage-data');
+        };
+    }, [onMessage, removeMessage]);
 
     return mageData ? (
         <div className={'mage-wrap flex-container'} ref={elementRef}>

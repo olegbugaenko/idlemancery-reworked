@@ -69,7 +69,7 @@ const automatedList = [{
 export const InterfaceSettings = () => {
     const worker = useContext(WorkerContext);
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
 
     const [unlocks, setUnlocksData] = useState({});
     const [hotkeys, setHotkeys] = useState({});
@@ -106,21 +106,33 @@ export const InterfaceSettings = () => {
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, [editingTab]);
 
-    onMessage("unlocks", (unlocks) => {
-        setUnlocksData(unlocks);
-    });
+    useEffect(() => {
+        const handleUnlocks = (nextUnlocks) => {
+            setUnlocksData(nextUnlocks);
+        };
 
-    onMessage("settings", settings => {
-        setSettings(settings);
-        if (isElectron() && window?.zoomAPI?.set && typeof settings?.uiScalePercent !== 'undefined') {
-            const factor = Math.max(0.5, Math.min(3, Number(settings.uiScalePercent) / 100));
-            window.zoomAPI.set(factor);
-        }
-    })
+        const handleSettings = (nextSettings) => {
+            setSettings(nextSettings);
+            if (isElectron() && window?.zoomAPI?.set && typeof nextSettings?.uiScalePercent !== 'undefined') {
+                const factor = Math.max(0.5, Math.min(3, Number(nextSettings.uiScalePercent) / 100));
+                window.zoomAPI.set(factor);
+            }
+        };
 
-    onMessage("all-hotkeys", (payload) => {
-        setHotkeys(payload);
-    });
+        const handleHotkeys = (payload) => {
+            setHotkeys(payload);
+        };
+
+        onMessage("unlocks", handleUnlocks);
+        onMessage("settings", handleSettings);
+        onMessage("all-hotkeys", handleHotkeys);
+
+        return () => {
+            removeMessage('unlocks');
+            removeMessage('settings');
+            removeMessage('all-hotkeys');
+        };
+    }, [onMessage, removeMessage]);
 
     const setSettingChanged = (key, value) => {
         sendData('set-setting', { key, value });

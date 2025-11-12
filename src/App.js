@@ -18,7 +18,7 @@ function App() {
 
     window.worker = worker;
 
-    const { onMessage, sendData } = useWorkerClient(window.worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(window.worker);
 
     const [readyToGo, setReadyToGo] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
@@ -35,39 +35,52 @@ function App() {
         };
     }, []);
 
-    onMessage('initialized', async (event) => {
-        let saveString = window.localStorage.getItem('idlemanceryV2Reworked');
-        if (window.electron?.loadFromCloud()) {
-            saveString = await window.electron.loadFromCloud();
-        }
-        if(!saveString) {
-            saveString = window.localStorage.getItem('idlemanceryV2Reworked');
-        }
-        if(!saveString) {
-            sendData('reset-game', {});
-            return
-        }
-        sendData('load-game', JSON.parse(saveString));
-    });
+    useEffect(() => {
+        const handleInitialized = async () => {
+            let saveString = window.localStorage.getItem('idlemanceryV2Reworked');
+            if (window.electron?.loadFromCloud()) {
+                saveString = await window.electron.loadFromCloud();
+            }
+            if(!saveString) {
+                saveString = window.localStorage.getItem('idlemanceryV2Reworked');
+            }
+            if(!saveString) {
+                sendData('reset-game', {});
+                return;
+            }
+            sendData('load-game', JSON.parse(saveString));
+        };
 
-    onMessage('loading', (event) => {
-        setReadyToGo(false);
-    });
+        const handleLoading = () => {
+            setReadyToGo(false);
+        };
 
-    onMessage('loaded', (pl) => {
-        // Request and apply sound valumes here
-        setReadyToGo(true);
-        if(pl.isReset) {
-            setOpenedTab('actions');
-        }
-    })
+        const handleLoaded = (pl) => {
+            setReadyToGo(true);
+            if(pl.isReset) {
+                setOpenedTab('actions');
+            }
+        };
 
-    onMessage('save-game', async (data) => {
-        window.localStorage.setItem('idlemanceryV2Reworked', JSON.stringify(data));
-        if (window.electron?.saveToCloud) {
-            await window.electron.saveToCloud(data); // При збереженні
-        }
-    })
+        const handleSaveGame = async (data) => {
+            window.localStorage.setItem('idlemanceryV2Reworked', JSON.stringify(data));
+            if (window.electron?.saveToCloud) {
+                await window.electron.saveToCloud(data); // При збереженні
+            }
+        };
+
+        onMessage('initialized', handleInitialized);
+        onMessage('loading', handleLoading);
+        onMessage('loaded', handleLoaded);
+        onMessage('save-game', handleSaveGame);
+
+        return () => {
+            removeMessage('initialized');
+            removeMessage('loading');
+            removeMessage('loaded');
+            removeMessage('save-game');
+        };
+    }, [onMessage, removeMessage, sendData, setOpenedTab]);
 
     useEffect(() => {
         if(readyToGo) {
