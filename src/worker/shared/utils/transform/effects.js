@@ -15,4 +15,7 @@ export const effectResponse = (effectData) => ({
     multiplier: effectData.multiplier,
     rawCap: effectData.rawCap,
     tags: effectData.tags,
+    nextUnlocks: effectData.nextUnlocks,
+    prevUnlocks: effectData.prevUnlocks,
+    unlocks: effectData.unlocks,
 })

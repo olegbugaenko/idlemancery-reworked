@@ -1,6 +1,7 @@
 import {GameModule} from "../../shared/game-module";
 import {achievementsDb} from "./achievements-db";
 import {gameCore} from "game-framework";
+import { achievementResponse } from "../../shared/utils/transform/achievements";
 
 export class AchievementsModule extends GameModule {
 
@@ -25,7 +26,7 @@ export class AchievementsModule extends GameModule {
                 return;
             }
             const toViewId = Object.entries(this.achievementsDone).find(([id, {s}]) => s === 1);
-            this.eventHandler.sendData('achievement-to-view', toViewId ? this.achievementsDB.find(a => a.id ===  toViewId[0]) : undefined);
+            this.eventHandler.sendData('achievement-to-view', toViewId ? achievementResponse(this.achievementsDB.find(a => a.id ===  toViewId[0])) : undefined);
         }))
 
         this.eventHandler.registerHandler('query-completed-achievements', (payload => {
@@ -73,7 +74,7 @@ export class AchievementsModule extends GameModule {
 
     listCompleted() {
         return this.achievementsDB.filter(a => this.achievementsDone[a.id]?.s > 0).map(a => ({
-            ...a,
+            ...achievementResponse(a),
             completedAt: this.achievementsDone[a.id].d,
         }))
     }

@@ -5,6 +5,7 @@ import {gameUnlocks} from "game-framework/src/utils/unlocks";
 import {calculateTimeToLevelUp} from "../../shared/utils/math";
 import {getScope} from "../../shared/utils/scopes";
 import { effectResponse } from "../../shared/utils/transform/effects";
+import { entityResponse } from "../../shared/utils/transform/entities";
 
 export class AttributesModule extends GameModule {
 
@@ -107,7 +108,7 @@ export class AttributesModule extends GameModule {
 
                         return {
                             ...unlock,
-                            data,
+                            data: entityResponse(data),
                             meta
                         }
                     }).sort((a, b) => b.level - a.level),

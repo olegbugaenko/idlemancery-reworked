@@ -25,5 +25,8 @@ export const resourceResponse = (resourceData) => ({
     isPinned: resourceData.isPinned,
     income: resourceData.income,
     multiplier: resourceData.multiplier,
-    consumption: resourceData.consumption
+    consumption: resourceData.consumption,
+    monitor: resourceData.monitor,
+    unlocks: resourceData.unlocks,
+    eta: resourceData.eta,
 })

@@ -319,7 +319,7 @@ export class ResourcePoolModule extends GameModule {
             rs.push(...pinned);
         }
         return rs.filter(one => gameResources.resourceExists(one.id) && one.isUnlocked).map(resource => ({
-            ...resource,
+            ...resourceResponse(resource),
             isNegative: resource.balance < 0,
             isPositive: resource.balance > 0 && resource.amount < resource.cap - SMALL_NUMBER,
             isCapped: resource.amount >= resource.cap - SMALL_NUMBER,

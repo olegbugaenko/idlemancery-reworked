@@ -6,6 +6,7 @@ import {cloneDeep} from "lodash";
 import {unlocksApi} from "game-framework/src/general/unlocks-api";
 import {SMALL_NUMBER} from "game-framework/src/utils/consts";
 import { entityResponse } from "../../shared/utils/transform/entities";
+import { resourceResponse } from "../../shared/utils/transform/resources";
 // import {initMageRanks} from "./mage-ranks-db";
 
 export class MageModule extends GameModule {
@@ -747,7 +748,7 @@ export class MageModule extends GameModule {
 
         const rs = gameResources.listAllResources(['resource']);
         const filtered = rs.filter(one => gameResources.resourceExists(one.id) && one.isUnlocked && !['mage-xp','skill-points'].includes(one.id)).map(resource => ({
-            ...resource,
+            ...resourceResponse(resource),
             isNegative: resource.balance < 0,
             isPositive: resource.balance > 0 && resource.amount < resource.cap - SMALL_NUMBER,
             isCapped: resource.amount >= resource.cap - SMALL_NUMBER,

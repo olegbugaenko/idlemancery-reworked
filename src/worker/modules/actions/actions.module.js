@@ -987,7 +987,7 @@ export class ActionsModule extends GameModule {
                 }
 
                 return {
-                    ...one,
+                    ...entityResponse(one),
                     prevUnlocks: (one.prevUnlocks ?? []).map(unlock => {
                         let data = {};
                         let meta = {};
@@ -1003,7 +1003,7 @@ export class ActionsModule extends GameModule {
 
                         return {
                             ...unlock,
-                            data,
+                            data: entityResponse(data),
                             meta
                         }
                     }),

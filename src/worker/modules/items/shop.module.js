@@ -4,6 +4,7 @@ import {charismaMod, registerShopItemsStage1} from "./shop-db";
 import {sellPriceMod} from "../inventory/inventory-items-db";
 import {SMALL_NUMBER} from "game-framework/src/utils/consts";
 import {checkMatchingRules} from "../../shared/utils/rule-utils";
+import { resourceResponse } from "../../shared/utils/transform/resources";
 
 export class ShopModule extends GameModule {
 
@@ -377,7 +378,7 @@ export class ShopModule extends GameModule {
                 const affordable = resourceCalculators.isAffordable(resource.get_cost());
 
                 return {
-                    ...resource,
+                    ...resourceResponse(resource),
                     stock: this.sellStocks[resource.id],
                     affordable,
                     isLeveled: this.leveledId === resource.id,

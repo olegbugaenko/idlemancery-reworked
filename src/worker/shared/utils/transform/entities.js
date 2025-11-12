@@ -23,4 +23,5 @@ export const entityResponse = (entityData) => ({
     allowedScopes: entityData.allowedScopes,
     icon_id: entityData.icon_id,
     scope: entityData.scope,
+    unlocks: entityData.unlocks,
 })
