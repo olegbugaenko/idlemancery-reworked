@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import WorkerContext from "../../context/worker-context";
 import { useWorkerClient } from "../../general/client";
 import { useAppContext } from "../../context/ui-context";
@@ -7,7 +7,7 @@ import {useTutorial} from "../../context/tutorial-context";
 
 export const MainMenu = () => {
     const worker = useContext(WorkerContext);
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const { openedTab, setOpenedTab, togglePopup } = useAppContext();
     const [unlocks, setUnlocksData] = useState({});
     const [newUnlocks, setNewUnlocks] = useState({});
@@ -41,9 +41,9 @@ export const MainMenu = () => {
         }
     }
 
-    const openTab = (id) => {
+    const openTab = useCallback((id) => {
         setOpenedTab(id);
-    }
+    }, [setOpenedTab]);
 
     useEffect(() => {
         const isEditableTarget = (el) => {
@@ -87,21 +87,31 @@ export const MainMenu = () => {
         return () => window.removeEventListener("keydown", handleKeyDown, { capture: true });
     }, [hotkeys]);
 
-    onMessage('all-hotkeys-all', payload => {
-        // console.log('Received AllHotkeys: ', payload);
-        setHotkeys(payload);
-    })
+    useEffect(() => {
+        const handleAllHotkeys = (payload) => {
+            setHotkeys(payload);
+        };
 
-    onMessage('hotkey-triggered', (hotkey) => {
-        if (hotkey.action === 'selectTab') {
-            openTab(hotkey.param);
-        } else if (hotkey.action === 'openQuickAccess') {
-            togglePopup('quick-access');
-        }
-    })
+        const handleHotkeyTriggered = (hotkey) => {
+            if (hotkey.action === 'selectTab') {
+                openTab(hotkey.param);
+            } else if (hotkey.action === 'openQuickAccess') {
+                togglePopup('quick-access');
+            }
+        };
 
-    onMessage('unlocks-main-menu', setUnlocksData);
-    onMessage('new-unlocks-notifications-main-menu', setNewUnlocks);
+        onMessage('all-hotkeys-all', handleAllHotkeys);
+        onMessage('hotkey-triggered', handleHotkeyTriggered);
+        onMessage('unlocks-main-menu', setUnlocksData);
+        onMessage('new-unlocks-notifications-main-menu', setNewUnlocks);
+
+        return () => {
+            removeMessage('all-hotkeys-all');
+            removeMessage('hotkey-triggered');
+            removeMessage('unlocks-main-menu');
+            removeMessage('new-unlocks-notifications-main-menu');
+        };
+    }, [onMessage, removeMessage, openTab, togglePopup, setUnlocksData, setNewUnlocks]);
 
     return (
         <div className={'left-most'}>

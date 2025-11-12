@@ -8,7 +8,7 @@ import {formatInt, formatValue, secondsToString} from "../../general/utils/strin
 
 export const PersonageCircle = () => {
     const worker = useContext(WorkerContext);
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const { togglePopup } = useAppContext();
     const [mageData, setMageData] = useState({});
     const [settings, setSettings] = useState({});
@@ -30,11 +30,19 @@ export const PersonageCircle = () => {
         window.notation = settings.notation;
     }, [settings?.notation]);
 
-    onMessage('mage-data-xpbar', (data) => {
-        const {settings, ...mage} = data;
-        setMageData(mage);
-        setSettings(settings);
-    });
+    useEffect(() => {
+        const handleMageData = (data) => {
+            const {settings: settingsData, ...mage} = data;
+            setMageData(mage);
+            setSettings(settingsData);
+        };
+
+        onMessage('mage-data-xpbar', handleMageData);
+
+        return () => {
+            removeMessage('mage-data-xpbar');
+        };
+    }, [onMessage, removeMessage]);
 
     return mageData ? (
         <div className={'mage-wrap flex-container'} ref={elementRef}>

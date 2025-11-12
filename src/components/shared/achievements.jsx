@@ -9,7 +9,7 @@ import {useTutorial} from "../../context/tutorial-context";
 export const ActiveAchievement = () => {
 
     const worker = useContext(WorkerContext);
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const [viewedAchievement, setViewedAchievement] = useState(null);;
     const { activePopup, togglePopup } = useAppContext();
     const { run } = useTutorial();
@@ -25,9 +25,17 @@ export const ActiveAchievement = () => {
         }
     }, [])
 
-    onMessage('achievement-to-view', (data) => {
-        setViewedAchievement(data);
-    })
+    useEffect(() => {
+        const handleAchievement = (data) => {
+            setViewedAchievement(data);
+        };
+
+        onMessage('achievement-to-view', handleAchievement);
+
+        return () => {
+            removeMessage('achievement-to-view');
+        };
+    }, [onMessage, removeMessage]);
 
     useEffect(() => {
         if (run) {
@@ -61,15 +69,21 @@ export const ActiveAchievement = () => {
 
 export const AchievementsCompleted = () => {
     const worker = useContext(WorkerContext);
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const [achievements, setAchievements] = useState({});
     const [selectedAchievement, setSelectedAchievement] = useState(null);
 
     useEffect(() => {
-        sendData('query-completed-achievements', {})
-    })
+        sendData('query-completed-achievements', {});
+    }, [sendData]);
 
-    onMessage('completed-achievements', setAchievements);
+    useEffect(() => {
+        onMessage('completed-achievements', setAchievements);
+
+        return () => {
+            removeMessage('completed-achievements');
+        };
+    }, [onMessage, removeMessage]);
 
     return <div className={'flex-container achievements-wrap'}>
         <div className={'achievement-list-wrap'}>

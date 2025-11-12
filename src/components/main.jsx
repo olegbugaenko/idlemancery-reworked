@@ -29,7 +29,7 @@ export const Main = ({ readyToGo, isLoading }) => {
 export const LoadedMain = () => {
     const worker = useContext(WorkerContext);
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const { startTutorialById, stopTutorial, setStepIndex } = useTutorial();
     const { initializeVolumes } = useSound();
 
@@ -50,32 +50,34 @@ export const LoadedMain = () => {
         // startTutorial();
     }, [])
 
-    onMessage('tour_status', payload => {
-        if(!payload?.isComplete && payload.isAllowed) {
-            startTutorialById('initial');
-            if(payload?.skipStep) {
-                setStepIndex(payload.skipStep);
+    useEffect(() => {
+        const handleTourStatus = (payload) => {
+            if(!payload?.isComplete && payload.isAllowed) {
+                startTutorialById('initial');
+                if(payload?.skipStep) {
+                    setStepIndex(payload.skipStep);
+                }
             }
-        }
-    })
+        };
 
-    onMessage('settings', (s) => {
-        // Apply Electron zoom if available
-        const percent = Number(s?.uiScalePercent ?? 100);
-        const factor = Math.max(0.5, Math.min(3, (Number.isFinite(percent) ? percent : 100) / 100));
-        if (window?.zoomAPI?.set) {
-            window.zoomAPI.set(factor);
-        }
-    })
+        const applyZoom = (s) => {
+            const percent = Number(s?.uiScalePercent ?? 100);
+            const factor = Math.max(0.5, Math.min(3, (Number.isFinite(percent) ? percent : 100) / 100));
+            if (window?.zoomAPI?.set) {
+                window.zoomAPI.set(factor);
+            }
+        };
 
-    // Apply zoom when settings are received with prefix label from the early request
-    onMessage('settings-ui', (s) => {
-        const percent = Number(s?.uiScalePercent ?? 100);
-        const factor = Math.max(0.5, Math.min(3, (Number.isFinite(percent) ? percent : 100) / 100));
-        if (window?.zoomAPI?.set) {
-            window.zoomAPI.set(factor);
-        }
-    })
+        onMessage('tour_status', handleTourStatus);
+        onMessage('settings', applyZoom);
+        onMessage('settings-ui', applyZoom);
+
+        return () => {
+            removeMessage('tour_status');
+            removeMessage('settings');
+            removeMessage('settings-ui');
+        };
+    }, [onMessage, removeMessage, startTutorialById, setStepIndex]);
 
     return (<div className={'page-wrap'}>
         <Content />
