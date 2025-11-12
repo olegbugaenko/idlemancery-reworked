@@ -1,4 +1,5 @@
 import React, {useEffect, useState, useContext, useCallback} from "react";
+import isEqual from "lodash/isEqual";
 import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
 import {formatInt, formatValue, secondsToString} from "../../general/utils/strings";
@@ -134,7 +135,7 @@ export const ResourcesBar = () => {
     </div> )
 }
 
-export const ResourceRow = React.memo(({ resource, onMouseEnter, onMouseLeave, onContextMenu, showCapProgress = true, onToggleHidden }) => {
+const ResourceRowComponent = ({ resource, onMouseEnter, onMouseLeave, onContextMenu, showCapProgress = true, onToggleHidden }) => {
 
     const aff = resource.monitor;
 
@@ -265,9 +266,34 @@ export const ResourceRow = React.memo(({ resource, onMouseEnter, onMouseLeave, o
             <div className={'next-unlock-bar'} style={{ width: `${resource.capProgress*100}%`}}></div>
         </div>) : null}
     </div> )
+};
+
+export const ResourceRow = React.memo(ResourceRowComponent, (prevProps, nextProps) => {
+    if(prevProps.showCapProgress !== nextProps.showCapProgress) {
+        return false;
+    }
+
+    if(prevProps.onToggleHidden !== nextProps.onToggleHidden) {
+        return false;
+    }
+
+    if(prevProps.onMouseEnter !== nextProps.onMouseEnter) {
+        return false;
+    }
+
+    if(prevProps.onMouseLeave !== nextProps.onMouseLeave) {
+        return false;
+    }
+
+    if(prevProps.onContextMenu !== nextProps.onContextMenu) {
+        return false;
+    }
+
+    return isEqual(prevProps.resource, nextProps.resource);
 });
 
 ResourceRow.displayName = 'ResourceRow';
+
 
 export const AttributesBar = () => {
     const worker = useContext(WorkerContext);

@@ -1,4 +1,5 @@
 import React, {useCallback, useContext, useEffect, useRef, useState} from "react";
+import isEqual from "lodash/isEqual";
 import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
 import PerfectScrollbar from "react-perfect-scrollbar";
@@ -238,7 +239,7 @@ export const ListEditor = React.memo(({
 
     const worker = useContext(WorkerContext);
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { sendData } = useWorkerClient(worker);
 
     const [editing, setEditing] = useState({ actions: [] })
 
@@ -524,11 +525,11 @@ export const ListEditor = React.memo(({
     return true;
 }))
 
-export const GeneralStats = ({ stats, aspects, setDetailVisible }) => {
+const GeneralStatsComponent = ({ stats, aspects, setDetailVisible }) => {
 
     const worker = useContext(WorkerContext);
 
-    const { onMessage, sendData } = useWorkerClient(worker);
+    const { sendData } = useWorkerClient(worker);
 
     const {isMobile} = useAppContext();
 
@@ -542,32 +543,32 @@ export const GeneralStats = ({ stats, aspects, setDetailVisible }) => {
         if(!isIntensityHidden && currentTourId === 'aspects') {
             unlockNextById(1);
         }
-    }, [isIntensityHidden, currentTourId, stepIndex])
+    }, [isIntensityHidden, currentTourId, stepIndex, unlockNextById])
 
-    const setAspectLevel = (id, level) => {
+    const setAspectLevel = useCallback((id, level) => {
         sendData('set-action-aspect-level', { id, level });
-    }
+    }, [sendData]);
 
-    const toggleMaxed = (id, flag) => {
+    const toggleMaxed = useCallback((id, flag) => {
         sendData('toggle-action-aspect-maxed', { id, flag });
-    }
+    }, [sendData]);
 
     const hasEffect = (stat) => {
         if(!stat?.value) return false;
         return Math.abs(stat?.value - 1.0) > 1.e-7;
     }
 
-    const highLightAffectedActions = (id) => {
+    const highLightAffectedActions = useCallback((id) => {
         sendData('set-monitored', { scope: 'actions', type: 'learn_modifier', id });
-    }
+    }, [sendData]);
 
-    const highLightDiscountedActions = (id) => {
+    const highLightDiscountedActions = useCallback((id) => {
         sendData('set-monitored', { scope: 'actions', type: 'discount', id });
-    }
+    }, [sendData]);
 
     const setMonitoredAttribute = useCallback((id) => {
         sendData('set-monitored', { scope: 'actions', type: 'attribute', id });
-    }, []);
+    }, [sendData]);
 
     return (<PerfectScrollbar>
         {aspects.isUnlocked ? (<div className={'block aspects-block'}>
@@ -645,3 +646,35 @@ export const GeneralStats = ({ stats, aspects, setDetailVisible }) => {
         </div>) : null}
     </PerfectScrollbar>)
 }
+
+export const GeneralStats = React.memo(GeneralStatsComponent, (prevProps, nextProps) => {
+    if(prevProps.setDetailVisible !== nextProps.setDetailVisible) {
+        return false;
+    }
+
+    const prevStats = prevProps.stats ?? {};
+    const nextStats = nextProps.stats ?? {};
+
+    if(!isEqual(prevStats.learnMults, nextStats.learnMults)) {
+        return false;
+    }
+
+    if(!isEqual(prevStats.xpDiscounts, nextStats.xpDiscounts)) {
+        return false;
+    }
+
+    const prevAspects = prevProps.aspects ?? {};
+    const nextAspects = nextProps.aspects ?? {};
+
+    if((prevAspects.isUnlocked ?? false) !== (nextAspects.isUnlocked ?? false)) {
+        return false;
+    }
+
+    if(!isEqual(prevAspects.list, nextAspects.list)) {
+        return false;
+    }
+
+    return true;
+});
+
+GeneralStats.displayName = 'GeneralStats';
