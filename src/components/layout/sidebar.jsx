@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useContext, useCallback} from "react";
+import React, {useEffect, useState, useContext, useCallback, useRef} from "react";
 import isEqual from "lodash/isEqual";
 import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
@@ -73,6 +73,12 @@ export const ResourcesBar = () => {
 
     const resourceData = useSidebarData(state => state.resources);
 
+    const sendDataRef = useRef(sendData);
+
+    useEffect(() => {
+        sendDataRef.current = sendData;
+    }, [sendData]);
+
     useEffect(() => {
         if (!worker) {
             return undefined;
@@ -95,8 +101,11 @@ export const ResourcesBar = () => {
     }, [worker, onMessage, sendData, removeMessage]);
 
     const setMonitoredAttribute = useCallback((id) => {
-        sendData('set-monitored', { scope: 'actions', type: 'resource', id });
-    }, [sendData]);
+        const fn = sendDataRef.current;
+        if(!fn) { return; }
+
+        fn('set-monitored', { scope: 'actions', type: 'resource', id });
+    }, []);
 
     const handleMouseEnter = useCallback((resource) => {
         setMonitoredAttribute(resource?.id ?? null);
@@ -107,8 +116,11 @@ export const ResourcesBar = () => {
     }, [setMonitoredAttribute]);
 
     const consumeResource = useCallback((id, amount = 1) => {
-        sendData('consume-inventory', { id, amount, sendDetails: true });
-    }, [sendData]);
+        const fn = sendDataRef.current;
+        if(!fn) { return; }
+
+        fn('consume-inventory', { id, amount, sendDetails: true });
+    }, []);
 
     const handleResourceContextMenu = useCallback((e, resource) => {
         e.preventDefault();

@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState, useMemo, useCallback} from "react";
+import React, {useContext, useEffect, useState, useMemo, useCallback, useRef} from "react";
 import {formatInt, formatValue, secondsToString} from "../../general/utils/strings";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import WorkerContext from "../../context/worker-context";
@@ -87,6 +87,7 @@ export const Statistics = () => {
 
     const worker = useContext(WorkerContext);
     const { onMessage, sendData } = useWorkerClient(worker);
+    const sendDataRef = useRef(sendData);
 
     const [stats, setStats] = useState({ multipliers: [], resources: [] });
     const [preferences, setPreferences] = useState({ multipliersShowHidden: false, resourcesShowHidden: false });
@@ -172,21 +173,31 @@ export const Statistics = () => {
         });
     }, [stats.resources, resourcesFilter, preferences.resourcesShowHidden]);
 
+    useEffect(() => {
+        sendDataRef.current = sendData;
+    }, [sendData]);
+
     const handleToggleMultiplierHidden = useCallback((multiplier) => {
         if(!multiplier?.id) {
             return;
         }
 
-        sendData('toggle-statistics-hidden', { scope: 'multipliers', id: multiplier.id });
-    }, [sendData]);
+        const fn = sendDataRef.current;
+        if(!fn) { return; }
+
+        fn('toggle-statistics-hidden', { scope: 'multipliers', id: multiplier.id });
+    }, []);
 
     const handleToggleResourceHidden = useCallback((resource) => {
         if(!resource?.id) {
             return;
         }
 
-        sendData('toggle-statistics-hidden', { scope: 'resources', id: resource.id });
-    }, [sendData]);
+        const fn = sendDataRef.current;
+        if(!fn) { return; }
+
+        fn('toggle-statistics-hidden', { scope: 'resources', id: resource.id });
+    }, []);
 
     const handleMultipliersShowHiddenChange = useCallback(() => {
         const next = !preferences.multipliersShowHidden;
