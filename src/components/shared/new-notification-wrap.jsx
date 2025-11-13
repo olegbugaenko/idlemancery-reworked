@@ -1,7 +1,6 @@
-import React, {useCallback, useContext, useEffect, useMemo, useState} from "react";
+import React, {useCallback, useContext, useEffect, useRef, useState} from "react";
 import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
-import { debounce } from 'lodash';
 
 const NewNotificationWrapComponent = ({ isNew, id, className = '', children }) => {
     const worker = useContext(WorkerContext);
@@ -13,20 +12,43 @@ const NewNotificationWrapComponent = ({ isNew, id, className = '', children }) =
         setIsNewLocal(!!isNew);
     }, [isNew]);
 
-    const setViewed = useMemo(() => debounce(() => {
-        if (id) {
+    const viewedTimeoutRef = useRef(null);
+
+    const clearViewedTimeout = useCallback(() => {
+        if (viewedTimeoutRef.current) {
+            clearTimeout(viewedTimeoutRef.current);
+            viewedTimeoutRef.current = null;
+        }
+    }, []);
+
+    useEffect(() => clearViewedTimeout, [clearViewedTimeout]);
+
+    useEffect(() => {
+        clearViewedTimeout();
+    }, [clearViewedTimeout, id]);
+
+    useEffect(() => {
+        if (!isNewLocal) {
+            clearViewedTimeout();
+        }
+    }, [clearViewedTimeout, isNewLocal]);
+
+    const scheduleViewed = useCallback(() => {
+        if (!id || !isNewLocal) {
+            return;
+        }
+
+        clearViewedTimeout();
+        viewedTimeoutRef.current = window.setTimeout(() => {
             sendData('set-new-notification-viewed-by-id', { id });
             setIsNewLocal(false);
-        }
-    }, 1000, { leading: false, trailing: true }), [id, sendData]);
-
-    useEffect(() => () => {
-        setViewed.cancel();
-    }, [setViewed]);
+            viewedTimeoutRef.current = null;
+        }, 1000);
+    }, [clearViewedTimeout, id, isNewLocal, sendData]);
 
     const handleMouseOver = useCallback(() => {
-        setViewed();
-    }, [setViewed]);
+        scheduleViewed();
+    }, [scheduleViewed]);
 
     return (
         <div
