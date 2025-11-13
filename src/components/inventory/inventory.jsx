@@ -1,27 +1,20 @@
-import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
+import React, {useCallback, useContext, useEffect, useMemo, useState} from "react";
 import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
-import {formatInt, formatValue, secondsToString} from "../../general/utils/strings";
 import PerfectScrollbar from "react-perfect-scrollbar";
-import {EffectsSection} from "../shared/effects-section.jsx";
-import CircularProgress from "../shared/circular-progress.jsx";
 import {FlashOverlay} from "../layout/flash-overlay.jsx";
-import {useFlashOnLevelUp} from "../../general/hooks/flash";
-import {isOverTippyEvent, TippyWrapper} from "../shared/tippy-wrapper.jsx";
-import RulesList from "../shared/rules-list.jsx";
 import {cloneDeep} from "lodash";
-import {BreakDown} from "../layout/sidebar.jsx";
-import {ResourceComparison} from "../shared/resource-comparison.jsx";
 import {NewNotificationWrap} from "../shared/new-notification-wrap.jsx";
-import StatRow from "../shared/stat-row.jsx";
 import {SearchField} from "../shared/search-field.jsx";
 import {useAppContext} from "../../context/ui-context";
-import {PinResource} from "../shared/pin-resource.jsx";
-import {CustomButton} from "../shared/buttons/custom-button.jsx";
 import {useModal} from "../../general/components/modal/index.jsx";
 import {HowToSign} from "../shared/how-to-sign.jsx";
 import {useTutorial} from "../../context/tutorial-context";
 import {playSound} from "../../context/sounds/sound-manager";
+import {InventoryDetails} from "./inventory-details.jsx";
+import {InventoryStats} from "./inventory-stats.jsx";
+import {InventoryItem} from "./inventory-card.jsx";
+import {getInventorySnapshot, updateInventoryState, useInventoryData} from "../../state/inventory-store";
 
 
 const INVENTORY_SEARCH_SCOPES = [{
@@ -192,26 +185,28 @@ const mergeInventoryState = (prevState, nextState) => {
     };
 };
 
+const selectAvailableItems = state => state?.available ?? [];
+const selectItemCategories = state => state?.itemCategories ?? [];
+const selectSelectedFilterId = state => state?.selectedFilterId ?? 'all';
+const selectAutomationUnlocked = state => !!state?.automationUnlocked;
+const selectInventoryDetails = state => state?.details ?? {};
+const selectInventorySearchData = state => state?.searchData ?? { search: '', selectedScopes: ['name', 'tags'] };
+
 export const Inventory = ({}) => {
 
     const worker = useContext(WorkerContext);
     const { isMobile } = useAppContext();
     const [isDetailVisible, setDetailVisible] = useState(!isMobile);
-    const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
+    const { unlockNextById, currentTourId } = useTutorial();
 
     const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const { confirm } = useModal();
-    const [inventoryData, setItemsData] = useState({
-        available: [],
-        current: undefined,
-        itemCategories: [],
-        selectedFilterId: 'all',
-        automationUnlocked: false,
-        details: {},
-        searchData: {
-            search: ''
-        }
-    });
+    const availableItems = useInventoryData(selectAvailableItems);
+    const itemCategories = useInventoryData(selectItemCategories);
+    const selectedFilterId = useInventoryData(selectSelectedFilterId);
+    const automationUnlocked = useInventoryData(selectAutomationUnlocked);
+    const inventoryDetails = useInventoryData(selectInventoryDetails);
+    const searchValue = useInventoryData(selectInventorySearchData);
     const [detailOpenedId, setDetailOpenedId] = useState(null); // here should be object containing id and rules
     const [viewedOpenedId, setViewedOpenedId] = useState(null);
     const [editData, setEditData] = useState(null);
@@ -291,7 +286,9 @@ export const Inventory = ({}) => {
 
     useEffect(() => {
         onMessage('inventory-data', (inventory) => {
-            setItemsData(prev => mergeInventoryState(prev, inventory));
+            const prev = getInventorySnapshot();
+            const merged = mergeInventoryState(prev, inventory);
+            updateInventoryState(merged);
         });
 
         return () => {
@@ -580,42 +577,36 @@ export const Inventory = ({}) => {
         sendData('set-inventory-search', { searchData });
     }, [sendData])
 
-    const onTogglePinned = useCallback((id, flag) => {
-        sendData('set-resource-pinned', { id, flag });
-    }, [sendData])
-
     const onToggleViewLasting = useCallback((id, flag) => {
         sendData('set-lasting-pinned', { id, flag });
     }, [sendData])
 
-    const selectedFilterId = inventoryData.selectedFilterId;
     const selectedItemId = detailOpenedId?.id ?? null;
     const categoryUnlocks = useMemo(() => newUnlocks.inventory?.items?.all?.items || {}, [newUnlocks]);
     const selectedFilterUnlocks = useMemo(() => categoryUnlocks[selectedFilterId]?.items || {}, [categoryUnlocks, selectedFilterId]);
 
-    const categoriesMenu = useMemo(() => inventoryData.itemCategories.map(category => (
+    const categoriesMenu = useMemo(() => itemCategories.map(category => (
         <li key={category.id} className={`category ${category.isSelected ? 'active' : ''}`} onClick={() => setItemsFilter(category.id)}>
             <NewNotificationWrap isNew={categoryUnlocks?.[category.id]?.hasNew}>
                 <span>{category.name}({category.items.length})</span>
             </NewNotificationWrap>
         </li>
-    )), [categoryUnlocks, inventoryData.itemCategories, setItemsFilter])
+    )), [categoryUnlocks, itemCategories, setItemsFilter])
 
-    const inventoryItems = useMemo(() => inventoryData.available.map(item => (
-        <NewNotificationWrap key={`inventory_${item.id}`} id={`inventory_${item.id}`} className={'narrow-wrapper'} isNew={selectedFilterUnlocks?.[`inventory_${item.id}`]?.hasNew}>
-            <InventoryCard
-                key={item.id}
-                isSelected={item.id === selectedItemId}
-                isChanged={isChanged}
-                {...item}
-                onPurchase={purchaseItem}
-                onFlash={handleFlash}
-                onShowDetails={setInventoryDetailsView}
-                onEditConfig={setInventoryDetailsEdit}
-                isMobile={isMobile}
-            />
-        </NewNotificationWrap>
-    )), [handleFlash, inventoryData.available, isChanged, isMobile, purchaseItem, selectedFilterUnlocks, selectedItemId, setInventoryDetailsEdit, setInventoryDetailsView])
+    const inventoryItems = useMemo(() => availableItems.map(item => (
+        <InventoryItem
+            key={item.id}
+            item={item}
+            isSelected={item.id === selectedItemId}
+            isChanged={isChanged}
+            isNew={selectedFilterUnlocks?.[`inventory_${item.id}`]?.hasNew}
+            onPurchase={purchaseItem}
+            onFlash={handleFlash}
+            onShowDetails={setInventoryDetailsView}
+            onEditConfig={setInventoryDetailsEdit}
+            isMobile={isMobile}
+        />
+    )), [availableItems, handleFlash, isChanged, isMobile, purchaseItem, selectedFilterUnlocks, selectedItemId, setInventoryDetailsEdit, setInventoryDetailsView])
 
     if(currentTourId === 'inventory') {
         unlockNextById(9);
@@ -632,7 +623,7 @@ export const Inventory = ({}) => {
                         <label>
                             <SearchField
                                 placeholder={'Search'}
-                                value={inventoryData.searchData || ''}
+                                value={searchValue || ''}
                                 onSetValue={val => setSearch(val)}
                                 scopes={INVENTORY_SEARCH_SCOPES}
                             />
@@ -676,422 +667,13 @@ export const Inventory = ({}) => {
                     onSave={onSave}
                     onCancel={onCancel}
                     onSell={onSell}
-                    automationUnlocked={inventoryData.automationUnlocked}
+                    automationUnlocked={automationUnlocked}
                     onConsume={purchaseItem}
-                    onTogglePinned={onTogglePinned}
                     onToggleViewLasting={onToggleViewLasting}
-                />) : (<InventoryStats details={inventoryData.details} setDetailVisible={setDetailVisible}/>)}
+                />) : (<InventoryStats details={inventoryDetails} setDetailVisible={setDetailVisible}/>)}
             </div>) : null}
         </div>
 
     )
 
 }
-
-export const InventoryCard = React.memo(({ isChanged, eta, usages, usagesFor, allowMultiConsume, isConsumable, isRare, isRareIngredient, isSelected, id, name, amount, balance, breakDown, isConsumed, cooldownProg, cooldown, onFlash, onPurchase, onShowDetails, onEditConfig, isMobile}) => {
-    const elementRef = useRef(null);
-
-    useFlashOnLevelUp(isConsumed, onFlash, elementRef);
-
-    const handleClick = (e) => {
-        if (e.button === 0) {
-            // Left-click
-            onEditConfig({id, name});
-        }
-    };
-
-    const handleContextMenu = (e) => {
-        e.preventDefault(); // Prevents the default context menu
-        if(!isConsumable) return;
-        let amt = 1;
-        if(allowMultiConsume) {
-            if(e.shiftKey) amt = amount;
-            if(e.ctrlKey && amount >= 1) amt = Math.max(0.1*amount, 1)
-        }
-        onPurchase(id, amt); // Your custom right-click action
-    };
-
-    return (<div
-        id={`inventory-item-card-${id}`}
-        ref={elementRef}
-        className={`icon-card item bigger flashable ${isSelected ? 'selected' : ''} ${isRare ? 'bluish' : ''} ${isRareIngredient ? 'ingredient' : ''}`}
-        onMouseEnter={() => {
-            if (!isMobile) {
-                onShowDetails(id);
-            }
-        }}
-        onMouseLeave={() => {
-            if (!isMobile) {
-                onShowDetails(null);
-            }
-        }}
-        onClick={handleClick}
-        onContextMenu={handleContextMenu}
-    >
-        <TippyWrapper content={<div className={'hint-popup'}>
-            <p>{name}({formatInt(amount)})</p>
-            {usages?.length ? (<div className={'block'}>
-                <p>Used By:</p>
-                <div className={'sub-items'}>
-                    {usages.map(one => (<p className={'padded-left'}>{one.name}</p>))}
-                </div>
-            </div> ) : null}
-            {usagesFor?.length ? (<div className={'block'}>
-                <p>Used For:</p>
-                <div className={'sub-items'}>
-                    {usagesFor.map(one => (<p className={'padded-left'}>{one.name}</p>))}
-                </div>
-            </div> ) : null}
-            {breakDown ? (<BreakDown breakDown={breakDown}/>) : null}
-            <div className={'block'}>
-                <p>Balance: {formatValue(balance)}</p>
-                {balance < 0 ? (<p>{`${secondsToString(-eta)} to empty`}</p>) : null}
-            </div>
-            <p>Left click to select</p>
-            {isConsumable ? (<p>Right click to consume</p>) : null}
-            {isConsumable && allowMultiConsume && amount > 10 ? (<p>Right click + CTRL to consume {formatInt(0.1*amount)}</p>) : null}
-            {isConsumable && allowMultiConsume? (<p>Right click + SHIFT to consume all</p>) : null}
-        </div> }>
-            <div className={'icon-content'}>
-                <CircularProgress progress={cooldownProg}>
-                    <img src={`icons/resources/${id}.png`} className={'resource'} />
-                </CircularProgress>
-                <span className={'level'}>{formatValue(amount)}</span>
-            </div>
-        </TippyWrapper>
-
-    </div> )
-}, ((prevProps, currProps) => {
-    if(prevProps.id !== currProps.id) {
-        return false;
-    }
-
-    if(prevProps.amount !== currProps.amount) {
-        return false;
-    }
-
-    if(prevProps.eta !== currProps.eta && (currProps.eta < 0 || prevProps.eta < 0)) {
-        return false;
-    }
-
-    if(prevProps.cooldownProg !== currProps.cooldownProg) {
-        return false;
-    }
-
-    if(prevProps.isConsumed !== currProps.isConsumed) {
-        return false;
-    }
-
-    if(prevProps.isChanged !== currProps.isChanged) {
-        return false;
-    }
-
-    if(prevProps.isSelected !== currProps.isSelected) {
-        return false;
-    }
-    return true;
-}))
-
-export const InventoryDetails = React.memo(({isChanged, editData, viewedData, resources, onAddAutoconsumeRule, onSetAutoconsumeRuleValue, onDeleteAutoconsumeRule, onAddAutosellRule, onSetAutosellRuleValue, onDeleteAutosellRule, onSave, onCancel, onSell, onSetAutosellPattern, onSetAutoconsumePattern, onSetAutosellReserved, onSetAutoconsumeReserved, onToggleAutoconsume, onToggleAutosell, automationUnlocked, onConsume, onTogglePinned, onToggleViewLasting}) => {
-
-    const worker = useContext(WorkerContext);
-
-    const { sendData, onMessage, removeMessage } = useWorkerClient(worker);
-
-    const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
-
-    const [details, setDetails] = useState(null);
-
-    const item = viewedData ? viewedData : editData;
-
-    let isEditing = !!editData && !viewedData;
-
-    if(!item) return null;
-
-    useEffect(() => {
-
-        if(item) {
-            sendData('query-inventory-details', { id: item.id, prefix: 'detail-blade' })
-        }
-    }, [item]);
-
-    useEffect(() => {
-        if(currentTourId === 'inventory' && details?.id === 'inventory_brightleaf') {
-            unlockNextById(14);
-        }
-    }, [details?.numConsumed, details?.currentDuration]);
-
-    useEffect(() => {
-        onMessage('detail-blade-inventory-details', (data) => {
-            setDetails(data);
-        });
-        
-        return () => {
-            removeMessage('detail-blade-inventory-details');
-        };
-    }, []);
-
-    const setAutoconsumePattern = (pattern) => {
-      onSetAutoconsumePattern(pattern)
-    }
-
-    const addAutoconsumeRule = () => {
-        onAddAutoconsumeRule()
-    }
-
-    const setAutoconsumeRuleValue = (index, key, value) => {
-        onSetAutoconsumeRuleValue(index, key, value)
-    }
-
-    const deleteAutoconsumeRule = (index) => {
-        onDeleteAutoconsumeRule(index)
-    }
-
-    const setAutosellPattern = (pattern) => {
-        onSetAutosellPattern(pattern)
-    }
-
-    const addAutosellRule = () => {
-        onAddAutosellRule()
-    }
-
-    const setAutosellRuleValue = (index, key, value) => {
-        onSetAutosellRuleValue(index, key, value)
-    }
-
-    const deleteAutosellRule = (index) => {
-        onDeleteAutosellRule(index)
-    }
-
-    const setReservedValue = (reserved) => {
-        onSetAutosellReserved(reserved)
-    }
-
-    const setReservedConsumeValue = (reserved) => {
-        onSetAutoconsumeReserved(reserved)
-    }
-
-    const toggleAutosell = () => {
-        onToggleAutosell()
-    }
-
-    const toggleAutoconsume = () => {
-        onToggleAutoconsume()
-    }
-
-    const consumeItem = () => {
-        if(currentTourId === 'inventory' && item.id === 'inventory_brightleaf') {
-            unlockNextById(14);
-        }
-        onConsume(item.id);
-    }
-
-    const togglePinned = () => {
-        onTogglePinned(item.id, !(details || item).isPinned);
-    }
-
-    const toggleViewLasting = () => {
-        onToggleViewLasting(item.id, !(details || item).show_lasting);
-    }
-
-    if(currentTourId === 'inventory' && item.id === 'inventory_brightleaf' && isEditing) {
-        unlockNextById(11);
-    }
-
-    return (
-        <>
-            <div className={'blade-outer'}>
-                <PerfectScrollbar>
-                    <div className={'blade-inner inventory-items-blade'}>
-                        <div className={'block'}>
-                            <div className={'inner-heading flex-container flex-row'}>
-                                <h4>{item.name} (x{formatInt(item.amount)})</h4>
-                                <PinResource id={item.id} isPinned={details?.isPinned} />
-                            </div>
-
-                            <div className={'description'}>
-                                {item.description}
-                            </div>
-                        </div>
-                        <div className={'block'}>
-                            <div className={'tags-container'}>
-                                {item.tags.map(tag => (<div key={tag} className={'tag'}>{tag}</div> ))}
-                            </div>
-                        </div>
-                        {item?.effects?.length ? (<div className={'block'}>
-                            <p>Effects on usage:</p>
-                            <div className={'effects'}>
-                                <EffectsSection effects={item.effects}/>
-                            </div>
-                        </div>) : null}
-                        {item.potentialPermanentEffects ? (<div className={'block'}>
-                            <p>Permanent Effects:</p>
-                            <div className={'effects'}>
-                                <ResourceComparison effects1={item.permanentEffects} effects2={item.potentialPermanentEffects}/>
-                            </div>
-                        </div>) : null}
-                        {item.duration ? (<div className={'block'}>
-                            <p>Effects lasting: {secondsToString(item.duration)}</p>
-                            <div className={'effects'}>
-                                <EffectsSection effects={item.potentialEffects} />
-                            </div>
-                            {item.canShowLasting ? (<div className={'show-lasting'}>
-                                <CustomButton
-                                    iconId={'icon_view_lasting'}
-                                    className={`toggle-effect-monitor medium-sm ${details?.show_lasting ? 'highlighted' : ''}`}
-                                    onClick={(e) => {toggleViewLasting()}}
-                                >{details?.show_lasting ? 'Stop showing active effects in left sidebar' : 'Show when active in left sidebar'}</CustomButton>
-                            </div> ) : null}
-                        </div>) : null}
-
-                        <div className={'block'}>
-                            {item.isConsumable ? (<div className={'flex-container consumption-block'}>
-                                <div className={'stats'}>
-                                    <p>Consumption Cooldown: {secondsToString(item.consumptionCooldown)}</p>
-                                    <p>Consumed amount: {formatInt(item.numConsumed)}</p>
-                                </div>
-                                <div className={'consume-block'}>
-                                    <button className={'consume-button'} onClick={consumeItem} disabled={details?.currentCooldown > 0 || details?.currentDuration > 0}>Consume</button>
-                                    {details?.currentDuration ? (<p className={'small'}>Running: {secondsToString(details?.currentDuration)}</p>) : null}
-                                    {details?.currentCooldown ? (<p className={'small'}>Cooldown: {secondsToString(details?.currentCooldown)}</p>) : null}
-                                </div>
-                            </div>) : null}
-                            {item.isSellable ? (<div>
-                                <p>Sold amount: {formatInt(item.soldAmount)}</p>
-                                <p>Coins Earned: {formatInt(item.coinsEarned)}</p>
-                            </div>) : null}
-                        </div>
-
-                        {item.isConsumable && automationUnlocked ? (<div className={'autoconsume-setting block'}>
-                            <div className={'rules-header flex-container'}>
-                                <p>Autoconsumption rules: {item.autoconsume?.rules?.length ? null : 'None'}</p>
-                                <label>
-                                    <input type={'checkbox'} checked={item.autoconsume?.isEnabled ?? undefined} onChange={toggleAutoconsume}/>
-                                    {item.autoconsume?.isEnabled ? ' ON' : ' OFF'}
-                                </label>
-                                {isEditing ? (<button onClick={addAutoconsumeRule}>Add rule (AND)</button>) : null}
-                            </div>
-
-                            <RulesList
-                                prefix={'autoconsume'}
-                                isEditing={isEditing}
-                                rules={item.autoconsume?.rules || []}
-                                resources={resources}
-                                pattern={item.autoconsume?.pattern}
-                                deleteRule={deleteAutoconsumeRule}
-                                setRuleValue={setAutoconsumeRuleValue}
-                                setPattern={setAutoconsumePattern}
-                                isAutoCheck={item.autoconsume?.isEnabled}
-                            />
-                            <div className={'autoconsume-amount flex-container'}>
-                                <p>Reserved Amount:</p>
-                                {isEditing ? <input type={'number'} onChange={e => setReservedConsumeValue(+e.target.value)}
-                                        value={item.autoconsume?.reserved || 0}/> : <span>{formatValue(item.autoconsume?.reserved || 0)}</span>}
-                            </div>
-                        </div>) : null}
-
-                        {item.isSellable && automationUnlocked ? (<div className={'autoconsume-setting block'}>
-                            <div className={'rules-header flex-container'}>
-                                <p>Autosell rules: {item.autosell?.rules?.length ? null : 'None'}</p>
-                                <label>
-                                    <input type={'checkbox'} checked={item.autosell?.isEnabled ?? undefined} onChange={toggleAutosell}/>
-                                    {item.autosell?.isEnabled ? ' ON' : ' OFF'}
-                                </label>
-                                {isEditing ? (<button onClick={addAutosellRule}>Add rule (AND)</button>) : null}
-                            </div>
-
-                            <RulesList
-                                prefix={'autosell'}
-                                isEditing={isEditing}
-                                rules={item.autosell?.rules || []}
-                                pattern={item.autosell?.pattern}
-                                resources={resources}
-                                deleteRule={deleteAutosellRule}
-                                setRuleValue={setAutosellRuleValue}
-                                setPattern={setAutosellPattern}
-                                isAutoCheck={item.autosell?.isEnabled}
-                            />
-                            <div className={'autosell-amount flex-container'}>
-                                <p>Reserved Amount:</p>
-                                {isEditing ? <input type={'number'} onChange={e => setReservedValue(+e.target.value)}
-                                        value={item.autosell?.reserved || 0}/> : <span>{formatValue(item.autosell?.reserved || 0)}</span>}
-                            </div>
-                        </div>) : null}
-
-                        {item.isSellable ? (<div className={'block sell-block'}>
-                            <p className={'text-desc'}>Sell price: {formatValue(item.sellPrice)}</p>
-                            <div className={'buttons flex-container'}>
-                                <button disabled={item.maxSell < 1} onClick={() => onSell(item.id, 1)}>Sell</button>
-                                <button disabled={item.maxSell < 1} onClick={() => onSell(item.id, item.maxSell)}>Sell max (x{formatInt(item.maxSell)})</button>
-                            </div>
-                        </div> ) : null}
-
-
-                    </div>
-                </PerfectScrollbar>
-            </div>
-            {isEditing ? (<div className={'buttons flex-container main-buttons'}>
-                <button className={'primary-action'} disabled={!isChanged} onClick={onSave}>Save</button>
-                {/*<TippyWrapper content={<div className={'hint-popup'}>Pinning item will make it visible at resources panel</div> }>
-                    <button onClick={togglePinned}>{details?.isPinned ? 'Unpin' : 'Pin'}</button>
-                </TippyWrapper>*/}
-                <button className={'warning-action'} onClick={onCancel}>Cancel</button>
-            </div>) : null}
-        </>
-    )
-}, (prevProps, currentProps) => {
-
-    if(prevProps.isChanged !== currentProps.isChanged) {
-        return false;
-    }
-
-    if(prevProps.editData !== currentProps.editData) {
-        return false;
-    }
-
-    if(prevProps.viewedData !== currentProps.viewedData) {
-        return false;
-    }
-
-    return true;
-})
-
-export const InventoryStats = ({ details, setDetailVisible }) => {
-
-    const { isMobile } = useAppContext();
-    // Масив статистик, які потрібно відобразити
-    const statsToDisplay = [
-        /*details.metabolism_rate,
-        details.cooldown_bonus,*/
-        details.bargaining,
-        details.bargaining_mod,
-        details.shop_max_stock,
-        details.shop_stock_renew_rate,
-        // Додайте інші статистики за потребою
-    ];
-
-    const hasEffect = useCallback((stat) => {
-        if(!stat?.value) return false;
-        return !stat.isMultiplier || Math.abs(stat?.value - 1.0) > 1.e-7;
-    }, [])
-
-    return (
-        <PerfectScrollbar>
-            <div className={'blade-inner'}>
-                <div className={'block'}>
-                    <p>General Stats:</p>
-                    <div className={'effects'}>
-                        {statsToDisplay.map((stat) => (
-                            hasEffect(stat) ? (
-                                <StatRow key={stat.id} stat={stat} />
-                            ) : null
-                        ))}
-                    </div>
-                </div>
-                {isMobile ? (<div className={'block buttons'}>
-                    <button onClick={() => setDetailVisible(false)}>Close</button>
-                </div>) : null}
-            </div>
-        </PerfectScrollbar>
-    );
-};
