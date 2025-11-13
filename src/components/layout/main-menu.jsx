@@ -15,6 +15,70 @@ const MENU_ITEMS = [
     { id: 'spellbook', label: 'Magic', unlockKey: 'spellbook', domId: 'main-menu-spellbook' },
 ];
 
+const isPlainObject = (value) => Object.prototype.toString.call(value) === '[object Object]';
+
+const cloneMenuValue = (value) => {
+    if (Array.isArray(value)) {
+        return value.map(cloneMenuValue);
+    }
+
+    if (isPlainObject(value)) {
+        const cloned = {};
+        for (const [key, nestedValue] of Object.entries(value)) {
+            cloned[key] = cloneMenuValue(nestedValue);
+        }
+        return cloned;
+    }
+
+    return value;
+};
+
+const areMenuValuesEqual = (prevValue, nextValue) => {
+    if (Object.is(prevValue, nextValue)) {
+        return true;
+    }
+
+    const prevIsArray = Array.isArray(prevValue);
+    const nextIsArray = Array.isArray(nextValue);
+    if (prevIsArray || nextIsArray) {
+        if (!prevIsArray || !nextIsArray || prevValue.length !== nextValue.length) {
+            return false;
+        }
+        for (let i = 0; i < prevValue.length; i += 1) {
+            if (!areMenuValuesEqual(prevValue[i], nextValue[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    const prevIsObject = isPlainObject(prevValue);
+    const nextIsObject = isPlainObject(nextValue);
+    if (prevIsObject || nextIsObject) {
+        if (!prevIsObject || !nextIsObject) {
+            return false;
+        }
+
+        const prevKeys = Object.keys(prevValue);
+        const nextKeys = Object.keys(nextValue);
+        if (prevKeys.length !== nextKeys.length) {
+            return false;
+        }
+
+        for (const key of prevKeys) {
+            if (!Object.prototype.hasOwnProperty.call(nextValue, key)) {
+                return false;
+            }
+            if (!areMenuValuesEqual(prevValue[key], nextValue[key])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    return false;
+};
+
 const areMenuMapsEqual = (prev = {}, next = {}) => {
     const prevKeys = Object.keys(prev);
     const nextKeys = Object.keys(next);
@@ -22,35 +86,16 @@ const areMenuMapsEqual = (prev = {}, next = {}) => {
 
     for (const key of prevKeys) {
         if (!Object.prototype.hasOwnProperty.call(next, key)) return false;
-        const prevValue = prev[key];
-        const nextValue = next[key];
-
-        const prevIsObject = typeof prevValue === 'object' && prevValue !== null;
-        const nextIsObject = typeof nextValue === 'object' && nextValue !== null;
-
-        if (prevIsObject && nextIsObject) {
-            const prevInnerKeys = Object.keys(prevValue);
-            const nextInnerKeys = Object.keys(nextValue);
-            if (prevInnerKeys.length !== nextInnerKeys.length) return false;
-            for (const innerKey of prevInnerKeys) {
-                if (!Object.prototype.hasOwnProperty.call(nextValue, innerKey)) return false;
-                if (!Object.is(prevValue[innerKey], nextValue[innerKey])) return false;
-            }
-            continue;
-        }
-
-        if (!Object.is(prevValue, nextValue)) return false;
+        if (!areMenuValuesEqual(prev[key], next[key])) return false;
     }
 
     return true;
 };
 
 const normalizeMenuMap = (map = {}) => {
-    const normalized = Object.create(null);
+    const normalized = {};
     for (const [key, value] of Object.entries(map || {})) {
-        normalized[key] = typeof value === 'object' && value !== null
-            ? { ...value }
-            : value;
+        normalized[key] = cloneMenuValue(value);
     }
     return normalized;
 };
