@@ -235,7 +235,7 @@ export const Inventory = ({}) => {
     useEffect(() => {
         const interval = setInterval(() => {
             sendData('query-inventory-data', {});
-        }, 100);
+        }, 200);
         sendData('query-all-resources', { prefix: 'inventory'});
         const interval2 = setInterval(() => {
             sendData('query-new-unlocks-notifications', { suffix: 'inventory', scope: 'inventory' })
