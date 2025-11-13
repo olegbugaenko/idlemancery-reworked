@@ -1,9 +1,61 @@
-import React, { useState, useEffect, useContext, useCallback } from "react";
+import React, { useState, useEffect, useContext, useCallback, useRef, useMemo } from "react";
 import WorkerContext from "../../context/worker-context";
 import { useWorkerClient } from "../../general/client";
 import { useAppContext } from "../../context/ui-context";
 import { NewNotificationWrap } from "../shared/new-notification-wrap.jsx";
-import {useTutorial} from "../../context/tutorial-context";
+
+const MENU_ITEMS = [
+    { id: 'actions', label: 'Actions', unlockKey: 'actions', domId: 'main-menu-actions' },
+    { id: 'shop', label: 'Shop', unlockKey: 'shop', domId: 'shop', lockedText: 'Locked (Reach 2 coins)' },
+    { id: 'inventory', label: 'Inventory', unlockKey: 'inventory', domId: 'main-menu-inventory' },
+    { id: 'property', label: 'Property', unlockKey: 'property', domId: 'main-menu-property' },
+    { id: 'world', label: 'World', unlockKey: 'world', domId: 'main-menu-world' },
+    { id: 'workshop', label: 'Workshop', unlockKey: 'workshop', domId: 'main-menu-workshop' },
+    { id: 'social', label: 'Social', unlockKey: 'social', domId: 'main-menu-social' },
+    { id: 'spellbook', label: 'Magic', unlockKey: 'spellbook', domId: 'main-menu-spellbook' },
+];
+
+const areMenuMapsEqual = (prev = {}, next = {}) => {
+    if (prev === next) return true;
+    const prevKeys = Object.keys(prev);
+    const nextKeys = Object.keys(next);
+    if (prevKeys.length !== nextKeys.length) return false;
+
+    for (const key of prevKeys) {
+        if (!Object.prototype.hasOwnProperty.call(next, key)) return false;
+        const prevValue = prev[key];
+        const nextValue = next[key];
+
+        const prevIsObject = typeof prevValue === 'object' && prevValue !== null;
+        const nextIsObject = typeof nextValue === 'object' && nextValue !== null;
+
+        if (prevIsObject && nextIsObject) {
+            const prevInnerKeys = Object.keys(prevValue);
+            const nextInnerKeys = Object.keys(nextValue);
+            if (prevInnerKeys.length !== nextInnerKeys.length) return false;
+            for (const innerKey of prevInnerKeys) {
+                if (!Object.prototype.hasOwnProperty.call(nextValue, innerKey)) return false;
+                if (!Object.is(prevValue[innerKey], nextValue[innerKey])) return false;
+            }
+            continue;
+        }
+
+        if (!Object.is(prevValue, nextValue)) return false;
+    }
+
+    return true;
+};
+
+const buildHotkeyLookup = (hotkeys = {}) => {
+    const lookup = Object.create(null);
+    for (const hotkey of Object.values(hotkeys)) {
+        const combination = hotkey?.combination?.toUpperCase();
+        if (combination) {
+            lookup[combination] = hotkey;
+        }
+    }
+    return lookup;
+};
 
 export const MainMenu = () => {
     const worker = useContext(WorkerContext);
@@ -11,8 +63,9 @@ export const MainMenu = () => {
     const { openedTab, setOpenedTab, togglePopup } = useAppContext();
     const [unlocks, setUnlocksData] = useState({});
     const [newUnlocks, setNewUnlocks] = useState({});
-    const [hotkeys, setHotkeys] = useState({});
-    const { stepIndex, unlockNextById, jumpOver, currentTourId } = useTutorial();
+    const unlocksRef = useRef(unlocks);
+    const newUnlocksRef = useRef(newUnlocks);
+    const hotkeyMapRef = useRef(Object.create(null));
 
     useEffect(() => {
         sendData('query-unlocks', { prefix: 'main-menu' });
@@ -27,10 +80,28 @@ export const MainMenu = () => {
         return () => {
             clearInterval(interval);
         }
-    }, []);
+    }, [sendData]);
 
-    const triggerHotkey = (combination) => {
-        const hotkey = Object.values(hotkeys || {}).find(h => h.combination === combination);
+    const openTab = useCallback((id) => {
+        setOpenedTab(id);
+    }, [setOpenedTab]);
+
+    const updateUnlocks = useCallback((nextUnlocks = {}) => {
+        if (!areMenuMapsEqual(unlocksRef.current, nextUnlocks)) {
+            unlocksRef.current = nextUnlocks;
+            setUnlocksData(nextUnlocks);
+        }
+    }, [setUnlocksData]);
+
+    const updateNewUnlocks = useCallback((nextNewUnlocks = {}) => {
+        if (!areMenuMapsEqual(newUnlocksRef.current, nextNewUnlocks)) {
+            newUnlocksRef.current = nextNewUnlocks;
+            setNewUnlocks(nextNewUnlocks);
+        }
+    }, [setNewUnlocks]);
+
+    const triggerHotkey = useCallback((combination) => {
+        const hotkey = hotkeyMapRef.current[combination];
 
         if(!hotkey) return;
 
@@ -39,11 +110,7 @@ export const MainMenu = () => {
         } else if(hotkey.action === 'openQuickAccess') {
             togglePopup('quick-access');
         }
-    }
-
-    const openTab = useCallback((id) => {
-        setOpenedTab(id);
-    }, [setOpenedTab]);
+    }, [openTab, togglePopup]);
 
     useEffect(() => {
         const isEditableTarget = (el) => {
@@ -78,18 +145,18 @@ export const MainMenu = () => {
             if (event.shiftKey) keys.push("Shift");
             if (event.altKey) keys.push("Alt");
             keys.push(event.key.toUpperCase());
-            const combination = keys.join("+");
+            const combination = keys.join("+").toUpperCase();
 
             triggerHotkey(combination); // Call triggerHotkey when a combination is pressed
         };
 
         window.addEventListener("keydown", handleKeyDown, { capture: true });
         return () => window.removeEventListener("keydown", handleKeyDown, { capture: true });
-    }, [hotkeys]);
+    }, [triggerHotkey]);
 
     useEffect(() => {
         const handleAllHotkeys = (payload) => {
-            setHotkeys(payload);
+            hotkeyMapRef.current = buildHotkeyLookup(payload);
         };
 
         const handleHotkeyTriggered = (hotkey) => {
@@ -102,8 +169,8 @@ export const MainMenu = () => {
 
         onMessage('all-hotkeys-all', handleAllHotkeys);
         onMessage('hotkey-triggered', handleHotkeyTriggered);
-        onMessage('unlocks-main-menu', setUnlocksData);
-        onMessage('new-unlocks-notifications-main-menu', setNewUnlocks);
+        onMessage('unlocks-main-menu', updateUnlocks);
+        onMessage('new-unlocks-notifications-main-menu', updateNewUnlocks);
 
         return () => {
             removeMessage('all-hotkeys-all');
@@ -111,73 +178,48 @@ export const MainMenu = () => {
             removeMessage('unlocks-main-menu');
             removeMessage('new-unlocks-notifications-main-menu');
         };
-    }, [onMessage, removeMessage, openTab, togglePopup, setUnlocksData, setNewUnlocks]);
+    }, [onMessage, removeMessage, openTab, togglePopup, updateUnlocks, updateNewUnlocks]);
+
+    const menuItems = useMemo(() => MENU_ITEMS.map((item) => {
+        const isUnlocked = Boolean(unlocks[item.unlockKey]);
+        const hasNotification = Boolean(newUnlocks[item.unlockKey]?.hasNew);
+
+        return {
+            ...item,
+            isUnlocked,
+            hasNotification,
+        };
+    }), [unlocks, newUnlocks]);
 
     return (
         <div className={'left-most'}>
             <ul className={'menu bigger'}>
-                {unlocks.actions && (
-                    <li id={'main-menu-actions'} className={openedTab === 'actions' ? 'active' : ''} onClick={() => {
-                        setOpenedTab('actions')
-                    }}>
-                        <NewNotificationWrap isNew={newUnlocks.actions?.hasNew}>
-                            <span>Actions</span>
-                        </NewNotificationWrap>
-                    </li>
-                )}
-                {unlocks.shop ? (
-                    <li id={'shop'} className={openedTab === 'shop' ? 'active' : ''} onClick={() => setOpenedTab('shop')}>
-                        <NewNotificationWrap isNew={newUnlocks.shop?.hasNew}>
-                            <span>Shop</span>
-                        </NewNotificationWrap>
-                    </li>
-                ) : (
-                    <li id={'shop'} className={'locked'}>
-                        <span>Locked (Reach 2 coins)</span>
-                    </li>
-                )}
-                {unlocks.inventory && (
-                    <li id={'main-menu-inventory'} className={openedTab === 'inventory' ? 'active' : ''} onClick={() => setOpenedTab('inventory')}>
-                        <NewNotificationWrap isNew={newUnlocks.inventory?.hasNew}>
-                            <span>Inventory</span>
-                        </NewNotificationWrap>
-                    </li>
-                )}
-                {unlocks.property && (
-                    <li id={'main-menu-property'} className={openedTab === 'property' ? 'active' : ''} onClick={() => setOpenedTab('property')}>
-                        <NewNotificationWrap isNew={newUnlocks.property?.hasNew}>
-                            <span>Property</span>
-                        </NewNotificationWrap>
-                    </li>
-                )}
-                {unlocks.world && (
-                    <li id={'main-menu-world'} className={openedTab === 'world' ? 'active' : ''} onClick={() => setOpenedTab('world')}>
-                        <NewNotificationWrap isNew={newUnlocks.world?.hasNew}>
-                            <span>World</span>
-                        </NewNotificationWrap>
-                    </li>
-                )}
-                {unlocks.workshop && (
-                    <li id={'main-menu-workshop'} className={openedTab === 'workshop' ? 'active' : ''} onClick={() => setOpenedTab('workshop')}>
-                        <NewNotificationWrap isNew={newUnlocks.workshop?.hasNew}>
-                            <span>Workshop</span>
-                        </NewNotificationWrap>
-                    </li>
-                )}
-                {unlocks.social && (
-                    <li id={'main-menu-social'} className={openedTab === 'social' ? 'active' : ''} onClick={() => setOpenedTab('social')}>
-                        <NewNotificationWrap isNew={newUnlocks.social?.hasNew}>
-                            <span>Social</span>
-                        </NewNotificationWrap>
-                    </li>
-                )}
-                {unlocks.spellbook && (
-                    <li id={'main-menu-spellbook'} className={openedTab === 'spellbook' ? 'active' : ''} onClick={() => setOpenedTab('spellbook')}>
-                        <NewNotificationWrap isNew={newUnlocks.spellbook?.hasNew}>
-                            <span>Magic</span>
-                        </NewNotificationWrap>
-                    </li>
-                )}
+                {menuItems.map(({ id, domId, label, isUnlocked, hasNotification, lockedText }) => {
+                    if (!isUnlocked && !lockedText) {
+                        return null;
+                    }
+
+                    if (!isUnlocked) {
+                        return (
+                            <li key={id} id={domId} className={'locked'}>
+                                <span>{lockedText}</span>
+                            </li>
+                        );
+                    }
+
+                    return (
+                        <li
+                            key={id}
+                            id={domId}
+                            className={openedTab === id ? 'active' : ''}
+                            onClick={() => openTab(id)}
+                        >
+                            <NewNotificationWrap isNew={hasNotification}>
+                                <span>{label}</span>
+                            </NewNotificationWrap>
+                        </li>
+                    );
+                })}
             </ul>
         </div>
     );
