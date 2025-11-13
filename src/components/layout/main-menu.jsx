@@ -16,7 +16,6 @@ const MENU_ITEMS = [
 ];
 
 const areMenuMapsEqual = (prev = {}, next = {}) => {
-    if (prev === next) return true;
     const prevKeys = Object.keys(prev);
     const nextKeys = Object.keys(next);
     if (prevKeys.length !== nextKeys.length) return false;
@@ -44,6 +43,16 @@ const areMenuMapsEqual = (prev = {}, next = {}) => {
     }
 
     return true;
+};
+
+const normalizeMenuMap = (map = {}) => {
+    const normalized = Object.create(null);
+    for (const [key, value] of Object.entries(map || {})) {
+        normalized[key] = typeof value === 'object' && value !== null
+            ? { ...value }
+            : value;
+    }
+    return normalized;
 };
 
 const buildHotkeyLookup = (hotkeys = {}) => {
@@ -87,16 +96,18 @@ export const MainMenu = () => {
     }, [setOpenedTab]);
 
     const updateUnlocks = useCallback((nextUnlocks = {}) => {
-        if (!areMenuMapsEqual(unlocksRef.current, nextUnlocks)) {
-            unlocksRef.current = nextUnlocks;
-            setUnlocksData(nextUnlocks);
+        const normalizedUnlocks = normalizeMenuMap(nextUnlocks);
+        if (!areMenuMapsEqual(unlocksRef.current, normalizedUnlocks)) {
+            unlocksRef.current = normalizedUnlocks;
+            setUnlocksData(normalizedUnlocks);
         }
     }, [setUnlocksData]);
 
     const updateNewUnlocks = useCallback((nextNewUnlocks = {}) => {
-        if (!areMenuMapsEqual(newUnlocksRef.current, nextNewUnlocks)) {
-            newUnlocksRef.current = nextNewUnlocks;
-            setNewUnlocks(nextNewUnlocks);
+        const normalizedNewUnlocks = normalizeMenuMap(nextNewUnlocks);
+        if (!areMenuMapsEqual(newUnlocksRef.current, normalizedNewUnlocks)) {
+            newUnlocksRef.current = normalizedNewUnlocks;
+            setNewUnlocks(normalizedNewUnlocks);
         }
     }, [setNewUnlocks]);
 
