@@ -37,6 +37,12 @@ export const registerArtifact = (id, options) => {
     }
     const ingredients = Object.keys(cost);
     options.attributes = {...(options.attributes || {}), ingredients}
+    const originalUnlockCondition = options.unlockCondition;
+    options.unlockCondition = () => {
+        if(!gameEntity.isEntityUnlocked('action_expedition')) return false;
+        if(originalUnlockCondition) return originalUnlockCondition();
+        return true;
+    }
     gameEntity.registerGameEntity(id, options);
 }
 

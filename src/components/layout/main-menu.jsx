@@ -239,7 +239,9 @@ export const MainMenu = () => {
     const menuItems = useMemo(() => MENU_ITEMS.map((item) => {
         const isUnlocked = Boolean(unlocks[item.unlockKey]);
         const hasNotification = Boolean(newUnlocks[item.unlockKey]?.hasNew);
-
+        if(item.id === 'property') {
+            console.log('Updating menu', item.id, hasNotification, newUnlocks[item.unlockKey]);
+        }
         return {
             ...item,
             isUnlocked,
