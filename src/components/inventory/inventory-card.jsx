@@ -6,6 +6,9 @@ import {BreakDown} from "../layout/sidebar.jsx";
 import {useFlashOnLevelUp} from "../../general/hooks/flash";
 import {NewNotificationWrap} from "../shared/new-notification-wrap.jsx";
 
+const itemKeysToCompare = ['id', 'eta', 'cooldownProg', 'isConsumed', 'isChanged', 'isSelected', 'cooldownProg'];
+const itemKeysToCompareDelta = ['amount', 'balance']
+
 export const InventoryCard = React.memo(({ isChanged, eta, usages, usagesFor, allowMultiConsume, isConsumable, isRare, isRareIngredient, isSelected, id, name, amount, balance, breakDown, isConsumed, cooldownProg, cooldown, onFlash, onPurchase, onShowDetails, onEditConfig, isMobile}) => {
     const elementRef = useRef(null);
 
@@ -141,6 +144,18 @@ const InventoryItemComponent = ({
 };
 
 const areInventoryItemPropsEqual = (prev, next) => {
+    if(!prev.item || !next.item) return false;
+
+    itemKeysToCompare.forEach(key => {
+        if(prev.item[key] !== next.item[key]) {
+            return false;
+        }
+    });
+    itemKeysToCompareDelta.forEach(key => {
+        if(Math.abs(1 -(prev.item[key] / (next.item[key] + 1.e-6))) > 1.e-3) {
+            return false;
+        }
+    });
     return (
         prev.item === next.item &&
         prev.isChanged === next.isChanged &&
