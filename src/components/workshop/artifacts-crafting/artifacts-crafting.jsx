@@ -146,6 +146,8 @@ export const ArtifactsCrafting = ({ children }) => {
                     <div className="artifacts-crafting-header">
                         <h2>Artifact Discovery</h2>
                         <p>Place materials in slots to discover artifact recipes</p>
+                        <p>Artifacts can be discovered by clicking on the "Check Recipe" button</p>
+                        <p>Every discovered recipe unlock its own artifact, which can be purchased in the Artifacts tab under "Property" menu</p>
                     </div>
 
                     {/* Crafting Slots */}

@@ -3083,7 +3083,7 @@ export const registerActionsStage1 = () => {
                 effects: {
                     'machinery_efficiency': {
                         A: 0.002*gameEffects.getEffectValue(getRankId('action_learn_mechanics')),
-                        B: 0.098*gameEffects.getEffectValue(getRankId('action_learn_mechanics')),
+                        B: 0.998*gameEffects.getEffectValue(getRankId('action_learn_mechanics')),
                         type: 0,
                     }
                 }
@@ -4658,6 +4658,7 @@ export const registerActionsStage1 = () => {
         }
     })
 
+
     registerGameAction('action_crafting_training', {
         tags: ["action", "training", "physical"],
         name: 'Crafting Training',
@@ -4763,6 +4764,62 @@ export const registerActionsStage1 = () => {
         },
         attributes: {
             baseXPCost: 25000,
+            isTraining: true,
+            isRankAvailable: true,
+        }
+    })
+
+    
+    registerGameAction('action_archeology_intuition_training', {
+        tags: ["action", "training", "magical", "spiritual"],
+        name: 'Archeology Intuition Training',
+        category: ACTION_CATS.MAGICAL,
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        discountEffects: ['magical_actions_discount'],
+        description: 'Train your intuition to better understand the mysteries of the past and increase your efficiency in understanding where to search for artifacts.',
+        level: 1,
+        minDemoVersion: 20,
+        getLearnRate: () => {
+            return 1
+        },
+        learningEffects: ['spiritual_learning_rate'],
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'expedition_xp_rate': {
+                        A: 0.01*gameEffects.getEffectValue(getRankId('action_alchemy_training')),
+                        B: 0.99,
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 1500000,
+                        type: 0,
+                    },
+                    'knowledge': {
+                        A: 0.0,
+                        B: 4000000,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: []
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_magic_ability',
+            level: 60000
+        }],
+        unlockCondition: () => {
+            return true
+        },
+        attributes: {
+            baseXPCost: 1.e+16,
             isTraining: true,
             isRankAvailable: true,
         }

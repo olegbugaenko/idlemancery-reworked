@@ -440,14 +440,14 @@ export const CraftingListsPanel = ({ runningList, editListToDetails, lists, view
             <div className={'panel-col automation-interval'}>
                 <label>
                     Switch lists interval:
-                    <select onChange={e => changeAutomationInterval(+e.target.value)}>
-                        <option value={10} selected={autotriggerIntervalSetting === 10}>10 seconds</option>
-                        <option value={30} selected={autotriggerIntervalSetting === 30}>30 seconds</option>
-                        <option value={60} selected={autotriggerIntervalSetting === 60}>1 minute</option>
-                        <option value={300} selected={autotriggerIntervalSetting === 300}>5 minutes</option>
-                        <option value={900} selected={autotriggerIntervalSetting === 900}>15 minutes</option>
-                        <option value={1800} selected={autotriggerIntervalSetting === 1800}>30 minutes</option>
-                        <option value={3600} selected={autotriggerIntervalSetting === 3600}>1 hour</option>
+                    <select value={autotriggerIntervalSetting} onChange={e => changeAutomationInterval(+e.target.value)}>
+                        <option value={10}>10 seconds</option>
+                        <option value={30}>30 seconds</option>
+                        <option value={60}>1 minute</option>
+                        <option value={300}>5 minutes</option>
+                        <option value={900}>15 minutes</option>
+                        <option value={1800}>30 minutes</option>
+                        <option value={3600}>1 hour</option>
                     </select>
                 </label>
             </div>

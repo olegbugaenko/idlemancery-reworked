@@ -4,6 +4,7 @@ import {charismaMod, registerShopItemsStage1} from "./shop-db";
 import {sellPriceMod} from "../inventory/inventory-items-db";
 import {registerCourseItemsStage1} from "./courses-db";
 import {checkMatchingRules} from "../../shared/utils/rule-utils";
+import { resourceResponse } from "../../shared/utils/transform/resources";
 
 export class CoursesModule extends GameModule {
 
@@ -345,7 +346,7 @@ export class CoursesModule extends GameModule {
         }
 
         if(entityData.entityEfficiency < 1) {
-            entityData.missingResource = gameResources.getResource(gameEntity.getEntity(`learning_${entity.id}`)?.modifier?.bottleNeck);
+            entityData.missingResource = resourceResponse(gameResources.getResource(gameEntity.getEntity(`learning_${entity.id}`)?.modifier?.bottleNeck));
         }
 
         return entityData;

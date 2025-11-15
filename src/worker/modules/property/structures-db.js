@@ -914,6 +914,77 @@ export const registerStructuresStage1 = () => {
         }),
     })
 
+    registerStructure('structure_spa_center', {
+        tags: ["structure", "upgrade", "purchaseable", "recreation"],
+        name: 'Spa Center',
+        description: 'Use best of known spa techniques to relax and restore your body.',
+        level: 0,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 40000,
+        }],
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_water') &&
+                   gameResources.isResourceUnlocked('inventory_stone_brick');
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                resources: {
+                    // +2 max level per Hydraulic Press level (additive)
+                    'energy': { A: 0.2, B: 1, type: 0 },
+                    'health': { A: 0.2, B: 1, type: 0 },
+                }
+            }),
+            consumption: {
+                resources: {
+                    'living_space': { A: 3, B: 0, type: 0 }
+                }
+            }
+        },
+        get_cost: () => ({
+            'inventory_water': { A: 1.5, B: 250000, type: 1 },
+            'inventory_pot': { A: 1.5, B: 200, type: 1 },
+            'inventory_stone_brick': { A: 1.5, B: 375000, type: 1 },
+            'living_space': { A: 0, B: 3, type: 0 },
+        }),
+    })
+    
+    registerStructure('structure_meditation_center', {
+        tags: ["structure", "upgrade", "purchaseable", "recreation"],
+        name: 'Meditation Center',
+        description: 'Create your own meditation center to relax and restore your mind.',
+        level: 0,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 40000,
+        }],
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_water') &&
+                   gameResources.isResourceUnlocked('inventory_stone_brick');
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                resources: {
+                    // +2 max level per Hydraulic Press level (additive)
+                    'mana': { A: 0.2, B: 1, type: 0 },
+                }
+            }),
+            consumption: {
+                resources: {
+                    'living_space': { A: 3, B: 0, type: 0 }
+                }
+            }
+        },
+        get_cost: () => ({
+            'inventory_herbal_fibers': { A: 1.5, B: 125000, type: 1 },
+            'inventory_pot': { A: 1.5, B: 200, type: 1 },
+            'inventory_stone_brick': { A: 1.5, B: 375000, type: 1 },
+            'living_space': { A: 0, B: 3, type: 0 },
+        }),
+    })
+
     registerStructure('structure_magic_library', {
         tags: ["structure", "upgrade", "purchaseable", "magical", "education"],
         name: 'Magic Library',
@@ -1091,6 +1162,60 @@ export const registerStructuresStage1 = () => {
             'living_space': {
                 A: 0,
                 B: 5,
+                type: 0
+            }
+        }),
+    })
+
+    registerStructure('structure_forge', {
+        tags: ["structure", "upgrade", "purchaseable", "crafting", "jewelry"],
+        name: 'Forge',
+        description: 'A specialized workshop for crafting and enhancing jewelry. Increases the effectiveness of jewelry accessories.',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_forge_technology') > 0;
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'accessory_jewelry_efficiency': {
+                        A: 0.05,
+                        B: 1,
+                        C: 1.01,
+                        type: 3,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 3,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            },
+            effectDeps: ['accessory_jewelry_efficiency']
+        },
+        get_cost: () => ({
+            'inventory_stone_brick': {
+                A: 1.5,
+                B: 500000,
+                type: 1
+            },
+            'inventory_iron_plate': {
+                A: 1.5,
+                B: 200000,
+                type: 1
+            },
+            'inventory_sapphire': {
+                A: 1.5,
+                B: 500000,
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 3,
                 type: 0
             }
         }),

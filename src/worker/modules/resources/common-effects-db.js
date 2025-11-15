@@ -499,6 +499,14 @@ export const registerCommomEffects = () => {
         minValue: 1,
     })
 
+    gameEffects.registerEffect('accessory_jewelry_efficiency', {
+        name: 'Jewelry Accessories Efficiency',
+        tags: ['multiplier'],
+        description: 'Increases effects provided by accessories with tag "jewelry"',
+        defaultValue: 1,
+        minValue: 1,
+    })
+
     gameEffects.registerEffect('nature_spells_efficiency', {
         name: 'Nature Magic Efficiency',
         tags: ['multiplier'],

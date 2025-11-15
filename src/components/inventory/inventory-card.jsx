@@ -53,13 +53,13 @@ export const InventoryCard = React.memo(({ isChanged, eta, usages, usagesFor, al
             {usages?.length ? (<div className={'block'}>
                 <p>Used By:</p>
                 <div className={'sub-items'}>
-                    {usages.map(one => (<p className={'padded-left'}>{one.name}</p>))}
+                    {usages.map((one, index) => (<p key={one.id ?? one.name ?? index} className={'padded-left'}>{one.name}</p>))}
                 </div>
             </div> ) : null}
             {usagesFor?.length ? (<div className={'block'}>
                 <p>Used For:</p>
                 <div className={'sub-items'}>
-                    {usagesFor.map(one => (<p className={'padded-left'}>{one.name}</p>))}
+                    {usagesFor.map((one, index) => (<p key={one.id ?? one.name ?? index} className={'padded-left'}>{one.name}</p>))}
                 </div>
             </div> ) : null}
             {breakDown ? (<BreakDown breakDown={breakDown}/>) : null}

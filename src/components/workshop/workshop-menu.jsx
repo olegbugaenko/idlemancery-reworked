@@ -63,7 +63,7 @@ export const WorkshopMenu = ({ selectedTab, setSelectedTab }) => {
                 </li>) : null}
                 {unlocks.artifacts ? (<li id={'workshop-menu-artifacts'} className={`${selectedTab === 'artifacts' ? 'active' : ''}`} onClick={() => {setSelectedTab('artifacts');}}>
                     <NewNotificationWrap isNew={newUnlocks.workshop?.items?.artifacts?.hasNew}>
-                        <span>Artifacts</span>
+                        <span>Artifact Recipes</span>
                     </NewNotificationWrap>
                 </li>) : null}
             </ul>

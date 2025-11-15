@@ -8,7 +8,7 @@ export const registerEventsStage1 = () => {
         gameEntity.registerGameEntity(id, {
             ...options,
             isAbstract: true,
-            tags: [...(options.tags || []), "event-hall", "social"],
+            tags: [...(options.tags || []), "event-hall"],
             level: 0,
             maxLevel: 1,
             unlockCondition: options.unlockCondition || (() => true),

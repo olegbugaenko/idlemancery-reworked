@@ -3677,5 +3677,25 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+    gameEntity.registerGameEntity('shop_item_forge_technology', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Forge Technology',
+        description: 'Unlocks the construction of a Forge, a specialized workshop that enhances the effectiveness of jewelry accessories.',
+        level: 0,
+        maxLevel: 1,
+        minDemoVersion: 20,
+        unlockedBy: [{ type: 'effect', id: 'attribute_patience', level: 70000 }],
+        unlockCondition: () => true,
+        attributes: { isCollectable: false },
+        resourceModifier: {},
+        get_cost: () => ({
+            'coins': {
+                A: 1,
+                B: 1.5e+13*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        }),
+    })
+
 
 }

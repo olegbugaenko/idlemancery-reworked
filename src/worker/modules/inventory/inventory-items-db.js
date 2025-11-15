@@ -1692,7 +1692,7 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_advanced_alchemy') > 0
         },
-        sellPrice: 1500000000,
+        sellPrice: 35000000,
     })
 
     registerInventoryItem('inventory_herbalists_elixir', {
@@ -1721,7 +1721,7 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_advanced_alchemy') > 0
         },
-        sellPrice: 1500000000,
+        sellPrice: 35000000,
     })
 
     registerInventoryItem('inventory_alchemists_elixir', {
@@ -1750,7 +1750,7 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_advanced_alchemy') > 0
         },
-        sellPrice: 1500000000,
+        sellPrice: 3500000,
     })
 
     registerInventoryItem('inventory_elementalists_elixir', {
@@ -1779,7 +1779,7 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_advanced_alchemy') > 0
         },
-        sellPrice: 1500000000,
+        sellPrice: 35000000,
     })
 
     registerInventoryItem('inventory_diplomats_elixir', {
@@ -1808,7 +1808,7 @@ export const registerInventoryItems = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.getLevel('shop_item_advanced_alchemy') > 0
         },
-        sellPrice: 1500000000,
+        sellPrice: 35000000,
     })
 
 

@@ -5,6 +5,7 @@ import {CraftingListsSubmodule} from "./crafting-lists.submodule";
 import {SMALL_NUMBER} from "game-framework/src/utils/consts";
 import {packEffects} from "../../shared/utils/objects";
 import { entityResponse } from "../../shared/utils/transform/entities";
+import { resourceResponse } from "../../shared/utils/transform/resources";
 
 export class CraftingModule extends GameModule {
 
@@ -1470,7 +1471,7 @@ export class CraftingModule extends GameModule {
         return {
             ...entityResponse(entity),
             efficiency,
-            bottleNeck,
+            bottleNeck: resourceResponse(bottleNeck),
             rebalanceInfo,
             effects: this.getRecipeEffectsWithMultipliers(id, calculatedEffort, isRunning, true),
             affordable: gameEntity.getAffordable(entity.id),

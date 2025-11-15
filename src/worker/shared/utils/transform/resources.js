@@ -1,4 +1,4 @@
-export const resourceResponse = (resourceData) => ({
+export const resourceResponse = (resourceData) => resourceData ? ({
     allowedTileTypes: resourceData.allowedTileTypes,
     amount: resourceData.amount,
     attributes: resourceData.attributes,    
@@ -29,4 +29,4 @@ export const resourceResponse = (resourceData) => ({
     monitor: resourceData.monitor,
     unlocks: resourceData.unlocks,
     eta: resourceData.eta,
-})
+}) : null;

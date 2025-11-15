@@ -1,5 +1,6 @@
 import {GameModule} from "../../shared/game-module";
 import {gameCore, gameEffects, gameEntity, gameResources, resourceCalculators} from "game-framework";
+import { resourceResponse } from "../../shared/utils/transform/resources";
 
 export class ArtifactsCraftingModule extends GameModule {
 
@@ -81,7 +82,7 @@ export class ArtifactsCraftingModule extends GameModule {
             slotIndex: index,
             materialId: materialId,
             isEmpty: materialId === null,
-            material: materialId ? gameResources.getResource(materialId) : null,
+            material: materialId ? resourceResponse(gameResources.getResource(materialId)) : null,
             highlighting: this.getSlotHighlighting(materialId, index),
             matchingArtifact: matchingArtifact
         }));

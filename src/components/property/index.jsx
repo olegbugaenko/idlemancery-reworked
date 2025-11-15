@@ -274,7 +274,7 @@ export const GeneralStats = ({ setDetailVisible }) => {
                             <h4>Property Stats</h4>
                         </div>
                         <div className={'block'}>
-                            {item.property.map(stat => (<div className={'row flex-row'}>
+                            {item.property.map(stat => (<div className={'row flex-row'} key={stat.id ?? stat.name}>
                                 <TippyWrapper content={<div className={'hint-popup'}><p>{stat.description}</p></div>}>
                                     <p>{stat.name}</p>
                                 </TippyWrapper>
@@ -288,7 +288,7 @@ export const GeneralStats = ({ setDetailVisible }) => {
                         </div>
                         <div className={'block'}>
                             {item.accessories.map(stat => (
-                                <StatRow onHover={highLightMagicSchools} stat={stat}/>
+                                <StatRow key={stat.id ?? stat.name} onHover={highLightMagicSchools} stat={stat}/>
                             ))}
                         </div>
                     </>) : null}
@@ -298,7 +298,7 @@ export const GeneralStats = ({ setDetailVisible }) => {
                         </div>
                         <div className={'block'}>
                             {item.amplifiers.map(stat => (
-                                <StatRow onHover={highLightMagicSchools} stat={stat}/>
+                                <StatRow key={stat.id ?? stat.name} onHover={highLightMagicSchools} stat={stat}/>
                             ))}
                         </div>
                     </>) : null}

@@ -426,16 +426,17 @@ export const registerAccessoriesStage1 = () => {
             return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.getLevel('shop_item_stone_refinement_manual') >= 1;
         },
         resourceModifier: {
-            multiplier: {
+            get_multiplier: () => ({
                 effects: {
                     'physical_training_learn_speed': {
-                        A: 0.04,
-                        B: 1,
+                        A: 0.04*gameEffects.getEffectValue('accessory_jewelry_efficiency'),
+                        B: gameEffects.getEffectValue('accessory_jewelry_efficiency'),
                         C: 1.01,
                         type: 3,
                     }
                 }
-            },
+            }),
+            effectDeps: ['accessory_jewelry_efficiency']
         },
         get_cost: () => ({
             'inventory_ruby': {
@@ -448,7 +449,7 @@ export const registerAccessoriesStage1 = () => {
 
 
     registerAccessory('accessory_vitality_talisman', {
-        tags: ["accessory", "upgrade", "purchaseable", "storage", "mineral", "trinket"],
+        tags: ["accessory", "upgrade", "purchaseable", "storage", "jewelry", "mineral", "trinket"],
         name: 'Vitality Talisman',
         description: 'Increase your HP and energy caps',
         level: 0,
@@ -456,22 +457,23 @@ export const registerAccessoriesStage1 = () => {
             return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.getLevel('shop_item_stone_refinement_manual') >= 1;
         },
         resourceModifier: {
-            capMult: {
+            get_capMult: () => ({
                 resources: {
                     'energy': {
-                        A: 0.05,
-                        B: 1,
+                        A: 0.05*gameEffects.getEffectValue('accessory_jewelry_efficiency'),
+                        B: 1*gameEffects.getEffectValue('accessory_jewelry_efficiency'),
                         C: 1.01,
                         type: 3,
                     },
                     'health': {
-                        A: 0.05,
-                        B: 1,
+                        A: 0.05*gameEffects.getEffectValue('accessory_jewelry_efficiency'),
+                        B: 1*gameEffects.getEffectValue('accessory_jewelry_efficiency'),
                         C: 1.01,
                         type: 3,
                     }
                 }
-            },
+            }),
+            effectDeps: ['accessory_jewelry_efficiency']
         },
         get_cost: () => ({
             'inventory_ruby': {
@@ -492,16 +494,17 @@ export const registerAccessoriesStage1 = () => {
             return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.getLevel('shop_item_stone_refinement_manual') >= 1;
         },
         resourceModifier: {
-            multiplier: {
+            get_multiplier: () => ({
                 effects: {
                     'spell_xp_rate': {
-                        A: 0.1,
-                        B: 1,
+                        A: 0.1*gameEffects.getEffectValue('accessory_jewelry_efficiency'),
+                        B: gameEffects.getEffectValue('accessory_jewelry_efficiency'),
                         C: 1.01,
                         type: 3,
                     }
                 }
-            },
+            }),
+            effectDeps: ['accessory_jewelry_efficiency']
         },
         get_cost: () => ({
             'inventory_sapphire': {
@@ -522,16 +525,17 @@ export const registerAccessoriesStage1 = () => {
             return gameEntity.getLevel('shop_item_crafting_courses') > 0 && gameEntity.getLevel('shop_item_stone_refinement_manual') >= 1;
         },
         resourceModifier: {
-            capMult: {
+            get_capMult: () => ({
                 resources: {
                     'mana': {
-                        A: 0.05,
-                        B: 1,
+                        A: 0.05*gameEffects.getEffectValue('accessory_jewelry_efficiency'),
+                        B: gameEffects.getEffectValue('accessory_jewelry_efficiency'),
                         C: 1.01,
                         type: 3,
                     }
                 }
-            },
+            }),
+            effectDeps: ['accessory_jewelry_efficiency']
         },
         get_cost: () => ({
             'inventory_sapphire': {
@@ -839,16 +843,17 @@ export const registerAccessoriesStage1 = () => {
                 && gameResources.isResourceUnlocked('inventory_green_ink');
         },
         resourceModifier: {
-            multiplier: {
+            get_multiplier: () => ({
                 resources: {
                     'energy': {
-                        A: 0.02,
-                        B: 1,
+                        A: 0.02*gameEffects.getEffectValue('accessory_jewelry_efficiency'),
+                        B: gameEffects.getEffectValue('accessory_jewelry_efficiency'),
                         C: 1.01,
                         type: 3,
                     }
                 }
-            },
+            }),
+            effectDeps: ['accessory_jewelry_efficiency']
         },
         get_cost: () => ({
             'inventory_obsidian_shard': {
@@ -871,7 +876,7 @@ export const registerAccessoriesStage1 = () => {
 
 
     registerAccessory('accessory_obsidian_amulet', {
-        tags: ["accessory", "upgrade", "purchaseable", "effect", "actions-learning", "mineral", "trinket"],
+        tags: ["accessory", "upgrade", "purchaseable", "effect", "actions-learning", "jewelry", "mineral", "trinket"],
         name: 'Obsidian Amulet',
         description: 'An intricately crafted amulet of polished obsidian, its dark surface seems to absorb distraction, sharpening your focus and accelerating the mastery of routine tasks.',
         level: 0,
@@ -881,16 +886,17 @@ export const registerAccessoriesStage1 = () => {
                 && gameResources.isResourceUnlocked('inventory_obsidian_shard');
         },
         resourceModifier: {
-            multiplier: {
+            get_multiplier: () => ({
                 effects: {
                     'routine_learning_speed': {
-                        A: 0.05,
-                        B: 1,
+                        A: 0.05*gameEffects.getEffectValue('accessory_jewelry_efficiency'),
+                        B: gameEffects.getEffectValue('accessory_jewelry_efficiency'),
                         C: 1.01,
                         type: 3,
                     }
                 }
-            },
+            }),
+            effectDeps: ['accessory_jewelry_efficiency']
         },
         get_cost: () => ({
             'inventory_obsidian_shard': {
@@ -913,7 +919,7 @@ export const registerAccessoriesStage1 = () => {
 
 
     registerAccessory('accessory_steel_amulet', {
-        tags: ["accessory", "upgrade", "purchaseable", "resource", "metal", "trinket"],
+        tags: ["accessory", "upgrade", "purchaseable", "resource", "metal", "jewelry", "trinket"],
         name: 'Steel Amulet',
         description: 'A steel amulet increasing your health regeneration',
         level: 0,
@@ -924,16 +930,17 @@ export const registerAccessoriesStage1 = () => {
         },
         minDemoVersion: 20,
         resourceModifier: {
-            multiplier: {
+            get_multiplier: () => ({
                 resources: {
                     'health': {
-                        A: 0.02,
-                        B: 1,
+                        A: 0.02*gameEffects.getEffectValue('accessory_jewelry_efficiency'),
+                        B: gameEffects.getEffectValue('accessory_jewelry_efficiency'),
                         C: 1.01,
                         type: 3,
                     }
                 }
-            },
+            }),
+            effectDeps: ['accessory_jewelry_efficiency']
         },
         get_cost: () => ({
             'inventory_forged_steel': {

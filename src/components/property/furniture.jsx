@@ -49,6 +49,7 @@ export const FurnitureUpgrades = ({ setItemDetails, purchaseItem, deleteItem, ne
             search: '',
         },
         hideMaxed: false,
+        showHidden: false,
         propertyCategories: [],
         customFilters: {},
         customFiltersOrder: [],

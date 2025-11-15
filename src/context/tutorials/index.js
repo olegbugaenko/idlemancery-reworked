@@ -80,7 +80,7 @@ const stepsInitial = [
     },
     {
         target: '#level_up_indicator_action_walk',
-        content: 'Now that the action is running, it\'s gaining XP. When the progress indicator fills up, the action will level up. Each new level requires more XP.',
+        content: 'Now that the action is launched, it\'s gaining XP. When the progress indicator fills up, the action will level up. Each new level requires more XP.',
         disableBeacon: true,
         disableOverlayClose: true,
         spotlightClicks: true,
@@ -115,7 +115,7 @@ const stepsInitial = [
     },
     {
         target: '#level',
-        content: 'While running actions, your mage will also gain experience. Each new mage level grants one skill point. Unspent points appear here, and clicking this indicator lets you allocate them.',
+        content: 'While performing actions, your mage will also gain experience. Each new mage level grants one skill point. Unspent points appear here, and clicking this indicator lets you allocate them.',
         disableBeacon: true,
         disableOverlayClose: true,
         spotlightClicks: true,

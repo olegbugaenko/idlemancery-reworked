@@ -3,6 +3,7 @@ import {gameEntity, gameResources, gameCore, resourceCalculators} from "game-fra
 import {checkMatchingRules} from "../../shared/utils/rule-utils";
 import {mapObject} from "../../shared/utils/objects";
 import {SMALL_NUMBER} from "game-framework/src/utils/consts";
+import { resourceResponse } from "../../shared/utils/transform/resources";
 
 export class MapTileListsSubmodule extends GameModule {
 
@@ -343,7 +344,7 @@ export class MapTileListsSubmodule extends GameModule {
                         probability: 0,
                         amountMin: 0,
                         amountMax: 0,
-                        resource: gameResources.getResource(drop.id)
+                        resource: resourceResponse(gameResources.getResource(drop.id))
                     };
                 }
 

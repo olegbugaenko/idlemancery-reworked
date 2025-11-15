@@ -512,7 +512,7 @@ export const GeneralStats = ({ setDetailVisible }) => {
                 </div>
                 <div className={'block'}>
                     <p>General Stats</p>
-                    {Object.values(data.stats).map(stat => (<div>
+                    {Object.values(data.stats).map((stat, idx) => (<div key={stat.id ?? stat.name ?? idx}>
                         {hasEffect(stat) ? (<StatRow stat={stat} />) : null}
                     </div> ))}
                 </div>
@@ -750,14 +750,14 @@ export const CraftingListDetails = ({
                             <div className={'rules-header flex-container'}>
                                 <p>Autotrigger rules: {editing?.autotrigger?.rules?.length ? null : 'None'}</p>
                                 <label>
-                                    <input type={'checkbox'} checked={editing.autotrigger?.isEnabled ?? undefined} onChange={toggleAutotrigger}/>
+                                    <input type={'checkbox'} checked={!!editing.autotrigger?.isEnabled} onChange={toggleAutotrigger}/>
                                     {editing.autotrigger?.isEnabled ? ' ON' : ' OFF'}
                                 </label>
                                 {isEditing ? (<button onClick={addAutotriggerRule}>Add rule (AND)</button>) : null}
                             </div>
                             <div className={'priority-line flex-container'}>
                                 <p>Priority: </p>
-                                <input type={'number'} value={editing.autotrigger?.priority || 0} onChange={e => setAutotriggerPriority(+(e.target.value || 0))}/>
+                                <input type={'number'} value={editing.autotrigger?.priority ?? 0} onChange={e => setAutotriggerPriority(+(e.target.value || 0))}/>
                             </div>
                             <RulesList
                                 isEditing={isEditing}

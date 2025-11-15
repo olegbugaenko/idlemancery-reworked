@@ -41,6 +41,25 @@ export const AlchemyWrap = ({ children }) => {
 
     const [detailOpened, setDetailOpened] = useState(null);
 
+    useEffect(() => {
+        const interval2 = setInterval(() => {
+            sendData('query-new-unlocks-notifications', { suffix: 'alchemy', scope: 'workshop' })
+        }, 1000)
+        return () => {
+            clearInterval(interval2);
+        }
+    }, [])
+
+    useEffect(() => {
+        onMessage('new-unlocks-notifications-alchemy', payload => {
+            setNewUnlocks(payload);
+        });
+        
+        return () => {
+            removeMessage('new-unlocks-notifications-alchemy');
+        };
+    }, []);
+
     const setItemDetails = useCallback((id) => {
         if(currentTourId === 'alchemy' && [3,9].includes(stepIndex)) {
             return;
@@ -409,6 +428,8 @@ export const AlchemyWrap = ({ children }) => {
         setListDetails(null);
     }, [])
 
+    console.log('AlchemyWrap', newUnlocks);
+
     return (<div className={'items-wrap alchemy-workshop-wrap'}>
         <InterfaceSettingsContext.Provider value={{ showNumericInputs, setShowNumericInputs: handleShowNumericInputsChange }}>
             <div className={'items ingame-box'}>
@@ -760,7 +781,7 @@ export const GeneralStats = ({ setDetailVisible }) => {
                 </div>
                 <div className={'block'}>
                     <p>General Stats</p>
-                    {Object.values(data.stats).map(stat => (<div>
+                    {Object.values(data.stats).map((stat, idx) => (<div key={stat.id ?? stat.name ?? idx}>
                         {hasEffect(stat) ? (<StatRow stat={stat} />) : null}
                     </div> ))}
                 </div>
