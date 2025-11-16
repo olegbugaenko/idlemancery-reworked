@@ -15,6 +15,7 @@ import {useAppContext} from "../../context/ui-context";
 import {ActiveActions} from "../shared/active-actions.jsx";
 import {ActiveAchievement} from "../shared/achievements.jsx";
 import {updateSidebarState, useSidebarData} from "../../state/sidebar-store";
+import {useCtrlPressed} from "../../general/hooks/use-ctrl-pressed";
 
 export const Sidebar = () => {
 
@@ -72,6 +73,7 @@ export const ResourcesBar = () => {
     const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
 
     const resourceData = useSidebarData(state => state.resources);
+    const isCtrlPressed = useCtrlPressed();
 
     const sendDataRef = useRef(sendData);
 
@@ -142,12 +144,13 @@ export const ResourcesBar = () => {
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
                 onContextMenu={handleResourceContextMenu}
+                isCtrlPressed={isCtrlPressed}
             />
         ))}
     </div> )
 }
 
-const ResourceRowComponent = ({ resource, onMouseEnter, onMouseLeave, onContextMenu, showCapProgress = true, onToggleHidden }) => {
+const ResourceRowComponent = ({ resource, onMouseEnter, onMouseLeave, onContextMenu, showCapProgress = true, onToggleHidden, isCtrlPressed = false }) => {
 
     const aff = resource.monitor;
 
@@ -212,6 +215,14 @@ const ResourceRowComponent = ({ resource, onMouseEnter, onMouseLeave, onContextM
         {formatValue(resource.balance || 0)}
     </span>);
 
+    const renderBreakdownSummary = () => {
+        return (<div className={'block'}>
+            <p>Income: {formatValue((resource.income || 0)*(resource.multiplier || 1))}</p>
+            <p>Multiplier: {formatValue(resource.multiplier || 1)}</p>
+            <p>Consumption: {formatValue(resource.consumption || 0)}</p>
+        </div>);
+    };
+
     const handleToggleHiddenClick = (event) => {
         if(!onToggleHidden) {
             return;
@@ -255,11 +266,11 @@ const ResourceRowComponent = ({ resource, onMouseEnter, onMouseLeave, onContextM
                 </TippyWrapper>
             ) : resourceAmount}
             {isBreakdownHasData(resource.breakDown) ? (
-                <TippyWrapper content={<div className={'hint-popup'}><BreakDown breakDown={resource.breakDown}/><div className="block">
-                        {resource.income > 0 ? (<p>Total Income: {formatValue(resource.income*resource.multiplier)}</p>) : null}
-                        {resource.consumption > 0 ? (<p>Total Consumption: {formatValue(resource.consumption)}</p>) : null}
-                        <p>Net Income: {formatValue(resource.balance)}</p>
-                    </div></div> }>
+                <TippyWrapper content={<div className={'hint-popup'}>
+                    {!isCtrlPressed ? (<p className={'hint ctrl-hint'}>Hit Ctrl to see more details</p>) : null}
+                    {isCtrlPressed ? (<BreakDown breakDown={resource.breakDown}/>) : null}
+                    {renderBreakdownSummary()}
+                </div> }>
                     {resourceBalance}
                 </TippyWrapper>
             ) : resourceBalance}
@@ -282,6 +293,10 @@ const ResourceRowComponent = ({ resource, onMouseEnter, onMouseLeave, onContextM
 
 export const ResourceRow = React.memo(ResourceRowComponent, (prevProps, nextProps) => {
     if(prevProps.showCapProgress !== nextProps.showCapProgress) {
+        return false;
+    }
+
+    if(prevProps.isCtrlPressed !== nextProps.isCtrlPressed) {
         return false;
     }
 

@@ -10,6 +10,7 @@ import EconomicMetrics from "./economic-metrics.jsx";
 import {SearchField} from "../shared/search-field.jsx";
 import {ResourceRow} from "../layout/sidebar.jsx";
 import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
+import {useCtrlPressed} from "../../general/hooks/use-ctrl-pressed";
 
 const COLORS = ['#6088FE', '#00C49F', '#FFBB28', '#FF8042',
                 '#1019FE', '#30309F', '#AD09AD', '#FE66FE',
@@ -94,6 +95,7 @@ export const Statistics = () => {
     const [activeTab, setActiveTab] = useState('general');
     const [multipliersFilter, setMultipliersFilter] = useState({ search: '' });
     const [resourcesFilter, setResourcesFilter] = useState({ search: '' });
+    const isCtrlPressed = useCtrlPressed();
 
     const filteredMultipliers = useMemo(() => {
         const source = stats.multipliers || [];
@@ -353,6 +355,7 @@ export const Statistics = () => {
                                             key={resource.id}
                                             resource={resource}
                                             onToggleHidden={handleToggleResourceHidden}
+                                            isCtrlPressed={isCtrlPressed}
                                         />
                                     )) : (<div className={'no-data'}>No resources to display.</div>)}
                                 </div>

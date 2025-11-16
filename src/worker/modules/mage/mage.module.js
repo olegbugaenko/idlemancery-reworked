@@ -111,8 +111,17 @@ export class MageModule extends GameModule {
             this.eventHandler.sendData('skills-data', data);
         })
 
-        this.eventHandler.registerHandler('toggle-speedup', () => {
-            this.bankedTime.speedUpFactor = 5 - this.bankedTime.speedUpFactor;
+        this.eventHandler.registerHandler('set-speedup-factor', ({ factor }) => {
+            const allowedFactors = [1, 4, 8];
+            const numericFactor = Number(factor);
+            const targetFactor = allowedFactors.includes(numericFactor) ? numericFactor : 1;
+
+            if(targetFactor > 1 && (!this.bankedTime?.current || this.bankedTime.current <= 0)) {
+                this.bankedTime.speedUpFactor = 1;
+                return;
+            }
+
+            this.bankedTime.speedUpFactor = targetFactor;
         })
 
         this.eventHandler.registerHandler('query-active-effects', () => {

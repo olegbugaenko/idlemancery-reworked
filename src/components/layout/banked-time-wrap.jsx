@@ -22,8 +22,8 @@ export const BankedTimeWrap = () => {
         }
     }, []);
 
-    const toggleSpeedUp = () => {
-        sendData('toggle-speedup', {});
+    const setSpeedUpFactor = (factor) => {
+        sendData('set-speedup-factor', { factor });
     }
 
     useEffect(() => {
@@ -50,14 +50,33 @@ export const BankedTimeWrap = () => {
             <TippyWrapper content={<div className={'hint-popup'}>
                 <p>You were offline {secondsToString((mageData.bankedTime?.current || 0)/1000)}</p>
                 <p>Speed up bonus capped at {secondsToString((mageData.bankedTime?.max || 0)/1000)}</p>
-                <p>You can use this time to speed up your game by factor of 4</p>
+                <p>You can use this time to speed up your game by factors of 4 or 8</p>
             </div> }>
                 <div className={'banked-time footer-add-info'}>
                     <img className={'ui-icon'} src={"icons/interface/time.png"}/>
                     {secondsToString((mageData.bankedTime?.current || 0)/1000)}
-                    <span className={`banked-toggle ${mageData.bankedTime?.speedUpFactor > 1 ? 'activated' : ''} ${mageData.bankedTime?.current <= 0 ? 'disabled' : ''}`} onClick={toggleSpeedUp}>
-                X{formatInt(4)}
-            </span>
+                    {[1, 4, 8].map((factor) => {
+                        const isActive = mageData.bankedTime?.speedUpFactor === factor;
+                        const isDisabled = factor > 1 && (mageData.bankedTime?.current || 0) <= 0;
+
+                        const handleClick = () => {
+                            if(isDisabled || isActive) {
+                                return;
+                            }
+
+                            setSpeedUpFactor(factor);
+                        };
+
+                        return (
+                            <span
+                                key={factor}
+                                className={`banked-toggle ${isActive ? 'activated' : ''} ${isDisabled ? 'disabled' : ''}`}
+                                onClick={handleClick}
+                            >
+                                X{formatInt(factor)}
+                            </span>
+                        );
+                    })}
                 </div>
             </TippyWrapper>
             <ul className={'menu small'}>
