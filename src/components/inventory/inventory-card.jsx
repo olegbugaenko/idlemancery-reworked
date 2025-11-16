@@ -66,20 +66,22 @@ export const InventoryCard = React.memo(({ isChanged, eta, usages, usagesFor, al
     >
         <TippyWrapper content={<div className={'hint-popup'}>
             <p>{name}({formatInt(amount)})</p>
-            {usages?.length ? (<div className={'block'}>
+            {!isCtrlPressed && (usages?.length || usagesFor?.length || breakDown) ? (
+                <p className={'hint ctrl-hint'}>Hit Ctrl to see more details</p>
+            ) : null}
+            {isCtrlPressed && usages?.length ? (<div className={'block'}>
                 <p>Used By:</p>
                 <div className={'sub-items'}>
                     {usages.map((one, index) => (<p key={one.id ?? one.name ?? index} className={'padded-left'}>{one.name}</p>))}
                 </div>
             </div> ) : null}
-            {usagesFor?.length ? (<div className={'block'}>
+            {isCtrlPressed && usagesFor?.length ? (<div className={'block'}>
                 <p>Used For:</p>
                 <div className={'sub-items'}>
                     {usagesFor.map((one, index) => (<p key={one.id ?? one.name ?? index} className={'padded-left'}>{one.name}</p>))}
                 </div>
             </div> ) : null}
             {breakDown ? (<>
-                {!isCtrlPressed ? (<p className={'hint ctrl-hint'}>Hit Ctrl to see more details</p>) : null}
                 {isCtrlPressed ? (<BreakDown breakDown={breakDown}/>) : null}
                 {renderBreakdownSummary()}
             </>) : null}
