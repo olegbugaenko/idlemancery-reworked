@@ -24,4 +24,5 @@ export const entityResponse = (entityData) => ({
     icon_id: entityData.icon_id,
     scope: entityData.scope,
     unlocks: entityData.unlocks,
+    autocast: entityData.autocast,
 })

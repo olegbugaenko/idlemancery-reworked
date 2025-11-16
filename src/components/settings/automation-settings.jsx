@@ -346,6 +346,8 @@ export const AutomatedSell = ({ auto, resources, onSaveSell }) => {
         onSaveSell(id, data);
     })
 
+    console.log('AutomatedSell: ', auto);
+    
     return <AutomatedItem
         scope={'autosell'}
         id={auto.id}

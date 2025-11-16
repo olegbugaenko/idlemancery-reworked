@@ -29,4 +29,7 @@ export const resourceResponse = (resourceData) => resourceData ? ({
     monitor: resourceData.monitor,
     unlocks: resourceData.unlocks,
     eta: resourceData.eta,
+    autosell: resourceData.autosell,
+    autoconsume: resourceData.autoconsume,
+    autopurchase: resourceData.autopurchase,
 }) : null;
