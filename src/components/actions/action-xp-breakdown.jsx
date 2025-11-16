@@ -14,6 +14,7 @@ export const ActionXPBreakdown = ({ id }) => {
         total: 0,
         nextEtas: {}
     });
+    const [isCtrlPressed, setIsCtrlPressed] = useState(false);
 
     // const [filterId, setFilterId] = useState('all');
 
@@ -32,19 +33,44 @@ export const ActionXPBreakdown = ({ id }) => {
         onMessage(`action-xp-breakdown-${id}`, breakdowns => {
             setBreakdowns(breakdowns);
         });
-        
+
         return () => {
             removeMessage(`action-xp-breakdown-${id}`);
         };
     }, [id]);
 
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if(event.key === 'Control') {
+                setIsCtrlPressed(true);
+            }
+        };
+
+        const handleKeyUp = (event) => {
+            if(event.key === 'Control' || !event.ctrlKey) {
+                setIsCtrlPressed(false);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('keyup', handleKeyUp);
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('keyup', handleKeyUp);
+        };
+    }, []);
+
     return (<div className={'hint-popup breakdowns'}>
+        {!isCtrlPressed ? (<p className={'hint ctrl-hint'}>Hit Ctrl to see more details</p>) : null}
         {breakdowns.breakDowns && Object.values(breakdowns.breakDowns).length ? (
             Object.values(breakdowns.breakDowns).map(breakDown => (<div key={breakDown.title} className={'breakdown-section'}>
                 <p className={'semi-title'}>{breakDown.title}: {breakDown.isPlain ? '+' : 'X'}{formatValue(breakDown.value)}</p>
-                <div className={'breakdown-section-sub'}>
-                    <BreakDown breakDown={breakDown.breakDown} />
-                </div>
+                {isCtrlPressed && breakDown.breakDown ? (
+                    <div className={'breakdown-section-sub'}>
+                        <BreakDown breakDown={breakDown.breakDown} />
+                    </div>
+                ) : null}
             </div> ))
         ) : null}
         <div className={'block etas-milestones'}>
