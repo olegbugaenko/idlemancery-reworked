@@ -2051,6 +2051,142 @@ h4 {
     height: calc(100% - 100px);
 }
 
+.crafting-wrap.zoo-wrap {
+    display: flex;
+    flex-direction: column;
+}
+
+.zoo-wrap .head {
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.zoo-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+}
+
+.zoo-summary .summary-item {
+    flex-direction: column;
+    align-items: flex-start;
+    font-size: 14px;
+}
+
+.zoo-summary .summary-item .label {
+    color: var(--text-muted);
+    font-size: 12px;
+    margin: 0;
+}
+
+.zoo-summary .summary-item .value {
+    font-weight: 600;
+}
+
+.zoo-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.zoo-controls .space-item {
+    margin-right: 0;
+    gap: 8px;
+}
+
+.zoo-controls .remaining-limit {
+    font-weight: 600;
+}
+
+.zoo-content {
+    height: calc(100% - 8px);
+    padding: 0 8px 8px;
+}
+
+.zoo-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+.zoo-card {
+    width: 360px;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+}
+
+.zoo-card .card-head {
+    display: flex;
+    gap: 12px;
+}
+
+.zoo-card .icon-wrap {
+    width: 72px;
+    height: 72px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.zoo-card .icon-wrap img {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+}
+
+.zoo-card .info .title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.zoo-card .info .description {
+    font-size: 13px;
+    margin: 4px 0;
+}
+
+.zoo-card .zoo-stats-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+}
+
+.limit-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 8px 0;
+}
+
+.limit-slider {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.limit-slider .level-set {
+    flex: 1;
+}
+
+.limit-unlocked {
+    font-style: italic;
+    color: var(--text-muted);
+}
+
+.zoo-locked {
+    margin: 24px;
+    text-align: center;
+    font-size: 16px;
+    opacity: 0.8;
+}
+
 .card.craftable {
     width: 300px;
     min-height: 110px;

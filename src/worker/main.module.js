@@ -11,6 +11,7 @@ import {SpellModule} from "./modules/magic/spells.module";
 import {CraftingModule} from "./modules/workshop/crafting.module";
 import {PlantationsModule} from "./modules/workshop/plantations.module";
 import {ArtifactsCraftingModule} from "./modules/workshop/artifacts-crafting.module";
+import {ZooModule} from "./modules/workshop/zoo.module";
 import {UnlockNotificationsModule} from "./shared/modules/unlock-notifications.module";
 import {RandomEventsModule} from "./modules/general/random-events.module";
 import {TemporaryEffectsModule} from "./modules/general/temporary-effects.module";
@@ -43,6 +44,7 @@ export class MainModule extends GameModule {
         gameCore.registerModule('crafting', CraftingModule);
         gameCore.registerModule('plantations', PlantationsModule);
         gameCore.registerModule('artifacts-crafting', ArtifactsCraftingModule);
+        gameCore.registerModule('zoo', ZooModule);
         gameCore.registerModule('unlock-notifications', UnlockNotificationsModule);
         //gameCore.registerModule('random-events', RandomEventsModule);
         gameCore.registerModule('map', MapModule);
@@ -102,6 +104,7 @@ export class MainModule extends GameModule {
                 'workshop': gameEntity.getLevel('shop_item_crafting_courses') > 0 || gameEntity.getLevel('shop_item_alchemy_courses') > 0 || gameResources.getResource('plantation_slots').income > 0,
                 'artifacts': gameEntity.isEntityUnlocked('action_expedition'),
                 'plantation': gameResources.getResource('plantation_slots').income > 0,
+                'zoo': gameEntity.getLevel('shop_item_magical_zoo') > 0,
                 'guilds': gameEffects.getEffectValue('attribute_charisma') >= 500,
                 'social': gameEntity.getLevel('structure_event_hall') > 0,
                 'map': gameEntity.getLevel('shop_item_map') > 0,
