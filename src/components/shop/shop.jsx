@@ -18,6 +18,7 @@ import {playSound} from "../../context/sounds/sound-manager";
 import {FavoriteButton} from "../shared/favorite-button.jsx";
 import RulesList from "../shared/rules-list.jsx";
 import {cloneDeep} from "lodash";
+import {useMonitoredEntity} from "../../general/hooks/use-monitored-entity";
 
 export const Shop = ({}) => {
     const [detailOpened, setDetailOpened] = useState(null);
@@ -360,6 +361,7 @@ export const CourseItems = ({ setItemDetails, purchaseItem, newUnlocks, isMobile
     });
 
     const [overlayPositions, setOverlayPositions] = useState([]);
+    const setMonitoredCourse = useMonitoredEntity({ type: 'course' });
 
     const handleFlash = (position) => {
         setOverlayPositions((prev) => [...prev, position]);
@@ -395,7 +397,18 @@ export const CourseItems = ({ setItemDetails, purchaseItem, newUnlocks, isMobile
         <PerfectScrollbar>
             <div className={'flex-container'}>
                 {itemsData.available.map(item => <NewNotificationWrap key={`course_${item.id}`} id={`course_${item.id}`} className={'narrow-wrapper'} isNew={newUnlocks?.all?.items?.[`course_${item.id}`]?.hasNew}>
-                    <CourseCard isMobile={isMobile} onFlash={handleFlash} key={item.id} {...item} onPurchase={purchaseItem} onShowDetails={setItemDetails} toggleAutopurchase={toggleAutopurchase} isAutomationUnlocked={itemsData.isAutomationUnlocked} toggleEditedItem={toggleEditedItem}/>
+                    <CourseCard
+                        isMobile={isMobile}
+                        onFlash={handleFlash}
+                        key={item.id}
+                        {...item}
+                        onPurchase={purchaseItem}
+                        onShowDetails={setItemDetails}
+                        toggleAutopurchase={toggleAutopurchase}
+                        isAutomationUnlocked={itemsData.isAutomationUnlocked}
+                        toggleEditedItem={toggleEditedItem}
+                        onHoverMonitored={setMonitoredCourse}
+                    />
                 </NewNotificationWrap>)}
                 {overlayPositions.map((position, index) => (
                     <FlashOverlay key={index} position={position} />
@@ -478,18 +491,54 @@ export const ItemResourceCard = ({ id, name, purchaseMultiplier, stock, level, m
 }
 
 
-export const CourseCard = ({ toNext, id, efficiency, isRunning, name, level, progress, maxProgress, max, affordable, isLeveled, onFlash, onPurchase, onShowDetails, isAutoPurchase, toggleAutopurchase, isAutomationUnlocked, isMobile, isFavorite, toggleEditedItem}) => {
+export const CourseCard = ({
+    toNext,
+    id,
+    efficiency,
+    isRunning,
+    name,
+    level,
+    progress,
+    maxProgress,
+    max,
+    affordable,
+    isLeveled,
+    onFlash,
+    onPurchase,
+    onShowDetails,
+    isAutoPurchase,
+    toggleAutopurchase,
+    isAutomationUnlocked,
+    isMobile,
+    isFavorite,
+    toggleEditedItem,
+    onHoverMonitored,
+}) => {
 
     const elementRef = useRef(null);
 
     useFlashOnLevelUp(isLeveled, onFlash, elementRef);
 
 
+    const handleMouseEnter = () => {
+        if(!isMobile) {
+            onShowDetails(id);
+        }
+        onHoverMonitored && onHoverMonitored(id);
+    };
+
+    const handleMouseLeave = () => {
+        if(!isMobile) {
+            onShowDetails(null);
+        }
+        onHoverMonitored && onHoverMonitored(null);
+    };
+
     return (<div
         ref={elementRef}
         className={`course-card card shop-course item flashable ${isRunning ? ' running' : ''} ${efficiency < 1 ? ' efficiency-dropped lower-eff' : ''}  ${affordable.hardLocked ? 'hard-locked' : ''}  ${!affordable.isAffordable ? 'unavailable' : ''}`}
-        onMouseEnter={() => isMobile ? null : onShowDetails(id)}
-        onMouseLeave={() => isMobile ? null : onShowDetails(null)}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
         onClick={(e) => {
             if(isMobile) {
                 onShowDetails(id)

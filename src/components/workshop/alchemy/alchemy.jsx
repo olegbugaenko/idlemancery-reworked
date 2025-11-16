@@ -13,6 +13,7 @@ import {PinResource} from "../../shared/pin-resource.jsx";
 import {useTutorial} from "../../../context/tutorial-context";
 import {FavoriteButton} from "../../shared/favorite-button.jsx";
 import { InterfaceSettingsContext } from "./index.jsx";
+import {useMonitoredEntity} from "../../../general/hooks/use-monitored-entity";
 import {RecipeTitleWithTooltip} from "./recipe-title-with-tooltip.jsx";
 
 export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, openListDetails, addItemToList, isEditList, setShowNumericInputs }) => {
@@ -84,6 +85,8 @@ export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, op
         console.log('Frontend alchemy onToggleLock:', { id, isLocked, filterId });
         sendData('toggle-effort-lock', { id, isLocked, filterId });
     }, [sendData, filterId]);
+
+    const setMonitoredRecipe = useMonitoredEntity({ type: 'recipe' });
 
     /*if(currentTourId === 'alchemy') {
         if(craftingData.available?.length) {
@@ -169,7 +172,19 @@ export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, op
             <PerfectScrollbar>
                 <div className={'flex-container'}>
                     {craftingData.available.map(craftable => <NewNotificationWrap id={`crafting_${craftable.id}`} key={`crafting_${craftable.id}`} className={'narrow-wrapper'} isNew={newUnlocks?.all?.items?.[`crafting_${craftable.id}`]?.hasNew}>
-                        <ItemCard addItemToList={addItemToList} key={craftable.id} {...craftable} dataVersion={dataVersion} onSetLevel={setItemLevel} onShowDetails={setItemDetails} isMobile={isMobile} isEditList={isEditList} showNumericInputs={showNumericInputs} onToggleLock={onToggleLock}/>
+                        <ItemCard
+                            addItemToList={addItemToList}
+                            key={craftable.id}
+                            {...craftable}
+                            dataVersion={dataVersion}
+                            onSetLevel={setItemLevel}
+                            onShowDetails={setItemDetails}
+                            isMobile={isMobile}
+                            isEditList={isEditList}
+                            showNumericInputs={showNumericInputs}
+                            onToggleLock={onToggleLock}
+                            onHoverMonitored={setMonitoredRecipe}
+                        />
                     </NewNotificationWrap>)}
                 </div>
             </PerfectScrollbar>
@@ -193,7 +208,7 @@ export const Alchemy = ({ setItemDetails, setItemLevel, filterId, newUnlocks, op
     </div>)
 }
 
-export const ItemCard = ({ id, icon_id, isRunning, resourceAmount, resourceBalance, breakDown, isLowerEfficiency, name, effort, isLocked, maxLevel, onSetLevel, onShowDetails, addItemToList, isMobile, isEditList, isRebalanced, isRebalancedBeneficial, showNumericInputs, onToggleLock, dataVersion, bonusesDetails }) => {
+export const ItemCard = ({ id, icon_id, isRunning, resourceAmount, resourceBalance, breakDown, isLowerEfficiency, name, effort, isLocked, maxLevel, onSetLevel, onShowDetails, addItemToList, isMobile, isEditList, isRebalanced, isRebalancedBeneficial, showNumericInputs, onToggleLock, dataVersion, bonusesDetails, onHoverMonitored }) => {
 
     const [inputValue, setInputValue] = useState(effort);
 
@@ -214,11 +229,25 @@ export const ItemCard = ({ id, icon_id, isRunning, resourceAmount, resourceBalan
         setInputValue(effort);
     };
 
+    const handleMouseEnter = () => {
+        if(!isMobile) {
+            onShowDetails(id);
+        }
+        onHoverMonitored && onHoverMonitored(id);
+    };
+
+    const handleMouseLeave = () => {
+        if(!isMobile) {
+            onShowDetails(null);
+        }
+        onHoverMonitored && onHoverMonitored(null);
+    };
+
     return (<div
         className={`card craftable ${isRunning ? 'running' : ''} ${isLowerEfficiency ? 'lower-eff' : ''} ${isRebalanced ? (isRebalancedBeneficial ? 'rebalanced-beneficial' : 'rebalanced') : ''}`}
-        onMouseEnter={() => !isMobile ? onShowDetails(id) : null}
+        onMouseEnter={handleMouseEnter}
         onMouseOver={() => !isMobile ? onShowDetails(id) : null}
-        onMouseLeave={() => !isMobile ? onShowDetails(null) : null}
+        onMouseLeave={handleMouseLeave}
         onClick={() => (isMobile && !isEditList) ? onShowDetails(id) : addItemToList({id, name})}
     >
         <div className={'flex-container two-side-card'}>

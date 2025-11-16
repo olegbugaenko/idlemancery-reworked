@@ -6,6 +6,19 @@ export class MonitoringModule extends GameModule {
     constructor() {
         super();
 
+        const clearMonitoredEffects = () => {
+            gameCore.getModule('attributes').setMonitored([]);
+            gameCore.getModule('resource-pool').setMonitored([]);
+        };
+
+        const pushMonitoredEffects = (data, skipIds = [], skipTags) => {
+            const effects = data.filter(one => one.type === 'effects');
+            const resources = data.filter(one => one.type === 'resources');
+
+            gameCore.getModule('attributes').setMonitored(effects);
+            gameCore.getModule('resource-pool').setMonitored(resources, skipTags, skipIds);
+        };
+
         this.eventHandler.registerHandler('set-monitored', ({ scope, type, id}) => {
             if(scope === 'actions') {
                 gameCore.getModule('actions').setMonitored({ type, id });
@@ -42,11 +55,10 @@ export class MonitoringModule extends GameModule {
                             return r;
                         })
 
-                        gameCore.getModule('attributes').setMonitored(effects);
-                        gameCore.getModule('resource-pool').setMonitored(resources, ['runningActions'], skippedIds);
+                        const combinedEffects = [...effects, ...resources];
+                        pushMonitoredEffects(combinedEffects, skippedIds, ['runningActions']);
                     } else {
-                        gameCore.getModule('attributes').setMonitored([]);
-                        gameCore.getModule('resource-pool').setMonitored([]);
+                        clearMonitoredEffects();
                     }
                 }
 
@@ -63,29 +75,59 @@ export class MonitoringModule extends GameModule {
                         // console.log('Effs: ', effDurable, effects);
 
                         const data = [...effects.map(one => ({...one, isOneTime: true})), ...effDurable];
-                        const attrs = data.filter(one => one.type === 'effects');
-                        const resources = data.filter(one => one.type === 'resources');
-
-                        gameCore.getModule('attributes').setMonitored(attrs);
-                        gameCore.getModule('resource-pool').setMonitored(resources, undefined, [id, `active_${id}`]);
+                        pushMonitoredEffects(data, [id, `active_${id}`]);
                     } else {
-                        gameCore.getModule('attributes').setMonitored([]);
-                        gameCore.getModule('resource-pool').setMonitored([]);
+                        clearMonitoredEffects();
                     }
                 }
 
-                if(['furniture', 'accessory', 'amplifier', 'shop_upgrade', 'structure', 'artifact'].includes(type)) {
+                if(type === 'course') {
+                    if(id) {
+                        const entity = gameEntity.getEntity(id);
+                        if(entity) {
+                            const learningEffects = entity.learningEntity
+                                ? resourceApi.unpackEffects(entity.learningEntity.resourceModifier || {}, entity.level)
+                                : [];
+                            const data = [
+                                ...gameEntity.getEffects(id, 1, null, true),
+                                ...learningEffects,
+                            ];
+                            pushMonitoredEffects(data, [id, `learning_${id}`]);
+                        } else {
+                            clearMonitoredEffects();
+                        }
+                    } else {
+                        clearMonitoredEffects();
+                    }
+                    return;
+                }
+
+                if(type === 'recipe') {
+                    if(id) {
+                        const craftingModule = gameCore.getModule('crafting');
+                        if(craftingModule?.getRecipeEffectsWithMultipliers) {
+                            const assignedEffort = craftingModule.craftingSlots?.[id]?.effort;
+                            const calculatedEffort = assignedEffort && assignedEffort > 0 ? assignedEffort : 1;
+                            const isRunning = gameEntity.entityExists(`activeCrafting_${id}`);
+                            const data = craftingModule.getRecipeEffectsWithMultipliers(id, calculatedEffort, isRunning, false);
+                            pushMonitoredEffects(data, [id, `activeCrafting_${id}`]);
+                        } else {
+                            clearMonitoredEffects();
+                        }
+                    } else {
+                        clearMonitoredEffects();
+                    }
+                    return;
+                }
+
+                const genericMonitorTypes = ['furniture', 'accessory', 'amplifier', 'shop_upgrade', 'structure', 'artifact'];
+                if(genericMonitorTypes.includes(type)) {
                     // if id null - clear monitors, else - replace em
                     if(id) {
-                        const data = gameEntity.getEffects(id, 1, null, true)
-                        const effects = data.filter(one => one.type === 'effects');
-                        const resources = data.filter(one => one.type === 'resources');
-
-                        gameCore.getModule('attributes').setMonitored(effects);
-                        gameCore.getModule('resource-pool').setMonitored(resources, undefined, [id]);
+                        const data = gameEntity.getEffects(id, 1, null, true);
+                        pushMonitoredEffects(data, [id]);
                     } else {
-                        gameCore.getModule('attributes').setMonitored([]);
-                        gameCore.getModule('resource-pool').setMonitored([]);
+                        clearMonitoredEffects();
                     }
                 }
 
