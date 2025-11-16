@@ -15,6 +15,7 @@ import {InventoryDetails} from "./inventory-details.jsx";
 import {InventoryStats} from "./inventory-stats.jsx";
 import {InventoryItem} from "./inventory-card.jsx";
 import {getInventorySnapshot, updateInventoryState, useInventoryData} from "../../state/inventory-store";
+import {useCtrlPressed} from "../../general/hooks/use-ctrl-pressed";
 
 
 const INVENTORY_SEARCH_SCOPES = [{
@@ -196,6 +197,7 @@ export const Inventory = ({}) => {
 
     const worker = useContext(WorkerContext);
     const { isMobile } = useAppContext();
+    const isCtrlPressed = useCtrlPressed();
     const [isDetailVisible, setDetailVisible] = useState(!isMobile);
     const { unlockNextById, currentTourId } = useTutorial();
 
@@ -605,8 +607,9 @@ export const Inventory = ({}) => {
             onShowDetails={setInventoryDetailsView}
             onEditConfig={setInventoryDetailsEdit}
             isMobile={isMobile}
+            isCtrlPressed={isCtrlPressed}
         />
-    )), [availableItems, handleFlash, isChanged, isMobile, purchaseItem, selectedFilterUnlocks, selectedItemId, setInventoryDetailsEdit, setInventoryDetailsView])
+    )), [availableItems, handleFlash, isChanged, isCtrlPressed, isMobile, purchaseItem, selectedFilterUnlocks, selectedItemId, setInventoryDetailsEdit, setInventoryDetailsView])
 
     if(currentTourId === 'inventory') {
         unlockNextById(9);
