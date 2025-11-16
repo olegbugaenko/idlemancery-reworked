@@ -74,7 +74,8 @@ export class MonitoringModule extends GameModule {
                     }
                 }
 
-                if(['furniture', 'accessory', 'amplifier', 'shop_upgrade', 'structure', 'artifact'].includes(type)) {
+                const genericMonitorTypes = ['furniture', 'accessory', 'amplifier', 'shop_upgrade', 'structure', 'artifact', 'course', 'recipe'];
+                if(genericMonitorTypes.includes(type)) {
                     // if id null - clear monitors, else - replace em
                     if(id) {
                         const data = gameEntity.getEffects(id, 1, null, true)
