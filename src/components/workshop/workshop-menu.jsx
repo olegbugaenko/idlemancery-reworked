@@ -88,11 +88,15 @@ export const WorkshopMenu = ({ selectedTab, setSelectedTab }) => {
                         <span>Artifact Recipes</span>
                     </NewNotificationWrap>
                 </li>) : null}
-                {effectiveUnlocks.zoo ? (<li id={'workshop-menu-zoo'} className={`${selectedTab === 'zoo' ? 'active' : ''}`} onClick={() => {setSelectedTab('zoo');}}>
-                    <NewNotificationWrap isNew={newUnlocks.workshop?.items?.zoo?.hasNew}>
+                {effectiveUnlocks.zoo ? (
+                    <li
+                        id={'workshop-menu-zoo'}
+                        className={`${selectedTab === 'zoo' ? 'active' : ''}`}
+                        onClick={() => {setSelectedTab('zoo');}}
+                    >
                         <span>Zoo</span>
-                    </NewNotificationWrap>
-                </li>) : null}
+                    </li>
+                ) : null}
             </ul>
         )
 }

@@ -45,7 +45,27 @@ export class ZooModule extends GameModule {
                 limitPercent: null,
             };
         }
+        this.normalizeLimitState(this.animalsState[id]);
         return this.animalsState[id];
+    }
+
+    normalizeLimitState(state) {
+        if (!state) {
+            return;
+        }
+        if (!state.isLimited) {
+            state.limitPercent = null;
+            return;
+        }
+        if (typeof state.limitPercent !== 'number' || isNaN(state.limitPercent)) {
+            state.limitPercent = 0;
+        }
+        if (state.limitPercent >= 1) {
+            state.isLimited = false;
+            state.limitPercent = null;
+        } else if (state.limitPercent < 0) {
+            state.limitPercent = 0;
+        }
     }
 
     tick(game, delta) {
@@ -70,22 +90,21 @@ export class ZooModule extends GameModule {
             return;
         }
 
-        let changed = false;
         ZOO_ANIMALS.forEach((animal) => {
             const state = this.ensureAnimalState(animal.id);
-            if (!state.isLimited) {
-                const growth = delta * (0.01 + 0.001 * state.count);
-                if (growth > 0) {
-                    state.count += growth;
-                    this.syncAnimalLevel(animal, state.count);
-                    changed = true;
-                }
+            const limitValue = this.getAnimalLimitValue(animal.id, totalSpace);
+            const canGrow = limitValue === null || state.count + SMALL_NUMBER < limitValue;
+            if (!canGrow) {
+                return;
+            }
+            const growth = delta * (0.01 + 0.001 * state.count);
+            if (growth > 0) {
+                state.count += growth;
+                this.syncAnimalLevel(animal, state.count);
             }
         });
 
-        if (changed) {
-            this.applyLimits(totalSpace);
-        }
+        this.applyLimits(totalSpace);
     }
 
     syncAnimalLevel(animal, value) {
@@ -173,23 +192,25 @@ export class ZooModule extends GameModule {
         }
         const state = this.ensureAnimalState(id);
         const hasExplicitPercent = typeof percent === 'number' && !isNaN(percent);
-        if (typeof isLimited === 'boolean') {
+        if (hasExplicitPercent) {
+            const normalized = Math.max(0, Math.min(1, percent));
+            if (normalized >= 1) {
+                state.isLimited = false;
+                state.limitPercent = null;
+            } else {
+                const otherPercent = this.getTotalLimitedPercent(id);
+                const allowed = Math.max(0, 1 - otherPercent);
+                state.isLimited = true;
+                state.limitPercent = Math.min(normalized, allowed);
+            }
+        } else if (typeof isLimited === 'boolean') {
             state.isLimited = isLimited;
             if (!isLimited) {
                 state.limitPercent = null;
             }
         }
 
-        if (hasExplicitPercent) {
-            state.isLimited = true;
-        }
-
-        if (state.isLimited) {
-            const otherPercent = this.getTotalLimitedPercent(id);
-            const allowed = Math.max(0, 1 - otherPercent);
-            const normalized = hasExplicitPercent ? Math.max(0, Math.min(1, percent)) : (state.limitPercent ?? allowed);
-            state.limitPercent = Math.min(normalized, allowed);
-        }
+        this.normalizeLimitState(state);
 
         this.applyLimits();
         this.sendZooData();
@@ -208,7 +229,7 @@ export class ZooModule extends GameModule {
                 icon: animal.icon,
                 count: state.count,
                 isLimited: state.isLimited,
-                limitPercent: state.isLimited ? (state.limitPercent ?? 0) : null,
+                limitPercent: state.isLimited ? (state.limitPercent ?? 0) : 1,
                 limitValue,
                 effects: packEffects(currentEffects),
             };
@@ -253,6 +274,7 @@ export class ZooModule extends GameModule {
                         isLimited: !!saved.isLimited,
                         limitPercent: typeof saved.limitPercent === 'number' ? saved.limitPercent : null,
                     };
+                    this.normalizeLimitState(this.animalsState[animal.id]);
                 }
             });
         }

@@ -87,12 +87,12 @@ const devPreviewZooData = {
     ]
 };
 
-const ZooCard = ({ animal, totalSpace, showNumericInputs, onSetLimit, onToggleLimit, onShowDetails, isMobile }) => {
-    const [inputValue, setInputValue] = useState(animal.limitPercent ?? 0);
+const ZooCard = ({ animal, totalSpace, showNumericInputs, onSetLimit, onShowDetails, isMobile }) => {
+    const [inputValue, setInputValue] = useState(animal.isLimited ? (animal.limitPercent ?? 0) : 1);
     const spaceShare = totalSpace > 0 ? (animal.count / totalSpace) : 0;
 
     useEffect(() => {
-        setInputValue(animal.limitPercent ?? 0);
+        setInputValue(animal.isLimited ? (animal.limitPercent ?? 0) : 1);
     }, [animal.limitPercent, animal.isLimited]);
 
     const handleInputChange = (value) => {
@@ -110,7 +110,7 @@ const ZooCard = ({ animal, totalSpace, showNumericInputs, onSetLimit, onToggleLi
     };
 
     const handleNumericBlur = () => {
-        setInputValue(animal.limitPercent ?? 0);
+        setInputValue(animal.isLimited ? (animal.limitPercent ?? 0) : 1);
     };
 
     const handleMouseEnter = () => {
@@ -206,16 +206,6 @@ const ZooCard = ({ animal, totalSpace, showNumericInputs, onSetLimit, onToggleLi
                         </div>
                     </div>
                 </div>
-                <div className={'buttons zoo-limit-toggle'}>
-                    <label className={'checkbox-label'}>
-                        <input
-                            type={'checkbox'}
-                            checked={animal.isLimited}
-                            onChange={(e) => onToggleLimit(animal.id, e.target.checked)}
-                        />
-                        <span>{animal.isLimited ? 'Limit enabled' : 'Unlimited growth'}</span>
-                    </label>
-                </div>
             </div>
         </div>
     );
@@ -291,7 +281,7 @@ const ZooOverview = ({ space, limits, zooUnlocked, isMobile, onClose }) => (
             <div className={'block'}>
                 <p>Status</p>
                 <p className={'hint'}>
-                    {zooUnlocked ? 'Your Magical Zoo is active. Hover over a card to inspect an animal or adjust its limit below.' : 'Purchase the Magical Zoo upgrade to unlock enclosures and start collecting mystical animals.'}
+                    {zooUnlocked ? 'Your Magical Zoo is active. Hover over a card to inspect an animal or adjust its limit below.' : 'Construct Enclosures or other buildings that provide Magic Zoo Space to start collecting mystical animals.'}
                 </p>
             </div>
             {isMobile ? (
@@ -358,10 +348,6 @@ export const ZooWrap = ({ children }) => {
 
     const onSetLimit = useCallback((id, percent) => {
         sendData('set-zoo-limit', { id, percent });
-    }, [sendData]);
-
-    const onToggleLimit = useCallback((id, flag) => {
-        sendData('set-zoo-limit', { id, isLimited: flag });
     }, [sendData]);
 
     const space = zooData.space || defaultZooData.space;
@@ -452,7 +438,6 @@ export const ZooWrap = ({ children }) => {
                                             totalSpace={space.total}
                                             showNumericInputs={showNumericInputs}
                                             onSetLimit={onSetLimit}
-                                            onToggleLimit={onToggleLimit}
                                             onShowDetails={handleShowDetails}
                                             isMobile={isMobile}
                                         />

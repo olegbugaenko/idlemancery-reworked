@@ -90,6 +90,8 @@ export class MainModule extends GameModule {
         })
 
         this.eventHandler.registerHandler('query-unlocks', (payload) => {
+            const plantationSlots = gameResources.getResource('plantation_slots');
+            const zooSpace = gameResources.getResource('magic_zoo_space');
             const unlocks = {
                 'actions': true,
                 'actionLists': gameEntity.getLevel('shop_item_notebook') > 0,
@@ -101,10 +103,10 @@ export class MainModule extends GameModule {
                 'spellbook': gameEntity.getLevel('shop_item_spellbook') > 0,
                 'crafting': gameEntity.getLevel('shop_item_crafting_courses') > 0,
                 'alchemy': gameEntity.getLevel('shop_item_alchemy_courses') > 0,
-                'workshop': gameEntity.getLevel('shop_item_crafting_courses') > 0 || gameEntity.getLevel('shop_item_alchemy_courses') > 0 || gameResources.getResource('plantation_slots').income > 0,
+                'workshop': gameEntity.getLevel('shop_item_crafting_courses') > 0 || gameEntity.getLevel('shop_item_alchemy_courses') > 0 || (plantationSlots?.income || 0) > 0,
                 'artifacts': gameEntity.isEntityUnlocked('action_expedition'),
-                'plantation': gameResources.getResource('plantation_slots').income > 0,
-                'zoo': gameEntity.getLevel('shop_item_magical_zoo') > 0,
+                'plantation': (plantationSlots?.income || 0) > 0,
+                'zoo': (zooSpace?.income || 0) > 0,
                 'guilds': gameEffects.getEffectValue('attribute_charisma') >= 500,
                 'social': gameEntity.getLevel('structure_event_hall') > 0,
                 'map': gameEntity.getLevel('shop_item_map') > 0,
