@@ -172,6 +172,7 @@ export class ZooModule extends GameModule {
             return;
         }
         const state = this.ensureAnimalState(id);
+        const hasExplicitPercent = typeof percent === 'number' && !isNaN(percent);
         if (typeof isLimited === 'boolean') {
             state.isLimited = isLimited;
             if (!isLimited) {
@@ -179,14 +180,19 @@ export class ZooModule extends GameModule {
             }
         }
 
+        if (hasExplicitPercent) {
+            state.isLimited = true;
+        }
+
         if (state.isLimited) {
             const otherPercent = this.getTotalLimitedPercent(id);
             const allowed = Math.max(0, 1 - otherPercent);
-            const normalized = typeof percent === 'number' ? Math.max(0, Math.min(1, percent)) : (state.limitPercent ?? allowed);
+            const normalized = hasExplicitPercent ? Math.max(0, Math.min(1, percent)) : (state.limitPercent ?? allowed);
             state.limitPercent = Math.min(normalized, allowed);
         }
 
         this.applyLimits();
+        this.sendZooData();
     }
 
     getZooData() {

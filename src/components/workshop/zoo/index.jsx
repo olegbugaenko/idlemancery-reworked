@@ -6,6 +6,7 @@ import {formatValue} from "../../../general/utils/strings";
 import {EffectsSection} from "../../shared/effects-section.jsx";
 import {TippyWrapper} from "../../shared/tippy-wrapper.jsx";
 import {useAppContext} from "../../../context/ui-context";
+import {RawResource} from "../../shared/raw-resource.jsx";
 
 const defaultZooData = {
     unlocked: false,
@@ -95,9 +96,6 @@ const ZooCard = ({ animal, totalSpace, showNumericInputs, onSetLimit, onToggleLi
     }, [animal.limitPercent, animal.isLimited]);
 
     const handleInputChange = (value) => {
-        if (!animal.isLimited) {
-            return;
-        }
         const normalized = Math.max(0, Math.min(1, value));
         const rounded = Math.round(normalized * 1000000) / 1000000;
         setInputValue(rounded);
@@ -160,67 +158,64 @@ const ZooCard = ({ animal, totalSpace, showNumericInputs, onSetLimit, onToggleLi
             </div>
             <div className={'bottom self-placed zoo-card-controls'}>
                 <div className={'buttons'}>
-                    <span className={'label'}>Limit population:</span>
+                    <span className={'label'}>Limit share:</span>
+                    <div className={'effort-control flex-container flex-row'}>
+                        <div
+                            className={'icon-content minimize-icon interface-icon tiny'}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                handleInputChange(0);
+                            }}
+                        >
+                            <img src={'icons/interface/minimize.png'} alt={'Minimize'}/>
+                        </div>
+                        {showNumericInputs ? (
+                            <input
+                                type={'number'}
+                                className={'level-set numeric-input'}
+                                min={0}
+                                max={1}
+                                step={0.000001}
+                                value={inputValue}
+                                onChange={handleInputEvent}
+                                onBlur={handleNumericBlur}
+                                onClick={(e) => e.stopPropagation()}
+                                onKeyDown={(e) => e.stopPropagation()}
+                            />
+                        ) : (
+                            <input
+                                type={'range'}
+                                className={'level-set'}
+                                min={0}
+                                max={1}
+                                step={0.000001}
+                                value={inputValue}
+                                onChange={handleInputEvent}
+                            />
+                        )}
+                        <div
+                            className={'icon-content maximize-icon interface-icon tiny'}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                handleInputChange(1);
+                            }}
+                        >
+                            <img src={'icons/interface/maximize.png'} alt={'Maximize'}/>
+                        </div>
+                    </div>
+                </div>
+                <div className={'buttons zoo-limit-toggle'}>
                     <label className={'checkbox-label'}>
                         <input
                             type={'checkbox'}
                             checked={animal.isLimited}
                             onChange={(e) => onToggleLimit(animal.id, e.target.checked)}
                         />
-                        <span>{animal.isLimited ? 'Enabled' : 'Unlimited growth'}</span>
+                        <span>{animal.isLimited ? 'Limit enabled' : 'Unlimited growth'}</span>
                     </label>
                 </div>
-                {animal.isLimited ? (
-                    <div className={'buttons'}>
-                        <span className={'label'}>Limit share:</span>
-                        <div className={'effort-control flex-container flex-row'}>
-                            <div
-                                className={'icon-content minimize-icon interface-icon tiny'}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    e.preventDefault();
-                                    handleInputChange(0);
-                                }}
-                            >
-                                <img src={'icons/interface/minimize.png'} alt={'Minimize'}/>
-                            </div>
-                            {showNumericInputs ? (
-                                <input
-                                    type={'number'}
-                                    className={'level-set numeric-input'}
-                                    min={0}
-                                    max={1}
-                                    step={0.000001}
-                                    value={inputValue}
-                                    onChange={handleInputEvent}
-                                    onBlur={handleNumericBlur}
-                                    onClick={(e) => e.stopPropagation()}
-                                    onKeyDown={(e) => e.stopPropagation()}
-                                />
-                            ) : (
-                                <input
-                                    type={'range'}
-                                    className={'level-set'}
-                                    min={0}
-                                    max={1}
-                                    step={0.000001}
-                                    value={inputValue}
-                                    onChange={handleInputEvent}
-                                />
-                            )}
-                            <div
-                                className={'icon-content maximize-icon interface-icon tiny'}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    e.preventDefault();
-                                    handleInputChange(1);
-                                }}
-                            >
-                                <img src={'icons/interface/maximize.png'} alt={'Maximize'}/>
-                            </div>
-                        </div>
-                    </div>
-                ) : null}
             </div>
         </div>
     );
@@ -283,24 +278,15 @@ const ZooOverview = ({ space, limits, zooUnlocked, isMobile, onClose }) => (
             </div>
             <div className={'block'}>
                 <p>Space Summary</p>
-                <div className={'zoo-detail-stats'}>
-                    <div className={'flex-row flex-container'}>
-                        <span>Total Space</span>
-                        <strong>{formatValue(space.total)}</strong>
-                    </div>
-                    <div className={'flex-row flex-container'}>
-                        <span>Used</span>
-                        <strong>{formatValue(space.used)}</strong>
-                    </div>
-                    <div className={'flex-row flex-container'}>
-                        <span>Free</span>
-                        <strong>{formatValue(space.free)}</strong>
-                    </div>
-                    <div className={'flex-row flex-container'}>
-                        <span>Reserved limits</span>
-                        <strong>{formatValue((limits.totalPercent ?? 0) * 100)}%</strong>
-                    </div>
+                <div className={'flex-row flex-container zoo-capacity-line'}>
+                    <RawResource id={'magic_zoo_space'} name={'Zoo Capacity'} />
+                    <span className={'slots-amount'}>
+                        {formatValue(space.used)}/{formatValue(space.total)}
+                    </span>
                 </div>
+                <p className={'hint separated'}>
+                    Reserved limits: <strong>{formatValue((limits.totalPercent ?? 0) * 100)}%</strong>
+                </p>
             </div>
             <div className={'block'}>
                 <p>Status</p>
@@ -381,13 +367,6 @@ export const ZooWrap = ({ children }) => {
     const space = zooData.space || defaultZooData.space;
     const limits = zooData.limits || defaultZooData.limits;
 
-    const summary = useMemo(() => ([
-        { label: 'Total Space', value: formatValue(space.total) },
-        { label: 'Used', value: formatValue(space.used) },
-        { label: 'Free', value: formatValue(space.free) },
-        { label: 'Reserved Limits', value: `${formatValue((limits.totalPercent ?? 0) * 100)}%` },
-    ]), [space.total, space.used, space.free, limits.totalPercent]);
-
     const handleShowDetails = useCallback((id) => {
         if (!id) {
             setDetailOpened(null);
@@ -430,12 +409,16 @@ export const ZooWrap = ({ children }) => {
                 <div className={'crafting-wrap zoo-wrap'}>
                     <div className={'head zoo-header'}>
                         <div className={'flex-container zoo-summary'}>
-                            {summary.map((item) => (
-                                <div key={item.label} className={'space-item summary-item'}>
-                                    <span className={'label'}>{item.label}</span>
-                                    <span className={'value'}>{item.value}</span>
+                            <TippyWrapper content={<div className={'hint-popup'}>
+                                <p className={'hint'}>Zoo Capacity shows how much total Magical Zoo Space your enclosures provide. Animals consume this space as they grow.</p>
+                            </div>}>
+                                <div className={'space-item summary-item zoo-capacity'}>
+                                    <RawResource id={'magic_zoo_space'} name={'Zoo Capacity'} />
+                                    <span className={`slots-amount ${space.total > 0 ? 'slots-available' : 'slots-unavailable'}`}>
+                                        {formatValue(space.used)}/{formatValue(space.total)}
+                                    </span>
                                 </div>
-                            ))}
+                            </TippyWrapper>
                         </div>
                         <div className={'auto-rebalance-controls zoo-controls'}>
                             <div className={'space-item'}>
