@@ -90,16 +90,34 @@ export class ZooModule extends GameModule {
             return;
         }
 
+        let usedSpace = this.getTotalCount();
+        let freeSpace = Math.max(0, totalSpace - usedSpace);
+
         ZOO_ANIMALS.forEach((animal) => {
             const state = this.ensureAnimalState(animal.id);
             const limitValue = this.getAnimalLimitValue(animal.id, totalSpace);
-            const canGrow = limitValue === null || state.count + SMALL_NUMBER < limitValue;
-            if (!canGrow) {
+            const limitRemaining = limitValue === null ? null : Math.max(0, limitValue - state.count);
+
+            const hasLimitRoom = limitRemaining === null ? true : limitRemaining > SMALL_NUMBER;
+            if (!hasLimitRoom || freeSpace <= SMALL_NUMBER) {
                 return;
             }
+
             const growth = delta * (0.01 + 0.001 * state.count);
-            if (growth > 0) {
-                state.count += growth;
+            if (growth <= SMALL_NUMBER) {
+                return;
+            }
+
+            const allowedGrowth = Math.min(
+                growth,
+                limitRemaining ?? growth,
+                freeSpace
+            );
+
+            if (allowedGrowth > SMALL_NUMBER) {
+                state.count += allowedGrowth;
+                usedSpace += allowedGrowth;
+                freeSpace = Math.max(0, totalSpace - usedSpace);
                 this.syncAnimalLevel(animal, state.count);
             }
         });
