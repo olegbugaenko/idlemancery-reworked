@@ -87,7 +87,7 @@ const devPreviewZooData = {
     ]
 };
 
-const ZooCard = ({ animal, totalSpace, showNumericInputs, onSetLimit, onShowDetails, isMobile }) => {
+const ZooCard = ({ animal, totalSpace, showNumericInputs, onSetLimit, onHover, onSelect, isMobile, isSelected }) => {
     const [inputValue, setInputValue] = useState(animal.isLimited ? (animal.limitPercent ?? 0) : 1);
     const spaceShare = totalSpace > 0 ? (animal.count / totalSpace) : 0;
 
@@ -115,28 +115,26 @@ const ZooCard = ({ animal, totalSpace, showNumericInputs, onSetLimit, onShowDeta
 
     const handleMouseEnter = () => {
         if (!isMobile) {
-            onShowDetails(animal.id);
+            onHover?.(animal.id);
         }
     };
 
     const handleMouseLeave = () => {
         if (!isMobile) {
-            onShowDetails(null);
+            onHover?.(null);
         }
     };
 
     const handleClick = () => {
-        if (isMobile) {
-            onShowDetails(animal.id);
-        }
+        onSelect?.(animal.id);
     };
 
     return (
         <div
-            className={'card craftable zoo-card'}
+            className={`card craftable zoo-card ${isSelected ? 'selected' : ''}`}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
-            onMouseOver={() => !isMobile ? onShowDetails(animal.id) : null}
+            onMouseOver={() => !isMobile ? onHover?.(animal.id) : null}
             onClick={handleClick}
         >
             <div className={'flex-container two-side-card'}>
@@ -297,7 +295,8 @@ export const ZooWrap = ({ children }) => {
     const worker = useContext(WorkerContext);
     const { isMobile } = useAppContext();
     const [isDetailVisible, setDetailVisible] = useState(!isMobile);
-    const [detailOpened, setDetailOpened] = useState(null);
+    const [hoveredAnimalId, setHoveredAnimalId] = useState(null);
+    const [selectedAnimalId, setSelectedAnimalId] = useState(null);
     const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const [zooData, setZooData] = useState(defaultZooData);
     const [showNumericInputs, setShowNumericInputs] = useState(() => {
@@ -352,28 +351,49 @@ export const ZooWrap = ({ children }) => {
 
     const space = zooData.space || defaultZooData.space;
     const limits = zooData.limits || defaultZooData.limits;
+    const animals = zooData.animals || defaultZooData.animals;
 
-    const handleShowDetails = useCallback((id) => {
-        if (!id) {
-            setDetailOpened(null);
+    const handleHoverAnimal = useCallback((id) => {
+        if (isMobile) {
+            return;
+        }
+        setHoveredAnimalId(id);
+    }, [isMobile]);
+
+    const handleSelectAnimal = useCallback((id) => {
+        setSelectedAnimalId((prev) => {
+            const next = prev === id ? null : id;
+            if (isMobile) {
+                setDetailVisible(!!next);
+            }
+            return next;
+        });
+    }, [isMobile]);
+
+    useEffect(() => {
+        if (hoveredAnimalId && !animals.some((animal) => animal.id === hoveredAnimalId)) {
+            setHoveredAnimalId(null);
+        }
+    }, [hoveredAnimalId, animals]);
+
+    useEffect(() => {
+        if (selectedAnimalId && !animals.some((animal) => animal.id === selectedAnimalId)) {
+            setSelectedAnimalId(null);
             if (isMobile) {
                 setDetailVisible(false);
             }
-            return;
         }
-        setDetailOpened(id);
-        if (isMobile) {
-            setDetailVisible(true);
-        }
-    }, [isMobile]);
+    }, [selectedAnimalId, animals, isMobile]);
 
     const activeAnimal = useMemo(() => {
-        if (!detailOpened) return null;
-        return zooData.animals.find((animal) => animal.id === detailOpened) || null;
-    }, [detailOpened, zooData.animals]);
+        const prioritizedId = hoveredAnimalId || selectedAnimalId;
+        if (!prioritizedId) return null;
+        return animals.find((animal) => animal.id === prioritizedId) || null;
+    }, [animals, hoveredAnimalId, selectedAnimalId]);
 
     const handleCloseDetail = useCallback(() => {
-        setDetailOpened(null);
+        setSelectedAnimalId(null);
+        setHoveredAnimalId(null);
         setDetailVisible(false);
     }, []);
 
@@ -431,15 +451,17 @@ export const ZooWrap = ({ children }) => {
                         {zooData.unlocked ? (
                             <PerfectScrollbar>
                                 <div className={'flex-container'}>
-                                    {zooData.animals.map((animal) => (
+                                    {animals.map((animal) => (
                                         <ZooCard
                                             key={animal.id}
                                             animal={animal}
                                             totalSpace={space.total}
                                             showNumericInputs={showNumericInputs}
                                             onSetLimit={onSetLimit}
-                                            onShowDetails={handleShowDetails}
+                                            onHover={handleHoverAnimal}
+                                            onSelect={handleSelectAnimal}
                                             isMobile={isMobile}
+                                            isSelected={selectedAnimalId === animal.id}
                                         />
                                     ))}
                                 </div>
@@ -452,7 +474,7 @@ export const ZooWrap = ({ children }) => {
                     </div>
                 </div>
             </div>
-            {(!isMobile || isDetailVisible || detailOpened) ? (
+            {(!isMobile || isDetailVisible || selectedAnimalId) ? (
                 <div className={'item-detail ingame-box detail-blade'}>
                     {activeAnimal ? (
                         <ZooDetails
