@@ -440,26 +440,7 @@ const ZooDetails = ({
 
                 <div className={'block zoo-feed-requirements'}>
                     <p>Feeding Cost</p>
-                    {feedRequirements.length ? (
-                        <ul>
-                            {feedRequirements.map((req, index) => (
-                                <li key={req.resource?.id ?? index}>
-                                    <div className={'resource-name'}>
-                                        <RawResource id={req.resource?.id} name={req.resource?.name ?? req.resource?.id} />
-                                    </div>
-                                    <div className={'values'}>
-                                        <span>{formatValue(req.perAnimal ?? 0)} / animal</span>
-                                        <span>{formatValue(req.consumption ?? 0)} / s</span>
-                                        {isEditing && typeof req.previewConsumption === 'number' && Math.abs((req.previewConsumption ?? 0) - (req.consumption ?? 0)) > FEED_EPSILON ? (
-                                            <span className={'preview'}>Preview: {formatValue(req.previewConsumption)} / s</span>
-                                        ) : null}
-                                    </div>
-                                </li>
-                            ))}
-                        </ul>
-                    ) : (
-                        <p className={'hint'}>No feeding costs configured for this animal yet.</p>
-                    )}
+                    <EffectsSection effects={feedInfo.feedEffects} maxDisplay={10} />
                 </div>
 
                 <div className={'block zoo-breeding-block'}>

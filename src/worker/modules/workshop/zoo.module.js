@@ -296,6 +296,8 @@ export class ZooModule extends GameModule {
             : summary.feedLevel;
         const previewEffectiveMultiplier = previewLevel * summary.feedEfficiency;
 
+        const feedEffects = gameEntity.entityExists(animal.feedEntityId) ? gameEntity.getEffects(animal.feedEntityId, 0, null, false, 1, 1, feedLevelOverride) : [];
+        console.log('Feed effects: ', feedEffects);
         return {
             ...summary,
             feed: {
@@ -306,6 +308,7 @@ export class ZooModule extends GameModule {
                 previewEffectiveMultiplier,
                 missingResource: this.getFeedBottleneck(animal),
                 requirements: this.buildFeedRequirementsData(animal, state, summary.feedLevel, previewLevel),
+                feedEffects,
             },
             breeding: {
                 baseRate: baseGrowthRate,
