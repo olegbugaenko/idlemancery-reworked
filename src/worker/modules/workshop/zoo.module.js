@@ -113,6 +113,15 @@ export class ZooModule extends GameModule {
             return;
         }
 
+        const spaceResource = gameResources.getResource('magic_zoo_space');
+        if (!spaceResource) {
+            return;
+        }
+        const spaceIncome = spaceResource.income;
+        if (spaceIncome <= SMALL_NUMBER || spaceResource.bala) {
+            return;
+        }
+
         const totalSpace = this.getTotalSpace();
         if (totalSpace <= SMALL_NUMBER) {
             let hasChanges = false;
@@ -130,8 +139,8 @@ export class ZooModule extends GameModule {
             return;
         }
 
-        let usedSpace = this.getTotalCount();
-        let freeSpace = Math.max(0, totalSpace - usedSpace);
+        let usedSpace = gameResources.getResource('magic_zoo_space')?.consumption || 0;
+        let freeSpace = gameResources.getResource('magic_zoo_space')?.balance || 0;
 
         ZOO_ANIMALS.forEach((animal) => {
             const state = this.ensureAnimalState(animal.id);
@@ -147,11 +156,13 @@ export class ZooModule extends GameModule {
             const feedLevel = this.getActiveFeedLevel(state);
             const feedEfficiency = this.getFeedEfficiency(animal);
             const growthMultiplier = feedLevel * feedEfficiency;
+            console.log('Animal id: ', animal.id, ' growthMultiplier: ', growthMultiplier, feedLevel, feedEfficiency);
+            
             if (growthMultiplier <= SMALL_NUMBER) {
                 return;
             }
 
-            const growth = delta * (0.01 + 0.001 * state.count) * growthMultiplier;
+            const growth = delta * (0.01) * growthMultiplier * spaceIncome;
             if (growth <= SMALL_NUMBER) {
                 return;
             }

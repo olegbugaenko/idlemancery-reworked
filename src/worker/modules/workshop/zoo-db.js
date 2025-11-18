@@ -29,6 +29,15 @@ export const ZOO_ANIMALS = [
                     }
                 }
             },
+            consumption: {
+                resources: {
+                    'magic_zoo_space': {
+                        A: 0.5,
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            },
             effectDeps: ['earth_amplifier_efficiency', 'air_amplifier_efficiency']
         }
     },
@@ -50,6 +59,15 @@ export const ZOO_ANIMALS = [
                 effects: {
                     'books_learning_rate': {
                         A: 0.003,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+            consumption: {
+                resources: {
+                    'magic_zoo_space': {
+                        A: 0,
                         B: 1,
                         type: 0,
                     }
@@ -81,6 +99,15 @@ export const ZOO_ANIMALS = [
                     }
                 }
             },
+            consumption: {
+                resources: {
+                    'magic_zoo_space': {
+                        A: 1,
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            },
             effectDeps: ['physical_training_learn_speed']
         }
     }
@@ -95,16 +122,16 @@ const buildFeedConsumptionModifier = (animal) => {
     return {
         get_consumption: () => ({
             resources: Object.entries(requirements).reduce((acc, [resourceId, amount]) => {
-                const multiplier = gameEntity.getAttribute(animal.entityId, 'feed_level_multiplier', 1);
                 acc[resourceId] = {
-                    A: 0,
-                    B: amount * multiplier,
+                    A: amount,
+                    B: 0,
                     type: 0,
                     label: `${animal.name} Feeding`,
                 };
                 return acc;
             }, {}),
         }),
+        getCustomAmplifier: () => gameEntity.getAttribute(animal.entityId, 'feed_level_multiplier', 1),
     };
 };
 
