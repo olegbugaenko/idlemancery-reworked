@@ -241,9 +241,6 @@ const ZooCard = ({ animal, totalSpace, showNumericInputs, onSetLimit, onHover, o
                         <span>Space: <strong>{formatValue(spaceShare * 100)}%</strong></span>
                     </div>
                     <div className={'zoo-stats-row'}>
-                        <span>Limit: <strong>{animal.isLimited ? `${formatValue((animal.limitPercent ?? 0) * 100)}%` : 'Unlimited'}</strong></span>
-                    </div>
-                    <div className={'zoo-stats-row'}>
                         <span>Feeding:</span>
                         <strong>
                             {formatValue((animal.feedLevel ?? 1) * 100)}%

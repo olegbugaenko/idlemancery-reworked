@@ -95,7 +95,7 @@ const buildFeedConsumptionModifier = (animal) => {
     return {
         get_consumption: () => ({
             resources: Object.entries(requirements).reduce((acc, [resourceId, amount]) => {
-                const multiplier = gameEntity.getAttribute(animal.feedEntityId, 'feed_level_multiplier', 1);
+                const multiplier = gameEntity.getAttribute(animal.entityId, 'feed_level_multiplier', 1);
                 acc[resourceId] = {
                     A: 0,
                     B: amount * multiplier,
@@ -122,7 +122,9 @@ export const registerZooAnimals = () => {
 
         if (animal.feedEntityId) {
             const feedModifier = buildFeedConsumptionModifier(animal);
+            console.log('Feed modifier: ', feedModifier, animal.id, animal.feedEntityId);
             if (!feedModifier) {
+                console.error(`Feed modifier not found for animal: ${animal.id}`);
                 return;
             }
             gameEntity.registerGameEntity(animal.feedEntityId, {
