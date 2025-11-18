@@ -2158,6 +2158,83 @@ h4 {
     font-size: 13px;
 }
 
+.zoo-details .block + .block {
+    margin-top: 16px;
+}
+
+.zoo-feed-block .zoo-feed-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 13px;
+}
+
+.zoo-feed-block .preview-row span,
+.zoo-feed-block .preview-row strong,
+.zoo-feed-requirements .preview,
+.zoo-breeding-row.preview-row span,
+.zoo-breeding-row.preview-row strong {
+    color: var(--highlight);
+}
+
+.zoo-feed-controls {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.zoo-feed-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.zoo-feed-requirements ul {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.zoo-feed-requirements li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.zoo-feed-requirements li:first-child {
+    border-top: none;
+}
+
+.zoo-feed-requirements .resource-name {
+    flex: 0 0 160px;
+}
+
+.zoo-feed-requirements .values {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 13px;
+    text-align: right;
+}
+
+.zoo-breeding-block .zoo-breeding-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    margin-bottom: 4px;
+}
+
+.zoo-feed-block .hint.warning {
+    margin-top: 8px;
+}
+
 .limit-controls {
     display: flex;
     flex-direction: column;

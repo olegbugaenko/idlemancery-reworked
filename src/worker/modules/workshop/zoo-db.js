@@ -4,9 +4,16 @@ export const ZOO_ANIMALS = [
     {
         id: 'magic_henk',
         entityId: 'zoo_animal_magic_henk',
+        feedEntityId: 'zoo_animal_magic_henk_feeding',
         name: 'Magic Henk',
         icon: 'inventory_charged_amethyst',
         description: 'A dimensional wanderer whose mere presence harmonizes magical amplifiers.',
+        attributes: {
+            isCollectable: false,
+            breedFeedRequirement: {
+                inventory_focusberry: 1_000_000,
+            },
+        },
         resourceModifier: {
             multiplier: {
                 effects: {
@@ -28,9 +35,16 @@ export const ZOO_ANIMALS = [
     {
         id: 'magic_cat',
         entityId: 'zoo_animal_magic_cat',
+        feedEntityId: 'zoo_animal_magic_cat_feeding',
         name: 'Magic Cat',
         icon: 'inventory_ruby',
         description: 'A curious feline that curls up on spellbooks, inspiring faster study sessions.',
+        attributes: {
+            isCollectable: false,
+            breedFeedRequirement: {
+                inventory_nightshade: 1_200_000,
+            },
+        },
         resourceModifier: {
             multiplier: {
                 effects: {
@@ -47,9 +61,16 @@ export const ZOO_ANIMALS = [
     {
         id: 'green_bear',
         entityId: 'zoo_animal_green_bear',
+        feedEntityId: 'zoo_animal_green_bear_feeding',
         name: 'Green Bear',
         icon: 'inventory_spark',
         description: 'A gentle giant that practices tai chi, motivating physical training routines.',
+        attributes: {
+            isCollectable: false,
+            breedFeedRequirement: {
+                inventory_ginseng: 1_500_000,
+            },
+        },
         resourceModifier: {
             multiplier: {
                 effects: {
@@ -65,6 +86,28 @@ export const ZOO_ANIMALS = [
     }
 ];
 
+const buildFeedConsumptionModifier = (animal) => {
+    const requirements = animal.attributes?.breedFeedRequirement || {};
+    if (!Object.keys(requirements).length) {
+        return null;
+    }
+
+    return {
+        get_consumption: () => ({
+            resources: Object.entries(requirements).reduce((acc, [resourceId, amount]) => {
+                const multiplier = gameEntity.getAttribute(animal.feedEntityId, 'feed_level_multiplier', 1);
+                acc[resourceId] = {
+                    A: 0,
+                    B: amount * multiplier,
+                    type: 0,
+                    label: `${animal.name} Feeding`,
+                };
+                return acc;
+            }, {}),
+        }),
+    };
+};
+
 export const registerZooAnimals = () => {
     ZOO_ANIMALS.forEach((animal) => {
         gameEntity.registerGameEntity(animal.entityId, {
@@ -73,8 +116,28 @@ export const registerZooAnimals = () => {
             description: animal.description,
             icon_id: animal.icon,
             level: 0,
-            attributes: { isCollectable: false },
+            attributes: animal.attributes || { isCollectable: false },
             resourceModifier: animal.resourceModifier,
         });
+
+        if (animal.feedEntityId) {
+            const feedModifier = buildFeedConsumptionModifier(animal);
+            if (!feedModifier) {
+                return;
+            }
+            gameEntity.registerGameEntity(animal.feedEntityId, {
+                tags: ["zoo_animal_feed", "automation"],
+                name: `${animal.name} Feeding`,
+                description: `Feeding schedule for ${animal.name}`,
+                icon_id: animal.icon,
+                level: 0,
+                attributes: {
+                    isCollectable: false,
+                    zooAnimalId: animal.id,
+                    feed_level_multiplier: 1,
+                },
+                resourceModifier: feedModifier,
+            });
+        }
     });
 };
