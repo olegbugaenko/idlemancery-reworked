@@ -318,17 +318,18 @@ export const ZooWrap = ({ children }) => {
         if (!isEditing) {
             return;
         }
-        const resetValue = animalDetail?.feed?.level ?? 1;
-        if (activeAnimal?.id) {
-            feedDraftAnimalIdRef.current = activeAnimal.id;
-        }
-        setFeedDraftValue(resetValue);
+        const resetValue = animalDetail?.feed?.level ?? activeAnimal?.feedLevel ?? 1;
+        feedDraftAnimalIdRef.current = null;
+        setFeedDraftValue(null);
         setAutofeedDraft(cloneDeep(initialAutofeedRef.current || { isEnabled: false, rules: [], pattern: '' }));
         if (isDevPreview) {
             if (activeAnimal) {
                 setAnimalDetail(buildDevPreviewDetail(activeAnimal));
             }
             return;
+        }
+        if (activeAnimal) {
+            setAnimalDetail(buildFallbackDetailFromSummary({ ...activeAnimal, feedLevel: resetValue }));
         }
         if (activeAnimal?.id) {
             sendData('query-zoo-animal-details', { id: activeAnimal.id });
