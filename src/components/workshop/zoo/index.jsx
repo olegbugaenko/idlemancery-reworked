@@ -8,6 +8,7 @@ import {TippyWrapper} from "../../shared/tippy-wrapper.jsx";
 import {useAppContext} from "../../../context/ui-context";
 import {RawResource} from "../../shared/raw-resource.jsx";
 import RulesList from "../../shared/rules-list.jsx";
+import {cloneDeep, isEqual} from "lodash";
 
 const FEED_EPSILON = 0.000001;
 
@@ -180,30 +181,31 @@ const devPreviewZooData = {
 };
 
 const ZooCard = ({ animal, totalSpace, showNumericInputs, onSetLimit, onHover, onSelect, isMobile, isSelected }) => {
-    const [inputValue, setInputValue] = useState(animal.isLimited ? (animal.limitPercent ?? 0) : 1);
     const spaceShare = totalSpace > 0 ? (animal.count / totalSpace) : 0;
+    const limitValue = animal.isLimited ? (animal.limitPercent ?? 0) : 1;
+    const [inputValue, setInputValue] = useState(limitValue);
 
     useEffect(() => {
-        setInputValue(animal.isLimited ? (animal.limitPercent ?? 0) : 1);
-    }, [animal.limitPercent, animal.isLimited]);
+        setInputValue(limitValue);
+    }, [limitValue]);
 
-    const handleInputChange = (value) => {
-        const normalized = Math.max(0, Math.min(1, value));
-        const rounded = Math.round(normalized * 1000000) / 1000000;
+    const applyValue = useCallback((value) => {
+        if (typeof value !== 'number' || isNaN(value)) {
+            return;
+        }
+        const normalized = clampShare(value);
+        const rounded = Math.round(normalized * 1_000_000) / 1_000_000;
         setInputValue(rounded);
         onSetLimit(animal.id, rounded);
-    };
+    }, [animal.id, onSetLimit]);
 
-    const handleInputEvent = (event) => {
-        const value = parseFloat(event.target.value);
-        if (!isNaN(value)) {
-            handleInputChange(value);
-        }
-    };
+    const handleInputEvent = useCallback((event) => {
+        applyValue(parseFloat(event.target.value));
+    }, [applyValue]);
 
-    const handleNumericBlur = () => {
-        setInputValue(animal.isLimited ? (animal.limitPercent ?? 0) : 1);
-    };
+    const handleBlur = useCallback(() => {
+        setInputValue(limitValue);
+    }, [limitValue]);
 
     const handleMouseEnter = () => {
         if (!isMobile) {
@@ -231,7 +233,7 @@ const ZooCard = ({ animal, totalSpace, showNumericInputs, onSetLimit, onHover, o
         >
             <div className={'flex-container two-side-card'}>
                 <div className={'left'}>
-                    <img src={`icons/resources/${animal.icon}.png`} className={'resource big'} alt={animal.name}/>
+                    <img src={`icons/zoo/${animal.icon}.png`} className={'resource big'} alt={animal.name}/>
                 </div>
                 <div className={'right'}>
                     <div className={'head'}>
@@ -259,7 +261,7 @@ const ZooCard = ({ animal, totalSpace, showNumericInputs, onSetLimit, onHover, o
                             onClick={(e) => {
                                 e.stopPropagation();
                                 e.preventDefault();
-                                handleInputChange(0);
+                                applyValue(0);
                             }}
                         >
                             <img src={'icons/interface/minimize.png'} alt={'Minimize'}/>
@@ -273,7 +275,7 @@ const ZooCard = ({ animal, totalSpace, showNumericInputs, onSetLimit, onHover, o
                                 step={0.000001}
                                 value={inputValue}
                                 onChange={handleInputEvent}
-                                onBlur={handleNumericBlur}
+                                onBlur={handleBlur}
                                 onClick={(e) => e.stopPropagation()}
                                 onKeyDown={(e) => e.stopPropagation()}
                             />
@@ -525,6 +527,9 @@ export const ZooWrap = ({ children }) => {
     const [feedDraftValue, setFeedDraftValue] = useState(null);
     const feedDraftAnimalIdRef = useRef(null);
     const [resources, setResources] = useState([]);
+    const resourcesRef = useRef([]);
+    const [autofeedDraft, setAutofeedDraft] = useState({ isEnabled: false, rules: [], pattern: '' });
+    const initialAutofeedRef = useRef({ isEnabled: false, rules: [], pattern: '' });
 
     const isDevPreview = useMemo(() => {
         if (typeof window === 'undefined') {
@@ -570,6 +575,10 @@ export const ZooWrap = ({ children }) => {
             removeMessage('all-resources-zoo');
         };
     }, [isDevPreview, onMessage, removeMessage]);
+
+    useEffect(() => {
+        resourcesRef.current = resources;
+    }, [resources]);
 
     useEffect(() => {
         if (isDevPreview) {
@@ -699,6 +708,12 @@ export const ZooWrap = ({ children }) => {
         });
     }, [selectedAnimalId, animalDetail?.id, animalDetail?.feed?.level]);
 
+    useEffect(() => {
+        const autofeed = animalDetail?.autofeed || { isEnabled: false, rules: [], pattern: '' };
+        initialAutofeedRef.current = cloneDeep(autofeed);
+        setAutofeedDraft(cloneDeep(autofeed));
+    }, [animalDetail?.id]);
+
     const handleFeedLevelChange = useCallback((value) => {
         if (!isEditing || !activeAnimal?.id) {
             return;
@@ -719,13 +734,22 @@ export const ZooWrap = ({ children }) => {
         }
         const currentLevel = animalDetail?.feed?.level ?? 1;
         const valueToSave = clampShare(feedDraftValue ?? currentLevel);
+        const normalizedAutofeed = cloneDeep(autofeedDraft || { isEnabled: false, rules: [], pattern: '' });
         if (isDevPreview) {
             setAnimalDetail(buildDevPreviewDetail({ ...activeAnimal, feedLevel: valueToSave }, valueToSave));
             setFeedDraftValue(valueToSave);
+            initialAutofeedRef.current = normalizedAutofeed;
+            setAutofeedDraft(normalizedAutofeed);
             return;
         }
-        sendData('save-zoo-feed-settings', { id: activeAnimal.id, feedLevel: valueToSave });
-    }, [isEditing, activeAnimal, feedDraftValue, animalDetail, isDevPreview, sendData]);
+        sendData('save-zoo-feed-settings', {
+            id: activeAnimal.id,
+            feedLevel: valueToSave,
+            autofeed: normalizedAutofeed,
+        });
+        initialAutofeedRef.current = normalizedAutofeed;
+        setAutofeedDraft(normalizedAutofeed);
+    }, [isEditing, activeAnimal, feedDraftValue, animalDetail, isDevPreview, sendData, autofeedDraft]);
 
     const handleFeedCancel = useCallback(() => {
         if (!isEditing) {
@@ -736,6 +760,7 @@ export const ZooWrap = ({ children }) => {
             feedDraftAnimalIdRef.current = activeAnimal.id;
         }
         setFeedDraftValue(resetValue);
+        setAutofeedDraft(cloneDeep(initialAutofeedRef.current || { isEnabled: false, rules: [], pattern: '' }));
         if (isDevPreview) {
             if (activeAnimal) {
                 setAnimalDetail(buildDevPreviewDetail(activeAnimal));
@@ -763,12 +788,104 @@ export const ZooWrap = ({ children }) => {
     const detailFeedLevel = detailAnimalData?.feed?.level ?? 1;
     const isFeedDirty = isEditing && typeof feedDraftValue === 'number' && Math.abs(feedDraftValue - detailFeedLevel) > FEED_EPSILON;
 
-    // TODO: replace mocks with actual logic
-    const onToggleAutofeed = useCallback(() => {});
-    const addAutofeedRule = useCallback(() => {});
-    const deleteAutofeedRule = useCallback(() => {});
-    const setAutofeedRuleValue = useCallback(() => {});
-    const setAutofeedPattern = useCallback(() => {});
+    const ensureAutofeedDraft = useCallback((data) => {
+        const draft = data ? cloneDeep(data) : {};
+        const rules = Array.isArray(draft.rules) ? draft.rules : [];
+        return {
+            isEnabled: !!draft.isEnabled,
+            rules,
+            pattern: typeof draft.pattern === 'string' ? draft.pattern : '',
+        };
+    }, []);
+
+    const onToggleAutofeed = useCallback(() => {
+        if (!isEditing) {
+            return;
+        }
+        setAutofeedDraft((prev) => {
+            const draft = ensureAutofeedDraft(prev);
+            draft.isEnabled = !draft.isEnabled;
+            return draft;
+        });
+    }, [ensureAutofeedDraft, isEditing]);
+
+    const addAutofeedRule = useCallback(() => {
+        if (!isEditing) {
+            return;
+        }
+        setAutofeedDraft((prev) => {
+            const draft = ensureAutofeedDraft(prev);
+            if (!resourcesRef.current || !resourcesRef.current.length) {
+                console.warn('No resources available for autofeed rule');
+                return draft;
+            }
+            draft.rules.push({
+                resource_id: resourcesRef.current?.[0]?.id,
+                condition: 'less_or_eq',
+                value_type: 'percentage',
+                value: 50,
+            });
+            return draft;
+        });
+    }, [ensureAutofeedDraft, isEditing]);
+
+    const deleteAutofeedRule = useCallback((index) => {
+        if (!isEditing) {
+            return;
+        }
+        setAutofeedDraft((prev) => {
+            const draft = ensureAutofeedDraft(prev);
+            draft.rules.splice(index, 1);
+            return draft;
+        });
+    }, [ensureAutofeedDraft, isEditing]);
+
+    const setAutofeedRuleValue = useCallback((index, key, value) => {
+        if (!isEditing) {
+            return;
+        }
+        setAutofeedDraft((prev) => {
+            const draft = ensureAutofeedDraft(prev);
+            if (!draft.rules[index]) {
+                draft.rules[index] = {};
+            }
+            draft.rules[index] = {
+                ...draft.rules[index],
+                [key]: value,
+            };
+            return draft;
+        });
+    }, [ensureAutofeedDraft, isEditing]);
+
+    const setAutofeedPattern = useCallback((pattern) => {
+        if (!isEditing) {
+            return;
+        }
+        setAutofeedDraft((prev) => {
+            const draft = ensureAutofeedDraft(prev);
+            draft.pattern = pattern;
+            return draft;
+        });
+    }, [ensureAutofeedDraft, isEditing]);
+
+    const isAutofeedDirty = useMemo(() => {
+        return isEditing && !isEqual(ensureAutofeedDraft(autofeedDraft), ensureAutofeedDraft(initialAutofeedRef.current));
+    }, [autofeedDraft, ensureAutofeedDraft, isEditing]);
+
+    const isDirty = isFeedDirty || isAutofeedDirty;
+
+    const displayedAnimalDetail = useMemo(() => {
+        if (!detailAnimalData) {
+            return null;
+        }
+        if (!isEditing) {
+            return detailAnimalData;
+        }
+        return {
+            ...detailAnimalData,
+            autofeed: ensureAutofeedDraft(autofeedDraft ?? detailAnimalData.autofeed),
+        };
+    }, [autofeedDraft, detailAnimalData, ensureAutofeedDraft, isEditing]);
 
     return (
         <div className={'items-wrap crafting-workshop-wrap zoo-workshop-wrap'}>
@@ -849,9 +966,9 @@ export const ZooWrap = ({ children }) => {
             </div>
             {(!isMobile || isDetailVisible || selectedAnimalId) ? (
                 <div className={'item-detail ingame-box detail-blade'}>
-                    {detailAnimalData ? (
+                    {displayedAnimalDetail ? (
                         <ZooDetails
-                            animal={detailAnimalData}
+                            animal={displayedAnimalDetail}
                             totalSpace={space.total}
                             onClose={handleCloseDetail}
                             isMobile={isMobile}
@@ -861,13 +978,14 @@ export const ZooWrap = ({ children }) => {
                             onFeedLevelChange={handleFeedLevelChange}
                             onSaveFeedLevel={handleFeedSave}
                             onCancelFeedLevel={handleFeedCancel}
-                            isFeedDirty={isFeedDirty}
+                            isFeedDirty={isDirty}
                             automationUnlocked={automationUnlocked}
                             onToggleAutofeed={onToggleAutofeed}
                             addAutofeedRule={addAutofeedRule}
                             deleteAutofeedRule={deleteAutofeedRule}
                             setAutofeedRuleValue={setAutofeedRuleValue}
                             setAutofeedPattern={setAutofeedPattern}
+                            resources={resources}
                         />
                     ) : (
                         <ZooOverview
