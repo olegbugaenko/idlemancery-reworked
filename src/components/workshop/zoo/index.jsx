@@ -181,30 +181,31 @@ const devPreviewZooData = {
 };
 
 const ZooCard = ({ animal, totalSpace, showNumericInputs, onSetLimit, onHover, onSelect, isMobile, isSelected }) => {
-    const [inputValue, setInputValue] = useState(animal.isLimited ? (animal.limitPercent ?? 0) : 1);
     const spaceShare = totalSpace > 0 ? (animal.count / totalSpace) : 0;
+    const limitValue = animal.isLimited ? (animal.limitPercent ?? 0) : 1;
+    const [inputValue, setInputValue] = useState(limitValue);
 
     useEffect(() => {
-        setInputValue(animal.isLimited ? (animal.limitPercent ?? 0) : 1);
-    }, [animal.limitPercent, animal.isLimited]);
+        setInputValue(limitValue);
+    }, [limitValue]);
 
-    const handleInputChange = (value) => {
-        const normalized = Math.max(0, Math.min(1, value));
-        const rounded = Math.round(normalized * 1000000) / 1000000;
+    const applyValue = useCallback((value) => {
+        if (typeof value !== 'number' || isNaN(value)) {
+            return;
+        }
+        const normalized = clampShare(value);
+        const rounded = Math.round(normalized * 1_000_000) / 1_000_000;
         setInputValue(rounded);
         onSetLimit(animal.id, rounded);
-    };
+    }, [animal.id, onSetLimit]);
 
-    const handleInputEvent = (event) => {
-        const value = parseFloat(event.target.value);
-        if (!isNaN(value)) {
-            handleInputChange(value);
-        }
-    };
+    const handleInputEvent = useCallback((event) => {
+        applyValue(parseFloat(event.target.value));
+    }, [applyValue]);
 
-    const handleNumericBlur = () => {
-        setInputValue(animal.isLimited ? (animal.limitPercent ?? 0) : 1);
-    };
+    const handleBlur = useCallback(() => {
+        setInputValue(limitValue);
+    }, [limitValue]);
 
     const handleMouseEnter = () => {
         if (!isMobile) {
@@ -232,7 +233,7 @@ const ZooCard = ({ animal, totalSpace, showNumericInputs, onSetLimit, onHover, o
         >
             <div className={'flex-container two-side-card'}>
                 <div className={'left'}>
-                    <img src={`icons/resources/${animal.icon}.png`} className={'resource big'} alt={animal.name}/>
+                    <img src={`icons/zoo/${animal.icon}.png`} className={'resource big'} alt={animal.name}/>
                 </div>
                 <div className={'right'}>
                     <div className={'head'}>
@@ -260,7 +261,7 @@ const ZooCard = ({ animal, totalSpace, showNumericInputs, onSetLimit, onHover, o
                             onClick={(e) => {
                                 e.stopPropagation();
                                 e.preventDefault();
-                                handleInputChange(0);
+                                applyValue(0);
                             }}
                         >
                             <img src={'icons/interface/minimize.png'} alt={'Minimize'}/>
@@ -274,7 +275,7 @@ const ZooCard = ({ animal, totalSpace, showNumericInputs, onSetLimit, onHover, o
                                 step={0.000001}
                                 value={inputValue}
                                 onChange={handleInputEvent}
-                                onBlur={handleNumericBlur}
+                                onBlur={handleBlur}
                                 onClick={(e) => e.stopPropagation()}
                                 onKeyDown={(e) => e.stopPropagation()}
                             />

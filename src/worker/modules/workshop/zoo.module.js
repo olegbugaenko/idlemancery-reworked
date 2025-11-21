@@ -148,10 +148,13 @@ export class ZooModule extends GameModule {
             const isMatching = checkMatchingRules(automation.rules, automation.pattern);
             const activeLevel = isMatching ? baseLevel : 0;
 
+            // console.log('AUTOEFF: ', animal.id, activeLevel, baseLevel, isMatching, this.activeAutofeedLevels[animal.id]);
+
             if (this.activeAutofeedLevels[animal.id] !== activeLevel) {
                 this.activeAutofeedLevels[animal.id] = activeLevel;
                 if (animal.feedEntityId) {
                     gameEntity.setAttribute(animal.feedEntityId, 'feed_level_multiplier', activeLevel);
+                    this.syncAnimalLevels(animal, state);
                 }
             }
         });
@@ -202,15 +205,10 @@ export class ZooModule extends GameModule {
             const limitValue = this.getAnimalLimitValue(animal.id, totalSpace);
             const limitRemaining = limitValue === null ? null : Math.max(0, limitValue - state.count);
 
-            const hasLimitRoom = limitRemaining === null ? true : limitRemaining > SMALL_NUMBER;
-            if (!hasLimitRoom || freeSpace <= SMALL_NUMBER) {
-                return;
-            }
-
             const feedLevel = this.activeAutofeedLevels[animal.id] ?? this.getActiveFeedLevel(state);
             const feedEfficiency = this.getFeedEfficiency(animal);
             const growthMultiplier = feedLevel * feedEfficiency;
-            console.log('Animal id: ', animal.id, ' growthMultiplier: ', growthMultiplier, feedLevel, feedEfficiency, animal);
+            // console.log('Animal id: ', animal.id, ' growthMultiplier: ', this.getBaseGrowthRate(feedLevel, feedEfficiency), feedLevel, feedEfficiency, limitRemaining, animal.count, limitValue);
             
             if (growthMultiplier <= SMALL_NUMBER) {
                 return;
@@ -252,7 +250,7 @@ export class ZooModule extends GameModule {
             return 0;
         }
         if(animal.feedEntityId === 'zoo_animal_magic_henk_feeding') {
-           console.log('Feed efficiency: ', animal.feedEntityId, gameEntity.getEntityEfficiency(animal.feedEntityId) ?? 0, gameResources.getResource('inventory_focusberry').targetEfficiency); 
+           // console.log('Feed efficiency: ', animal.feedEntityId, gameEntity.getEntityEfficiency(animal.feedEntityId) ?? 0, gameResources.getResource('inventory_focusberry').targetEfficiency); 
         }
         return gameEntity.getEntityEfficiency(animal.feedEntityId) ?? 0;
     }
@@ -354,7 +352,7 @@ export class ZooModule extends GameModule {
         const previewEffectiveMultiplier = previewLevel * summary.feedEfficiency;
 
         const feedEffects = gameEntity.entityExists(animal.feedEntityId) ? gameEntity.getEffects(animal.feedEntityId, 0, null, false, 1, 1, feedLevelOverride) : [];
-        console.log('Feed effects: ', feedEffects);
+        // console.log('Feed effects: ', feedEffects);
         return {
             ...summary,
             feed: {

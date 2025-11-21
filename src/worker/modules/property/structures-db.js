@@ -1238,11 +1238,20 @@ export const registerStructuresStage1 = () => {
                         type: 0,
                     }
                 }
-            }
+            },
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 5,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            },
         },
         get_cost: () => ({
             'coins': {
-                A: 2,
+                A: 1.3,
                 B: 5.e+12*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 1
             },
@@ -1255,6 +1264,11 @@ export const registerStructuresStage1 = () => {
                 A: 1.3,
                 B: 15000,
                 type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 5,
+                type: 0
             }
         }),
     })
