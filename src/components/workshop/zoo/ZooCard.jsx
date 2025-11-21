@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { formatValue } from "../../../general/utils/strings";
 import { TippyWrapper } from "../../shared/tippy-wrapper.jsx";
 import { clampShare } from "./utils";
@@ -6,29 +6,50 @@ import { clampShare } from "./utils";
 export const ZooCard = ({ animal, totalSpace, showNumericInputs, onSetLimit, onToggleLimitLock, onHover, onSelect, isMobile, isSelected }) => {
     const spaceShare = totalSpace > 0 ? (animal.count / totalSpace) : 0;
     const limitValue = animal.isLimited ? (animal.limitPercent ?? 0) : 1;
-    const [inputValue, setInputValue] = useState(limitValue);
+    const [inputValue, setInputValue] = useState(limitValue.toString());
 
     useEffect(() => {
-        setInputValue(limitValue);
+        setInputValue(limitValue.toString());
     }, [limitValue]);
 
     const applyValue = useCallback((value) => {
         if (typeof value !== 'number' || isNaN(value)) {
+            setInputValue(limitValue.toString());
             return;
         }
         const normalized = clampShare(value);
         const rounded = Math.round(normalized * 1_000_000) / 1_000_000;
-        setInputValue(rounded);
+        setInputValue(rounded.toString());
         onSetLimit(animal.id, rounded);
-    }, [animal.id, onSetLimit]);
+    }, [animal.id, limitValue, onSetLimit]);
 
     const handleInputEvent = useCallback((event) => {
-        applyValue(parseFloat(event.target.value));
-    }, [applyValue]);
+        setInputValue(event.target.value);
+    }, []);
 
     const handleBlur = useCallback(() => {
-        setInputValue(limitValue);
-    }, [limitValue]);
+        applyValue(parseFloat(inputValue));
+    }, [applyValue, inputValue]);
+
+    const handleKeyDown = useCallback((event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            applyValue(parseFloat(inputValue));
+        }
+        if (event.key === 'Escape') {
+            event.preventDefault();
+            setInputValue(limitValue.toString());
+        }
+    }, [applyValue, inputValue, limitValue]);
+
+    const sliderValue = useMemo(() => {
+        const parsed = parseFloat(inputValue);
+        return Number.isFinite(parsed) ? parsed : limitValue;
+    }, [inputValue, limitValue]);
+
+    const handleSliderChange = useCallback((event) => {
+        applyValue(parseFloat(event.target.value));
+    }, [applyValue]);
 
     const handleMouseEnter = () => {
         if (!isMobile) {
@@ -100,7 +121,10 @@ export const ZooCard = ({ animal, totalSpace, showNumericInputs, onSetLimit, onT
                                 onChange={handleInputEvent}
                                 onBlur={handleBlur}
                                 onClick={(e) => e.stopPropagation()}
-                                onKeyDown={(e) => e.stopPropagation()}
+                                onKeyDown={(e) => {
+                                    e.stopPropagation();
+                                    handleKeyDown(e);
+                                }}
                             />
                         ) : (
                             <input
@@ -109,8 +133,8 @@ export const ZooCard = ({ animal, totalSpace, showNumericInputs, onSetLimit, onT
                                 min={0}
                                 max={1}
                                 step={0.000001}
-                                value={inputValue}
-                                onChange={handleInputEvent}
+                                value={sliderValue}
+                                onChange={handleSliderChange}
                             />
                         )}
                         <div
