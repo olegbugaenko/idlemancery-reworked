@@ -462,7 +462,7 @@ export class PropertyModule extends GameModule {
 
         gameResources.registerResource('magic_zoo_space', {
             tags: ['living', 'secondary'],
-            name: 'Magic Zoo Space',
+            name: 'Zoo Capacity',
             description: 'Available space for housing magical creatures in your zoo.',
             isService: true,
             isConstantEfficiency: true,

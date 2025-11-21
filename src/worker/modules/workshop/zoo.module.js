@@ -108,6 +108,10 @@ export class ZooModule extends GameModule {
         return this.normalizeFeedLevel(state?.feedLevel ?? 1);
     }
 
+    getBaseGrowthRate(feedLevel, feedEfficiency) {
+        return 0.01 * feedLevel * feedEfficiency;
+    }
+
     tick(game, delta) {
         if (!this.isUnlocked()) {
             return;
@@ -118,7 +122,7 @@ export class ZooModule extends GameModule {
             return;
         }
         const spaceIncome = spaceResource.income;
-        if (spaceIncome <= SMALL_NUMBER || spaceResource.bala) {
+        if (spaceIncome <= SMALL_NUMBER || spaceResource.balance <= SMALL_NUMBER) {
             return;
         }
 
@@ -144,7 +148,6 @@ export class ZooModule extends GameModule {
 
         ZOO_ANIMALS.forEach((animal) => {
             const state = this.ensureAnimalState(animal.id);
-            this.syncAnimalLevels(animal, state);
             const limitValue = this.getAnimalLimitValue(animal.id, totalSpace);
             const limitRemaining = limitValue === null ? null : Math.max(0, limitValue - state.count);
 
@@ -156,13 +159,13 @@ export class ZooModule extends GameModule {
             const feedLevel = this.getActiveFeedLevel(state);
             const feedEfficiency = this.getFeedEfficiency(animal);
             const growthMultiplier = feedLevel * feedEfficiency;
-            console.log('Animal id: ', animal.id, ' growthMultiplier: ', growthMultiplier, feedLevel, feedEfficiency);
+            console.log('Animal id: ', animal.id, ' growthMultiplier: ', growthMultiplier, feedLevel, feedEfficiency, animal);
             
             if (growthMultiplier <= SMALL_NUMBER) {
                 return;
             }
 
-            const growth = delta * (0.01) * growthMultiplier * spaceIncome;
+            const growth = delta * this.getBaseGrowthRate(feedLevel, feedEfficiency);
             if (growth <= SMALL_NUMBER) {
                 return;
             }
@@ -195,9 +198,12 @@ export class ZooModule extends GameModule {
 
     getFeedEfficiency(animal) {
         if (!animal.feedEntityId || !gameEntity.entityExists(animal.feedEntityId)) {
-            return 1;
+            return 0;
         }
-        return gameEntity.getEntityEfficiency(animal.feedEntityId) ?? 1;
+        if(animal.feedEntityId === 'zoo_animal_magic_henk_feeding') {
+           console.log('Feed efficiency: ', animal.feedEntityId, gameEntity.getEntityEfficiency(animal.feedEntityId) ?? 0, gameResources.getResource('inventory_focusberry').targetEfficiency); 
+        }
+        return gameEntity.getEntityEfficiency(animal.feedEntityId) ?? 0;
     }
 
     getFeedBottleneck(animal) {
@@ -311,10 +317,15 @@ export class ZooModule extends GameModule {
                 feedEffects,
             },
             breeding: {
-                baseRate: baseGrowthRate,
-                currentRate: baseGrowthRate * summary.effectiveGrowthMultiplier,
-                previewRate: baseGrowthRate * previewEffectiveMultiplier,
+                baseRate: this.getBaseGrowthRate(1,1),
+                currentRate: this.getBaseGrowthRate(summary.feedLevel, summary.feedEfficiency),//baseGrowthRate * summary.effectiveGrowthMultiplier,
+                previewRate: this.getBaseGrowthRate(previewLevel, summary.feedEfficiency),
             },
+            autofeed: {
+                isEnabled: true, // TODO: remove hardcoded value
+                rules: [],
+                pattern: '',
+            }
         };
     }
 
@@ -435,6 +446,7 @@ export class ZooModule extends GameModule {
                 remainingPercent: Math.max(0, 1 - totalPercent),
             },
             animals,
+            automationUnlocked: gameEntity.getLevel('shop_item_planner') > 0,
         };
     }
 

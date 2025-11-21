@@ -7,6 +7,7 @@ import {EffectsSection} from "../../shared/effects-section.jsx";
 import {TippyWrapper} from "../../shared/tippy-wrapper.jsx";
 import {useAppContext} from "../../../context/ui-context";
 import {RawResource} from "../../shared/raw-resource.jsx";
+import RulesList from "../../shared/rules-list.jsx";
 
 const FEED_EPSILON = 0.000001;
 
@@ -316,6 +317,13 @@ const ZooDetails = ({
     onSaveFeedLevel,
     onCancelFeedLevel,
     isFeedDirty,
+    automationUnlocked,
+    onToggleAutofeed,
+    addAutofeedRule,
+    deleteAutofeedRule,
+    setAutofeedRuleValue,
+    setAutofeedPattern,
+    resources,
 }) => {
     if (!animal) {
         return null;
@@ -341,134 +349,124 @@ const ZooDetails = ({
     };
 
     return (
-        <PerfectScrollbar>
-            <div className={'blade-inner zoo-details'}>
-                <div className={'block'}>
-                    <h4>{animal.name}</h4>
-                    <p className={'hint separated'}>{animal.description}</p>
-                </div>
-                <div className={'block'}>
-                    <p>Population</p>
-                    <div className={'zoo-detail-stats'}>
-                        <div className={'flex-row flex-container'}>
-                            <span>Animals</span>
-                            <strong>{formatValue(animal.count)}</strong>
+        <>
+        <div className={'blade-outer'}>
+            <PerfectScrollbar>
+                <div className={'blade-inner zoo-details'}>
+                    <div className={'block'}>
+                        <h4>{animal.name}(x{formatValue(animal.count)})</h4>
+                        <p className={'hint separated'}>{animal.description}</p>
+                    </div>
+                    <div className={'block'}>
+                        <p>Population</p>
+                        <div className={'zoo-detail-stats'}>
+                            <div className={'flex-row flex-container'}>
+                                <span>Limit</span>
+                                <strong>{animal.isLimited ? `${formatValue((animal.limitPercent ?? 0) * 100)}% (~${formatValue(animal.limitValue ?? 0)} space)` : 'Unlimited'}</strong>
+                            </div>
                         </div>
-                        <div className={'flex-row flex-container'}>
-                            <span>Space usage</span>
-                            <strong>{formatValue(spaceShare * 100)}%</strong>
-                        </div>
-                        <div className={'flex-row flex-container'}>
-                            <span>Limit</span>
-                            <strong>{animal.isLimited ? `${formatValue((animal.limitPercent ?? 0) * 100)}% (~${formatValue(animal.limitValue ?? 0)} space)` : 'Unlimited'}</strong>
+                        <div className={'block'}>
+                            <p>Effects</p>
+                            <EffectsSection effects={animal.effects} maxDisplay={10} />
                         </div>
                     </div>
-                </div>
 
-                <div className={'block zoo-feed-block'}>
-                    <p>Feeding</p>
-                    <div className={'zoo-feed-summary'}>
-                        <div className={'flex-row flex-container'}>
-                            <span>Feeding level</span>
-                            <strong>{formatValue(displayedFeedLevel * 100)}%</strong>
+                    <div className={'block zoo-feed-block'}>
+                        <p>Feeding</p>
+                        <div className={'zoo-feed-summary'}>
+                            <p className={'flex-row flex-container'}>
+                                <span>Breeding</span>
+                                <span>{formatValue(showPreview ? previewEffectiveMultiplier * 100 : displayedFeedLevel * 100)}%</span>
+                            </p>
+                            {isEditing ? (
+                                <div className={'zoo-feed-controls'}>
+                                    <span className={'label'}>Adjust feeding level</span>
+                                    <div className={'effort-control flex-container flex-row'}>
+                                        <div
+                                            className={'icon-content minimize-icon interface-icon tiny'}
+                                            onClick={() => handleFeedInput(0)}
+                                        >
+                                            <img src={'icons/interface/minimize.png'} alt={'Minimize'} />
+                                        </div>
+                                        {showNumericInputs ? (
+                                            <input
+                                                type={'number'}
+                                                className={'level-set numeric-input'}
+                                                min={0}
+                                                max={1}
+                                                step={0.000001}
+                                                value={displayedFeedLevel}
+                                                onChange={(event) => handleFeedInput(parseFloat(event.target.value))}
+                                            />
+                                        ) : (
+                                            <input
+                                                type={'range'}
+                                                className={'level-set'}
+                                                min={0}
+                                                max={1}
+                                                step={0.000001}
+                                                value={displayedFeedLevel}
+                                                onChange={(event) => handleFeedInput(parseFloat(event.target.value))}
+                                            />
+                                        )}
+                                        <div
+                                            className={'icon-content maximize-icon interface-icon tiny'}
+                                            onClick={() => handleFeedInput(1)}
+                                        >
+                                            <img src={'icons/interface/maximize.png'} alt={'Maximize'} />
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : null}
                         </div>
-                        <div className={'flex-row flex-container'}>
-                            <span>Feeding efficiency</span>
-                            <strong>{formatValue(feedEfficiency * 100)}%</strong>
-                        </div>
-                        <div className={'flex-row flex-container'}>
-                            <span>Effective breeding</span>
-                            <strong>{formatValue(effectiveMultiplier * 100)}%</strong>
-                        </div>
-                        {showPreview ? (
-                            <div className={'flex-row flex-container preview-row'}>
-                                <span>Preview</span>
-                                <strong>{formatValue(previewEffectiveMultiplier * 100)}%</strong>
-                            </div>
+                        
+                        {feedInfo.missingResource ? (
+                            <p className={'hint warning yellow'}>
+                                Breeding is slowed to {formatValue(feedInfo.efficiency ?? 0, 2)}% due to a lack of {feedInfo.missingResource.name ?? feedInfo.missingResource.id}.
+                            </p>
                         ) : null}
                     </div>
-                    {isEditing ? (
-                        <div className={'zoo-feed-controls'}>
-                            <span className={'label'}>Adjust feeding level</span>
-                            <div className={'effort-control flex-container flex-row'}>
-                                <div
-                                    className={'icon-content minimize-icon interface-icon tiny'}
-                                    onClick={() => handleFeedInput(0)}
-                                >
-                                    <img src={'icons/interface/minimize.png'} alt={'Minimize'} />
-                                </div>
-                                {showNumericInputs ? (
-                                    <input
-                                        type={'number'}
-                                        className={'level-set numeric-input'}
-                                        min={0}
-                                        max={1}
-                                        step={0.000001}
-                                        value={displayedFeedLevel}
-                                        onChange={(event) => handleFeedInput(parseFloat(event.target.value))}
-                                    />
-                                ) : (
-                                    <input
-                                        type={'range'}
-                                        className={'level-set'}
-                                        min={0}
-                                        max={1}
-                                        step={0.000001}
-                                        value={displayedFeedLevel}
-                                        onChange={(event) => handleFeedInput(parseFloat(event.target.value))}
-                                    />
-                                )}
-                                <div
-                                    className={'icon-content maximize-icon interface-icon tiny'}
-                                    onClick={() => handleFeedInput(1)}
-                                >
-                                    <img src={'icons/interface/maximize.png'} alt={'Maximize'} />
-                                </div>
-                            </div>
-                            <div className={'buttons zoo-feed-actions'}>
-                                <button className={'warning-action'} onClick={onCancelFeedLevel}>Cancel</button>
-                                <button className={'primary-action'} disabled={!isFeedDirty} onClick={onSaveFeedLevel}>Save</button>
-                            </div>
-                        </div>
-                    ) : null}
-                    {feedInfo.missingResource ? (
-                        <p className={'hint warning'}>
-                            Breeding is slowed due to a lack of <strong>{feedInfo.missingResource.name ?? feedInfo.missingResource.id}</strong>.
+
+                    <div className={'block zoo-feed-requirements'}>
+                        <p>Breeding Output</p>
+                        <EffectsSection effects={feedInfo.feedEffects} maxDisplay={10} />
+                        <p className={'zoo-breeding-row flex-row flex-container'}>
+                            <span>Breeding Rate</span>
+                            <span>{formatValue(showPreview ? breedingInfo.previewRate ?? 0 : breedingInfo.currentRate ?? 0, 4)} / s</span>
                         </p>
-                    ) : null}
-                </div>
-
-                <div className={'block zoo-feed-requirements'}>
-                    <p>Feeding Cost</p>
-                    <EffectsSection effects={feedInfo.feedEffects} maxDisplay={10} />
-                </div>
-
-                <div className={'block zoo-breeding-block'}>
-                    <p>Breeding Rate</p>
-                    <div className={'zoo-breeding-row'}>
-                        <span>Current</span>
-                        <strong>{formatValue(breedingInfo.currentRate ?? 0)} / s</strong>
                     </div>
-                    {showPreview ? (
-                        <div className={'zoo-breeding-row preview-row'}>
-                            <span>Preview</span>
-                            <strong>{formatValue(breedingInfo.previewRate ?? 0)} / s</strong>
+
+                    {automationUnlocked ? (<div className={'autoconsume-setting'}>
+                        <div className={'rules-header flex-container'}>
+                            <p>Autofeed rules: </p>
+                            <label>
+                                <input type={'checkbox'} checked={animal.autofeed?.isEnabled ?? undefined} onChange={onToggleAutofeed}/>
+                                {animal.autofeed?.isEnabled ? ' ON' : ' OFF'}
+                            </label>
+                            {isEditing ? (<button onClick={addAutofeedRule}>Add rule (AND)</button>) : null}
                         </div>
-                    ) : null}
-                </div>
+                        <RulesList
+                            key={`${animal.id}-${isEditing}-${animal.autofeed?.rules?.length || 0}`}
+                            isEditing={isEditing}
+                            rules={animal.autofeed?.rules || []}
+                            resources={resources}
+                            pattern={animal.autofeed?.pattern}
+                            deleteRule={deleteAutofeedRule}
+                            setRuleValue={setAutofeedRuleValue}
+                            setPattern={setAutofeedPattern}
+                            isAutoCheck={animal.autofeed?.isEnabled}
+                        />
 
-                <div className={'block'}>
-                    <p>Effects</p>
-                    <EffectsSection effects={animal.effects} maxDisplay={10} />
-                </div>
+                    </div>) : null}
 
-                {isMobile ? (
-                    <div className={'block buttons'}>
-                        <button onClick={onClose}>Close</button>
-                    </div>
-                ) : null}
-            </div>
-        </PerfectScrollbar>
+                </div>
+            </PerfectScrollbar>
+        </div>
+        {isEditing || isMobile ? (<div className={'buttons zoo-feed-actions'}>
+            <button className={'warning-action'} onClick={onCancelFeedLevel}>Cancel</button>
+            <button className={'primary-action'} disabled={!isFeedDirty} onClick={onSaveFeedLevel}>Save</button>
+        </div>) : null}
+        </>
     );
 };
 
@@ -526,6 +524,7 @@ export const ZooWrap = ({ children }) => {
     const [animalDetail, setAnimalDetail] = useState(null);
     const [feedDraftValue, setFeedDraftValue] = useState(null);
     const feedDraftAnimalIdRef = useRef(null);
+    const [resources, setResources] = useState([]);
 
     const isDevPreview = useMemo(() => {
         if (typeof window === 'undefined') {
@@ -546,8 +545,13 @@ export const ZooWrap = ({ children }) => {
         const interval = setInterval(() => {
             sendData('query-zoo-data');
         }, 250);
+        sendData('query-all-resources', { prefix: 'zoo'});
+        const interval2 = setInterval(() => {
+            sendData('query-new-unlocks-notifications', { suffix: 'zoo', scope: 'zoo' })
+        }, 1000)
         return () => {
             clearInterval(interval);
+            clearInterval(interval2);
         };
     }, [isDevPreview, sendData]);
 
@@ -558,8 +562,12 @@ export const ZooWrap = ({ children }) => {
         onMessage('zoo-data', (payload) => {
             setZooData(payload || defaultZooData);
         });
+        onMessage('all-resources-zoo', (payload) => {
+            setResources(payload || []);
+        });
         return () => {
             removeMessage('zoo-data');
+            removeMessage('all-resources-zoo');
         };
     }, [isDevPreview, onMessage, removeMessage]);
 
@@ -587,6 +595,7 @@ export const ZooWrap = ({ children }) => {
     const space = zooData.space || defaultZooData.space;
     const limits = zooData.limits || defaultZooData.limits;
     const animals = zooData.animals || defaultZooData.animals;
+    const automationUnlocked = zooData.automationUnlocked || defaultZooData.automationUnlocked;
 
     const handleHoverAnimal = useCallback((id) => {
         if (isMobile) {
@@ -754,6 +763,13 @@ export const ZooWrap = ({ children }) => {
     const detailFeedLevel = detailAnimalData?.feed?.level ?? 1;
     const isFeedDirty = isEditing && typeof feedDraftValue === 'number' && Math.abs(feedDraftValue - detailFeedLevel) > FEED_EPSILON;
 
+    // TODO: replace mocks with actual logic
+    const onToggleAutofeed = useCallback(() => {});
+    const addAutofeedRule = useCallback(() => {});
+    const deleteAutofeedRule = useCallback(() => {});
+    const setAutofeedRuleValue = useCallback(() => {});
+    const setAutofeedPattern = useCallback(() => {});
+
     return (
         <div className={'items-wrap crafting-workshop-wrap zoo-workshop-wrap'}>
             <div className={'items ingame-box'}>
@@ -846,6 +862,12 @@ export const ZooWrap = ({ children }) => {
                             onSaveFeedLevel={handleFeedSave}
                             onCancelFeedLevel={handleFeedCancel}
                             isFeedDirty={isFeedDirty}
+                            automationUnlocked={automationUnlocked}
+                            onToggleAutofeed={onToggleAutofeed}
+                            addAutofeedRule={addAutofeedRule}
+                            deleteAutofeedRule={deleteAutofeedRule}
+                            setAutofeedRuleValue={setAutofeedRuleValue}
+                            setAutofeedPattern={setAutofeedPattern}
                         />
                     ) : (
                         <ZooOverview

@@ -2068,7 +2068,6 @@ h4 {
 }
 
 .zoo-summary .summary-item {
-    flex-direction: column;
     align-items: flex-start;
     font-size: 14px;
 }
@@ -4997,4 +4996,8 @@ body::after {
 .statistics-content .resources .resource-toggle-hidden {
     margin-left: 8px;
     cursor: pointer;
+}
+
+.zoo-feed-controls .effort-control .level-set{
+    width: 120px;
 }
