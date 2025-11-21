@@ -3,513 +3,16 @@ import WorkerContext from "../../../context/worker-context";
 import {useWorkerClient} from "../../../general/client";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import {formatValue} from "../../../general/utils/strings";
-import {EffectsSection} from "../../shared/effects-section.jsx";
 import {TippyWrapper} from "../../shared/tippy-wrapper.jsx";
 import {useAppContext} from "../../../context/ui-context";
 import {RawResource} from "../../shared/raw-resource.jsx";
-import RulesList from "../../shared/rules-list.jsx";
 import {cloneDeep, isEqual} from "lodash";
-
-const FEED_EPSILON = 0.000001;
-
-const clampShare = (value) => {
-    if (typeof value !== 'number' || isNaN(value)) {
-        return 0;
-    }
-    if (value < 0) {
-        return 0;
-    }
-    if (value > 1) {
-        return 1;
-    }
-    return value;
-};
-
-const DEV_FEED_REQUIREMENTS = {
-    magic_henk: { id: 'inventory_focusberry', name: 'Focusberry', perAnimal: 1_000_000 },
-    magic_cat: { id: 'inventory_nightshade', name: 'Nightshade', perAnimal: 1_200_000 },
-    green_bear: { id: 'inventory_ginseng', name: 'Ginseng', perAnimal: 1_500_000 },
-};
-
-const buildFallbackDetailFromSummary = (animal) => {
-    if (!animal) {
-        return null;
-    }
-    const feedLevel = typeof animal.feedLevel === 'number' ? animal.feedLevel : 1;
-    const feedEfficiency = typeof animal.feedEfficiency === 'number' ? animal.feedEfficiency : 1;
-    const effectiveMultiplier = typeof animal.effectiveGrowthMultiplier === 'number'
-        ? animal.effectiveGrowthMultiplier
-        : feedLevel * feedEfficiency;
-    const baseRate = 0.01 + 0.001 * (animal.count ?? 0);
-    return {
-        ...animal,
-        feed: {
-            level: feedLevel,
-            efficiency: feedEfficiency,
-            effectiveMultiplier,
-            previewLevel: feedLevel,
-            previewEffectiveMultiplier: effectiveMultiplier,
-            missingResource: null,
-            requirements: [],
-        },
-        breeding: {
-            baseRate,
-            currentRate: baseRate * effectiveMultiplier,
-            previewRate: baseRate * effectiveMultiplier,
-        },
-    };
-};
-
-const buildDevPreviewDetail = (animal, overrideLevel = null) => {
-    const fallback = buildFallbackDetailFromSummary(animal);
-    if (!fallback) {
-        return null;
-    }
-    const feedLevel = fallback.feed?.level ?? 1;
-    const previewLevel = clampShare(typeof overrideLevel === 'number' ? overrideLevel : feedLevel);
-    const efficiency = fallback.feed?.efficiency ?? 1;
-    const count = fallback.count ?? 0;
-    const requirement = DEV_FEED_REQUIREMENTS[fallback.id];
-    const requirements = requirement ? [{
-        resource: { id: requirement.id, name: requirement.name },
-        perAnimal: requirement.perAnimal,
-        consumption: requirement.perAnimal * count * feedLevel,
-        previewConsumption: requirement.perAnimal * count * previewLevel,
-    }] : [];
-
-    return {
-        ...fallback,
-        feed: {
-            ...fallback.feed,
-            requirements,
-            previewLevel,
-            previewEffectiveMultiplier: previewLevel * efficiency,
-        },
-        breeding: {
-            ...fallback.breeding,
-            previewRate: fallback.breeding.baseRate * previewLevel * efficiency,
-        },
-    };
-};
-
-const defaultZooData = {
-    unlocked: false,
-    space: { total: 0, used: 0, free: 0 },
-    limits: { totalPercent: 0, remainingPercent: 1 },
-    animals: [],
-};
-
-const devPreviewZooData = {
-    unlocked: true,
-    space: { total: 75, used: 52, free: 23 },
-    limits: { totalPercent: 0.65, remainingPercent: 0.35 },
-    animals: [
-        {
-            id: 'magic_henk',
-            name: 'Magic Henk',
-            description: 'A dimensional wanderer whose mere presence harmonizes magical amplifiers.',
-            icon: 'inventory_charged_amethyst',
-            count: 18.2,
-            isLimited: true,
-            limitPercent: 0.35,
-            limitValue: 26.25,
-            feedLevel: 0.8,
-            feedEfficiency: 1,
-            effectiveGrowthMultiplier: 0.8,
-            effects: {
-                earth_amplifier_efficiency: {
-                    name: 'Earth Amplifier Efficiency',
-                    type: 'effects',
-                    scope: 'income',
-                    isPercentage: true,
-                    value: 0.125
-                },
-                air_amplifier_efficiency: {
-                    name: 'Air Amplifier Efficiency',
-                    type: 'effects',
-                    scope: 'income',
-                    isPercentage: true,
-                    value: 0.125
-                }
-            }
-        },
-        {
-            id: 'magic_cat',
-            name: 'Magic Cat',
-            description: 'A curious feline that curls up on spellbooks, inspiring faster study sessions.',
-            icon: 'inventory_ruby',
-            count: 14.6,
-            isLimited: false,
-            limitPercent: null,
-            limitValue: null,
-            feedLevel: 0.6,
-            feedEfficiency: 0.95,
-            effectiveGrowthMultiplier: 0.57,
-            effects: {
-                books_learning_rate: {
-                    name: 'Books Learning Rate',
-                    type: 'effects',
-                    scope: 'income',
-                    isPercentage: true,
-                    value: 0.083
-                }
-            }
-        },
-        {
-            id: 'green_bear',
-            name: 'Green Bear',
-            description: 'A gentle giant that practices tai chi, motivating physical training routines.',
-            icon: 'inventory_spark',
-            count: 19.1,
-            isLimited: true,
-            limitPercent: 0.30,
-            limitValue: 22.5,
-            feedLevel: 0.9,
-            feedEfficiency: 0.85,
-            effectiveGrowthMultiplier: 0.765,
-            effects: {
-                physical_training_learn_speed: {
-                    name: 'Physical Training Learn Speed',
-                    type: 'effects',
-                    scope: 'income',
-                    isPercentage: true,
-                    value: 0.091
-                }
-            }
-        }
-    ]
-};
-
-const ZooCard = ({ animal, totalSpace, showNumericInputs, onSetLimit, onHover, onSelect, isMobile, isSelected }) => {
-    const spaceShare = totalSpace > 0 ? (animal.count / totalSpace) : 0;
-    const limitValue = animal.isLimited ? (animal.limitPercent ?? 0) : 1;
-    const [inputValue, setInputValue] = useState(limitValue);
-
-    useEffect(() => {
-        setInputValue(limitValue);
-    }, [limitValue]);
-
-    const applyValue = useCallback((value) => {
-        if (typeof value !== 'number' || isNaN(value)) {
-            return;
-        }
-        const normalized = clampShare(value);
-        const rounded = Math.round(normalized * 1_000_000) / 1_000_000;
-        setInputValue(rounded);
-        onSetLimit(animal.id, rounded);
-    }, [animal.id, onSetLimit]);
-
-    const handleInputEvent = useCallback((event) => {
-        applyValue(parseFloat(event.target.value));
-    }, [applyValue]);
-
-    const handleBlur = useCallback(() => {
-        setInputValue(limitValue);
-    }, [limitValue]);
-
-    const handleMouseEnter = () => {
-        if (!isMobile) {
-            onHover?.(animal.id);
-        }
-    };
-
-    const handleMouseLeave = () => {
-        if (!isMobile) {
-            onHover?.(null);
-        }
-    };
-
-    const handleClick = () => {
-        onSelect?.(animal.id);
-    };
-
-    return (
-        <div
-            className={`card craftable zoo-card ${isSelected ? 'selected' : ''}`}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-            onMouseOver={() => !isMobile ? onHover?.(animal.id) : null}
-            onClick={handleClick}
-        >
-            <div className={'flex-container two-side-card'}>
-                <div className={'left'}>
-                    <img src={`icons/zoo/${animal.icon}.png`} className={'resource big'} alt={animal.name}/>
-                </div>
-                <div className={'right'}>
-                    <div className={'head'}>
-                        <p className={'title'}>{animal.name}</p>
-                    </div>
-                    <div className={'zoo-stats-row'}>
-                        <span>Animals: <strong>{formatValue(animal.count)}</strong></span>
-                        <span>Space: <strong>{formatValue(spaceShare * 100)}%</strong></span>
-                    </div>
-                    <div className={'zoo-stats-row'}>
-                        <span>Feeding:</span>
-                        <strong>
-                            {formatValue((animal.feedLevel ?? 1) * 100)}%
-                            {typeof animal.feedEfficiency === 'number' ? ` (Eff. ${formatValue((animal.feedEfficiency ?? 1) * 100)}%)` : ''}
-                        </strong>
-                    </div>
-                </div>
-            </div>
-            <div className={'bottom self-placed zoo-card-controls'}>
-                <div className={'buttons'}>
-                    <span className={'label'}>Limit share:</span>
-                    <div className={'effort-control flex-container flex-row'}>
-                        <div
-                            className={'icon-content minimize-icon interface-icon tiny'}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                e.preventDefault();
-                                applyValue(0);
-                            }}
-                        >
-                            <img src={'icons/interface/minimize.png'} alt={'Minimize'}/>
-                        </div>
-                        {showNumericInputs ? (
-                            <input
-                                type={'number'}
-                                className={'level-set numeric-input'}
-                                min={0}
-                                max={1}
-                                step={0.000001}
-                                value={inputValue}
-                                onChange={handleInputEvent}
-                                onBlur={handleBlur}
-                                onClick={(e) => e.stopPropagation()}
-                                onKeyDown={(e) => e.stopPropagation()}
-                            />
-                        ) : (
-                            <input
-                                type={'range'}
-                                className={'level-set'}
-                                min={0}
-                                max={1}
-                                step={0.000001}
-                                value={inputValue}
-                                onChange={handleInputEvent}
-                            />
-                        )}
-                        <div
-                            className={'icon-content maximize-icon interface-icon tiny'}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                e.preventDefault();
-                                handleInputChange(1);
-                            }}
-                        >
-                            <img src={'icons/interface/maximize.png'} alt={'Maximize'}/>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-const ZooDetails = ({
-    animal,
-    totalSpace,
-    onClose,
-    isMobile,
-    showNumericInputs,
-    isEditing,
-    feedLevelDraft,
-    onFeedLevelChange,
-    onSaveFeedLevel,
-    onCancelFeedLevel,
-    isFeedDirty,
-    automationUnlocked,
-    onToggleAutofeed,
-    addAutofeedRule,
-    deleteAutofeedRule,
-    setAutofeedRuleValue,
-    setAutofeedPattern,
-    resources,
-}) => {
-    if (!animal) {
-        return null;
-    }
-
-    const spaceShare = totalSpace > 0 ? (animal.count / totalSpace) : 0;
-    const feedInfo = animal.feed || {};
-    const breedingInfo = animal.breeding || {};
-    const displayedFeedLevel = isEditing && typeof feedLevelDraft === 'number'
-        ? clampShare(feedLevelDraft)
-        : clampShare(feedInfo.level ?? 1);
-    const feedEfficiency = feedInfo.efficiency ?? 1;
-    const effectiveMultiplier = displayedFeedLevel * feedEfficiency;
-    const previewEffectiveMultiplier = feedInfo.previewEffectiveMultiplier ?? effectiveMultiplier;
-    const showPreview = isEditing && Math.abs(previewEffectiveMultiplier - effectiveMultiplier) > FEED_EPSILON;
-    const feedRequirements = feedInfo.requirements || [];
-
-    const handleFeedInput = (value) => {
-        if (typeof value !== 'number' || isNaN(value)) {
-            return;
-        }
-        onFeedLevelChange?.(clampShare(value));
-    };
-
-    return (
-        <>
-        <div className={'blade-outer'}>
-            <PerfectScrollbar>
-                <div className={'blade-inner zoo-details'}>
-                    <div className={'block'}>
-                        <h4>{animal.name}(x{formatValue(animal.count)})</h4>
-                        <p className={'hint separated'}>{animal.description}</p>
-                    </div>
-                    <div className={'block'}>
-                        <p>Population</p>
-                        <div className={'zoo-detail-stats'}>
-                            <div className={'flex-row flex-container'}>
-                                <span>Limit</span>
-                                <strong>{animal.isLimited ? `${formatValue((animal.limitPercent ?? 0) * 100)}% (~${formatValue(animal.limitValue ?? 0)} space)` : 'Unlimited'}</strong>
-                            </div>
-                        </div>
-                        <div className={'block'}>
-                            <p>Effects</p>
-                            <EffectsSection effects={animal.effects} maxDisplay={10} />
-                        </div>
-                    </div>
-
-                    <div className={'block zoo-feed-block'}>
-                        <p>Feeding</p>
-                        <div className={'zoo-feed-summary'}>
-                            <p className={'flex-row flex-container'}>
-                                <span>Breeding</span>
-                                <span>{formatValue(showPreview ? previewEffectiveMultiplier * 100 : displayedFeedLevel * 100)}%</span>
-                            </p>
-                            {isEditing ? (
-                                <div className={'zoo-feed-controls'}>
-                                    <span className={'label'}>Adjust feeding level</span>
-                                    <div className={'effort-control flex-container flex-row'}>
-                                        <div
-                                            className={'icon-content minimize-icon interface-icon tiny'}
-                                            onClick={() => handleFeedInput(0)}
-                                        >
-                                            <img src={'icons/interface/minimize.png'} alt={'Minimize'} />
-                                        </div>
-                                        {showNumericInputs ? (
-                                            <input
-                                                type={'number'}
-                                                className={'level-set numeric-input'}
-                                                min={0}
-                                                max={1}
-                                                step={0.000001}
-                                                value={displayedFeedLevel}
-                                                onChange={(event) => handleFeedInput(parseFloat(event.target.value))}
-                                            />
-                                        ) : (
-                                            <input
-                                                type={'range'}
-                                                className={'level-set'}
-                                                min={0}
-                                                max={1}
-                                                step={0.000001}
-                                                value={displayedFeedLevel}
-                                                onChange={(event) => handleFeedInput(parseFloat(event.target.value))}
-                                            />
-                                        )}
-                                        <div
-                                            className={'icon-content maximize-icon interface-icon tiny'}
-                                            onClick={() => handleFeedInput(1)}
-                                        >
-                                            <img src={'icons/interface/maximize.png'} alt={'Maximize'} />
-                                        </div>
-                                    </div>
-                                </div>
-                            ) : null}
-                        </div>
-                        
-                        {feedInfo.missingResource ? (
-                            <p className={'hint warning yellow'}>
-                                Breeding is slowed to {formatValue(feedInfo.efficiency ?? 0, 2)}% due to a lack of {feedInfo.missingResource.name ?? feedInfo.missingResource.id}.
-                            </p>
-                        ) : null}
-                    </div>
-
-                    <div className={'block zoo-feed-requirements'}>
-                        <p>Breeding Output</p>
-                        <EffectsSection effects={feedInfo.feedEffects} maxDisplay={10} />
-                        <p className={'zoo-breeding-row flex-row flex-container'}>
-                            <span>Breeding Rate</span>
-                            <span>{formatValue(showPreview ? breedingInfo.previewRate ?? 0 : breedingInfo.currentRate ?? 0, 4)} / s</span>
-                        </p>
-                    </div>
-
-                    {automationUnlocked ? (<div className={'autoconsume-setting'}>
-                        <div className={'rules-header flex-container'}>
-                            <p>Autofeed rules: </p>
-                            <label>
-                                <input type={'checkbox'} checked={animal.autofeed?.isEnabled ?? undefined} onChange={onToggleAutofeed}/>
-                                {animal.autofeed?.isEnabled ? ' ON' : ' OFF'}
-                            </label>
-                            {isEditing ? (<button onClick={addAutofeedRule}>Add rule (AND)</button>) : null}
-                        </div>
-                        <RulesList
-                            key={`${animal.id}-${isEditing}-${animal.autofeed?.rules?.length || 0}`}
-                            isEditing={isEditing}
-                            rules={animal.autofeed?.rules || []}
-                            resources={resources}
-                            pattern={animal.autofeed?.pattern}
-                            deleteRule={deleteAutofeedRule}
-                            setRuleValue={setAutofeedRuleValue}
-                            setPattern={setAutofeedPattern}
-                            isAutoCheck={animal.autofeed?.isEnabled}
-                        />
-
-                    </div>) : null}
-
-                </div>
-            </PerfectScrollbar>
-        </div>
-        {isEditing || isMobile ? (<div className={'buttons zoo-feed-actions'}>
-            <button className={'warning-action'} onClick={onCancelFeedLevel}>Cancel</button>
-            <button className={'primary-action'} disabled={!isFeedDirty} onClick={onSaveFeedLevel}>Save</button>
-        </div>) : null}
-        </>
-    );
-};
-
-const ZooOverview = ({ space, limits, zooUnlocked, isMobile, onClose }) => (
-    <PerfectScrollbar>
-        <div className={'blade-inner zoo-details'}>
-            <div className={'block'}>
-                <h4>Magical Zoo</h4>
-                <p className={'hint separated'}>
-                    Assign percentage caps to each animal type to control how much of your total Magic Zoo Space they can occupy.
-                    Set a limit to reserve habitat for other creatures or keep it unlimited to let the population grow freely.
-                    Use the detail blade to fine-tune feeding levels, preview the required food, and only save the changes when
-                    you are satisfied with the projected breeding rate.
-                </p>
-            </div>
-            <div className={'block'}>
-                <p>Space Summary</p>
-                <div className={'flex-row flex-container zoo-capacity-line'}>
-                    <RawResource id={'magic_zoo_space'} name={'Zoo Capacity'} />
-                    <span className={'slots-amount'}>
-                        {formatValue(space.used)}/{formatValue(space.total)}
-                    </span>
-                </div>
-                <p className={'hint separated'}>
-                    Reserved limits: <strong>{formatValue((limits.totalPercent ?? 0) * 100)}%</strong>
-                </p>
-            </div>
-            <div className={'block'}>
-                <p>Status</p>
-                <p className={'hint'}>
-                    {zooUnlocked ? 'Your Magical Zoo is active. Hover over a card to inspect an animal or adjust its limit below.' : 'Construct Enclosures or other buildings that provide Magic Zoo Space to start collecting mystical animals.'}
-                </p>
-            </div>
-            {isMobile ? (
-                <div className={'block buttons'}>
-                    <button onClick={onClose}>Close</button>
-                </div>
-            ) : null}
-        </div>
-    </PerfectScrollbar>
-);
+import {useModal} from "../../../general/components/modal/index.jsx";
+import { ZooCard } from "./ZooCard.jsx";
+import { ZooDetails } from "./ZooDetails.jsx";
+import { ZooOverview } from "./ZooOverview.jsx";
+import { buildDevPreviewDetail, buildFallbackDetailFromSummary, clampShare, FEED_EPSILON, normalizeLimitsPreview } from "./utils";
+import { defaultZooData, devPreviewZooData } from "./constants";
 
 export const ZooWrap = ({ children }) => {
     const worker = useContext(WorkerContext);
@@ -518,6 +21,7 @@ export const ZooWrap = ({ children }) => {
     const [hoveredAnimalId, setHoveredAnimalId] = useState(null);
     const [selectedAnimalId, setSelectedAnimalId] = useState(null);
     const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
+    const { confirm } = useModal();
     const [zooData, setZooData] = useState(defaultZooData);
     const [showNumericInputs, setShowNumericInputs] = useState(() => {
         const saved = localStorage.getItem('zoo-show-numeric-inputs');
@@ -597,14 +101,47 @@ export const ZooWrap = ({ children }) => {
         localStorage.setItem('zoo-show-numeric-inputs', JSON.stringify(value));
     }, []);
 
-    const onSetLimit = useCallback((id, percent) => {
-        sendData('set-zoo-limit', { id, percent });
-    }, [sendData]);
-
     const space = zooData.space || defaultZooData.space;
     const limits = zooData.limits || defaultZooData.limits;
     const animals = zooData.animals || defaultZooData.animals;
     const automationUnlocked = zooData.automationUnlocked || defaultZooData.automationUnlocked;
+
+    const onSetLimit = useCallback((id, percent, { onCancel } = {}) => {
+        const preview = normalizeLimitsPreview(animals, id, percent);
+        const totalSpace = space.total || 0;
+        const riskyAnimals = preview.filter((animal) => {
+            if (!animal.isLimited || typeof animal.limitPercent !== 'number') {
+                return false;
+            }
+            const newLimitValue = animal.limitPercent * totalSpace;
+            return (animal.count ?? 0) > newLimitValue + FEED_EPSILON;
+        });
+
+        const proceed = () => sendData('set-zoo-limit', { id, percent });
+
+        if (!riskyAnimals.length) {
+            proceed();
+            return;
+        }
+
+        const names = riskyAnimals.map((animal) => animal.name || animal.id).join(', ');
+        confirm({
+            title: 'Confirm limit reduction',
+            message: names
+                ? `The limit for ${names} will drop below the current population. Some animals will be lost. Continue?`
+                : 'Updating these limits will reduce some animal populations. Continue?',
+            confirmText: 'Reduce limit',
+            cancelText: 'Cancel',
+            onConfirm: proceed,
+            onCancel: () => {
+                onCancel?.();
+            },
+        });
+    }, [animals, confirm, sendData, space.total]);
+
+    const onToggleLimitLock = useCallback((id, isLocked) => {
+        sendData('toggle-zoo-limit-lock', { id, isLocked });
+    }, [sendData]);
 
     const handleHoverAnimal = useCallback((id) => {
         if (isMobile) {
@@ -632,17 +169,56 @@ export const ZooWrap = ({ children }) => {
     useEffect(() => {
         if (selectedAnimalId && !animals.some((animal) => animal.id === selectedAnimalId)) {
             setSelectedAnimalId(null);
-            if (isMobile) {
-                setDetailVisible(false);
-            }
         }
-    }, [selectedAnimalId, animals, isMobile]);
+    }, [selectedAnimalId, animals]);
+
+    useEffect(() => {
+        setSelectedAnimalId((prev) => {
+            if (prev) {
+                const animalExists = animals.some((animal) => animal.id === prev);
+                if (!animalExists) {
+                    return null;
+                }
+                const activeAnimal = animals.find((animal) => animal.id === prev);
+                if (feedDraftAnimalIdRef.current !== activeAnimal.id) {
+                    setFeedDraftValue(null);
+                    setAutofeedDraft(cloneDeep(activeAnimal.autofeed || { isEnabled: false, rules: [], pattern: '' }));
+                    initialAutofeedRef.current = cloneDeep(activeAnimal.autofeed || { isEnabled: false, rules: [], pattern: '' });
+                }
+            }
+            return prev;
+        });
+    }, [animals]);
+
+    useEffect(() => {
+        setHoveredAnimalId((prev) => {
+            if (!prev) {
+                return null;
+            }
+            const animalExists = animals.some((animal) => animal.id === prev);
+            if (!animalExists) {
+                return null;
+            }
+            return prev;
+        });
+    }, [animals]);
 
     const activeAnimal = useMemo(() => {
-        const prioritizedId = hoveredAnimalId || selectedAnimalId;
-        if (!prioritizedId) return null;
-        return animals.find((animal) => animal.id === prioritizedId) || null;
+        if (selectedAnimalId) {
+            return animals.find((animal) => animal.id === selectedAnimalId);
+        }
+        if (hoveredAnimalId) {
+            return animals.find((animal) => animal.id === hoveredAnimalId);
+        }
+        return null;
     }, [animals, hoveredAnimalId, selectedAnimalId]);
+
+    useEffect(() => {
+        if (feedDraftAnimalIdRef.current !== activeAnimal?.id) {
+            setFeedDraftValue(null);
+        }
+        feedDraftAnimalIdRef.current = activeAnimal?.id ?? null;
+    }, [activeAnimal]);
 
     const isEditing = useMemo(() => !!selectedAnimalId && activeAnimal && selectedAnimalId === activeAnimal.id, [selectedAnimalId, activeAnimal]);
 
@@ -715,18 +291,8 @@ export const ZooWrap = ({ children }) => {
     }, [animalDetail?.id]);
 
     const handleFeedLevelChange = useCallback((value) => {
-        if (!isEditing || !activeAnimal?.id) {
-            return;
-        }
-        const nextValue = clampShare(value);
-        feedDraftAnimalIdRef.current = activeAnimal.id;
-        setFeedDraftValue(nextValue);
-        if (isDevPreview) {
-            setAnimalDetail(buildDevPreviewDetail(activeAnimal, nextValue));
-            return;
-        }
-        sendData('query-zoo-animal-details', { id: activeAnimal.id, feedLevelOverride: nextValue });
-    }, [isEditing, activeAnimal, isDevPreview, sendData]);
+        setFeedDraftValue(clampShare(value));
+    }, []);
 
     const handleFeedSave = useCallback(() => {
         if (!isEditing || !activeAnimal?.id) {
@@ -755,17 +321,18 @@ export const ZooWrap = ({ children }) => {
         if (!isEditing) {
             return;
         }
-        const resetValue = animalDetail?.feed?.level ?? 1;
-        if (activeAnimal?.id) {
-            feedDraftAnimalIdRef.current = activeAnimal.id;
-        }
-        setFeedDraftValue(resetValue);
+        const resetValue = animalDetail?.feed?.level ?? activeAnimal?.feedLevel ?? 1;
+        feedDraftAnimalIdRef.current = null;
+        setFeedDraftValue(null);
         setAutofeedDraft(cloneDeep(initialAutofeedRef.current || { isEnabled: false, rules: [], pattern: '' }));
         if (isDevPreview) {
             if (activeAnimal) {
                 setAnimalDetail(buildDevPreviewDetail(activeAnimal));
             }
             return;
+        }
+        if (activeAnimal) {
+            setAnimalDetail(buildFallbackDetailFromSummary({ ...activeAnimal, feedLevel: resetValue }));
         }
         if (activeAnimal?.id) {
             sendData('query-zoo-animal-details', { id: activeAnimal.id });
@@ -948,6 +515,7 @@ export const ZooWrap = ({ children }) => {
                                             totalSpace={space.total}
                                             showNumericInputs={showNumericInputs}
                                             onSetLimit={onSetLimit}
+                                            onToggleLimitLock={onToggleLimitLock}
                                             onHover={handleHoverAnimal}
                                             onSelect={handleSelectAnimal}
                                             isMobile={isMobile}

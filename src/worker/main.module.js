@@ -31,6 +31,7 @@ export class MainModule extends GameModule {
 
     constructor() {
         super();
+
         gameCore.registerModule('attributes', AttributesModule);
         gameCore.registerModule('temporary-effects', TemporaryEffectsModule);
         gameCore.registerModule('resource-pool', ResourcePoolModule);
