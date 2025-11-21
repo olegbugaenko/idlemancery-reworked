@@ -8,9 +8,9 @@ import {useAppContext} from "../../../context/ui-context";
 import {RawResource} from "../../shared/raw-resource.jsx";
 import {cloneDeep, isEqual} from "lodash";
 import {useModal} from "../../../general/components/modal/index.jsx";
-import { ZooCard } from "./ZooCard";
-import { ZooDetails } from "./ZooDetails";
-import { ZooOverview } from "./ZooOverview";
+import { ZooCard } from "./ZooCard.jsx";
+import { ZooDetails } from "./ZooDetails.jsx";
+import { ZooOverview } from "./ZooOverview.jsx";
 import { buildDevPreviewDetail, buildFallbackDetailFromSummary, clampShare, FEED_EPSILON, normalizeLimitsPreview } from "./utils";
 import { defaultZooData, devPreviewZooData } from "./constants";
 
