@@ -4,6 +4,7 @@ import {registerZooAnimals, ZOO_ANIMALS} from "./zoo-db";
 import {packEffects} from "../../shared/utils/objects";
 import {SMALL_NUMBER} from "game-framework/src/utils/consts";
 import {resourceResponse} from "../../shared/utils/transform/resources";
+import {checkMatchingRules} from "../../shared/utils/rule-utils";
 
 const DEFAULT_DATA = () => ZOO_ANIMALS.reduce((acc, animal) => {
     acc[animal.id] = {
@@ -11,9 +12,12 @@ const DEFAULT_DATA = () => ZOO_ANIMALS.reduce((acc, animal) => {
         isLimited: false,
         limitPercent: null,
         feedLevel: 1,
+        autofeed: { isEnabled: false, rules: [], pattern: '' },
     };
     return acc;
 }, {});
+
+const DEFAULT_AUTOMATION_STATE = () => ({ isEnabled: false, rules: [], pattern: '' });
 
 export class ZooModule extends GameModule {
 
@@ -54,11 +58,25 @@ export class ZooModule extends GameModule {
                 isLimited: false,
                 limitPercent: null,
                 feedLevel: 1,
+                autofeed: DEFAULT_AUTOMATION_STATE(),
             };
         }
         this.normalizeLimitState(this.animalsState[id]);
         this.animalsState[id].feedLevel = this.normalizeFeedLevel(this.animalsState[id].feedLevel);
+        this.animalsState[id].autofeed = this.normalizeAutofeedState(this.animalsState[id].autofeed);
         return this.animalsState[id];
+    }
+
+    normalizeAutofeedState(state) {
+        const base = DEFAULT_AUTOMATION_STATE();
+        if (!state) {
+            return base;
+        }
+        return {
+            isEnabled: !!state.isEnabled,
+            rules: Array.isArray(state.rules) ? state.rules : [],
+            pattern: typeof state.pattern === 'string' ? state.pattern : '',
+        };
     }
 
     normalizeFeedLevel(value) {
@@ -105,7 +123,13 @@ export class ZooModule extends GameModule {
     }
 
     getActiveFeedLevel(state) {
-        return this.normalizeFeedLevel(state?.feedLevel ?? 1);
+        const normalized = this.normalizeFeedLevel(state?.feedLevel ?? 1);
+        const automation = this.normalizeAutofeedState(state?.autofeed);
+        if (!automation.isEnabled) {
+            return normalized;
+        }
+        const isMatching = checkMatchingRules(automation.rules, automation.pattern);
+        return isMatching ? normalized : 0;
     }
 
     getBaseGrowthRate(feedLevel, feedEfficiency) {
@@ -322,9 +346,7 @@ export class ZooModule extends GameModule {
                 previewRate: this.getBaseGrowthRate(previewLevel, summary.feedEfficiency),
             },
             autofeed: {
-                isEnabled: true, // TODO: remove hardcoded value
-                rules: [],
-                pattern: '',
+                ...this.normalizeAutofeedState(state.autofeed),
             }
         };
     }
@@ -412,7 +434,7 @@ export class ZooModule extends GameModule {
         this.sendZooData();
     }
 
-    saveAnimalFeedSettings({ id, feedLevel }) {
+    saveAnimalFeedSettings({ id, feedLevel, autofeed }) {
         if (!id) {
             return;
         }
@@ -423,6 +445,7 @@ export class ZooModule extends GameModule {
         const state = this.ensureAnimalState(id);
         const normalized = this.normalizeFeedLevel(typeof feedLevel === 'number' ? feedLevel : state.feedLevel);
         state.feedLevel = normalized;
+        state.autofeed = this.normalizeAutofeedState(typeof autofeed === 'undefined' ? state.autofeed : autofeed);
         this.syncAnimalLevels(animal, state);
         this.sendZooData();
         this.sendAnimalDetail(id);
@@ -472,6 +495,7 @@ export class ZooModule extends GameModule {
                     state.isLimited = !!saved.isLimited;
                     state.limitPercent = typeof saved.limitPercent === 'number' ? saved.limitPercent : null;
                     state.feedLevel = this.normalizeFeedLevel(typeof saved.feedLevel === 'number' ? saved.feedLevel : 1);
+                    state.autofeed = this.normalizeAutofeedState(saved.autofeed);
                     this.normalizeLimitState(state);
                 }
             });
