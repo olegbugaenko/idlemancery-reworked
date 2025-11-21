@@ -217,8 +217,78 @@ export const ZooWrap = ({ children }) => {
         feedDraftAnimalIdRef.current = activeAnimal?.id ?? null;
     }, [activeAnimal]);
 
+    const isEditing = useMemo(() => !!selectedAnimalId && activeAnimal && selectedAnimalId === activeAnimal.id, [selectedAnimalId, activeAnimal]);
+
+    const isEditingRef = useRef(false);
+    useEffect(() => {
+        isEditingRef.current = isEditing;
+    }, [isEditing]);
+
+    useEffect(() => {
+        if (isDevPreview) {
+            return () => {};
+        }
+        if (!activeAnimal?.id) {
+            setAnimalDetail(null);
+            return () => {};
+        }
+        const requestDetails = () => {
+            const payload = { id: activeAnimal.id };
+            if (isEditingRef.current && typeof feedDraftValue === 'number' && feedDraftAnimalIdRef.current === activeAnimal.id) {
+                payload.feedLevelOverride = feedDraftValue;
+            }
+            sendData('query-zoo-animal-details', payload);
+        };
+        requestDetails();
+        const interval = setInterval(requestDetails, 500);
+        return () => {
+            clearInterval(interval);
+        };
+    }, [activeAnimal?.id, isDevPreview, sendData, feedDraftValue]);
+
+    useEffect(() => {
+        if (!isDevPreview) {
+            return;
+        }
+        if (!activeAnimal) {
+            setAnimalDetail(null);
+            return;
+        }
+        const override = isEditing && typeof feedDraftValue === 'number' ? feedDraftValue : null;
+        setAnimalDetail(buildDevPreviewDetail(activeAnimal, override));
+    }, [isDevPreview, activeAnimal, isEditing, feedDraftValue]);
+
+    useEffect(() => {
+        if (!selectedAnimalId) {
+            setFeedDraftValue(null);
+            feedDraftAnimalIdRef.current = null;
+            return;
+        }
+        if (!animalDetail?.id || animalDetail.id !== selectedAnimalId) {
+            return;
+        }
+        const actualLevel = animalDetail.feed?.level ?? 1;
+        if (feedDraftAnimalIdRef.current !== animalDetail.id) {
+            feedDraftAnimalIdRef.current = animalDetail.id;
+            setFeedDraftValue(actualLevel);
+            return;
+        }
+        setFeedDraftValue((prev) => {
+            if (prev === null || Math.abs(prev - actualLevel) < FEED_EPSILON) {
+                return actualLevel;
+            }
+            return prev;
+        });
+    }, [selectedAnimalId, animalDetail?.id, animalDetail?.feed?.level]);
+
+    useEffect(() => {
+        const autofeed = animalDetail?.autofeed || { isEnabled: false, rules: [], pattern: '' };
+        initialAutofeedRef.current = cloneDeep(autofeed);
+        setAutofeedDraft(cloneDeep(autofeed));
+    }, [animalDetail?.id]);
+
     const handleFeedLevelChange = useCallback((value) => {
-        setFeedDraftValue(value);
+        setFeedDraftValue(clampShare(value));
     }, []);
 
     const handleFeedSave = useCallback(() => {
