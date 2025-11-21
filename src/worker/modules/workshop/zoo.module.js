@@ -25,6 +25,7 @@ export class ZooModule extends GameModule {
         super();
         this.animalsState = DEFAULT_DATA();
         this.currentVersion = 2;
+        this.activeAutofeedLevels = {};
 
         this.eventHandler.registerHandler('query-zoo-data', () => {
             this.sendZooData();
@@ -132,6 +133,30 @@ export class ZooModule extends GameModule {
         return isMatching ? normalized : 0;
     }
 
+    updateAutofeedActivation() {
+        ZOO_ANIMALS.forEach((animal) => {
+            const state = this.ensureAnimalState(animal.id);
+            const automation = this.normalizeAutofeedState(state?.autofeed);
+            if (!automation.isEnabled) {
+                if (this.activeAutofeedLevels[animal.id] !== undefined) {
+                    delete this.activeAutofeedLevels[animal.id];
+                }
+                return;
+            }
+
+            const baseLevel = this.normalizeFeedLevel(state.feedLevel);
+            const isMatching = checkMatchingRules(automation.rules, automation.pattern);
+            const activeLevel = isMatching ? baseLevel : 0;
+
+            if (this.activeAutofeedLevels[animal.id] !== activeLevel) {
+                this.activeAutofeedLevels[animal.id] = activeLevel;
+                if (animal.feedEntityId) {
+                    gameEntity.setAttribute(animal.feedEntityId, 'feed_level_multiplier', activeLevel);
+                }
+            }
+        });
+    }
+
     getBaseGrowthRate(feedLevel, feedEfficiency) {
         return 0.01 * feedLevel * feedEfficiency;
     }
@@ -140,6 +165,8 @@ export class ZooModule extends GameModule {
         if (!this.isUnlocked()) {
             return;
         }
+
+        this.updateAutofeedActivation();
 
         const spaceResource = gameResources.getResource('magic_zoo_space');
         if (!spaceResource) {
@@ -180,7 +207,7 @@ export class ZooModule extends GameModule {
                 return;
             }
 
-            const feedLevel = this.getActiveFeedLevel(state);
+            const feedLevel = this.activeAutofeedLevels[animal.id] ?? this.getActiveFeedLevel(state);
             const feedEfficiency = this.getFeedEfficiency(animal);
             const growthMultiplier = feedLevel * feedEfficiency;
             console.log('Animal id: ', animal.id, ' growthMultiplier: ', growthMultiplier, feedLevel, feedEfficiency, animal);
@@ -486,6 +513,7 @@ export class ZooModule extends GameModule {
 
     load(obj) {
         this.animalsState = DEFAULT_DATA();
+        this.activeAutofeedLevels = {};
         if (obj?.animals) {
             ZOO_ANIMALS.forEach((animal) => {
                 if (obj.animals[animal.id]) {
@@ -508,6 +536,7 @@ export class ZooModule extends GameModule {
 
     reset() {
         this.animalsState = DEFAULT_DATA();
+        this.activeAutofeedLevels = {};
         ZOO_ANIMALS.forEach((animal) => this.syncAnimalLevels(animal, this.animalsState[animal.id]));
         this.sendZooData();
     }
