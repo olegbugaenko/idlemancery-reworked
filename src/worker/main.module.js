@@ -32,11 +32,6 @@ export class MainModule extends GameModule {
     constructor() {
         super();
 
-        // Compatibility: older code paths rely on gameResources.resourceExists,
-        // which is not provided by the current game-framework bundle.
-        if (typeof gameResources.resourceExists !== 'function') {
-            gameResources.resourceExists = (id) => !!gameResources.getResource(id);
-        }
         gameCore.registerModule('attributes', AttributesModule);
         gameCore.registerModule('temporary-effects', TemporaryEffectsModule);
         gameCore.registerModule('resource-pool', ResourcePoolModule);
