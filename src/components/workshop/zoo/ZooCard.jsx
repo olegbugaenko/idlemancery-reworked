@@ -100,7 +100,7 @@ export const ZooCard = ({ animal, totalSpace, showNumericInputs, onSetLimit, onT
             </div>
             <div className={'bottom self-placed zoo-card-controls'}>
                 <div className={'buttons'}>
-                    <span className={'label'}>Limit share:</span>
+                    <span className={'label'}>Limit:</span>
                     <div className={'effort-control flex-container flex-row'}>
                         <div
                             className={'icon-content minimize-icon interface-icon tiny'}
