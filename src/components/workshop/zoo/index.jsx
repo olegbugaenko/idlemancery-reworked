@@ -106,7 +106,7 @@ export const ZooWrap = ({ children }) => {
     const animals = zooData.animals || defaultZooData.animals;
     const automationUnlocked = zooData.automationUnlocked || defaultZooData.automationUnlocked;
 
-    const onSetLimit = useCallback((id, percent) => {
+    const onSetLimit = useCallback((id, percent, { onCancel } = {}) => {
         const preview = normalizeLimitsPreview(animals, id, percent);
         const totalSpace = space.total || 0;
         const riskyAnimals = preview.filter((animal) => {
@@ -133,6 +133,9 @@ export const ZooWrap = ({ children }) => {
             confirmText: 'Reduce limit',
             cancelText: 'Cancel',
             onConfirm: proceed,
+            onCancel: () => {
+                onCancel?.();
+            },
         });
     }, [animals, confirm, sendData, space.total]);
 

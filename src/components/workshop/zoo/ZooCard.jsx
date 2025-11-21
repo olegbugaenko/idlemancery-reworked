@@ -20,7 +20,9 @@ export const ZooCard = ({ animal, totalSpace, showNumericInputs, onSetLimit, onT
         const normalized = clampShare(value);
         const rounded = Math.round(normalized * 1_000_000) / 1_000_000;
         setInputValue(rounded.toString());
-        onSetLimit(animal.id, rounded);
+        onSetLimit(animal.id, rounded, {
+            onCancel: () => setInputValue(limitValue.toString()),
+        });
     }, [animal.id, limitValue, onSetLimit]);
 
     const handleInputEvent = useCallback((event) => {
