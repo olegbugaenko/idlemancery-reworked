@@ -460,6 +460,18 @@ export class PropertyModule extends GameModule {
             }
         })
 
+        gameResources.registerResource('magic_zoo_space', {
+            tags: ['living', 'secondary'],
+            name: 'Zoo Capacity',
+            description: 'Available space for housing magical creatures in your zoo.',
+            isService: true,
+            isConstantEfficiency: true,
+            saveBalanceTree: true,
+            unlockCondition: () => {
+                return gameEntity.getLevel('shop_item_magical_zoo') > 0
+            }
+        })
+
         registerFurnitureStage1();
         registerAccessoriesStage1();
         registerStructuresStage1();

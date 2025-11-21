@@ -121,6 +121,16 @@ export const MainMenu = () => {
     const newUnlocksRef = useRef(newUnlocks);
     const hotkeyMapRef = useRef(Object.create(null));
 
+    const zooPreviewEnabled = useMemo(() => {
+        if (typeof window === 'undefined') {
+            return false;
+        }
+        if (process.env.NODE_ENV === 'production') {
+            return false;
+        }
+        return new URLSearchParams(window.location.search).get('zooPreview') === '1';
+    }, []);
+
     useEffect(() => {
         sendData('query-unlocks', { prefix: 'main-menu' });
         sendData('query-new-unlocks-notifications', { suffix: 'main-menu', depth: 0 });
@@ -237,7 +247,9 @@ export const MainMenu = () => {
     }, [onMessage, removeMessage, openTab, togglePopup, updateUnlocks, updateNewUnlocks]);
 
     const menuItems = useMemo(() => MENU_ITEMS.map((item) => {
-        const isUnlocked = Boolean(unlocks[item.unlockKey]);
+        const isUnlocked = (zooPreviewEnabled && item.id === 'workshop')
+            ? true
+            : Boolean(unlocks[item.unlockKey]);
         const hasNotification = Boolean(newUnlocks[item.unlockKey]?.hasNew);
         if(item.id === 'property') {
             console.log('Updating menu', item.id, hasNotification, newUnlocks[item.unlockKey]);
@@ -247,7 +259,7 @@ export const MainMenu = () => {
             isUnlocked,
             hasNotification,
         };
-    }), [unlocks, newUnlocks]);
+    }), [unlocks, newUnlocks, zooPreviewEnabled]);
 
     return (
         <div className={'left-most'}>

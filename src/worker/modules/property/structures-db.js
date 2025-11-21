@@ -1220,4 +1220,42 @@ export const registerStructuresStage1 = () => {
             }
         }),
     })
+
+    registerStructure('structure_magic_zoo_enclosure', {
+        tags: ["structure", "upgrade", "purchaseable", "zoo"],
+        name: 'Enclosure',
+        description: 'Dedicated magical enclosure that provides living space for mystical animals.',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_magical_zoo') > 0;
+        },
+        resourceModifier: {
+            income: {
+                resources: {
+                    'magic_zoo_space': {
+                        A: 5,
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 5.e+12*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'inventory_refined_wood': {
+                A: 1.3,
+                B: 25000,
+                type: 1
+            },
+            'inventory_forged_steel': {
+                A: 1.3,
+                B: 15000,
+                type: 1
+            }
+        }),
+    })
 }
