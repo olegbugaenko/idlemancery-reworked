@@ -111,6 +111,7 @@ const devPreviewZooData = {
             icon: 'inventory_charged_amethyst',
             count: 18.2,
             isLimited: true,
+            isLimitLocked: false,
             limitPercent: 0.35,
             limitValue: 26.25,
             feedLevel: 0.8,
@@ -140,6 +141,7 @@ const devPreviewZooData = {
             icon: 'inventory_ruby',
             count: 14.6,
             isLimited: false,
+            isLimitLocked: false,
             limitPercent: null,
             limitValue: null,
             feedLevel: 0.6,
@@ -162,6 +164,7 @@ const devPreviewZooData = {
             icon: 'inventory_spark',
             count: 19.1,
             isLimited: true,
+            isLimitLocked: false,
             limitPercent: 0.30,
             limitValue: 22.5,
             feedLevel: 0.9,
@@ -180,7 +183,7 @@ const devPreviewZooData = {
     ]
 };
 
-const ZooCard = ({ animal, totalSpace, showNumericInputs, onSetLimit, onHover, onSelect, isMobile, isSelected }) => {
+const ZooCard = ({ animal, totalSpace, showNumericInputs, onSetLimit, onToggleLimitLock, onHover, onSelect, isMobile, isSelected }) => {
     const spaceShare = totalSpace > 0 ? (animal.count / totalSpace) : 0;
     const limitValue = animal.isLimited ? (animal.limitPercent ?? 0) : 1;
     const [inputValue, setInputValue] = useState(limitValue);
@@ -295,11 +298,25 @@ const ZooCard = ({ animal, totalSpace, showNumericInputs, onSetLimit, onHover, o
                             onClick={(e) => {
                                 e.stopPropagation();
                                 e.preventDefault();
-                                handleInputChange(1);
+                                applyValue(1);
                             }}
                         >
                             <img src={'icons/interface/maximize.png'} alt={'Maximize'}/>
                         </div>
+                        <TippyWrapper content={<div className={'hint-popup'}>
+                            <p className={'hint'}>Lock this animal limit to keep it unchanged when other limits are normalized.</p>
+                        </div>}>
+                            <div
+                                className={`icon-content interface-icon tiny ${animal.isLimitLocked ? 'locked' : 'unlocked'}`}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    e.preventDefault();
+                                    onToggleLimitLock?.(animal.id, !animal.isLimitLocked);
+                                }}
+                            >
+                                <img src={animal.isLimitLocked ? 'icons/interface/lock.png' : 'icons/interface/unlock.png'} alt={animal.isLimitLocked ? 'Locked' : 'Unlocked'} />
+                            </div>
+                        </TippyWrapper>
                     </div>
                 </div>
             </div>
@@ -599,6 +616,10 @@ export const ZooWrap = ({ children }) => {
 
     const onSetLimit = useCallback((id, percent) => {
         sendData('set-zoo-limit', { id, percent });
+    }, [sendData]);
+
+    const onToggleLimitLock = useCallback((id, isLocked) => {
+        sendData('toggle-zoo-limit-lock', { id, isLocked });
     }, [sendData]);
 
     const space = zooData.space || defaultZooData.space;
@@ -948,6 +969,7 @@ export const ZooWrap = ({ children }) => {
                                             totalSpace={space.total}
                                             showNumericInputs={showNumericInputs}
                                             onSetLimit={onSetLimit}
+                                            onToggleLimitLock={onToggleLimitLock}
                                             onHover={handleHoverAnimal}
                                             onSelect={handleSelectAnimal}
                                             isMobile={isMobile}
