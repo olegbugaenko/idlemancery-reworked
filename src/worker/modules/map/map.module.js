@@ -330,7 +330,7 @@ export class MapModule extends GameModule {
                     effEff,
                     drops: this.mapTiles[i][j].drops.map((d, index) => {
                         const isRevealed = this.mapTiles[i][j].r?.includes(index);
-                        if(!gameResources.resources[d.id]) {
+                        if(!gameResources.resourceExists(d.id)) {
                             return;
                         }
                         const rs = gameResources.getResource(d.id);

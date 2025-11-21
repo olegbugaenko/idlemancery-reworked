@@ -756,7 +756,7 @@ export class MageModule extends GameModule {
         }));
 
         const rs = gameResources.listAllResources(['resource']);
-        const filtered = rs.filter(one => gameResources.resources[one.id] && one.isUnlocked && !['mage-xp','skill-points'].includes(one.id)).map(resource => ({
+        const filtered = rs.filter(one => gameResources.resourceExists(one.id) && one.isUnlocked && !['mage-xp','skill-points'].includes(one.id)).map(resource => ({
             ...resourceResponse(resource),
             isNegative: resource.balance < 0,
             isPositive: resource.balance > 0 && resource.amount < resource.cap - SMALL_NUMBER,
