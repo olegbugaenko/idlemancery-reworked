@@ -311,10 +311,11 @@ export class ZooModule extends GameModule {
         }, 0);
     }
 
-    normalizeTotalLimits() {
+    normalizeTotalLimits(anchorId = null) {
         let totalLimitedPercent = 0;
         let lockedLimitedPercent = 0;
         const unlockedLimited = [];
+        let anchorEntry = null;
 
         ZOO_ANIMALS.forEach((animal) => {
             const state = this.ensureAnimalState(animal.id);
@@ -324,6 +325,8 @@ export class ZooModule extends GameModule {
             totalLimitedPercent += state.limitPercent;
             if (state.isLimitLocked) {
                 lockedLimitedPercent += state.limitPercent;
+            } else if (anchorId && animal.id === anchorId) {
+                anchorEntry = { id: animal.id, percent: state.limitPercent };
             } else {
                 unlockedLimited.push({ id: animal.id, percent: state.limitPercent });
             }
@@ -331,12 +334,19 @@ export class ZooModule extends GameModule {
 
         if (totalLimitedPercent > 1 + SMALL_NUMBER) {
             const availablePercent = Math.max(0, 1 - lockedLimitedPercent);
-            const unlockedTotal = totalLimitedPercent - lockedLimitedPercent;
+            const anchorPercent = Math.min(anchorEntry?.percent ?? 0, availablePercent);
+            const remainingPercent = Math.max(0, availablePercent - anchorPercent);
+            const unlockedTotal = (totalLimitedPercent - lockedLimitedPercent) - (anchorEntry?.percent ?? 0);
+
+            if (anchorEntry && anchorPercent !== anchorEntry.percent) {
+                const anchorState = this.ensureAnimalState(anchorEntry.id);
+                anchorState.limitPercent = anchorPercent;
+            }
 
             if (unlockedTotal > SMALL_NUMBER) {
                 unlockedLimited.forEach(({ id, percent }) => {
                     const proportion = percent / unlockedTotal;
-                    const normalized = availablePercent * proportion;
+                    const normalized = remainingPercent * proportion;
                     const state = this.ensureAnimalState(id);
                     state.limitPercent = normalized;
                 });
@@ -494,7 +504,7 @@ export class ZooModule extends GameModule {
 
         this.normalizeLimitState(state);
 
-        this.normalizeTotalLimits();
+        this.normalizeTotalLimits(id);
 
         this.applyLimits();
         this.sendZooData();

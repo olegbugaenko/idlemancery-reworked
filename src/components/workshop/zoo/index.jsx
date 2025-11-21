@@ -9,6 +9,7 @@ import {useAppContext} from "../../../context/ui-context";
 import {RawResource} from "../../shared/raw-resource.jsx";
 import RulesList from "../../shared/rules-list.jsx";
 import {cloneDeep, isEqual} from "lodash";
+import {useModal} from "../../../general/components/modal/index.jsx";
 
 const FEED_EPSILON = 0.000001;
 
@@ -23,6 +24,64 @@ const clampShare = (value) => {
         return 1;
     }
     return value;
+};
+
+const normalizeLimitsPreview = (animals, changedId, changedPercent) => {
+    const prepared = animals.map((animal) => {
+        if (animal.id === changedId) {
+            const normalized = clampShare(changedPercent);
+            if (normalized >= 1) {
+                return { ...animal, isLimited: false, limitPercent: null };
+            }
+            return { ...animal, isLimited: true, limitPercent: normalized };
+        }
+
+        const basePercent = animal.isLimited ? clampShare(animal.limitPercent ?? 0) : null;
+        return {
+            ...animal,
+            isLimited: basePercent !== null,
+            limitPercent: basePercent,
+        };
+    });
+
+    let totalLimitedPercent = 0;
+    let lockedLimitedPercent = 0;
+    const unlocked = [];
+    let anchor = null;
+
+    prepared.forEach((animal) => {
+        if (!animal.isLimited || typeof animal.limitPercent !== 'number' || animal.limitPercent <= 0) {
+            return;
+        }
+        totalLimitedPercent += animal.limitPercent;
+        if (animal.isLimitLocked) {
+            lockedLimitedPercent += animal.limitPercent;
+        } else if (animal.id === changedId) {
+            anchor = animal;
+        } else {
+            unlocked.push(animal);
+        }
+    });
+
+    if (totalLimitedPercent > 1 + FEED_EPSILON) {
+        const availablePercent = Math.max(0, 1 - lockedLimitedPercent);
+        const anchorPercent = Math.min(anchor?.limitPercent ?? 0, availablePercent);
+        const remainingPercent = Math.max(0, availablePercent - anchorPercent);
+        const unlockedTotal = unlocked.reduce((acc, animal) => acc + animal.limitPercent, 0);
+
+        if (anchor && anchorPercent !== anchor.limitPercent) {
+            anchor.limitPercent = anchorPercent;
+        }
+
+        if (unlockedTotal > FEED_EPSILON) {
+            unlocked.forEach((animal) => {
+                const proportion = animal.limitPercent / unlockedTotal;
+                animal.limitPercent = remainingPercent * proportion;
+            });
+        }
+    }
+
+    return prepared;
 };
 
 const DEV_FEED_REQUIREMENTS = {
@@ -535,6 +594,7 @@ export const ZooWrap = ({ children }) => {
     const [hoveredAnimalId, setHoveredAnimalId] = useState(null);
     const [selectedAnimalId, setSelectedAnimalId] = useState(null);
     const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
+    const { confirm } = useModal();
     const [zooData, setZooData] = useState(defaultZooData);
     const [showNumericInputs, setShowNumericInputs] = useState(() => {
         const saved = localStorage.getItem('zoo-show-numeric-inputs');
@@ -614,18 +674,44 @@ export const ZooWrap = ({ children }) => {
         localStorage.setItem('zoo-show-numeric-inputs', JSON.stringify(value));
     }, []);
 
-    const onSetLimit = useCallback((id, percent) => {
-        sendData('set-zoo-limit', { id, percent });
-    }, [sendData]);
-
-    const onToggleLimitLock = useCallback((id, isLocked) => {
-        sendData('toggle-zoo-limit-lock', { id, isLocked });
-    }, [sendData]);
-
     const space = zooData.space || defaultZooData.space;
     const limits = zooData.limits || defaultZooData.limits;
     const animals = zooData.animals || defaultZooData.animals;
     const automationUnlocked = zooData.automationUnlocked || defaultZooData.automationUnlocked;
+
+    const onSetLimit = useCallback((id, percent) => {
+        const preview = normalizeLimitsPreview(animals, id, percent);
+        const totalSpace = space.total || 0;
+        const riskyAnimals = preview.filter((animal) => {
+            if (!animal.isLimited || typeof animal.limitPercent !== 'number') {
+                return false;
+            }
+            const newLimitValue = animal.limitPercent * totalSpace;
+            return (animal.count ?? 0) > newLimitValue + FEED_EPSILON;
+        });
+
+        const proceed = () => sendData('set-zoo-limit', { id, percent });
+
+        if (!riskyAnimals.length) {
+            proceed();
+            return;
+        }
+
+        const names = riskyAnimals.map((animal) => animal.name || animal.id).join(', ');
+        confirm({
+            title: 'Підтвердити зменшення лімітів',
+            message: names
+                ? `Ліміт для ${names} стане нижчим за поточну кількість. Частина тварюк буде втрачена. Продовжити?`
+                : 'Зміна лімітів зменшить кількість деяких тварюк. Продовжити?',
+            confirmText: 'Зменшити',
+            cancelText: 'Скасувати',
+            onConfirm: proceed,
+        });
+    }, [animals, confirm, sendData, space.total]);
+
+    const onToggleLimitLock = useCallback((id, isLocked) => {
+        sendData('toggle-zoo-limit-lock', { id, isLocked });
+    }, [sendData]);
 
     const handleHoverAnimal = useCallback((id) => {
         if (isMobile) {

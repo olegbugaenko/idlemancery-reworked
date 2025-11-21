@@ -3,6 +3,7 @@ jest.mock('../modules/workshop/zoo-db', () => ({
   ZOO_ANIMALS: [
     { id: 'animal_a', name: 'Animal A', description: '', icon: 'a', entityId: 'entity_a', feedEntityId: 'feed_a' },
     { id: 'animal_b', name: 'Animal B', description: '', icon: 'b', entityId: 'entity_b', feedEntityId: 'feed_b' },
+    { id: 'animal_c', name: 'Animal C', description: '', icon: 'c', entityId: 'entity_c', feedEntityId: 'feed_c' },
   ],
 }));
 
@@ -63,5 +64,18 @@ describe('ZooModule limit normalization with locks', () => {
 
     expect(zooModule.animalsState.animal_a.limitPercent).toBeCloseTo(0.7);
     expect(zooModule.animalsState.animal_b.limitPercent).toBeCloseTo(0.3);
+  });
+
+  test('keeps newly set unlocked limit stable and scales remaining unlocked', () => {
+    zooModule.setAnimalLimit({ id: 'animal_a', percent: 0.5 });
+    zooModule.toggleAnimalLimitLock({ id: 'animal_a', isLocked: true });
+    zooModule.setAnimalLimit({ id: 'animal_b', percent: 0.2 });
+    zooModule.setAnimalLimit({ id: 'animal_c', percent: 0.3 });
+
+    zooModule.setAnimalLimit({ id: 'animal_b', percent: 0.3 });
+
+    expect(zooModule.animalsState.animal_a.limitPercent).toBeCloseTo(0.5);
+    expect(zooModule.animalsState.animal_b.limitPercent).toBeCloseTo(0.3);
+    expect(zooModule.animalsState.animal_c.limitPercent).toBeCloseTo(0.2);
   });
 });
