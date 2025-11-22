@@ -111,7 +111,7 @@ export const MachineryUpgrades = ({ setItemDetails, purchaseItem, deleteItem, ne
                 <PerfectScrollbar>
                     <div className={'flex-container'}>
                         {data.available.map(machine => (
-                            <NewNotificationWrap key={machine.id} id={machine.id} className={'narrow-wrapper'} isNew={newUnlocks?.[machine.id]?.hasNew}>
+                            <NewNotificationWrap key={machine.id} id={machine.id} className={`narrow-wrapper ${newUnlocks?.items?.[machine.id]?.hasNew ? 'has-new' : 'has-viewed'}`} isNew={newUnlocks?.all?.items?.[machine.id]?.hasNew}>
                                 <MachineCard
                                     {...machine}
                                     onFlash={handleFlash}

@@ -2450,4 +2450,52 @@ export const registerInventoryItems = () => {
         sellPrice: 1600000,
     })
 
+    registerInventoryItem('inventory_copper_ore', {
+        name: 'Copper Ore',
+        hasCap: false,
+        tags: ['inventory', 'material'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        attributes: {
+
+        },
+        unlockedBy: {
+            type: 'entity',
+            id: 'action_copper_mining',
+            level: 1,
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.isEntityUnlocked('action_copper_mining')
+        },
+        sellPrice: 215625,
+    })
+
+    registerInventoryItem('inventory_copper_wire', {
+        name: 'Copper Wire',
+        hasCap: false,
+        tags: ['inventory', 'material'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        attributes: {
+
+        },
+        unlockedBy: {
+            type: 'entity',
+            id: 'action_copper_mining',
+            level: 1,
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_backpack') > 0 && gameEntity.isEntityUnlocked('action_copper_mining')
+        },
+        sellPrice: 3215625,
+    })
+
+
+
 }

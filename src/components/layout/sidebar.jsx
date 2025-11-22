@@ -217,8 +217,9 @@ const ResourceRowComponent = ({ resource, onMouseEnter, onMouseLeave, onContextM
 
     const renderBreakdownSummary = () => {
         return (<div className={'block'}>
-            <p>Income: {formatValue((resource.income || 0)*(resource.multiplier || 1))}</p>
+            <p>Raw Income: {formatValue(resource.income || 0)}</p>
             <p>Multiplier: {formatValue(resource.multiplier || 1)}</p>
+            <p>Total Income: {formatValue(resource.income || 0)*(resource.multiplier || 1)}</p>
             <p>Consumption: {formatValue(resource.consumption || 0)}</p>
         </div>);
     };

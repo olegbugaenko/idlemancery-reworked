@@ -1272,4 +1272,52 @@ export const registerStructuresStage1 = () => {
             }
         }),
     })
+
+    registerStructure('structure_copper_fence', {
+        tags: ["structure", "upgrade", "purchaseable", "zoo"],
+        name: 'Copper Fence',
+        description: 'A reinforced copper fence that enhances the magical properties of zoo enclosures, increasing available zoo space.',
+        level: 0,
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_copper_wire') && 
+                   gameEntity.getLevel('structure_magic_zoo_enclosure') > 0;
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                resources: {
+                    'magic_zoo_space': {
+                        A: 0.1,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }),
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 2,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            },
+        },
+        get_cost: () => ({
+            'inventory_copper_wire': {
+                A: 1.3,
+                B: 8000,
+                type: 1
+            },
+            'inventory_wooden_beam': {
+                A: 1.3,
+                B: 5000000,
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 2,
+                type: 0
+            }
+        }),
+    })
 }

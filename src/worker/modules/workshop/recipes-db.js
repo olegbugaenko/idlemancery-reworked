@@ -404,6 +404,43 @@ export const registerCraftingRecipes = () => {
             baseXPCost: 10,
         },
     })
+    
+    registerCraftingRecipe('craft_copper_wire', {
+        tags: ["recipe", "crafting", "material", "physical"],
+        name: 'Craft Copper Wire',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Use copper ore to create copper wire',
+        level: 1,
+        resourceId: 'inventory_copper_wire',
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'inventory_copper_wire': {
+                        A: 1.3,
+                        B: 0.0001*gameEffects.getEffectValue('crafting_effort')*gameEffects.getEffectValue('crafting_efficiency'),
+                        type: 1,
+                    }
+                }
+            }),
+            get_consumption: ()=>({
+                resources: {
+                    'inventory_copper_ore': {
+                        A: 1.5,
+                        B: 1*gameEffects.getEffectValue('crafting_effort')/gameEffects.getEffectValue('crafting_materials_discount'),
+                        type: 1
+                    },
+                }
+            }),
+            effectDeps: ['crafting_efficiency', 'crafting_materials_discount', 'crafting_effort']
+        },
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_copper_wire')
+        },
+        attributes: {
+            baseXPCost: 10,
+        },
+    })
 
     registerCraftingRecipe('craft_forged_steel', {
         tags: ["recipe", "crafting", "material", "physical"],
