@@ -59,6 +59,11 @@ export const ZooDetails = ({
                         <p className={'hint separated'}>{animal.description}</p>
                     </div>
                     <div className={'block'}>
+                        <div className={'tags-container'}>
+                            {animal.tags.map(tag => (<div key={tag} className={'tag'}>{tag}</div>))}
+                        </div>
+                    </div>
+                    <div className={'block'}>
                         <p>Population</p>
                         <div className={'zoo-detail-stats'}>
                             <div className={'flex-row flex-container'}>

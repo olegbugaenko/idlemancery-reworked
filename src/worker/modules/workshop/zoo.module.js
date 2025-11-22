@@ -266,7 +266,7 @@ export class ZooModule extends GameModule {
 
     getTotalSpace() {
         const resource = gameResources.getResource('magic_zoo_space');
-        return resource?.income || 0;
+        return (resource?.income || 0)*(resource?.multiplier || 1);
     }
 
     getTotalCount() {
@@ -282,6 +282,7 @@ export class ZooModule extends GameModule {
         return {
             id: animal.id,
             name: animal.name,
+            tags: animal.tags,
             description: animal.description,
             icon: animal.icon,
             count: state.count,

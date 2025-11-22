@@ -5,6 +5,7 @@ export const ZOO_ANIMALS = [
         id: 'magic_henk',
         entityId: 'zoo_animal_magic_henk',
         feedEntityId: 'zoo_animal_magic_henk_feeding',
+        tags: ['zoo_animal', 'domestic', 'bird', 'herbivore'],
         name: 'Magic Henk',
         icon: 'magic_henk',
         description: 'A dimensional wanderer whose mere presence harmonizes magical amplifiers.',
@@ -31,6 +32,7 @@ export const ZOO_ANIMALS = [
     {
         id: 'magic_cat',
         entityId: 'zoo_animal_magic_cat',
+        tags: ['zoo_animal', 'domestic', 'mammal', 'carnivore'],
         feedEntityId: 'zoo_animal_magic_cat_feeding',
         name: 'Magic Cat',
         icon: 'magic_cat',
@@ -58,6 +60,7 @@ export const ZOO_ANIMALS = [
     {
         id: 'green_bear',
         entityId: 'zoo_animal_green_bear',
+        tags: ['zoo_animal', 'wild', 'mammal', 'omnivore'],
         feedEntityId: 'zoo_animal_green_bear_feeding',
         name: 'Green Bear',
         icon: 'magic_bear',
