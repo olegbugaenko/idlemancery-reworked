@@ -1521,6 +1521,53 @@ export const registerActionsStage1 = () => {
         }
     })
 
+    
+    registerGameAction('action_copper_mining', {
+        tags: ["action", "activity", "physical", "manual-labor"],
+        name: 'Copper Mining',
+        isAbstract: false,
+        minDemoVersion: 20,
+        category: ACTION_CATS.OTHER,
+        allowedImpacts: ['effects'],
+        description: 'Go to mine and get some copper ore',
+        level: 1,
+        discountEffects: ['physical_actions_discount'],
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'inventory_copper_ore': {
+                        A: 0.000004*gameEffects.getEffectValue('manual_labor_efficiency')*gameEffects.getEffectValue('mining_efficiency'),
+                        B: 0.00002*gameEffects.getEffectValue('manual_labor_efficiency')*gameEffects.getEffectValue('mining_efficiency'),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 6300,
+                        type: 0,
+                    },
+                    'health': {
+                        A: 0.0,
+                        B: 3500,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['manual_labor_efficiency', 'mining_efficiency']
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 90000,
+        }],
+        attributes: {
+            baseXPCost: 2.e+15,
+            primaryAttribute: 'attribute_strength'
+        }
+    })
 
 
     registerGameAction('action_rest', {

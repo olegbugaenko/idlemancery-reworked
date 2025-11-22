@@ -264,6 +264,46 @@ export const registerMachineryStage1 = () => {
             'living_space': { A: 0, B: 4, type: 0 },
         }),
     });
+
+    // Automated Greenhouse — increases plantation efficiency
+    registerMachine('machine_automated_greenhouse', {
+        tags: ['machinery', 'upgrade', 'purchaseable', 'industrial', 'agricultural'],
+        name: 'Automated Greenhouse',
+        description: 'An electrically-powered greenhouse that enhances plantation efficiency through controlled climate and automated systems.',
+        level: 0,
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_copper_wire');
+        },
+        attributes: {
+            manualLoad: 1,
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'plantations_efficiency': {
+                        A: 0.02,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'living_space': { A: 4, B: 0, type: 0 },
+                    'inventory_coal': { A: 5.0/getCoalDiscount(), B: 0.0, C: 1.02, type: 3 },
+                }
+            }),
+            getCustomAmplifier: () => gameEntity.getAttribute('machine_automated_greenhouse', 'manualLoad') ?? 1,
+            customAmplifierApplyTypes: ['effects'],
+            customAmplifierApplyScopes: ['multiplier'],
+            effectDeps: ['plantations_efficiency'],
+        },
+        get_cost: () => ({
+            'inventory_copper_wire': { A: 1.5, B: 500, type: 1 },
+            'inventory_forged_steel': { A: 1.5, B: 8000, type: 1 },
+            'living_space': { A: 0, B: 4, type: 0 },
+        }),
+    });
 }
 
 
