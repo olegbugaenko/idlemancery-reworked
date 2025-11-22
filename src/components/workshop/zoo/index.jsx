@@ -7,11 +7,10 @@ import {TippyWrapper} from "../../shared/tippy-wrapper.jsx";
 import {useAppContext} from "../../../context/ui-context";
 import {RawResource} from "../../shared/raw-resource.jsx";
 import {cloneDeep, isEqual} from "lodash";
-import {useModal} from "../../../general/components/modal/index.jsx";
 import { ZooCard } from "./ZooCard.jsx";
 import { ZooDetails } from "./ZooDetails.jsx";
 import { ZooOverview } from "./ZooOverview.jsx";
-import { buildDevPreviewDetail, buildFallbackDetailFromSummary, clampShare, FEED_EPSILON, normalizeLimitsPreview } from "./utils";
+import { buildDevPreviewDetail, buildFallbackDetailFromSummary, clampShare, FEED_EPSILON } from "./utils";
 import { defaultZooData, devPreviewZooData } from "./constants";
 
 export const ZooWrap = ({ children }) => {
@@ -21,7 +20,6 @@ export const ZooWrap = ({ children }) => {
     const [hoveredAnimalId, setHoveredAnimalId] = useState(null);
     const [selectedAnimalId, setSelectedAnimalId] = useState(null);
     const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
-    const { confirm } = useModal();
     const [zooData, setZooData] = useState(defaultZooData);
     const [showNumericInputs, setShowNumericInputs] = useState(() => {
         const saved = localStorage.getItem('zoo-show-numeric-inputs');
@@ -102,46 +100,8 @@ export const ZooWrap = ({ children }) => {
     }, []);
 
     const space = zooData.space || defaultZooData.space;
-    const limits = zooData.limits || defaultZooData.limits;
     const animals = zooData.animals || defaultZooData.animals;
     const automationUnlocked = zooData.automationUnlocked || defaultZooData.automationUnlocked;
-
-    const onSetLimit = useCallback((id, percent, { onCancel } = {}) => {
-        const preview = normalizeLimitsPreview(animals, id, percent);
-        const totalSpace = space.total || 0;
-        const riskyAnimals = preview.filter((animal) => {
-            if (!animal.isLimited || typeof animal.limitPercent !== 'number') {
-                return false;
-            }
-            const newLimitValue = animal.limitPercent * totalSpace;
-            return (animal.count ?? 0) > newLimitValue + FEED_EPSILON;
-        });
-
-        const proceed = () => sendData('set-zoo-limit', { id, percent });
-
-        if (!riskyAnimals.length) {
-            proceed();
-            return;
-        }
-
-        const names = riskyAnimals.map((animal) => animal.name || animal.id).join(', ');
-        confirm({
-            title: 'Confirm limit reduction',
-            message: names
-                ? `The limit for ${names} will drop below the current population. Some animals will be lost. Continue?`
-                : 'Updating these limits will reduce some animal populations. Continue?',
-            confirmText: 'Reduce limit',
-            cancelText: 'Cancel',
-            onConfirm: proceed,
-            onCancel: () => {
-                onCancel?.();
-            },
-        });
-    }, [animals, confirm, sendData, space.total]);
-
-    const onToggleLimitLock = useCallback((id, isLocked) => {
-        sendData('toggle-zoo-limit-lock', { id, isLocked });
-    }, [sendData]);
 
     const handleHoverAnimal = useCallback((id) => {
         if (isMobile) {
@@ -473,12 +433,12 @@ export const ZooWrap = ({ children }) => {
                     <div className={'head zoo-header'}>
                         <div className={'flex-container zoo-summary'}>
                             <TippyWrapper content={<div className={'hint-popup'}>
-                                <p className={'hint'}>Zoo Capacity shows how much total Magical Zoo Space your enclosures provide. Animals consume this space as they grow.</p>
+                                <p className={'hint'}>Zoo Capacity shows how much total Magical Zoo Space your enclosures provide. Each species can grow up to this amount on its own without consuming space from others.</p>
                             </div>}>
                                 <div className={'space-item summary-item zoo-capacity'}>
                                     <RawResource id={'magic_zoo_space'} name={'Zoo Capacity'} />
                                     <span className={`slots-amount ${space.total > 0 ? 'slots-available' : 'slots-unavailable'}`}>
-                                        {formatValue(space.used)}/{formatValue(space.total)}
+                                        {formatValue(space.total)}
                                     </span>
                                 </div>
                             </TippyWrapper>
@@ -486,7 +446,7 @@ export const ZooWrap = ({ children }) => {
                         <div className={'auto-rebalance-controls zoo-controls'}>
                             <div className={'space-item'}>
                                 <TippyWrapper content={<div className={'hint-popup'}>
-                                    <p>Switch between sliders and numeric inputs when setting zoo limits.</p>
+                                    <p>Switch between sliders and numeric inputs when adjusting zoo feeding.</p>
                                 </div>}>
                                     <label className={'checkbox-label'}>
                                         <input
@@ -497,10 +457,6 @@ export const ZooWrap = ({ children }) => {
                                         <span>Show numeric inputs</span>
                                     </label>
                                 </TippyWrapper>
-                            </div>
-                            <div className={'space-item remaining-limit'}>
-                                <span>Remaining limit pool:</span>
-                                <strong>{formatValue((limits.remainingPercent ?? 0) * 100)}%</strong>
                             </div>
                         </div>
                     </div>
@@ -513,9 +469,6 @@ export const ZooWrap = ({ children }) => {
                                             key={animal.id}
                                             animal={animal}
                                             totalSpace={space.total}
-                                            showNumericInputs={showNumericInputs}
-                                            onSetLimit={onSetLimit}
-                                            onToggleLimitLock={onToggleLimitLock}
                                             onHover={handleHoverAnimal}
                                             onSelect={handleSelectAnimal}
                                             isMobile={isMobile}
@@ -558,7 +511,6 @@ export const ZooWrap = ({ children }) => {
                     ) : (
                         <ZooOverview
                             space={space}
-                            limits={limits}
                             zooUnlocked={zooData.unlocked}
                             isMobile={isMobile}
                             onClose={() => setDetailVisible(false)}
