@@ -29,7 +29,8 @@ export const ZooDetails = ({
         return null;
     }
 
-    const spaceShare = totalSpace > 0 ? (animal.count / totalSpace) : 0;
+    const maxCount = animal?.capacity?.maxCount ?? (totalSpace > 0 ? totalSpace / (animal?.capacity?.requiredSpace || 1) : 0);
+    const spaceShare = maxCount > 0 ? (animal.count / maxCount) : 0;
     const feedInfo = animal.feed || {};
     const breedingInfo = animal.breeding || {};
     const displayedFeedLevel = isEditing && typeof feedLevelDraft === 'number'
@@ -61,8 +62,8 @@ export const ZooDetails = ({
                         <p>Population</p>
                         <div className={'zoo-detail-stats'}>
                             <div className={'flex-row flex-container'}>
-                                <span>Space usage</span>
-                                <strong>{formatValue(spaceShare * 100)}%</strong>
+                                <span>Capacity usage</span>
+                                <strong>{formatValue(spaceShare * 100)}% {maxCount > 0 ? `(max ${formatValue(maxCount)})` : ''}</strong>
                             </div>
                         </div>
                         <div className={'block'}>

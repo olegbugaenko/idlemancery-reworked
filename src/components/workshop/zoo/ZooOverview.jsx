@@ -9,8 +9,9 @@ export const ZooOverview = ({ space, zooUnlocked, isMobile, onClose }) => (
             <div className={'block'}>
                 <h4>Magical Zoo</h4>
                 <p className={'hint separated'}>
-                    Each animal species can grow all the way up to your full Magical Zoo Capacity. Focus on feeding choices to
-                    decide which animals thrive, and use the detail blade to preview food needs before saving changes.
+                    Each animal species can grow all the way up to your full Magical Zoo Capacity without competing for space.
+                    Focus on feeding choices to decide which animals thrive, and use the detail blade to preview food needs
+                    before saving changes.
                 </p>
             </div>
             <div className={'block'}>
@@ -18,7 +19,7 @@ export const ZooOverview = ({ space, zooUnlocked, isMobile, onClose }) => (
                 <div className={'flex-row flex-container zoo-capacity-line'}>
                     <RawResource id={'magic_zoo_space'} name={'Zoo Capacity'} />
                     <span className={'slots-amount'}>
-                        {formatValue(space.used)}/{formatValue(space.total)}
+                        {formatValue(space.total)}
                     </span>
                 </div>
             </div>

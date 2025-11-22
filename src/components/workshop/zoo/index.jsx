@@ -433,12 +433,12 @@ export const ZooWrap = ({ children }) => {
                     <div className={'head zoo-header'}>
                         <div className={'flex-container zoo-summary'}>
                             <TippyWrapper content={<div className={'hint-popup'}>
-                                <p className={'hint'}>Zoo Capacity shows how much total Magical Zoo Space your enclosures provide. Animals consume this space as they grow.</p>
+                                <p className={'hint'}>Zoo Capacity shows how much total Magical Zoo Space your enclosures provide. Each species can grow up to this amount on its own without consuming space from others.</p>
                             </div>}>
                                 <div className={'space-item summary-item zoo-capacity'}>
                                     <RawResource id={'magic_zoo_space'} name={'Zoo Capacity'} />
                                     <span className={`slots-amount ${space.total > 0 ? 'slots-available' : 'slots-unavailable'}`}>
-                                        {formatValue(space.used)}/{formatValue(space.total)}
+                                        {formatValue(space.total)}
                                     </span>
                                 </div>
                             </TippyWrapper>

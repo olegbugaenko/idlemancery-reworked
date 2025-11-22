@@ -2,7 +2,8 @@ import React from "react";
 import { formatValue } from "../../../general/utils/strings";
 
 export const ZooCard = ({ animal, totalSpace, onHover, onSelect, isMobile, isSelected }) => {
-    const spaceShare = totalSpace > 0 ? (animal.count / totalSpace) : 0;
+    const maxCount = animal?.capacity?.maxCount ?? (totalSpace > 0 ? totalSpace / (animal?.capacity?.requiredSpace || 1) : 0);
+    const spaceShare = maxCount > 0 ? (animal.count / maxCount) : 0;
 
     const handleMouseEnter = () => {
         if (!isMobile) {
@@ -38,7 +39,7 @@ export const ZooCard = ({ animal, totalSpace, onHover, onSelect, isMobile, isSel
                     </div>
                     <div className={'zoo-stats-row'}>
                         <span>Animals: <strong>{formatValue(animal.count)}</strong></span>
-                        <span>Space: <strong>{formatValue(spaceShare * 100)}%</strong></span>
+                        <span>Capacity: <strong>{formatValue(spaceShare * 100)}%</strong></span>
                     </div>
             <div className={'zoo-stats-row'}>
                 <span>Feeding:</span>

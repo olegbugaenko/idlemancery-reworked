@@ -136,6 +136,23 @@ export class ZooModule extends GameModule {
         return 0.01 * feedLevel * feedEfficiency;
     }
 
+    getRequiredSpace(animal) {
+        const space = animal?.attributes?.requiredSpace;
+        if (typeof space !== 'number' || isNaN(space) || space <= SMALL_NUMBER) {
+            return 1;
+        }
+        return space;
+    }
+
+    getAnimalMaxCount(animal, totalSpace = null) {
+        const space = totalSpace ?? this.getTotalSpace();
+        const requiredSpace = this.getRequiredSpace(animal);
+        if (requiredSpace <= SMALL_NUMBER) {
+            return Infinity;
+        }
+        return space / requiredSpace;
+    }
+
     tick(game, delta) {
         if (!this.isUnlocked()) {
             return;
@@ -169,9 +186,6 @@ export class ZooModule extends GameModule {
             return;
         }
 
-        let usedSpace = gameResources.getResource('magic_zoo_space')?.consumption || 0;
-        let freeSpace = gameResources.getResource('magic_zoo_space')?.balance || 0;
-
         ZOO_ANIMALS.forEach((animal) => {
             const state = this.ensureAnimalState(animal.id);
             const feedLevel = this.activeAutofeedLevels[animal.id] ?? this.getActiveFeedLevel(state);
@@ -187,12 +201,16 @@ export class ZooModule extends GameModule {
                 return;
             }
 
-            const allowedGrowth = Math.min(growth, freeSpace);
+            const maxCount = this.getAnimalMaxCount(animal, totalSpace);
+            const remainingSpace = maxCount - state.count;
+            if (remainingSpace <= SMALL_NUMBER) {
+                return;
+            }
+
+            const allowedGrowth = Math.min(growth, remainingSpace);
 
             if (allowedGrowth > SMALL_NUMBER) {
                 state.count += allowedGrowth;
-                usedSpace += allowedGrowth;
-                freeSpace = Math.max(0, totalSpace - usedSpace);
                 this.syncAnimalLevels(animal, state);
             }
         });
@@ -260,6 +278,7 @@ export class ZooModule extends GameModule {
         const currentEffects = gameEntity.entityExists(animal.entityId) ? gameEntity.getEffects(animal.entityId) : [];
         const feedLevel = this.getActiveFeedLevel(state);
         const feedEfficiency = this.getFeedEfficiency(animal);
+        const requiredSpace = this.getRequiredSpace(animal);
         return {
             id: animal.id,
             name: animal.name,
@@ -270,6 +289,10 @@ export class ZooModule extends GameModule {
             feedLevel,
             feedEfficiency,
             effectiveGrowthMultiplier: feedLevel * feedEfficiency,
+            capacity: {
+                requiredSpace,
+                maxCount: this.getAnimalMaxCount(animal, totalSpace),
+            },
         };
     }
 
@@ -326,17 +349,16 @@ export class ZooModule extends GameModule {
     applyLimits(spaceOverride = null) {
         const totalSpace = spaceOverride ?? this.getTotalSpace();
         let hasChanges = false;
-        let totalCount = this.getTotalCount();
-        if (totalCount > totalSpace + SMALL_NUMBER) {
-            const overflow = totalCount - totalSpace;
-            const ratio = totalSpace > SMALL_NUMBER ? (totalSpace / totalCount) : 0;
-            ZOO_ANIMALS.forEach((animal) => {
-                const state = this.animalsState[animal.id];
-                state.count = state.count * ratio;
+        ZOO_ANIMALS.forEach((animal) => {
+            const state = this.animalsState[animal.id];
+            const maxCount = this.getAnimalMaxCount(animal, totalSpace);
+            const clamped = Math.max(0, Math.min(state.count, maxCount));
+            if (Math.abs(clamped - state.count) > SMALL_NUMBER) {
+                state.count = clamped;
                 this.syncAnimalLevels(animal, state);
-            });
-            hasChanges = true;
-        }
+                hasChanges = true;
+            }
+        });
 
         if (hasChanges) {
             this.sendZooData();
@@ -364,13 +386,12 @@ export class ZooModule extends GameModule {
         const totalSpace = this.getTotalSpace();
         const animals = ZOO_ANIMALS.map((animal) => this.buildAnimalSummary(animal, totalSpace));
 
-        const usedSpace = this.getTotalCount();
         return {
             unlocked: this.isUnlocked(),
             space: {
                 total: totalSpace,
-                used: usedSpace,
-                free: Math.max(0, totalSpace - usedSpace),
+                used: 0,
+                free: totalSpace,
             },
             animals,
             automationUnlocked: gameEntity.getLevel('shop_item_planner') > 0,

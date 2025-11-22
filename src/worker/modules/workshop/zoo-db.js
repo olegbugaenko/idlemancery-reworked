@@ -10,6 +10,7 @@ export const ZOO_ANIMALS = [
         description: 'A dimensional wanderer whose mere presence harmonizes magical amplifiers.',
         attributes: {
             isCollectable: false,
+            requiredSpace: 0.5,
             breedFeedRequirement: {
                 inventory_focusberry: 1_000_000,
             },
@@ -20,15 +21,6 @@ export const ZOO_ANIMALS = [
                     'air_amplifier_efficiency': {
                         A: 0.02,
                         B: 1,
-                        type: 0,
-                    }
-                }
-            },
-            consumption: {
-                resources: {
-                    'magic_zoo_space': {
-                        A: 0.5,
-                        B: 0,
                         type: 0,
                     }
                 }
@@ -45,6 +37,7 @@ export const ZOO_ANIMALS = [
         description: 'A curious feline that curls up on spellbooks, inspiring faster study sessions.',
         attributes: {
             isCollectable: false,
+            requiredSpace: 1,
             breedFeedRequirement: {
                 inventory_nightshade: 1_200_000,
             },
@@ -54,15 +47,6 @@ export const ZOO_ANIMALS = [
                 effects: {
                     'books_learning_rate': {
                         A: 0.02,
-                        B: 1,
-                        type: 0,
-                    }
-                }
-            },
-            consumption: {
-                resources: {
-                    'magic_zoo_space': {
-                        A: 0,
                         B: 1,
                         type: 0,
                     }
@@ -80,6 +64,7 @@ export const ZOO_ANIMALS = [
         description: 'A gentle giant that practices tai chi, motivating physical training routines.',
         attributes: {
             isCollectable: false,
+            requiredSpace: 1,
             breedFeedRequirement: {
                 inventory_ginseng: 1_500_000,
             },
@@ -90,15 +75,6 @@ export const ZOO_ANIMALS = [
                     'physical_training_learn_speed': {
                         A: 0.02,
                         B: 1,
-                        type: 0,
-                    }
-                }
-            },
-            consumption: {
-                resources: {
-                    'magic_zoo_space': {
-                        A: 1,
-                        B: 0,
                         type: 0,
                     }
                 }
