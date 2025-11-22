@@ -19,64 +19,6 @@ export const clampShare = (value) => {
     return value;
 };
 
-export const normalizeLimitsPreview = (animals, changedId, changedPercent) => {
-    const prepared = animals.map((animal) => {
-        if (animal.id === changedId) {
-            const normalized = clampShare(changedPercent);
-            if (normalized >= 1) {
-                return { ...animal, isLimited: false, limitPercent: null };
-            }
-            return { ...animal, isLimited: true, limitPercent: normalized };
-        }
-
-        const basePercent = animal.isLimited ? clampShare(animal.limitPercent ?? 0) : null;
-        return {
-            ...animal,
-            isLimited: basePercent !== null,
-            limitPercent: basePercent,
-        };
-    });
-
-    let totalLimitedPercent = 0;
-    let lockedLimitedPercent = 0;
-    const unlocked = [];
-    let anchor = null;
-
-    prepared.forEach((animal) => {
-        if (!animal.isLimited || typeof animal.limitPercent !== 'number' || animal.limitPercent <= 0) {
-            return;
-        }
-        totalLimitedPercent += animal.limitPercent;
-        if (animal.isLimitLocked) {
-            lockedLimitedPercent += animal.limitPercent;
-        } else if (animal.id === changedId) {
-            anchor = animal;
-        } else {
-            unlocked.push(animal);
-        }
-    });
-
-    if (totalLimitedPercent > 1 + FEED_EPSILON) {
-        const availablePercent = Math.max(0, 1 - lockedLimitedPercent);
-        const anchorPercent = Math.min(anchor?.limitPercent ?? 0, availablePercent);
-        const remainingPercent = Math.max(0, availablePercent - anchorPercent);
-        const unlockedTotal = unlocked.reduce((acc, animal) => acc + animal.limitPercent, 0);
-
-        if (anchor && anchorPercent !== anchor.limitPercent) {
-            anchor.limitPercent = anchorPercent;
-        }
-
-        if (unlockedTotal > FEED_EPSILON) {
-            unlocked.forEach((animal) => {
-                const proportion = animal.limitPercent / unlockedTotal;
-                animal.limitPercent = remainingPercent * proportion;
-            });
-        }
-    }
-
-    return prepared;
-};
-
 export const buildFallbackDetailFromSummary = (animal) => {
     if (!animal) {
         return null;

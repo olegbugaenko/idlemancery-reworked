@@ -61,8 +61,8 @@ export const ZooDetails = ({
                         <p>Population</p>
                         <div className={'zoo-detail-stats'}>
                             <div className={'flex-row flex-container'}>
-                                <span>Limit</span>
-                                <strong>{animal.isLimited ? `${formatValue((animal.limitPercent ?? 0) * 100)}% (~${formatValue(animal.limitValue ?? 0)} space)` : 'Unlimited'}</strong>
+                                <span>Space usage</span>
+                                <strong>{formatValue(spaceShare * 100)}%</strong>
                             </div>
                         </div>
                         <div className={'block'}>
