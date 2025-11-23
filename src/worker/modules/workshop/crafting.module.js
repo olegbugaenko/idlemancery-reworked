@@ -1565,27 +1565,33 @@ export class CraftingModule extends GameModule {
 
         const calculatedEffort = this.craftingSlots[entity.id]?.effort ? this.craftingSlots[entity.id]?.effort : 1;
 
-        // Check if this recipe was rebalanced
-        const currentEffort = this.craftingSlots[entity.id]?.effort || 0;
-        const originalEffort = this.originalAllocations[entity.id] || this.alchemyOriginalAllocations[entity.id];
+        // Check if this recipe was rebalanced - only if auto-rebalance is enabled
+        const isAlchemy = entity.tags && entity.tags.includes('alchemy');
+        const isCrafting = entity.tags && entity.tags.includes('material');
+        const autoRebalanceEnabled = isAlchemy ? this.alchemyAutoRebalanceEnabled : (isCrafting ? this.autoRebalanceEnabled : false);
         
-        if (originalEffort !== undefined && Math.abs(originalEffort - currentEffort) > 0.001) {
-            const isBeneficial = currentEffort > originalEffort;
-            const intensityReduction = ((originalEffort - currentEffort) / originalEffort * 100).toFixed(2);
+        if (autoRebalanceEnabled) {
+            const currentEffort = this.craftingSlots[entity.id]?.effort || 0;
+            const originalEffort = isAlchemy ? this.alchemyOriginalAllocations[entity.id] : (isCrafting ? this.originalAllocations[entity.id] : undefined);
             
-            // Get the stored rebalance reason, or fall back to current bottleneck
-            const rebalanceReasons = this.originalAllocations[entity.id] !== undefined ? this.rebalanceReasons : this.alchemyRebalanceReasons;
-            const storedMissingResource = rebalanceReasons[entity.id];
-            const missingResource = storedMissingResource || bottleNeck?.name || 'resources';
-            
-            rebalanceInfo = {
-                isRebalanced: true,
-                isBeneficial,
-                originalEffort,
-                currentEffort,
-                intensityReduction: Math.abs(intensityReduction),
-                missingResource
-            };
+            if (originalEffort !== undefined && Math.abs(originalEffort - currentEffort) > 0.001) {
+                const isBeneficial = currentEffort > originalEffort;
+                const intensityReduction = ((originalEffort - currentEffort) / originalEffort * 100).toFixed(2);
+                
+                // Get the stored rebalance reason, or fall back to current bottleneck
+                const rebalanceReasons = isAlchemy ? this.alchemyRebalanceReasons : this.rebalanceReasons;
+                const storedMissingResource = rebalanceReasons[entity.id];
+                const missingResource = storedMissingResource || bottleNeck?.name || 'resources';
+                
+                rebalanceInfo = {
+                    isRebalanced: true,
+                    isBeneficial,
+                    originalEffort,
+                    currentEffort,
+                    intensityReduction: Math.abs(intensityReduction),
+                    missingResource
+                };
+            }
         }
 
         return {

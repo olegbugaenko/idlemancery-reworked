@@ -12,6 +12,7 @@ import { ZooDetails } from "./ZooDetails.jsx";
 import { ZooOverview } from "./ZooOverview.jsx";
 import { buildDevPreviewDetail, buildFallbackDetailFromSummary, clampShare, FEED_EPSILON } from "./utils";
 import { defaultZooData, devPreviewZooData } from "./constants";
+import { NewNotificationWrap } from "../../shared/new-notification-wrap.jsx";
 
 export const ZooWrap = ({ children }) => {
     const worker = useContext(WorkerContext);
@@ -21,6 +22,7 @@ export const ZooWrap = ({ children }) => {
     const [selectedAnimalId, setSelectedAnimalId] = useState(null);
     const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const [zooData, setZooData] = useState(defaultZooData);
+    const [newUnlocks, setNewUnlocks] = useState({});
     const [showNumericInputs, setShowNumericInputs] = useState(() => {
         const saved = localStorage.getItem('zoo-show-numeric-inputs');
         return saved ? JSON.parse(saved) : false;
@@ -75,6 +77,18 @@ export const ZooWrap = ({ children }) => {
         return () => {
             removeMessage('zoo-data');
             removeMessage('all-resources-zoo');
+        };
+    }, [isDevPreview, onMessage, removeMessage]);
+
+    useEffect(() => {
+        if (isDevPreview) {
+            return () => {};
+        }
+        onMessage('new-unlocks-notifications-zoo', payload => {
+            setNewUnlocks(payload || {});
+        });
+        return () => {
+            removeMessage('new-unlocks-notifications-zoo');
         };
     }, [isDevPreview, onMessage, removeMessage]);
 
@@ -465,15 +479,22 @@ export const ZooWrap = ({ children }) => {
                             <PerfectScrollbar>
                                 <div className={'flex-container'}>
                                     {animals.map((animal) => (
-                                        <ZooCard
-                                            key={animal.id}
-                                            animal={animal}
-                                            totalSpace={space.total}
-                                            onHover={handleHoverAnimal}
-                                            onSelect={handleSelectAnimal}
-                                            isMobile={isMobile}
-                                            isSelected={selectedAnimalId === animal.id}
-                                        />
+                                        <NewNotificationWrap
+                                            key={`zoo_${animal.id}`}
+                                            id={`zoo_${animal.id}`}
+                                            className={'narrow-wrapper'}
+                                            isNew={newUnlocks?.zoo?.items?.zoo?.items?.all?.items?.[`zoo_${animal.id}`]?.hasNew}
+                                        >
+                                            <ZooCard
+                                                key={animal.id}
+                                                animal={animal}
+                                                totalSpace={space.total}
+                                                onHover={handleHoverAnimal}
+                                                onSelect={handleSelectAnimal}
+                                                isMobile={isMobile}
+                                                isSelected={selectedAnimalId === animal.id}
+                                            />
+                                        </NewNotificationWrap>
                                     ))}
                                 </div>
                             </PerfectScrollbar>

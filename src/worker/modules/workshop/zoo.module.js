@@ -1,5 +1,5 @@
 import {GameModule} from "../../shared/game-module";
-import {gameEntity, gameResources} from "game-framework";
+import {gameCore, gameEntity, gameResources} from "game-framework";
 import {registerZooAnimals, ZOO_ANIMALS} from "./zoo-db";
 import {packEffects} from "../../shared/utils/objects";
 import {SMALL_NUMBER} from "game-framework/src/utils/consts";
@@ -38,8 +38,40 @@ export class ZooModule extends GameModule {
         });
     }
 
+    /**
+     * Returns the effective feed level considering user setting, automation rules and capacity cap.
+     * - If automation rules disable feeding → 0
+     * - If animal is at capacity → 0
+     * - Otherwise → user's feed level
+     */
+    getEffectiveFeedLevel(animal, state, totalSpace = null) {
+        const baseLevel = this.getActiveFeedLevel(state);
+        if (baseLevel <= SMALL_NUMBER) {
+            return 0;
+        }
+        const space = totalSpace ?? this.getTotalSpace();
+        const maxCount = this.getAnimalMaxCount(animal, space);
+        if (state.count >= maxCount - SMALL_NUMBER) {
+            return 0;
+        }
+        return baseLevel;
+    }
+
     initialize() {
         registerZooAnimals();
+    }
+
+    regenerateNotifications() {
+        ZOO_ANIMALS.forEach(animal => {
+            const isUnlocked = this.isUnlocked() && gameEntity.isEntityUnlocked(animal.entityId);
+            gameCore.getModule('unlock-notifications').registerNewNotification(
+                'zoo',
+                'zoo',
+                'all',
+                `zoo_${animal.id}`,
+                isUnlocked
+            );
+        });
     }
 
     isUnlocked() {
@@ -106,6 +138,7 @@ export class ZooModule extends GameModule {
     }
 
     updateAutofeedActivation() {
+        const totalSpace = this.getTotalSpace();
         ZOO_ANIMALS.forEach((animal) => {
             const state = this.ensureAnimalState(animal.id);
             const automation = this.normalizeAutofeedState(state?.autofeed);
@@ -118,7 +151,8 @@ export class ZooModule extends GameModule {
 
             const baseLevel = this.normalizeFeedLevel(state.feedLevel);
             const isMatching = checkMatchingRules(automation.rules, automation.pattern);
-            const activeLevel = isMatching ? baseLevel : 0;
+            const preliminaryLevel = isMatching ? baseLevel : 0;
+            const activeLevel = this.getEffectiveFeedLevel(animal, state, totalSpace) * (preliminaryLevel > 0 ? 1 : 0);
 
             // console.log('AUTOEFF: ', animal.id, activeLevel, baseLevel, isMatching, this.activeAutofeedLevels[animal.id]);
 
@@ -188,7 +222,7 @@ export class ZooModule extends GameModule {
 
         ZOO_ANIMALS.forEach((animal) => {
             const state = this.ensureAnimalState(animal.id);
-            const feedLevel = this.activeAutofeedLevels[animal.id] ?? this.getActiveFeedLevel(state);
+            const feedLevel = this.activeAutofeedLevels[animal.id] ?? this.getEffectiveFeedLevel(animal, state, totalSpace);
             const feedEfficiency = this.getFeedEfficiency(animal);
             const growthMultiplier = feedLevel * feedEfficiency;
             
@@ -222,8 +256,9 @@ export class ZooModule extends GameModule {
         const value = state?.count || 0;
         gameEntity.setEntityLevel(animal.entityId, value, true);
         if (animal.feedEntityId) {
+            const totalSpace = this.getTotalSpace();
             gameEntity.setEntityLevel(animal.feedEntityId, value, true);
-            gameEntity.setAttribute(animal.feedEntityId, 'feed_level_multiplier', this.getActiveFeedLevel(state));
+            gameEntity.setAttribute(animal.feedEntityId, 'feed_level_multiplier', this.getEffectiveFeedLevel(animal, state, totalSpace));
         }
     }
 
@@ -276,7 +311,7 @@ export class ZooModule extends GameModule {
     buildAnimalSummary(animal, totalSpace) {
         const state = this.ensureAnimalState(animal.id);
         const currentEffects = gameEntity.entityExists(animal.entityId) ? gameEntity.getEffects(animal.entityId) : [];
-        const feedLevel = this.getActiveFeedLevel(state);
+        const feedLevel = this.getEffectiveFeedLevel(animal, state, totalSpace);
         const feedEfficiency = this.getFeedEfficiency(animal);
         const requiredSpace = this.getRequiredSpace(animal);
         return {

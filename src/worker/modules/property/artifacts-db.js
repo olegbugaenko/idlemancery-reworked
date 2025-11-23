@@ -233,6 +233,111 @@ export const registerArtifactsStage1 = () => {
         })
     })
 
+    // New artifacts crafted from Wild Hunt materials
+    // Scholar's Kit — increases knowledge generation
+    registerArtifact('artifact_scholars_kit', {
+        tags: ["artifact", "upgrade", "purchaseable", "paper"],
+        name: 'Scholar\'s Kit',
+        allowedImpacts: ['resources'],
+        description: 'A curated scholarly set that enhances your study discipline, increasing knowledge generation.',
+        level: 0,
+        resourceModifier: {
+            get_multiplier: () => ({
+                resources: {
+                    'knowledge': {
+                        A: 0.04,
+                        B: 1,
+                        C: 1.01,
+                        type: 0,
+                    }
+                }
+            })
+        },
+        get_cost: () => ({
+            'inventory_boar_hide': { A: 1.2, B: 8, type: 1 },
+            'inventory_pince_nez': { A: 1.2, B: 6, type: 1 },
+            'inventory_paper': { A: 1.2, B: 20000, type: 1 },
+        })
+    })
+
+    // Hunter's Flask — increases expedition XP rate
+    registerArtifact('artifact_hunters_flask', {
+        tags: ["artifact", "upgrade", "purchaseable", "expedition"],
+        name: 'Hunter\'s Flask',
+        allowedImpacts: ['effects'],
+        description: 'A battle-tested flask decorated with trophies, invigorating your senses and hastening expedition experience.',
+        level: 0,
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'expedition_xp_rate': {
+                        A: 0.1,
+                        B: 1,
+                        C: 1.03,
+                        type: 3,
+                    }
+                }
+            })
+        },
+        get_cost: () => ({
+            'inventory_wolve_tooth': { A: 1.2, B: 12, type: 1 },
+            'inventory_bear_claw': { A: 1.2, B: 8, type: 1 },
+            'inventory_hunter_flask': { A: 1.2, B: 10, type: 1 },
+        })
+    })
+
+    // Spear of the Stalwart — increases energy cap
+    registerArtifact('artifact_spear_of_the_stalwart', {
+        tags: ["artifact", "upgrade", "purchaseable", "physical"],
+        name: 'Spear of the Stalwart',
+        allowedImpacts: ['resources'],
+        description: 'A rugged spear symbolizing endurance. Its aura fortifies your vigor, increasing maximum energy.',
+        level: 0,
+        resourceModifier: {
+            get_capMult: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.10,
+                        B: 1,
+                        C: 1.02,
+                        type: 3,
+                    }
+                }
+            })
+        },
+        get_cost: () => ({
+            'inventory_bear_claw': { A: 1.2, B: 6, type: 1 },
+            'inventory_ochre': { A: 1.2, B: 20, type: 1 },
+            'inventory_refined_wood': { A: 1.2, B: 300000, type: 1 },
+        })
+    })
+
+    // Flask of Recovery — increases health cap
+    registerArtifact('artifact_flask_of_recovery', {
+        tags: ["artifact", "upgrade", "purchaseable"],
+        name: 'Flask of Recovery',
+        allowedImpacts: ['resources'],
+        description: 'A restorative brew that reinforces the body, increasing maximum health.',
+        level: 0,
+        resourceModifier: {
+            get_capMult: () => ({
+                resources: {
+                    'health': {
+                        A: 0.10,
+                        B: 1,
+                        C: 1.02,
+                        type: 3,
+                    }
+                }
+            })
+        },
+        get_cost: () => ({
+            'inventory_wolve_tooth': { A: 1.2, B: 10, type: 1 },
+            'inventory_hunter_flask': { A: 1.2, B: 8, type: 1 },
+            'inventory_water': { A: 1.2, B: 200, type: 1 },
+        })
+    })
+
     registerArtifact('artifact_focusing_monocle', {
         tags: ["artifact", "upgrade", "purchaseable"],
         name: 'Focusing Monocle',

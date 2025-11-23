@@ -281,9 +281,10 @@ export const registerMachineryStage1 = () => {
             get_multiplier: () => ({
                 effects: {
                     'plantations_efficiency': {
-                        A: 0.02,
+                        A: 0.2,
                         B: 1,
-                        type: 0,
+                        C: 1.02,
+                        type: 3,
                     }
                 }
             }),

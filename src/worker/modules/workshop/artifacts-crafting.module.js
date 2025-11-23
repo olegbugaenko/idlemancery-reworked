@@ -149,6 +149,10 @@ export class ArtifactsCraftingModule extends GameModule {
             // Get ingredients from artifact
             const ingredients = this.getArtifactIngredients(artifact);
             if (!ingredients) continue;
+
+            // New rule: highlight only if ALL ingredients of this recipe are unlocked as resources
+            const allIngredientsUnlocked = ingredients.every(resId => gameResources.isResourceUnlocked(resId));
+            if (!allIngredientsUnlocked) continue;
             
             // Check if ALL current materials are part of this recipe
             const allCurrentMaterialsInRecipe = currentMaterials.every(material => 

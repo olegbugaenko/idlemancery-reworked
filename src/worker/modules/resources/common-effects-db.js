@@ -607,6 +607,16 @@ export const registerCommomEffects = () => {
         description: 'Increase bonuses that you are getting from air amplifiers'
     })
 
+    gameEffects.registerEffect('fire_amplifier_efficiency', {
+        name: 'Fire Amplifier Efficiency',
+        tags: ['multiplier'],
+        defaultValue: 1.,
+        minValue: 1.,
+        hasCap: false,
+        saveBalanceTree: true,
+        description: 'Increase bonuses that you are getting from fire amplifiers'
+    })
+
     gameEffects.registerEffect('trade_warehouse_coins_cap_bonus', {
         name: 'Trade Warehouse Coins Cap Bonus',
         tags: ['multiplier'],
@@ -729,6 +739,15 @@ export const registerCommomEffects = () => {
         name: 'Trade Stall Knowledge Bonus',
         tags: ['multiplier'],
         description: 'Increases knowledge gain from trade stalls',
+        defaultValue: 0.,
+        minValue: 0,
+        hasCap: false,
+    })
+
+    gameEffects.registerEffect('library_knowledge_cap_bonus', {
+        name: 'Library Knowledge Cap Bonus',
+        tags: ['multiplier'],
+        description: 'Increases knowledge capacity bonus from library',
         defaultValue: 0.,
         minValue: 0,
         hasCap: false,

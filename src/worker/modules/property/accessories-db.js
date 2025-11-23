@@ -68,7 +68,6 @@ export const registerAccessoriesStage1 = () => {
         }),
     })
 
-
     registerAccessory('accessory_wooden_talisman', {
         tags: ["accessory", "upgrade", "purchaseable", "resource", "wooden", "trinket"],
         name: 'Wooden Talisman',
@@ -411,6 +410,112 @@ export const registerAccessoriesStage1 = () => {
             'inventory_nightshade': {
                 A: 1.1,
                 B: 20/getAccessoryDiscount(),
+                type: 1
+            }
+        }),
+    })
+
+    // Scientific Papers series (unlocked by PhD expertise upgrades)
+    registerAccessory('accessory_scientific_papers_social', {
+        tags: ["accessory", "upgrade", "purchaseable", "effect", "paper", "scroll", "scientific"],
+        name: 'Scientific Papers: Social Sciences',
+        description: 'A curated collection of peer-reviewed works in social sciences. Reduces XP requirements for social actions.',
+        level: 0,
+        minDemoVersion: 20,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_expertise_social_sciences') > 0;
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'social_actions_discount': {
+                        A: 0.1,
+                        B: 1,
+                        C: 1.01,
+                        type: 3,
+                    }
+                }
+            }),
+        },
+        get_cost: () => ({
+            'inventory_enchanted_paper': {
+                A: 1.1,
+                B: 2000000/getAccessoryDiscount(),
+                type: 1
+            },
+            mental_energy: {
+                A: 1.1,
+                B: 20000/getAccessoryDiscount(),
+                type: 1
+            }
+        }),
+    })
+
+    registerAccessory('accessory_scientific_papers_anatomy', {
+        tags: ["accessory", "upgrade", "purchaseable", "effect", "paper", "scroll", "scientific"],
+        name: 'Scientific Papers: Anatomy',
+        description: 'Comprehensive anatomical studies compiled into an accessible format. Reduces XP requirements for physical actions.',
+        level: 0,
+        minDemoVersion: 20,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_expertise_anatomy') > 0;
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'physical_actions_discount': {
+                        A: 0.1,
+                        B: 1,
+                        C: 1.01,
+                        type: 3,
+                    }
+                }
+            }),
+        },
+        get_cost: () => ({
+            'inventory_enchanted_paper': {
+                A: 1.1,
+                B: 2000000/getAccessoryDiscount(),
+                type: 1
+            },
+            mental_energy: {
+                A: 1.1,
+                B: 20000/getAccessoryDiscount(),
+                type: 1
+            }
+        }),
+    })
+
+    registerAccessory('accessory_scientific_papers_philosophy', {
+        tags: ["accessory", "upgrade", "purchaseable", "effect", "paper", "scroll", "scientific"],
+        name: 'Scientific Papers: Philosophy',
+        description: 'A synthesis of philosophical treatises that sharpen reasoning. Reduces XP requirements for mental actions.',
+        level: 0,
+        minDemoVersion: 20,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_expertise_philosophy') > 0;
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'mental_actions_discount': {
+                        A: 0.1,
+                        B: 1,
+                        C: 1.01,
+                        type: 3,
+                    }
+                }
+            }),
+        },
+        get_cost: () => ({
+            'inventory_enchanted_paper': {
+                A: 1.1,
+                B: 2000000/getAccessoryDiscount(),
+                type: 1
+            },
+            mental_energy: {
+                A: 1.1,
+                B: 20000/getAccessoryDiscount(),
                 type: 1
             }
         }),
@@ -1004,6 +1109,47 @@ export const registerAccessoriesStage1 = () => {
             'inventory_refined_wood': {
                 A: 1.1,
                 B: 50/getAccessoryDiscount(),
+                type: 1
+            }
+        }),
+    })
+
+    
+    registerAccessory('accessory_pulsating_bracelet', {
+        tags: ["accessory", "upgrade", "purchaseable", "effect", "bracelet", "metal"],
+        name: 'Pulsating Bracelet',
+        description: 'A copper-bound bracelet that resonates with your heartbeat, accelerating physical training.',
+        level: 0,
+        minDemoVersion: 20,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 100000,
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0;
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'physical_training_learn_speed': {
+                        A: 0.06,
+                        B: 1,
+                        C: 1.01,
+                        type: 3,
+                    }
+                }
+            }),
+        },
+        get_cost: () => ({
+            'inventory_copper_wire': {
+                A: 1.1,
+                B: 400/getAccessoryDiscount(),
+                type: 1
+            },
+            'health': {
+                A: 1.1,
+                B: 40000000/getAccessoryDiscount(),
                 type: 1
             }
         }),

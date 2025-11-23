@@ -35,6 +35,7 @@ export const initExpeditionsDB = () => {
         }
     });
 
+
     registerExpeditionLocation('expedition_ancient_cemetery', {
         name: 'Ancient Cemetery',
         description: 'A forgotten burial ground where ancient warriors and mages were laid to rest. The spirits here guard powerful relics and mystical knowledge. Higher levels reveal more dangerous but rewarding encounters.',
@@ -103,6 +104,50 @@ export const initExpeditionsDB = () => {
         unlockCondition: () => {
             return gameEntity.getLevel('action_expedition') > 0 && 
                    gameEffects.getEffectValue('attribute_magic_ability') >= 30000;
+        }
+    });
+
+    
+    // New location unlocked by 125K Strength - consumes expedition effort and health
+    registerExpeditionLocation('expedition_wild_hunt', {
+        name: 'Wild Hunt Grounds',
+        description: 'Track powerful beasts through unforgiving wilderness. The terrain is harsh and the prey is dangerous, but the trophies are priceless.',
+        tags: ['expedition', 'expedition-location'],
+        isAbstract: true,
+        level: 0,
+        baseXp: 800,
+        attributes: {
+            baseXp: 800,
+            possibleLoot: {
+                'inventory_wolve_tooth': 0.04,
+                'inventory_bear_claw': 0.04,
+                'inventory_boar_hide': 0.04,
+            }
+        },
+        resourceModifier: {
+            get_consumption: () => ({
+                resources: {
+                    'expedition_effort': {
+                        A: 1.5,
+                        B: 3.0,
+                        type: 1,
+                    },
+                    'health': {
+                        A: 1.5,
+                        B: 500000.0,
+                        type: 1,
+                    }
+                }
+            }),
+            effectDeps: ['expedition_efficiency']
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 125000
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('action_expedition') > 0;
         }
     });
 };

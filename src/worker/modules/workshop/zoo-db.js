@@ -20,7 +20,7 @@ export const ZOO_ANIMALS = [
             multiplier: {
                 effects: {
                     'air_amplifier_efficiency': {
-                        A: 0.02,
+                        A: 0.01,
                         B: 1,
                         type: 0,
                     }
@@ -41,7 +41,7 @@ export const ZOO_ANIMALS = [
             isCollectable: false,
             requiredSpace: 1,
             breedFeedRequirement: {
-                inventory_nightshade: 1_200_000,
+                inventory_nightshade: 400_000,
             },
         },
         resourceModifier: {
@@ -69,7 +69,7 @@ export const ZOO_ANIMALS = [
             isCollectable: false,
             requiredSpace: 1,
             breedFeedRequirement: {
-                inventory_ginseng: 1_500_000,
+                inventory_ginseng: 500_000,
             },
         },
         resourceModifier: {
@@ -83,6 +83,72 @@ export const ZOO_ANIMALS = [
                 }
             },
             effectDeps: ['physical_training_learn_speed']
+        }
+    },
+    {
+        id: 'cow',
+        entityId: 'zoo_animal_cow',
+        feedEntityId: 'zoo_animal_cow_feeding',
+        tags: ['zoo_animal', 'domestic', 'mammal', 'herbivore'],
+        name: 'Cow',
+        icon: 'magic_cow',
+        description: 'A calm domestic bovine whose steady rhythm enriches the land, improving plantation efficiency.',
+        attributes: {
+            isCollectable: false,
+            requiredSpace: 1,
+            breedFeedRequirement: {
+                inventory_knowledge_moss: 1_000_000,
+            },
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 125000,
+        }],
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'plantations_efficiency': {
+                        A: 0.02,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+            effectDeps: ['plantations_efficiency']
+        }
+    },
+    {
+        id: 'duck',
+        entityId: 'zoo_animal_duck',
+        feedEntityId: 'zoo_animal_duck_feeding',
+        tags: ['zoo_animal', 'domestic', 'bird', 'omnivore'],
+        name: 'Duck',
+        icon: 'magic_duck',
+        description: 'An inquisitive waterfowl whose keen observation hones mental routines, increasing mental activities learning rate.',
+        attributes: {
+            isCollectable: false,
+            requiredSpace: 0.5,
+            breedFeedRequirement: {
+                inventory_golden_algae: 800_000,
+            },
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 125000,
+        }],
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'mental_activities_learn_rate': {
+                        A: 0.01,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+            effectDeps: ['mental_activities_learn_rate']
         }
     }
 ];
@@ -118,6 +184,8 @@ export const registerZooAnimals = () => {
             description: animal.description,
             icon_id: animal.icon,
             level: 0,
+            unlockedBy: animal.unlockedBy,
+            unlockCondition: animal.unlockCondition,
             attributes: animal.attributes || { isCollectable: false },
             resourceModifier: animal.resourceModifier,
         });

@@ -3717,5 +3717,104 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+    gameEntity.registerGameEntity('shop_item_phd_defense', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'PhD Defense',
+        description: 'Successfully defend your doctoral dissertation. This achievement enhances your library, allowing it to store more knowledge.',
+        level: 0,
+        maxLevel: 1,
+        minDemoVersion: 20,
+        unlockedBy: [{ type: 'effect', id: 'attribute_charisma', level: 100000 }],
+        unlockCondition: () => true,
+        attributes: { isCollectable: false },
+        resourceModifier: {
+            income: {
+                effects: {
+                    'library_knowledge_cap_bonus': {
+                        A: 0.1,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1,
+                B: 50.e+12*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        }),
+    })
+
+    // Advanced Academia — unlocks high-tier courses
+    gameEntity.registerGameEntity('shop_item_advanced_academia', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Advanced Academia',
+        description: 'Access advanced academic programs and research paths. Unlocks specialized courses that expand mental reserves and zoo capacity.',
+        level: 0,
+        maxLevel: 1,
+        minDemoVersion: 20,
+        unlockedBy: [{ type: 'effect', id: 'attribute_patience', level: 150000 }],
+        unlockCondition: () => true,
+        attributes: { isCollectable: false },
+        resourceModifier: {},
+        get_cost: () => ({
+            'coins': {
+                A: 1,
+                B: 2.0e+14*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        }),
+    })
+
+    // Expertise Upgrades unlocked by PhD Defense
+    gameEntity.registerGameEntity('shop_item_expertise_social_sciences', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Expertise in Social Sciences',
+        description: 'Advanced academic expertise in social sciences. Unlocks accessory \"Scientific Papers: Social Sciences\".',
+        level: 0,
+        maxLevel: 1,
+        minDemoVersion: 20,
+        unlockCondition: () => gameEntity.getLevel('shop_item_phd_defense') > 0,
+        attributes: { isCollectable: false },
+        resourceModifier: {},
+        get_cost: () => ({
+            'coins': { A: 1, B: 1.e+14*charismaMod(gameEffects.getEffectValue('attribute_charisma')), type: 0 },
+            'inventory_enchanted_paper': { A: 1.5, B: 1.e+8, type: 1 },
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_expertise_anatomy', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Expertise in Anatomy',
+        description: 'Advanced academic expertise in anatomy. Unlocks accessory \"Scientific Papers: Anatomy\".',
+        level: 0,
+        maxLevel: 1,
+        minDemoVersion: 20,
+        unlockCondition: () => gameEntity.getLevel('shop_item_phd_defense') > 0,
+        attributes: { isCollectable: false },
+        resourceModifier: {},
+        get_cost: () => ({
+            'coins': { A: 1, B: 1.e+14*charismaMod(gameEffects.getEffectValue('attribute_charisma')), type: 0 },
+            'inventory_enchanted_paper': { A: 1.5, B: 1.e+8, type: 1 },
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_expertise_philosophy', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Expertise in Philosophy',
+        description: 'Advanced academic expertise in philosophy. Unlocks accessory \"Scientific Papers: Philosophy\".',
+        level: 0,
+        maxLevel: 1,
+        minDemoVersion: 20,
+        unlockCondition: () => gameEntity.getLevel('shop_item_phd_defense') > 0,
+        attributes: { isCollectable: false },
+        resourceModifier: {},
+        get_cost: () => ({
+            'coins': { A: 1, B: 1.e+14*charismaMod(gameEffects.getEffectValue('attribute_charisma')), type: 0 },
+            'inventory_enchanted_paper': { A: 1.5, B: 1.e+8, type: 1 },
+        }),
+    })
 
 }
