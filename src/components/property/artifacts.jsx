@@ -7,12 +7,10 @@ import {FlashOverlay} from "../layout/flash-overlay.jsx";
 import {useFlashOnLevelUp} from "../../general/hooks/flash";
 import {NewNotificationWrap} from "../shared/new-notification-wrap.jsx";
 import {SearchField} from "../shared/search-field.jsx";
-import {RawResource} from "../shared/raw-resource.jsx";
 import CustomFilter from "../shared/custom-filter.jsx";
 import CustomFiltersList from "../shared/custom-filter-list.jsx";
 import {DragDropContext} from "react-beautiful-dnd";
 import {TippyWrapper} from "../shared/tippy-wrapper.jsx";
-import {BreakDown} from "../layout/sidebar.jsx";
 import {CustomButton} from "../shared/buttons/custom-button.jsx";
 import {AutomationIcon} from "../shared/buttons/automation-checkbox.jsx";
 
@@ -30,27 +28,31 @@ const ACTIONS_SEARCH_SCOPES = [{
     label: 'resources'
 },{
     id: 'effects',
-    label: 'effects'
+    label: 'effects',
 }]
 
 export const ArtifactUpgrades = ({ setItemDetails, purchaseItem, deleteItem, newUnlocks, isMobile }) => {
     const worker = useContext(WorkerContext);
     const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
-    
+
     const [artifactsData, setItemsData] = useState({
         available: [],
+        propertyCategories: [],
+        selectedCategory: 'all',
         searchData: {
             search: '',
         },
-        categories: [],
         showMaxed: false,
         sortOption: 'name',
         sortOrder: 'asc',
         hiddenItems: {},
         customFilters: {},
-        customFiltersOrder: []
+        customFiltersOrder: [],
+        showHidden: false,
     });
 
+    const [isCustomFilterOpened, setCustomFilterOpened] = useState(false);
+    const [editingCustomFilter, setEditingCustomFilter] = useState(null);
     const [overlayPositions, setOverlayPositions] = useState([]);
 
     const handleFlash = (position) => {
@@ -61,23 +63,24 @@ export const ArtifactUpgrades = ({ setItemDetails, purchaseItem, deleteItem, new
     };
 
     useEffect(() => {
-        sendData('query-furnitures-data', { filterId: 'artifact' });
         const interval = setInterval(() => {
             sendData('query-furnitures-data', { filterId: 'artifact' });
-        }, 1000);
+        }, 100);
+        return () => {
+            clearInterval(interval);
+        }
+    }, [])
 
+    useEffect(() => {
         onMessage('furnitures-data', (data) => {
-            console.log('dataReceived', data);
             setItemsData(data);
         });
-    
+
         return () => {
             removeMessage('furnitures-data');
-            clearInterval(interval);
         };
     }, []);
 
-    
     const toggleAutopurchase = useCallback((id, flag) => {
         sendData('set-furniture-autopurchase', { id, flag, filterId: 'artifact' });
     }, [sendData]);
@@ -90,55 +93,153 @@ export const ArtifactUpgrades = ({ setItemDetails, purchaseItem, deleteItem, new
         sendData('set-furniture-show-hidden', { showHidden, filterId: 'artifact' });
     }, [sendData]);
 
-    return (
-        <div className={'upgrades-wrap'}>
-            <div className={'sub-heading'}>
-                <div className={'complete'}>
-                    <p>Artifacts: {artifactsData.available ? artifactsData.available.filter(item => item.level > 0).length : 0} / {artifactsData.available ? artifactsData.available.length : 0}</p>
-                </div>
-                <div className={'filters'}>
-                    <label>
-                        Show Hidden
-                        <input type={'checkbox'} checked={artifactsData.showHidden} onChange={e => setShowHidden(!artifactsData.showHidden)}/>
-                    </label>
-                </div>
+    const setSearch = (searchData) => {
+        sendData('set-furniture-search-text', { filterId: 'artifact', searchData: searchData });
+    }
+
+    const handlePinToggle = (id, newFlag) => {
+        sendData('toggle-property-custom-filter-pinned', { id, flag: newFlag, filterId: 'artifact' });
+    };
+
+    const setActionsFilter = (filterId) => {
+        sendData('apply-property-custom-filter', { id: filterId, filterId: 'artifact' })
+    }
+
+    const handleEditFilter = (id) => {
+        const filterData = artifactsData.customFilters[id];
+        setEditingCustomFilter({ ...filterData });
+    };
+
+    const handleDeleteFilter = (id) => {
+        sendData('delete-property-custom-filter', { id, filterId: 'artifact' });
+    };
+
+    const handleAddFilter = () => {
+        setEditingCustomFilter({ rules: [], condition: '', category: 'action', name: '' });
+    };
+
+    const handleClose = () => {
+        setCustomFilterOpened(false);
+    };
+
+    const onDragEnd = (result) => {
+        const {source, destination} = result;
+
+        if (!destination) return;
+
+        const sourceDroppableId = source.droppableId;
+        const destinationDroppableId = destination.droppableId;
+
+        if (sourceDroppableId === 'custom-filters' && destinationDroppableId === 'custom-filters') {
+            if (source.index !== destination.index) {
+                sendData('actions-change-custom-filters-order', {
+                    sourceIndex: source.index,
+                    destinationIndex: destination.index
+                })
+            }
+        }
+    }
+
+    return (<DragDropContext onDragEnd={onDragEnd}><div className={'furniture-wrap'}>
+        <div className={'head'}>
+            <div className={'complete'}>
+                <p>Artifacts: {artifactsData.available ? artifactsData.available.filter(item => item.level > 0).length : 0} / {artifactsData.available ? artifactsData.available.length : 0}</p>
             </div>
-            <div className={'items-cat'}>
-                <PerfectScrollbar>
-                    <div className={'flex-container'}>
-                        {artifactsData.available.map(item => 
-                            <NewNotificationWrap 
-                                key={`artifact_${item.id}`} 
-                                id={item.id} 
-                                className={'narrow-wrapper'} 
-                                isNew={newUnlocks?.all?.items?.[item.id]?.hasNew}
-                            >
-                                <ArtifactCard 
-                                    isMobile={isMobile}
-                                    key={item.id} 
-                                    onFlash={handleFlash}
-                                    {...item} 
-                                    onPurchase={purchaseItem} 
-                                    onDelete={deleteItem}
-                                    onShowDetails={setItemDetails} 
-                                    toggleAutopurchase={toggleAutopurchase} 
-                                    isAutomationUnlocked={artifactsData.isAutomationUnlocked}
-                                    toggleHiddenItem={toggleHiddenItem}
-                                />
-                            </NewNotificationWrap>
-                        )}
-                        {overlayPositions.map((position, index) => (
-                            <FlashOverlay key={index} position={position} />
-                        ))}
-                    </div>
-                </PerfectScrollbar>
+            <div className={'filters'}>
+                <label>
+                    <SearchField
+                        placeholder={'Search'}
+                        value={artifactsData.searchData}
+                        onSetValue={val => setSearch(val)}
+                        scopes={ACTIONS_SEARCH_SCOPES}
+                    />
+                </label>
+                <label>
+                    Show Hidden
+                    <input type={'checkbox'} checked={artifactsData.showHidden} onChange={e => setShowHidden(!artifactsData.showHidden)}/>
+                </label>
             </div>
         </div>
-    );
+        <div className={'categories flex-container sub-heading'}>
+            <ul className={'menu'}>
+                {artifactsData.propertyCategories.filter(one => one.isPinned || one.isSelected).map(category => (<li key={category.id} className={`category ${category.isSelected ? 'active' : ''}`} onClick={() => setActionsFilter(category.id)}>
+                    <NewNotificationWrap isNew={newUnlocks?.[category.id]?.hasNew}>
+                        <span>{category.name}({category.items.length})</span>
+                    </NewNotificationWrap>
+                </li> ))}
+                <li className={'add-custom-filter additional'}>
+                                <span className={'create-custom button-like'} onClick={() => {
+                                    setCustomFilterOpened(true);
+                                }}>Edit Filters</span>
+                    {isCustomFilterOpened ? (<div className={'custom-filter-edit-wrap'}>
+                        {editingCustomFilter ? (
+                                <CustomFilter
+                                    prefix={'actions-filter'}
+                                    category={'artifact'}
+                                    id={editingCustomFilter?.id}
+                                    name={editingCustomFilter?.name}
+                                    rules={editingCustomFilter?.rules}
+                                    condition={editingCustomFilter?.condition}
+                                    onCancel={() => {
+                                        setEditingCustomFilter(null);
+                                    }}
+                                    onSave={(data) => {
+                                        sendData('save-property-custom-filter', {...data, filterId: 'artifact'});
+                                        setEditingCustomFilter(null);
+                                    }}
+                                />)
+                            : (<CustomFiltersList
+                                filterOrder={artifactsData.customFiltersOrder}
+                                filters={artifactsData.customFilters}
+                                onPinToggle={handlePinToggle}
+                                onApply={setActionsFilter}
+                                onEdit={handleEditFilter}
+                                onDelete={handleDeleteFilter}
+                                showAddButton
+                                onAdd={handleAddFilter}
+                                showCloseButton
+                                onClose={handleClose}
+                            />)}
+                    </div> ) : null}
+
+                </li>
+            </ul>
+        </div>
+        <div className={'furnitures-cat'}>
+            <PerfectScrollbar>
+                <div className={'flex-container'}>
+                    {artifactsData.available.map(item =>
+                        <NewNotificationWrap
+                            key={`artifact_${item.id}`}
+                            id={item.id}
+                            className={'narrow-wrapper'}
+                            isNew={newUnlocks?.[artifactsData.selectedCategory]?.items?.[item.id]?.hasNew}
+                        >
+                            <ArtifactCard
+                                isMobile={isMobile}
+                                key={item.id}
+                                onFlash={handleFlash}
+                                {...item}
+                                onPurchase={purchaseItem}
+                                onDelete={deleteItem}
+                                onShowDetails={setItemDetails}
+                                toggleAutopurchase={toggleAutopurchase}
+                                isAutomationUnlocked={artifactsData.isAutomationUnlocked}
+                                toggleHiddenItem={toggleHiddenItem}
+                            />
+                        </NewNotificationWrap>
+                    )}
+                    {overlayPositions.map((position, index) => (
+                        <FlashOverlay key={index} position={position} />
+                    ))}
+                </div>
+            </PerfectScrollbar>
+        </div>
+    </div></DragDropContext>)
 };
 
-const ArtifactCard = ({ 
-    id, name, level, max, affordable, isLeveled, isCapped, isHidden, onFlash, onPurchase, onShowDetails, 
+const ArtifactCard = ({
+    id, name, level, max, affordable, isLeveled, isCapped, isHidden, onFlash, onPurchase, onShowDetails,
     isAutoPurchase, onDelete, toggleAutopurchase, isAutomationUnlocked, isMobile, toggleHiddenItem
 }) => {
     const elementRef = useRef(null);
@@ -181,11 +282,11 @@ const ArtifactCard = ({
                             e.stopPropagation();
                             toggleHiddenItem(id, !isHidden)
                         }}>
-                            {isHidden ? (<img src={"icons/interface/icon_show.png"}/>) : (<img src={"icons/interface/icon_hide.png"}/>)}
+                            {isHidden ? (<img src={"icons/interface/icon_show.png"}/>) : (<img src={"icons/interface/icon_hide.png"}/>) }
                         </div>
                     </TippyWrapper>
                 </div>
             </div>
         </div>
     </div> )
-}; 
+};
