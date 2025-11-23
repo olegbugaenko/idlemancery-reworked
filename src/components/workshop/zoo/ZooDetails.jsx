@@ -126,9 +126,9 @@ export const ZooDetails = ({
                             ) : null}
                         </div>
 
-                        {feedInfo.missingResource ? (
+                        {feedInfo.missingResource && feedInfo.efficiency < 1 ? (
                             <p className={'hint warning yellow'}>
-                                Breeding is slowed to {formatValue(feedInfo.efficiency ?? 0, 2)}% due to a lack of {feedInfo.missingResource.name ?? feedInfo.missingResource.id}.
+                                Breeding is slowed to {formatValue((feedInfo.efficiency ?? 0)*100, 2)}% due to a lack of {feedInfo.missingResource.name ?? feedInfo.missingResource.id}.
                             </p>
                         ) : null}
                     </div>

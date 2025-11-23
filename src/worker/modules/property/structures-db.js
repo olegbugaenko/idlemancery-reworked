@@ -610,6 +610,15 @@ export const registerStructuresStage1 = () => {
                     }
                 }
             }),
+            get_capMult: () => ({
+                resources: {
+                    'knowledge': {
+                        A: gameEffects.getEffectValue('library_knowledge_cap_bonus'),
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }),
             consumption: {
                 resources: {
                     'living_space': {
@@ -619,7 +628,7 @@ export const registerStructuresStage1 = () => {
                     }
                 }
             },
-            effectDeps: ['learning_rate']
+            effectDeps: ['learning_rate', 'library_knowledge_cap_bonus']
         },
         get_cost: () => ({
             'inventory_wooden_beam': {
@@ -1288,7 +1297,8 @@ export const registerStructuresStage1 = () => {
                     'magic_zoo_space': {
                         A: 0.1,
                         B: 1,
-                        type: 0,
+                        C: 1.02,
+                        type: 3,
                     }
                 }
             }),

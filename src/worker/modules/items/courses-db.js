@@ -30,6 +30,7 @@ export const registerCourse = (id, options, learningModifier) => {
 
 export const registerCourseItemsStage1 = () => {
 
+
     registerCourse('course_body_capability', {
         name: 'Body Capability',
         tags: ['physical', 'enchancement'],
@@ -182,6 +183,78 @@ export const registerCourseItemsStage1 = () => {
                 'knowledge': {
                     A: 1.1,
                     B: 50/gameEffects.getEffectValue('courses_knowledge_discount'),
+                    type: 1,
+                }
+            }
+        }),
+        effectDeps: ['courses_knowledge_discount']
+    })
+    
+    // New courses unlocked by Advanced Academia (Patience 150K shop item)
+    registerCourse('course_cognitive_reservoirs', {
+        name: 'Cognitive Reservoirs',
+        tags: ['mental', 'enchancement'],
+        minDemoVersion: 20,
+        attributes: {
+            basicDuration: 5200,
+        },
+        level: 0,
+        unlockCondition: () => gameEntity.getLevel('shop_item_advanced_academia') > 0,
+        resourceModifier: {
+            capMult: {
+                resources: {
+                    'mental_energy': {
+                        A: 0.1,
+                        B: 1,
+                        type: 0,
+                    },
+                    'knowledge': {
+                        A: 0.1,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+        }
+    }, {
+        get_consumption: () => ({
+            resources: {
+                'knowledge': {
+                    A: 1.1,
+                    B: 6000/gameEffects.getEffectValue('courses_knowledge_discount'),
+                    type: 1,
+                }
+            }
+        }),
+        effectDeps: ['courses_knowledge_discount']
+    })
+
+    registerCourse('course_zoo_capacity_planning', {
+        name: 'Zoo Capacity Planning',
+        tags: ['zoo', 'enchancement'],
+        minDemoVersion: 20,
+        attributes: {
+            basicDuration: 5200,
+        },
+        level: 0,
+        unlockCondition: () => gameEntity.getLevel('shop_item_advanced_academia') > 0,
+        resourceModifier: {
+            multiplier: {
+                resources: {
+                    'magic_zoo_space': {
+                        A: 0.05,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+        }
+    }, {
+        get_consumption: () => ({
+            resources: {
+                'knowledge': {
+                    A: 1.1,
+                    B: 6000/gameEffects.getEffectValue('courses_knowledge_discount'),
                     type: 1,
                 }
             }

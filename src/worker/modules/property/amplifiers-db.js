@@ -227,6 +227,73 @@ export const registerAmplifiersStage1 = () => {
         }),
     })
 
+    registerAmplifier('amplifier_body_ignition', {
+        tags: ["amplifier", "upgrade", "purchaseable", "spark", "actions"],
+        name: 'Body Ignition Amplifier',
+        description: 'Increase physical training learning rate',
+        level: 0,
+        minDemoVersion: 20,
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_fire');
+        },
+        resourceModifier: {
+            get_capMult: ()=>({
+                resources: {
+                    'energy': {
+                        A: 0.1*gameEffects.getEffectValue('fire_amplifier_efficiency'),
+                        B: 1,
+                        C: 1.01,
+                        type: 3,
+                    },
+                    'health': {
+                        A: 0.1*gameEffects.getEffectValue('fire_amplifier_efficiency'),
+                        B: 1,
+                        C: 1.01,
+                        type: 3,
+                    }
+                }
+            }),
+            effectDeps: ['fire_amplifier_efficiency'],
+        },
+        get_cost: () => ({
+            'inventory_fire': {
+                A: 1.2,
+                B: 100/gameEffects.getEffectValue('amplifier_cost_reduction'),
+                type: 1
+            }
+        }),
+    })
+
+    registerAmplifier('amplifier_conjuration_focus', {
+        tags: ["amplifier", "upgrade", "purchaseable", "fire", "magic"],
+        name: 'Conjuration Focus Amplifier',
+        description: 'Enhance your conjuration magic efficiency through the power of fire.',
+        level: 0,
+        minDemoVersion: 20,
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_fire');
+        },
+        resourceModifier: {
+            get_multiplier: ()=>({
+                effects: {
+                    'conjuration_spells_efficiency': {
+                        A: 0.02*gameEffects.getEffectValue('fire_amplifier_efficiency'),
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['fire_amplifier_efficiency', 'conjuration_spells_efficiency'],
+        },
+        get_cost: () => ({
+            'inventory_fire': {
+                A: 1.2,
+                B: 100/gameEffects.getEffectValue('amplifier_cost_reduction'),
+                type: 1
+            }
+        }),
+    })
+
 /*
     registerAmplifier('amplifier_arcane_conduit', {
         tags: ["amplifier", "upgrade", "purchaseable", "spark", "actions"],

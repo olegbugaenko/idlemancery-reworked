@@ -183,6 +183,11 @@ export class UnlockNotificationsModule extends GameModule {
         gameCore.getModule('plantations').regenerateNotifications();
         gameCore.getModule('magic').regenerateNotifications();
         gameCore.getModule('events').regenerateNotifications();
+        // Zoo notifications
+        const zooModule = gameCore.getModule('zoo');
+        if (zooModule && typeof zooModule.regenerateNotifications === 'function') {
+            zooModule.regenerateNotifications();
+        }
     }
 
     /**

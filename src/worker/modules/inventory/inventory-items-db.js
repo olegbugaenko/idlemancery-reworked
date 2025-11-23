@@ -2414,6 +2414,46 @@ export const registerInventoryItems = () => {
         sellPrice: 2000000,
     })
 
+    // Wild Hunt expedition materials
+    registerInventoryItem('inventory_wolve_tooth', {
+        name: 'Wolven Tooth',
+        hasCap: false,
+        tags: ['inventory', 'material', 'rare', 'artifact-material', 'wild-material'],
+        defaultCap: 0,
+        isAbstract: true,
+        attributes: { isRare: true },
+        unlockCondition: () => {
+            return gameEntity.isEntityUnlocked('expedition_wild_hunt');
+        },
+        sellPrice: 1500000,
+    })
+
+    registerInventoryItem('inventory_bear_claw', {
+        name: 'Bear Claw',
+        hasCap: false,
+        tags: ['inventory', 'material', 'rare', 'artifact-material', 'wild-material'],
+        defaultCap: 0,
+        isAbstract: true,
+        attributes: { isRare: true },
+        unlockCondition: () => {
+            return gameEntity.isEntityUnlocked('expedition_wild_hunt');
+        },
+        sellPrice: 1500000,
+    })
+
+    registerInventoryItem('inventory_boar_hide', {
+        name: 'Boar Hide',
+        hasCap: false,
+        tags: ['inventory', 'material', 'rare', 'artifact-material', 'wild-material'],
+        defaultCap: 0,
+        isAbstract: true,
+        attributes: { isRare: true },
+        unlockCondition: () => {
+            return gameEntity.isEntityUnlocked('expedition_wild_hunt');
+        },
+        sellPrice: 1500000,
+    })
+
     registerInventoryItem('inventory_scribe_quill', {
         name: 'Scribe Quill',
         hasCap: false,
