@@ -1,5 +1,5 @@
 import {GameModule} from "../../shared/game-module";
-import {gameCore, gameEntity, gameResources} from "game-framework";
+import {gameCore, gameEntity, gameResources, gameEffects} from "game-framework";
 import {registerZooAnimals, ZOO_ANIMALS} from "./zoo-db";
 import {packEffects} from "../../shared/utils/objects";
 import {SMALL_NUMBER} from "game-framework/src/utils/consts";
@@ -166,8 +166,12 @@ export class ZooModule extends GameModule {
         });
     }
 
-    getBaseGrowthRate(feedLevel, feedEfficiency) {
-        return 0.01 * feedLevel * feedEfficiency;
+    getBaseGrowthRate(feedLevel, feedEfficiency, breedingEffectId = null) {
+        let breedingMultiplier = 1;
+        if (breedingEffectId) {
+            breedingMultiplier = gameEffects.getEffectValue(breedingEffectId) || 1;
+        }
+        return 0.01 * feedLevel * feedEfficiency * breedingMultiplier;
     }
 
     getRequiredSpace(animal) {
@@ -230,7 +234,8 @@ export class ZooModule extends GameModule {
                 return;
             }
 
-            const growth = delta * this.getBaseGrowthRate(feedLevel, feedEfficiency);
+            const breedingEffectId = animal.attributes?.breedingEffectId;
+            const growth = delta * this.getBaseGrowthRate(feedLevel, feedEfficiency, breedingEffectId);
             if (growth <= SMALL_NUMBER) {
                 return;
             }
@@ -347,10 +352,20 @@ export class ZooModule extends GameModule {
         const previewLevel = typeof feedLevelOverride === 'number' && !isNaN(feedLevelOverride)
             ? this.normalizeFeedLevel(feedLevelOverride)
             : summary.feedLevel;
-        const previewEffectiveMultiplier = previewLevel * summary.feedEfficiency;
+
+        // Recalculate efficiency for preview using the preview feed level
+        let previewFeedEfficiency = summary.feedEfficiency;
+        if (animal.feedEntityId && typeof feedLevelOverride === 'number' && !isNaN(feedLevelOverride)) {
+            const originalMultiplier = gameEntity.getAttribute(animal.feedEntityId, 'feed_level_multiplier', summary.feedLevel);
+            gameEntity.setAttribute(animal.feedEntityId, 'feed_level_multiplier', previewLevel);
+            previewFeedEfficiency = this.getFeedEfficiency(animal);
+            gameEntity.setAttribute(animal.feedEntityId, 'feed_level_multiplier', originalMultiplier);
+        }
+        const previewEffectiveMultiplier = previewLevel * previewFeedEfficiency;
 
         const feedEffects = gameEntity.entityExists(animal.feedEntityId) ? gameEntity.getEffects(animal.feedEntityId, 0, null, false, 1, 1, feedLevelOverride) : [];
-        // console.log('Feed effects: ', feedEffects);
+        console.log('Feed effects: ', feedLevelOverride, previewLevel);
+        console.log('Breeding multiplier: ', animal.attributes?.breedingEffectId, gameEffects.getEffectValue(animal.attributes?.breedingEffectId), this.getBaseGrowthRate(1, 1, animal.attributes?.breedingEffectId));
         return {
             ...summary,
             feed: {
@@ -364,9 +379,9 @@ export class ZooModule extends GameModule {
                 feedEffects,
             },
             breeding: {
-                baseRate: this.getBaseGrowthRate(1,1),
-                currentRate: this.getBaseGrowthRate(summary.feedLevel, summary.feedEfficiency),//baseGrowthRate * summary.effectiveGrowthMultiplier,
-                previewRate: this.getBaseGrowthRate(previewLevel, summary.feedEfficiency),
+                baseRate: this.getBaseGrowthRate(1, 1, animal.attributes?.breedingEffectId),
+                currentRate: this.getBaseGrowthRate(summary.feedLevel, summary.feedEfficiency, animal.attributes?.breedingEffectId),
+                previewRate: this.getBaseGrowthRate(previewLevel, previewFeedEfficiency, animal.attributes?.breedingEffectId),
             },
             autofeed: {
                 ...this.normalizeAutofeedState(state.autofeed),

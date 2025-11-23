@@ -214,6 +214,85 @@ export const registerStructuresStage1 = () => {
         }),
     })
 
+    // Underground tier
+    registerStructure('structure_underground_residence', {
+        tags: ["structure", "upgrade", "purchaseable", "living"],
+        name: 'Underground Residence',
+        description: 'Reinforced underground housing that expands your usable land without increasing surface footprint.',
+        level: 0,
+        maxLevel: 20,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_underground_constructions') > 0;
+        },
+        resourceModifier: {
+            income: {
+                resources: {
+                    'living_space': {
+                        A: 6,
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            },
+        },
+        get_cost: () => ({
+            'inventory_copper_wire': {
+                A: 1.4,
+                B: 4250,
+                type: 1
+            },
+            'inventory_stone': {
+                A: 1.5,
+                B: 20000000,
+                type: 1
+            },
+            'inventory_pot': {
+                A: 1.3,
+                B: 500000,
+                type: 1
+            }
+        }),
+    })
+
+    registerStructure('structure_underground_lab', {
+        tags: ["structure", "upgrade", "purchaseable", "zoo"],
+        name: 'Underground Lab',
+        description: 'A clandestine laboratory for advanced zoological research. Enhances the effectiveness of your zoo animals.',
+        level: 0,
+        maxLevel: 10,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_underground_constructions') > 0
+                && gameEntity.getLevel('shop_item_magical_zoo') > 0;
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'zoo_animals_efficiency': {
+                        A: 0.10,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            },
+            // Underground facilities occupy existing living space
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 4,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            },
+            effectDeps: ['zoo_animals_efficiency']
+        },
+        get_cost: () => ({
+            'inventory_copper_wire': { A: 1.4, B: 2500, type: 1 },
+            'inventory_stone_brick': { A: 1.5, B: 25000000, type: 1 },
+            'inventory_pot': { A: 1.3, B: 1000000, type: 1 },
+        }),
+    })
+
     registerStructure('structure_stone_workshop', {
         tags: ["structure", "upgrade", "purchaseable", "crafting"],
         name: 'Stone Workshop',

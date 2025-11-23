@@ -1,4 +1,4 @@
-import { gameEntity } from "game-framework";
+import { gameEntity, gameEffects } from "game-framework";
 
 export const ZOO_ANIMALS = [
     {
@@ -15,18 +15,19 @@ export const ZOO_ANIMALS = [
             breedFeedRequirement: {
                 inventory_focusberry: 1_000_000,
             },
+            breedingEffectId: 'birds_breeding_efficiency',
         },
         resourceModifier: {
-            multiplier: {
+            get_multiplier: () => ({
                 effects: {
                     'air_amplifier_efficiency': {
-                        A: 0.01,
+                        A: 0.01*gameEffects.getEffectValue('zoo_animals_efficiency'),
                         B: 1,
                         type: 0,
                     }
                 }
-            },
-            effectDeps: ['earth_amplifier_efficiency', 'air_amplifier_efficiency']
+            }),
+            effectDeps: ['zoo_animals_efficiency']
         }
     },
     {
@@ -43,18 +44,19 @@ export const ZOO_ANIMALS = [
             breedFeedRequirement: {
                 inventory_nightshade: 400_000,
             },
+            breedingEffectId: 'mammal_breeding_efficiency',
         },
         resourceModifier: {
-            multiplier: {
+            get_multiplier: () => ({
                 effects: {
                     'books_learning_rate': {
-                        A: 0.02,
+                        A: 0.02*gameEffects.getEffectValue('zoo_animals_efficiency'),
                         B: 1,
                         type: 0,
                     }
                 }
-            },
-            effectDeps: ['books_learning_rate']
+            }),
+            effectDeps: ['zoo_animals_efficiency']
         }
     },
     {
@@ -71,18 +73,19 @@ export const ZOO_ANIMALS = [
             breedFeedRequirement: {
                 inventory_ginseng: 500_000,
             },
+            breedingEffectId: 'mammal_breeding_efficiency',
         },
         resourceModifier: {
-            multiplier: {
+            get_multiplier: () => ({
                 effects: {
                     'physical_training_learn_speed': {
-                        A: 0.02,
+                        A: 0.02*gameEffects.getEffectValue('zoo_animals_efficiency'),
                         B: 1,
                         type: 0,
                     }
                 }
-            },
-            effectDeps: ['physical_training_learn_speed']
+            }),
+            effectDeps: ['zoo_animals_efficiency']
         }
     },
     {
@@ -99,6 +102,7 @@ export const ZOO_ANIMALS = [
             breedFeedRequirement: {
                 inventory_knowledge_moss: 1_000_000,
             },
+            breedingEffectId: 'mammal_breeding_efficiency',
         },
         unlockedBy: [{
             type: 'effect',
@@ -106,16 +110,16 @@ export const ZOO_ANIMALS = [
             level: 125000,
         }],
         resourceModifier: {
-            multiplier: {
+            get_multiplier: () => ({
                 effects: {
                     'plantations_efficiency': {
-                        A: 0.02,
+                        A: 0.02*gameEffects.getEffectValue('zoo_animals_efficiency'),
                         B: 1,
                         type: 0,
                     }
                 }
-            },
-            effectDeps: ['plantations_efficiency']
+            }),
+            effectDeps: ['zoo_animals_efficiency']
         }
     },
     {
@@ -132,6 +136,7 @@ export const ZOO_ANIMALS = [
             breedFeedRequirement: {
                 inventory_golden_algae: 800_000,
             },
+            breedingEffectId: 'birds_breeding_efficiency',
         },
         unlockedBy: [{
             type: 'effect',
@@ -139,16 +144,16 @@ export const ZOO_ANIMALS = [
             level: 125000,
         }],
         resourceModifier: {
-            multiplier: {
+            get_multiplier: () => ({
                 effects: {
                     'mental_activities_learn_rate': {
-                        A: 0.01,
+                        A: 0.01*gameEffects.getEffectValue('zoo_animals_efficiency'),
                         B: 1,
                         type: 0,
                     }
                 }
-            },
-            effectDeps: ['mental_activities_learn_rate']
+            }),
+            effectDeps: ['zoo_animals_efficiency']
         }
     }
 ];
@@ -171,7 +176,8 @@ const buildFeedConsumptionModifier = (animal) => {
                 return acc;
             }, {}),
         }),
-        // Use feedEntityId here because ZooModule writes feed_level_multiplier on the *feeding* entity
+        // Use feedEntityId here because ZooModule writes feed_level_multiplier on the *feeding* entity.
+        // (Global buffs to animal effectiveness are applied in get_multiplier of each animal, not here.)
         getCustomAmplifier: () => gameEntity.getAttribute(animal.feedEntityId, 'feed_level_multiplier', 1),
     };
 };
@@ -179,7 +185,7 @@ const buildFeedConsumptionModifier = (animal) => {
 export const registerZooAnimals = () => {
     ZOO_ANIMALS.forEach((animal) => {
         gameEntity.registerGameEntity(animal.entityId, {
-            tags: ["zoo_animal", "upgrade"],
+            tags: ["zoo_animal", "upgrade", ...(animal.tags || [])],
             name: animal.name,
             description: animal.description,
             icon_id: animal.icon,
@@ -203,6 +209,7 @@ export const registerZooAnimals = () => {
                 description: `Feeding schedule for ${animal.name}`,
                 icon_id: animal.icon,
                 level: 0,
+                attributeRegenDeps: ['feed_level_multiplier'],
                 attributes: {
                     isCollectable: false,
                     zooAnimalId: animal.id,

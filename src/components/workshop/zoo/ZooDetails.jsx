@@ -138,7 +138,7 @@ export const ZooDetails = ({
                         <EffectsSection effects={feedInfo.feedEffects} maxDisplay={10} />
                         <p className={'zoo-breeding-row flex-row flex-container'}>
                             <span>Breeding Rate</span>
-                            <span>{formatValue(showPreview ? breedingInfo.previewRate ?? 0 : breedingInfo.currentRate ?? 0, 4)} / s</span>
+                            <span>{formatValue(breedingInfo.previewRate ?? 0, 4)} / s</span>
                         </p>
                     </div>
 

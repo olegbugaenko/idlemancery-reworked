@@ -836,7 +836,7 @@ export const registerCommomEffects = () => {
     })
 
     gameEffects.registerEffect('artifact_scroll_efficiency', {
-        name: 'Artifact Scroll Efficiency',
+        name: 'Scroll Accessories Efficiency',
         tags: ['multiplier'],
         defaultValue: 1.,
         minValue: 1,
@@ -850,6 +850,43 @@ export const registerCommomEffects = () => {
         defaultValue: 1.,
         minValue: 0.1,
         description: 'Reduces coal consumption by machinery and industrial equipment',
+        saveBalanceTree: true,
+    })
+
+    // Zoo related bonuses
+    gameEffects.registerEffect('zoo_animals_efficiency', {
+        name: 'Zoo Animals Efficiency',
+        tags: ['multiplier'],
+        defaultValue: 1.,
+        minValue: 1.,
+        description: 'Increases the effective efficiency of fed zoo animals (affects growth rates)',
+        saveBalanceTree: true,
+    })
+
+    gameEffects.registerEffect('birds_breeding_efficiency', {
+        name: 'Birds Breeding Efficiency',
+        tags: ['multiplier'],
+        defaultValue: 1.,
+        minValue: 1.,
+        description: 'Increases breeding efficiency for birds in the magical zoo',
+        saveBalanceTree: true,
+    })
+
+    gameEffects.registerEffect('mammal_breeding_efficiency', {
+        name: 'Mammal Breeding Efficiency',
+        tags: ['multiplier'],
+        defaultValue: 1.,
+        minValue: 1.,
+        description: 'Increases breeding efficiency for mammals in the magical zoo',
+        saveBalanceTree: true,
+    })
+
+    gameEffects.registerEffect('reptile_breeding_efficiency', {
+        name: 'Reptile Breeding Efficiency',
+        tags: ['multiplier'],
+        defaultValue: 1.,
+        minValue: 1.,
+        description: 'Increases breeding efficiency for reptiles in the magical zoo',
         saveBalanceTree: true,
     })
 

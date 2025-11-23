@@ -106,6 +106,11 @@ const CustomFilter = React.memo(({
             sendData('query-all-structure-tags', { prefix });
             sendData('query-all-property-effects', { prefix, filterId: category });
         }
+        if(category === 'artifact') {
+            sendData('query-all-artifact-tags', { prefix });
+            // For artifacts we may also want available effects list if needed in future:
+            sendData('query-all-property-effects', { prefix, filterId: category });
+        }
     }, [prefix]);
 
     // Subscribe to incoming data
@@ -135,6 +140,10 @@ const CustomFilter = React.memo(({
         });
 
         onMessage(`all-structure-tags-${prefix}`, (payload) => {
+            setTags(payload);
+        });
+
+        onMessage(`all-artifact-tags-${prefix}`, (payload) => {
             setTags(payload);
         });
     }, [prefix]);
