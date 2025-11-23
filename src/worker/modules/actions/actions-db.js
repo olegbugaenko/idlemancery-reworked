@@ -4649,6 +4649,66 @@ export const registerActionsStage1 = () => {
             isRankAvailable: true,
         }
     })
+    
+    registerGameAction('action_enhance_mind', {
+        tags: ["action", "mental", "training"],
+        name: 'Enhance Mind',
+        category: ACTION_CATS.MENTAL,
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        discountEffects: ['mental_actions_discount'],
+        description: 'Use your mana to enhance your mind, increasing your willpower and memory.',
+        level: 1,
+        minDemoVersion: 20,
+        getLearnRate: () => {
+            return 5
+        },
+        learningEffects: ['mental_training_learning_rate'],
+        resourceModifier: {
+            get_income: () => ({
+                effects: {
+                    'attribute_willpower': {
+                        A: 4*gameEffects.getEffectValue(getRankId('action_mental_endurance')),
+                        B: -4,
+                        type: 0,
+                    },
+                    'attribute_memory': {
+                        A: 1*gameEffects.getEffectValue(getRankId('action_mental_endurance')),
+                        B: -1,
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'mana': {
+                        A: 0.0,
+                        B: 1500000,
+                        type: 0,
+                    },
+                    'knowledge': {
+                        A: 0.0,
+                        B: 5000000,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: []
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_magic_ability',
+            level: 125000
+        }],
+        unlockCondition: () => {
+            return true
+        },
+        attributes: {
+            baseXPCost: 500000000000,
+            isTraining: true,
+            isRankAvailable: true,
+        }
+    })
 
     registerGameAction('action_elemental_channeling', {
         tags: ["action", "magical", "channeling"],

@@ -46,6 +46,32 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+
+    // Unlocks underground construction tier
+    gameEntity.registerGameEntity('shop_item_underground_constructions', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Underground Constructions',
+        description: 'Unlocks techniques for building durable underground facilities. Enables Underground Residence and Underground Lab.',
+        level: 0,
+        maxLevel: 1,
+        minDemoVersion: 20,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 150000,
+        }],
+        unlockCondition: () => true,
+        attributes: { isCollectable: false },
+        resourceModifier: {},
+        get_cost: () => ({
+            'coins': {
+                A: 1,
+                B: 5.0e+14*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        }),
+    })
+
     gameEntity.registerGameEntity('shop_item_notebook', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Notebook',
@@ -3817,4 +3843,129 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+    gameEntity.registerGameEntity('shop_item_elemental_shop_access', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Elemental Shop Access',
+        description: 'Bribe the council of the Elemental Plane to allow you to access the elemental shop. It will provide you access to knowledge how to improve various aspects of your life using elements.',
+        level: 0,
+        maxLevel: 1,
+        minDemoVersion: 20,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_magic_ability',
+            level: 150000,
+        }],
+        unlockCondition: () => {
+            return gameEffects.getEffectValue('attribute_magic_ability') >= 100
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2.0,
+                B: 1.e+15*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'mana': {
+                A: 1.0,
+                B: 1.e+8,
+                type: 0
+            }
+        }),
+    })
+
+    
+    // Elemental upgrade line (requires elemental shop access), up to 10 levels each
+    gameEntity.registerGameEntity('shop_item_elemental_smelting_secrets', {
+        tags: ["shop", "upgrade", "purchaseable", "elemental"],
+        name: 'Secrets of Magical Smelting',
+        description: 'Harness fire to enhance metallurgic processes. Increases output of Iron Plates and Copper Wires.',
+        level: 0,
+        maxLevel: 10,
+        minDemoVersion: 20,
+        unlockCondition: () => gameEntity.getLevel('shop_item_elemental_shop_access') > 0,
+        attributes: { isCollectable: false },
+        resourceModifier: {
+            multiplier: {
+                resources: {
+                    'inventory_iron_plate': { A: 0.2, B: 1, type: 0 },
+                    'inventory_copper_wire': { A: 0.2, B: 1, type: 0 },
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': { A: 1.5, B: 1.0e+15*charismaMod(gameEffects.getEffectValue('attribute_charisma')), type: 1 },
+            'inventory_fire': { A: 1.5, B: 40000, type: 1 },
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_elemental_purification_secrets', {
+        tags: ["shop", "upgrade", "purchaseable", "elemental"],
+        name: 'Secrets of Purification',
+        description: 'Purify rare minerals with the power of water. Increases yield of Rubies, Sapphires and Obsidian Shards.',
+        level: 0,
+        maxLevel: 10,
+        minDemoVersion: 20,
+        unlockCondition: () => gameEntity.getLevel('shop_item_elemental_shop_access') > 0,
+        attributes: { isCollectable: false },
+        resourceModifier: {
+            multiplier: {
+                resources: {
+                    'inventory_ruby': { A: 0.2, B: 1, type: 0 },
+                    'inventory_sapphire': { A: 0.2, B: 1, type: 0 },
+                    'inventory_obsidian_shard': { A: 0.2, B: 1, type: 0 },
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': { A: 1.5, B: 1.0e+15*charismaMod(gameEffects.getEffectValue('attribute_charisma')), type: 1 },
+            'inventory_water': { A: 1.5, B: 1000000, type: 1 },
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_elemental_breath_of_lightness', {
+        tags: ["shop", "upgrade", "purchaseable", "elemental"],
+        name: 'Breath of Lightness',
+        description: 'Channel the airy currents to study faster. Increases overall learning speed.',
+        level: 0,
+        maxLevel: 10,
+        minDemoVersion: 20,
+        unlockCondition: () => gameEntity.getLevel('shop_item_elemental_shop_access') > 0,
+        attributes: { isCollectable: false },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'learning_rate': { A: 0.1, B: 1, type: 0 },
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': { A: 1.5, B: 1.0e+15*charismaMod(gameEffects.getEffectValue('attribute_charisma')), type: 1 },
+            'inventory_air': { A: 1.5, B: 1000000, type: 1 },
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_elemental_secrets_of_nature', {
+        tags: ["shop", "upgrade", "purchaseable", "elemental"],
+        name: 'Secrets of Nature',
+        description: 'Infuse work and growth with the essence of earth. Increases Manual Labor Efficiency and Plantation Efficiency.',
+        level: 0,
+        maxLevel: 10,
+        minDemoVersion: 20,
+        unlockCondition: () => gameEntity.getLevel('shop_item_elemental_shop_access') > 0,
+        attributes: { isCollectable: false },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'manual_labor_efficiency': { A: 0.2, B: 1, type: 0 },
+                    'plantations_efficiency': { A: 0.2, B: 1, type: 0 },
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': { A: 1.5, B: 1.0e+15*charismaMod(gameEffects.getEffectValue('attribute_charisma')), type: 1 },
+            'inventory_earth': { A: 1.5, B: 1000000, type: 1 },
+        }),
+    })
 }

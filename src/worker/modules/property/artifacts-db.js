@@ -49,7 +49,7 @@ export const registerArtifact = (id, options) => {
 export const registerArtifactsStage1 = () => {
 
     registerArtifact('artifact_singing_amphora', {
-        tags: ["artifact", "upgrade", "purchaseable"],
+        tags: ["artifact", "upgrade", "purchaseable", "resources"],
         name: 'Singing Amphora',
         allowedImpacts: ['effects','resources'],
         description: 'A magical vessel that resonates with mana, increasing your mana income through harmonic vibrations',
@@ -86,7 +86,7 @@ export const registerArtifactsStage1 = () => {
     })
 
     registerArtifact('artifact_vessel_of_wealth', {
-        tags: ["artifact", "upgrade", "purchaseable"],
+        tags: ["artifact", "upgrade", "purchaseable", "storage"],
         name: 'Vessel of Wealth',
         allowedImpacts: ['effects','resources'],
         description: 'A magical container that expands your capacity to store wealth, increasing maximum coins',
@@ -123,7 +123,7 @@ export const registerArtifactsStage1 = () => {
     })
 
     registerArtifact('artifact_figurine_of_balance', {
-        tags: ["artifact", "upgrade", "purchaseable"],
+        tags: ["artifact", "upgrade", "purchaseable", "actions"],
         name: 'Figurine of Balance',
         allowedImpacts: ['effects','resources'],
         description: 'An ancient figurine that embodies perfect balance, accelerating the learning of routine actions',
@@ -160,7 +160,7 @@ export const registerArtifactsStage1 = () => {
     })
 
     registerArtifact('artifact_charged_hammer', {
-        tags: ["artifact", "upgrade", "purchaseable"],
+        tags: ["artifact", "upgrade", "purchaseable", "crafting"],
         name: 'Charged Hammer',
         allowedImpacts: ['effects','resources'],
         description: 'A masterwork hammer infused with ancient power and magical energy, greatly enhancing crafting intensity',
@@ -197,7 +197,7 @@ export const registerArtifactsStage1 = () => {
     })
 
     registerArtifact('artifact_endless_waterskin', {
-        tags: ["artifact", "upgrade", "purchaseable"],
+        tags: ["artifact", "upgrade", "purchaseable", "resources"],
         name: 'Endless Waterskin',
         allowedImpacts: ['effects','resources'],
         description: 'A magical waterskin that never runs dry, allowing gatherers to focus entirely on their work without worrying about water supply',
@@ -236,7 +236,7 @@ export const registerArtifactsStage1 = () => {
     // New artifacts crafted from Wild Hunt materials
     // Scholar's Kit — increases knowledge generation
     registerArtifact('artifact_scholars_kit', {
-        tags: ["artifact", "upgrade", "purchaseable", "paper"],
+        tags: ["artifact", "upgrade", "purchaseable", "paper", "resources"],
         name: 'Scholar\'s Kit',
         allowedImpacts: ['resources'],
         description: 'A curated scholarly set that enhances your study discipline, increasing knowledge generation.',
@@ -262,7 +262,7 @@ export const registerArtifactsStage1 = () => {
 
     // Hunter's Flask — increases expedition XP rate
     registerArtifact('artifact_hunters_flask', {
-        tags: ["artifact", "upgrade", "purchaseable", "expedition"],
+        tags: ["artifact", "upgrade", "purchaseable", "expedition", "actions"],
         name: 'Hunter\'s Flask',
         allowedImpacts: ['effects'],
         description: 'A battle-tested flask decorated with trophies, invigorating your senses and hastening expedition experience.',
@@ -288,7 +288,7 @@ export const registerArtifactsStage1 = () => {
 
     // Spear of the Stalwart — increases energy cap
     registerArtifact('artifact_spear_of_the_stalwart', {
-        tags: ["artifact", "upgrade", "purchaseable", "physical"],
+        tags: ["artifact", "upgrade", "purchaseable", "physical", "storage"],
         name: 'Spear of the Stalwart',
         allowedImpacts: ['resources'],
         description: 'A rugged spear symbolizing endurance. Its aura fortifies your vigor, increasing maximum energy.',
@@ -314,7 +314,7 @@ export const registerArtifactsStage1 = () => {
 
     // Flask of Recovery — increases health cap
     registerArtifact('artifact_flask_of_recovery', {
-        tags: ["artifact", "upgrade", "purchaseable"],
+        tags: ["artifact", "upgrade", "purchaseable", "storage"],
         name: 'Flask of Recovery',
         allowedImpacts: ['resources'],
         description: 'A restorative brew that reinforces the body, increasing maximum health.',
@@ -339,7 +339,7 @@ export const registerArtifactsStage1 = () => {
     })
 
     registerArtifact('artifact_focusing_monocle', {
-        tags: ["artifact", "upgrade", "purchaseable"],
+        tags: ["artifact", "upgrade", "purchaseable", "actions"],
         name: 'Focusing Monocle',
         allowedImpacts: ['effects','resources'],
         description: 'A precision-crafted monocle that helps focus magical energy more efficiently, reducing the cost of magical actions',
@@ -376,7 +376,7 @@ export const registerArtifactsStage1 = () => {
     })
 
     registerArtifact('artifact_amplifier_optimizer', {
-        tags: ["artifact", "upgrade", "purchaseable"],
+        tags: ["artifact", "upgrade", "purchaseable", "crafting"],
         name: 'Amplifier Optimizer',
         allowedImpacts: ['effects','resources'],
         description: 'A sophisticated device that optimizes magical amplifier efficiency, significantly reducing their material costs',
@@ -413,7 +413,7 @@ export const registerArtifactsStage1 = () => {
     })
 
     registerArtifact('artifact_enchanted_paper_optimizer', {
-        tags: ["artifact", "upgrade", "purchaseable", "mineral", "device"],
+        tags: ["artifact", "upgrade", "purchaseable", "mineral", "device", "crafting"],
         name: 'Enchanted Paper Optimizer',
         allowedImpacts: ['effects'],
         description: 'A sophisticated artifact crafted from magical lens, sapphire, and charged amethyst that optimizes the mana consumption when crafting enchanted paper, significantly reducing the magical energy required',
@@ -451,7 +451,7 @@ export const registerArtifactsStage1 = () => {
 
     // Magical Bookmark + Dynosaur Bone + Refined Wood -> Tome accessories efficiency
     registerArtifact('artifact_scholars_bookmark', {
-        tags: ["artifact", "upgrade", "purchaseable"],
+        tags: ["artifact", "upgrade", "purchaseable", "actions"],
         name: 'Scholar\'s Bookmark',
         allowedImpacts: ['effects'],
         description: 'An enchanted marker carved onto ancient bone and wood. It subtly amplifies the power of accessories classified as tomes.',
@@ -477,7 +477,7 @@ export const registerArtifactsStage1 = () => {
 
     // Vibrating Pot + Scribe Quill + Red Ink -> Alchemy effort boost
     registerArtifact('artifact_alchemists_resonator', {
-        tags: ["artifact", "upgrade", "purchaseable"],
+        tags: ["artifact", "upgrade", "purchaseable", "crafting"],
         name: 'Alchemist\'s Resonator',
         allowedImpacts: ['effects'],
         description: 'A resonant set crafted from an enchanted vessel, a master quill and ritual ink. It heightens alchemical intensity.',
@@ -503,7 +503,7 @@ export const registerArtifactsStage1 = () => {
 
     // Magic Lens + Magical Bookmark + Sapphire -> Knowledge cap boost
     registerArtifact('artifact_lens_of_retention', {
-        tags: ["artifact", "upgrade", "purchaseable", "mineral", "device"],
+        tags: ["artifact", "upgrade", "purchaseable", "mineral", "device", "storage"],
         name: 'Lens of Retention',
         allowedImpacts: ['resources'],
         description: 'A precise assembly that focuses insight through a sapphire core and mnemonic bookmark, increasing knowledge capacity.',
@@ -529,7 +529,7 @@ export const registerArtifactsStage1 = () => {
 
     // Scribe Quill + Magical Bookmark + Paper -> Mental training learning speed
     registerArtifact('artifact_scholars_set', {
-        tags: ["artifact", "upgrade", "purchaseable", "paper"],
+        tags: ["artifact", "upgrade", "purchaseable", "paper", "actions"],
         name: 'Scholar\'s Set',
         allowedImpacts: ['effects'],
         description: 'A classic study kit that inspires dedication and clarity, improving mental training learning rate.',
@@ -555,7 +555,7 @@ export const registerArtifactsStage1 = () => {
 
     // Titan's Dumbbell — Dynosaur Bone + Ochre + Magic Feather -> boosts physical training learning rate
     registerArtifact('artifact_titans_dumbbell', {
-        tags: ["artifact", "upgrade", "purchaseable", "physical", "training"],
+        tags: ["artifact", "upgrade", "purchaseable", "physical", "training", "actions"],
         name: 'Titan\'s Dumbbell',
         allowedImpacts: ['effects'],
         description: 'You almost faint from the sheer grandeur and power of this artifact—once wielded by the Titans themselves to forge their mighty muscles.',
@@ -583,7 +583,7 @@ export const registerArtifactsStage1 = () => {
     })
 
     registerArtifact('artifact_reading_spectacles', {
-        tags: ["artifact", "upgrade", "purchaseable", "mineral", "device"],
+        tags: ["artifact", "upgrade", "purchaseable", "mineral", "device", "actions"],
         name: 'Reading Spectacles',
         allowedImpacts: ['effects'],
         description: 'Magical spectacles crafted from pince-nez, charged amethyst, and refined wood that enhance your ability to read and comprehend books, significantly increasing reading efficiency',

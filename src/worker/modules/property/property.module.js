@@ -151,18 +151,26 @@ const DEFAULT_ARTIFACTS_FILTERS = {
     'mana': {
         id: 'mana',
         condition: '',
-        rules: [{ type: 'tag', object: 'mana'}],
-        name: 'Mana',
+        rules: [{ type: 'tag', object: 'actions'}],
+        name: 'Actions',
         isPinned: true,
         sortIndex: 1,
     },
     'wealth': {
         id: 'wealth',
         condition: '',
-        rules: [{ type: 'tag', object: 'wealth'}],
-        name: 'Wealth',
+        rules: [{ type: 'tag', object: 'resources'}],
+        name: 'Resources',
         isPinned: true,
         sortIndex: 2,
+    },
+    'storage': {
+        id: 'storage',
+        condition: '',
+        rules: [{ type: 'tag', object: 'storage'}],
+        name: 'Storage',
+        isPinned: true,
+        sortIndex: 3,
     },
     'crafting': {
         id: 'crafting',
@@ -170,7 +178,7 @@ const DEFAULT_ARTIFACTS_FILTERS = {
         rules: [{ type: 'tag', object: 'crafting'}],
         name: 'Crafting',
         isPinned: true,
-        sortIndex: 3,
+        sortIndex: 4,
     }
 }
 
@@ -428,9 +436,19 @@ export class PropertyModule extends GameModule {
             this.sendAllStructuresTags(payload)
         })
 
+        this.eventHandler.registerHandler('query-all-artifact-tags', (payload) => {
+            this.sendAllArtifactsTags(payload)
+        })
+
         this.eventHandler.registerHandler('set-machine-load', ({ id, value }) => {
             const val = Math.max(0, Math.min(1, value ?? 0));
             gameEntity.setAttribute(id, 'manualLoad', val);
+            // Refresh machinery list to reflect new efficiency/load immediately
+            this.sendFurnituresData({ filterId: 'machinery' }, {
+                searchData: this.searchData?.machinery,
+                hideMaxed: this.hideMaxed?.machinery || false,
+                showHidden: this.showHidden?.machinery || false,
+            });
         })
 
         this.eventHandler.registerHandler('query-all-property-effects', (payload) => {
@@ -653,6 +671,18 @@ export class PropertyModule extends GameModule {
     }
 
     save() {
+        // Persist manual loads for machinery so sliders survive reload
+        let manualLoads = {};
+        try {
+            const machines = gameEntity.listEntitiesByTags(['machinery']) || [];
+            machines.forEach(m => {
+                const load = gameEntity.getAttribute(m.id, 'manualLoad');
+                if (typeof load === 'number') {
+                    manualLoads[m.id] = load;
+                }
+            });
+        } catch (e) {}
+
         return {
             furnitures: this.purchasedFurnitures,
             hideMaxed: this.hideMaxed,
@@ -663,6 +693,7 @@ export class PropertyModule extends GameModule {
             customFiltersOrder: this.customFiltersOrder,
             selectedFilterId: this.selectedFilterId,
             hiddenItems: this.hiddenItems,
+            manualLoads,
         }
     }
 
@@ -800,6 +831,15 @@ export class PropertyModule extends GameModule {
                 amplifier: Object.keys(this.customFilters.amplifier),
                 artifact: Object.keys(this.customFilters.artifact)
             };
+        }
+
+        // Restore manual loads for machinery
+        if (saveObject?.manualLoads) {
+            Object.entries(saveObject.manualLoads).forEach(([id, val]) => {
+                if (typeof val === 'number') {
+                    gameEntity.setAttribute(id, 'manualLoad', Math.max(0, Math.min(1, val)));
+                }
+            });
         }
 
         /*this.sendFurnituresData({ filterId: 'furniture' }, {
@@ -1037,6 +1077,15 @@ export class PropertyModule extends GameModule {
     sendAllMachineryTags(payload) {
         const data = this.getAllItemsTags('machinery');
         let label = 'all-machinery-tags';
+        if(payload?.prefix) {
+            label = `${label}-${payload?.prefix}`
+        }
+        this.eventHandler.sendData(label, data);
+    }
+
+    sendAllArtifactsTags(payload) {
+        const data = this.getAllItemsTags('artifact');
+        let label = 'all-artifact-tags';
         if(payload?.prefix) {
             label = `${label}-${payload?.prefix}`
         }

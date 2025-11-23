@@ -62,7 +62,7 @@ export const registerMachineryStage1 = () => {
                     'living_space': { A: 1, B: 0, type: 0 },
                 }
             }),
-            getCustomAmplifier: () => gameEntity.getAttribute('machine_auto_quarry', 'manualLoad') ?? 1,
+            getCustomAmplifier: () => gameEntity.getAttribute('machine_auto_quarry', 'manualLoad') ?? 0,
             customAmplifierApplyTypes: ['resources'],
             customAmplifierApplyScopes: ['income','consumption'],
             effectDeps: ['machinery_efficiency', 'coal_consumption_discount'],
@@ -99,7 +99,7 @@ export const registerMachineryStage1 = () => {
                     'living_space': { A: 1, B: 0, type: 0 },
                 }
             }),
-            getCustomAmplifier: () => gameEntity.getAttribute('machine_auto_lumbermill', 'manualLoad') ?? 1,
+            getCustomAmplifier: () => gameEntity.getAttribute('machine_auto_lumbermill', 'manualLoad') ?? 0,
             customAmplifierApplyTypes: ['resources'],
             customAmplifierApplyScopes: ['income','consumption'],
             effectDeps: ['machinery_efficiency', 'crafting_materials_discount', 'coal_consumption_discount'],
@@ -135,7 +135,7 @@ export const registerMachineryStage1 = () => {
                     'living_space': { A: 4, B: 0, type: 0 },
                 }
             }),
-            getCustomAmplifier: () => gameEntity.getAttribute('machine_automatic_ore_mine', 'manualLoad') ?? 1,
+            getCustomAmplifier: () => gameEntity.getAttribute('machine_automatic_ore_mine', 'manualLoad') ?? 0,
             customAmplifierApplyTypes: ['resources'],
             customAmplifierApplyScopes: ['income','consumption'],
             effectDeps: ['machinery_efficiency', 'coal_consumption_discount'],
@@ -173,7 +173,7 @@ export const registerMachineryStage1 = () => {
                     'living_space': { A: 4, B: 0, type: 0 },
                 }
             }),
-            getCustomAmplifier: () => gameEntity.getAttribute('machine_automatic_clay_mine', 'manualLoad') ?? 1,
+            getCustomAmplifier: () => gameEntity.getAttribute('machine_automatic_clay_mine', 'manualLoad') ?? 0,
             customAmplifierApplyTypes: ['resources'],
             customAmplifierApplyScopes: ['income','consumption'],
             effectDeps: ['machinery_efficiency', 'coal_consumption_discount'],
@@ -212,7 +212,7 @@ export const registerMachineryStage1 = () => {
                     'living_space': { A: 4, B: 0, type: 0 },
                 }
             }),
-            getCustomAmplifier: () => gameEntity.getAttribute('machine_automated_papermill', 'manualLoad') ?? 1,
+            getCustomAmplifier: () => gameEntity.getAttribute('machine_automated_papermill', 'manualLoad') ?? 0,
             customAmplifierApplyTypes: ['resources'],
             customAmplifierApplyScopes: ['income','consumption'],
             effectDeps: ['machinery_efficiency', 'crafting_materials_discount', 'coal_consumption_discount'],
@@ -251,7 +251,7 @@ export const registerMachineryStage1 = () => {
                     'living_space': { A: 4, B: 0, type: 0 },
                 }
             }),
-            getCustomAmplifier: () => gameEntity.getAttribute('machine_automated_brickworks', 'manualLoad') ?? 1,
+            getCustomAmplifier: () => gameEntity.getAttribute('machine_automated_brickworks', 'manualLoad') ?? 0,
             customAmplifierApplyTypes: ['resources'],
             customAmplifierApplyScopes: ['income','consumption'],
             effectDeps: ['machinery_efficiency', 'crafting_materials_discount', 'coal_consumption_discount'],
@@ -271,6 +271,7 @@ export const registerMachineryStage1 = () => {
         name: 'Automated Greenhouse',
         description: 'An electrically-powered greenhouse that enhances plantation efficiency through controlled climate and automated systems.',
         level: 0,
+        attributeRegenDeps: ['manualLoad'],
         unlockCondition: () => {
             return gameResources.isResourceUnlocked('inventory_copper_wire');
         },
@@ -294,7 +295,7 @@ export const registerMachineryStage1 = () => {
                     'inventory_coal': { A: 5.0/getCoalDiscount(), B: 0.0, C: 1.02, type: 3 },
                 }
             }),
-            getCustomAmplifier: () => gameEntity.getAttribute('machine_automated_greenhouse', 'manualLoad') ?? 1,
+            getCustomAmplifier: () => gameEntity.getAttribute('machine_automated_greenhouse', 'manualLoad') ?? 0,
             customAmplifierApplyTypes: ['effects'],
             customAmplifierApplyScopes: ['multiplier'],
             effectDeps: ['plantations_efficiency'],
@@ -302,6 +303,106 @@ export const registerMachineryStage1 = () => {
         get_cost: () => ({
             'inventory_copper_wire': { A: 1.5, B: 500, type: 1 },
             'inventory_forged_steel': { A: 1.5, B: 8000, type: 1 },
+            'living_space': { A: 0, B: 4, type: 0 },
+        }),
+    });
+
+    // Incubator — increases birds breeding efficiency
+    registerMachine('machine_incubator', {
+        tags: ['machinery', 'upgrade', 'purchaseable', 'industrial', 'agricultural', 'zoo'],
+        name: 'Incubator',
+        description: 'An advanced incubation system that optimizes breeding conditions for birds, significantly increasing their breeding efficiency in the magical zoo.',
+        level: 0,
+        attributeRegenDeps: ['manualLoad'],
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 200000,
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_automated_mechanisms') > 0;
+        },
+        attributes: {
+            manualLoad: 1,
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'birds_breeding_efficiency': {
+                        A: 0.2,
+                        B: 1,
+                        C: 1.02,
+                        type: 3,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'living_space': { A: 4, B: 0, type: 0 },
+                    'inventory_coal': { A: 3.0/getCoalDiscount(), B: 0.0, C: 1.02, type: 3 },
+                    'inventory_water': { A: 500.0, B: 0.0, C: 1.02, type: 3 },
+                }
+            }),
+            getCustomAmplifier: () => gameEntity.getAttribute('machine_incubator', 'manualLoad') ?? 0,
+            // Scale both the provided effects and the machine consumption by manual load
+            customAmplifierApplyTypes: ['effects', 'resources'],
+            customAmplifierApplyScopes: ['multiplier', 'consumption'],
+            effectDeps: ['birds_breeding_efficiency', 'coal_consumption_discount'],
+        },
+        get_cost: () => ({
+            'inventory_copper_wire': { A: 1.5, B: 2000, type: 1 },
+            'inventory_forged_steel': { A: 1.5, B: 1500000, type: 1 },
+            'inventory_stone_brick': { A: 1.5, B: 50000000, type: 1 },
+            'living_space': { A: 0, B: 4, type: 0 },
+        }),
+    });
+
+    // Breeding Facility — increases mammals breeding efficiency
+    registerMachine('machine_breeding_facility', {
+        tags: ['machinery', 'upgrade', 'purchaseable', 'industrial', 'agricultural', 'zoo'],
+        name: 'Breeding Facility',
+        description: 'A sophisticated facility designed to optimize breeding conditions for mammals, significantly increasing their breeding efficiency in the magical zoo.',
+        level: 0,
+        attributeRegenDeps: ['manualLoad'],
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 200000,
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_automated_mechanisms') > 0;
+        },
+        attributes: {
+            manualLoad: 1,
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'mammal_breeding_efficiency': {
+                        A: 0.2,
+                        B: 1,
+                        C: 1.02,
+                        type: 3,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'living_space': { A: 4, B: 0, type: 0 },
+                    'inventory_coal': { A: 3.0/getCoalDiscount(), B: 0.0, C: 1.02, type: 3 },
+                    'inventory_water': { A: 500.0, B: 0.0, C: 1.02, type: 3 },
+                }
+            }),
+            getCustomAmplifier: () => gameEntity.getAttribute('machine_breeding_facility', 'manualLoad') ?? 0,
+            // Scale both the provided effects and the machine consumption by manual load
+            customAmplifierApplyTypes: ['effects', 'resources'],
+            customAmplifierApplyScopes: ['multiplier', 'consumption'],
+            effectDeps: ['mammal_breeding_efficiency', 'coal_consumption_discount'],
+        },
+        get_cost: () => ({
+            'inventory_copper_wire': { A: 1.5, B: 2000, type: 1 },
+            'inventory_forged_steel': { A: 1.5, B: 1500000, type: 1 },
+            'inventory_stone_brick': { A: 1.5, B: 50000000, type: 1 },
             'living_space': { A: 0, B: 4, type: 0 },
         }),
     });
