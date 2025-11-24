@@ -351,7 +351,7 @@ export const registerMachineryStage1 = () => {
         },
         get_cost: () => ({
             'inventory_copper_wire': { A: 1.5, B: 2000, type: 1 },
-            'inventory_forged_steel': { A: 1.5, B: 1500000, type: 1 },
+            'inventory_forged_steel': { A: 1.5, B: 150000000, type: 1 },
             'inventory_stone_brick': { A: 1.5, B: 50000000, type: 1 },
             'living_space': { A: 0, B: 4, type: 0 },
         }),
@@ -401,7 +401,7 @@ export const registerMachineryStage1 = () => {
         },
         get_cost: () => ({
             'inventory_copper_wire': { A: 1.5, B: 2000, type: 1 },
-            'inventory_forged_steel': { A: 1.5, B: 1500000, type: 1 },
+            'inventory_forged_steel': { A: 1.5, B: 150000000, type: 1 },
             'inventory_stone_brick': { A: 1.5, B: 50000000, type: 1 },
             'living_space': { A: 0, B: 4, type: 0 },
         }),

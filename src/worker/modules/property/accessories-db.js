@@ -1368,4 +1368,107 @@ export const registerAccessoriesStage1 = () => {
             }
         }),
     })
+
+    registerAccessory('accessory_titans_hammer', {
+        tags: ["accessory", "upgrade", "purchaseable", "resource", "maps", "paper", "device"],
+        name: 'Titans Hammer',
+        description: 'A copper-bound forge hammer that turns raw might into precise output.',
+        level: 0,
+        minDemoVersion: 20,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 200000
+        }],
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_iron_plate');
+        },
+        resourceModifier: {
+            multiplier: {
+                resources: {
+                    'inventory_iron_plate': {
+                        A: 0.05,
+                        B: 1,
+                        C: 1.004,
+                        type: 3,
+                    },
+                    'inventory_forged_steel': {
+                        A: 0.05,
+                        B: 1,
+                        C: 1.004,
+                        type: 3,
+                    },
+                    'inventory_copper_wire': {
+                        A: 0.05,
+                        B: 1,
+                        C: 1.004,
+                        type: 3,
+                    }
+                }
+            },
+        },
+        get_cost: () => ({
+            'inventory_copper_ore': {
+                A: 1.1,
+                B: 1.e+7/getAccessoryDiscount(),
+                type: 1
+            },
+            'inventory_forged_steel': {
+                A: 1.1,
+                B: 1.e+8/getAccessoryDiscount(),
+                type: 1
+            },
+            'inventory_refined_wood': {
+                A: 1.1,
+                B: 2.5e+8/getAccessoryDiscount(),
+                type: 1
+            },
+        }),
+    })
+    
+    registerAccessory('accessory_titans_drill', {
+        tags: ["accessory", "upgrade", "purchaseable", "resource", "maps", "paper", "device"],
+        name: 'Titans Drill',
+        description: 'A titan-grade auger that bites deeper into every vein.',
+        level: 0,
+        minDemoVersion: 20,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 200000
+        }],
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_iron_plate');
+        },
+        resourceModifier: {
+            multiplier: {
+                resources: {
+                    'inventory_iron_ore': {
+                        A: 0.05,
+                        B: 1,
+                        C: 1.004,
+                        type: 3,
+                    },
+                    'inventory_copper_ore': {
+                        A: 0.05,
+                        B: 1,
+                        C: 1.004,
+                        type: 3,
+                    }
+                }
+            },
+        },
+        get_cost: () => ({
+            'inventory_forged_steel': {
+                A: 1.1,
+                B: 1.e+8/getAccessoryDiscount(),
+                type: 1
+            },
+            'inventory_refined_wood': {
+                A: 1.1,
+                B: 2.5e+8/getAccessoryDiscount(),
+                type: 1
+            },
+        }),
+    })
 }

@@ -1345,12 +1345,12 @@ export const registerStructuresStage1 = () => {
             },
             'inventory_refined_wood': {
                 A: 1.3,
-                B: 25000,
+                B: 2500000,
                 type: 1
             },
             'inventory_forged_steel': {
                 A: 1.3,
-                B: 15000,
+                B: 1500000,
                 type: 1
             },
             'living_space': {
@@ -1399,7 +1399,7 @@ export const registerStructuresStage1 = () => {
             },
             'inventory_wooden_beam': {
                 A: 1.3,
-                B: 5000000,
+                B: 500000000,
                 type: 1
             },
             'living_space': {
