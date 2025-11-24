@@ -1074,6 +1074,27 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+    gameEntity.registerGameEntity('shop_item_ritualism', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Ritualism',
+        description: 'Unlocks arcane rituals that reshape your training flow.',
+        level: 0,
+        maxLevel: 1,
+        unlockCondition: () => {
+            return gameEffects.getEffectValue('attribute_magic_ability') >= 200000;
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1,
+                B: 2e15*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        }),
+    })
+
 
     gameEntity.registerGameEntity('shop_item_magic_accessories_access', {
         tags: ["shop", "upgrade", "purchaseable"],

@@ -4,6 +4,7 @@ import WorkerContext from "../../context/worker-context";
 import {useWorkerClient} from "../../general/client";
 import {MagicMenu} from "./magic-menu.jsx";
 import {SpellbookWrap} from "./spellbook/spellbook.jsx";
+import {RitualsWrap} from "./rituals/rituals.jsx";
 
 export const Magic = ({  }) => {
 
@@ -21,6 +22,7 @@ export const Magic = ({  }) => {
     onMessage('unlocks-magic-main', (unlocks) => {
         const mapToPages = {
             spellbook: 'spellbook',
+            rituals: 'rituals',
         }
 
         if(!unlocks[mapToPages[selectedTab]]) {
@@ -35,6 +37,12 @@ export const Magic = ({  }) => {
         return <SpellbookWrap>
             <MagicMenu selectedTab={selectedTab} setSelectedTab={setSelectedTab}/>
         </SpellbookWrap>
+    }
+
+    if(selectedTab === 'rituals') {
+        return <RitualsWrap>
+            <MagicMenu selectedTab={selectedTab} setSelectedTab={setSelectedTab}/>
+        </RitualsWrap>
     }
 
 

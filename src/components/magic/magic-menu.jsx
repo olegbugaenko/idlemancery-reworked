@@ -39,6 +39,11 @@ export const MagicMenu = ({ selectedTab, setSelectedTab }) => {
                         <span>Spellbook</span>
                     </NewNotificationWrap>
                 </li>) : null}
+                {unlocks.rituals ? (<li id={'magic-menu-rituals'} className={`${selectedTab === 'rituals' ? 'active' : ''}`} onClick={() => {setSelectedTab('rituals');}}>
+                    <NewNotificationWrap isNew={false}>
+                        <span>Rituals</span>
+                    </NewNotificationWrap>
+                </li>) : null}
             </ul>
         )
 }
