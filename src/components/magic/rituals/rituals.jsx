@@ -1,10 +1,11 @@
+import React, {useContext, useEffect, useState} from "react";
 import WorkerContext from "../../../context/worker-context";
 import {useWorkerClient} from "../../../general/client";
-import {useContext, useEffect, useState} from "react";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import {EffectsSection} from "../../shared/effects-section.jsx";
 import RulesList from "../../shared/rules-list.jsx";
 import {CustomButton} from "../../shared/buttons/custom-button.jsx";
+import {NewNotificationWrap} from "../../shared/new-notification-wrap.jsx";
 
 export const RitualsWrap = ({ children }) => {
 
@@ -13,11 +14,20 @@ export const RitualsWrap = ({ children }) => {
     const [rituals, setRituals] = useState([]);
     const [selected, setSelected] = useState(null);
     const [details, setDetails] = useState(null);
+    const [newUnlocks, setNewUnlocks] = useState({});
 
     useEffect(() => {
         const interval = setInterval(() => {
             sendData('query-rituals', {});
         }, 500);
+        return () => clearInterval(interval);
+    }, []);
+
+    useEffect(() => {
+        sendData('query-new-unlocks-notifications', { suffix: 'rituals', scope: 'spellbook' });
+        const interval = setInterval(() => {
+            sendData('query-new-unlocks-notifications', { suffix: 'rituals', scope: 'spellbook' });
+        }, 1000);
         return () => clearInterval(interval);
     }, []);
 
@@ -33,6 +43,10 @@ export const RitualsWrap = ({ children }) => {
 
     onMessage('ritual-details', payload => {
         setDetails(payload);
+    });
+
+    onMessage('new-unlocks-notifications-rituals', payload => {
+        setNewUnlocks(payload);
     });
 
     const onToggle = (id) => {
@@ -52,24 +66,30 @@ export const RitualsWrap = ({ children }) => {
                 <div className={'spells-list'}>
                     <PerfectScrollbar>
                         {rituals.map(ritual => (
-                            <div key={ritual.id} className={`spell ${ritual.isActive ? 'active' : ''}`} onClick={() => setSelected(ritual.id)}>
-                                <div className={'icon-card spell-card'}>
-                                    <div className={'icon-content'}>
-                                        <div className={'icon-body'}>
-                                            <div className={'title-wrap'}>
-                                                <div className={'spell-title'}>{ritual.name}</div>
-                                                <div className={'tags'}>
-                                                    {(ritual.tags || []).map(tag => <span key={`${ritual.id}_${tag}`}>{tag}</span>)}
+                            <NewNotificationWrap
+                                key={ritual.id}
+                                id={`ritual_${ritual.id}`}
+                                isNew={newUnlocks.spellbook?.items?.spellbook?.items?.rituals?.items?.[`ritual_${ritual.id}`]?.hasNew}
+                            >
+                                <div className={`spell ${ritual.isActive ? 'active' : ''}`} onClick={() => setSelected(ritual.id)}>
+                                    <div className={'icon-card spell-card'}>
+                                        <div className={'icon-content'}>
+                                            <div className={'icon-body'}>
+                                                <div className={'title-wrap'}>
+                                                    <div className={'spell-title'}>{ritual.name}</div>
+                                                    <div className={'tags'}>
+                                                        {(ritual.tags || []).map(tag => <span key={`${ritual.id}_${tag}`}>{tag}</span>)}
+                                                    </div>
                                                 </div>
+                                                <div className={'spell-desc'}>{ritual.description}</div>
                                             </div>
-                                            <div className={'spell-desc'}>{ritual.description}</div>
-                                        </div>
-                                        <div className={'action-wrap'}>
-                                            <CustomButton onClick={() => onToggle(ritual.id)}>{ritual.isActive ? 'Disable' : 'Activate'}</CustomButton>
+                                            <div className={'action-wrap'}>
+                                                <CustomButton onClick={() => onToggle(ritual.id)}>{ritual.isActive ? 'Disable' : 'Activate'}</CustomButton>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </NewNotificationWrap>
                         ))}
                     </PerfectScrollbar>
                 </div>

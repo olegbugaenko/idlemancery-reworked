@@ -150,6 +150,20 @@ export class RitualModule extends GameModule {
         this.rituals[payload.id].autocast = payload.autocast;
     }
 
+    regenerateNotifications() {
+        const entities = gameEntity.listEntitiesByTags(['magic-ritual']);
+
+        entities.forEach(item => {
+            gameCore.getModule('unlock-notifications').registerNewNotification(
+                'spellbook',
+                'spellbook',
+                'rituals',
+                `ritual_${item.id}`,
+                item.isUnlocked
+            );
+        });
+    }
+
     sendRitualData() {
         const items = gameEntity.listEntitiesByTags(['magic-ritual']);
         const response = items.map(ritual => ({

@@ -28,19 +28,19 @@ export const MagicMenu = ({ selectedTab, setSelectedTab }) => {
         setUnlocksData(unlocks);
     })
 
-    onMessage('new-unlocks-notifications-magic', payload => {
+    onMessage('new-unlocks-notifications-spellbook', payload => {
         setNewUnlocks(payload);
     })
 
     return (
             <ul className={'menu'}>
                 {unlocks.crafting ? (<li id={'magic-menu-spellbook'} className={`${selectedTab === 'spellbook' ? 'active' : ''}`} onClick={() => {setSelectedTab('spellbook');}}>
-                    <NewNotificationWrap isNew={newUnlocks.workshop?.items?.crafting?.hasNew}>
+                    <NewNotificationWrap isNew={newUnlocks.spellbook?.items?.spellbook?.items?.all?.hasNew}>
                         <span>Spellbook</span>
                     </NewNotificationWrap>
                 </li>) : null}
                 {unlocks.rituals ? (<li id={'magic-menu-rituals'} className={`${selectedTab === 'rituals' ? 'active' : ''}`} onClick={() => {setSelectedTab('rituals');}}>
-                    <NewNotificationWrap isNew={false}>
+                    <NewNotificationWrap isNew={newUnlocks.spellbook?.items?.spellbook?.items?.rituals?.hasNew}>
                         <span>Rituals</span>
                     </NewNotificationWrap>
                 </li>) : null}
