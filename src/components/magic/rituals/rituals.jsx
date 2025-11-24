@@ -60,39 +60,48 @@ export const RitualsWrap = ({ children }) => {
     }
 
     return (
-        <div className={'content-magic spell-wrap'}>
-            {children}
-            <div className={'spell-inner spell-wrap'}>
-                <div className={'spells-list'}>
+        <div className={'spell-wrap'}>
+            <div className={'ingame-box spell'}>
+                <div className={'menu-wrap magic'}>
+                    <div className={'head'}>
+                        {children}
+                    </div>
+                </div>
+                <div className={'magic-cat spells-list'}>
                     <PerfectScrollbar>
-                        {rituals.map(ritual => (
-                            <NewNotificationWrap
-                                key={ritual.id}
-                                id={`ritual_${ritual.id}`}
-                                isNew={newUnlocks.spellbook?.items?.spellbook?.items?.rituals?.items?.[`ritual_${ritual.id}`]?.hasNew}
-                            >
-                                <div className={`spell ${ritual.isActive ? 'active' : ''}`} onClick={() => setSelected(ritual.id)}>
-                                    <div className={'icon-card spell-card'}>
-                                        <div className={'icon-content'}>
-                                            <div className={'icon-body'}>
-                                                <div className={'title-wrap'}>
-                                                    <div className={'spell-title'}>{ritual.name}</div>
-                                                    <div className={'tags'}>
-                                                        {(ritual.tags || []).map(tag => <span key={`${ritual.id}_${tag}`}>{tag}</span>)}
+                        <div className={'flex-container'}>
+                            {rituals.map(ritual => (
+                                <NewNotificationWrap
+                                    key={ritual.id}
+                                    id={`ritual_${ritual.id}`}
+                                    className={'narrow-wrapper'}
+                                    isNew={newUnlocks.spellbook?.items?.spellbook?.items?.rituals?.items?.[`ritual_${ritual.id}`]?.hasNew}
+                                >
+                                    <div className={`spell ${ritual.isActive ? 'active' : ''}`} onClick={() => setSelected(ritual.id)}>
+                                        <div className={'icon-card spell-card'}>
+                                            <div className={'icon-content'}>
+                                                <div className={'icon-body'}>
+                                                    <div className={'title-wrap'}>
+                                                        <div className={'spell-title'}>{ritual.name}</div>
+                                                        <div className={'tags'}>
+                                                            {(ritual.tags || []).map(tag => <span key={`${ritual.id}_${tag}`}>{tag}</span>)}
+                                                        </div>
                                                     </div>
+                                                    <div className={'spell-desc'}>{ritual.description}</div>
                                                 </div>
-                                                <div className={'spell-desc'}>{ritual.description}</div>
-                                            </div>
-                                            <div className={'action-wrap'}>
-                                                <CustomButton onClick={() => onToggle(ritual.id)}>{ritual.isActive ? 'Disable' : 'Activate'}</CustomButton>
+                                                <div className={'action-wrap'}>
+                                                    <CustomButton onClick={() => onToggle(ritual.id)}>{ritual.isActive ? 'Disable' : 'Activate'}</CustomButton>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </NewNotificationWrap>
-                        ))}
+                                </NewNotificationWrap>
+                            ))}
+                        </div>
                     </PerfectScrollbar>
                 </div>
+            </div>
+            <div className={'item-detail ingame-box detail-blade'}>
                 <div className={'spell-details'}>
                     {details ? (
                         <div className={'spell-details-inner'}>
