@@ -10,6 +10,7 @@ export class RitualModule extends GameModule {
         super();
         this.rituals = {};
         this.switchCooldown = 0;
+        this.autoCheckCooldown = 0;
 
         this.eventHandler.registerHandler('toggle-ritual', payload => {
             this.toggleRitual(payload.id);
@@ -41,19 +42,30 @@ export class RitualModule extends GameModule {
             this.switchCooldown -= delta;
         }
 
-        for(const ritualId in this.rituals) {
-            const ritual = this.rituals[ritualId];
-            if(!ritual?.autocast?.isEnabled) continue;
+        this.autoCheckCooldown -= delta;
 
-            const isMatching = checkMatchingRules(ritual.autocast?.rules || [], ritual.autocast?.pattern);
+        if(this.autoCheckCooldown <= 0) {
+            const availableRituals = gameEntity.listEntitiesByTags(['magic-ritual']).filter(entity => entity.isUnlocked);
 
-            if(isMatching && !ritual.isRunning && this.switchCooldown <= 0) {
-                this.toggleRitual(ritualId);
-            }
+            availableRituals.forEach(entity => {
+                if(!this.rituals[entity.id]) {
+                    this.rituals[entity.id] = { isRunning: false, autocast: { rules: [] } };
+                }
+                const ritualState = this.rituals[entity.id];
+                if(!ritualState?.autocast?.isEnabled) return;
 
-            if(!isMatching && ritual.isRunning && this.switchCooldown <= 0) {
-                this.toggleRitual(ritualId);
-            }
+                const isMatching = checkMatchingRules(ritualState.autocast?.rules || [], ritualState.autocast?.pattern);
+
+                if(isMatching && !ritualState.isRunning && this.switchCooldown <= 0) {
+                    this.toggleRitual(entity.id);
+                }
+
+                if(!isMatching && ritualState.isRunning && this.switchCooldown <= 0) {
+                    this.toggleRitual(entity.id);
+                }
+            });
+
+            this.autoCheckCooldown = 1;
         }
     }
 
