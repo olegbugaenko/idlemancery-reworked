@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, useEffect, useMemo, useState} from "react";
 import WorkerContext from "../../../context/worker-context";
 import {useWorkerClient} from "../../../general/client";
 import PerfectScrollbar from "react-perfect-scrollbar";
@@ -13,7 +13,8 @@ export const RitualsWrap = ({ children }) => {
     const { onMessage, sendData } = useWorkerClient(worker);
     const [rituals, setRituals] = useState([]);
     const [selected, setSelected] = useState(null);
-    const [details, setDetails] = useState(null);
+    const [hovered, setHovered] = useState(null);
+    const [details, setDetails] = useState({});
     const [newUnlocks, setNewUnlocks] = useState({});
 
     useEffect(() => {
@@ -31,18 +32,20 @@ export const RitualsWrap = ({ children }) => {
         return () => clearInterval(interval);
     }, []);
 
+    const detailId = useMemo(() => hovered ?? selected, [hovered, selected]);
+
     useEffect(() => {
-        if(selected) {
-            sendData('query-ritual-details', { id: selected });
+        if(detailId) {
+            sendData('query-ritual-details', { id: detailId });
         }
-    }, [selected]);
+    }, [detailId]);
 
     onMessage('rituals-data', payload => {
         setRituals(payload.available || []);
     });
 
     onMessage('ritual-details', payload => {
-        setDetails(payload);
+        setDetails(prev => ({ ...prev, [payload.id]: payload }));
     });
 
     onMessage('new-unlocks-notifications-rituals', payload => {
@@ -54,9 +57,23 @@ export const RitualsWrap = ({ children }) => {
     }
 
     const onSaveAutomation = (autocast) => {
-        if(details) {
-            sendData('save-ritual-settings', { id: details.id, autocast });
+        if(detailId) {
+            sendData('save-ritual-settings', { id: detailId, autocast });
         }
+    }
+
+    const onToggleAutomation = () => {
+        const current = details[detailId];
+        if(!current) return;
+        const updated = { ...(current.autocast || {}), isEnabled: !current.autocast?.isEnabled };
+        onSaveAutomation(updated);
+    }
+
+    const onAddRule = () => {
+        const current = details[detailId];
+        if(!current) return;
+        const rules = current.autocast?.rules || [];
+        onSaveAutomation({ ...(current.autocast || {}), rules: [...rules, { condition: 'true' }] });
     }
 
     return (
@@ -77,21 +94,16 @@ export const RitualsWrap = ({ children }) => {
                                     className={'narrow-wrapper'}
                                     isNew={newUnlocks.spellbook?.items?.spellbook?.items?.rituals?.items?.[`ritual_${ritual.id}`]?.hasNew}
                                 >
-                                    <div className={`spell ${ritual.isActive ? 'active' : ''}`} onClick={() => setSelected(ritual.id)}>
-                                        <div className={'icon-card spell-card'}>
-                                            <div className={'icon-content'}>
-                                                <div className={'icon-body'}>
-                                                    <div className={'title-wrap'}>
-                                                        <div className={'spell-title'}>{ritual.name}</div>
-                                                        <div className={'tags'}>
-                                                            {(ritual.tags || []).map(tag => <span key={`${ritual.id}_${tag}`}>{tag}</span>)}
-                                                        </div>
-                                                    </div>
-                                                    <div className={'spell-desc'}>{ritual.description}</div>
-                                                </div>
-                                                <div className={'action-wrap'}>
-                                                    <CustomButton onClick={() => onToggle(ritual.id)}>{ritual.isActive ? 'Disable' : 'Activate'}</CustomButton>
-                                                </div>
+                                    <div
+                                        className={`icon-card item bigger spell-card ${ritual.isActive ? 'active' : ''}`}
+                                        onMouseEnter={() => setHovered(ritual.id)}
+                                        onMouseLeave={() => setHovered(null)}
+                                        onClick={() => setSelected(ritual.id)}
+                                        onContextMenu={(e) => { e.preventDefault(); onToggle(ritual.id); }}
+                                    >
+                                        <div className={'icon-content'}>
+                                            <div className={'icon-body ritual-icon'}>
+                                                <img src={`icons/rituals/${ritual.id}.png`} className={'resource'} />
                                             </div>
                                         </div>
                                     </div>
@@ -103,33 +115,46 @@ export const RitualsWrap = ({ children }) => {
             </div>
             <div className={'item-detail ingame-box detail-blade'}>
                 <div className={'spell-details'}>
-                    {details ? (
+                    {detailId && details[detailId] ? (
                         <div className={'spell-details-inner'}>
                             <div className={'spell-info-block'}>
                                 <div className={'title-wrap'}>
-                                    <div className={'spell-title'}>{details.name}</div>
+                                    <div className={'spell-title'}>{details[detailId].name}</div>
                                     <div className={'tags'}>
-                                        {(details.tags || []).map(tag => <span key={`${details.id}_${tag}`}>{tag}</span>)}
+                                        {(details[detailId].tags || []).map(tag => <span key={`${details[detailId].id}_${tag}`}>{tag}</span>)}
                                     </div>
                                 </div>
-                                <div className={'spell-desc'}>{details.description}</div>
+                                <div className={'spell-desc'}>{details[detailId].description}</div>
                             </div>
                             <div className={'spell-effects-lasting-block'}>
                                 <h4>Effects</h4>
-                                <EffectsSection effects={details.potentialEffects} prefix={'effects'}/>
+                                <EffectsSection effects={details[detailId].potentialEffects} prefix={'effects'}/>
                             </div>
                             <div className={'spell-automation-block'}>
                                 <h4>Automation</h4>
+                                <div className={'rules-header flex-container'}>
+                                    <p>Autotrigger rules:</p>
+                                    <label>
+                                        <input type={'checkbox'} checked={details[detailId].autocast?.isEnabled ?? false} onChange={onToggleAutomation}/>
+                                        {details[detailId].autocast?.isEnabled ? ' ON' : ' OFF'}
+                                    </label>
+                                    <button onClick={onAddRule}>Add rule (AND)</button>
+                                </div>
                                 <RulesList
-                                    rules={details.autocast?.rules || []}
-                                    setRules={(rules) => onSaveAutomation({ ...(details.autocast || {}), rules })}
+                                    rules={details[detailId].autocast?.rules || []}
+                                    setRules={(rules) => onSaveAutomation({ ...(details[detailId].autocast || {}), rules })}
                                     unlocks={{ spells: true, rituals: true }}
-                                    conditionStr={details.autocast?.pattern}
-                                    setConditionStr={(pattern) => onSaveAutomation({ ...(details.autocast || {}), pattern })}
+                                    conditionStr={details[detailId].autocast?.pattern}
+                                    setConditionStr={(pattern) => onSaveAutomation({ ...(details[detailId].autocast || {}), pattern })}
                                 />
                             </div>
+                            <div className={'spell-automation-block'}>
+                                <CustomButton onClick={() => onToggle(details[detailId].id)}>
+                                    {details[detailId].isActive ? 'Disable' : 'Activate'}
+                                </CustomButton>
+                            </div>
                         </div>
-                    ) : <div className={'spell-details-inner'}>Select a ritual to see details</div>}
+                    ) : <div className={'spell-details-inner'}>Hover or select a ritual to see details</div>}
                 </div>
             </div>
         </div>
