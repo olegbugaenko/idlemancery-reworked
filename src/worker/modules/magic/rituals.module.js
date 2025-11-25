@@ -1,4 +1,4 @@
-import {gameEntity, gameCore, resourceApi} from "game-framework";
+import {gameEntity, gameCore} from "game-framework";
 import {GameModule} from "../../shared/game-module";
 import {initRitualsDB} from "./rituals-db";
 import {checkMatchingRules} from "../../shared/utils/rule-utils";
@@ -191,10 +191,7 @@ export class RitualModule extends GameModule {
     sendRitualDetails(id) {
         const ritual = gameEntity.getEntity(id);
         if(!ritual) return;
-        let potentialEffects = [];
-        if(ritual.resourceModifier) {
-            potentialEffects = resourceApi.unpackEffects({ resourceModifier: ritual.resourceModifier }, ritual.level, true);
-        }
+        const potentialEffects = gameEntity.getEffects(id, 0, ritual.level, true);
 
         this.eventHandler.sendData('ritual-details', {
             ...entityResponse(ritual),

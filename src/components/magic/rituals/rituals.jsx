@@ -67,9 +67,28 @@ export const RitualsWrap = ({ children }) => {
         setNewUnlocks(payload);
     });
 
-    const onToggle = (id) => {
+    const onToggle = useCallback((id) => {
+        if(!id) return;
+
+        setDetails(prev => {
+            if(!prev[id]) return prev;
+            return {
+                ...prev,
+                [id]: { ...prev[id], isActive: !prev[id].isActive }
+            };
+        });
+
+        if(editData?.id === id) {
+            setEditData(prev => prev ? { ...prev, isActive: !prev.isActive } : prev);
+        }
+
+        if(viewedData?.id === id) {
+            setViewedData(prev => prev ? { ...prev, isActive: !prev.isActive } : prev);
+        }
+
         sendData('toggle-ritual', { id });
-    }
+        sendData('query-ritual-details', { id });
+    }, [editData?.id, viewedData?.id, sendData]);
 
     const onSave = useCallback(() => {
         if(!editData) return;
@@ -78,12 +97,16 @@ export const RitualsWrap = ({ children }) => {
     }, [editData]);
 
     const onCancel = useCallback(() => {
+        const prevId = detailOpenedId;
         setDetailOpenedId(null);
         setEditData(null);
         setViewedOpenedId(null);
         setViewedData(null);
         setChanged(false);
-    }, []);
+        if(prevId) {
+            sendData('query-ritual-details', { id: prevId });
+        }
+    }, [detailOpenedId, sendData]);
 
     const setRitualDetailsEdit = useCallback((id) => {
         setViewedOpenedId(null);
@@ -237,7 +260,7 @@ export const RitualsWrap = ({ children }) => {
                                 <div className={'rules-header flex-container'}>
                                     <p>Autotrigger rules:</p>
                                     <label>
-                                        <input type={'checkbox'} checked={detailAutocast.autocast?.isEnabled ?? false} onChange={onToggleAutomation} disabled={!editData}/>
+                                        <input type={'checkbox'} checked={detailAutocast.autocast?.isEnabled ?? false} onChange={onToggleAutomation}/>
                                         {detailAutocast.autocast?.isEnabled ? ' ON' : ' OFF'}
                                     </label>
                                     {editData ? <button onClick={onAddRule}>Add rule (AND)</button> : null}
@@ -262,7 +285,7 @@ export const RitualsWrap = ({ children }) => {
                             {editData ? (
                                 <div className={'main-buttons buttons flex-container'}>
                                     <button className={'primary-action'} disabled={!isChanged} onClick={onSave}>Save</button>
-                                    <button className={'warning-action'} disabled={!isChanged} onClick={onCancel}>Cancel</button>
+                                    <button className={'warning-action'} onClick={onCancel}>Cancel</button>
                                 </div>
                             ) : null}
                         </div>
