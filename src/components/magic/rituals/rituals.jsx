@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useMemo, useState} from "react";
+import React, {useContext, useEffect, useMemo, useState, useCallback} from "react";
 import WorkerContext from "../../../context/worker-context";
 import {useWorkerClient} from "../../../general/client";
 import PerfectScrollbar from "react-perfect-scrollbar";
@@ -6,15 +6,19 @@ import {EffectsSection} from "../../shared/effects-section.jsx";
 import RulesList from "../../shared/rules-list.jsx";
 import {CustomButton} from "../../shared/buttons/custom-button.jsx";
 import {NewNotificationWrap} from "../../shared/new-notification-wrap.jsx";
+import {cloneDeep} from "lodash";
 
 export const RitualsWrap = ({ children }) => {
 
     const worker = useContext(WorkerContext);
     const { onMessage, sendData } = useWorkerClient(worker);
     const [rituals, setRituals] = useState([]);
-    const [selected, setSelected] = useState(null);
-    const [hovered, setHovered] = useState(null);
+    const [detailOpenedId, setDetailOpenedId] = useState(null);
+    const [viewedOpenedId, setViewedOpenedId] = useState(null);
+    const [editData, setEditData] = useState(null);
+    const [viewedData, setViewedData] = useState(null);
     const [details, setDetails] = useState({});
+    const [isChanged, setChanged] = useState(false);
     const [newUnlocks, setNewUnlocks] = useState({});
 
     useEffect(() => {
@@ -32,7 +36,7 @@ export const RitualsWrap = ({ children }) => {
         return () => clearInterval(interval);
     }, []);
 
-    const detailId = useMemo(() => hovered ?? selected, [hovered, selected]);
+    const detailId = useMemo(() => viewedOpenedId ?? detailOpenedId, [viewedOpenedId, detailOpenedId]);
 
     useEffect(() => {
         if(detailId) {
@@ -46,6 +50,17 @@ export const RitualsWrap = ({ children }) => {
 
     onMessage('ritual-details', payload => {
         setDetails(prev => ({ ...prev, [payload.id]: payload }));
+        if(viewedOpenedId === payload.id) {
+            setViewedData(payload);
+        }
+        if(detailOpenedId === payload.id) {
+            setEditData(prev => {
+                if(prev && prev.id === payload.id && isChanged) {
+                    return prev;
+                }
+                return payload;
+            });
+        }
     });
 
     onMessage('new-unlocks-notifications-rituals', payload => {
@@ -56,25 +71,118 @@ export const RitualsWrap = ({ children }) => {
         sendData('toggle-ritual', { id });
     }
 
-    const onSaveAutomation = (autocast) => {
-        if(detailId) {
-            sendData('save-ritual-settings', { id: detailId, autocast });
+    const onSave = useCallback(() => {
+        if(!editData) return;
+        sendData('save-ritual-settings', { id: editData.id, autocast: editData.autocast });
+        setChanged(false);
+    }, [editData]);
+
+    const onCancel = useCallback(() => {
+        setDetailOpenedId(null);
+        setEditData(null);
+        setViewedOpenedId(null);
+        setViewedData(null);
+        setChanged(false);
+    }, []);
+
+    const setRitualDetailsEdit = useCallback((id) => {
+        setViewedOpenedId(null);
+        setDetailOpenedId(id);
+        setChanged(false);
+        if(details[id]) {
+            setEditData(details[id]);
         }
-    }
+        if(id) {
+            sendData('query-ritual-details', { id });
+        }
+    }, [details]);
 
-    const onToggleAutomation = () => {
-        const current = details[detailId];
-        if(!current) return;
-        const updated = { ...(current.autocast || {}), isEnabled: !current.autocast?.isEnabled };
-        onSaveAutomation(updated);
-    }
+    const setRitualDetailsView = useCallback((id) => {
+        if(editData?.id === id) return;
+        setViewedOpenedId(id);
+        if(id) {
+            sendData('query-ritual-details', { id });
+        }
+    }, [editData?.id]);
 
-    const onAddRule = () => {
-        const current = details[detailId];
-        if(!current) return;
-        const rules = current.autocast?.rules || [];
-        onSaveAutomation({ ...(current.autocast || {}), rules: [...rules, { condition: 'true' }] });
-    }
+    const ensureAutocast = useCallback((source) => {
+        const clone = cloneDeep(source ?? {});
+        if(!clone.autocast) {
+            clone.autocast = { rules: [], pattern: '', isEnabled: false };
+        }
+        if(!clone.autocast.rules) {
+            clone.autocast.rules = [];
+        }
+        if(clone.autocast.pattern === undefined) {
+            clone.autocast.pattern = '';
+        }
+        if(clone.autocast.isEnabled === undefined) {
+            clone.autocast.isEnabled = false;
+        }
+        return clone;
+    }, []);
+
+    const onToggleAutomation = useCallback(() => {
+        if(!editData) return;
+        const updated = ensureAutocast(editData);
+        updated.autocast.isEnabled = !updated.autocast.isEnabled;
+        setEditData(updated);
+        setChanged(true);
+    }, [editData, ensureAutocast]);
+
+    const onAddRule = useCallback(() => {
+        if(!editData) return;
+        const updated = ensureAutocast(editData);
+        updated.autocast.rules.push({ compare_type: 'resource_amount', condition: 'less_or_eq', value_type: 'percentage', value: 50 });
+        setEditData(updated);
+        setChanged(true);
+    }, [editData, ensureAutocast]);
+
+    const setRuleValue = useCallback((index, key, value) => {
+        setEditData(prev => {
+            if(!prev) return prev;
+            const updated = ensureAutocast(prev);
+            if(!updated.autocast.rules[index]) {
+                updated.autocast.rules[index] = {};
+            }
+            updated.autocast.rules[index][key] = value;
+            return updated;
+        });
+        setChanged(true);
+    }, [ensureAutocast]);
+
+    const deleteRule = useCallback((index) => {
+        setEditData(prev => {
+            if(!prev) return prev;
+            const updated = ensureAutocast(prev);
+            updated.autocast.rules.splice(index, 1);
+            return updated;
+        });
+        setChanged(true);
+    }, [ensureAutocast]);
+
+    const setPattern = useCallback((pattern) => {
+        setEditData(prev => {
+            if(!prev) return prev;
+            const updated = ensureAutocast(prev);
+            updated.autocast.pattern = pattern;
+            return updated;
+        });
+        setChanged(true);
+    }, [ensureAutocast]);
+
+    const detailItem = useMemo(() => viewedData || editData || (detailId ? details[detailId] : null), [viewedData, editData, detailId, details]);
+
+    const effectsForDisplay = useMemo(() => {
+        if(!detailItem?.potentialEffects) return {};
+        if(Array.isArray(detailItem.potentialEffects)) {
+            return detailItem.potentialEffects.reduce((acc, effect, idx) => {
+                acc[idx] = effect;
+                return acc;
+            }, {});
+        }
+        return detailItem.potentialEffects;
+    }, [detailItem]);
 
     return (
         <div className={'spell-wrap'}>
@@ -96,9 +204,9 @@ export const RitualsWrap = ({ children }) => {
                                 >
                                     <div
                                         className={`icon-card item bigger spell-card ${ritual.isActive ? 'active' : ''}`}
-                                        onMouseEnter={() => setHovered(ritual.id)}
-                                        onMouseLeave={() => setHovered(null)}
-                                        onClick={() => setSelected(ritual.id)}
+                                        onMouseEnter={() => setRitualDetailsView(ritual.id)}
+                                        onMouseLeave={() => setRitualDetailsView(null)}
+                                        onClick={() => setRitualDetailsEdit(ritual.id)}
                                         onContextMenu={(e) => { e.preventDefault(); onToggle(ritual.id); }}
                                     >
                                         <div className={'icon-content'}>
@@ -115,44 +223,53 @@ export const RitualsWrap = ({ children }) => {
             </div>
             <div className={'item-detail ingame-box detail-blade'}>
                 <div className={'spell-details'}>
-                    {detailId && details[detailId] ? (
+                    {detailItem ? (
                         <div className={'spell-details-inner'}>
                             <div className={'spell-info-block'}>
                                 <div className={'title-wrap'}>
-                                    <div className={'spell-title'}>{details[detailId].name}</div>
+                                    <div className={'spell-title'}>{detailItem.name}</div>
                                     <div className={'tags'}>
-                                        {(details[detailId].tags || []).map(tag => <span key={`${details[detailId].id}_${tag}`}>{tag}</span>)}
+                                        {(detailItem.tags || []).map(tag => <span key={`${detailItem.id}_${tag}`}>{tag}</span>)}
                                     </div>
                                 </div>
-                                <div className={'spell-desc'}>{details[detailId].description}</div>
+                                <div className={'spell-desc'}>{detailItem.description}</div>
                             </div>
                             <div className={'spell-effects-lasting-block'}>
                                 <h4>Effects</h4>
-                                <EffectsSection effects={details[detailId].potentialEffects} prefix={'effects'}/>
+                                <EffectsSection effects={effectsForDisplay} prefix={'effects'}/>
                             </div>
                             <div className={'spell-automation-block'}>
                                 <h4>Automation</h4>
                                 <div className={'rules-header flex-container'}>
                                     <p>Autotrigger rules:</p>
                                     <label>
-                                        <input type={'checkbox'} checked={details[detailId].autocast?.isEnabled ?? false} onChange={onToggleAutomation}/>
-                                        {details[detailId].autocast?.isEnabled ? ' ON' : ' OFF'}
+                                        <input type={'checkbox'} checked={detailItem.autocast?.isEnabled ?? false} onChange={onToggleAutomation} disabled={!editData}/>
+                                        {detailItem.autocast?.isEnabled ? ' ON' : ' OFF'}
                                     </label>
-                                    <button onClick={onAddRule}>Add rule (AND)</button>
+                                    {editData ? <button onClick={onAddRule}>Add rule (AND)</button> : null}
                                 </div>
                                 <RulesList
-                                    rules={details[detailId].autocast?.rules || []}
-                                    setRules={(rules) => onSaveAutomation({ ...(details[detailId].autocast || {}), rules })}
-                                    unlocks={{ spells: true, rituals: true }}
-                                    conditionStr={details[detailId].autocast?.pattern}
-                                    setConditionStr={(pattern) => onSaveAutomation({ ...(details[detailId].autocast || {}), pattern })}
+                                    prefix={'rituals'}
+                                    isEditing={!!editData}
+                                    rules={(detailItem.autocast?.rules) || []}
+                                    pattern={detailItem.autocast?.pattern}
+                                    deleteRule={deleteRule}
+                                    setRuleValue={setRuleValue}
+                                    setPattern={setPattern}
+                                    isAutoCheck={detailItem.autocast?.isEnabled}
                                 />
                             </div>
                             <div className={'spell-automation-block'}>
-                                <CustomButton onClick={() => onToggle(details[detailId].id)}>
-                                    {details[detailId].isActive ? 'Disable' : 'Activate'}
+                                <CustomButton onClick={() => onToggle(detailItem.id)}>
+                                    {detailItem.isActive ? 'Disable' : 'Activate'}
                                 </CustomButton>
                             </div>
+                            {editData ? (
+                                <div className={'main-buttons buttons flex-container'}>
+                                    <button className={'primary-action'} disabled={!isChanged} onClick={onSave}>Save</button>
+                                    <button className={'warning-action'} disabled={!isChanged} onClick={onCancel}>Cancel</button>
+                                </div>
+                            ) : null}
                         </div>
                     ) : <div className={'spell-details-inner'}>Hover or select a ritual to see details</div>}
                 </div>
