@@ -87,6 +87,7 @@ export const RitualsWrap = ({ children }) => {
 
     const setRitualDetailsEdit = useCallback((id) => {
         setViewedOpenedId(null);
+        setViewedData(null);
         setDetailOpenedId(id);
         setChanged(false);
         if(details[id]) {
@@ -100,9 +101,11 @@ export const RitualsWrap = ({ children }) => {
     const setRitualDetailsView = useCallback((id) => {
         if(editData?.id === id) return;
         setViewedOpenedId(id);
-        if(id) {
-            sendData('query-ritual-details', { id });
+        if(!id) {
+            setViewedData(null);
+            return;
         }
+        sendData('query-ritual-details', { id });
     }, [editData?.id]);
 
     const ensureAutocast = useCallback((source) => {
@@ -173,16 +176,7 @@ export const RitualsWrap = ({ children }) => {
 
     const detailItem = useMemo(() => viewedData || editData || (detailId ? details[detailId] : null), [viewedData, editData, detailId, details]);
 
-    const effectsForDisplay = useMemo(() => {
-        if(!detailItem?.potentialEffects) return {};
-        if(Array.isArray(detailItem.potentialEffects)) {
-            return detailItem.potentialEffects.reduce((acc, effect, idx) => {
-                acc[idx] = effect;
-                return acc;
-            }, {});
-        }
-        return detailItem.potentialEffects;
-    }, [detailItem]);
+    const detailAutocast = useMemo(() => ensureAutocast(detailItem), [detailItem, ensureAutocast]);
 
     return (
         <div className={'spell-wrap'}>
@@ -236,27 +230,28 @@ export const RitualsWrap = ({ children }) => {
                             </div>
                             <div className={'spell-effects-lasting-block'}>
                                 <h4>Effects</h4>
-                                <EffectsSection effects={effectsForDisplay} prefix={'effects'}/>
+                                <EffectsSection effects={detailItem?.potentialEffects || {}} prefix={'effects'}/>
                             </div>
                             <div className={'spell-automation-block'}>
                                 <h4>Automation</h4>
                                 <div className={'rules-header flex-container'}>
                                     <p>Autotrigger rules:</p>
                                     <label>
-                                        <input type={'checkbox'} checked={detailItem.autocast?.isEnabled ?? false} onChange={onToggleAutomation} disabled={!editData}/>
-                                        {detailItem.autocast?.isEnabled ? ' ON' : ' OFF'}
+                                        <input type={'checkbox'} checked={detailAutocast.autocast?.isEnabled ?? false} onChange={onToggleAutomation} disabled={!editData}/>
+                                        {detailAutocast.autocast?.isEnabled ? ' ON' : ' OFF'}
                                     </label>
                                     {editData ? <button onClick={onAddRule}>Add rule (AND)</button> : null}
                                 </div>
                                 <RulesList
                                     prefix={'rituals'}
                                     isEditing={!!editData}
-                                    rules={(detailItem.autocast?.rules) || []}
-                                    pattern={detailItem.autocast?.pattern}
+                                    key={`${detailItem.id}-${!!editData}-${detailAutocast.autocast?.rules?.length || 0}`}
+                                    rules={(detailAutocast.autocast?.rules) || []}
+                                    pattern={detailAutocast.autocast?.pattern}
                                     deleteRule={deleteRule}
                                     setRuleValue={setRuleValue}
                                     setPattern={setPattern}
-                                    isAutoCheck={detailItem.autocast?.isEnabled}
+                                    isAutoCheck={detailAutocast.autocast?.isEnabled}
                                 />
                             </div>
                             <div className={'spell-automation-block'}>
