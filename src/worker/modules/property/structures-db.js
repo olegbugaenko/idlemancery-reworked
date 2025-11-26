@@ -1409,4 +1409,112 @@ export const registerStructuresStage1 = () => {
             }
         }),
     })
+
+    registerStructure('structure_reinforced_warehouse', {
+        tags: ["structure", "upgrade", "purchaseable", "storage"],
+        name: 'Reinforced Warehouse',
+        description: 'A heavily reinforced storage facility constructed with obsidian. Significantly increases your coin storage capacity.',
+        level: 0,
+        maxLevel: 20,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_improved_obsidian_processing') > 0;
+        },
+        resourceModifier: {
+            get_capMult: () => ({
+                resources: {
+                    'coins': {
+                        A: 0.05,
+                        B: 1,
+                        C: 1.01,
+                        type: 3,
+                    }
+                }
+            }),
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 4,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            },
+        },
+        get_cost: () => ({
+            'inventory_obsidian_shard': {
+                A: 1.3,
+                B: 5000000000,
+                type: 1
+            },
+            'inventory_stone_brick': {
+                A: 1.3,
+                B: 10000000000,
+                type: 1
+            },
+            'inventory_forged_steel': {
+                A: 1.3,
+                B: 2000000000,
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 4,
+                type: 0
+            }
+        }),
+    })
+
+    registerStructure('structure_reinforced_monument', {
+        tags: ["structure", "upgrade", "purchaseable", "storage", "mental"],
+        name: 'Reinforced Monument',
+        description: 'A majestic monument crafted from obsidian that channels mental energy. Significantly increases your Mental Energy storage capacity.',
+        level: 0,
+        maxLevel: 20,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_improved_obsidian_processing') > 0;
+        },
+        resourceModifier: {
+            get_capMult: () => ({
+                resources: {
+                    'mental_energy': {
+                        A: 0.15,
+                        B: 1,
+                        C: 1.02,
+                        type: 3,
+                    }
+                }
+            }),
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 4,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            },
+        },
+        get_cost: () => ({
+            'inventory_obsidian_shard': {
+                A: 1.3,
+                B: 5000000000,
+                type: 1
+            },
+            'inventory_stone_brick': {
+                A: 1.3,
+                B: 10000000000,
+                type: 1
+            },
+            'inventory_forged_steel': {
+                A: 1.3,
+                B: 2000000000,
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 4,
+                type: 0
+            }
+        }),
+    })
 }

@@ -6,7 +6,9 @@ import {EffectsSection} from "../../shared/effects-section.jsx";
 import RulesList from "../../shared/rules-list.jsx";
 import {CustomButton} from "../../shared/buttons/custom-button.jsx";
 import {NewNotificationWrap} from "../../shared/new-notification-wrap.jsx";
+import CircularProgress from "../../shared/circular-progress.jsx";
 import {cloneDeep} from "lodash";
+
 
 export const RitualsWrap = ({ children }) => {
 
@@ -227,9 +229,11 @@ export const RitualsWrap = ({ children }) => {
                                         onContextMenu={(e) => { e.preventDefault(); onToggle(ritual.id); }}
                                     >
                                         <div className={'icon-content'}>
-                                            <div className={'icon-body ritual-icon'}>
-                                                <img src={`icons/rituals/${ritual.id}.png`} className={'resource'} />
-                                            </div>
+                                            <CircularProgress progress={ritual.cooldownProg ?? 1}>
+                                                
+                                                    <img src={`icons/rituals/${ritual.icon ?? ritual.id}.png`} className={'resource'} />
+                                                
+                                            </CircularProgress>
                                         </div>
                                     </div>
                                 </NewNotificationWrap>
@@ -239,58 +243,62 @@ export const RitualsWrap = ({ children }) => {
                 </div>
             </div>
             <div className={'item-detail ingame-box detail-blade'}>
-                <div className={'spell-details'}>
-                    {detailItem ? (
-                        <div className={'spell-details-inner'}>
-                            <div className={'spell-info-block'}>
-                                <div className={'title-wrap'}>
-                                    <div className={'spell-title'}>{detailItem.name}</div>
-                                    <div className={'tags'}>
-                                        {(detailItem.tags || []).map(tag => <span key={`${detailItem.id}_${tag}`}>{tag}</span>)}
+                {detailItem ? (
+                    <div className={'spell-details-inner blade-outer'}>
+                        <PerfectScrollbar>
+                            <div className={'blade-inner'}>
+                                <div className={'spell-info-block'}>
+                                    <h4>{detailItem.name}</h4>
+                                    <div className={'description'}>
+                                        {detailItem.description}
                                     </div>
                                 </div>
-                                <div className={'spell-desc'}>{detailItem.description}</div>
-                            </div>
-                            <div className={'spell-effects-lasting-block'}>
-                                <h4>Effects</h4>
-                                <EffectsSection effects={detailItem?.potentialEffects || {}} prefix={'effects'}/>
-                            </div>
-                            <div className={'spell-automation-block'}>
-                                <h4>Automation</h4>
-                                <div className={'rules-header flex-container'}>
-                                    <p>Autotrigger rules:</p>
-                                    <label>
-                                        <input type={'checkbox'} checked={detailAutocast.autocast?.isEnabled ?? false} onChange={onToggleAutomation}/>
-                                        {detailAutocast.autocast?.isEnabled ? ' ON' : ' OFF'}
-                                    </label>
-                                    {editData ? <button onClick={onAddRule}>Add rule (AND)</button> : null}
+                                <div className={'block'}>
+                                    <div className={'tags-container'}>
+                                        {detailItem.tags.map(tag => (<div className={'tag'}>{tag}</div> ))}
+                                    </div>
                                 </div>
-                                <RulesList
-                                    prefix={'rituals'}
-                                    isEditing={!!editData}
-                                    key={`${detailItem.id}-${!!editData}-${detailAutocast.autocast?.rules?.length || 0}`}
-                                    rules={(detailAutocast.autocast?.rules) || []}
-                                    pattern={detailAutocast.autocast?.pattern}
-                                    deleteRule={deleteRule}
-                                    setRuleValue={setRuleValue}
-                                    setPattern={setPattern}
-                                    isAutoCheck={detailAutocast.autocast?.isEnabled}
-                                />
-                            </div>
-                            <div className={'spell-automation-block'}>
-                                <CustomButton onClick={() => onToggle(detailItem.id)}>
-                                    {detailItem.isActive ? 'Disable' : 'Activate'}
-                                </CustomButton>
-                            </div>
-                            {editData ? (
-                                <div className={'main-buttons buttons flex-container'}>
-                                    <button className={'primary-action'} disabled={!isChanged} onClick={onSave}>Save</button>
-                                    <button className={'warning-action'} onClick={onCancel}>Cancel</button>
+                                <div className={'spell-effects-lasting-block'}>
+                                    <h4>Effects</h4>
+                                    <EffectsSection effects={detailItem?.potentialEffects || {}} prefix={'effects'} maxDisplay={10}/>
                                 </div>
-                            ) : null}
-                        </div>
-                    ) : <div className={'spell-details-inner'}>Hover or select a ritual to see details</div>}
-                </div>
+                                <div className={'spell-automation-block autoconsume-setting'}>
+                                    <h4>Automation</h4>
+                                    <div className={'rules-header flex-container'}>
+                                        <p>Autotrigger rules:</p>
+                                        <label>
+                                            <input type={'checkbox'} checked={detailAutocast.autocast?.isEnabled ?? false} onChange={onToggleAutomation}/>
+                                            {detailAutocast.autocast?.isEnabled ? ' ON' : ' OFF'}
+                                        </label>
+                                        {editData ? <button onClick={onAddRule}>Add rule (AND)</button> : null}
+                                    </div>
+                                    <RulesList
+                                        prefix={'rituals'}
+                                        isEditing={!!editData}
+                                        key={`${detailItem.id}-${!!editData}-${detailAutocast.autocast?.rules?.length || 0}`}
+                                        rules={(detailAutocast.autocast?.rules) || []}
+                                        pattern={detailAutocast.autocast?.pattern}
+                                        deleteRule={deleteRule}
+                                        setRuleValue={setRuleValue}
+                                        setPattern={setPattern}
+                                        isAutoCheck={detailAutocast.autocast?.isEnabled}
+                                    />
+                                </div>
+                                <div className={'spell-automation-block'}>
+                                    <CustomButton onClick={() => onToggle(detailItem.id)}>
+                                        {detailItem.isActive ? 'Disable' : 'Activate'}
+                                    </CustomButton>
+                                </div>
+                            </div>
+                        </PerfectScrollbar>
+                        {editData ? (
+                            <div className={'main-buttons buttons flex-container'}>
+                                <button className={'primary-action'} disabled={!isChanged} onClick={onSave}>Save</button>
+                                <button className={'warning-action'} onClick={onCancel}>Cancel</button>
+                            </div>
+                        ) : null}
+                    </div>
+                ) : <div className={'spell-details-inner'}>Hover or select a ritual to see details</div>}
             </div>
         </div>
     )

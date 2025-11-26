@@ -5001,3 +5001,12 @@ body::after {
 .zoo-feed-controls .effort-control .level-set{
     width: 120px;
 }
+
+.unlock-title .arrow-down {
+    margin-left: 8px;
+    display: inline-block;
+}
+
+.unlock-title .arrow-down.opened {
+    transform: rotate(180deg);
+}

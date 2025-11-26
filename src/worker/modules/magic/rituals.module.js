@@ -65,18 +65,20 @@ export class RitualModule extends GameModule {
                 }
             });
 
-            this.autoCheckCooldown = 1;
+            this.autoCheckCooldown = 10;
         }
     }
 
     save() {
         return {
             rituals: this.rituals,
+            switchCooldown: this.switchCooldown,
         }
     }
 
     load(saveObj) {
         this.rituals = saveObj?.rituals || {};
+        this.switchCooldown = saveObj?.switchCooldown ?? 0;
         for(const id in this.rituals) {
             if(this.rituals[id]?.isRunning) {
                 this.activateRitual(id, true);
@@ -98,7 +100,8 @@ export class RitualModule extends GameModule {
 
     toggleRitual(id) {
         const entity = gameEntity.getEntity(id);
-        if(!entity || !entity.isUnlocked) return;
+        console.log('toggleRitual: ', id, this.rituals, this.switchCooldown, entity);
+        if(!entity || !gameEntity.isEntityUnlocked(id)) return;
 
         if(this.switchCooldown > 0) return;
 
@@ -142,6 +145,7 @@ export class RitualModule extends GameModule {
         if(!skipCooldown) {
             this.switchCooldown = 60;
         }
+        console.log('activateRitual: ', id, this.rituals);
     }
 
     deactivateRitual(id) {
@@ -152,6 +156,7 @@ export class RitualModule extends GameModule {
         if(gameEntity.entityExists(`active_${id}`)) {
             gameEntity.unsetEntity(`active_${id}`);
         }
+        console.log('deactivateRitual: ', id, this.rituals);
     }
 
     saveSettings(payload) {
@@ -178,12 +183,14 @@ export class RitualModule extends GameModule {
 
     sendRitualData() {
         const items = gameEntity.listEntitiesByTags(['magic-ritual']);
+        const maxCooldown = 60; // Maximum switch cooldown in seconds
         const response = items.map(ritual => ({
             ...entityResponse(ritual),
             isActive: this.rituals[ritual.id]?.isRunning || false,
             autocast: this.rituals[ritual.id]?.autocast || { rules: [] },
             monitored: this.monitorData?.id === ritual.id,
             switchCooldown: Math.max(this.switchCooldown, 0),
+            cooldownProg: Math.max(0, Math.min(1, (maxCooldown - Math.max(this.switchCooldown, 0)) / maxCooldown)),
         }));
         this.eventHandler.sendData('rituals-data', { available: response });
     }

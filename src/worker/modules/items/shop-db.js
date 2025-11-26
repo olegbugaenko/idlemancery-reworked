@@ -1080,6 +1080,11 @@ export const registerShopItemsStage1 = () => {
         description: 'Unlocks arcane rituals that reshape your training flow.',
         level: 0,
         maxLevel: 1,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_magic_ability',
+            level: 200000,
+        }],
         unlockCondition: () => {
             return gameEffects.getEffectValue('attribute_magic_ability') >= 200000;
         },
@@ -3719,6 +3724,26 @@ export const registerShopItemsStage1 = () => {
             'coins': {
                 A: 1,
                 B: 3.e+12*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_improved_obsidian_processing', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Improved Obsidian Processing',
+        description: 'Unlocks advanced obsidian processing techniques. Enables construction of Reinforced Warehouse and Reinforced Monument, structures that significantly expand your storage capacity.',
+        level: 0,
+        maxLevel: 1,
+        minDemoVersion: 20,
+        unlockedBy: [{ type: 'effect', id: 'attribute_strength', level: 250000 }],
+        unlockCondition: () => true,
+        attributes: { isCollectable: false },
+        resourceModifier: {},
+        get_cost: () => ({
+            'coins': {
+                A: 1,
+                B: 3.e+15*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 0
             }
         }),

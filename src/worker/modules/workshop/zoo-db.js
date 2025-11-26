@@ -21,9 +21,12 @@ export const ZOO_ANIMALS = [
             get_multiplier: () => ({
                 effects: {
                     'air_amplifier_efficiency': {
-                        A: 0.01*gameEffects.getEffectValue('zoo_animals_efficiency'),
+                        A: 100,
                         B: 1,
-                        type: 0,
+                        C: 0.01*gameEffects.getEffectValue('zoo_animals_efficiency'),
+                        type: 5,
+                        diminish: 0.6,
+                        diminishStep: 1000,
                     }
                 }
             }),
@@ -50,9 +53,12 @@ export const ZOO_ANIMALS = [
             get_multiplier: () => ({
                 effects: {
                     'books_learning_rate': {
-                        A: 0.02*gameEffects.getEffectValue('zoo_animals_efficiency'),
+                        A: 100,
                         B: 1,
-                        type: 0,
+                        C: 0.02*gameEffects.getEffectValue('zoo_animals_efficiency'),
+                        type: 5,
+                        diminish: 0.6,
+                        diminishStep: 1000,
                     }
                 }
             }),
@@ -79,9 +85,12 @@ export const ZOO_ANIMALS = [
             get_multiplier: () => ({
                 effects: {
                     'physical_training_learn_speed': {
-                        A: 0.02*gameEffects.getEffectValue('zoo_animals_efficiency'),
+                        A: 100,
                         B: 1,
-                        type: 0,
+                        C: 0.02*gameEffects.getEffectValue('zoo_animals_efficiency'),
+                        type: 5,
+                        diminish: 0.6,
+                        diminishStep: 1000,
                     }
                 }
             }),
@@ -113,9 +122,12 @@ export const ZOO_ANIMALS = [
             get_multiplier: () => ({
                 effects: {
                     'plantations_efficiency': {
-                        A: 0.02*gameEffects.getEffectValue('zoo_animals_efficiency'),
+                        A: 100,
                         B: 1,
-                        type: 0,
+                        C: 0.02*gameEffects.getEffectValue('zoo_animals_efficiency'),
+                        type: 5,
+                        diminish: 0.6,
+                        diminishStep: 1000,
                     }
                 }
             }),
@@ -147,9 +159,12 @@ export const ZOO_ANIMALS = [
             get_multiplier: () => ({
                 effects: {
                     'mental_activities_learn_rate': {
-                        A: 0.01*gameEffects.getEffectValue('zoo_animals_efficiency'),
+                        A: 100,
                         B: 1,
-                        type: 0,
+                        C: 0.02*gameEffects.getEffectValue('zoo_animals_efficiency'),
+                        type: 5,
+                        diminish: 0.6,
+                        diminishStep: 1000,
                     }
                 }
             }),

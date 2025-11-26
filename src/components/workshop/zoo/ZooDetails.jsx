@@ -64,11 +64,10 @@ export const ZooDetails = ({
                         </div>
                     </div>
                     <div className={'block'}>
-                        <p>Population</p>
                         <div className={'zoo-detail-stats'}>
                             <div className={'flex-row flex-container'}>
-                                <span>Capacity usage</span>
-                                <strong>{formatValue(spaceShare * 100)}% {maxCount > 0 ? `(max ${formatValue(maxCount)})` : ''}</strong>
+                                <span>Population</span>
+                                <strong>{formatValue(animal.count)} {maxCount > 0 ? `(/${formatValue(maxCount)})` : ''}</strong>
                             </div>
                         </div>
                         <div className={'block'}>

@@ -38,6 +38,7 @@ export class MageModule extends GameModule {
             multipliers: false,
             resources: false,
         };
+        this.unlocksOpenedSections = {};
 
 
         this.skillGroupsCached = {};
@@ -203,6 +204,16 @@ export class MageModule extends GameModule {
         this.eventHandler.registerHandler('query-total-unlocks', () => {
             const data = unlocksApi.getGeneralUnlocksStats();
             this.eventHandler.sendData('total-unlocks', data);
+        })
+
+        this.eventHandler.registerHandler('query-unlocks-opened-sections', () => {
+            this.eventHandler.sendData('unlocks-opened-sections', this.unlocksOpenedSections || {});
+        })
+
+        this.eventHandler.registerHandler('set-unlocks-opened-sections', (payload) => {
+            if (payload && typeof payload === 'object') {
+                this.unlocksOpenedSections = { ...this.unlocksOpenedSections, ...payload };
+            }
         })
     }
 
@@ -828,6 +839,7 @@ export class MageModule extends GameModule {
             statisticsHiddenMultipliers: this.hiddenMultipliers,
             statisticsHiddenResources: this.hiddenResources,
             statisticsShowHidden: this.statisticsShowHidden,
+            unlocksOpenedSections: this.unlocksOpenedSections,
         }
     }
 
@@ -906,6 +918,7 @@ export class MageModule extends GameModule {
             multipliers: obj?.statisticsShowHidden?.multipliers || false,
             resources: obj?.statisticsShowHidden?.resources || false,
         };
+        this.unlocksOpenedSections = obj?.unlocksOpenedSections || {};
     }
 
     setSkill(skillId, amount, bForce = false) {
