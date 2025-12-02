@@ -4683,7 +4683,7 @@ body::after {
 /* Expeditions Styles */
 .expeditions-wrap {
     display: flex;
-    height: 100%;
+    height: calc(100% - 40px);
     background: var(--darkbg);
 }
 
@@ -5000,4 +5000,13 @@ body::after {
 
 .zoo-feed-controls .effort-control .level-set{
     width: 120px;
+}
+
+.unlock-title .arrow-down {
+    margin-left: 8px;
+    display: inline-block;
+}
+
+.unlock-title .arrow-down.opened {
+    transform: rotate(180deg);
 }

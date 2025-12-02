@@ -610,7 +610,7 @@ export const registerCourseItemsStage1 = () => {
 
     registerCourse('course_crafting_economy', {
         name: 'Crafting Optimization',
-        tags: ['magical', 'reductive'],
+        tags: ['tools', 'reductive'],
         minDemoVersion: 20,
         description: 'Mastering the art of resource management, this course teaches how to minimize material waste and maximize output, making every crafted piece more cost-effective.',
         attributes: {
@@ -650,7 +650,7 @@ export const registerCourseItemsStage1 = () => {
 
     registerCourse('course_alchemy_economy', {
         name: 'Alchemy Optimization',
-        tags: ['magical', 'reductive'],
+        tags: ['tools', 'reductive'],
         minDemoVersion: 20,
         description: 'A deep dive into the refined techniques of potion-making, allowing alchemists to extract the full potential of ingredients while reducing unnecessary expenditure.',
         attributes: {

@@ -244,6 +244,12 @@ export const checkMatchingRule = (rule) => {
     if(rule.compare_type === 'spell_running') {
         return checkMatchingSpellRunningRule(rule);
     }
+    if(rule.compare_type === 'ritual_running') {
+        const ritualRunning = gameCore.getModule('rituals').rituals[rule.ritual_id]?.isRunning;
+        if(rule.condition === 'true') return !!ritualRunning;
+        if(rule.condition === 'false') return !ritualRunning;
+        return false;
+    }
     if(rule.compare_type === 'crafting_list_running') {
         return checkMatchingCraftingListRule(rule);
     }

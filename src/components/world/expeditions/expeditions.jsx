@@ -157,12 +157,8 @@ export const ExpeditionsWrap = ({ children }) => {
 
     const saveChanges = () => {
         if(editData && isChanged) {
-            // Stop current expedition if running
-            if(editData.isRunning) {
-                stopExpedition(editData.id);
-            }
-            // Start new expedition with new level
-            startExpedition(editData.id, editData.level);
+            // Just save the settings (level) without starting the expedition
+            sendData('save-expedition-settings', { id: editData.id, level: editData.level });
             setChanged(false);
         }
     }
@@ -408,39 +404,57 @@ const ExpeditionDetails = ({ expedition, isEditing, isChanged, onChangeLevel, on
                             </div>
                         </div>
                     )}
-                    
-                    <div className="block expedition-actions buttons flex-container">
-                        {expedition.isRunning ? (
-                            <CustomButton 
-                                onClick={() => onStop(expedition.id)}
-                                className="warning-action"
-                            >
-                                Stop Expedition
-                            </CustomButton>
-                        ) : (
-                            <CustomButton 
-                                onClick={() => onStart(expedition.id, expedition.level)}
-                                disabled={!expedition.isUnlocked}
-                                className="primary-action"
-                            >
-                                Start Expedition
-                            </CustomButton>
-                        )}
-                        
-                        {isEditing && isChanged && (
-                            <CustomButton onClick={onSave} className="save-btn">
-                                Save Changes
-                            </CustomButton>
-                        )}
-                        
-                        {isEditing && (
-                            <CustomButton onClick={onCancel} className="cancel-btn">
-                                Cancel
-                            </CustomButton>
-                        )}
-                    </div>
                 </div>
             </PerfectScrollbar>
+            {isEditing ? (
+                <div className="main-buttons buttons flex-container">
+                    {expedition.isRunning ? (
+                        <CustomButton 
+                            onClick={() => onStop(expedition.id)}
+                            className="warning-action"
+                        >
+                            Stop Expedition
+                        </CustomButton>
+                    ) : (
+                        <CustomButton 
+                            onClick={() => onStart(expedition.id, expedition.level)}
+                            disabled={!expedition.isUnlocked}
+                            className="primary-action"
+                        >
+                            Start Expedition
+                        </CustomButton>
+                    )}
+                    
+                    {isChanged && (
+                        <CustomButton onClick={onSave} className="primary-action">
+                            Save Changes
+                        </CustomButton>
+                    )}
+                    
+                    <CustomButton onClick={onCancel} className="warning-action">
+                        Cancel
+                    </CustomButton>
+                </div>
+            ) : (
+                <div className="main-buttons buttons flex-container">
+                    {expedition.isRunning ? (
+                        <CustomButton 
+                            onClick={() => onStop(expedition.id)}
+                            className="warning-action"
+                        >
+                            Stop Expedition
+                        </CustomButton>
+                    ) : (
+                        <CustomButton 
+                            onClick={() => onStart(expedition.id, expedition.level)}
+                            disabled={!expedition.isUnlocked}
+                            className="primary-action"
+                        >
+                            Start Expedition
+                        </CustomButton>
+                    )}
+                </div>
+            )}
         </div>
     );
 };

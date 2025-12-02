@@ -8,6 +8,7 @@ import {ShopModule} from "./modules/items/shop.module";
 import {InventoryModule} from "./modules/inventory/inventory.module";
 import {PropertyModule} from "./modules/property/property.module";
 import {SpellModule} from "./modules/magic/spells.module";
+import {RitualModule} from "./modules/magic/rituals.module";
 import {CraftingModule} from "./modules/workshop/crafting.module";
 import {PlantationsModule} from "./modules/workshop/plantations.module";
 import {ArtifactsCraftingModule} from "./modules/workshop/artifacts-crafting.module";
@@ -42,6 +43,7 @@ export class MainModule extends GameModule {
         gameCore.registerModule('courses', CoursesModule);
         gameCore.registerModule('inventory', InventoryModule);
         gameCore.registerModule('magic', SpellModule);
+        gameCore.registerModule('rituals', RitualModule);
         gameCore.registerModule('crafting', CraftingModule);
         gameCore.registerModule('plantations', PlantationsModule);
         gameCore.registerModule('artifacts-crafting', ArtifactsCraftingModule);
@@ -102,6 +104,7 @@ export class MainModule extends GameModule {
                 'structures': gameEntity.getLevel('shop_item_constructing') > 0,
                 'magic': gameEntity.getLevel('shop_item_spellbook') > 0,
                 'spellbook': gameEntity.getLevel('shop_item_spellbook') > 0,
+                'rituals': gameEntity.getLevel('shop_item_ritualism') > 0,
                 'crafting': gameEntity.getLevel('shop_item_crafting_courses') > 0,
                 'alchemy': gameEntity.getLevel('shop_item_alchemy_courses') > 0,
                 'workshop': gameEntity.getLevel('shop_item_crafting_courses') > 0 || gameEntity.getLevel('shop_item_alchemy_courses') > 0 || (plantationSlots?.income || 0) > 0,

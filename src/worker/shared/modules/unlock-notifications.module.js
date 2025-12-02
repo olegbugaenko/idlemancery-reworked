@@ -182,6 +182,7 @@ export class UnlockNotificationsModule extends GameModule {
         gameCore.getModule('crafting').regenerateNotifications();
         gameCore.getModule('plantations').regenerateNotifications();
         gameCore.getModule('magic').regenerateNotifications();
+        gameCore.getModule('rituals').regenerateNotifications();
         gameCore.getModule('events').regenerateNotifications();
         // Zoo notifications
         const zooModule = gameCore.getModule('zoo');

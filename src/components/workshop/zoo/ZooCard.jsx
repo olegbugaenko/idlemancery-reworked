@@ -38,8 +38,7 @@ export const ZooCard = ({ animal, totalSpace, onHover, onSelect, isMobile, isSel
                         <p className={'title'}>{animal.name}</p>
                     </div>
                     <div className={'zoo-stats-row'}>
-                        <span>Animals: <strong>{formatValue(animal.count)}</strong></span>
-                        <span>Capacity: <strong>{formatValue(spaceShare * 100)}%</strong></span>
+                        <span>Animals: <strong>{formatValue(animal.count)}</strong> / <strong>{formatValue(maxCount)}</strong></span>
                     </div>
             <div className={'zoo-stats-row'}>
                 <span>Feeding:</span>

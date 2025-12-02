@@ -217,6 +217,18 @@ const mapCompareType = {
             return unlocks.spells;
         }
     },
+    'ritual_running': {
+        label: 'Ritual Running',
+        subject: 'ritual_id',
+        availableConditions: [
+            'true',
+            'false',
+        ],
+        isHideValue: true,
+        unlockCondition: (unlocks) => {
+            return unlocks.rituals;
+        }
+    },
     'crafting_list_running': {
         label: 'Crafting List',
         subject: 'crafting_list_id',

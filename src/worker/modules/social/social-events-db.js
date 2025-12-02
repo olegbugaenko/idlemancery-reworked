@@ -485,4 +485,91 @@ export const registerEventsStage1 = () => {
             'inventory_herbal_fibers': { A: 0, B: 35000, type: 0 },
         })
     })
+
+    // Spiritual Awakening Ceremony — boosts knowledge and mental energy caps
+    registerGameSocialEvent('event_academic_expansion_initiative', {
+        name: 'Spiritual Awakening Ceremony',
+        description: 'Host a profound spiritual ceremony that expands consciousness and inner capacity. Through meditation and collective enlightenment, participants unlock deeper mental reserves, permanently increasing knowledge and mental energy storage capacity.',
+        permanentEffect: 'academic_capacity_expansion',
+        temporaryEffect: 'academic_capacity_expansion',
+        category: 'spiritual',
+        tags: ["spiritual"],
+        unlockCondition: () => true,
+        minDemoVersion: 20,
+        unlockedBy: [{ type: 'effect', id: 'attribute_charisma', level: 200000 }],
+        resourceModifier: {
+            get_multiplier: () => ({
+                resources: {
+                    'mental_energy': {
+                        A: 0.75,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }),
+        },
+        permanentResourceModifier: {
+            get_capMult: () => ({
+                resources: {
+                    'knowledge': {
+                        A: 0.05,
+                        B: 1,
+                        type: 0,
+                    },
+                    'mental_energy': {
+                        A: 0.05,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['socio_campaign_efficiency']
+        },
+        get_cost: () => ({
+            'coins': { A: 0, B: 8000000000, type: 0 },
+            'inventory_enchanted_paper': { A: 0, B: 50000, type: 0 },
+            'inventory_green_ink': { A: 0, B: 25000, type: 0 },
+        })
+    })
+
+    // Wisdom Transmission Ritual — boosts knowledge multiplier
+    registerGameSocialEvent('event_wisdom_transmission_ritual', {
+        name: 'Wisdom Transmission Ritual',
+        description: 'Conduct an ancient ritual where accumulated wisdom flows through the collective consciousness. This sacred ceremony enhances the very essence of knowledge generation, permanently increasing knowledge multiplier.',
+        permanentEffect: 'wisdom_transmission_bonus',
+        temporaryEffect: 'wisdom_transmission_bonus',
+        category: 'spiritual',
+        tags: ["spiritual"],
+        unlockCondition: () => true,
+        minDemoVersion: 20,
+        unlockedBy: [{ type: 'effect', id: 'attribute_charisma', level: 250000 }],
+        resourceModifier: {
+            get_multiplier: () => ({
+                resources: {
+                    'knowledge': {
+                        A: 0.75,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }),
+        },
+        permanentResourceModifier: {
+            get_multiplier: () => ({
+                resources: {
+                    'knowledge': {
+                        A: 0.02,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['socio_campaign_efficiency']
+        },
+        get_cost: () => ({
+            'coins': { A: 0, B: 10000000000, type: 0 },
+            'inventory_enchanted_paper': { A: 0, B: 75000, type: 0 },
+            'inventory_green_ink': { A: 0, B: 40000, type: 0 },
+        })
+    })
 } 
