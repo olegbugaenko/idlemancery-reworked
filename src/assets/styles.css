@@ -4683,7 +4683,7 @@ body::after {
 /* Expeditions Styles */
 .expeditions-wrap {
     display: flex;
-    height: 100%;
+    height: calc(100% - 40px);
     background: var(--darkbg);
 }
 

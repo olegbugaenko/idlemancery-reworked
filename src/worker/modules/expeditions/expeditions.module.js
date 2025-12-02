@@ -33,6 +33,10 @@ export class ExpeditionsModule extends GameModule {
         this.eventHandler.registerHandler('query-expedition-details', (payload) => {
             this.sendExpeditionDetails(payload.id, payload.prefix, payload.level)
         })
+
+        this.eventHandler.registerHandler('save-expedition-settings', (payload) => {
+            this.saveExpeditionSettings(payload.id, payload.level);
+        })
     }
 
     initialize() {
@@ -235,19 +239,28 @@ export class ExpeditionsModule extends GameModule {
         for (const expeditionId in this.expeditions) {
             const expedition = this.expeditions[expeditionId];
             if (expedition.isRunning) {
-                const expeditionEntity = gameEntity.getEntity(expeditionId);
-                if (expeditionEntity) {
-                    // Recreate active expedition entity
-                    gameEntity.registerGameEntity(`activeExpedition_${expeditionId}`, {
-                        copyFromId: expeditionId,
-                        isAbstract: false,
-                        level: expedition.level,
-                        tags: ['active_expedition', 'active_effect'],
-                        scope: 'expeditions',
-                        unlockedBy: undefined,
-                    });
-                    
-                    gameEntity.setEntityLevel(`activeExpedition_${expeditionId}`, expedition.level);
+                // Only restore if the expedition is still unlocked
+                if (gameEntity.isEntityUnlocked(expeditionId)) {
+                    const expeditionEntity = gameEntity.getEntity(expeditionId);
+                    if (expeditionEntity) {
+                        // Recreate active expedition entity
+                        gameEntity.registerGameEntity(`activeExpedition_${expeditionId}`, {
+                            copyFromId: expeditionId,
+                            isAbstract: false,
+                            level: expedition.level,
+                            tags: ['active_expedition', 'active_effect'],
+                            scope: 'expeditions',
+                            unlockedBy: undefined,
+                        });
+                        
+                        gameEntity.setEntityLevel(`activeExpedition_${expeditionId}`, expedition.level);
+                    }
+                } else {
+                    // Clean up if expedition is no longer unlocked
+                    expedition.isRunning = false;
+                    if (gameEntity.entityExists(`activeExpedition_${expeditionId}`)) {
+                        gameEntity.unsetEntity(`activeExpedition_${expeditionId}`);
+                    }
                 }
             }
         }
@@ -330,6 +343,38 @@ export class ExpeditionsModule extends GameModule {
 
         // Unregister active expedition entity
         gameEntity.unsetEntity(`activeExpedition_${id}`);
+
+        this.sendExpeditionData();
+    }
+
+    saveExpeditionSettings(id, level) {
+        // Initialize expedition data if not exists
+        if (!this.expeditions[id]) {
+            this.expeditions[id] = {
+                level: 0,
+                xp: 0,
+                maxAchievedLevel: 0,
+                isRunning: false
+            }
+        }
+
+        // Check if level is available
+        const maxLevel = this.getMaxLevel(id);
+        if (level > maxLevel) {
+            console.warn(`Level ${level} not available for expedition ${id}. Max level: ${maxLevel}`);
+            return;
+        }
+
+        // Save the level without starting the expedition
+        this.expeditions[id].level = level;
+
+        // If expedition is running, update the active entity level
+        if (this.expeditions[id].isRunning) {
+            const activeEntity = gameEntity.getEntity(`activeExpedition_${id}`);
+            if (activeEntity) {
+                gameEntity.setEntityLevel(`activeExpedition_${id}`, level);
+            }
+        }
 
         this.sendExpeditionData();
     }

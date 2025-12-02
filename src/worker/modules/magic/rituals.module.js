@@ -81,7 +81,16 @@ export class RitualModule extends GameModule {
         this.switchCooldown = saveObj?.switchCooldown ?? 0;
         for(const id in this.rituals) {
             if(this.rituals[id]?.isRunning) {
-                this.activateRitual(id, true);
+                // Only activate if the ritual is still unlocked
+                if(gameEntity.isEntityUnlocked(id)) {
+                    this.activateRitual(id, true);
+                } else {
+                    // Clean up if ritual is no longer unlocked
+                    this.rituals[id].isRunning = false;
+                    if(gameEntity.entityExists(`active_${id}`)) {
+                        gameEntity.unsetEntity(`active_${id}`);
+                    }
+                }
             }
         }
     }
