@@ -492,7 +492,7 @@ export const registerEventsStage1 = () => {
         description: 'Host a profound spiritual ceremony that expands consciousness and inner capacity. Through meditation and collective enlightenment, participants unlock deeper mental reserves, permanently increasing knowledge and mental energy storage capacity.',
         permanentEffect: 'academic_capacity_expansion',
         temporaryEffect: 'academic_capacity_expansion',
-        category: 'spiritual',
+        category: 'educational',
         tags: ["spiritual"],
         unlockCondition: () => true,
         minDemoVersion: 20,
@@ -547,7 +547,12 @@ export const registerEventsStage1 = () => {
             get_multiplier: () => ({
                 resources: {
                     'knowledge': {
-                        A: 0.75,
+                        A: 0.5,
+                        B: 1,
+                        type: 0,
+                    },
+                    'mental_energy': {
+                        A: 0.5,
                         B: 1,
                         type: 0,
                     }
@@ -558,6 +563,11 @@ export const registerEventsStage1 = () => {
             get_multiplier: () => ({
                 resources: {
                     'knowledge': {
+                        A: 0.02,
+                        B: 1,
+                        type: 0,
+                    },
+                    'mental_energy': {
                         A: 0.02,
                         B: 1,
                         type: 0,

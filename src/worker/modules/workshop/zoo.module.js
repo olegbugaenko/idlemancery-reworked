@@ -140,6 +140,15 @@ export class ZooModule extends GameModule {
     updateAutofeedActivation() {
         const totalSpace = this.getTotalSpace();
         ZOO_ANIMALS.forEach((animal) => {
+            // Only process unlocked animals
+            if (!gameEntity.isEntityUnlocked(animal.entityId)) {
+                // Clear autofeed level for unlocked animals
+                if (this.activeAutofeedLevels[animal.id] !== undefined) {
+                    delete this.activeAutofeedLevels[animal.id];
+                }
+                return;
+            }
+
             const state = this.ensureAnimalState(animal.id);
             const automation = this.normalizeAutofeedState(state?.autofeed);
             if (!automation.isEnabled) {
@@ -225,6 +234,11 @@ export class ZooModule extends GameModule {
         }
 
         ZOO_ANIMALS.forEach((animal) => {
+            // Only process unlocked animals
+            if (!gameEntity.isEntityUnlocked(animal.entityId)) {
+                return;
+            }
+
             const state = this.ensureAnimalState(animal.id);
             const feedLevel = this.activeAutofeedLevels[animal.id] ?? this.getEffectiveFeedLevel(animal, state, totalSpace);
             const feedEfficiency = this.getFeedEfficiency(animal);
@@ -258,6 +272,18 @@ export class ZooModule extends GameModule {
     }
 
     syncAnimalLevels(animal, state) {
+        // Only sync levels for unlocked animals
+        if (!gameEntity.isEntityUnlocked(animal.entityId)) {
+            // Reset to 0 if not unlocked
+            if (gameEntity.entityExists(animal.entityId)) {
+                gameEntity.setEntityLevel(animal.entityId, 0, true);
+            }
+            if (animal.feedEntityId && gameEntity.entityExists(animal.feedEntityId)) {
+                gameEntity.setEntityLevel(animal.feedEntityId, 0, true);
+            }
+            return;
+        }
+
         const value = state?.count || 0;
         gameEntity.setEntityLevel(animal.entityId, value, true);
         if (animal.feedEntityId) {
@@ -401,6 +427,18 @@ export class ZooModule extends GameModule {
         const totalSpace = spaceOverride ?? this.getTotalSpace();
         let hasChanges = false;
         ZOO_ANIMALS.forEach((animal) => {
+            // Only apply limits to unlocked animals
+            if (!gameEntity.isEntityUnlocked(animal.entityId)) {
+                // Reset count to 0 for unlocked animals
+                const state = this.animalsState[animal.id];
+                if (state && state.count > SMALL_NUMBER) {
+                    state.count = 0;
+                    this.syncAnimalLevels(animal, state);
+                    hasChanges = true;
+                }
+                return;
+            }
+
             const state = this.animalsState[animal.id];
             const maxCount = this.getAnimalMaxCount(animal, totalSpace);
             const clamped = Math.max(0, Math.min(state.count, maxCount));
@@ -435,7 +473,9 @@ export class ZooModule extends GameModule {
 
     getZooData() {
         const totalSpace = this.getTotalSpace();
-        const animals = ZOO_ANIMALS.map((animal) => this.buildAnimalSummary(animal, totalSpace));
+        const animals = ZOO_ANIMALS
+            .filter((animal) => gameEntity.isEntityUnlocked(animal.entityId))
+            .map((animal) => this.buildAnimalSummary(animal, totalSpace));
 
         return {
             unlocked: this.isUnlocked(),

@@ -13,7 +13,7 @@ export const ZOO_ANIMALS = [
             isCollectable: false,
             requiredSpace: 0.5,
             breedFeedRequirement: {
-                inventory_focusberry: 1_000_000,
+                inventory_focusberry: 600_000,
             },
             breedingEffectId: 'birds_breeding_efficiency',
         },
@@ -55,7 +55,7 @@ export const ZOO_ANIMALS = [
                     'books_learning_rate': {
                         A: 100,
                         B: 1,
-                        C: 0.02*gameEffects.getEffectValue('zoo_animals_efficiency'),
+                        C: 0.05*gameEffects.getEffectValue('zoo_animals_efficiency'),
                         type: 5,
                         diminish: 0.6,
                         diminishStep: 1000,
@@ -87,7 +87,7 @@ export const ZOO_ANIMALS = [
                     'physical_training_learn_speed': {
                         A: 100,
                         B: 1,
-                        C: 0.02*gameEffects.getEffectValue('zoo_animals_efficiency'),
+                        C: 0.05*gameEffects.getEffectValue('zoo_animals_efficiency'),
                         type: 5,
                         diminish: 0.6,
                         diminishStep: 1000,
@@ -146,7 +146,7 @@ export const ZOO_ANIMALS = [
             isCollectable: false,
             requiredSpace: 0.5,
             breedFeedRequirement: {
-                inventory_golden_algae: 800_000,
+                inventory_golden_algae: 600_000,
             },
             breedingEffectId: 'birds_breeding_efficiency',
         },

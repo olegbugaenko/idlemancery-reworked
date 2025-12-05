@@ -1595,6 +1595,22 @@ h4 {
     justify-content: center;
 }
 
+.autoconsume-setting .rules .rule-row-wrap .col.index-rule {
+    width: 28px;
+    flex-grow: 0;
+    height: 28px;
+    position: absolute;
+    background: #112;
+    left: -4px;
+    top: -8px;
+    border-radius: 50%;
+    border: 1px solid #777777;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+}
+
 .rules-header.flex-container {
     align-items: center;
     margin-top: 8px;
@@ -3144,7 +3160,10 @@ span.highlighted-span.yellow {
 
 .expedition-label {
     font-size: 14px;
-    color: #cccccc;
+}
+
+.expedition-head-inner {
+    padding: 8px;
 }
 
 .expedition-value {

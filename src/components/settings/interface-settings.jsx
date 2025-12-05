@@ -262,6 +262,21 @@ export const InterfaceSettings = () => {
                             </select>
                         </div>
                     </div>
+                    <div className={"row flex-container"}>
+                        <div className={'col'}>
+                            <label>
+                                <input 
+                                    type={'checkbox'} 
+                                    checked={settings?.showBreakdownsAlwaysExpanded ?? false} 
+                                    onChange={(e) => setSettingChanged('showBreakdownsAlwaysExpanded', e.target.checked)}
+                                />
+                                Show breakdowns always expanded
+                            </label>
+                        </div>
+                        <div className={'col'}>
+                            <p className={'hint'}>If checked, breakdown details will always be visible without pressing Ctrl</p>
+                        </div>
+                    </div>
                     {/*<div className={"row flex-container"}>
                         <div className={"col"}>
                             <label>

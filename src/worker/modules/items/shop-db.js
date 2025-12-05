@@ -72,6 +72,41 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+    // Unlocks magic library bonus to spiritual learning
+    gameEntity.registerGameEntity('shop_item_magical_knowledge_exchange', {
+        tags: ["shop", "upgrade", "purchaseable", "magical", "education"],
+        name: 'Magical Knowledge Exchange',
+        description: 'Establish a network for exchanging magical knowledge through your Magic Libraries. Each library level now contributes to spiritual learning rate.',
+        level: 0,
+        maxLevel: 1,
+        minDemoVersion: 20,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_charisma',
+            level: 150000,
+        }],
+        unlockCondition: () => gameEntity.getLevel('shop_item_arcane_sanctum') > 0,
+        attributes: { isCollectable: false },
+        resourceModifier: {
+            income: {
+                effects: {
+                    'magic_library_magic_discount': {
+                        A: 0.1,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 1,
+                B: 5.0e+14*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        }),
+    })
+
     gameEntity.registerGameEntity('shop_item_notebook', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Notebook',
@@ -3749,6 +3784,26 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+    gameEntity.registerGameEntity('shop_item_magic_weaving', {
+        tags: ["shop", "upgrade", "purchaseable", "magical", "crafting"],
+        name: 'Magic Weaving',
+        description: 'Master the ancient art of weaving magic into fabric. Unlocks Flax cultivation, Magical Fabric crafting, and enables creation of powerful magical garments and accessories.',
+        level: 0,
+        maxLevel: 1,
+        minDemoVersion: 20,
+        unlockedBy: [{ type: 'effect', id: 'attribute_patience', level: 250000 }],
+        unlockCondition: () => true,
+        attributes: { isCollectable: false },
+        resourceModifier: {},
+        get_cost: () => ({
+            'coins': {
+                A: 1,
+                B: 3.e+15*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        }),
+    })
+
     gameEntity.registerGameEntity('shop_item_forge_technology', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Forge Technology',
@@ -3852,8 +3907,8 @@ export const registerShopItemsStage1 = () => {
         attributes: { isCollectable: false },
         resourceModifier: {},
         get_cost: () => ({
-            'coins': { A: 1, B: 1.e+14*charismaMod(gameEffects.getEffectValue('attribute_charisma')), type: 0 },
-            'inventory_enchanted_paper': { A: 1.5, B: 1.e+8, type: 1 },
+            'coins': { A: 1, B: 7.e+13*charismaMod(gameEffects.getEffectValue('attribute_charisma')), type: 0 },
+            'inventory_enchanted_paper': { A: 1.5, B: 1.e+7, type: 1 },
         }),
     })
 
@@ -3868,8 +3923,8 @@ export const registerShopItemsStage1 = () => {
         attributes: { isCollectable: false },
         resourceModifier: {},
         get_cost: () => ({
-            'coins': { A: 1, B: 1.e+14*charismaMod(gameEffects.getEffectValue('attribute_charisma')), type: 0 },
-            'inventory_enchanted_paper': { A: 1.5, B: 1.e+8, type: 1 },
+            'coins': { A: 1, B: 7.e+13*charismaMod(gameEffects.getEffectValue('attribute_charisma')), type: 0 },
+            'inventory_enchanted_paper': { A: 1.5, B: 1.e+7, type: 1 },
         }),
     })
 
@@ -3884,8 +3939,8 @@ export const registerShopItemsStage1 = () => {
         attributes: { isCollectable: false },
         resourceModifier: {},
         get_cost: () => ({
-            'coins': { A: 1, B: 1.e+14*charismaMod(gameEffects.getEffectValue('attribute_charisma')), type: 0 },
-            'inventory_enchanted_paper': { A: 1.5, B: 1.e+8, type: 1 },
+            'coins': { A: 1, B: 7.e+13*charismaMod(gameEffects.getEffectValue('attribute_charisma')), type: 0 },
+            'inventory_enchanted_paper': { A: 1.5, B: 1.e+7, type: 1 },
         }),
     })
 

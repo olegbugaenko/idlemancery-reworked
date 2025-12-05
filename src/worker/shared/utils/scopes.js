@@ -36,5 +36,11 @@ export const getScope = (entity) => {
     if(entity.tags.includes('expedition-location')) {
         return 'Expedition Location';
     }
+    if(entity.tags.includes('zoo_animal')) {
+        return 'Zoo Animal';
+    }
+    if(entity.tags.includes('machinery')) {
+        return 'Machinery';
+    }
     return ''
 }

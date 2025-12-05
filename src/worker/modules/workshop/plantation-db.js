@@ -177,4 +177,9 @@ export function registerPlantations () {
         name: 'Grow Mystic Bloom',
         description: 'Grow Mystic Bloom'
     })
+
+    registerPlant('flax_plantation', 'inventory_flax', 0.00005, 1000, {
+        name: 'Grow Flax',
+        description: 'Cultivate flax plants for textile production and magical weaving'
+    })
 }

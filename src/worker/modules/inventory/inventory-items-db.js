@@ -578,6 +578,50 @@ export const registerInventoryItems = () => {
         allowedTileTypes: ['mountain', 'savanna']
     })
 
+    registerInventoryItem('inventory_flax', {
+        name: 'Flax',
+        hasCap: false,
+        tags: ['inventory', 'material', 'plantable', 'textile'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        getUsageCooldown: () => {
+            return 0;
+        },
+        attributes: {
+            duration: 0,
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_magic_weaving') > 0
+        },
+        sellPrice: 1.e+5,
+        get_cost: (amount = 1) => ({
+            coins: amount*5.e+5*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+        }),
+    })
+
+    registerInventoryItem('inventory_magical_fabric', {
+        name: 'Magical Fabric',
+        hasCap: false,
+        tags: ['inventory', 'material', 'craftable', 'magical', 'textile'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+
+        },
+        getUsageCooldown: () => {
+            return 0;
+        },
+        attributes: {
+            duration: 0,
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_magic_weaving') > 0
+        },
+        sellPrice: 1.e+6,
+    })
 
     registerInventoryItem('inventory_mystic_bloom', {
         name: 'Mystic Bloom',

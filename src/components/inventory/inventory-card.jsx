@@ -9,7 +9,7 @@ import {NewNotificationWrap} from "../shared/new-notification-wrap.jsx";
 const itemKeysToCompare = ['id', 'eta', 'cooldownProg', 'isConsumed', 'isChanged', 'isSelected', 'cooldownProg'];
 const itemKeysToCompareDelta = ['amount', 'balance']
 
-export const InventoryCard = React.memo(({ isChanged, eta, usages, usagesFor, allowMultiConsume, isConsumable, isRare, isRareIngredient, isSelected, id, name, amount, balance, breakDown, isConsumed, cooldownProg, cooldown, onFlash, onPurchase, onShowDetails, onEditConfig, isMobile, isCtrlPressed }) => {
+export const InventoryCard = React.memo(({ isChanged, eta, usages, usagesFor, allowMultiConsume, isConsumable, isRare, isRareIngredient, isSelected, id, name, amount, balance, breakDown, isConsumed, cooldownProg, cooldown, onFlash, onPurchase, onShowDetails, onEditConfig, isMobile, isCtrlPressed, showBreakdownsAlwaysExpanded = false }) => {
     const elementRef = useRef(null);
 
     useFlashOnLevelUp(isConsumed, onFlash, elementRef);
@@ -66,23 +66,23 @@ export const InventoryCard = React.memo(({ isChanged, eta, usages, usagesFor, al
     >
         <TippyWrapper content={<div className={'hint-popup'}>
             <p>{name}({formatInt(amount)})</p>
-            {!isCtrlPressed && (usages?.length || usagesFor?.length || breakDown) ? (
+            {!showBreakdownsAlwaysExpanded && !isCtrlPressed && (usages?.length || usagesFor?.length || breakDown) ? (
                 <p className={'hint ctrl-hint'}>Hit Ctrl to see more details</p>
             ) : null}
-            {isCtrlPressed && usages?.length ? (<div className={'block'}>
+            {(showBreakdownsAlwaysExpanded || isCtrlPressed) && usages?.length ? (<div className={'block'}>
                 <p>Used By:</p>
                 <div className={'sub-items'}>
                     {usages.map((one, index) => (<p key={one.id ?? one.name ?? index} className={'padded-left'}>{one.name}</p>))}
                 </div>
             </div> ) : null}
-            {isCtrlPressed && usagesFor?.length ? (<div className={'block'}>
+            {(showBreakdownsAlwaysExpanded || isCtrlPressed) && usagesFor?.length ? (<div className={'block'}>
                 <p>Used For:</p>
                 <div className={'sub-items'}>
                     {usagesFor.map((one, index) => (<p key={one.id ?? one.name ?? index} className={'padded-left'}>{one.name}</p>))}
                 </div>
             </div> ) : null}
             {breakDown ? (<>
-                {isCtrlPressed ? (<BreakDown breakDown={breakDown}/>) : null}
+                {(showBreakdownsAlwaysExpanded || isCtrlPressed) ? (<BreakDown breakDown={breakDown}/>) : null}
                 {renderBreakdownSummary()}
             </>) : null}
             <div className={'block'}>
@@ -135,6 +135,9 @@ export const InventoryCard = React.memo(({ isChanged, eta, usages, usagesFor, al
     if(prevProps.isCtrlPressed !== currProps.isCtrlPressed) {
         return false;
     }
+    if(prevProps.showBreakdownsAlwaysExpanded !== currProps.showBreakdownsAlwaysExpanded) {
+        return false;
+    }
     return true;
 }));
 
@@ -149,6 +152,7 @@ const InventoryItemComponent = ({
     onShowDetails,
     onEditConfig,
     isCtrlPressed,
+    showBreakdownsAlwaysExpanded,
 }) => {
     return (
         <NewNotificationWrap
@@ -166,6 +170,7 @@ const InventoryItemComponent = ({
                 onEditConfig={onEditConfig}
                 isMobile={isMobile}
                 isCtrlPressed={isCtrlPressed}
+                showBreakdownsAlwaysExpanded={showBreakdownsAlwaysExpanded}
             />
         </NewNotificationWrap>
     );
@@ -194,7 +199,8 @@ const areInventoryItemPropsEqual = (prev, next) => {
         prev.onPurchase === next.onPurchase &&
         prev.onShowDetails === next.onShowDetails &&
         prev.onEditConfig === next.onEditConfig &&
-        prev.isCtrlPressed === next.isCtrlPressed
+        prev.isCtrlPressed === next.isCtrlPressed &&
+        prev.showBreakdownsAlwaysExpanded === next.showBreakdownsAlwaysExpanded
     );
 };
 

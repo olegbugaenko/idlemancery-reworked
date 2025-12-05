@@ -172,7 +172,7 @@ export const ExpeditionsWrap = ({ children }) => {
             <div className="expeditions-inner-wrap">
 
                 <div className="head">
-                    <div className="flex-container">
+                    <div className="flex-container expedition-head-inner">
                         {expeditionEffortData && (
                             <TippyWrapper content={<div className={'hint-popup'}>
                                 <p className={'hint'}>Shows the amount of available effort you can use for expeditions.</p>

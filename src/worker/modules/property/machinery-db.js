@@ -292,7 +292,7 @@ export const registerMachineryStage1 = () => {
             get_consumption: () => ({
                 resources: {
                     'living_space': { A: 4, B: 0, type: 0 },
-                    'inventory_coal': { A: 5.0/getCoalDiscount(), B: 0.0, C: 1.02, type: 3 },
+                    'inventory_coal': { A: 15.0/getCoalDiscount(), B: 0.0, C: 1.02, type: 3 },
                 }
             }),
             getCustomAmplifier: () => gameEntity.getAttribute('machine_automated_greenhouse', 'manualLoad') ?? 0,
@@ -339,8 +339,8 @@ export const registerMachineryStage1 = () => {
             get_consumption: () => ({
                 resources: {
                     'living_space': { A: 4, B: 0, type: 0 },
-                    'inventory_coal': { A: 3.0/getCoalDiscount(), B: 0.0, C: 1.02, type: 3 },
-                    'inventory_water': { A: 500.0, B: 0.0, C: 1.02, type: 3 },
+                    'inventory_coal': { A: 600.0/getCoalDiscount(), B: 0.0, C: 1.02, type: 3 },
+                    'inventory_water': { A: 2500.0, B: 0.0, C: 1.02, type: 3 },
                 }
             }),
             getCustomAmplifier: () => gameEntity.getAttribute('machine_incubator', 'manualLoad') ?? 0,
@@ -389,8 +389,8 @@ export const registerMachineryStage1 = () => {
             get_consumption: () => ({
                 resources: {
                     'living_space': { A: 4, B: 0, type: 0 },
-                    'inventory_coal': { A: 3.0/getCoalDiscount(), B: 0.0, C: 1.02, type: 3 },
-                    'inventory_water': { A: 500.0, B: 0.0, C: 1.02, type: 3 },
+                    'inventory_coal': { A: 600.0/getCoalDiscount(), B: 0.0, C: 1.02, type: 3 },
+                    'inventory_water': { A: 2500.0, B: 0.0, C: 1.02, type: 3 },
                 }
             }),
             getCustomAmplifier: () => gameEntity.getAttribute('machine_breeding_facility', 'manualLoad') ?? 0,

@@ -684,7 +684,7 @@ export const registerAccessoriesStage1 = () => {
 
 
     registerAccessory('accessory_sages_notes', {
-        tags: ["accessory", "upgrade", "purchaseable", "resource", "paper", "scroll"],
+        tags: ["accessory", "upgrade", "purchaseable", "resource", "paper", "scroll", "notes"],
         name: 'Sage\'s Notes',
         description: 'Increase your knowledge generation',
         level: 0,
@@ -725,7 +725,7 @@ export const registerAccessoriesStage1 = () => {
     })
 
     registerAccessory('accessory_mages_notes', {
-        tags: ["accessory", "upgrade", "purchaseable", "resource", "magic", "paper", "scroll"],
+        tags: ["accessory", "upgrade", "purchaseable", "resource", "magic", "paper", "scroll", "notes"],
         name: 'Mage\'s Notes',
         description: 'Increase your mana generation',
         level: 0,
@@ -807,7 +807,7 @@ export const registerAccessoriesStage1 = () => {
 
 
     registerAccessory('accessory_scribes_notes', {
-        tags: ["accessory", "upgrade", "purchaseable", "effect", "courses", "paper", "scroll"],
+        tags: ["accessory", "upgrade", "purchaseable", "effect", "courses", "paper", "scroll", "notes"],
         name: 'Scribe\'s Notes',
         description: 'Detailed notes that enhance course efficiency, reducing XP requirements for mastering actions.',
         level: 0,
@@ -1370,7 +1370,7 @@ export const registerAccessoriesStage1 = () => {
     })
 
     registerAccessory('accessory_titans_hammer', {
-        tags: ["accessory", "upgrade", "purchaseable", "resource", "maps", "paper", "device"],
+        tags: ["accessory", "upgrade", "purchaseable", "resource", "device"],
         name: 'Titans Hammer',
         description: 'A copper-bound forge hammer that turns raw might into precise output.',
         level: 0,
@@ -1410,7 +1410,7 @@ export const registerAccessoriesStage1 = () => {
         get_cost: () => ({
             'inventory_copper_ore': {
                 A: 1.1,
-                B: 1.e+7/getAccessoryDiscount(),
+                B: 2.e+7/getAccessoryDiscount(),
                 type: 1
             },
             'inventory_forged_steel': {
@@ -1427,7 +1427,7 @@ export const registerAccessoriesStage1 = () => {
     })
     
     registerAccessory('accessory_titans_drill', {
-        tags: ["accessory", "upgrade", "purchaseable", "resource", "maps", "paper", "device"],
+        tags: ["accessory", "upgrade", "purchaseable", "resource", "device"],
         name: 'Titans Drill',
         description: 'A titan-grade auger that bites deeper into every vein.',
         level: 0,
@@ -1467,6 +1467,127 @@ export const registerAccessoriesStage1 = () => {
             'inventory_refined_wood': {
                 A: 1.1,
                 B: 2.5e+8/getAccessoryDiscount(),
+                type: 1
+            },
+        }),
+    })
+
+    registerAccessory('accessory_obsidian_copper_bracelet', {
+        tags: ["accessory", "upgrade", "purchaseable", "storage", "jewelry", "mineral", "metal"],
+        name: 'Obsidian-Copper Bracelet',
+        description: 'A sturdy bracelet forged from obsidian shards and copper wire. The combination of these materials creates a powerful resonance that expands your energy reserves, significantly increasing maximum energy capacity.',
+        level: 0,
+        minDemoVersion: 20,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 175000,
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_crafting_courses') > 0
+                && gameResources.isResourceUnlocked('inventory_obsidian_shard')
+                && gameResources.isResourceUnlocked('inventory_copper_wire');
+        },
+        resourceModifier: {
+            get_capMult: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.10,
+                        B: 1,
+                        C: 1.02,
+                        type: 3,
+                    }
+                }
+            })
+        },
+        get_cost: () => ({
+            'inventory_obsidian_shard': {
+                A: 1.1,
+                B: 50000000/getAccessoryDiscount(),
+                type: 1
+            },
+            'inventory_copper_wire': {
+                A: 1.1,
+                B: 100000/getAccessoryDiscount(),
+                type: 1
+            },
+        }),
+    })
+
+    registerAccessory('accessory_mages_robes', {
+        tags: ["accessory", "upgrade", "purchaseable", "storage", "magical", "fabric", "clothing"],
+        name: "Mage's Robes",
+        description: 'Elegant robes woven from magical fabric and infused with focusberry essence. These enchanted garments significantly expand your mana reserves, allowing for more powerful spellcasting.',
+        level: 0,
+        minDemoVersion: 20,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_magic_weaving') > 0
+                && gameResources.isResourceUnlocked('inventory_magical_fabric')
+                && gameResources.isResourceUnlocked('inventory_focusberry');
+        },
+        resourceModifier: {
+            get_capMult: () => ({
+                resources: {
+                    'mana': {
+                        A: 0.12,
+                        B: 1,
+                        C: 1.02,
+                        type: 3,
+                    }
+                }
+            })
+        },
+        get_cost: () => ({
+            'inventory_magical_fabric': {
+                A: 1.1,
+                B: 50000/getAccessoryDiscount(),
+                type: 1
+            },
+            'inventory_focusberry': {
+                A: 1.1,
+                B: 100000000/getAccessoryDiscount(),
+                type: 1
+            },
+            'energy': {
+                A: 1.1,
+                B: 50000000/getAccessoryDiscount(),
+                type: 1
+            },
+        }),
+    })
+
+    registerAccessory('accessory_wisdom_circlet', {
+        tags: ["accessory", "upgrade", "purchaseable", "magical", "fabric", "clothing"],
+        name: 'Wisdom Circlet',
+        description: 'An ornate circlet crafted from copper wire and magical fabric. This mystical headpiece enhances the power of all tome-based accessories, amplifying their magical properties.',
+        level: 0,
+        minDemoVersion: 20,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_magic_weaving') > 0
+                && gameResources.isResourceUnlocked('inventory_magical_fabric')
+                && gameResources.isResourceUnlocked('inventory_copper_wire');
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'tome_accessories_efficiency': {
+                        A: 0.08,
+                        B: 1,
+                        C: 1.02,
+                        type: 3,
+                    }
+                }
+            })
+        },
+        get_cost: () => ({
+            'inventory_magical_fabric': {
+                A: 1.1,
+                B: 75000/getAccessoryDiscount(),
+                type: 1
+            },
+            'inventory_copper_wire': {
+                A: 1.1,
+                B: 15000000/getAccessoryDiscount(),
                 type: 1
             },
         }),

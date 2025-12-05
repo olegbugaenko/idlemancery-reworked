@@ -74,6 +74,7 @@ export const ResourcesBar = () => {
 
     const resourceData = useSidebarData(state => state.resources);
     const isCtrlPressed = useCtrlPressed();
+    const [showBreakdownsAlwaysExpanded, setShowBreakdownsAlwaysExpanded] = useState(false);
 
     const sendDataRef = useRef(sendData);
 
@@ -90,8 +91,14 @@ export const ResourcesBar = () => {
             updateSidebarState({ resources });
         };
 
+        const handleSettings = (settings) => {
+            setShowBreakdownsAlwaysExpanded(settings?.showBreakdownsAlwaysExpanded ?? false);
+        };
+
         onMessage('resources-data', handleResources);
+        onMessage('settings', handleSettings);
         sendData('query-resources-data', { includePinned: true });
+        sendData('query-settings', {});
         const interval = setInterval(() => {
             sendData('query-resources-data', { includePinned: true });
         }, 200);
@@ -99,6 +106,7 @@ export const ResourcesBar = () => {
         return () => {
             clearInterval(interval);
             removeMessage('resources-data');
+            removeMessage('settings');
         };
     }, [worker, onMessage, sendData, removeMessage]);
 
@@ -137,7 +145,7 @@ export const ResourcesBar = () => {
     }, [consumeResource]);
 
     return (<div className={'resources'} id={'tutorial-resources'}>
-        {resourceData.map(res => (
+            {resourceData.map(res => (
             <ResourceRow
                 key={res.id}
                 resource={res}
@@ -145,12 +153,13 @@ export const ResourcesBar = () => {
                 onMouseLeave={handleMouseLeave}
                 onContextMenu={handleResourceContextMenu}
                 isCtrlPressed={isCtrlPressed}
+                showBreakdownsAlwaysExpanded={showBreakdownsAlwaysExpanded}
             />
         ))}
     </div> )
 }
 
-const ResourceRowComponent = ({ resource, onMouseEnter, onMouseLeave, onContextMenu, showCapProgress = true, onToggleHidden, isCtrlPressed = false }) => {
+const ResourceRowComponent = ({ resource, onMouseEnter, onMouseLeave, onContextMenu, showCapProgress = true, onToggleHidden, isCtrlPressed = false, showBreakdownsAlwaysExpanded = false }) => {
 
     const aff = resource.monitor;
 
@@ -224,6 +233,18 @@ const ResourceRowComponent = ({ resource, onMouseEnter, onMouseLeave, onContextM
         </div>);
     };
 
+    const renderStorageBreakdownSummary = () => {
+        const defaultCap = resource.defaultCap || 0;
+        const rawCap = resource.rawCap || 0;
+        const capMult = resource.capMult || 1;
+        const totalCap = resource.cap || 0;
+        return (<div className={'block'}>
+            <p>Raw Cap: {formatValue(rawCap)}</p>
+            <p>Cap Multiplier: {formatValue(capMult)}</p>
+            <p>Total Cap: {formatValue(totalCap)}</p>
+        </div>);
+    };
+
     const handleToggleHiddenClick = (event) => {
         if(!onToggleHidden) {
             return;
@@ -262,14 +283,19 @@ const ResourceRowComponent = ({ resource, onMouseEnter, onMouseLeave, onContextM
                 </div>
             )}
             {resource.hasCap || resource.balance < 0 ? (
-                <TippyWrapper content={<div className={'hint-popup'}><BreakDown category={'cap'} breakDown={resource.storageBreakdown}/>{resource.eta >= 0 ? `${secondsToString(resource.eta)} to full` : `${secondsToString(-resource.eta)} to empty`}</div> }>
+                <TippyWrapper content={<div className={'hint-popup'}>
+                    {!showBreakdownsAlwaysExpanded && !isCtrlPressed ? (<p className={'hint ctrl-hint'}>Hit Ctrl to see more details</p>) : null}
+                    {(showBreakdownsAlwaysExpanded || isCtrlPressed) ? (<BreakDown category={'cap'} breakDown={resource.storageBreakdown}/>) : null}
+                    {renderStorageBreakdownSummary()}
+                    {resource.eta >= 0 ? `${secondsToString(resource.eta)} to full` : `${secondsToString(-resource.eta)} to empty`}
+                </div> }>
                     {resourceAmount}
                 </TippyWrapper>
             ) : resourceAmount}
             {isBreakdownHasData(resource.breakDown) ? (
                 <TippyWrapper content={<div className={'hint-popup'}>
-                    {!isCtrlPressed ? (<p className={'hint ctrl-hint'}>Hit Ctrl to see more details</p>) : null}
-                    {isCtrlPressed ? (<BreakDown breakDown={resource.breakDown}/>) : null}
+                    {!showBreakdownsAlwaysExpanded && !isCtrlPressed ? (<p className={'hint ctrl-hint'}>Hit Ctrl to see more details</p>) : null}
+                    {(showBreakdownsAlwaysExpanded || isCtrlPressed) ? (<BreakDown breakDown={resource.breakDown}/>) : null}
                     {renderBreakdownSummary()}
                 </div> }>
                     {resourceBalance}
@@ -298,6 +324,10 @@ export const ResourceRow = React.memo(ResourceRowComponent, (prevProps, nextProp
     }
 
     if(prevProps.isCtrlPressed !== nextProps.isCtrlPressed) {
+        return false;
+    }
+
+    if(prevProps.showBreakdownsAlwaysExpanded !== nextProps.showBreakdownsAlwaysExpanded) {
         return false;
     }
 

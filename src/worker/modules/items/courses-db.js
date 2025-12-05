@@ -221,7 +221,7 @@ export const registerCourseItemsStage1 = () => {
             resources: {
                 'knowledge': {
                     A: 1.1,
-                    B: 6000/gameEffects.getEffectValue('courses_knowledge_discount'),
+                    B: 6000000/gameEffects.getEffectValue('courses_knowledge_discount'),
                     type: 1,
                 }
             }
@@ -254,7 +254,7 @@ export const registerCourseItemsStage1 = () => {
             resources: {
                 'knowledge': {
                     A: 1.1,
-                    B: 6000/gameEffects.getEffectValue('courses_knowledge_discount'),
+                    B: 6000000/gameEffects.getEffectValue('courses_knowledge_discount'),
                     type: 1,
                 }
             }

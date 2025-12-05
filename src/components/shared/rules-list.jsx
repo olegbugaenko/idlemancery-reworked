@@ -485,6 +485,11 @@ const RulesList = React.memo(
 
                     return (
                         <div className={`rule-row-wrap ${isEditing ? 'editing' : ''}`}>
+                            <div className="col index-rule">
+                                  <span className="index-rule-value">
+                                    {index + 1}
+                                  </span>
+                                </div>
                             {isEditing && (
                                 <div className="col delete-rule">
                                   <span className="close" onClick={() => deleteRule(index)}>

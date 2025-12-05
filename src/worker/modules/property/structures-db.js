@@ -1082,15 +1082,20 @@ export const registerStructuresStage1 = () => {
             return gameEntity.getLevel('shop_item_arcane_sanctum') > 0;
         },
         resourceModifier: {
-            multiplier: {
+            get_multiplier: () => ({
                 effects: {
                     'artifact_scroll_efficiency': {
                         A: 0.08,
                         B: 1,
                         type: 0,
+                    },
+                    'spiritual_learning_rate': {
+                        A: gameEffects.getEffectValue('magic_library_magic_discount'),
+                        B: 1,
+                        type: 0,
                     }
                 }
-            },
+            }),
             consumption: {
                 resources: {
                     'living_space': {
@@ -1100,7 +1105,7 @@ export const registerStructuresStage1 = () => {
                     }
                 }
             },
-            effectDeps: ['artifact_scroll_efficiency']
+            effectDeps: ['artifact_scroll_efficiency', 'magic_library_magic_discount']
         },
         get_cost: () => ({
             'coins': {

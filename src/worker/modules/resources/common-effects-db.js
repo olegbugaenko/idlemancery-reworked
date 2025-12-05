@@ -744,6 +744,15 @@ export const registerCommomEffects = () => {
         hasCap: false,
     })
 
+    gameEffects.registerEffect('magic_library_magic_discount', {
+        name: 'Magic Library Spiritual Learning Bonus',
+        tags: ['multiplier'],
+        description: 'Increases spiritual learning rate from magic libraries',
+        defaultValue: 0.,
+        minValue: 0,
+        hasCap: false,
+    })
+
     gameEffects.registerEffect('library_knowledge_cap_bonus', {
         name: 'Library Knowledge Cap Bonus',
         tags: ['multiplier'],

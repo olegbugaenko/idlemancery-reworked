@@ -1480,4 +1480,51 @@ export const registerCraftingRecipes = () => {
         },
     })
 
+    registerCraftingRecipe('craft_magical_fabric', {
+        tags: ["recipe", "crafting", "material", "magical", "textile"],
+        name: 'Weave Magical Fabric',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Weave flax with nightshade essence and mana to create magical fabric',
+        level: 1,
+        resourceId: 'inventory_magical_fabric',
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'inventory_magical_fabric': {
+                        A: 1.3,
+                        B: 0.000015*gameEffects.getEffectValue('crafting_efficiency')*gameEffects.getEffectValue('crafting_effort'),
+                        type: 1,
+                    }
+                }
+            }),
+            get_consumption: ()=>({
+                resources: {
+                    'inventory_flax': {
+                        A: 1.5,
+                        B: 20*gameEffects.getEffectValue('crafting_effort')/gameEffects.getEffectValue('crafting_materials_discount'),
+                        type: 1
+                    },
+                    'inventory_nightshade': {
+                        A: 1.5,
+                        B: 500*gameEffects.getEffectValue('crafting_effort')/gameEffects.getEffectValue('crafting_materials_discount'),
+                        type: 1
+                    },
+                    'mana': {
+                        A: 1.5,
+                        B: 50*gameEffects.getEffectValue('crafting_effort')/gameEffects.getEffectValue('crafting_materials_discount'),
+                        type: 1,
+                    }
+                }
+            }),
+            effectDeps: ['crafting_efficiency', 'crafting_materials_discount', 'crafting_effort']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_magic_weaving') > 0
+        },
+        attributes: {
+            baseXPCost: 10,
+        },
+    })
+
 }

@@ -200,6 +200,7 @@ export const Inventory = ({}) => {
     const isCtrlPressed = useCtrlPressed();
     const [isDetailVisible, setDetailVisible] = useState(!isMobile);
     const { unlockNextById, currentTourId } = useTutorial();
+    const [showBreakdownsAlwaysExpanded, setShowBreakdownsAlwaysExpanded] = useState(false);
 
     const { onMessage, sendData, removeMessage } = useWorkerClient(worker);
     const { confirm } = useModal();
@@ -263,10 +264,18 @@ export const Inventory = ({}) => {
             setResources(payload);
         });
         
+        const handleSettings = (settings) => {
+            setShowBreakdownsAlwaysExpanded(settings?.showBreakdownsAlwaysExpanded ?? false);
+        };
+
+        onMessage('settings', handleSettings);
+        sendData('query-settings', {});
+        
         return () => {
             removeMessage('all-resources');
+            removeMessage('settings');
         };
-    }, []);
+    }, [onMessage, sendData, removeMessage]);
 
     useEffect(() => {
         onMessage('inventory-details', (payload) => {
@@ -608,8 +617,9 @@ export const Inventory = ({}) => {
             onEditConfig={setInventoryDetailsEdit}
             isMobile={isMobile}
             isCtrlPressed={isCtrlPressed}
+            showBreakdownsAlwaysExpanded={showBreakdownsAlwaysExpanded}
         />
-    )), [availableItems, handleFlash, isChanged, isCtrlPressed, isMobile, purchaseItem, selectedFilterUnlocks, selectedItemId, setInventoryDetailsEdit, setInventoryDetailsView])
+    )), [availableItems, handleFlash, isChanged, isCtrlPressed, isMobile, purchaseItem, selectedFilterUnlocks, selectedItemId, setInventoryDetailsEdit, setInventoryDetailsView, showBreakdownsAlwaysExpanded])
 
     if(currentTourId === 'inventory') {
         unlockNextById(9);
