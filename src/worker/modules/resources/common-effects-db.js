@@ -499,6 +499,14 @@ export const registerCommomEffects = () => {
         minValue: 1,
     })
 
+    gameEffects.registerEffect('device_accessories_efficiency', {
+        name: 'Device Accessories Efficiency',
+        tags: ['multiplier'],
+        description: 'Increases effects provided by accessories with tag "device"',
+        defaultValue: 1,
+        minValue: 1,
+    })
+
     gameEffects.registerEffect('accessory_jewelry_efficiency', {
         name: 'Jewelry Accessories Efficiency',
         tags: ['multiplier'],
@@ -706,6 +714,14 @@ export const registerCommomEffects = () => {
         defaultValue: 1.,
         minValue: 1.,
         description: 'Determines how efficient mining operations are'
+    })
+
+    gameEffects.registerEffect('mining_machinery_efficiency', {
+        name: 'Mining Machinery Efficiency',
+        tags: ['multiplier'],
+        defaultValue: 1.,
+        minValue: 1.,
+        description: 'Increases efficiency of automated mining machinery and processing plants'
     })
 
     gameEffects.registerEffect('tinkers_shed_crafting_bonus', {

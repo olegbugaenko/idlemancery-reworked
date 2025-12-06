@@ -1522,4 +1522,290 @@ export const registerStructuresStage1 = () => {
             }
         }),
     })
+
+    registerStructure('structure_building_materials_factory', {
+        tags: ["structure", "upgrade", "purchaseable", "industrial", "production"],
+        name: 'Building Materials Factory',
+        description: 'A massive industrial complex for producing construction materials. Significantly increases production of wooden beams and stone bricks through automated processing.',
+        level: 0,
+        maxLevel: 10,
+        minDemoVersion: 20,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_advanced_engineering_2') > 0;
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                resources: {
+                    'inventory_wooden_beam': {
+                        A: 0.20,
+                        B: 1,
+                        C: 1.02,
+                        type: 3,
+                    },
+                    'inventory_stone_brick': {
+                        A: 0.20,
+                        B: 1,
+                        C: 1.02,
+                        type: 3,
+                    }
+                }
+            }),
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 5,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            },
+        },
+        get_cost: () => ({
+            'inventory_forged_steel': {
+                A: 1.3,
+                B: 15000000000,
+                type: 1
+            },
+            'inventory_stone_brick': {
+                A: 1.3,
+                B: 20000000000,
+                type: 1
+            },
+            'inventory_copper_wire': {
+                A: 1.3,
+                B: 500000,
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 5,
+                type: 0
+            }
+        }),
+    })
+
+    registerStructure('structure_mining_processing_plant', {
+        tags: ["structure", "upgrade", "purchaseable", "industrial", "mining"],
+        name: 'Mining Processing Plant',
+        description: 'An advanced mining facility with automated ore processing systems. Dramatically improves the efficiency of all mining machinery operations.',
+        level: 0,
+        maxLevel: 10,
+        minDemoVersion: 20,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_advanced_engineering_2') > 0;
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'mining_machinery_efficiency': {
+                        A: 0.25,
+                        B: 1,
+                        C: 1.02,
+                        type: 3,
+                    }
+                }
+            }),
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 5,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            },
+        },
+        get_cost: () => ({
+            'inventory_forged_steel': {
+                A: 1.3,
+                B: 15000000000,
+                type: 1
+            },
+            'inventory_stone_brick': {
+                A: 1.3,
+                B: 20000000000,
+                type: 1
+            },
+            'inventory_wooden_beam': {
+                A: 1.3,
+                B: 50000000000,
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 5,
+                type: 0
+            }
+        }),
+    })
+
+    registerStructure('structure_device_maintenance_factory', {
+        tags: ["structure", "upgrade", "purchaseable", "industrial", "accessories"],
+        name: 'Device Maintenance Factory',
+        description: 'A specialized facility dedicated to maintaining, calibrating, and upgrading mechanical devices. Significantly increases the efficiency of all device-type accessories through expert care and optimization.',
+        level: 0,
+        maxLevel: 10,
+        minDemoVersion: 20,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 350000,
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_advanced_engineering_2') > 0;
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'device_accessories_efficiency': {
+                        A: 0.15,
+                        B: 1,
+                        C: 1.02,
+                        type: 3,
+                    }
+                }
+            }),
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 5,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            },
+        },
+        get_cost: () => ({
+            'inventory_wooden_beam': {
+                A: 1.3,
+                B: 1000000000000,
+                type: 1
+            },
+            'inventory_stone_brick': {
+                A: 1.3,
+                B: 1000000000000,
+                type: 1
+            },
+            'inventory_forged_steel': {
+                A: 1.3,
+                B: 200000000000,
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 5,
+                type: 0
+            }
+        }),
+    })
+
+    registerStructure('structure_memory_crystal', {
+        tags: ["structure", "upgrade", "purchaseable", "magical", "spiritual", "crystal"],
+        name: 'Memory Crystal',
+        description: 'A colossal crystalline structure forged from countless sapphires and enchanted wood. This magnificent monument channels ancient magical knowledge, significantly accelerating spell mastery and experience gain.',
+        level: 0,
+        maxLevel: 10,
+        minDemoVersion: 20,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_magic_capability',
+            level: 250000,
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_mysticism') > 0;
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'spell_xp_rate': {
+                        A: 0.20,
+                        B: 1,
+                        C: 1.02,
+                        type: 3,
+                    }
+                }
+            }),
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 5,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            },
+        },
+        get_cost: () => ({
+            'inventory_sapphire': {
+                A: 1.3,
+                B: 1000000000000,
+                type: 1
+            },
+            'inventory_wooden_beam': {
+                A: 1.3,
+                B: 100000000000,
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 5,
+                type: 0
+            }
+        }),
+    })
+
+    registerStructure('structure_wisdom_monolith', {
+        tags: ["structure", "upgrade", "purchaseable", "magical", "spiritual", "monument"],
+        name: 'Wisdom Monolith',
+        description: 'A towering sapphire monument radiating ethereal wisdom. This mystical obelisk amplifies mental clarity and focus, enhancing the speed of mental training and contemplation.',
+        level: 0,
+        maxLevel: 10,
+        minDemoVersion: 20,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_magic_capability',
+            level: 250000,
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_mysticism') > 0;
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'mental_training_learning_rate': {
+                        A: 0.10,
+                        B: 1,
+                        C: 1.02,
+                        type: 3,
+                    }
+                }
+            }),
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 5,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            },
+        },
+        get_cost: () => ({
+            'inventory_sapphire': {
+                A: 1.3,
+                B: 1000000000000,
+                type: 1
+            },
+            'inventory_stone_brick': {
+                A: 1.3,
+                B: 100000000000,
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 5,
+                type: 0
+            }
+        }),
+    })
 }

@@ -3784,6 +3784,26 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+    gameEntity.registerGameEntity('shop_item_advanced_engineering_2', {
+        tags: ["shop", "upgrade", "purchaseable", "industrial"],
+        name: 'Advanced Engineering II',
+        description: 'Unlock cutting-edge industrial engineering techniques. Enables construction of massive factories: Building Materials Factory for enhanced construction resource production, and Mining Processing Plant for improved mining efficiency.',
+        level: 0,
+        maxLevel: 1,
+        minDemoVersion: 20,
+        unlockedBy: [{ type: 'effect', id: 'attribute_strength', level: 300000 }],
+        unlockCondition: () => true,
+        attributes: { isCollectable: false },
+        resourceModifier: {},
+        get_cost: () => ({
+            'coins': {
+                A: 1,
+                B: 5.e+15*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        }),
+    })
+
     gameEntity.registerGameEntity('shop_item_magic_weaving', {
         tags: ["shop", "upgrade", "purchaseable", "magical", "crafting"],
         name: 'Magic Weaving',
@@ -3799,6 +3819,26 @@ export const registerShopItemsStage1 = () => {
             'coins': {
                 A: 1,
                 B: 3.e+15*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_mysticism', {
+        tags: ["shop", "upgrade", "purchaseable", "magical", "spiritual"],
+        name: 'Mysticism',
+        description: 'Unlock profound mystical knowledge and construct legendary magical monuments. Enables building of Memory Crystal and Wisdom Monolith - powerful structures that enhance magical learning and mental training.',
+        level: 0,
+        maxLevel: 1,
+        minDemoVersion: 20,
+        unlockedBy: [{ type: 'effect', id: 'attribute_magic_ability', level: 250000 }],
+        unlockCondition: () => true,
+        attributes: { isCollectable: false },
+        resourceModifier: {},
+        get_cost: () => ({
+            'coins': {
+                A: 1,
+                B: 1.e+16*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 0
             }
         }),

@@ -170,6 +170,80 @@ export const ZOO_ANIMALS = [
             }),
             effectDeps: ['zoo_animals_efficiency']
         }
+    },
+    {
+        id: 'raven',
+        entityId: 'zoo_animal_raven',
+        feedEntityId: 'zoo_animal_raven_feeding',
+        tags: ['zoo_animal', 'wild', 'bird', 'omnivore'],
+        name: 'Raven',
+        icon: 'magic_raven',
+        description: 'A proud and free-spirited bird of exceptional intelligence. Its presence sharpens mental focus, significantly boosting mental training speed.',
+        attributes: {
+            isCollectable: false,
+            requiredSpace: 4,
+            breedFeedRequirement: {
+                inventory_thinkroot: 4_000_000,
+            },
+            breedingEffectId: 'birds_breeding_efficiency',
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 300000,
+        }],
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'mental_training_learning_rate': {
+                        A: 100,
+                        B: 1,
+                        C: 0.02*gameEffects.getEffectValue('zoo_animals_efficiency'),
+                        type: 5,
+                        diminish: 0.6,
+                        diminishStep: 1000,
+                    }
+                }
+            }),
+            effectDeps: ['zoo_animals_efficiency']
+        }
+    },
+    {
+        id: 'wolf',
+        entityId: 'zoo_animal_wolf',
+        feedEntityId: 'zoo_animal_wolf_feeding',
+        tags: ['zoo_animal', 'wild', 'mammal', 'carnivore'],
+        name: 'Wolf',
+        icon: 'magic_wolf',
+        description: 'A brave and loyal ally, reliable in scouting the most dangerous locations. Its keen tracking instincts dramatically enhance expedition efforts.',
+        attributes: {
+            isCollectable: false,
+            requiredSpace: 2,
+            breedFeedRequirement: {
+                inventory_ember_leaf: 1_000_000,
+            },
+            breedingEffectId: 'mammal_breeding_efficiency',
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 300000,
+        }],
+        resourceModifier: {
+            get_multiplier: () => ({
+                resources: {
+                    'expedition_effort': {
+                        A: 100,
+                        B: 1,
+                        C: 0.02*gameEffects.getEffectValue('zoo_animals_efficiency'),
+                        type: 5,
+                        diminish: 0.6,
+                        diminishStep: 1000,
+                    }
+                }
+            }),
+            effectDeps: ['zoo_animals_efficiency']
+        }
     }
 ];
 

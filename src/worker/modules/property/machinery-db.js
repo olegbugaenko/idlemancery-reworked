@@ -40,7 +40,7 @@ const getCoalDiscount = () => {
 export const registerMachineryStage1 = () => {
     // Automated Quarry — consumes coal, produces stone
     registerMachine('machine_auto_quarry', {
-        tags: ['machinery', 'upgrade', 'purchaseable', 'industrial'],
+        tags: ['machinery', 'upgrade', 'purchaseable', 'industrial', 'mining'],
         name: 'Automated Quarry',
         description: 'Consumes coal to mine stone automatically.',
         level: 0,
@@ -53,7 +53,7 @@ export const registerMachineryStage1 = () => {
         resourceModifier: {
             get_income: () => ({
                 resources: {
-                    'inventory_stone': { A: 500 * gameEffects.getEffectValue('machinery_efficiency'), B: 0.0, C: 1.03, type: 3 },
+                    'inventory_stone': { A: 500 * gameEffects.getEffectValue('machinery_efficiency') * gameEffects.getEffectValue('mining_machinery_efficiency'), B: 0.0, C: 1.03, type: 3 },
                 }
             }),
             get_consumption: () => ({
@@ -65,7 +65,7 @@ export const registerMachineryStage1 = () => {
             getCustomAmplifier: () => gameEntity.getAttribute('machine_auto_quarry', 'manualLoad') ?? 0,
             customAmplifierApplyTypes: ['resources'],
             customAmplifierApplyScopes: ['income','consumption'],
-            effectDeps: ['machinery_efficiency', 'coal_consumption_discount'],
+            effectDeps: ['machinery_efficiency', 'coal_consumption_discount', 'mining_machinery_efficiency'],
         },
         get_cost: () => ({
             'inventory_wooden_beam': { A: 1.2, B: 40000, type: 1 },
@@ -126,7 +126,7 @@ export const registerMachineryStage1 = () => {
         resourceModifier: {
             get_income: () => ({
                 resources: {
-                    'inventory_iron_ore': { A: 200 * gameEffects.getEffectValue('machinery_efficiency'), B: 0.0, C: 1.02, type: 3 },
+                    'inventory_iron_ore': { A: 200 * gameEffects.getEffectValue('machinery_efficiency') * gameEffects.getEffectValue('mining_machinery_efficiency'), B: 0.0, C: 1.02, type: 3 },
                 }
             }),
             get_consumption: () => ({
@@ -138,7 +138,7 @@ export const registerMachineryStage1 = () => {
             getCustomAmplifier: () => gameEntity.getAttribute('machine_automatic_ore_mine', 'manualLoad') ?? 0,
             customAmplifierApplyTypes: ['resources'],
             customAmplifierApplyScopes: ['income','consumption'],
-            effectDeps: ['machinery_efficiency', 'coal_consumption_discount'],
+            effectDeps: ['machinery_efficiency', 'coal_consumption_discount', 'mining_machinery_efficiency'],
         },
         get_cost: () => ({
             'coins': { A: 1.5, B: 1000000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')), type: 1 },
@@ -164,7 +164,7 @@ export const registerMachineryStage1 = () => {
         resourceModifier: {
             get_income: () => ({
                 resources: {
-                    'inventory_clay': { A: 50 * gameEffects.getEffectValue('machinery_efficiency'), B: 0.0, C: 1.02, type: 3 },
+                    'inventory_clay': { A: 50 * gameEffects.getEffectValue('machinery_efficiency') * gameEffects.getEffectValue('mining_machinery_efficiency'), B: 0.0, C: 1.02, type: 3 },
                 }
             }),
             get_consumption: () => ({
@@ -176,7 +176,7 @@ export const registerMachineryStage1 = () => {
             getCustomAmplifier: () => gameEntity.getAttribute('machine_automatic_clay_mine', 'manualLoad') ?? 0,
             customAmplifierApplyTypes: ['resources'],
             customAmplifierApplyScopes: ['income','consumption'],
-            effectDeps: ['machinery_efficiency', 'coal_consumption_discount'],
+            effectDeps: ['machinery_efficiency', 'coal_consumption_discount', 'mining_machinery_efficiency'],
         },
         get_cost: () => ({
             'coins': { A: 1.5, B: 1000000000*charismaMod(gameEffects.getEffectValue('attribute_charisma')), type: 1 },

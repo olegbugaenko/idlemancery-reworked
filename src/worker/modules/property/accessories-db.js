@@ -1067,7 +1067,7 @@ export const registerAccessoriesStage1 = () => {
     })
 
     registerAccessory('accessory_steel_hammer', {
-        tags: ["accessory", "upgrade", "purchaseable", "resource", "metal", "tool"],
+        tags: ["accessory", "upgrade", "purchaseable", "resource", "metal", "device"],
         name: 'Steel Hammer',
         description: 'Increase stone refinement efficiency',
         level: 0,
