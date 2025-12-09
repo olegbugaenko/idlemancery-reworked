@@ -20,6 +20,10 @@ export class RitualModule extends GameModule {
             this.sendRitualData();
         });
 
+        this.eventHandler.registerHandler('query-all-rituals', payload => {
+            this.sendAllRituals(payload);
+        });
+
         this.eventHandler.registerHandler('query-ritual-details', payload => {
             this.sendRitualDetails(payload.id);
         });
@@ -202,6 +206,24 @@ export class RitualModule extends GameModule {
             cooldownProg: Math.max(0, Math.min(1, (maxCooldown - Math.max(this.switchCooldown, 0)) / maxCooldown)),
         }));
         this.eventHandler.sendData('rituals-data', { available: response });
+    }
+
+    getAllRitualsData() {
+        const items = gameEntity.listEntitiesByTags(['magic-ritual']);
+
+        return items.map(ritual => ({
+            ...entityResponse(ritual),
+            isUnlocked: ritual.isUnlocked,
+        }))
+    }
+
+    sendAllRituals(payload) {
+        const data = this.getAllRitualsData();
+        let label = 'all-rituals';
+        if(payload?.prefix) {
+            label = `${label}-${payload?.prefix}`
+        }
+        this.eventHandler.sendData(label, data);
     }
 
     sendRitualDetails(id) {

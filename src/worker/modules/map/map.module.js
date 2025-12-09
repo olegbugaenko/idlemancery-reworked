@@ -145,6 +145,10 @@ export class MapModule extends GameModule {
         const activeEntities = gameEntity.listEntitiesByTags(['exploration']);
 
         activeEntities.forEach(ent => {
+            // Skip entities without valid attributes (corrupted or old save data)
+            if (!ent.attributes || ent.attributes.i === undefined || ent.attributes.j === undefined) {
+                return;
+            }
             this.setTileRunning(ent.attributes.i, ent.attributes.j, false, 1);
         })
     }
@@ -346,6 +350,10 @@ export class MapModule extends GameModule {
                         }
                         if(isRare) {
                             amtHerbsMult = 0.25*amtHerbsMult ** 0.5;
+                            // Apply rare plants bonus for rare herbs
+                            if(isHerb) {
+                                amtHerbsMult *= gameEffects.getEffectValue('rare_plants_on_map');
+                            }
                         }
                         let rarityProbMult = 1.;
                         if(rs.rarity <= 2) {
@@ -465,7 +473,7 @@ export class MapModule extends GameModule {
             min: 0.25 * minComplexity ** 1.75,
             max: maxComplexity ** 1.75,
         }
-        console.log('mapComplex: ', minComplexity, maxComplexity);
+        
         return result;
     }
 
@@ -655,6 +663,9 @@ export class MapModule extends GameModule {
             const activeEntities = gameEntity.listEntitiesByTags(['exploration']);
 
             activeEntities.forEach(ent => {
+                if(!ent.attributes || ent.attributes.i === undefined || ent.attributes.j === undefined) {
+                    return;
+                }
                 const tile = this.mapTilesProcessed[ent.attributes.i][ent.attributes.j];
                 tile.drops.forEach((drop, index) => {
                     if(!gameResources.isResourceUnlocked(drop.id)) {

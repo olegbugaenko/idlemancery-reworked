@@ -26,6 +26,7 @@ import {EventsModule} from "./modules/social/social-events.module";
 import {StatisticsModule} from "./modules/statistics/statistics.module";
 import {FavoritesModule} from "./modules/favorites/favorites.module";
 import {ExpeditionsModule} from "./modules/expeditions/expeditions.module";
+import {PressModule} from "./modules/social/press.module";
 
 
 export class MainModule extends GameModule {
@@ -59,6 +60,7 @@ export class MainModule extends GameModule {
         gameCore.registerModule('statistics', StatisticsModule);
         gameCore.registerModule('favorites', FavoritesModule);
         gameCore.registerModule('expeditions', ExpeditionsModule);
+        gameCore.registerModule('press', PressModule);
 
 
         this.eventHandler.registerHandler('initialize-game', (data) => {
@@ -123,6 +125,7 @@ export class MainModule extends GameModule {
                 'social-main': gameEntity.getLevel('structure_event_hall') > 0,
                 'expeditions': gameEntity.isEntityUnlocked('action_expedition'),
                 'amnesia': gameEntity.getLevel('shop_item_alchemy_courses') > 0,
+                'press': gameEntity.getLevel('printing_machine') > 0,
             }
             let label = 'unlocks';
             if(payload?.prefix) {

@@ -609,6 +609,111 @@ export const registerActionsStage1 = () => {
         }
     })
 
+    registerGameAction('action_city_council_advisor', {
+        tags: ["action", "job", "politician", "social"],
+        name: 'City Council Advisor',
+        isAbstract: false,
+        category: ACTION_CATS.COINS,
+        allowedImpacts: ['effects'],
+        description: 'Serve as the chief advisor to the city mayor and council, guiding urban policy and major municipal decisions. Your expertise in governance and persuasion commands exceptional compensation.',
+        level: 1,
+        minDemoVersion: 20,
+        discountEffects: ['social_actions_discount'],
+        jobType: 'social',
+        getLearnRate: () => {
+            return 1;
+        },
+        learningEffects: ['job_learning_rate'],
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'coins': {
+                        A: 14.0*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_social'),
+                        B: 126.0*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_social'),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 2650,
+                        type: 0,
+                    },
+                    'mental_energy': {
+                        A: 0.0,
+                        B: 65,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['coins_earned_bonus', 'job_efficiency_social']
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_charisma',
+            level: 350000,
+        }],
+        attributes: {
+            baseXPCost: 20,
+            primaryAttribute: 'attribute_charisma'
+        }
+    })
+
+    registerGameAction('action_career_mentorship', {
+        tags: ["action", "training", "social"],
+        name: 'Career Mentorship',
+        category: ACTION_CATS.SOCIAL,
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Engage in intensive mentorship sessions with industry leaders and professionals. Learn advanced career strategies and job-specific skills that accelerate your professional growth.',
+        level: 1,
+        minDemoVersion: 20,
+        getLearnRate: () => {
+            return 1;
+        },
+        learningEffects: ['social_training_learning_rate'],
+        discountEffects: ['social_actions_discount'],
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'job_learning_rate': {
+                        A: 0.01,
+                        B: 0.99,
+                        C: 1.0005,
+                        type: 3,
+                    }
+                }
+            }),
+            consumption: {
+                resources: {
+                    'energy': {
+                        A: 0,
+                        B: 150000000,
+                        type: 0
+                    },
+                    'mental_energy': {
+                        A: 0,
+                        B: 250000,
+                        type: 0
+                    }
+                }
+            },
+            effectDeps: []
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_charisma',
+            level: 500000,
+        }],
+        attributes: {
+            baseXPCost: 1.e+18,
+            isTraining: true,
+            primaryAttribute: 'attribute_charisma'
+        }
+    })
+
     registerGameAction('action_clean_stable', {
         tags: ["action", "job", "physical"],
         name: 'Clean Stable',
@@ -865,6 +970,58 @@ export const registerActionsStage1 = () => {
             type: 'effect',
             id: 'attribute_strength',
             level: 75000,
+        }],
+        attributes: {
+            baseXPCost: 20,
+            primaryAttribute: 'attribute_strength'
+        }
+    })
+
+    registerGameAction('action_megastructure_engineer', {
+        tags: ["action", "job", "physical"],
+        name: 'Megastructure Engineer',
+        isAbstract: false,
+        category: ACTION_CATS.COINS,
+        allowedImpacts: ['effects'],
+        description: 'Oversee the construction of massive infrastructure projects that reshape entire regions. Your unmatched strength and expertise command extraordinary compensation.',
+        level: 1,
+        minDemoVersion: 20,
+        discountEffects: ['physical_actions_discount'],
+        jobType: 'physical',
+        getLearnRate: () => {
+            return 1;
+        },
+        learningEffects: ['job_learning_rate'],
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'coins': {
+                        A: 18.0*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_physical'),
+                        B: 162.0*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_physical'),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 900,
+                        type: 0,
+                    },
+                    'health': {
+                        A: 0.0,
+                        B: 450,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['coins_earned_bonus', 'job_efficiency_physical']
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 350000,
         }],
         attributes: {
             baseXPCost: 20,
@@ -1229,6 +1386,58 @@ export const registerActionsStage1 = () => {
             type: 'effect',
             id: 'attribute_magic_ability',
             level: 75000,
+        }],
+        attributes: {
+            baseXPCost: 20,
+            primaryAttribute: 'attribute_magic_capability'
+        }
+    })
+
+    registerGameAction('action_realm_weaver', {
+        tags: ["action", "job", "magical"],
+        name: 'Realm Weaver',
+        isAbstract: false,
+        category: ACTION_CATS.COINS,
+        minDemoVersion: 20,
+        allowedImpacts: ['effects'],
+        description: 'Manipulate the fabric of reality itself, creating and maintaining massive magical infrastructures for entire civilizations. Your mastery of the arcane is without parallel, and your services are priceless.',
+        level: 1,
+        discountEffects: ['magical_actions_discount'],
+        jobType: 'magical',
+        getLearnRate: () => {
+            return 1;
+        },
+        learningEffects: ['job_learning_rate'],
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'coins': {
+                        A: 32.0*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_magical'),
+                        B: 288.0*gameEffects.getEffectValue('coins_earned_bonus')*gameEffects.getEffectValue('job_efficiency_magical'),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'energy': {
+                        A: 0.0,
+                        B: 1120,
+                        type: 0,
+                    },
+                    'mana': {
+                        A: 0.0,
+                        B: 440,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['coins_earned_bonus', 'job_efficiency_magical']
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_magic_ability',
+            level: 350000,
         }],
         attributes: {
             baseXPCost: 20,

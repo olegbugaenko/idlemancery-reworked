@@ -205,6 +205,13 @@ export class ResourcePoolModule extends GameModule {
             isUnlocked: () => false,
         })
 
+        gameResources.registerResource('printing_effort', {
+            tags: ['press', 'social', 'secondary'],
+            name: 'Printing Effort',
+            isService: true,
+            unlockCondition: () => gameEntity.getLevel('shop_item_press_license') > 0,
+        })
+
         registerInventoryItems();
 
         gameResources.registerResource('guild_reputation', {

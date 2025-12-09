@@ -152,5 +152,50 @@ export const initRitualsDB = () => {
             return gameEntity.getLevel('shop_item_ritualism') > 0;
         }
     });
+
+    registerRitual('ritual_ethereal_transcendence', {
+        name: 'Ethereal Transcendence',
+        description: 'Ascend beyond physical limitations to channel pure magical energy. Greatly amplifies mana regeneration and spiritual learning, but completely severs your connection to natural and alchemical arts.',
+        tags: ['magic-ritual', 'ritual', 'magic'],
+        level: 1,
+        isAbstract: true,
+        minDemoVersion: 20,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_magic_ability',
+            level: 500000,
+        }],
+        resourceModifier: {
+            multiplier: {
+                resources: {
+                    mana: {
+                        A: 0,
+                        B: 2,
+                        type: 0,
+                    },
+                },
+                effects: {
+                    spiritual_learning_rate: {
+                        A: 0,
+                        B: 2,
+                        type: 0,
+                    },
+                    gathering_herbs_amount: {
+                        A: 0,
+                        B: 0.1,
+                        type: 0,
+                    },
+                    alchemy_ability: {
+                        A: 0,
+                        B: 0.1,
+                        type: 0,
+                    }
+                }
+            }
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_ritualism') > 0;
+        }
+    });
 }
 

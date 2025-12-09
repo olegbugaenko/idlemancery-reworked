@@ -42,5 +42,8 @@ export const getScope = (entity) => {
     if(entity.tags.includes('machinery')) {
         return 'Machinery';
     }
+    if(entity.tags.includes('press_journal')) {
+        return 'Press Journal';
+    }
     return ''
 }

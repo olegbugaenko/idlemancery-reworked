@@ -180,7 +180,8 @@ export class ZooModule extends GameModule {
         if (breedingEffectId) {
             breedingMultiplier = gameEffects.getEffectValue(breedingEffectId) || 1;
         }
-        return 0.01 * feedLevel * feedEfficiency * breedingMultiplier;
+        const generalBreedingEfficiency = gameEffects.getEffectValue('breeding_efficiency') || 1;
+        return 0.01 * feedLevel * feedEfficiency * breedingMultiplier * generalBreedingEfficiency;
     }
 
     getRequiredSpace(animal) {

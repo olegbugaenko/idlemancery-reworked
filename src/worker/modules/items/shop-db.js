@@ -2793,6 +2793,44 @@ export const registerShopItemsStage1 = () => {
             }
         }),
     })
+
+    gameEntity.registerGameEntity('shop_item_advanced_cartography_3', {
+        tags: ["shop", "upgrade", "purchaseable", "maps"],
+        name: 'Advanced Cartography III',
+        description: 'Master the most sophisticated cartographic techniques, pushing the boundaries of map complexity and exploration depth to unprecedented levels.',
+        level: 0,
+        maxLevel: 5,
+        minDemoVersion: 20,
+        resourceModifier: {
+            income: {
+                effects: {
+                    max_map_level: {
+                        A: 1,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            }
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 400000
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_advanced_cartography') > 0
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 5.0e+16*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
 /*
     gameEntity.registerGameEntity('shop_item_advanced_negotiations', {
         tags: ["shop", "upgrade", "purchaseable"],
@@ -3804,6 +3842,26 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+    gameEntity.registerGameEntity('shop_item_advanced_engineering_3', {
+        tags: ["shop", "upgrade", "purchaseable", "industrial"],
+        name: 'Advanced Engineering III',
+        description: 'Master advanced industrial optimization. Unlocks Botanical Survey Station for improved rare plant discovery and Industrial Hub for enhanced facility operation.',
+        level: 0,
+        maxLevel: 1,
+        minDemoVersion: 20,
+        unlockedBy: [{ type: 'effect', id: 'attribute_strength', level: 500000 }],
+        unlockCondition: () => true,
+        attributes: { isCollectable: false },
+        resourceModifier: {},
+        get_cost: () => ({
+            'coins': {
+                A: 1,
+                B: 100.e+15*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        }),
+    })
+
     gameEntity.registerGameEntity('shop_item_magic_weaving', {
         tags: ["shop", "upgrade", "purchaseable", "magical", "crafting"],
         name: 'Magic Weaving',
@@ -3984,6 +4042,26 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+    gameEntity.registerGameEntity('shop_item_expertise_alchemy', {
+        tags: ["shop", "upgrade", "purchaseable", "alchemy"],
+        name: 'Expertise in Alchemy',
+        description: 'Master the pinnacle of alchemical knowledge. Unlocks five legendary compound elixirs that combine the power of two base elixirs to grant permanent enhancements.',
+        level: 0,
+        maxLevel: 1,
+        minDemoVersion: 20,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 500000,
+        }],
+        unlockCondition: () => gameEntity.getLevel('shop_item_advanced_alchemy') > 0,
+        attributes: { isCollectable: false },
+        resourceModifier: {},
+        get_cost: () => ({
+            'coins': { A: 2, B: 1.e+17*charismaMod(gameEffects.getEffectValue('attribute_charisma')), type: 1 },
+        }),
+    })
+
     gameEntity.registerGameEntity('shop_item_elemental_shop_access', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Elemental Shop Access',
@@ -4107,6 +4185,99 @@ export const registerShopItemsStage1 = () => {
         get_cost: () => ({
             'coins': { A: 1.5, B: 1.0e+15*charismaMod(gameEffects.getEffectValue('attribute_charisma')), type: 1 },
             'inventory_earth': { A: 1.5, B: 1000000, type: 1 },
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_press_license', {
+        tags: ["shop", "upgrade", "purchaseable", "social", "press"],
+        name: 'Press License',
+        description: 'Obtain a legal right to found a publishing house, introducing the Press system to your guild. Unlocks the ability to build and manage a printing machine and start publishing journals.',
+        level: 0,
+        maxLevel: 1,
+        minDemoVersion: 20,
+        unlockedBy: [{ type: 'effect', id: 'attribute_charisma', level: 300000 }],
+        unlockCondition: () => true,
+        attributes: { isCollectable: false },
+        resourceModifier: {},
+        get_cost: () => ({
+            'coins': {
+                A: 1,
+                B: 1.0e+16*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        }),
+    })
+
+    // Compact Habitat Technology — increases zoo capacity multiplier
+    gameEntity.registerGameEntity('shop_item_zoo_expansion_program', {
+        tags: ["shop", "upgrade", "purchaseable", "zoo"],
+        name: 'Compact Habitat Technology',
+        description: 'Advanced magical containment systems and space-efficient enclosure designs. These innovative habitats use dimensional folding and comfort-enhancing enchantments to safely house more creatures in the same space without compromising their well-being.',
+        level: 0,
+        maxLevel: 10,
+        minDemoVersion: 20,
+        unlockedBy: [{ type: 'effect', id: 'attribute_patience', level: 350000 }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_magical_zoo') > 0;
+        },
+        attributes: { isCollectable: false },
+        resourceModifier: {
+            get_multiplier: () => ({
+                resources: {
+                    'magic_zoo_space': {
+                        A: 0.25,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            })
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 5.0e+16*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 0
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_advanced_woodworking', {
+        tags: ["shop", "upgrade", "purchaseable", "crafting"],
+        name: 'Advanced Woodworking Technology',
+        description: 'Revolutionary woodworking techniques and specialized machinery that dramatically improve lumber processing efficiency. Unlocks the construction of Advanced Lumbermill facilities.',
+        level: 0,
+        maxLevel: 1,
+        minDemoVersion: 20,
+        unlockedBy: [{ type: 'effect', id: 'attribute_strength', level: 400000 }],
+        unlockCondition: () => true,
+        attributes: { isCollectable: false },
+        resourceModifier: {},
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 5.0e+16*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
+        }),
+    })
+
+    gameEntity.registerGameEntity('shop_item_advanced_nature_magic', {
+        tags: ["shop", "upgrade", "purchaseable", "magic", "nature"],
+        name: 'Advanced Nature Magic',
+        description: 'Unlock profound secrets of natural magic, gaining access to powerful spells that manipulate life forces and enhance alchemical processes. Opens new dimensions of nature-based spellcasting.',
+        level: 0,
+        maxLevel: 1,
+        minDemoVersion: 20,
+        unlockedBy: [{ type: 'effect', id: 'attribute_magic_ability', level: 300000 }],
+        unlockCondition: () => true,
+        attributes: { isCollectable: false },
+        resourceModifier: {},
+        get_cost: () => ({
+            'coins': {
+                A: 2,
+                B: 5.0e+16*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            }
         }),
     })
 }

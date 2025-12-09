@@ -294,6 +294,41 @@ export const registerAmplifiersStage1 = () => {
         }),
     })
 
+    registerAmplifier('amplifier_alchemical_flame', {
+        tags: ["amplifier", "upgrade", "purchaseable", "fire", "alchemy"],
+        name: 'Alchemical Flame Amplifier',
+        description: 'Channel the purifying power of fire to reduce mana consumption in alchemical processes. The flame burns away inefficiencies, allowing you to transmute with greater economy.',
+        level: 0,
+        minDemoVersion: 20,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_magic_ability',
+            level: 400000,
+        }],
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_fire') && gameEntity.getLevel('shop_item_alchemy_courses') > 0;
+        },
+        resourceModifier: {
+            get_multiplier: ()=>({
+                effects: {
+                    'alchemy_mana_discount': {
+                        A: 0.02*gameEffects.getEffectValue('fire_amplifier_efficiency'),
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }),
+            effectDeps: ['fire_amplifier_efficiency', 'alchemy_mana_discount'],
+        },
+        get_cost: () => ({
+            'inventory_fire': {
+                A: 1.2,
+                B: 10000/gameEffects.getEffectValue('amplifier_cost_reduction'),
+                type: 1
+            }
+        }),
+    })
+
 /*
     registerAmplifier('amplifier_arcane_conduit', {
         tags: ["amplifier", "upgrade", "purchaseable", "spark", "actions"],

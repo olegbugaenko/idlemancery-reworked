@@ -409,6 +409,14 @@ export const registerCommomEffects = () => {
         description: 'Increases learning speed for all courses'
     })
 
+    gameEffects.registerEffect('press_learning_speed', {
+        name: 'Press Learning Speed',
+        tags: ['multiplier'],
+        defaultValue: 1.,
+        minValue: 1.,
+        description: 'Increases leveling speed for all press journals'
+    })
+
     gameEffects.registerEffect('reductive_courses_power', {
         name: 'Reductive Courses Power',
         tags: ['multiplier'],
@@ -583,6 +591,16 @@ export const registerCommomEffects = () => {
         hasCap: false,
         saveBalanceTree: true,
         description: 'Decrease resources consumed by alchemical recipes'
+    })
+
+    gameEffects.registerEffect('alchemy_mana_discount', {
+        name: 'Alchemy Mana Discount',
+        tags: ['multiplier'],
+        defaultValue: 1.,
+        minValue: 1.,
+        hasCap: false,
+        saveBalanceTree: true,
+        description: 'Reduce mana consumption for alchemy recipes'
     })
 
     gameEffects.registerEffect('amplifier_cost_reduction', {
@@ -806,6 +824,24 @@ export const registerCommomEffects = () => {
         hasCap: false,
     })
 
+    gameEffects.registerEffect('mining_processing_plant_max_level_bonus', {
+        name: 'Mining Processing Plant Max Level Bonus',
+        tags: ['multiplier'],
+        description: 'Additional max levels for Mining Processing Plant',
+        defaultValue: 0,
+        minValue: 0,
+        hasCap: false,
+    })
+
+    gameEffects.registerEffect('rare_plants_on_map', {
+        name: 'Rare Plants on Map',
+        tags: ['multiplier'],
+        description: 'Increases the chance to find rare plants during exploration',
+        defaultValue: 1,
+        minValue: 0,
+        hasCap: false,
+    })
+
     gameEffects.registerEffect('masters_table_efficiency', {
         name: 'Master\'s Table Efficiency',
         tags: ['multiplier'],
@@ -885,6 +921,15 @@ export const registerCommomEffects = () => {
         defaultValue: 1.,
         minValue: 1.,
         description: 'Increases the effective efficiency of fed zoo animals (affects growth rates)',
+        saveBalanceTree: true,
+    })
+
+    gameEffects.registerEffect('breeding_efficiency', {
+        name: 'Breeding Efficiency',
+        tags: ['multiplier'],
+        defaultValue: 1.,
+        minValue: 1.,
+        description: 'Increases the breeding speed of all zoo animals',
         saveBalanceTree: true,
     })
 

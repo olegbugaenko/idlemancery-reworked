@@ -1,6 +1,7 @@
 import React, {useContext, useEffect, useState} from "react";
 import {SocialMenu} from "./social-menu.jsx";
 import {EventHallWrap} from "./event-hall.jsx";
+import {PressWrap} from "./press.jsx";
 import {useUICache} from "../../general/hooks/local-cache";
 import WorkerContext from "../../context/worker-context";
 import {useAppContext} from "../../context/ui-context";
@@ -22,7 +23,8 @@ export const Social = ({  }) => {
     useEffect(() => {
         onMessage('unlocks-social-main', (unlocks) => {
             const mapToPages = {
-                events: 'events'
+                events: 'events',
+                press: 'press'
             }
 
             if(!unlocks[mapToPages[selectedTab]]) {
@@ -42,6 +44,12 @@ export const Social = ({  }) => {
         return <EventHallWrap>
             <SocialMenu selectedTab={selectedTab} setSelectedTab={setSelectedTab}/>
         </EventHallWrap>
+    }
+
+    if(selectedTab === 'press') {
+        return <PressWrap>
+            <SocialMenu selectedTab={selectedTab} setSelectedTab={setSelectedTab}/>
+        </PressWrap>
     }
 
 }

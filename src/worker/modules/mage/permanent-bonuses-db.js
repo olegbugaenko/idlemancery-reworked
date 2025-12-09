@@ -572,4 +572,135 @@ export const registerPermanentBonuses = () => {
         }
     })
 
+    // Compound Elixirs (Expertise Alchemy)
+    gameEntity.registerGameEntity('compound_laborers_effect', {
+        tags: ["bonus", "permanent", "compound", "alchemy"],
+        name: 'Laborer\'s Compound',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_expertise_alchemy') > 0;
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'manual_labor_efficiency': {
+                        A: 50,
+                        B: 1,
+                        C: 0.01,
+                        type: 5,
+                        diminishStep: 500,
+                        diminish: 0.8,
+                    }
+                }
+            }
+        }
+    })
+
+    gameEntity.registerGameEntity('compound_zookeepers_effect', {
+        tags: ["bonus", "permanent", "compound", "alchemy"],
+        name: 'Zookeeper\'s Compound',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_expertise_alchemy') > 0;
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                resources: {
+                    'magic_zoo_space': {
+                        A: 50,
+                        B: 1,
+                        C: 0.005,
+                        type: 5,
+                        diminishStep: 500,
+                        diminish: 0.8,
+                    }
+                }
+            }
+        }
+    })
+
+    gameEntity.registerGameEntity('compound_conjurers_effect', {
+        tags: ["bonus", "permanent", "compound", "alchemy"],
+        name: 'Conjurer\'s Compound',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_expertise_alchemy') > 0;
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'conjuration_spells_efficiency': {
+                        A: 50,
+                        B: 1,
+                        C: 0.01,
+                        type: 5,
+                        diminishStep: 500,
+                        diminish: 0.8,
+                    }
+                }
+            }
+        }
+    })
+
+    gameEntity.registerGameEntity('compound_publishers_effect', {
+        tags: ["bonus", "permanent", "compound", "alchemy"],
+        name: 'Publisher\'s Compound',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_expertise_alchemy') > 0;
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'press_learning_speed': {
+                        A: 50,
+                        B: 1,
+                        C: 0.01,
+                        type: 5,
+                        diminishStep: 500,
+                        diminish: 0.8,
+                    }
+                }
+            }
+        }
+    })
+
+    gameEntity.registerGameEntity('compound_artisans_effect', {
+        tags: ["bonus", "permanent", "compound", "alchemy"],
+        name: 'Artisan\'s Compound',
+        level: 0,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_expertise_alchemy') > 0;
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        resourceModifier: {
+            multiplier: {
+                effects: {
+                    'accessories_discount': {
+                        A: 50,
+                        B: 1,
+                        C: 0.01,
+                        type: 5,
+                        diminishStep: 500,
+                        diminish: 0.8,
+                    }
+                }
+            }
+        }
+    })
+
 }

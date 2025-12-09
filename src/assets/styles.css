@@ -1322,6 +1322,7 @@ h4 {
 }
 
 .card.action .head,
+.card.card.journal .head,
 .card.social-event .head,
 .card.expedition .head {
     display: flex;
@@ -1329,7 +1330,8 @@ h4 {
     align-items: center;
 }
 
-.card.action .bottom .xp-box * {
+.card.action .bottom .xp-box *,
+.card.journal .bottom .xp-box * {
     font-size: 12px;
 }
 
@@ -1472,6 +1474,7 @@ h4 {
 
 
 .card.action .xp-box,
+.card.journal .xp-box,
 .detail-blade .xp-box {
     display: flex;
     justify-content: space-between;
@@ -2041,7 +2044,8 @@ h4 {
     height: calc(100% - 40px);
 }
 
-.crafting-wrap .head {
+.crafting-wrap .head,
+.press .head {
     padding: 8px;
     display: flex;
     justify-content: space-between;
@@ -3856,7 +3860,8 @@ ul.menu .add-custom-filter .add-wrap {
     padding: 0 12px;
 }
 
-.card .bottom.self-placed input.level-set {
+.card .bottom.self-placed input.level-set,
+.card.journal input.level-set {
     width: 90px;
 }
 
@@ -5028,4 +5033,12 @@ body::after {
 
 .unlock-title .arrow-down.opened {
     transform: rotate(180deg);
+}
+
+.card.journal {
+    width: 300px;
+}
+
+.card.journal .head {
+    padding: 0;
 }

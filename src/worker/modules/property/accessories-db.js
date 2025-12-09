@@ -1077,28 +1077,29 @@ export const registerAccessoriesStage1 = () => {
                 && gameResources.isResourceUnlocked('inventory_forged_steel');
         },
         resourceModifier: {
-            multiplier: {
+            get_multiplier: () => ({
                 resources: {
                     'inventory_sapphire': {
-                        A: 0.02,
-                        B: 1,
+                        A: 0.02*gameEffects.getEffectValue('device_accessories_efficiency'),
+                        B: gameEffects.getEffectValue('device_accessories_efficiency'),
                         C: 1.01,
                         type: 3,
                     },
                     'inventory_ruby': {
-                        A: 0.02,
-                        B: 1,
+                        A: 0.02*gameEffects.getEffectValue('device_accessories_efficiency'),
+                        B: gameEffects.getEffectValue('device_accessories_efficiency'),
                         C: 1.01,
                         type: 3,
                     },
                     'inventory_obsidian_shard': {
-                        A: 0.02,
-                        B: 1,
+                        A: 0.02*gameEffects.getEffectValue('device_accessories_efficiency'),
+                        B: gameEffects.getEffectValue('device_accessories_efficiency'),
                         C: 1.01,
                         type: 3,
                     }
                 }
-            },
+            }),
+            effectDeps: ['device_accessories_efficiency']
         },
         get_cost: () => ({
             'inventory_forged_steel': {
@@ -1206,20 +1207,21 @@ export const registerAccessoriesStage1 = () => {
             return gameEntity.getLevel('shop_item_amber_gathering') > 0;
         },
         resourceModifier: {
-            income: {
+            get_income: () => ({
                 resources: {
                     'crafting_slots': {
-                        A: 1,
+                        A: 1*gameEffects.getEffectValue('device_accessories_efficiency'),
                         B: 0,
                         type: 0,
                     },
                     'alchemy_slots': {
-                        A: 1,
+                        A: 1*gameEffects.getEffectValue('device_accessories_efficiency'),
                         B: 0,
                         type: 0,
                     }
                 }
-            },
+            }),
+            effectDeps: ['device_accessories_efficiency']
         },
         get_cost: () => ({
             'inventory_amber': {
@@ -1245,15 +1247,16 @@ export const registerAccessoriesStage1 = () => {
             return gameEntity.getLevel('shop_item_amber_gathering') > 0;
         },
         resourceModifier: {
-            multiplier: {
+            get_multiplier: () => ({
                 effects: {
                     'learning_rate': {
-                        A: 0.02,
-                        B: 1,
+                        A: 0.02*gameEffects.getEffectValue('device_accessories_efficiency'),
+                        B: gameEffects.getEffectValue('device_accessories_efficiency'),
                         type: 0,
                     }
                 }
-            },
+            }),
+            effectDeps: ['device_accessories_efficiency']
         },
         get_cost: () => ({
             'inventory_amber': {
@@ -1286,16 +1289,17 @@ export const registerAccessoriesStage1 = () => {
                 && gameResources.isResourceUnlocked('inventory_green_ink');
         },
         resourceModifier: {
-            multiplier: {
+            get_multiplier: () => ({
                 resources: {
                     'gathering_effort': {
-                        A: 0.04,
-                        B: 1,
+                        A: 0.04*gameEffects.getEffectValue('device_accessories_efficiency'),
+                        B: gameEffects.getEffectValue('device_accessories_efficiency'),
                         C: 1.01,
                         type: 3,
                     }
                 }
-            },
+            }),
+            effectDeps: ['device_accessories_efficiency']
         },
         get_cost: () => ({
             'inventory_enchanted_paper': {
@@ -1384,28 +1388,29 @@ export const registerAccessoriesStage1 = () => {
             return gameResources.isResourceUnlocked('inventory_iron_plate');
         },
         resourceModifier: {
-            multiplier: {
+            get_multiplier: () => ({
                 resources: {
                     'inventory_iron_plate': {
-                        A: 0.05,
-                        B: 1,
+                        A: 0.05*gameEffects.getEffectValue('device_accessories_efficiency'),
+                        B: gameEffects.getEffectValue('device_accessories_efficiency'),
                         C: 1.004,
                         type: 3,
                     },
                     'inventory_forged_steel': {
-                        A: 0.05,
-                        B: 1,
+                        A: 0.05*gameEffects.getEffectValue('device_accessories_efficiency'),
+                        B: gameEffects.getEffectValue('device_accessories_efficiency'),
                         C: 1.004,
                         type: 3,
                     },
                     'inventory_copper_wire': {
-                        A: 0.05,
-                        B: 1,
+                        A: 0.05*gameEffects.getEffectValue('device_accessories_efficiency'),
+                        B: gameEffects.getEffectValue('device_accessories_efficiency'),
                         C: 1.004,
                         type: 3,
                     }
                 }
-            },
+            }),
+            effectDeps: ['device_accessories_efficiency']
         },
         get_cost: () => ({
             'inventory_copper_ore': {
@@ -1441,22 +1446,23 @@ export const registerAccessoriesStage1 = () => {
             return gameResources.isResourceUnlocked('inventory_iron_plate');
         },
         resourceModifier: {
-            multiplier: {
+            get_multiplier: () => ({
                 resources: {
                     'inventory_iron_ore': {
-                        A: 0.05,
-                        B: 1,
+                        A: 0.05*gameEffects.getEffectValue('device_accessories_efficiency'),
+                        B: gameEffects.getEffectValue('device_accessories_efficiency'),
                         C: 1.004,
                         type: 3,
                     },
                     'inventory_copper_ore': {
-                        A: 0.05,
-                        B: 1,
+                        A: 0.05*gameEffects.getEffectValue('device_accessories_efficiency'),
+                        B: gameEffects.getEffectValue('device_accessories_efficiency'),
                         C: 1.004,
                         type: 3,
                     }
                 }
-            },
+            }),
+            effectDeps: ['device_accessories_efficiency']
         },
         get_cost: () => ({
             'inventory_forged_steel': {
@@ -1588,6 +1594,53 @@ export const registerAccessoriesStage1 = () => {
             'inventory_copper_wire': {
                 A: 1.1,
                 B: 15000000/getAccessoryDiscount(),
+                type: 1
+            },
+        }),
+    })
+
+    registerAccessory('accessory_paper_press', {
+        tags: ["accessory", "upgrade", "purchaseable", "resource", "paper", "device"],
+        name: 'Paper Press',
+        description: 'A sophisticated mechanical device that optimizes paper production through precision pressing and drying techniques. This industrial tool significantly increases paper manufacturing efficiency.',
+        level: 0,
+        minDemoVersion: 20,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 450000,
+        }],
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_paper_working') > 0
+                && gameResources.isResourceUnlocked('inventory_paper');
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                resources: {
+                    'inventory_paper': {
+                        A: 0.01*gameEffects.getEffectValue('device_accessories_efficiency'),
+                        B: gameEffects.getEffectValue('device_accessories_efficiency'),
+                        C: 1.015,
+                        type: 3,
+                    }
+                }
+            }),
+            effectDeps: ['device_accessories_efficiency']
+        },
+        get_cost: () => ({
+            'inventory_forged_steel': {
+                A: 1.1,
+                B: 500000000000/getAccessoryDiscount(),
+                type: 1
+            },
+            'inventory_wooden_beam': {
+                A: 1.1,
+                B: 50000000000/getAccessoryDiscount(),
+                type: 1
+            },
+            'inventory_enchanted_paper': {
+                A: 1.1,
+                B: 1000000000/getAccessoryDiscount(),
                 type: 1
             },
         }),

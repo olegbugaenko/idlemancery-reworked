@@ -26,7 +26,7 @@ export const ZOO_ANIMALS = [
                         C: 0.01*gameEffects.getEffectValue('zoo_animals_efficiency'),
                         type: 5,
                         diminish: 0.6,
-                        diminishStep: 1000,
+                        diminishStep: 50,
                     }
                 }
             }),
@@ -58,7 +58,7 @@ export const ZOO_ANIMALS = [
                         C: 0.05*gameEffects.getEffectValue('zoo_animals_efficiency'),
                         type: 5,
                         diminish: 0.6,
-                        diminishStep: 1000,
+                        diminishStep: 100,
                     }
                 }
             }),
@@ -90,7 +90,7 @@ export const ZOO_ANIMALS = [
                         C: 0.05*gameEffects.getEffectValue('zoo_animals_efficiency'),
                         type: 5,
                         diminish: 0.6,
-                        diminishStep: 1000,
+                        diminishStep: 100,
                     }
                 }
             }),
@@ -127,7 +127,7 @@ export const ZOO_ANIMALS = [
                         C: 0.02*gameEffects.getEffectValue('zoo_animals_efficiency'),
                         type: 5,
                         diminish: 0.6,
-                        diminishStep: 1000,
+                        diminishStep: 20,
                     }
                 }
             }),
@@ -164,7 +164,7 @@ export const ZOO_ANIMALS = [
                         C: 0.02*gameEffects.getEffectValue('zoo_animals_efficiency'),
                         type: 5,
                         diminish: 0.6,
-                        diminishStep: 1000,
+                        diminishStep: 100,
                     }
                 }
             }),
@@ -177,7 +177,7 @@ export const ZOO_ANIMALS = [
         feedEntityId: 'zoo_animal_raven_feeding',
         tags: ['zoo_animal', 'wild', 'bird', 'omnivore'],
         name: 'Raven',
-        icon: 'magic_raven',
+        icon: 'raven',
         description: 'A proud and free-spirited bird of exceptional intelligence. Its presence sharpens mental focus, significantly boosting mental training speed.',
         attributes: {
             isCollectable: false,
@@ -201,7 +201,7 @@ export const ZOO_ANIMALS = [
                         C: 0.02*gameEffects.getEffectValue('zoo_animals_efficiency'),
                         type: 5,
                         diminish: 0.6,
-                        diminishStep: 1000,
+                        diminishStep: 100,
                     }
                 }
             }),
@@ -214,7 +214,7 @@ export const ZOO_ANIMALS = [
         feedEntityId: 'zoo_animal_wolf_feeding',
         tags: ['zoo_animal', 'wild', 'mammal', 'carnivore'],
         name: 'Wolf',
-        icon: 'magic_wolf',
+        icon: 'wolf',
         description: 'A brave and loyal ally, reliable in scouting the most dangerous locations. Its keen tracking instincts dramatically enhance expedition efforts.',
         attributes: {
             isCollectable: false,
@@ -235,10 +235,10 @@ export const ZOO_ANIMALS = [
                     'expedition_effort': {
                         A: 100,
                         B: 1,
-                        C: 0.02*gameEffects.getEffectValue('zoo_animals_efficiency'),
+                        C: 0.004*gameEffects.getEffectValue('zoo_animals_efficiency'),
                         type: 5,
                         diminish: 0.6,
-                        diminishStep: 1000,
+                        diminishStep: 50,
                     }
                 }
             }),

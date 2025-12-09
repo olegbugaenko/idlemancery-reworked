@@ -1095,12 +1095,12 @@ export const registerCraftingRecipes = () => {
                     },
                     'mana': {
                         A: 1.5,
-                        B: 3*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        B: 3*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount')/gameEffects.getEffectValue('alchemy_mana_discount'),
                         type: 1
                     }
                 }
             }),
-            effectDeps: ['alchemy_efficiency','alchemy_materials_discount', 'alchemy_effort']
+            effectDeps: ['alchemy_efficiency','alchemy_materials_discount', 'alchemy_effort', 'alchemy_mana_discount']
         },
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_alchemy_courses') > 0 && gameResources.isResourceUnlocked('inventory_rare_azureblossom')
@@ -1337,12 +1337,12 @@ export const registerCraftingRecipes = () => {
                     },
                     'mana': {
                         A: 1.0,
-                        B: 2000*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        B: 2000*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount')/gameEffects.getEffectValue('alchemy_mana_discount'),
                         type: 1
                     }
                 }
             }),
-            effectDeps: ['alchemy_efficiency','alchemy_materials_discount', 'alchemy_effort']
+            effectDeps: ['alchemy_efficiency','alchemy_materials_discount', 'alchemy_effort', 'alchemy_mana_discount']
         },
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_advanced_alchemy') > 0 && gameResources.isResourceUnlocked('inventory_spirit_potion') && gameResources.isResourceUnlocked('inventory_insight_potion')
@@ -1397,6 +1397,232 @@ export const registerCraftingRecipes = () => {
         },
         attributes: {
             baseXPCost: 50,
+            isRare: true,
+        },
+    })
+
+    // Compound Elixirs (Expertise Alchemy)
+    registerCraftingRecipe('craft_laborers_compound', {
+        tags: ["recipe", "crafting", "alchemy", "physical", "compound"],
+        name: 'Brew Laborer\'s Compound',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Combine the essences of craftsmanship and herbalism to create a powerful elixir that permanently enhances your efficiency in all manual labor tasks.',
+        level: 1,
+        resourceId: 'inventory_laborers_compound',
+        resourceModifier: {
+            get_income: ()=>({
+                resources: {
+                    'inventory_laborers_compound': {
+                        A: 1.0,
+                        B: 0.00002*gameEffects.getEffectValue('alchemy_effort')*gameEffects.getEffectValue('alchemy_efficiency'),
+                        type: 1,
+                    }
+                }
+            }),
+            get_consumption: ()=>({
+                resources: {
+                    'inventory_craftmasters_elixir': {
+                        A: 1.0,
+                        B: 250*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    },
+                    'inventory_herbalists_elixir': {
+                        A: 1.0,
+                        B: 250*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    },
+                }
+            }),
+            effectDeps: ['alchemy_efficiency','alchemy_materials_discount', 'alchemy_effort']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_expertise_alchemy') > 0 
+                && gameResources.isResourceUnlocked('inventory_craftmasters_elixir') 
+                && gameResources.isResourceUnlocked('inventory_herbalists_elixir')
+        },
+        attributes: {
+            baseXPCost: 100,
+            isRare: true,
+        },
+    })
+
+    registerCraftingRecipe('craft_zookeepers_compound', {
+        tags: ["recipe", "crafting", "alchemy", "magical", "compound"],
+        name: 'Brew Zookeeper\'s Compound',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Fuse herbalist and alchemist essences into a transformative elixir that permanently expands the capacity of your magical zoo.',
+        level: 1,
+        resourceId: 'inventory_zookeepers_compound',
+        resourceModifier: {
+            get_income: ()=>({
+                resources: {
+                    'inventory_zookeepers_compound': {
+                        A: 1.0,
+                        B: 0.00002*gameEffects.getEffectValue('alchemy_effort')*gameEffects.getEffectValue('alchemy_efficiency'),
+                        type: 1,
+                    }
+                }
+            }),
+            get_consumption: ()=>({
+                resources: {
+                    'inventory_herbalists_elixir': {
+                        A: 1.0,
+                        B: 250*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    },
+                    'inventory_alchemists_elixir': {
+                        A: 1.0,
+                        B: 250*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    }
+                }
+            }),
+            effectDeps: ['alchemy_efficiency','alchemy_materials_discount', 'alchemy_effort']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_expertise_alchemy') > 0 
+                && gameResources.isResourceUnlocked('inventory_herbalists_elixir') 
+                && gameResources.isResourceUnlocked('inventory_alchemists_elixir')
+        },
+        attributes: {
+            baseXPCost: 100,
+            isRare: true,
+        },
+    })
+
+    registerCraftingRecipe('craft_conjurers_compound', {
+        tags: ["recipe", "crafting", "alchemy", "magical", "compound"],
+        name: 'Brew Conjurer\'s Compound',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Merge alchemical and elemental mastery into a potent elixir that permanently enhances the power of your conjuration spells.',
+        level: 1,
+        resourceId: 'inventory_conjurers_compound',
+        resourceModifier: {
+            get_income: ()=>({
+                resources: {
+                    'inventory_conjurers_compound': {
+                        A: 1.0,
+                        B: 0.00002*gameEffects.getEffectValue('alchemy_effort')*gameEffects.getEffectValue('alchemy_efficiency'),
+                        type: 1,
+                    }
+                }
+            }),
+            get_consumption: ()=>({
+                resources: {
+                    'inventory_alchemists_elixir': {
+                        A: 1.0,
+                        B: 250*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    },
+                    'inventory_elementalists_elixir': {
+                        A: 1.0,
+                        B: 250*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    }
+                }
+            }),
+            effectDeps: ['alchemy_efficiency','alchemy_materials_discount', 'alchemy_effort']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_expertise_alchemy') > 0 
+                && gameResources.isResourceUnlocked('inventory_alchemists_elixir') 
+                && gameResources.isResourceUnlocked('inventory_elementalists_elixir')
+        },
+        attributes: {
+            baseXPCost: 100,
+            isRare: true,
+        },
+    })
+
+    registerCraftingRecipe('craft_publishers_compound', {
+        tags: ["recipe", "crafting", "alchemy", "social", "compound"],
+        name: 'Brew Publisher\'s Compound',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Combine elemental energy with diplomatic finesse to create an elixir that permanently accelerates the learning speed of all press journals.',
+        level: 1,
+        resourceId: 'inventory_publishers_compound',
+        resourceModifier: {
+            get_income: ()=>({
+                resources: {
+                    'inventory_publishers_compound': {
+                        A: 1.0,
+                        B: 0.00002*gameEffects.getEffectValue('alchemy_effort')*gameEffects.getEffectValue('alchemy_efficiency'),
+                        type: 1,
+                    }
+                }
+            }),
+            get_consumption: ()=>({
+                resources: {
+                    'inventory_elementalists_elixir': {
+                        A: 1.0,
+                        B: 250*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    },
+                    'inventory_diplomats_elixir': {
+                        A: 1.0,
+                        B: 250*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    }
+                }
+            }),
+            effectDeps: ['alchemy_efficiency','alchemy_materials_discount', 'alchemy_effort']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_expertise_alchemy') > 0 
+                && gameResources.isResourceUnlocked('inventory_elementalists_elixir') 
+                && gameResources.isResourceUnlocked('inventory_diplomats_elixir')
+        },
+        attributes: {
+            baseXPCost: 100,
+            isRare: true,
+        },
+    })
+
+    registerCraftingRecipe('craft_artisans_compound', {
+        tags: ["recipe", "crafting", "alchemy", "physical", "compound"],
+        name: 'Brew Artisan\'s Compound',
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Unite diplomatic charm with masterful crafting into a legendary elixir that permanently reduces the cost of all accessories.',
+        level: 1,
+        resourceId: 'inventory_artisans_compound',
+        resourceModifier: {
+            get_income: ()=>({
+                resources: {
+                    'inventory_artisans_compound': {
+                        A: 1.0,
+                        B: 0.00002*gameEffects.getEffectValue('alchemy_effort')*gameEffects.getEffectValue('alchemy_efficiency'),
+                        type: 1,
+                    }
+                }
+            }),
+            get_consumption: ()=>({
+                resources: {
+                    'inventory_diplomats_elixir': {
+                        A: 1.0,
+                        B: 250*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    },
+                    'inventory_craftmasters_elixir': {
+                        A: 1.0,
+                        B: 250*gameEffects.getEffectValue('alchemy_effort')/gameEffects.getEffectValue('alchemy_materials_discount'),
+                        type: 1
+                    },
+                }
+            }),
+            effectDeps: ['alchemy_efficiency','alchemy_materials_discount', 'alchemy_effort']
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_expertise_alchemy') > 0 
+                && gameResources.isResourceUnlocked('inventory_diplomats_elixir') 
+                && gameResources.isResourceUnlocked('inventory_craftmasters_elixir')
+        },
+        attributes: {
+            baseXPCost: 100,
             isRare: true,
         },
     })

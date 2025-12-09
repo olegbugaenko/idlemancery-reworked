@@ -959,8 +959,6 @@ export class PropertyModule extends GameModule {
 
         const spaceRes = gameResources.getResource('living_space');
 
-        // console.log('showHidden: ', this.showHidden, options.showHidden);
-
         return {
             available: entities.filter(one => one.isUnlocked
                 && (!options?.hideMaxed || !one.isCapped)
@@ -979,8 +977,8 @@ export class PropertyModule extends GameModule {
                 isHidden: this.hiddenItems[payload.filterId]?.[entity.id],
                 isAutoPurchase: this.autoPurchase[entity.id] ?? false,
                 spaceUsage: gameEntity.getEffects(entity.id, 0).find(one => one.id === 'living_space')?.value / Math.max(1, spaceRes.consumption),
-                manualLoad: entity.attributes?.manualLoad,
-                efficiency: gameEntity.getEntityEfficiency(entity.id) ?? 1,
+                manualLoad: gameEntity.getAttribute(entity.id, 'manualLoad'),
+                efficiency: (this.purchasedFurnitures[entity.id] || 0) > 0 ? gameEntity.getEntityEfficiency(entity.id) : 1,
             })),
             propertyCategories: Object.values(perCats).filter(cat => cat.items.length > 0).sort((a, b) => a.sortIndex - b.sortIndex),
             space: {
@@ -1106,7 +1104,7 @@ export class PropertyModule extends GameModule {
         const list = [];
         for(const key in effectIdsUnique) {
             list.push({
-                ...gameEffects.getEffect(key),
+                ...effectResponse(gameEffects.getEffect(key)),
                 isUnlocked: effectIdsUnique[key] && gameEffects.isEffectUnlocked(key)
             })
         }

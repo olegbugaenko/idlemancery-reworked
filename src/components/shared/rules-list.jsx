@@ -266,6 +266,7 @@ const RulesList = React.memo(
         const [actionsLists, setActionsLists] = useState([]);
         const [tags, setTags] = useState([]);
         const [spells, setSpells] = useState([]);
+        const [rituals, setRituals] = useState([]);
         const [craftingLists, setCraftingLists] = useState([]);
         const [courses, setCourses] = useState([]);
         const [socialEvents, setSocialEvents] = useState([]);
@@ -296,6 +297,7 @@ const RulesList = React.memo(
             sendData('query-all-action-tags', { prefix });
             sendData('query-actions-lists', { prefix });
             sendData('query-all-spells', { prefix });
+            sendData('query-all-rituals', { prefix });
             sendData('query-all-crafting-lists', { prefix });
             sendData('query-all-courses', { prefix });
             sendData('query-social-events-automation', { prefix });
@@ -345,6 +347,10 @@ const RulesList = React.memo(
 
         onMessage(`all-spells-${prefix}`, (payload) => {
             setSpells(payload);
+        })
+
+        onMessage(`all-rituals-${prefix}`, (payload) => {
+            setRituals(payload);
         })
 
         onMessage(`all-crafting-lists-${prefix}`, (payload) => {
@@ -408,6 +414,8 @@ const RulesList = React.memo(
                             subjectArray = actionsLists;
                         } else if (subject === 'spell_id') {
                             subjectArray = spells;
+                        } else if (subject === 'ritual_id') {
+                            subjectArray = rituals;
                         } else if (subject === 'crafting_list_id') {
                             subjectArray = craftingLists;
                         } else if (subject === 'course_id') {

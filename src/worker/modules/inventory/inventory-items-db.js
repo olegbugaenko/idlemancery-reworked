@@ -1855,6 +1855,132 @@ export const registerInventoryItems = () => {
         sellPrice: 35000000,
     })
 
+    // Compound Elixirs (Expertise Alchemy)
+    registerInventoryItem('inventory_laborers_compound', {
+        name: 'Laborer\'s Compound',
+        hasCap: false,
+        tags: ['inventory', 'consumable', 'potion', 'rare', 'compound'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+            updateLevelBy('compound_laborers_effect', amount)
+        },
+        getUsageCooldown: () => {
+            return 0.1;
+        },
+        attributes: {
+            isRare: true,
+            entityEffect: 'compound_laborers_effect',
+            allowMultiConsume: true,
+        },
+        resourceModifier: {},
+        usageGain: {},
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_expertise_alchemy') > 0
+        },
+        sellPrice: 150000000,
+    })
+
+    registerInventoryItem('inventory_zookeepers_compound', {
+        name: 'Zookeeper\'s Compound',
+        hasCap: false,
+        tags: ['inventory', 'consumable', 'potion', 'rare', 'compound'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+            updateLevelBy('compound_zookeepers_effect', amount)
+        },
+        getUsageCooldown: () => {
+            return 0.1;
+        },
+        attributes: {
+            isRare: true,
+            entityEffect: 'compound_zookeepers_effect',
+            allowMultiConsume: true,
+        },
+        resourceModifier: {},
+        usageGain: {},
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_expertise_alchemy') > 0
+        },
+        sellPrice: 150000000,
+    })
+
+    registerInventoryItem('inventory_conjurers_compound', {
+        name: 'Conjurer\'s Compound',
+        hasCap: false,
+        tags: ['inventory', 'consumable', 'potion', 'rare', 'compound'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+            updateLevelBy('compound_conjurers_effect', amount)
+        },
+        getUsageCooldown: () => {
+            return 0.1;
+        },
+        attributes: {
+            isRare: true,
+            entityEffect: 'compound_conjurers_effect',
+            allowMultiConsume: true,
+        },
+        resourceModifier: {},
+        usageGain: {},
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_expertise_alchemy') > 0
+        },
+        sellPrice: 150000000,
+    })
+
+    registerInventoryItem('inventory_publishers_compound', {
+        name: 'Publisher\'s Compound',
+        hasCap: false,
+        tags: ['inventory', 'consumable', 'potion', 'rare', 'compound'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+            updateLevelBy('compound_publishers_effect', amount)
+        },
+        getUsageCooldown: () => {
+            return 0.1;
+        },
+        attributes: {
+            isRare: true,
+            entityEffect: 'compound_publishers_effect',
+            allowMultiConsume: true,
+        },
+        resourceModifier: {},
+        usageGain: {},
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_expertise_alchemy') > 0
+        },
+        sellPrice: 150000000,
+    })
+
+    registerInventoryItem('inventory_artisans_compound', {
+        name: 'Artisan\'s Compound',
+        hasCap: false,
+        tags: ['inventory', 'consumable', 'potion', 'rare', 'compound'],
+        defaultCap: 0,
+        isAbstract: true,
+        onUse: (amount) => {
+            updateLevelBy('compound_artisans_effect', amount)
+        },
+        getUsageCooldown: () => {
+            return 0.1;
+        },
+        attributes: {
+            isRare: true,
+            entityEffect: 'compound_artisans_effect',
+            allowMultiConsume: true,
+        },
+        resourceModifier: {},
+        usageGain: {},
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_expertise_alchemy') > 0
+        },
+        sellPrice: 150000000,
+    })
+
 
     // Rare
 

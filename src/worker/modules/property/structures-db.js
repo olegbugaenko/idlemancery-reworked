@@ -1247,11 +1247,6 @@ export const registerStructuresStage1 = () => {
                 B: 300000,
                 type: 1
             },
-            'inventory_coal': {
-                A: 1.25,
-                B: 1000,
-                type: 1
-            },
             'living_space': {
                 A: 0,
                 B: 5,
@@ -1528,7 +1523,6 @@ export const registerStructuresStage1 = () => {
         name: 'Building Materials Factory',
         description: 'A massive industrial complex for producing construction materials. Significantly increases production of wooden beams and stone bricks through automated processing.',
         level: 0,
-        maxLevel: 10,
         minDemoVersion: 20,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_advanced_engineering_2') > 0;
@@ -1589,7 +1583,7 @@ export const registerStructuresStage1 = () => {
         name: 'Mining Processing Plant',
         description: 'An advanced mining facility with automated ore processing systems. Dramatically improves the efficiency of all mining machinery operations.',
         level: 0,
-        maxLevel: 10,
+        getMaxLevel: () => 10 + gameEffects.getEffectValue('mining_processing_plant_max_level_bonus'),
         minDemoVersion: 20,
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_advanced_engineering_2') > 0;
@@ -1600,7 +1594,7 @@ export const registerStructuresStage1 = () => {
                     'mining_machinery_efficiency': {
                         A: 0.25,
                         B: 1,
-                        C: 1.02,
+                        C: 1.04,
                         type: 3,
                     }
                 }
@@ -1799,6 +1793,238 @@ export const registerStructuresStage1 = () => {
             'inventory_stone_brick': {
                 A: 1.3,
                 B: 100000000000,
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 5,
+                type: 0
+            }
+        }),
+    })
+
+    registerStructure('structure_advanced_lumbermill', {
+        tags: ["structure", "upgrade", "purchaseable", "production", "wood"],
+        name: 'Advanced Lumbermill',
+        description: 'A state-of-the-art lumber processing facility equipped with precision cutting machinery and automated refinement systems. Dramatically increases the production of both raw wood and refined wood products.',
+        level: 0,
+        maxLevel: 10,
+        minDemoVersion: 20,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_advanced_woodworking') > 0;
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                resources: {
+                    'inventory_wood': {
+                        A: 0.15,
+                        B: 1,
+                        C: 1.02,
+                        type: 3,
+                    },
+                    'inventory_refined_wood': {
+                        A: 0.15,
+                        B: 1,
+                        C: 1.02,
+                        type: 3,
+                    }
+                }
+            }),
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 5,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            },
+        },
+        get_cost: () => ({
+            'inventory_forged_steel': {
+                A: 1.3,
+                B: 100000000000,
+                type: 1
+            },
+            'inventory_wooden_beam': {
+                A: 1.3,
+                B: 100000000000,
+                type: 1
+            },
+            'inventory_stone_brick': {
+                A: 1.3,
+                B: 50000000000,
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 5,
+                type: 0
+            }
+        }),
+    })
+
+    registerStructure('structure_repair_workshop', {
+        tags: ["structure", "upgrade", "purchaseable", "production", "workshop"],
+        name: 'Artisan Guild Hall',
+        description: 'A workshop where experienced craftsmen share their techniques, improving your crafting output.',
+        level: 0,
+        maxLevel: 10,
+        minDemoVersion: 20,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 450000,
+        }],
+        unlockCondition: () => gameEffects.getEffectValue('attribute_strength') > 450000,
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'crafting_effort': {
+                        A: 0.25,
+                        B: 1,
+                        C: 1.02,
+                        type: 3,
+                    }
+                }
+            }),
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 6,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            },
+        },
+        get_cost: () => ({
+            'inventory_forged_steel': {
+                A: 1.3,
+                B: 5000000000000,
+                type: 1
+            },
+            'inventory_wooden_beam': {
+                A: 1.3,
+                B: 5000000000000,
+                type: 1
+            },
+            'inventory_stone_brick': {
+                A: 1.3,
+                B: 2500000000000,
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 6,
+                type: 0
+            }
+        }),
+    })
+
+    registerStructure('structure_botanical_survey_station', {
+        tags: ["structure", "upgrade", "purchaseable", "exploration"],
+        name: 'Botanical Survey Station',
+        description: 'A research facility with advanced botanical equipment that helps identify and locate rare plants during map exploration.',
+        level: 0,
+        maxLevel: 50,
+        minDemoVersion: 20,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_advanced_engineering_3') > 0;
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'rare_plants_on_map': {
+                        A: 0.1,
+                        B: 1,
+                        type: 0,
+                    }
+                }
+            }),
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 4,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            },
+        },
+        get_cost: () => ({
+            'inventory_forged_steel': {
+                A: 1.4,
+                B: 50000000000000,
+                type: 1
+            },
+            'inventory_wooden_beam': {
+                A: 1.4,
+                B: 150000000000000,
+                type: 1
+            },
+            'inventory_obsidian_shard': {
+                A: 1.4,
+                B: 750000000000,
+                type: 1
+            },
+            'living_space': {
+                A: 0,
+                B: 4,
+                type: 0
+            }
+        }),
+    })
+
+    registerStructure('structure_industrial_hub', {
+        tags: ["structure", "upgrade", "purchaseable", "industrial"],
+        name: 'Industrial Hub',
+        description: 'A centralized management facility that coordinates and optimizes industrial operations, allowing factories to operate beyond their normal capacity.',
+        level: 0,
+        maxLevel: 5,
+        minDemoVersion: 20,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_advanced_engineering_3') > 0;
+        },
+        resourceModifier: {
+            get_income: () => ({
+                effects: {
+                    'stone_workshop_max_level_bonus': {
+                        A: 2,
+                        B: 0,
+                        type: 0,
+                    },
+                    'mining_processing_plant_max_level_bonus': {
+                        A: 2,
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            }),
+            consumption: {
+                resources: {
+                    'living_space': {
+                        A: 5,
+                        B: 0,
+                        type: 0
+                    }
+                }
+            },
+        },
+        get_cost: () => ({
+            'inventory_forged_steel': {
+                A: 1.4,
+                B: 75000000000000,
+                type: 1
+            },
+            'inventory_wooden_beam': {
+                A: 1.4,
+                B: 200000000000000,
+                type: 1
+            },
+            'inventory_stone_brick': {
+                A: 1.4,
+                B: 100000000000000,
                 type: 1
             },
             'living_space': {

@@ -406,6 +406,51 @@ export const registerMachineryStage1 = () => {
             'living_space': { A: 0, B: 4, type: 0 },
         }),
     });
+
+    registerMachine('printing_machine', {
+        tags: ["machinery", "purchaseable", "social", "press", "machine"],
+        name: 'Printing Machine',
+        description: 'A complex press for mass-producing publication effort, the vital resource for publishing journals.',
+        level: 0,
+        unlockCondition: () => gameEntity.getLevel('shop_item_press_license') > 0,
+        attributes: {
+            isMachinery: true
+        },
+        resourceModifier: {
+            get_income: () => ({
+                resources: {
+                    'printing_effort': {
+                        A: 0.1 * gameEffects.getEffectValue('machinery_efficiency'),
+                        B: 1 * gameEffects.getEffectValue('machinery_efficiency'),
+                        C: 1.05,
+                        type: 3
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    'inventory_paper': {
+                        A: 200000,
+                        B: 0,
+                        C: 1.05,
+                        type: 3
+                    },
+                    'inventory_coal': { A: 100.0/getCoalDiscount(), B: 0.0, C: 1.05, type: 3 },
+                    'living_space': {
+                        A: 5,
+                        B: 0,
+                        type: 0 
+                    }
+                }
+            }),
+            effectDeps: ['machinery_efficiency', 'coal_consumption_discount'],
+        },
+        get_cost: () => ({
+            'inventory_forged_steel': {A: 1.2, B: 200000000, type: 1},
+            'inventory_wooden_beam': {A: 1.2, B: 400000000, type: 1},
+            'living_space': {A: 0, B: 5, type: 0}
+        })
+    })
 }
 
 

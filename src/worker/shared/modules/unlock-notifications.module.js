@@ -189,6 +189,11 @@ export class UnlockNotificationsModule extends GameModule {
         if (zooModule && typeof zooModule.regenerateNotifications === 'function') {
             zooModule.regenerateNotifications();
         }
+        // Press notifications
+        const pressModule = gameCore.getModule('press');
+        if (pressModule && typeof pressModule.regenerateNotifications === 'function') {
+            pressModule.regenerateNotifications();
+        }
     }
 
     /**

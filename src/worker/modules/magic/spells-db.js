@@ -1261,4 +1261,96 @@ export const initSpellsDB1 = () => {
         },
     })
 
+    registerSpell('spell_lifes_blessing', {
+        name: 'Life\'s Blessing',
+        description: 'Invoke the primal forces of nature to accelerate the natural breeding cycles of zoo animals. All creatures benefit from enhanced vitality and reproduction rates.',
+        hasCap: false,
+        tags: ['spell', 'magic', 'nature', 'nature_magic'],
+        defaultCap: 0,
+        isAbstract: true,
+        level: 1,
+        minDemoVersion: 20,
+        onUse: (amount) => {
+
+        },
+        getUsageCooldown: () => {
+            return 0;
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'breeding_efficiency': {
+                        A: 0.05*gameEffects.getEffectValue('nature_spells_efficiency'),
+                        B: 1. + 0.15*gameEffects.getEffectValue('nature_spells_efficiency'),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    mana: {
+                        A: 1.5,
+                        B: 35000*getCostReduction('spell_lifes_blessing'),
+                        type: 1,
+                    }
+                }
+            }),
+            effectDeps: ['nature_spells_efficiency']
+        },
+        attributes: {
+            duration: 20,
+            xpOnCast: 80,
+            baseXPCost: 1.e+10,
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_advanced_nature_magic') > 0
+        },
+    })
+
+    registerSpell('spell_alchemical_essence', {
+        name: 'Alchemical Essence',
+        description: 'Channel nature\'s essence to enhance your alchemical prowess. Temporarily multiplies your alchemy ability, making potion creation more efficient.',
+        hasCap: false,
+        tags: ['spell', 'magic', 'nature', 'nature_magic'],
+        defaultCap: 0,
+        isAbstract: true,
+        level: 1,
+        minDemoVersion: 20,
+        onUse: (amount) => {
+
+        },
+        getUsageCooldown: () => {
+            return 0;
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'alchemy_effort': {
+                        A: 0.1*gameEffects.getEffectValue('nature_spells_efficiency'),
+                        B: 1. + 0.3*gameEffects.getEffectValue('nature_spells_efficiency'),
+                        type: 0,
+                    }
+                }
+            }),
+            get_consumption: () => ({
+                resources: {
+                    mana: {
+                        A: 1.5,
+                        B: 25000*getCostReduction('spell_alchemical_essence'),
+                        type: 1,
+                    }
+                }
+            }),
+            effectDeps: ['nature_spells_efficiency']
+        },
+        attributes: {
+            duration: 20,
+            xpOnCast: 100,
+            baseXPCost: 1.e+10,
+        },
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_advanced_nature_magic') > 0
+        },
+    })
+
 }

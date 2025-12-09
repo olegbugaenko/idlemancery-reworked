@@ -133,7 +133,7 @@ export class CraftingModule extends GameModule {
 
     tick(game, delta) {
         this.lists.tick(game, delta);
-        
+
         // Auto-rebalancing check for crafting
         if (this.autoRebalanceEnabled) {
             this.lastRebalanceCheck += delta;

@@ -51,6 +51,11 @@ export const SocialMenu = ({ selectedTab, setSelectedTab }) => {
                         <span>Event Hall</span>
                     </NewNotificationWrap>
                 </li>) : null}
+                {unlocks.press ? (<li id={'social-menu-press'} className={`${selectedTab === 'press' ? 'active' : ''}`} onClick={() => {setSelectedTab('press');}}>
+                    <NewNotificationWrap isNew={newUnlocks.social?.items?.press?.hasNew}>
+                        <span>Press</span>
+                    </NewNotificationWrap>
+                </li>) : null}
             </ul>
         )
 } 
