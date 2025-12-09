@@ -122,10 +122,17 @@ export class CoursesModule extends GameModule {
 
     getDuration(id) {
         const base = gameEntity.getAttribute(id, 'basicDuration');
-
         const level = this.courses[id]?.level ?? 0;
-
-        return base * Math.pow(1.25, level) / gameEffects.getEffectValue('courses_learning_speed');
+        
+        let duration = base * Math.pow(1.25, level) / gameEffects.getEffectValue('courses_learning_speed');
+        
+        // Check if course has specific speed effect
+        const speedEffect = gameEntity.getAttribute(id, 'speedEffect');
+        if (speedEffect) {
+            duration /= gameEffects.getEffectValue(speedEffect);
+        }
+        
+        return duration;
     }
 
     tick(game, delta) {

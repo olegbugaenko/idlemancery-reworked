@@ -833,6 +833,24 @@ export const registerCommomEffects = () => {
         hasCap: false,
     })
 
+    gameEffects.registerEffect('zoo_machinery_efficiency', {
+        name: 'Zoo Machinery Efficiency',
+        tags: ['multiplier'],
+        description: 'Increases the efficiency of zoo-related machinery',
+        defaultValue: 1,
+        minValue: 0,
+        hasCap: false,
+    })
+
+    gameEffects.registerEffect('enchancement_courses_speed', {
+        name: 'Enhancement Courses Speed',
+        tags: ['multiplier'],
+        description: 'Increases learning speed for enhancement-focused courses',
+        defaultValue: 1,
+        minValue: 0,
+        hasCap: false,
+    })
+
     gameEffects.registerEffect('rare_plants_on_map', {
         name: 'Rare Plants on Map',
         tags: ['multiplier'],
@@ -957,6 +975,15 @@ export const registerCommomEffects = () => {
         defaultValue: 1.,
         minValue: 1.,
         description: 'Increases breeding efficiency for reptiles in the magical zoo',
+        saveBalanceTree: true,
+    })
+
+    gameEffects.registerEffect('insects_breeding_efficiency', {
+        name: 'Insects Breeding Efficiency',
+        tags: ['multiplier'],
+        defaultValue: 1.,
+        minValue: 1.,
+        description: 'Increases breeding efficiency for insects in the magical zoo',
         saveBalanceTree: true,
     })
 

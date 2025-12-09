@@ -43,6 +43,10 @@ export const PressWrap = ({ children }) => {
         const detailId = viewedOpenedId ?? detailOpenedId;
         if (detailId) {
             sendData('query-press-journal-details', { id: detailId });
+            const interval = setInterval(() => {
+                sendData('query-press-journal-details', { id: detailId });
+            }, 500);
+            return () => clearInterval(interval);
         }
     }, [viewedOpenedId, detailOpenedId]);
 

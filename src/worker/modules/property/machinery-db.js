@@ -329,7 +329,7 @@ export const registerMachineryStage1 = () => {
             get_multiplier: () => ({
                 effects: {
                     'birds_breeding_efficiency': {
-                        A: 0.2,
+                        A: 0.2 * gameEffects.getEffectValue('zoo_machinery_efficiency'),
                         B: 1,
                         C: 1.02,
                         type: 3,
@@ -347,7 +347,7 @@ export const registerMachineryStage1 = () => {
             // Scale both the provided effects and the machine consumption by manual load
             customAmplifierApplyTypes: ['effects', 'resources'],
             customAmplifierApplyScopes: ['multiplier', 'consumption'],
-            effectDeps: ['birds_breeding_efficiency', 'coal_consumption_discount'],
+            effectDeps: ['birds_breeding_efficiency', 'coal_consumption_discount', 'zoo_machinery_efficiency'],
         },
         get_cost: () => ({
             'inventory_copper_wire': { A: 1.5, B: 2000, type: 1 },
@@ -379,7 +379,7 @@ export const registerMachineryStage1 = () => {
             get_multiplier: () => ({
                 effects: {
                     'mammal_breeding_efficiency': {
-                        A: 0.2,
+                        A: 0.2 * gameEffects.getEffectValue('zoo_machinery_efficiency'),
                         B: 1,
                         C: 1.02,
                         type: 3,
@@ -397,7 +397,7 @@ export const registerMachineryStage1 = () => {
             // Scale both the provided effects and the machine consumption by manual load
             customAmplifierApplyTypes: ['effects', 'resources'],
             customAmplifierApplyScopes: ['multiplier', 'consumption'],
-            effectDeps: ['mammal_breeding_efficiency', 'coal_consumption_discount'],
+            effectDeps: ['mammal_breeding_efficiency', 'coal_consumption_discount', 'zoo_machinery_efficiency'],
         },
         get_cost: () => ({
             'inventory_copper_wire': { A: 1.5, B: 2000, type: 1 },

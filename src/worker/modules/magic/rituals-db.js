@@ -185,7 +185,7 @@ export const initRitualsDB = () => {
                         B: 0.1,
                         type: 0,
                     },
-                    alchemy_ability: {
+                    alchemy_effort: {
                         A: 0,
                         B: 0.1,
                         type: 0,

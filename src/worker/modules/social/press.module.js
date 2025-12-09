@@ -29,7 +29,9 @@ export class PressModule extends GameModule {
     }
 
     getJournals() {
-        return gameEntity.listEntitiesByTags(['press_journal']);
+        return gameEntity.listEntitiesByTags(['press_journal']).filter(one => {
+            return gameEntity.isEntityUnlocked(one.id)
+        });
     }
 
     isPressUnlocked() {

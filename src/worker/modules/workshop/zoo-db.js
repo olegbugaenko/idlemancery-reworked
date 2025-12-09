@@ -237,8 +237,92 @@ export const ZOO_ANIMALS = [
                         B: 1,
                         C: 0.004*gameEffects.getEffectValue('zoo_animals_efficiency'),
                         type: 5,
-                        diminish: 0.6,
+                        diminish: 0.7,
                         diminishStep: 50,
+                    }
+                }
+            }),
+            effectDeps: ['zoo_animals_efficiency']
+        }
+    },
+    {
+        id: 'magic_beetle',
+        entityId: 'zoo_animal_magic_beetle',
+        feedEntityId: 'zoo_animal_magic_beetle_feeding',
+        tags: ['zoo_animal', 'magical', 'insect', 'herbivore'],
+        name: 'Magic Beetle',
+        icon: 'zoo_beetle',
+        description: 'An enchanted beetle with iridescent carapace that pulses with arcane energy. Its presence enhances the absorption of magical knowledge, reducing the effort required to master spells.',
+        attributes: {
+            isCollectable: false,
+            requiredSpace: 1,
+            breedFeedRequirement: {
+                inventory_knowledge_moss: 20_000_000,
+                inventory_mystic_bloom: 5_000_000,
+            },
+            breedingEffectId: 'insects_breeding_efficiency',
+        },
+        minDemoVersion: 20,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_entomology_guide') > 0;
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 600000,
+        }],
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'magical_actions_discount': {
+                        A: 100,
+                        B: 1,
+                        C: 0.02*gameEffects.getEffectValue('zoo_animals_efficiency'),
+                        type: 5,
+                        diminish: 0.6,
+                        diminishStep: 100,
+                    }
+                }
+            }),
+            effectDeps: ['zoo_animals_efficiency']
+        }
+    },
+    {
+        id: 'magic_aphid',
+        entityId: 'zoo_animal_magic_aphid',
+        feedEntityId: 'zoo_animal_magic_aphid_feeding',
+        tags: ['zoo_animal', 'magical', 'insect', 'herbivore'],
+        name: 'Magic Aphid',
+        icon: 'zoo_aphid',
+        description: 'A tiny insect infused with mana-efficient essence. When kept in the zoo, these creatures naturally reduce the mana cost of all alchemical transmutations.',
+        attributes: {
+            isCollectable: false,
+            requiredSpace: 1,
+            breedFeedRequirement: {
+                inventory_focusberry: 20_000_000,
+                inventory_mystic_bloom: 5_000_000,
+            },
+            breedingEffectId: 'insects_breeding_efficiency',
+        },
+        minDemoVersion: 20,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_entomology_guide') > 0;
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 600000,
+        }],
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'alchemy_mana_discount': {
+                        A: 100,
+                        B: 1,
+                        C: 0.01*gameEffects.getEffectValue('zoo_animals_efficiency'),
+                        type: 5,
+                        diminish: 0.8,
+                        diminishStep: 10,
                     }
                 }
             }),

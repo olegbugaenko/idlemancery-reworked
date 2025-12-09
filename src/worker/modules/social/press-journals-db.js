@@ -136,4 +136,34 @@ export const registerPressJournals = () => {
             })
         }
     })
+    
+    // Ethologist's Notes: breeding efficiency
+    gameEntity.registerGameEntity('press_journal_ethology', {
+        tags: ["press_journal", "press", "ethology", "zoo"],
+        name: 'Ethologist\'s Notes',
+        description: 'Behavioral studies and breeding insights from field observations that enhance animal reproduction success in your magical zoo.',
+        class: 'journal',
+        level: 0,
+        minDemoVersion: 20,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_charisma',
+            level: 600000,
+        }],
+        attributes: {
+            baseXPCost: 150,
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'breeding_efficiency': {
+                        A: 0.01,
+                        B: 1,
+                        C: 1.0007,
+                        type: 3
+                    },
+                }
+            })
+        }
+    })
 }

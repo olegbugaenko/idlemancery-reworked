@@ -37,6 +37,7 @@ export const registerCourseItemsStage1 = () => {
         minDemoVersion: 20,
         attributes: {
             basicDuration: 60,
+            speedEffect: 'enchancement_courses_speed',
         },
         level: 0,
         unlockCondition: () => gameEntity.getLevel('shop_item_training_room') > 0,
@@ -80,6 +81,7 @@ export const registerCourseItemsStage1 = () => {
         minDemoVersion: 20,
         attributes: {
             basicDuration: 60,
+            speedEffect: 'enchancement_courses_speed',
         },
         level: 0,
         unlockCondition: () => gameEntity.getLevel('shop_item_training_room') > 0,
@@ -119,6 +121,7 @@ export const registerCourseItemsStage1 = () => {
         minDemoVersion: 20,
         attributes: {
             basicDuration: 60,
+            speedEffect: 'enchancement_courses_speed',
         },
         level: 0,
         unlockCondition: () => gameEntity.getLevel('shop_item_training_room') > 0,
@@ -158,6 +161,7 @@ export const registerCourseItemsStage1 = () => {
         minDemoVersion: 20,
         attributes: {
             basicDuration: 60,
+            speedEffect: 'enchancement_courses_speed',
         },
         level: 0,
         unlockCondition: () => gameEntity.getLevel('shop_item_training_room') > 0,
@@ -193,7 +197,7 @@ export const registerCourseItemsStage1 = () => {
     // New courses unlocked by Advanced Academia (Patience 150K shop item)
     registerCourse('course_cognitive_reservoirs', {
         name: 'Cognitive Reservoirs',
-        tags: ['mental', 'enchancement'],
+        tags: ['mental', 'brainstorm'],
         minDemoVersion: 20,
         attributes: {
             basicDuration: 5200,
@@ -231,7 +235,7 @@ export const registerCourseItemsStage1 = () => {
 
     registerCourse('course_zoo_capacity_planning', {
         name: 'Zoo Capacity Planning',
-        tags: ['zoo', 'enchancement'],
+        tags: ['zoo', 'brainstorm'],
         minDemoVersion: 20,
         attributes: {
             basicDuration: 5200,

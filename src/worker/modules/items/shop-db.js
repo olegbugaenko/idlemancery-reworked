@@ -4062,6 +4062,26 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+    gameEntity.registerGameEntity('shop_item_entomology_guide', {
+        tags: ["shop", "upgrade", "purchaseable", "zoo", "magic"],
+        name: 'Entomology Guide',
+        description: 'A comprehensive study of magical insects and their arcane properties. Unlocks the ability to house and breed enchanted beetles and aphids in your zoo.',
+        level: 0,
+        maxLevel: 1,
+        minDemoVersion: 20,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_patience',
+            level: 600000,
+        }],
+        unlockCondition: () => gameEntity.getLevel('shop_item_magical_zoo') > 0,
+        attributes: { isCollectable: false },
+        resourceModifier: {},
+        get_cost: () => ({
+            'coins': { A: 2, B: 2.e+17*charismaMod(gameEffects.getEffectValue('attribute_charisma')), type: 1 },
+        }),
+    })
+
     gameEntity.registerGameEntity('shop_item_elemental_shop_access', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Elemental Shop Access',
