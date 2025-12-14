@@ -134,6 +134,48 @@ export const achievementsDb = [{
     ],
     completeCondition: () => gameEntity.getLevel('action_gossip') >= 5000
 },{
+    id: 'action_gossip_8',
+    title: 'The Whispering Cave',
+    text: [
+        "Rumors spread about a cave where mysterious voices could be heard — voices that supposedly foretold the future.",
+        "A group of brave townsfolk decided to investigate, and you joined them to see what was truly happening.",
+        "You made your way through a half-flooded underground passage. The voices were real. Everyone was terrified.",
+        "As the group whispered theories about spirits, curses, and ancient omens, you examined the cave more closely and found the real cause.",
+        "A small crack in the rock created a perfect resonance channel, carrying echoes from the market located directly above the cave.",
+        "The so-called \"prophecies\" turned out to be ordinary phrases like:",
+        "\"Three apples for a copper!\"",
+        "\"Who took my knife!?\"",
+        "\"Fresh fish!\"",
+        "But by the time you explained it, the group was already convinced that you had \"calmed the spirits\" and saved them from misfortune.",
+        "In gratitude, they gifted you a ceramic mug inscribed with: \"In memory of the victory over the Cave of Foretellings.\""
+    ],
+    completeCondition: () => gameEntity.getLevel('action_gossip') >= 8000
+},{
+    id: 'action_gossip_9',
+    title: 'The Skyfall Panic',
+    text: [
+        "It all began when someone claimed to have seen a mysterious object falling from the heavens and passing directly over your estate. Nobody agreed on what it looked like, but everyone agreed it was definitely not normal.",
+        "Within an hour, the rumors began multiplying:",
+        "\"It was glowing!\"",
+        "\"No, no — it was spinning!\"",
+        "\"I swear it was screaming!\"",
+        "\"It was the size of a cow!\"",
+        "\"My cousin said it was a sign of the end times!\"",
+        "\"This is obviously the work of sky spirits!\"",
+        "By midday the entire settlement was in a state of barely controlled panic. People gathered in groups, pointing nervously at the sky, while fortune-tellers suddenly enjoyed an excellent business day explaining the 'cosmic implications.'",
+        "Finally someone said: \"We must ask the person whose estate it flew over! They surely know!\"",
+        "Which is how you found yourself standing before a very anxious crowd, all demanding an explanation.",
+        "After a pause, you sighed and told them the truth.",
+        "Earlier that morning, your apprentice had attempted a 'simple' alchemical reaction in your backyard. It was supposed to produce a harmless puff of steam. Instead, it launched the lid of your cooking pot straight into the sky like a fired cannonball.",
+        "The crowd stared in silence.",
+        "\"…So the object of doom was… cookware?\" someone asked.",
+        "You nodded.",
+        "The crowd slowly dispersed — some embarrassed, some relieved, and a few disappointed that the world was not ending after all.",
+        "By evening the rumor had already evolved into: \"The great alchemist protects us from celestial threats by shooting warning signals into the sky.\"",
+        "You decided not to correct that version."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_gossip') >= 10000
+},{
     id: 'resource_coins_1',
     title: 'The First Clink',
     text: [
@@ -379,6 +421,66 @@ export const achievementsDb = [{
     ],
     completeCondition: () => gameEntity.getLevel('action_learn_languages') >= 4000
 },{
+    id: 'action_learn_languages_8',
+    title: 'The Midnight Translator',
+    text: [
+        "Returning home late after another exhausting training session, you heard screams piercing the night silence.",
+        "Imagining yourself as a superhero rescuing a princess from evil thieves, you sprinted toward the cries for help.",
+        "Turning into another alley, you saw a man in slippers and nothing else running from something. Seeing no real danger, you stopped the terrified man.",
+        "He recognized you and quickly explained that he's an artist who loves walking in the park at night seeking inspiration. He was about to sit on a bench when he heard a voice behind him shouting something that sounded like a death threat.",
+        "You asked if the voice said anything else.",
+        "Within a minute, you were laughing heartily and talking like old friends. As it turned out, the 'ominous' voice was speaking the dialect of an immigrant from the Southern Kingdom, simply trying to warn him that the bench was freshly painted.",
+        "You gifted the man your favorite book 'Dialects of the Southern Lands,' and with a sense of dignity and pride, headed home to sleep."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_learn_languages') >= 6000
+},{
+    id: 'action_learn_languages_9',
+    title: 'The Ancient Tavern Discovery',
+    text: [
+        "Walking through a crowd on your way to the library, a clumsy but sturdy man bumped your shoulder, nearly knocking you off your feet.",
+        "You were about to mutter a curse to give your offender a runny nose when he turned around and froze, staring at the book that had fallen from your hands.",
+        "\"Is that... is that 'Secrets of the Ancient Gethian Civilization'? You know Ancient Gethian?\"",
+        "You nodded affirmatively.",
+        "As it turned out, the man who accidentally pushed you was an archaeologist studying the ancient civilization. He told you about an artifact he'd found in nearby caves with an inscription he couldn't decipher. He was convinced, nonetheless, that he'd discovered a recipe for ancient Gethian magic that simply needed translation.",
+        "You enthusiastically agreed to help. After two days of traveling through thickets and battling nettles, you reached the ancient excavation site.",
+        "After studying all the findings, you assembled the fragmented inscription into a phrase. As it turned out, the inscription read: 'The Seafarer's Tavern.'",
+        "Your new archaeologist friend wasn't particularly pleased with this translation.",
+        "Looking around more carefully, you noticed a cave entrance. Entering it, your eyes widened at the quantity of barrels filled with cherry cider and grog.",
+        "Eventually, after thoroughly sampling the remains of ancient Gethian cuisine, you came up with the idea to organize a 'Gethian Culture Festival' at this location.",
+        "By the next day, local enthusiasts were eagerly clearing the path to the excavation site, while you and your new archaeologist companion supervised the work, smoking pipes and animatedly discussing the influence of elves on the Northern Yereian dialect of the kingdom."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_learn_languages') >= 8000
+},{
+    id: 'action_learn_languages_10',
+    title: 'The Ancient Songbook Fiasco',
+    text: [
+        "Your peaceful morning was interrupted when the town’s orchestra approached you with great excitement. They had uncovered an old leather-bound songbook written in a forgotten maritime language and wanted you to translate its 'ancient ceremonial hymn' for an upcoming cultural festival.",
+        "After several hours of decoding the faded text, you made an unfortunate discovery: it was not a hymn, nor anything close to ceremonial. It was a collection of rowdy drinking songs filled with sailor humor, questionable metaphors, and an alarming amount of commentary about socks, wind direction, and poor life choices.",
+        "You tried to warn the orchestra, but the conductor enthusiastically declared it a 'rare masterpiece of ancient lyrical art' before you could finish your explanation.",
+        "During the festival, the orchestra proudly performed a grand symphonic arrangement of 'The Ballad of the Missing Left Sock.'",
+        "The crowd was mesmerized. No one understood the lyrics, but everyone insisted it was 'deep' and 'symbolic.' Some even cried during the verse about misplacing a barrel of rum.",
+        "The true highlight came afterward, when a wealthy investor, utterly enchanted by the performance, grabbed your hands and proclaimed:",
+        "\"This is culture! I shall build a tavern shaped like a mighty ship at the edge of our settlement — and name it after you, the Great Interpreter of the Seas!\"",
+        "You attempted to explain that the song was literally about a drunk sailor arguing with a seagull, but the investor had already rushed off to rally carpenters.",
+        "By the next morning, construction had begun."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_learn_languages') >= 10000
+},{
+    id: 'action_learn_languages_12',
+    title: 'The Lost Proposal',
+    text: [
+        "You were working peacefully when a man in a long scholar’s robe burst through your door, clutching a wooden tablet as if it were the crown jewels. He introduced himself as an archaeologist from the capital and begged you to translate the ancient inscription on it.",
+        "The tablet held a faded text carved in a careful, elegant hand. You surrounded yourself with ten dictionaries, several grammars, and one cup of tea that went cold long before you noticed.",
+        "After hours of work, the truth became clear: the writing was in Old Elvish. The translation was simple yet intriguing: \"Up to the cave, and down beneath the oak.\"",
+        "The archaeologist was certain this pointed to a hidden treasure, a royal tomb, or at the very least, a monumental discovery. You set out together at once.",
+        "You found the cave easily, but the oak tree was nowhere to be seen — understandable, given that not many oaks survive a thousand years. So you picked a likely spot and began to dig.",
+        "After some time, your shovel hit something soft and rotten. You uncovered a small ancient chest, barely holding together after centuries underground.",
+        "Inside was only a single fragile parchment. In graceful Elvish script, it read: \"My beloved — if you find this, will you marry me?\"",
+        "You and the archaeologist stared at the note in silence. Somewhere long ago, an elf had hidden his proposal beneath an oak, hoping his beloved would find it. She never did.",
+        "You walked home quietly, touched by the devotion of a love story that never reached its ending."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_learn_languages') >= 12000
+},{
     id: 'action_pushup_1',
     title: 'Pushup Prodigy (Sort of)',
     text: [
@@ -460,6 +562,69 @@ export const achievementsDb = [{
         "Finally, disappointed and injured, you went to apply burn ointment. Closer to evening, when you saw that the dumbbell wasn't cooling down, you had a brilliant idea - now you don't need to go for firewood or refuel the stove - you have a free heater for warming your potion ingredients!"
     ],
     completeCondition: () => gameEntity.getLevel('action_pushup') >= 4000
+},{
+    id: 'action_pushup_9',
+    title: 'The Well Rescue',
+    text: [
+        "In the middle of the night, you were awakened by pounding on your door and screaming.",
+        "Opening the door, you saw your neighbor, pale with terror.",
+        "As it turned out, his beloved cat had fallen into the well. Knowing your ability to not only find but also solve problems, he ran to you for help.",
+        "You ran to the well but saw nothing but darkness. You tried to shout a 'Magnetism' spell, but after titanic efforts, you only managed to pull up a wooden log and a half-rotten jacket from the well.",
+        "Realizing that you'd be cleaning the well with magic until morning, you leaned into it and, bracing your arms against the walls, descended down.",
+        "Eventually, you heard an irritated meow, your hand pressing against something soft. You immediately shouted a levitation spell. The cat was literally ejected from the well. Grabbing onto a tree above the well, the cat descended to the ground.",
+        "Remembering that you couldn't cast a levitation spell on yourself, you were somewhat confused. However, recalling that you didn't train your body for nothing, you focused your gaze on the light barely breaking through into the deep well and began using all your climbing skills that you never even possessed.",
+        "Twenty minutes later, you had already forgotten about the well. A satisfied cat rubbed against your feet, and a grateful neighbor treated you to his signature cherry pie and completely unnecessary stories about his youthful adventures."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_pushup') >= 6000
+},{
+    id: 'action_pushup_10',
+    title: "The Titan's Stone",
+    text: [
+        "Studying an ancient map you received from an old collector, you set out to abandoned ruins in the north in search of artifacts.",
+        "Making your way through rubble and cobwebs, you found a small room with ancient inscriptions on the walls. Excited by the discovery, you began photographing the inscriptions for later translation.",
+        "Suddenly you heard a rumble - a massive stone shifted and blocked the only exit. An attempt to use magic failed - ancient runes on the stone absorbed any sorcery.",
+        "You tried to find another way out, but in vain. Eventually, realizing you had no choice, you pressed your shoulder against the stone and began to push.",
+        "At first nothing happened. Your feet slid on the floor. But you didn't give up - thousands of pushups, hundreds of hours of training couldn't be for nothing.",
+        "And the stone began to move. Millimeter by millimeter, until finally a gap formed.",
+        "Squeezing through outside, you heard a squeal of delight. A historian who was also exploring the ruins witnessed you moving the multi-ton stone.",
+        "\"Impossible!\" he shouted. \"According to legend, only the mighty titan can move the Guardian's Stone! I... I saw a titan!\"",
+        "The next day you woke up famous. The local historian had already managed to tell everyone about the 'incarnation of the ancient titan.'",
+        "You modestly tried to explain about regular training, but who listens to such boring details when there's a legend about a titan?"
+    ],
+    completeCondition: () => gameEntity.getLevel('action_pushup') >= 8000
+},{
+    id: 'action_pushup_11',
+    title: 'The Jasmine Beast Mystery',
+    text: [
+        "When rumors spread that a strange creature was stalking the village at night and eating livestock, the locals begged you to help. According to frightened witnesses, it moved silently, lurked in the dark, and vanished before dawn.",
+        "So you agreed to keep watch.",
+        "You spent the entire night hiding near the stables, your knees slowly turning numb after hours of crouching. Just before sunrise, something finally appeared — a jasmine bush. A jasmine bush that was moving.",
+        "It crept across the yard with suspicious determination, rustling softly as it approached the nearest stable.",
+        "You whispered an incantation of withering. Nothing happened.",
+        "You tried a binding spell to root the creature in place. Still nothing.",
+        "After several failed spells and an increasing sense that the “spirit” was mocking you, your patience evaporated. You leapt from your hiding spot, sprinted toward the creeping bush, grabbed it by the branches, and pulled with all your strength.",
+        "The bush exploded in every direction, and a moment later a bearded old man flew out of the collapsing foliage, landing with a heavy thud after briefly taking flight.",
+        "As it turned out, the “mysterious monster” was the village’s former elder — retired, but apparently not retired from mischief. Using a mix of minor magic, old military skills, and a great deal of spite, he had been sneaking around at night to 'teach everyone a lesson about vigilance.'",
+        "In the end, the only thing that defeated this ancient menace was your grip strength and the discipline of countless push-ups.",
+        "The villagers now claim you “banished the spirit.” You know you simply yanked a jasmine bush hard enough to unmask a remarkably agile old man."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_pushup') >= 10000
+},{
+    id: 'action_pushup_12',
+    title: 'The Obsidian Door of Disappointment',
+    text: [
+        "As a well-known adventurer, you were invited to assist an archaeological expedition in a neighboring province. The scholars hoped your experience would be invaluable during the dig.",
+        "After several days of work, your team finally uncovered a pair of massive obsidian doors sealing the entrance to something clearly important.",
+        "You tried magic first. Nothing happened. The expedition’s mages tried as well, with the same result.",
+        "With a resigned sigh, you pressed your hands against the ancient stone and pushed with all your strength. The doors slowly opened.",
+        "Inside was a chamber filled entirely with rocks. Small rocks, large rocks, and piles of rocks everywhere.",
+        "Determined not to return empty-handed, you and the scholars began clearing the stones, searching for anything of value.",
+        "Eventually, you uncovered a lone monolith with an inscription in Old Elvish. After studying it carefully, you translated:",
+        "\"The path to strength lies in accepting weakness. The path to purpose lies through disappointment.\"",
+        "The scholars gasped at the profound message. You simply stared at the monolith in silence.",
+        "You were celebrated as the hero who opened the Ancient Doors of Discipline, but on your journey home your thoughts drifted only to the tray of pies that had been waiting for you all week — and whether eating all of them at once counted as 'embracing purpose through disappointment.'"
+    ],
+    completeCondition: () => gameEntity.getLevel('action_pushup') >= 12000
 },{
     id: 'action_train_endurance',
     title: 'Jogging with a Purpose',
@@ -607,6 +772,22 @@ export const achievementsDb = [{
         "Reaching the nearest settlement, you learned about a gang operating nearby that, calling themselves guards, kidnaps people demanding ransom. You went to the local city government, and the next day you were participating in a search operation with the guards. By evening, all the familiar faces were already clanking chains in the local dungeon, and the local chief, learning your story, organized a marathon in your honor."
     ],
     completeCondition: () => gameEntity.getLevel('action_stamina_training') >= 4000
+},{
+    id: 'action_stamina_training_6',
+    title: 'The Teleporter Challenge',
+    text: [
+        "You met a boastful stranger in a tavern — a man newly arrived in the city who confidently claimed he could teleport short distances.",
+        "To prove his supposed ability, he announced that he could reach the neighboring settlement and return within an hour — a feat difficult even on horseback.",
+        "You raised an eyebrow. That alone offended him enough to spark a challenge: whoever reaches the settlement and returns first is the winner.",
+        "At the start, the stranger made a dramatic gesture, stepped behind a tree as if beginning an arcane ritual… and disappeared into the woods. The crowd gasped.",
+        "You simply began to run.",
+        "The trail was long and uneven, but you kept a steady pace, guided by your training and breath control. When you reached the settlement, you paused just long enough to get your bearings — only to see the stranger arriving from a side road, startled to find you there.",
+        "Without exchanging a word, both of you turned back and began the return trip.",
+        "In the end, you arrived almost simultaneously. Confused onlookers declared the race a draw.",
+        "Later, when no one else was listening, the stranger quietly admitted: \"Fine. I didn’t teleport. I had a horse tied near the settlement. But how in the world did you keep up with me?\"",
+        "You simply smiled — utterly exhausted, yet undeniably proud of your stamina."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_stamina_training') >= 6000
 },{
     id: 'action_cardio_training_1',
     title: 'The Heart Rate Challenge',
@@ -865,6 +1046,78 @@ export const achievementsDb = [{
     ],
     completeCondition: () => gameEntity.getLevel('action_meditate') >= 4000
 },{
+    id: 'action_meditate_9',
+    title: "The Couple's Therapy",
+    text: [
+        "You were sitting in your favorite meditation spot by the river when you heard a loud argument.",
+        "A couple couldn't agree on which veterinarian to take their cat to. The husband insisted on the old experienced doctor on the north side of the city. The wife shouted that the young veterinarian from the southern part understood cats much better and used modern methods.",
+        "The argument escalated. Your meditation was irreparably ruined.",
+        "Instead of chasing them away, you stood up and calmly said: \"Sit down. Both of you. Now.\"",
+        "They fell silent in surprise. You led them through breathing exercises, then deep relaxation.",
+        "Five minutes of silence. Ten. Their breathing leveled out, shoulders dropped.",
+        "Suddenly both opened their eyes in sync.",
+        "\"The cat!\" they exclaimed in unison.",
+        "\"We left the cat at home!\"",
+        "They simultaneously jumped up and ran home. Together. Without arguing.",
+        "The next day the couple brought you a basket of apples and thanked you. The cat turned out to be healthy, she'd just overeaten sour cream. And they decided to go to the old veterinarian - together.",
+        "Your reputation as a \"family therapist\" began to grow rapidly."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_meditate') >= 6000
+},{
+    id: 'action_meditate_10',
+    title: 'The Bandit Meditation',
+    text: [
+        "You were meditating in the forest, seeking inner peace, when you heard rustling in the bushes.",
+        "Three armed bandits stepped onto the path. The largest one loudly shouted: \"Money or your life!\"",
+        "You didn't open your eyes. Your breathing remained steady.",
+        "\"Hey, I'm talking to you!\" - the bandit approached closer, waving a knife.",
+        "You continued meditating. Inhale... exhale... complete tranquility.",
+        "\"What's wrong with him?\" muttered the second bandit. \"Is he deaf?\"",
+        "The first bandit crouched in front of you, trying to peer into your face. Your absolute calm confused him.",
+        "One minute of silence. Two. Five.",
+        "\"Why is he breathing like that?\" asked the third, sitting down nearby.",
+        "\"I don't know... but it's somehow pleasant to watch,\" murmured the first, lowering his knife.",
+        "Ten minutes later, all three were sitting around you in lotus position, their breathing synchronized with yours.",
+        "That's when the guard arrived.",
+        "The guard captain froze, seeing the scene: notorious local bandits peacefully meditating with you.",
+        "\"Should we arrest them?\" whispered a young guardsman.",
+        "\"Shh, don't disturb them,\" replied the captain.",
+        "An hour later, you opened your eyes. The bandits did too. There were tears in their eyes.",
+        "\"I... I don't remember the last time I felt such peace,\" whispered the leader.",
+        "They allowed themselves to be arrested without resistance. In prison, all three asked permission to continue meditation and signed up for your future classes.",
+        "The guard captain now recommends you as \"the kingdom's most effective peacekeeper.\""
+    ],
+    completeCondition: () => gameEntity.getLevel('action_meditate') >= 8000
+},{
+    id: 'action_meditate_11',
+    title: 'The Duel of Endless Calm',
+    text: [
+        "Two knights from rival orders approached you separately with the same request: they each wished to strengthen their mind before the grand tournament’s final rounds.",
+        "You agreed to train them individually, guiding each through long sessions of breathing, focus, posture, and mental clarity. Neither knew the other was also visiting you.",
+        "Both knights practiced with unwavering dedication. Their minds grew quiet as still water, their emotions steady as polished stone.",
+        "When tournament day arrived, fate placed them both in the finals.",
+        "The arena roared with excitement as the two stepped forward. Trumpets sounded. Banners fluttered. The duel began.",
+        "Their movements were perfectly controlled — each strike measured, each defense flawless. Minute after minute passed in seamless harmony.",
+        "An hour passed. Then two. By the third hour, half the audience was asleep, vendors had abandoned their stalls, and even the arena horses were dozing.",
+        "The judges eventually admitted what everyone could see: neither knight was capable of making a mistake. Their balance was perfect, their patience unbreakable, and the duel had no possible conclusion.",
+        "They declared a draw — the first in tournament history — and the match entered the royal chronicles as “The Most Peaceful Duel Ever Fought.”",
+        "Both knights thanked you later, though one added, a bit awkwardly: “Next time… perhaps teach us just a little less calm?”"
+    ],
+    completeCondition: () => gameEntity.getLevel('action_meditate') >= 10000
+},{
+    id: 'action_meditate_12',
+    title: 'The Fishermen of Unshakable Calm',
+    text: [
+        "You were invited on a fishing trip, though everyone knew you weren't exactly an experienced angler. While the others brought rods, bait, and buckets, you arrived with a meditation mat and a net you barely remembered owning.",
+        "The fishermen burst into laughter. \"Planning to breathe the fish out of the lake?\" they joked. You simply smiled and sat down at the water’s edge.",
+        "As you closed your eyes and began to meditate, something extraordinary happened. The surface of the lake stilled, ripples faded, and dozens of fish slowly gathered near the shore, forming a calm circle as if joining your session.",
+        "By the time the fishermen stopped laughing, the fish were floating in serene formation, their breathing — if fish even breathe like that — perfectly synchronized with yours.",
+        "Your friend, realizing the opportunity, quietly picked up your net and gently scooped the fish straight out of the water. None resisted. Some almost looked grateful.",
+        "By evening, you had a full basket of \"meditative fish.\" The fish soup you cooked was unbelievably calming — even the steam rising from the pot seemed to exhale peacefully.",
+        "The fish you took to the market continued meditating right on the merchant's stall, perfectly still, eyes half closed, inspiring customers to discuss \"inner harmony\" and \"the transient nature of rivers.\""
+    ],
+    completeCondition: () => gameEntity.getLevel('action_meditate') >= 12000
+},{
     id: 'action_home_errands_1',
     title: 'The Relic of Cleaning',
     text: [
@@ -992,9 +1245,31 @@ export const achievementsDb = [{
     text: [
         "You now own five whole plots of land. The townsfolk have started calling you 'the landlord'—mostly ironically.",
         "Yesterday, a chicken wandered across all five plots in under a minute. You chased it off with a stick and a speech about property rights.",
-        "The chicken didn’t seem impressed, but you felt powerful. That counts for something."
+        "The chicken didn't seem impressed, but you felt powerful. That counts for something."
     ],
     completeCondition: () => gameEntity.getLevel('shop_item_land') >= 5
+},{
+    id: 'shop_item_land_3',
+    title: 'The Border Dispute',
+    text: [
+        "You were enjoying your morning meditation on your favorite plot when you heard the thunder of hooves.",
+        "A group of riders led by an angry nobleman stopped near you. A man in an expensive jacket dismounted and loudly declared:",
+        "\"I am Baron Redford of the northern lands! You have violated my borders and illegally occupied part of my domain!\"",
+        "You calmly stood up, brushed the grass off your robe and nodded: \"Interesting. Let's check.\"",
+        "Half an hour later, your table was covered with documents. You methodically laid them out one by one: purchase agreement, royal seal, boundary plan...",
+        "\"...this is plot 47, this is 48, this one adjacent to your western border - plot 49...\"",
+        "The baron frowned at first, then his eyebrows began to rise.",
+        "\"...75, 76, 77... Here's exactly where you thought I violated the border - no, this is my plot 89, document from last spring...\"",
+        "By document number 100, the baron was sitting with his mouth open.",
+        "\"You... you keep ALL the documents? In chronological order? With boundary maps?\"",
+        "\"Of course,\" you replied. \"How else?\"",
+        "The baron silently looked at his scribe, who awkwardly looked away.",
+        "\"Lord Redford, we lost half our documents five years ago...\" the scribe whispered quietly.",
+        "The baron suddenly laughed: \"You know what? If you teach my scribe your organizational system, I'll personally make sure no one bothers you about borders again.\"",
+        "You shook hands.",
+        "Now Baron Redford is your best neighbor, and his scribe comes to you weekly for 'landowner organization courses' along with meditation."
+    ],
+    completeCondition: () => gameEntity.getLevel('shop_item_land') >= 100
 },{
     id: 'action_walking_433',
     title: '',
@@ -1348,6 +1623,75 @@ export const achievementsDb = [{
         return gameEntity.getLevel('action_spiritual_alignment') >= 4000
     }
 },{
+    id: 'action_spiritual_alignment_7',
+    title: 'The Spirit Consultation Queue',
+    text: [
+        "After reaching a new level of spiritual alignment, you decided it was time to share your wisdom with others. So you made a small announcement in the town square: \"Beginning tomorrow, I will hold introductory lessons on spiritual alignment and inner harmony.\"",
+        "It seemed harmless enough.",
+        "The next morning, you opened your door and nearly fainted. A long queue of townspeople stretched from your doorstep, down the street, around the corner, and possibly into the next district.",
+        "Apparently, the entire settlement had interpreted \"lessons\" as \"personal spiritual consulting for any issue imaginable.\"",
+        "The first visitor asked whether he should buy new boots or repair his old ones \"to avoid misaligning his energy path.\"",
+        "The second requested a blessing against heartburn.",
+        "The third whispered that a mouse lived in her pantry and wanted to know if it was her ancestral guardian spirit trying to send her messages.",
+        "A fourth asked whether meditating at his vegetables would help them grow faster.",
+        "You calmly explained that spiritual alignment was not fortune-telling, not a medical service, and definitely not a pest-identification technique. But each explanation only encouraged more questions.",
+        "People began bringing small gifts as thanks for your \"deep insights\": a loaf of bread, a crooked candle, three carrots, and a knitted scarf with a hole in the middle \"to let the aura breathe.\"",
+        "By midday you were exhausted, while the queue remained cheerful, convinced that your patience and gentle tone were signs of profound enlightenment.",
+        "When the final person finally left — thanking you for \"illuminating the sacred connection between emotions and rodents\" — you quietly closed the door.",
+        "Your spiritual alignment had improved, but you had accidentally become the town’s unofficial counselor."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_spiritual_alignment') >= 6000
+},{
+    id: 'action_spiritual_alignment_8',
+    title: 'The Not-So-Demonic Daughter',
+    text: [
+        "One morning, the city elder arrived at your doorstep in a state of absolute panic. He insisted that evil spirits had taken possession of his daughter and begged you to cleanse her aura before something terrible happened.",
+        "You explained that you were a spiritual guide, not an exorcist. But the elder, nearly in tears, promised support, influence, and the use of his connections in the capital if you would \"save his child.\"",
+        "So you agreed.",
+        "When you met the girl, she did not look possessed at all — she simply looked tired, irritated, and thoroughly unimpressed by her father's dramatics.",
+        "For the next three hours you spoke with her calmly about life, choices, expectations, and the weight of pressure. You guided her through simple meditations and gentle breathing exercises. Little by little, her mood softened.",
+        "Eventually she went downstairs, hugged her father, and apologized for being \"difficult.\"",
+        "The elder nearly burst into grateful tears, praising your \"powerful cleansing technique\" and thanking the heavens that you had saved her soul.",
+        "You quietly chose not to correct him.",
+        "The next day, however, the elder returned — pale, trembling, and no longer joyful.",
+        "His daughter had just announced that she wanted a large face tattoo \"to express her inner identity.\"",
+        "You sighed. Spiritual alignment could calm emotions… but it had no power over the artistic impulses of teenagers."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_spiritual_alignment') >= 8000
+},{
+    id: 'action_spiritual_alignment_9',
+    title: 'The Feline Council of the Temple',
+    text: [
+        "The monks of the hilltop temple summoned you in great distress. According to them, something deeply spiritual — and possibly ominous — was occurring within the sacred halls.",
+        "Every temple cat had begun gathering in the central chamber, sitting in a perfect circle and staring silently toward the main altar. They refused food, affection, and even the most persistent attempts to shoo them away.",
+        "\"Surely,\" whispered one monk, trembling, \"they have sensed a disturbance in the soul of the world.\"",
+        "You observed the cats, then the monks, then the cats again. Something felt strange — but not in a mystical sense.",
+        "You quietly asked questions, walked through the temple, and opened several doors the monks insisted had \"nothing unusual behind them.\"",
+        "Eventually you reached the basement storage room. Inside, you found towering piles of grain sacks, a thriving rat colony treating the place like their capital city, and a young temple assistant who almost dropped a sack when he saw you.",
+        "After a moment of silence, the assistant confessed: he had been running a secret storage of \"borrowed\" grain taken from donations, planning to sell it later. The abundance of food attracted rats. The rats attracted cats. The cats attracted panic.",
+        "You gently explained the situation to the monks. Relief washed over them. The cats looked quite proud of themselves. The assistant was sent away to \"meditate on honesty\" for a very long time.",
+        "The temple later proclaimed your intervention as \"a profound cleansing of deceptive energies.\" You chose not to correct them."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_spiritual_alignment') >= 10000
+},{
+    id: 'action_spiritual_alignment_12',
+    title: 'The Fox That Chose Peace',
+    text: [
+        "When you returned to your settlement after a week-long trip to the capital — where you had attended a conference on restorative magical practices — you expected to find nothing more dramatic than an overgrown garden and a stack of unanswered letters.",
+        "Instead, you walked straight into chaos: a patrol of hunters had cornered a wild fox near the fields and were preparing to put it down. The creature was snarling, pacing in frantic circles, her eyes wide with panic.",
+        "\"She's rabid,\" said the captain. \"One bite and— well, you understand.\"",
+        "But something about the fox's movements felt wrong to you. Not rage, not madness — just fear.",
+        "Before anyone could stop you, you stepped forward, approaching her slowly and calmly, letting your presence settle into the air like warm sunlight.",
+        "The fox stiffened, baring her teeth — then froze when your eyes met. A long, strange moment passed in complete silence.",
+        "Her posture softened. She blinked. Then, to everyone's shock, she rolled onto her back like a trusting village dog.",
+        "The captain whispered, horrified: \"Did... did you charm it?!\"",
+        "\"No,\" you said quietly. \"I just listened.\"",
+        "Upon closer inspection, the fox turned out not to be rabid at all — only wounded by an old metal trap that had terrified her into panic. You removed the trap, cleaned the wound, and wrapped it gently. The fox licked your hand in gratitude.",
+        "From that day on, she began appearing near your house, running in excited circles whenever you returned home, greeting you with all the enthusiasm of a loyal companion.",
+        "Villagers now call her your \"spiritual guardian.\" Hunters call her \"the one beast we're never touching again.\" But to you, she is simply a friend who once chose peace when fear seemed easier."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_spiritual_alignment') >= 12000
+},{
     id: 'thinkroot_plantation_1',
     title: 'The Forgotten Plantation',
     text: [
@@ -1598,6 +1942,71 @@ export const achievementsDb = [{
         return gameEntity.getLevel('action_nail_standing') >= 2000
     }
 },{
+    id: 'action_nail_standing_5',
+    title: 'The Master of Balance (Almost)',
+    text: [
+        "You decided to improve your balance as part of your nail-standing practice, so you placed a board over a shallow bowl of water in your yard and stepped onto it with calm determination. Everything was going perfectly — your breathing steady, your focus absolute.",
+        "Then your neighbor appeared. He watched you for a few seconds, nodded thoughtfully, and announced that your training looked 'too easy.'",
+        "Before you could protest, he quietly approached the board and placed a cucumber on it.",
+        "A cucumber.",
+        "'Now it’s a real challenge,' he said proudly, as if inventing a groundbreaking spiritual technique.",
+        "The moment you shifted your weight, your foot landed on the cucumber, the board shot sideways, and you flew directly into the bowl of water with all the grace of a startled duck.",
+        "Your neighbor stared at you in awe. 'That was a test of enlightenment,' he declared.",
+        "Sitting there, soaked from head to toe, you stared back at him. 'No,' you replied. 'That was a test of friendship.'"
+    ],
+    completeCondition: () => gameEntity.getLevel('action_nail_standing') >= 5000
+},{
+    id: 'action_nail_standing_8',
+    title: "The Stork’s Architectural Ambition",
+    text: [
+        "You chose a quiet morning to deepen your nail-standing practice, enjoying the calm breeze and the soft rustling of leaves. Your concentration was perfect — breath steady, posture aligned, mind clear.",
+        "Then you felt a light tug on your hair. At first you ignored it, assuming it was just the wind. But the tug became a pull. Then a yank.",
+        "When you slowly opened one eye, you froze. A large stork stood behind you, calmly inspecting your head as if evaluating a construction site.",
+        "Before you could react, the bird leaned forward and began collecting strands of your hair with professional dedication. Apparently, it had mistaken you for a perfectly still tree — an ideal foundation for its future nest.",
+        "Each time it pulled, you winced. Each time you winced, the stork clicked its beak angrily, as if scolding you for disrupting its architectural vision.",
+        "For several agonizing minutes, you remained motionless while the bird attempted to install a 'supporting framework' out of your hair, twigs, and, at one point, something that looked suspiciously like your neighbor’s lost sock.",
+        "When the stork finally gave up — offended that its 'tree' kept breathing — it flew away with a frustrated croak.",
+        "You exhaled in relief, rubbing your aching scalp. Your hair now resembled a badly designed birdhouse that had survived a storm.",
+        "After that experience, you decided it was time for a new hairstyle — preferably one that didn’t inspire wildlife to start construction projects on your head."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_nail_standing') >= 8000
+},{
+    "id": "action_nail_standing_9",
+    "title": "The Poet and the Living Statue",
+    "text": [
+        "You chose a peaceful clearing for your nail-standing practice, balancing carefully on the sharp points and easing your breath into calm, steady waves.",
+        "A few minutes later, you sensed someone approaching — but moving was out of the question.",
+        "Out of the bushes stepped a wandering poet with a feathered hat, a notebook, and the unmistakable expression of a man who had just found his next masterpiece.",
+        "\"A living statue!\" he whispered in awe. \"How magnificently still!\"",
+        "Before you could even blink, he positioned himself beside you, opened his notebook, and began reciting verses about \"the soul rising above earthly pain.\"",
+        "You remained frozen in place — partly due to concentration, mostly due to the dozens of tiny needles beneath your feet.",
+        "The poet circled you slowly, dramatically, describing your \"transcendence\" and \"unyielding posture\" from every possible angle. Each exaggerated gesture stirred the grass, dust, and (very inconveniently) a mosquito that landed on your cheek.",
+        "You desperately wanted to swat it. You could not. The poet interpreted your rigid suffering as \"divine artistic tension.\"",
+        "After twenty minutes he fell to his knees. \"Such discipline! Such agony! Such beauty!\" he exclaimed, scribbling furiously.",
+        "Finally, satisfied with his creation, he bowed deeply. \"Thank you, silent muse. One day, the world will know your torment.\"",
+        "When he disappeared down the path, you exhaled — a long, shaky breath of freedom — and carefully stepped off the nails, feeling that your feet had ascended to a new spiritual dimension of pain.",
+        "Later that week, you discovered a freshly printed poem circulating in the settlement titled: \"The Statue Who Breathed.\" The illustration looked suspiciously like you."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_nail_standing') >= 10000
+},{
+    id: 'action_nail_standing_10',
+    title: "The Firewalker and the Dog",
+    text: [
+        "You were in the middle of your nail-standing practice when distant shouting reached you from the edge of the settlement.",
+        "A storage shed had caught fire — dry straw and old timber turned it into a blazing furnace within minutes. Villagers ran around in panic, desperate and helpless.",
+        "\"There's a dog inside!\" someone cried. But no one dared to approach. Even from afar, the heat felt unbearable.",
+        "You sighed quietly. After years of training on sharp, merciless nails, your sense of 'unbearable' had shifted quite a bit.",
+        "Without hesitation, you walked toward the burning shed. Each step through the scorching heat stung, but compared to your usual training, it felt almost familiar.",
+        "Inside, through the smoke and crackling wood, you found a terrified dog curled up in the corner. You wrapped it in your cloak, lifted it gently, and turned back toward the flames.",
+        "Moments later, you stepped out of the inferno, carrying the unharmed dog in your arms. The villagers froze. Two people dropped their buckets. Someone whispered a prayer.",
+        "The dog wriggled free, jumped to the ground, and immediately began licking your face in frantic gratitude.",
+        "An elderly herbalist rushed to you and grabbed your hands. \"You… you WALKED THROUGH FIRE?!\" she gasped.",
+        "You shrugged modestly. \"Well… after nail-standing for hours, this felt somewhat less dramatic.\"",
+        "That evening, the settlement proclaimed you the \"Flame-Proof Fool\" — a title given with equal parts admiration and disbelief.",
+        "As for the dog, it now waits by your doorstep every morning and proudly brings you charred bits of wood from the burnt shed as \"tokens of appreciation.\""
+    ],
+    completeCondition: () => gameEntity.getLevel('action_nail_standing') >= 12000
+},{
     id: 'action_deep_focus_1',
     title: 'The Interrupted Meditation',
     text: [
@@ -1651,6 +2060,74 @@ export const achievementsDb = [{
     completeCondition: () => {
         return gameEntity.getLevel('action_yoga_practices') >= 4000
     }
+},{
+    id: 'action_yoga_practices_3',
+    title: 'The Market Peacekeeper',
+    text: [
+        "You came to the market for your usual shopping when you heard loud screams.",
+        "A man in a red jacket was waving his fists in front of a vegetable seller, shouting that he'd been cheated. A crowd was gathering, someone was already calling for the guard.",
+        "You came closer. The man was on the verge of a nervous breakdown - face red, breathing ragged, hands trembling.",
+        "\"Breathe with me,\" you said calmly, stepping between him and the seller. \"Inhale... exhale...\"",
+        "The man at first looked at you like you were insane, but your calm was contagious. You continued demonstrating breathing techniques.",
+        "A minute later his breathing leveled out. Two minutes more - he could speak without shouting.",
+        "\"Let's find your change together,\" you suggested. \"Check all your pockets, slowly.\"",
+        "The man began searching. Front pockets - empty. Jacket pockets - nothing. And then - back pocket of his pants. Coins.",
+        "Silence. The man turned even redder, but now from shame. The seller muttered something about \"yoga peacekeepers.\"",
+        "The crowd dispersed, and you calmly continued your shopping. The guard who was already running to the screams stopped in surprise, finding no conflict.",
+        "By evening the entire market square was discussing the \"mage of calm\" who stopped a fight with just the power of breathing."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_yoga_practices') >= 6000
+    }
+},{
+    id: 'action_yoga_practices_4',
+    title: 'The City Day Salvation',
+    text: [
+        "You were invited to a party celebrating the city's founding day. As a guest of honor, you sat next to the elder.",
+        "You had just swallowed a piece of chicken leg when you felt a touch on your back. In surprise, you screamed, which seriously frightened the elder's wife. She jumped up from the table, accidentally overturning it onto the guests.",
+        "People began to fuss and get angry. Food and drinks were spilled everywhere, elegant clothes were ruined, and the festive mood evaporated in an instant.",
+        "Feeling guilty for the ruined celebration, you stood up from the table and announced a contest - whoever performs Shavasana best, the relaxation pose, would receive your crafted enchanted figurine of the city hall.",
+        "You began demonstrating the pose, your voice calm and soothing, guiding everyone through the breathing exercises.",
+        "Within minutes, the tension began to dissolve. Some guests fell into such deep relaxation they actually fell asleep right there on the grass.",
+        "The rest, now calm and amused by the sleeping participants, continued the celebration in good spirits, completely forgetting about the incident.",
+        "By the end of the evening, everyone agreed it was the most memorable City Day celebration ever. The elder personally thanked you for saving the event.",
+        "The sleeping guests woke up refreshed hours later, confused about why they felt so well-rested at a party."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_yoga_practices') >= 8000
+    }
+},{
+    id: 'action_yoga_practices_5',
+    title: "The Most Boring Battle Ever",
+    text: [
+        "Two rival mages arrived at your door with an unusual request: they wanted you to judge a duel to determine who possessed the strongest concentration.",
+        "Not a spell duel. Not illusions. A yoga duel — specifically, who could hold Warrior Pose the longest.",
+        "You tried to explain that yoga wasn’t meant for competition, but they had already taken their positions.",
+        "The duel began. At first, both stood perfectly steady, faces calm and dignified.",
+        "After an hour, a curious crowd formed. After two hours, someone began selling snacks. By the third hour, people were placing bets.",
+        "A pigeon landed on one mage’s arm. Another pigeon landed on the other. Neither reacted.",
+        "Finally, after nearly three hours, a speck of dust triggered a tiny sneeze in one of the mages.",
+        "He wobbled, lost balance, and fell, while the other stubbornly remained in the pose, knees shaking like jelly.",
+        "The crowd erupted in applause. The duel was officially recorded in the kingdom’s history as 'The Most Boring Battle Ever.'",
+        "Both mages needed a week to recover, and you quietly decided never again to judge competitions involving pride, magic, or competitive stretching."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_yoga_practices') >= 10000
+},{
+    id: 'action_yoga_practices_12',
+    title: "The Storm-Balancer",
+    text: [
+        "You chose the hill above the settlement for your morning yoga practice, enjoying the silence and the wide view of the valley. Halfway through your warm-up, the sky suddenly darkened.",
+        "A storm rolled in quickly. Villagers rushed to secure their homes, shouting warnings for you to come inside before the winds became dangerous.",
+        "But instead of leaving, you stepped calmly into Warrior Pose, grounding your stance and steadying your breath.",
+        "Rain arrived first, cold and heavy. Wind roared across the hilltop, bending trees and sending debris tumbling — yet you stood unmoving.",
+        "Lightning flashed behind you, thunder echoed across the valley, and your silhouette remained firm, as if carved from stone.",
+        "From their windows, villagers watched in awe. Some whispered that you were controlling the storm. Others insisted the storm was simply too intimidated to knock you over.",
+        "For nearly an hour, the tempest raged. Your posture never faltered. Even the wind seemed to curve around you, unable to break your balance.",
+        "Then, as suddenly as it began, the storm weakened. Clouds parted. Sunlight bathed the hilltop, illuminating you like a victorious guardian.",
+        "When you finally relaxed the pose and descended back to the village, people greeted you with a mix of applause, reverence, and stunned silence.",
+        "By evening, everyone agreed that you had somehow 'kept the storm at bay,' and a new saying quietly began to spread: 'If balance is strong, even the wind steps aside.'"
+    ],
+    completeCondition: () => gameEntity.getLevel('action_yoga_practices') >= 12000
 },{
     id: 'event_self_motivation_art_permanent_bonus_1',
     title: 'The Cherry Juice Stain Revelation',
@@ -1727,6 +2204,82 @@ export const achievementsDb = [{
         return gameEntity.getLevel('action_crafting_training') >= 2000
     }
 },{
+    id: 'action_crafting_training_6',
+    title: 'The Professional Carpenters',
+    text: [
+        "The mayor personally came to you with a request for help. He urgently needed to restore tables for the city council, but his hired crew of \"professional craftsmen\" from a neighboring city had been making no progress for a week.",
+        "\"They have excellent recommendations!\" the mayor explained. \"But something keeps going wrong. Could you take a look?\"",
+        "You came to the workshop and found a strange scene. Three men in aprons labeled \"Master Carpenter\" were actively hammering something metallic.",
+        "Coming closer, you saw they were trying to hammer in bolts. With hammers. Straight into the wood. Without pre-drilling.",
+        "\"Excuse me, why aren't you using nails?\" you asked.",
+        "\"Nails?!\" the senior one bristled. \"We're professionals! Bolts are much stronger!\"",
+        "\"But bolts need nuts and drilling...\"",
+        "\"Drilling? That's for amateurs! We're real masters, we hammer them in!\"",
+        "You spent an hour explaining the difference between nails, bolts, and screws. Then another hour showing how to use a drill.",
+        "By evening, the tables were restored. The mayor was impressed.",
+        "The crew of \"professionals\" quietly disappeared the next day, leaving their aprons behind.",
+        "Turns out they were actors who played carpenters in a theatrical production and decided to earn some money with \"real\" work.",
+        "Now you have three excellent aprons labeled \"Master Carpenter.\" And a reputation as someone who can teach even actors the craft."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_crafting_training') >= 5000
+    }
+},{
+    id: 'action_crafting_training_7',
+    title: 'The Aesthetic Assembly Advocate',
+    text: [
+        "A fashionable instructor arrived in the city to give lectures on the \"aesthetic approach to furniture assembly.\"",
+        "His philosophy was simple: \"If a part looks beautiful, find it a beautiful place. We'll figure out the function later.\"",
+        "When you entered the classroom, you witnessed a surreal gallery of his teachings:",
+        "A nightstand with its door facing the wall.",
+        "A table standing on four legs of completely different lengths, because \"it expresses individuality.\"",
+        "A wardrobe where every shelf had been installed vertically \"to improve the flow of energy.\"",
+        "The students were captivated.",
+        "The instructor was delighted.",
+        "You… were speechless.",
+        "After demonstrating basic principles of levels, angles, stability, and load-bearing, the entire class experienced a sudden collective enlightenment.",
+        "The fashionable instructor quietly packed his things and vanished, leaving behind a box of decorative handles \"without any particular function.\""
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_crafting_training') >= 8000
+    }
+},{
+    id: 'action_crafting_training_8',
+    title: "The Seven-Legged Masterpiece",
+    text: [
+        "One morning, a man arrived at your workshop holding a crumpled sheet of parchment with both pride and desperation.",
+        "\"My son has designed a chair,\" he said with shining eyes. \"And I want you to build it. Exactly as drawn.\"",
+        "You unfolded the parchment. It depicted a seven-legged chair, four armrests pointing in different directions, a sun-shaped backrest with uneven rays, and, for reasons unknown, a smiling dragon perched on top.",
+        "You tried to explain that such a construction would challenge the laws of geometry, balance, and perhaps nature itself.",
+        "He placed a hand on his heart and said, \"I believe in you.\"",
+        "And so began one of the most unusual projects of your career. For several days you worked as carpenter, engineer, wizard, and stubborn optimist. You balanced the legs, reinforced the sun-shaped backrest, carved the cheerful dragon, and somehow made the entire structure stable.",
+        "When the family returned, the father gasped — but the child lit up with pure joy.",
+        "\"It's exactly like I imagined!\" he shouted, climbing onto the chair and declaring you the greatest magical craftsman in the kingdom.",
+        "The father wiped away tears. You pretended there was sawdust in your eye.",
+        "Even the wooden dragon on top seemed to smile.",
+        "By evening, the story of the 'Seven-Legged Chair of Dreams' had spread throughout the settlement, and although you'd never admit it aloud… you were a little proud too."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_crafting_training') >= 10000
+},{
+    id: 'action_crafting_training_9',
+    title: "The Ladder That Shouldn't Have Won",
+    text: [
+        "Early in the morning, just before the annual \"Most Reliable Ladder\" competition, a frantic craftsman burst into your workshop. His masterpiece ladder — his pride, his chance to join the Master Craftsmen Guild — had cracked clean through.",
+        "\"The rules forbid nails, glue, and magic! Only basic materials allowed! What do I do?!\" he wailed.",
+        "You examined the damage. Deep, ugly, and absolutely catastrophic for a ladder that had to survive public testing.",
+        "Without a word, you took action:",
+        "You grabbed the man's sleeve — and tore it clean off before he understood what was happening.",
+        "You cut the fabric into strips, wrapped them around the cracked rung, and tied a complex reinforcing knot normally used in bridge construction and by particularly desperate fishermen.",
+        "Within minutes, the ladder looked stable. Not pretty — but unquestionably sturdy.",
+        "At the competition, the judges tested it mercilessly: dropping sandbags on it, shaking it, stacking themselves on a single step, even turning it upside down.",
+        "The ladder held. Perfectly.",
+        "It won first place.",
+        "When the craftsman accepted the trophy, he proudly declared, \"The secret is all in the technique!\" while carefully hiding the fact that his shirt now had only one sleeve.",
+        "By evening, the story spread across the settlement: you were the person who could fix anything using skill, confidence, and, if necessary, someone else's clothing.",
+        "A new saying quietly appeared: \"If something cracks — find the master who isn’t afraid to use your sleeve.\""
+    ],
+    completeCondition: () => gameEntity.getLevel('action_crafting_training') >= 12000
+},{
     id: 'action_alchemy_training_4',
     title: 'The Rooster\'s Recipe Discovery',
     text: [
@@ -1756,6 +2309,44 @@ export const achievementsDb = [{
         return gameEntity.getLevel('action_alchemy_training') >= 2000
     }
 },{
+    id: 'action_alchemy_training_6',
+    title: 'The Watermelon Miracle',
+    text: [
+        "An enraged neighbor knocked on your door early in the morning, shouting that your goats had eaten all his cabbage.",
+        "You spent an entire hour trying to explain that you don't own any goats. You even showed him your entire property - not a single goat in sight.",
+        "But it was useless. The agitated neighbor continued waving his arms and threatening to curse you.",
+        "Finally, you grabbed a flask of your plant restoration potion and asked him to show you his garden.",
+        "At the garden, you poured the potion into a vial and spoke a wind spell. A real dust storm rose up in the garden, splashing the potion from the vial across the entire plot.",
+        "Five minutes later, after coughing up what felt like several kilograms of dust, you and your neighbor wiped your eyes and couldn't believe what you saw...",
+        "Instead of the eaten cabbage, watermelons had grown! Large, ripe, perfect watermelons.",
+        "You realized you'd mixed up the flasks and fearfully glanced at your neighbor. He stared intently at you, then at the garden.",
+        "\"Oh God! My wife loves watermelons! Finally, she won't be angry at me for the mess I made at home yesterday while drunk. You're my savior!\"",
+        "He embraced you so tightly you could barely breathe, thanked you profusely, and ran home to bring his wife.",
+        "Your reputation as \"the alchemist who can fix anything\" spread throughout the neighborhood, though you're still not entirely sure how you turned cabbage into watermelons."
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_alchemy_training') >= 5000
+    }
+},{
+    id: 'action_alchemy_training_7',
+    title: 'The Wine Disaster Rescue',
+    text: [
+        "Late in the evening, the local winemaker ran to you in complete despair. In three days, a great city festival was to begin, and all his wine - 50 barrels! - had suddenly turned sour.",
+        "\"I'm ruined! The mayor ordered wine from me for the entire festival! My reputation is destroyed!\" he lamented.",
+        "You went to his cellar and tasted the wine. Indeed - vinegar, not wine. Ordinary alchemy wouldn't help here.",
+        "\"Give me one night,\" you said.",
+        "By dawn, your laboratory had transformed into chaos of flasks, recipes, and calculations. You created a complex alchemical filter - a combination of magic, chemistry, and pure desperation.",
+        "A system of dozens of flasks, crystals, and herbs slowly filtered the soured wine. The acid was neutralized, the taste restored, magic stabilized the result.",
+        "Three hours before the festival began, the last barrel was saved.",
+        "The winemaker tasted it - and cried with happiness. The wine wasn't just drinkable - it had become even better than before!",
+        "At the festival, the mayor personally raised a toast in your honor. The winemaker announced that you would receive free wine from his cellar for the rest of your life.",
+        "And when other winemakers from the region heard about the \"miracle filter,\" you suddenly found yourself the most sought-after alchemical consultant in the wine industry.",
+        "Who knew that alchemy could be so... delicious?"
+    ],
+    completeCondition: () => {
+        return gameEntity.getLevel('action_alchemy_training') >= 8000
+    }
+},{
     id: 'action_elemental_channeling_1',
     title: 'The Yawn Disaster',
     text: [
@@ -1779,4 +2370,35 @@ export const achievementsDb = [{
     completeCondition: () => {
         return gameEntity.getLevel('action_elemental_channeling') >= 1000
     }
-}]
+},{
+    id: 'shop_item_press_license_1',
+    title: 'The Writer Competition',
+    text: [
+        "The licensing papers had barely touched your hands when the very first “writers” began lining up at your door. Word spread astonishingly fast: there was a new publisher in town, and apparently that meant everyone suddenly had a masterpiece to share with the world.",
+        "One by one, they presented their works with the solemnity of people unveiling legendary artifacts:",
+        "— A 200-page romance about the forbidden love between a miller and his own grindstone.",
+        "— A poetry collection titled “Ode to the Potato,” consisting entirely of metaphors comparing tubers to life, death, and occasionally chairs.",
+        "— A detective novel where the crime is revealed in the preface, and the remaining chapters explore the detective’s hobby of cataloguing spoons.",
+        "— A cookbook containing no recipes at all, but filled with philosophical musings such as “each reader must feel the spices within their soul before using them.”",
+        "They stood proudly, waiting for your verdict.",
+        "You slowly realized that selecting your first publication might be… significantly more complicated than obtaining the license itself.",
+        "Still, as you looked at the eager faces of your new “authors,” you couldn’t help but smile — tired already, yet unexpectedly thrilled about the strange literary journey ahead."
+    ],
+    completeCondition: () => gameEntity.getLevel('shop_item_press_license') > 0
+},{
+    id: 'action_train_bargaining_1',
+    title: 'The Rat Bargain',
+    text: [
+        "While passing through the marketplace, you noticed a distressed woman sitting beside a stall, clutching a nearly empty purse. When you asked what had happened, she tearfully explained that she had miscounted her coins and accidentally handed the merchant a much larger payment than she intended. Now she had no money left to feed her two children — and the merchant refused to return any of it.",
+        "You told her you would handle it.",
+        "Approaching the merchant, you quickly realized that arguing openly would lead nowhere. So you decided to try a different tactic.",
+        "With a subtle gesture, you whispered a short spell. A small rat slipped from your sleeve, landed on the merchant’s counter, and darted straight into the sack of grain the woman had just purchased.",
+        "You widened your eyes dramatically and asked the merchant if this was really the product he had just sold her. Seeing the rat's tail inside the bag, the merchant turned pale.",
+        "Within minutes, you had convinced him that the sack was clearly infested, that the woman deserved a replacement, and that he also owed her compensation for a knitted sweater the rat had supposedly chewed on while she was distracted by the overpayment.",
+        "Red-faced and sweating, the merchant returned her money, gave her a fresh sack of grain, and even added a few extra coins to avoid further trouble.",
+        "You walked back to the woman, who was stunned by the outcome.",
+        "You smiled as the rat disappeared into the marketplace crowd — and no one suspected a thing."
+    ],
+    completeCondition: () => gameEntity.getLevel('action_train_bargaining') >= 5000
+}
+]

@@ -1012,8 +1012,8 @@ export class PropertyModule extends GameModule {
             max: gameEntity.getEntityMaxLevel(entity.id),
             level: this.purchasedFurnitures[entity.id] || 0,
             affordable: gameEntity.getAffordable(entity.id),
-            potentialEffects: gameEntity.getEffects(entity.id, 1),
-            currentEffects: gameEntity.getEffects(entity.id),
+            potentialEffects: gameEntity.getEffects(entity.id, 1, undefined, undefined, undefined, gameEntity.getEntityEfficiency(entity.id) ?? 1),
+            currentEffects: gameEntity.getEffects(entity.id, undefined, undefined, undefined, undefined, gameEntity.getEntityEfficiency(entity.id) ?? 1),
             tags: entity.tags,
             efficiency: gameEntity.getEntityEfficiency(entity.id) ?? 1,
             missingResource: gameEntity.getEntity(entity.id)?.modifier?.bottleNeck ? resourceResponse(gameResources.getResource(gameEntity.getEntity(entity.id)?.modifier?.bottleNeck)) : null

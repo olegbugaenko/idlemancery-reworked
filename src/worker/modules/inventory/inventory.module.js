@@ -407,6 +407,7 @@ export class InventoryModule extends GameModule {
                 items: gameResources.listResourcesByTags(['inventory', ...filter.tags])
                     .filter(one => one.isUnlocked && !one.isCapped && (gameResources.getResource(one.id).amount >= SMALL_NUMBER
                         || Math.abs(gameResources.getResource(one.id).income) >= SMALL_NUMBER
+                        || (gameResources.getResource(one.id).targetEfficiency < 1)
                         || this.inventoryItems[one.id]?.autoconsume?.rules?.length
                         || this.inventoryItems[one.id]?.autoconsume?.isEnabled
                         || this.inventoryItems[one.id]?.autosell?.rules?.length

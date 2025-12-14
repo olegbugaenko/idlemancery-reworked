@@ -490,6 +490,14 @@ export const registerCommomEffects = () => {
         minValue: 1,
     })
 
+    gameEffects.registerEffect('materialization_spells_efficiency', {
+        name: 'Materialization Magic Efficiency',
+        tags: ['multiplier'],
+        description: 'Increase output of spells with tag "materialization"',
+        defaultValue: 1,
+        minValue: 1,
+    })
+
     gameEffects.registerEffect('elemental_spells_efficiency', {
         name: 'Elemental Magic Efficiency',
         tags: ['multiplier'],
@@ -519,6 +527,14 @@ export const registerCommomEffects = () => {
         name: 'Jewelry Accessories Efficiency',
         tags: ['multiplier'],
         description: 'Increases effects provided by accessories with tag "jewelry"',
+        defaultValue: 1,
+        minValue: 1,
+    })
+
+    gameEffects.registerEffect('accessory_clothing_efficiency', {
+        name: 'Clothing Accessories Efficiency',
+        tags: ['multiplier'],
+        description: 'Increases effects provided by accessories with tag "clothing"',
         defaultValue: 1,
         minValue: 1,
     })

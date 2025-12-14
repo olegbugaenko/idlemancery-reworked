@@ -1700,11 +1700,6 @@ export const registerStructuresStage1 = () => {
         level: 0,
         maxLevel: 10,
         minDemoVersion: 20,
-        unlockedBy: [{
-            type: 'effect',
-            id: 'attribute_magic_capability',
-            level: 250000,
-        }],
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_mysticism') > 0;
         },
@@ -1755,19 +1750,14 @@ export const registerStructuresStage1 = () => {
         level: 0,
         maxLevel: 10,
         minDemoVersion: 20,
-        unlockedBy: [{
-            type: 'effect',
-            id: 'attribute_magic_capability',
-            level: 250000,
-        }],
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_mysticism') > 0;
         },
         resourceModifier: {
             get_multiplier: () => ({
                 effects: {
-                    'mental_training_learning_rate': {
-                        A: 0.10,
+                    'spiritual_learning_rate': {
+                        A: 0.20,
                         B: 1,
                         C: 1.02,
                         type: 3,

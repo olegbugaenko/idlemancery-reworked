@@ -195,7 +195,7 @@ export class RitualModule extends GameModule {
     }
 
     sendRitualData() {
-        const items = gameEntity.listEntitiesByTags(['magic-ritual']);
+        const items = gameEntity.listEntitiesByTags(['magic-ritual']).filter(one => one.isUnlocked);
         const maxCooldown = 60; // Maximum switch cooldown in seconds
         const response = items.map(ritual => ({
             ...entityResponse(ritual),

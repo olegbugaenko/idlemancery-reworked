@@ -331,7 +331,7 @@ export const registerMachineryStage1 = () => {
                     'birds_breeding_efficiency': {
                         A: 0.2 * gameEffects.getEffectValue('zoo_machinery_efficiency'),
                         B: 1,
-                        C: 1.02,
+                        C: 1.04,
                         type: 3,
                     }
                 }
@@ -381,7 +381,7 @@ export const registerMachineryStage1 = () => {
                     'mammal_breeding_efficiency': {
                         A: 0.2 * gameEffects.getEffectValue('zoo_machinery_efficiency'),
                         B: 1,
-                        C: 1.02,
+                        C: 1.04,
                         type: 3,
                     }
                 }

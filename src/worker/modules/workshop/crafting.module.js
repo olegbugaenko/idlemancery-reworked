@@ -1057,12 +1057,13 @@ export class CraftingModule extends GameModule {
                 ? assertResourceFn(resourceId, false, ['runningCrafting'])
                 : gameResources.getResource(resourceId);
             const balance = resourceState?.balance ?? 0;
-            // Positive balances tend to represent unrelated external income, but
-            // when evaluating sustainability we only want to credit deficits so
-            // that dependency chains remain the driving limiter. Otherwise, a
-            // mocked or temporarily positive balance would make downstream
-            // recipes look infinitely sustainable.
-            baseBalances.set(resourceId, Math.min(0, balance));
+            // For resources with internal producers, clamp positive external income to 0
+            // so that dependency chains remain the driving limiter.
+            // But for resources that are ONLY produced externally (no internal producers),
+            // we should use the actual external balance since that's their only source.
+            const entry = resourceMap.get(resourceId);
+            const hasInternalProducers = entry && entry.producers.length > 0;
+            baseBalances.set(resourceId, hasInternalProducers ? Math.min(0, balance) : balance);
         }
 
         return { resourceMap, recipeEffects, baseBalances };

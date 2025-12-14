@@ -45,5 +45,8 @@ export const getScope = (entity) => {
     if(entity.tags.includes('press_journal')) {
         return 'Press Journal';
     }
+    if(entity.tags.includes('magic-ritual')) {
+        return 'Magic Ritual';
+    }
     return ''
 }

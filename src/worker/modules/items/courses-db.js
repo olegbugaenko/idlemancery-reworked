@@ -52,7 +52,8 @@ export const registerCourseItemsStage1 = () => {
                     'health': {
                         A: 0.1,
                         B: 1,
-                        type: 0,
+                        C: 1.02,    
+                        type: 3,
                     }
                 }
             },
@@ -89,9 +90,10 @@ export const registerCourseItemsStage1 = () => {
             multiplier: {
                 resources: {
                     'knowledge': {
-                        A: 0.05,
+                        A: 0.04,
                         B: 1,
-                        type: 0,
+                        C: 1.02,    
+                        type: 3,
                     }
                 }
             },
@@ -131,7 +133,8 @@ export const registerCourseItemsStage1 = () => {
                     'coins': {
                         A: 0.05,
                         B: 1,
-                        type: 0,
+                        C: 1.02,    
+                        type: 3,
                     }
                 }
             },

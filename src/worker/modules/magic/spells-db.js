@@ -682,7 +682,7 @@ export const initSpellsDB1 = () => {
         name: 'Conjure Wood',
         description: 'Create wood without having to use this heavy axe',
         hasCap: false,
-        tags: ['spell', 'magic', 'mental', 'conjuration_magic', 'natural'],
+        tags: ['spell', 'magic', 'mental', 'conjuration_magic', 'natural', 'materialization'],
         defaultCap: 0,
         isAbstract: true,
         level: 1,
@@ -703,7 +703,7 @@ export const initSpellsDB1 = () => {
                 resources: {
                     inventory_wood: {
                         A: 1.2,
-                        B: 2000*gameEffects.getEffectValue('conjuration_spells_efficiency'),
+                        B: 2000*gameEffects.getEffectValue('conjuration_spells_efficiency')*gameEffects.getEffectValue('materialization_spells_efficiency'),
                         type: 1,
                     }
                 }
@@ -717,7 +717,7 @@ export const initSpellsDB1 = () => {
                     }
                 }
             }),
-            effectDeps: ['conjuration_spells_efficiency']
+            effectDeps: ['conjuration_spells_efficiency', 'materialization_spells_efficiency']
         },
         /*usageGain: {
             get_consumption: () => ({
@@ -746,7 +746,7 @@ export const initSpellsDB1 = () => {
         name: 'Conjure Stone',
         description: 'Condense raw earth essence into solid stone.',
         hasCap: false,
-        tags: ['spell', 'magic', 'conjuration_magic'],
+        tags: ['spell', 'magic', 'conjuration_magic', 'materialization'],
         defaultCap: 0,
         isAbstract: true,
         level: 1,
@@ -757,7 +757,7 @@ export const initSpellsDB1 = () => {
                 resources: {
                     inventory_stone: {
                         A: 1.2,
-                        B: 600*gameEffects.getEffectValue('conjuration_spells_efficiency'),
+                        B: 600*gameEffects.getEffectValue('conjuration_spells_efficiency')*gameEffects.getEffectValue('materialization_spells_efficiency'),
                         type: 1,
                     }
                 }
@@ -771,7 +771,7 @@ export const initSpellsDB1 = () => {
                     }
                 }
             }),
-            effectDeps: ['conjuration_spells_efficiency']
+            effectDeps: ['conjuration_spells_efficiency', 'materialization_spells_efficiency']
         },
         /*usageGain: {
             get_consumption: () => ({
@@ -799,7 +799,7 @@ export const initSpellsDB1 = () => {
         name: 'Conjure Coal',
         description: 'Compress elemental essence into combustible coal.',
         hasCap: false,
-        tags: ['spell', 'magic', 'conjuration_magic'],
+        tags: ['spell', 'magic', 'conjuration_magic', 'materialization'],
         defaultCap: 0,
         isAbstract: true,
         level: 1,
@@ -810,7 +810,7 @@ export const initSpellsDB1 = () => {
                 resources: {
                     inventory_coal: {
                         A: 1.2,
-                        B: 10*gameEffects.getEffectValue('conjuration_spells_efficiency'),
+                        B: 10*gameEffects.getEffectValue('conjuration_spells_efficiency')*gameEffects.getEffectValue('materialization_spells_efficiency'),
                         type: 1,
                     }
                 }
@@ -824,7 +824,7 @@ export const initSpellsDB1 = () => {
                     }
                 }
             }),
-            effectDeps: ['conjuration_spells_efficiency']
+            effectDeps: ['conjuration_spells_efficiency', 'materialization_spells_efficiency']
         },
         /*usageGain: {
             get_consumption: () => ({
@@ -1300,7 +1300,7 @@ export const initSpellsDB1 = () => {
         attributes: {
             duration: 20,
             xpOnCast: 80,
-            baseXPCost: 1.e+10,
+            baseXPCost: 1.e+12,
         },
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_advanced_nature_magic') > 0
@@ -1346,7 +1346,7 @@ export const initSpellsDB1 = () => {
         attributes: {
             duration: 20,
             xpOnCast: 100,
-            baseXPCost: 1.e+10,
+            baseXPCost: 1.e+12,
         },
         unlockCondition: () => {
             return gameEntity.getLevel('shop_item_advanced_nature_magic') > 0

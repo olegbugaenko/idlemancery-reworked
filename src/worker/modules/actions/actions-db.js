@@ -714,68 +714,6 @@ export const registerActionsStage1 = () => {
         }
     })
 
-    registerGameAction('action_intensive_conditioning', {
-        tags: ["action", "training", "physical"],
-        name: 'Intensive Conditioning',
-        category: ACTION_CATS.PHYSICAL,
-        isAbstract: false,
-        allowedImpacts: ['effects'],
-        description: 'Push your body and mind to extreme limits through grueling conditioning regimens. This exhausting training significantly accelerates learning in all enhancement-focused courses.',
-        level: 1,
-        minDemoVersion: 20,
-        getLearnRate: () => {
-            return 1;
-        },
-        learningEffects: ['physical_training_learn_speed'],
-        discountEffects: ['physical_actions_discount'],
-        resourceModifier: {
-            get_income: () => ({
-                effects: {
-                    'attribute_vitality': {
-                        A: 1.5*gameEffects.getEffectValue(getRankId('action_intensive_conditioning')),
-                        B: 0,
-                        type: 0,
-                    }
-                }
-            }),
-            get_multiplier: () => ({
-                effects: {
-                    'enchancement_courses_speed': {
-                        A: 0.02,
-                        B: 0.98,
-                        C: 1.002,
-                        type: 3,
-                    }
-                }
-            }),
-            consumption: {
-                resources: {
-                    'health': {
-                        A: 0,
-                        B: 5000000000,
-                        type: 0
-                    },
-                    'mental_energy': {
-                        A: 0,
-                        B: 5000000,
-                        type: 0
-                    }
-                }
-            },
-            effectDeps: []
-        },
-        unlockedBy: [{
-            type: 'effect',
-            id: 'attribute_strength',
-            level: 600000,
-        }],
-        attributes: {
-            baseXPCost: 1.e+24,
-            isTraining: true,
-            isRankAvailable: true,
-        }
-    })
-
     registerGameAction('action_clean_stable', {
         tags: ["action", "job", "physical"],
         name: 'Clean Stable',
@@ -1457,12 +1395,12 @@ export const registerActionsStage1 = () => {
 
     registerGameAction('action_realm_weaver', {
         tags: ["action", "job", "magical"],
-        name: 'Realm Weaver',
+        name: 'Master Arcane Engineer',
         isAbstract: false,
         category: ACTION_CATS.COINS,
         minDemoVersion: 20,
         allowedImpacts: ['effects'],
-        description: 'Manipulate the fabric of reality itself, creating and maintaining massive magical infrastructures for entire civilizations. Your mastery of the arcane is without parallel, and your services are priceless.',
+        description: 'Design and implement complex magical systems for large-scale projects. Your expertise in arcane engineering is highly sought after by governments and major organizations.',
         level: 1,
         discountEffects: ['magical_actions_discount'],
         jobType: 'magical',
@@ -5198,6 +5136,69 @@ export const registerActionsStage1 = () => {
         },
         attributes: {
             baseXPCost: 1.e+16,
+            isTraining: true,
+            isRankAvailable: true,
+        }
+    })
+
+    
+    registerGameAction('action_intensive_conditioning', {
+        tags: ["action", "training", "physical"],
+        name: 'Intensive Conditioning',
+        category: ACTION_CATS.PHYSICAL,
+        isAbstract: false,
+        allowedImpacts: ['effects'],
+        description: 'Push your body and mind to extreme limits through grueling conditioning regimens. This exhausting training significantly accelerates learning in all enhancement-focused courses.',
+        level: 1,
+        minDemoVersion: 20,
+        getLearnRate: () => {
+            return 1;
+        },
+        learningEffects: ['physical_training_learn_speed'],
+        discountEffects: ['physical_actions_discount'],
+        resourceModifier: {
+            get_income: () => ({
+                effects: {
+                    'attribute_vitality': {
+                        A: 1.5*gameEffects.getEffectValue(getRankId('action_intensive_conditioning')),
+                        B: 0,
+                        type: 0,
+                    }
+                }
+            }),
+            get_multiplier: () => ({
+                effects: {
+                    'enchancement_courses_speed': {
+                        A: 0.02,
+                        B: 0.98,
+                        C: 1.002,
+                        type: 3,
+                    }
+                }
+            }),
+            consumption: {
+                resources: {
+                    'health': {
+                        A: 0,
+                        B: 5000000000,
+                        type: 0
+                    },
+                    'mental_energy': {
+                        A: 0,
+                        B: 5000000,
+                        type: 0
+                    }
+                }
+            },
+            effectDeps: []
+        },
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_strength',
+            level: 600000,
+        }],
+        attributes: {
+            baseXPCost: 1.e+27,
             isTraining: true,
             isRankAvailable: true,
         }

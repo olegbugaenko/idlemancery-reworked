@@ -1392,19 +1392,19 @@ export const registerAccessoriesStage1 = () => {
                 resources: {
                     'inventory_iron_plate': {
                         A: 0.05*gameEffects.getEffectValue('device_accessories_efficiency'),
-                        B: gameEffects.getEffectValue('device_accessories_efficiency'),
+                        B: 1,
                         C: 1.004,
                         type: 3,
                     },
                     'inventory_forged_steel': {
                         A: 0.05*gameEffects.getEffectValue('device_accessories_efficiency'),
-                        B: gameEffects.getEffectValue('device_accessories_efficiency'),
+                        B: 1,
                         C: 1.004,
                         type: 3,
                     },
                     'inventory_copper_wire': {
                         A: 0.05*gameEffects.getEffectValue('device_accessories_efficiency'),
-                        B: gameEffects.getEffectValue('device_accessories_efficiency'),
+                        B: 1,
                         C: 1.004,
                         type: 3,
                     }
@@ -1450,13 +1450,13 @@ export const registerAccessoriesStage1 = () => {
                 resources: {
                     'inventory_iron_ore': {
                         A: 0.05*gameEffects.getEffectValue('device_accessories_efficiency'),
-                        B: gameEffects.getEffectValue('device_accessories_efficiency'),
+                        B: 1,
                         C: 1.004,
                         type: 3,
                     },
                     'inventory_copper_ore': {
                         A: 0.05*gameEffects.getEffectValue('device_accessories_efficiency'),
-                        B: gameEffects.getEffectValue('device_accessories_efficiency'),
+                        B: 1,
                         C: 1.004,
                         type: 3,
                     }
@@ -1535,13 +1535,14 @@ export const registerAccessoriesStage1 = () => {
             get_capMult: () => ({
                 resources: {
                     'mana': {
-                        A: 0.12,
+                        A: 0.12*gameEffects.getEffectValue('accessory_clothing_efficiency'),
                         B: 1,
                         C: 1.02,
                         type: 3,
                     }
                 }
-            })
+            }),
+            effectDeps: ['accessory_clothing_efficiency']
         },
         get_cost: () => ({
             'inventory_magical_fabric': {
@@ -1577,13 +1578,14 @@ export const registerAccessoriesStage1 = () => {
             get_multiplier: () => ({
                 effects: {
                     'tome_accessories_efficiency': {
-                        A: 0.08,
+                        A: 0.08*gameEffects.getEffectValue('accessory_clothing_efficiency'),
                         B: 1,
                         C: 1.02,
                         type: 3,
                     }
                 }
-            })
+            }),
+            effectDeps: ['accessory_clothing_efficiency']
         },
         get_cost: () => ({
             'inventory_magical_fabric': {
@@ -1619,7 +1621,7 @@ export const registerAccessoriesStage1 = () => {
                 resources: {
                     'inventory_paper': {
                         A: 0.01*gameEffects.getEffectValue('device_accessories_efficiency'),
-                        B: gameEffects.getEffectValue('device_accessories_efficiency'),
+                        B: 1.0,
                         C: 1.015,
                         type: 3,
                     }
@@ -1643,6 +1645,123 @@ export const registerAccessoriesStage1 = () => {
                 B: 1000000000/getAccessoryDiscount(),
                 type: 1
             },
+        }),
+    })
+
+    registerAccessory('accessory_orb_of_materialization', {
+        tags: ["accessory", "upgrade", "purchaseable", "effect", "magic", "mineral", "jewelry"],
+        name: 'Orb of Materialization',
+        description: 'A mystical orb infused with the essence of fire and crystallized ruby. It amplifies your ability to materialize physical objects through magical means.',
+        level: 0,
+        minDemoVersion: 20,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_magic_ability',
+            level: 450000,
+        }],
+        unlockCondition: () => {
+            return gameResources.isResourceUnlocked('inventory_ruby') 
+                && gameResources.isResourceUnlocked('inventory_fire');
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'materialization_spells_efficiency': {
+                        A: 0.1*gameEffects.getEffectValue('accessory_jewelry_efficiency'),
+                        B: 1,
+                        C: 1.02,
+                        type: 3,
+                    }
+                }
+            }),
+            effectDeps: ['accessory_jewelry_efficiency']
+        },
+        get_cost: () => ({
+            'inventory_ruby': {
+                A: 1.1,
+                B: 1.e+11/getAccessoryDiscount(),
+                type: 1
+            },
+            'inventory_fire': {
+                A: 1.1,
+                B: 1.e+4/getAccessoryDiscount(),
+                type: 1
+            }
+        }),
+    })
+
+    registerAccessory('accessory_sage_hat', {
+        tags: ["accessory", "upgrade", "purchaseable", "effect", "magic", "clothing"],
+        name: "Sage's Hat",
+        description: 'A distinctive hat woven from enchanted fabric and imbued with mental clarity. Wearing it enhances your social presence and makes learning social skills more efficient.',
+        level: 0,
+        minDemoVersion: 20,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_sage_accessories_access') > 0
+                && gameResources.isResourceUnlocked('inventory_magical_fabric')
+                && gameResources.isResourceUnlocked('mental_energy');
+        },
+        resourceModifier: {
+            get_multiplier: () => ({
+                effects: {
+                    'social_actions_discount': {
+                        A: 0.05*gameEffects.getEffectValue('accessory_clothing_efficiency'),
+                        B: 1,
+                        C: 1.015,
+                        type: 3,
+                    }
+                }
+            }),
+            effectDeps: ['accessory_clothing_efficiency']
+        },
+        get_cost: () => ({
+            'inventory_magical_fabric': {
+                A: 1.1,
+                B: 100000/getAccessoryDiscount(),
+                type: 1
+            },
+            'knowledge': {
+                A: 1.1,
+                B: 50000000/getAccessoryDiscount(),
+                type: 1
+            }
+        }),
+    })
+
+    registerAccessory('accessory_consciousness_charm', {
+        tags: ["accessory", "upgrade", "purchaseable", "storage", "magic", "jewelry"],
+        name: 'Consciousness Charm',
+        description: 'A delicate charm that resonates with the depths of consciousness. It expands your mental capacity, allowing you to store more mental energy.',
+        level: 0,
+        minDemoVersion: 20,
+        unlockCondition: () => {
+            return gameEntity.getLevel('shop_item_sage_accessories_access') > 0
+                && gameResources.isResourceUnlocked('mental_energy');
+        },
+        resourceModifier: {
+            get_capMult: () => ({
+                resources: {
+                    'mental_energy': {
+                        A: 0.05*gameEffects.getEffectValue('accessory_jewelry_efficiency'),
+                        B: 1,
+                        C: 1.02,
+                        type: 3,
+                    }
+                }
+            }),
+            effectDeps: ['accessory_jewelry_efficiency']
+        },
+        get_cost: () => ({
+            'inventory_magical_fabric': {
+                A: 1.1,
+                B: 50000/getAccessoryDiscount(),
+                type: 1
+            },
+            'mana': {
+                A: 1.1,
+                B: 25000000/getAccessoryDiscount(),
+                type: 1
+            }
         }),
     })
 }

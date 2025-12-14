@@ -152,7 +152,7 @@ export const ActionListsPopup = ({ lists, isOpened, setOpenedFor, onSelect, onHo
             }
             return false;
         });
-    }, [lists, search, JSON.stringify(scope)])
+    }, [lists, search, scope.join(',')])
 
     const onDragEnd = (result) => {
         const { source, destination } = result;

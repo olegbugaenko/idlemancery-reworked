@@ -289,14 +289,13 @@ const JournalDetails = ({ journal, onClose, isFixed }) => {
             <PerfectScrollbar>
                 <div className={'blade-inner'}>
                     <div className={'block'}>
-                        <h4>{journal.name}</h4>
+                        <h4>{journal.name}&nbsp;({journal.level})</h4>
                         <div className={'description'}>
                             {journal.desc}
                         </div>
                     </div>
 
                     <div className={'block'}>
-                        <p>Level: {journal.level} / {journal.maxLevel || '∞'}</p>
                         <div className={'progress-section'}>
                             <div className={'flex-container flex-row'}>
                                 <p>XP: {formatInt(journal.xp || 0)} / {formatInt(journal.maxXP || 100)}</p>

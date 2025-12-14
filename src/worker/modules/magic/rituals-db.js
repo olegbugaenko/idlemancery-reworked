@@ -1,4 +1,4 @@
-import { gameEntity } from "game-framework";
+import { gameEffects, gameEntity } from "game-framework";
 
 export const registerRitual = (id, options) => {
 
@@ -194,7 +194,7 @@ export const initRitualsDB = () => {
             }
         },
         unlockCondition: () => {
-            return gameEntity.getLevel('shop_item_ritualism') > 0;
+            return gameEntity.getLevel('shop_item_ritualism') > 0 && gameEffects.getEffectValue('attribute_magic_ability') >= 500000;
         }
     });
 }

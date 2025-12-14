@@ -1476,6 +1476,38 @@ export const registerShopItemsStage1 = () => {
         }),
     })
 
+    gameEntity.registerGameEntity('shop_item_sage_accessories_access', {
+        tags: ["shop", "upgrade", "purchaseable"],
+        name: 'Sage Accessories Access',
+        description: 'Your mastery of magic has reached extraordinary heights. The shopkeeper now recognizes you as a true sage and grants access to the most exclusive collection of mystical accessories.',
+        level: 0,
+        maxLevel: 1,
+        minDemoVersion: 20,
+        unlockedBy: [{
+            type: 'effect',
+            id: 'attribute_magic_ability',
+            level: 600000,
+        }],
+        unlockCondition: () => {
+            return gameEffects.getEffectValue('attribute_magic_ability') >= 600000
+        },
+        attributes: {
+            isCollectable: false,
+        },
+        get_cost: () => ({
+            'coins': {
+                A: 2.0,
+                B: 2.e+17*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                type: 1
+            },
+            'mana': {
+                A: 1.0,
+                B: 20000000000,
+                type: 0
+            }
+        }),
+    })
+
     gameEntity.registerGameEntity('shop_item_magical_compass', {
         tags: ["shop", "upgrade", "purchaseable"],
         name: 'Magical Compass',
@@ -4295,7 +4327,7 @@ export const registerShopItemsStage1 = () => {
         get_cost: () => ({
             'coins': {
                 A: 2,
-                B: 5.0e+16*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
+                B: 2.5e+16*charismaMod(gameEffects.getEffectValue('attribute_charisma')),
                 type: 1
             }
         }),

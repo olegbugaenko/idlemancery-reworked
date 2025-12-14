@@ -1080,7 +1080,15 @@ const DraggableActionCardComponent = ({
     isSelected,
 }) => {
     const { id } = action;
-    const {ref, props: dragProps} = useDrag({ type: 'action', id: `action_card_${id}`, sourceId: 'actions-list', data: { id } });
+    
+    const dragConfig = useMemo(() => ({
+        type: 'action',
+        id: `action_card_${id}`,
+        sourceId: 'actions-list',
+        data: { id }
+    }), [id]);
+    
+    const {ref, props: dragProps} = useDrag(dragConfig);
 
     return (
         <div ref={ref} {...dragProps}>
