@@ -6,6 +6,15 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+            <h3>Idle Awakening v0.3.0</h3>
+                <div className={'features'}>
+                    <p>New mechanics: Zoo, Social Press and more</p>
+                    <p>New resources, alchemy and crafting recipes, actions and more</p>
+                    <p>New structures</p>
+                    <p>Fixed bugs related to machinery</p>
+                    <p>Added x8 speed up mode</p>
+                    <p>New stories</p>
+                </div>
                 <h3>Idle Awakening v0.2.2a</h3>
                 <div className={'features'}>
                     <p>Fixed a bug where in some cases living space might not display in costs</p>
