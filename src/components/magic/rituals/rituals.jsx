@@ -298,7 +298,12 @@ export const RitualsWrap = ({ children }) => {
                             </div>
                         ) : null}
                     </div>
-                ) : <div className={'spell-details-inner'}>Hover or select a ritual to see details</div>}
+                ) : <div className={'spell-details-inner'}>
+                    <p className={'hint'}>Rituals provide you specific bonuses and penalties while isActive</p>
+                    <p className={'hint'}>You can have only one ritual active at a time</p>
+                    <p className={'hint'}>You can't toggle rituals sooner than 60 seconds after the last toggle</p>
+                    <p className={'hint'}>Hover or select a ritual to see details</p>
+                    </div>}
             </div>
         </div>
     )

@@ -1677,7 +1677,7 @@ export const registerActionsStage1 = () => {
                     }
                 }
             }),
-            effectDeps: ['mining_efficiency', 'job_efficiency_physical']
+            effectDeps: ['mining_efficiency', 'manual_labor_efficiency']
         },
         unlockedBy: [{
             type: 'effect',

@@ -6,7 +6,7 @@ export const ZOO_ANIMALS = [
         entityId: 'zoo_animal_magic_henk',
         feedEntityId: 'zoo_animal_magic_henk_feeding',
         tags: ['zoo_animal', 'domestic', 'bird', 'herbivore'],
-        name: 'Magic Henk',
+        name: 'Magic Hen',
         icon: 'magic_henk',
         description: 'A dimensional wanderer whose mere presence harmonizes magical amplifiers.',
         attributes: {

@@ -6,7 +6,20 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
-            <h3>Idle Awakening v0.3.0</h3>
+                <h3>Idle Awakening v0.3.0b</h3>
+                <div className={'features'}>
+                    <p>Fixed a bug where missing mana didn't cause active spell efficiency to drop in some cases</p>
+                    <p>Fixed a bug where toggling "Show breakdowns always expanded" didn't apply correctly</p>
+                    <p>Fixed a bug where highlighting of positive/negative and capped resources didn't work properly</p>
+                    <p>Fixed some typos and descriptions</p>
+                </div>
+                <h3>Idle Awakening v0.3.0a</h3>
+                <div className={'features'}>
+                    <p>Fixed bug where manual labour efficiency was applied to "Clay Mining" action inconsistently</p>
+                    <p>Fixed bug where hover over learning multiplier didn't highlight actions it affects</p>
+                    <p>Added hints section to the right sidebar of rituals page</p>
+                </div>
+                <h3>Idle Awakening v0.3.0</h3>
                 <div className={'features'}>
                     <p>New mechanics: Zoo, Social Press and more</p>
                     <p>New resources, alchemy and crafting recipes, actions and more</p>

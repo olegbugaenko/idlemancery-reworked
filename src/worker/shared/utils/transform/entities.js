@@ -25,4 +25,6 @@ export const entityResponse = (entityData) => ({
     scope: entityData.scope,
     unlocks: entityData.unlocks,
     autocast: entityData.autocast,
+    learningEffects: entityData.learningEffects,
+    customIcon: entityData.customIcon,
 })

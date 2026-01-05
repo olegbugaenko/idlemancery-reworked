@@ -96,9 +96,9 @@ export const ResourcesBar = () => {
         };
 
         onMessage('resources-data', handleResources);
-        onMessage('settings', handleSettings);
+        onMessage('settings-sidebar', handleSettings);
         sendData('query-resources-data', { includePinned: true });
-        sendData('query-settings', {});
+        sendData('query-settings', { prefix: 'sidebar' });
         const interval = setInterval(() => {
             sendData('query-resources-data', { includePinned: true });
         }, 200);

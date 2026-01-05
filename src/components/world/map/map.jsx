@@ -17,7 +17,7 @@ const customStyles = {
         padding: '0', // Видаляємо паддінги
         borderRadius: '2px', // Можливо, зменшимо border-radius
         fontSize: '13px',
-        width: '300px',
+        width: window.innerWidth > 1280 ? '420px' : window.innerWidth > 1024 ? '300px' : '200px',
         background: 'rgba(0,0,0,0.3)'
     }),
     valueContainer: (provided, state) => ({
@@ -156,8 +156,25 @@ export const Map = ({ setItemDetails, openListDetails, isEditList }) => {
     }, [mapData.mapLists.automationUnlocked]);
 
     const setHighlighted = useCallback(data => {
-        sendData('map-highlight-resources', {ids: data.map(one => one.value)})
-    })
+        const resourceFilterMode = mapData.highlightFilters?.resourceFilterMode || 'any';
+        sendData('map-highlight-resources', {
+            ids: data.map(one => one.value),
+            resourceFilterMode: resourceFilterMode
+        })
+    }, [mapData.highlightFilters?.resourceFilterMode])
+
+    const changeResourceFilterMode = useCallback((e) => {
+        const mode = e.target.value;
+        sendData('map-highlight-filter', { resourceFilterMode: mode });
+        // Also update resources with new mode
+        const selectedResources = mapData.filterableLoot.filter(one => one.isSelected);
+        if (selectedResources.length > 0) {
+            sendData('map-highlight-resources', {
+                ids: selectedResources.map(one => one.id),
+                resourceFilterMode: mode
+            });
+        }
+    }, [mapData.filterableLoot])
 
     const toggleUnexplored = useCallback(() => {
         sendData('map-highlight-filter', { highlightUnexplored: !mapData.highlightFilters.highlightUnexplored});
@@ -193,21 +210,41 @@ export const Map = ({ setItemDetails, openListDetails, isEditList }) => {
 
             {mapData.filterableLoot?.length ? (<div className={'resources-filter'}>
                 <span>Search resources</span>
-                <Select
-                    isMulti={true}
-                    options={mapData.filterableLoot.map(one => ({
-                        value: one.id,
-                        label: one.name
-                    }))}
-                    defaultValue={mapData.filterableLoot.filter(one => one.isSelected).map(one => ({
-                        value: one.id,
-                        label: one.name
-                    }))}
-                    onChange={setHighlighted}
-                    styles={customStyles}
-                >
-
-                </Select>
+                <div style={{display: 'flex', gap: '10px', alignItems: 'center'}}>
+                    <Select
+                        isMulti={true}
+                        options={mapData.filterableLoot.map(one => ({
+                            value: one.id,
+                            label: one.name
+                        }))}
+                        defaultValue={mapData.filterableLoot.filter(one => one.isSelected).map(one => ({
+                            value: one.id,
+                            label: one.name
+                        }))}
+                        onChange={setHighlighted}
+                        styles={customStyles}
+                    >
+                    </Select>
+                    <select
+                        value={mapData.highlightFilters?.resourceFilterMode || 'any'}
+                        onChange={changeResourceFilterMode}
+                        style={{
+                            width: '100px',
+                            height: '30px',
+                            padding: '0 6px',
+                            fontSize: '13px',
+                            borderRadius: '2px',
+                            background: 'rgba(0,0,0,0.3)',
+                            color: '#fff',
+                            border: '1px solid #555',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        <option value="any">ANY</option>
+                        <option value="atLeast2">2 of them</option>
+                        <option value="all">ALL</option>
+                    </select>
+                </div>
             </div> ) : null}
             <div className={'other-filters'}>
                 <label className={'effort-control'}>

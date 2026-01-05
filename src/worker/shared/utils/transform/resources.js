@@ -32,4 +32,8 @@ export const resourceResponse = (resourceData) => resourceData ? ({
     autosell: resourceData.autosell,
     autoconsume: resourceData.autoconsume,
     autopurchase: resourceData.autopurchase,
+    isCapped: resourceData.isCapped,
+    isService: resourceData.isService,
+    isNegative: resourceData.isNegative,
+    isPositive: resourceData.isPositive,
 }) : null;

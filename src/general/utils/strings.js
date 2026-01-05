@@ -8,7 +8,7 @@ export const formatValue = (number, numDigits = 2, withSign = false) => {
     if(window?.notation === 'scientific') {
         return Math.abs(number) > 999 ? number.toExponential(numDigits) : number.toFixed(numDigits);
     }
-    const suffixes = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc', 'UDc', 'DDc', 'TDc', 'QaDc', 'QiDc', 'SxDc', 'SpDc'];
+    const suffixes = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc', 'UDc', 'DDc', 'TDc', 'QaDc', 'QiDc', 'SxDc', 'SpDc', 'OcDc', 'NoDc', 'Vg'];
     let sign = '';
 
     if(withSign && number > 0) {
@@ -38,7 +38,7 @@ export const formatInt = (number, numDigits = 2) => {
     if(window?.notation === 'scientific') {
         return Math.abs(Math.round(number)) > 999 ? Math.round(number).toExponential(numDigits) : Math.round(number);
     }
-    const suffixes = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc'];
+    const suffixes = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc', 'UDc', 'DDc', 'TDc', 'QaDc', 'QiDc', 'SxDc', 'SpDc', 'OcDc', 'NoDc', 'Vg'];
     let sign = '';
 
     if (number < 0) {

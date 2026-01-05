@@ -61,6 +61,7 @@ export class MageModule extends GameModule {
             }
             this.settings[payload.key] = payload.value;
             this.eventHandler.sendData('settings', this.settings);
+            this.eventHandler.sendData('settings-sidebar', this.settings);
         })
 
         this.eventHandler.registerHandler('set_tour_finished', ({ skipStep }) => {

@@ -33,7 +33,7 @@ export const registerCourseItemsStage1 = () => {
 
     registerCourse('course_body_capability', {
         name: 'Body Capability',
-        tags: ['physical', 'enchancement'],
+        tags: ['physical', 'enhancement'],
         minDemoVersion: 20,
         attributes: {
             basicDuration: 60,
@@ -78,7 +78,7 @@ export const registerCourseItemsStage1 = () => {
 
     registerCourse('course_mind_improvement', {
         name: 'Improved Mind',
-        tags: ['mental', 'enchancement'],
+        tags: ['mental', 'enhancement'],
         minDemoVersion: 20,
         attributes: {
             basicDuration: 60,
@@ -119,7 +119,7 @@ export const registerCourseItemsStage1 = () => {
 
     registerCourse('course_coins_improvement', {
         name: 'Work Ethic',
-        tags: ['social', 'enchancement'],
+        tags: ['social', 'enhancement'],
         minDemoVersion: 20,
         attributes: {
             basicDuration: 60,
@@ -160,7 +160,7 @@ export const registerCourseItemsStage1 = () => {
 
     registerCourse('course_navigation', {
         name: 'Improved Navigation',
-        tags: ['mental', 'enchancement'],
+        tags: ['mental', 'enhancement'],
         minDemoVersion: 20,
         attributes: {
             basicDuration: 60,

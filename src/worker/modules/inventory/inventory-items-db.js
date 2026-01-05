@@ -2357,7 +2357,6 @@ export const registerInventoryItems = () => {
         },
         sellPrice: 15000,
         rarity: 5,
-        allowedTileTypes: ['forest', 'mountain', 'hills']
     })
 
     registerInventoryItem('inventory_rare_azureblossom', {

@@ -230,7 +230,7 @@ export const registerAmplifiersStage1 = () => {
     registerAmplifier('amplifier_body_ignition', {
         tags: ["amplifier", "upgrade", "purchaseable", "spark", "actions"],
         name: 'Body Ignition Amplifier',
-        description: 'Increase physical training learning rate',
+        description: 'Increase your energy and health capacities.',
         level: 0,
         minDemoVersion: 20,
         unlockCondition: () => {

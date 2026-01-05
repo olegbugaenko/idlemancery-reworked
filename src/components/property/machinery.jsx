@@ -84,7 +84,7 @@ export const MachineryUpgrades = ({ setItemDetails, purchaseItem, deleteItem, ne
             <div className={'head'}>
                 <TippyWrapper content={<div className={'hint-popup'}><BreakDown breakDown={data.space.breakDown} /></div>}>
                     <div className={'space-item'}>
-                        <span className={'label'}>Machinery</span>
+                        <span className={'label'}>Living Space</span>
                         <span className={`slots-amount ${data.space.total > 0 ? 'slots-available' : 'slots-unavailable'}`}>{formatInt(Math.floor(data.space.total))}/{formatInt(data.space.max)}</span>
                     </div>
                 </TippyWrapper>

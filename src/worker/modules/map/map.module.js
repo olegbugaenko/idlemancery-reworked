@@ -41,6 +41,9 @@ export class MapModule extends GameModule {
             if('effortMax' in payload) {
                 this.highlightFilters['effortMax'] = payload.effortMax;
             }
+            if('resourceFilterMode' in payload) {
+                this.highlightFilters['resourceFilterMode'] = payload.resourceFilterMode;
+            }
             this.sendData();
         })
 
@@ -54,6 +57,9 @@ export class MapModule extends GameModule {
             payload.ids.forEach(id => {
                 this.highlightResources[id] = true;
             })
+            if('resourceFilterMode' in payload) {
+                this.highlightFilters['resourceFilterMode'] = payload.resourceFilterMode;
+            }
             this.sendData();
         })
 
@@ -501,7 +507,7 @@ export class MapModule extends GameModule {
         const col = this.mapTilesProcessed[iRow][iCol];
 
         const hasHighlightResources = Object.keys(this.highlightResources).length > 0;
-        const { highlightUnexplored, effortMin, effortMax } = this.highlightFilters;
+        const { highlightUnexplored, effortMin, effortMax, resourceFilterMode } = this.highlightFilters;
 
         const emptyConds = !hasHighlightResources && !highlightUnexplored && !effortMin && !effortMax;
 
@@ -510,7 +516,28 @@ export class MapModule extends GameModule {
         let isHighlight = true;
 
         if (hasHighlightResources) {
-            isHighlight = col.drops.some(drop => this.highlightResources[drop.id] && drop.isRevealed);
+            const mode = resourceFilterMode || 'any'; // default to 'any' if not set
+            const revealedDrops = col.drops.filter(drop => drop.isRevealed);
+            const matchingResources = revealedDrops.filter(drop => this.highlightResources[drop.id]);
+            const selectedResourceCount = Object.keys(this.highlightResources).length;
+            
+            switch(mode) {
+                case 'all':
+                    // All selected resources must be present
+                    isHighlight = selectedResourceCount > 0 && matchingResources.length === selectedResourceCount;
+                    break;
+                case 'atLeast2':
+                    // At least 2 of the selected resources must be present
+                    // Only highlight if at least 2 resources are selected
+                    isHighlight = selectedResourceCount >= 2 && matchingResources.length >= 2;
+                    break;
+                case 'any':
+                default:
+                    // At least 1 of the selected resources must be present (original behavior)
+                    isHighlight = matchingResources.length >= 1;
+                    break;
+            }
+            
             if (!isHighlight) return false; // Early exit optimization
         }
 
