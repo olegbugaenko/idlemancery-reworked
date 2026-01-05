@@ -6,6 +6,13 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
+            <h3>Idle Awakening v0.3.0c</h3>
+                <div className={'features'}>
+                    <p>QoL: Added new resource filter mode to map</p>
+                    <p>Fixed a bug where social events icon didn't show up properly</p>
+                    <p>Fixed a bug where big numbers didn't display properly</p>
+                    <p>Fixed some typos and descriptions</p>
+                </div>
                 <h3>Idle Awakening v0.3.0b</h3>
                 <div className={'features'}>
                     <p>Fixed a bug where missing mana didn't cause active spell efficiency to drop in some cases</p>
