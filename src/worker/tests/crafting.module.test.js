@@ -48,7 +48,9 @@ describe('CraftingModule', () => {
     gameEntity.getEntity.mockImplementation((id) => ({
       id,
       name: `Recipe ${id}`,
-      tags: id.includes('material') ? ['recipe', 'material'] : ['recipe', 'alchemy'],
+      tags: id.startsWith('craft_') || id.includes('material')
+        ? ['recipe', 'material']
+        : ['recipe', 'alchemy'],
       resourceId: id
     }));
 
@@ -56,6 +58,7 @@ describe('CraftingModule', () => {
     gameEntity.registerGameEntity.mockImplementation(() => {});
     gameEntity.unsetEntity.mockImplementation(() => {});
     gameEntity.listEntitiesByTags.mockReturnValue([]);
+    gameEntity.getEffects.mockReturnValue([]);
 
     gameResources.getResource.mockImplementation((id) => ({
       id,

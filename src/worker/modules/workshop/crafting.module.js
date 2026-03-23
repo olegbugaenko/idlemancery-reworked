@@ -7,6 +7,9 @@ import {packEffects} from "../../shared/utils/objects";
 import { entityResponse } from "../../shared/utils/transform/entities";
 import { resourceResponse } from "../../shared/utils/transform/resources";
 
+const EFFORT_SCALE = 1e6;
+const EFFORT_EPSILON = 1 / EFFORT_SCALE;
+
 export class CraftingModule extends GameModule {
 
     constructor(props) {
@@ -131,6 +134,88 @@ export class CraftingModule extends GameModule {
         registerCraftingRecipes()
     }
 
+    getCategoryTag(category) {
+        const tagToCat = {
+            'crafting': 'material',
+            'alchemy': 'alchemy'
+        };
+
+        return tagToCat[category];
+    }
+
+    effortToUnits(effort) {
+        if (!Number.isFinite(effort)) {
+            return 0;
+        }
+
+        const clamped = Math.max(0, Math.min(1, effort));
+        return Math.max(0, Math.min(EFFORT_SCALE, Math.round(clamped * EFFORT_SCALE)));
+    }
+
+    unitsToEffort(units) {
+        return units / EFFORT_SCALE;
+    }
+
+    quantizeEffort(effort) {
+        return this.unitsToEffort(this.effortToUnits(effort));
+    }
+
+    quantizeAllocations(allocations) {
+        if (!allocations) return;
+
+        for (const id of Object.keys(allocations)) {
+            allocations[id] = this.quantizeEffort(allocations[id] || 0);
+        }
+    }
+
+    quantizeCategoryEfforts(category) {
+        const categoryTag = this.getCategoryTag(category);
+        if (!categoryTag) return;
+
+        for (const [recipeId, slot] of Object.entries(this.craftingSlots)) {
+            const recipeTags = gameEntity.getEntity(recipeId)?.tags || [];
+            if (!recipeTags.includes(categoryTag)) continue;
+
+            slot.effort = this.quantizeEffort(slot.effort || 0);
+        }
+    }
+
+    distributeQuantizedEfforts(recipeIds, targetTotal, getWeight) {
+        if (!recipeIds?.length) return;
+
+        const totalUnits = this.effortToUnits(targetTotal);
+        const weightedIds = recipeIds
+            .map((id) => ({
+                id,
+                weight: Math.max(0, getWeight(id) || 0),
+            }))
+            .filter((entry) => entry.weight > 0);
+
+        if (!weightedIds.length) {
+            return;
+        }
+
+        const totalWeight = weightedIds.reduce((sum, entry) => sum + entry.weight, 0);
+        if (totalWeight <= 0) {
+            return;
+        }
+
+        let remainingUnits = totalUnits;
+
+        weightedIds.forEach((entry, index) => {
+            const isLast = index === weightedIds.length - 1;
+            const nextUnits = isLast
+                ? remainingUnits
+                : Math.min(
+                    remainingUnits,
+                    Math.floor((totalUnits * entry.weight) / totalWeight)
+                );
+
+            this.craftingSlots[entry.id].effort = this.unitsToEffort(nextUnits);
+            remainingUnits -= nextUnits;
+        });
+    }
+
     tick(game, delta) {
         this.lists.tick(game, delta);
 
@@ -193,6 +278,8 @@ export class CraftingModule extends GameModule {
         this.alchemyOriginalAllocations = obj?.alchemyOriginalAllocations || {};
         this.rebalanceReasons = obj?.rebalanceReasons || {};
         this.alchemyRebalanceReasons = obj?.alchemyRebalanceReasons || {};
+        this.quantizeAllocations(this.originalAllocations);
+        this.quantizeAllocations(this.alchemyOriginalAllocations);
 
         for(const id in this.craftingSlots) {
             this.setCraftingEffort({ id, effort: this.craftingSlots[id].effort, isForce: true });
@@ -220,10 +307,10 @@ export class CraftingModule extends GameModule {
     }
 
     validateAndNormalizeCategoryEfforts(category, updateOriginals = false) {
-        const tagToCat = {
-            'crafting': 'material',
-            alchemy: 'alchemy'
-        };
+        const categoryTag = this.getCategoryTag(category);
+        if (!categoryTag) return;
+
+        this.quantizeCategoryEfforts(category);
 
         let totalEffort = 0;
         let lockedEffort = 0;
@@ -234,7 +321,7 @@ export class CraftingModule extends GameModule {
             if (!slot.effort || slot.effort <= 0) continue;
 
             const recipeTags = gameEntity.getEntity(recipeId)?.tags || [];
-            if (!recipeTags.includes(tagToCat[category])) continue;
+            if (!recipeTags.includes(categoryTag)) continue;
 
             totalEffort += slot.effort;
 
@@ -246,23 +333,16 @@ export class CraftingModule extends GameModule {
         }
 
         // If total effort exceeds 100%, normalize
-        if (totalEffort > 1.001) {
+        if (totalEffort > 1 + EFFORT_EPSILON) {
             console.warn(`Loaded ${category} efforts exceed 100%: ${(totalEffort * 100).toFixed(2)}%. Normalizing...`);
             console.log('Locked effort:', lockedEffort, 'Unlocked slots:', unlockedSlots.length);
 
-            const availableEffort = Math.max(0, 1.0 - lockedEffort);
+            const availableEffort = this.quantizeEffort(Math.max(0, 1.0 - lockedEffort));
             const unlockedTotal = totalEffort - lockedEffort;
 
             if (unlockedTotal > 0 && availableEffort >= 0) {
-                // Normalize only unlocked efforts to fit in available space
-                for (const { recipeId, slot } of unlockedSlots) {
-                    if (!this.craftingSlots[recipeId].isLocked) {
-                        const proportion = slot.effort / unlockedTotal;
-                        const normalizedEffort = availableEffort * proportion;
-                        console.log(`Normalizing loaded ${recipeId}: ${slot.effort} -> ${normalizedEffort}`);
-                        this.craftingSlots[recipeId].effort = normalizedEffort;
-                    }
-                }
+                const recipeIds = unlockedSlots.map(({ recipeId }) => recipeId);
+                this.distributeQuantizedEfforts(recipeIds, availableEffort, (recipeId) => this.craftingSlots[recipeId]?.effort || 0);
             }
         }
 
@@ -277,22 +357,24 @@ export class CraftingModule extends GameModule {
             
             for (const [recipeId, originalEffort] of Object.entries(allocations)) {
                 const recipeTags = gameEntity.getEntity(recipeId)?.tags || [];
-                if (recipeTags.includes(tagToCat[category])) {
+                if (recipeTags.includes(categoryTag)) {
                     totalOriginalEffort += originalEffort;
                     categoryOriginals.push({ recipeId, originalEffort });
                 }
             }
             
             // Normalize originalEfforts to sum to 1.0
-            if (totalOriginalEffort > 1.001) {
+            if (totalOriginalEffort > 1 + EFFORT_EPSILON) {
                 console.log(`Normalizing originalEfforts for ${category}: total ${totalOriginalEffort} -> 1.0`);
                 
                 for (const { recipeId, originalEffort } of categoryOriginals) {
-                    const normalizedOriginal = originalEffort / totalOriginalEffort;
+                    const normalizedOriginal = this.quantizeEffort(originalEffort / totalOriginalEffort);
                     console.log(`Normalizing originalEffort for ${recipeId}: ${originalEffort} -> ${normalizedOriginal}`);
                     allocations[recipeId] = normalizedOriginal;
                 }
             }
+
+            this.quantizeAllocations(allocations);
         }
 
         // Additional safety check - ensure no locked recipe exceeds available space
@@ -300,7 +382,7 @@ export class CraftingModule extends GameModule {
             if (!slot.isLocked || !slot.effort || slot.effort <= 0) continue;
 
             const recipeTags = gameEntity.getEntity(recipeId)?.tags || [];
-            if (!recipeTags.includes(tagToCat[category])) continue;
+            if (!recipeTags.includes(categoryTag)) continue;
 
             const availableForLocked = this.getAvailableEffortForLockedRecipe(recipeId, category);
             if (slot.effort > availableForLocked) {
@@ -351,6 +433,8 @@ export class CraftingModule extends GameModule {
             effort = 1;
         }
 
+        effort = this.quantizeEffort(effort);
+
         if(id === 'craft_ruby') {
             console.log('New Ruby Effort: ', effort);
         }
@@ -371,6 +455,7 @@ export class CraftingModule extends GameModule {
 
         // Use filterId from parameter if provided, otherwise from slot
         const currentFilterId = filterId || this.craftingSlots[id].filterId;
+        this.quantizeCategoryEfforts(currentFilterId);
 
         if(!isForce && !isAutoRestore) {
             this.recalculateRemaining(id, currentFilterId, 1 - effort)
@@ -388,7 +473,7 @@ export class CraftingModule extends GameModule {
 
         // If bSetOriginal is true, set originalEffort to current effort
         if (bSetOriginal) {
-            allocations[id] = effort;
+            allocations[id] = this.quantizeEffort(effort);
         }
 
         // If this is not auto-restore and not force, check if we should remove from originalAllocations
@@ -433,23 +518,23 @@ export class CraftingModule extends GameModule {
     }
 
     recalculateRemaining(skipId, category) {
-        const tagToCat = {
-            'crafting': 'material',
-            alchemy: 'alchemy'
-        }
+        const categoryTag = this.getCategoryTag(category);
+        if (!categoryTag) return;
+
+        this.quantizeCategoryEfforts(category);
 
         const skippedEffort = this.craftingSlots[skipId]?.effort ?? 0;
         
         // Calculate total locked effort (excluding the skipped recipe)
         const lockedEffort = Object.entries(this.craftingSlots).reduce((acc, [key, recipe]) => {
-            if (key !== skipId && recipe.isLocked && gameEntity.getEntity(key).tags.includes(tagToCat[category])) {
+            if (key !== skipId && recipe.isLocked && gameEntity.getEntity(key).tags.includes(categoryTag)) {
                 return acc + recipe.effort;
             }
             return acc;
         }, 0);
         
-        const remainingToRedistribute = 1 - skippedEffort - lockedEffort;
-        const currentRecipes = Object.entries(this.craftingSlots).filter(([key, one]) => gameEntity.getEntity(key).tags.includes(tagToCat[category]));
+        const remainingToRedistribute = this.quantizeEffort(1 - skippedEffort - lockedEffort);
+        const currentRecipes = Object.entries(this.craftingSlots).filter(([key, one]) => gameEntity.getEntity(key).tags.includes(categoryTag));
         const currentEffortsTotal = currentRecipes.reduce((acc, [key, recipe]) => {
             // Only count unlocked recipes (excluding the skipped one)
             if (key !== skipId && !recipe.isLocked) {
@@ -465,19 +550,12 @@ export class CraftingModule extends GameModule {
             currentEffortsTotal, 
             mult
         });
-        if(Math.abs(mult - 1) > SMALL_NUMBER && mult < 1) {
-            if(this.craftingSlots) {
-                for(const id in this.craftingSlots) {
-                    const isIgnore = category && !gameEntity.getEntity(id).tags.includes(tagToCat[category]);
-                    const isLocked = this.craftingSlots[id].isLocked;
-                    if(!isIgnore && skipId !== id && !isLocked) {
-                        console.log(`recalculateRemaining: changing ${id} effort from ${this.craftingSlots[id].effort} to ${this.craftingSlots[id].effort * mult}`);
-                        this.craftingSlots[id].effort *= mult;
-                    } else if (isLocked) {
-                        console.log(`recalculateRemaining: skipping LOCKED ${id} with effort ${this.craftingSlots[id].effort}`);
-                    }
-                }
-            }
+        if(Math.abs(mult - 1) > EFFORT_EPSILON && mult < 1) {
+            const unlockedRecipeIds = currentRecipes
+                .filter(([id, recipe]) => id !== skipId && !recipe.isLocked)
+                .map(([id]) => id);
+
+            this.distributeQuantizedEfforts(unlockedRecipeIds, remainingToRedistribute, (id) => this.craftingSlots[id]?.effort || 0);
         }
         
         // Update active recipes after recalculating efforts
@@ -492,23 +570,21 @@ export class CraftingModule extends GameModule {
      * This ensures originalEffort reflects the actual redistributed efforts
      */
     updateOriginalAllocationsAfterRecalculate(category) {
-        const tagToCat = {
-            'crafting': 'material',
-            'alchemy': 'alchemy'
-        };
+        const categoryTag = this.getCategoryTag(category);
+        if (!categoryTag) return;
 
         const allocations = category === 'crafting' ? this.originalAllocations : this.alchemyOriginalAllocations;
 
         for (const [recipeId, slot] of Object.entries(this.craftingSlots)) {
             const recipeTags = gameEntity.getEntity(recipeId)?.tags || [];
-            if (!recipeTags.includes(tagToCat[category])) continue;
+            if (!recipeTags.includes(categoryTag)) continue;
 
             // Update originalEffort to current effort if it was previously stored
             if (allocations[recipeId] !== undefined && !slot.isLocked) {
                 const currentEffort = slot.effort || 0;
                 if (currentEffort > 0) {
                     console.log(`Updating originalEffort after recalculate for ${recipeId}: ${allocations[recipeId]} -> ${currentEffort}`);
-                    allocations[recipeId] = currentEffort;
+                    allocations[recipeId] = this.quantizeEffort(currentEffort);
                 }
             }
         }
@@ -547,10 +623,10 @@ export class CraftingModule extends GameModule {
     }
 
     normalizeTotalEffort(category, updateOriginals = false) {
-        const tagToCat = {
-            'crafting': 'material',
-            alchemy: 'alchemy'
-        };
+        const categoryTag = this.getCategoryTag(category);
+        if (!categoryTag) return;
+
+        this.quantizeCategoryEfforts(category);
 
         // Calculate total effort and locked effort for this category
         let totalEffort = 0;
@@ -561,7 +637,7 @@ export class CraftingModule extends GameModule {
             if (!slot.effort || slot.effort <= 0) continue;
             
             const recipeTags = gameEntity.getEntity(recipeId)?.tags || [];
-            if (!recipeTags.includes(tagToCat[category])) continue;
+            if (!recipeTags.includes(categoryTag)) continue;
             
             totalEffort += slot.effort;
             
@@ -575,28 +651,16 @@ export class CraftingModule extends GameModule {
         }
 
         // If total effort exceeds 100%, normalize only unlocked efforts
-        if (totalEffort > 1.001) { // Small tolerance for floating point errors
+        if (totalEffort > 1 + EFFORT_EPSILON) {
             console.warn(`Total effort for ${category} exceeded 100%: ${(totalEffort * 100).toFixed(2)}%. Normalizing unlocked efforts...`);
             console.log('Locked effort:', lockedEffort, 'Unlocked slots:', unlockedSlots.length);
             
-            const availableEffort = Math.max(0, 1.0 - lockedEffort);
+            const availableEffort = this.quantizeEffort(Math.max(0, 1.0 - lockedEffort));
             const unlockedTotal = totalEffort - lockedEffort;
             
             if (unlockedTotal > 0 && availableEffort >= 0) {
-                // Normalize only unlocked efforts to fit in available space
-                for (const { recipeId, slot } of unlockedSlots) {
-                    // Double check that this slot is not locked before changing it
-                    if (!this.craftingSlots[recipeId].isLocked) {
-                        const proportion = slot.effort / unlockedTotal;
-                        const normalizedEffort = availableEffort * proportion;
-                        console.log(`Normalizing ${recipeId}: ${slot.effort} -> ${normalizedEffort}`);
-                        this.craftingSlots[recipeId].effort = normalizedEffort;
-                    } else {
-                        console.log(`Skipping locked recipe ${recipeId} with effort ${slot.effort}`);
-                    }
-                }
-                
-                
+                const recipeIds = unlockedSlots.map(({ recipeId }) => recipeId);
+                this.distributeQuantizedEfforts(recipeIds, availableEffort, (recipeId) => this.craftingSlots[recipeId]?.effort || 0);
             }
         }
 
@@ -606,19 +670,21 @@ export class CraftingModule extends GameModule {
             let sum = 0;
             for (const [rid, val] of Object.entries(allocations)) {
                 const tags = gameEntity.getEntity(rid)?.tags || [];
-                if (tags.includes(tagToCat[category])) {
+                if (tags.includes(categoryTag)) {
                     sum += (val || 0);
                 }
             }
-            if (sum > 1 + 1e-9) {
+            if (sum > 1 + EFFORT_EPSILON) {
                 const k = 1 / sum;
                 for (const [rid, val] of Object.entries(allocations)) {
                     const tags = gameEntity.getEntity(rid)?.tags || [];
-                    if (tags.includes(tagToCat[category])) {
-                        allocations[rid] = (val || 0) * k;
+                    if (tags.includes(categoryTag)) {
+                        allocations[rid] = this.quantizeEffort((val || 0) * k);
                     }
                 }
             }
+
+            this.quantizeAllocations(allocations);
         }
     }
 

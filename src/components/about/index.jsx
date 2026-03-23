@@ -10,10 +10,10 @@ export const About = () => {
                 <div className={'features'}>
                     <p>Added possibility to search in property tab by cost</p>
                     <p>Added rank progress bar indicator to action card</p>
+                    <p>Added quantization algorithm for crafting and alchemy efforts for better precision</p>
                     <p>Fixed a bug where active ritual data could remain after reset</p>
                     <p>Fixed multiple action rank multiplier mismatches (Learn Botany, Archeology Intuition Training, Linguistic Drills, Enhance Mind)</p>
                     <p>Rebalanced Public Engagement to be a consistent mental action (tags, category, and discount)</p>
-                    <p>Added strict validation for rankable actions to prevent wrong rank links in future updates</p>
                 </div>
                 <h3>Idle Awakening v0.3.0c</h3>
                 <div className={'features'}>
