@@ -1,12 +1,17 @@
 import {gameEntity, gameCore, gameEffects, gameResources} from "game-framework"
 
 
-const getResourceModifierDataSearchable = (rs) => {
+const getResourceModifierDataSearchable = (rs, cost) => {
 
     const searchables = {
         'effects': [],
-        'resources': []
+        'resources': [],
+        'cost': []
     };
+
+    if(cost) {
+        searchables.cost.push(...Object.keys(cost).map(one => gameResources.getResource(one)?.name?.toLowerCase() ?? one.toLowerCase()));
+    }
 
     if(!rs) return searchables;
 
@@ -30,7 +35,7 @@ const getResourceModifierDataSearchable = (rs) => {
 
 export const registerStructure = (id, options) => {
 
-    options.searchableMeta = getResourceModifierDataSearchable(options.resourceModifier);
+    options.searchableMeta = getResourceModifierDataSearchable(options.resourceModifier, options.get_cost ? options.get_cost() : options.cost);
 
     gameEntity.registerGameEntity(id, options);
 }

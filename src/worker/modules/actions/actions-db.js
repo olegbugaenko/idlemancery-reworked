@@ -54,6 +54,32 @@ const getResourceModifierDataSearchable = (rs) => {
     return searchables;
 }
 
+const collectRankRefsFromValue = (value, refs = new Set()) => {
+    if(!value) return refs;
+
+    if(typeof value === 'function') {
+        const fnSource = value.toString();
+        const re = /getRankId\((['"])(action_[^'"]+)\1\)/g;
+        let match = re.exec(fnSource);
+        while(match) {
+            refs.add(match[2]);
+            match = re.exec(fnSource);
+        }
+        return refs;
+    }
+
+    if(Array.isArray(value)) {
+        value.forEach(item => collectRankRefsFromValue(item, refs));
+        return refs;
+    }
+
+    if(typeof value === 'object') {
+        Object.values(value).forEach(item => collectRankRefsFromValue(item, refs));
+    }
+
+    return refs;
+}
+
 const registerGameAction = (id, options) => {
 
     const primaryAttribute = options.attributes.primaryAttribute;
@@ -65,6 +91,14 @@ const registerGameAction = (id, options) => {
     options.resourceModifier.prefix = 'Action: ';
 
     if(options.attributes.isRankAvailable) {
+        if(!options.attributes.allowExternalRankRefs && options.resourceModifier) {
+            const rankRefs = [...collectRankRefsFromValue(options.resourceModifier)];
+            const externalRankRefs = rankRefs.filter(refId => refId !== id);
+            if(externalRankRefs.length > 0) {
+                throw new Error(`[actions-db] Rank reference mismatch for "${id}". External rank refs found: ${externalRankRefs.join(', ')}`);
+            }
+        }
+
         gameEffects.registerEffect(getRankId(id), {
             name: `${options.name} Rank Multiplier`,
             minValue: 1,
@@ -2081,9 +2115,9 @@ export const registerActionsStage1 = () => {
 
 
     registerGameAction('action_public_engagement', {
-        tags: ["action", "mental", "social", "activity"],
+        tags: ["action", "mental", "activity"],
         name: 'Public Engagement',
-        category: ACTION_CATS.SOCIAL,
+        category: ACTION_CATS.MENTAL,
         isAbstract: false,
         allowedImpacts: ['effects'],
         description: 'Engage with the public through speeches, events, and social interactions to inspire others and strengthen your influence. This action enhances the effectiveness of all social actions, making your efforts more impactful.',
@@ -2093,7 +2127,7 @@ export const registerActionsStage1 = () => {
             return 4.
         },
         learningEffects: ['mental_activities_learn_rate'],
-        discountEffects: ['social_actions_discount'],
+        discountEffects: ['mental_actions_discount'],
         resourceModifier: {
             get_multiplier: () => ({
                 effects: {
@@ -3234,7 +3268,7 @@ export const registerActionsStage1 = () => {
             get_multiplier: () => ({
                 effects: {
                     'plantations_efficiency': {
-                        A: 0.005*gameEffects.getEffectValue(getRankId('action_learn_geography')),
+                        A: 0.005*gameEffects.getEffectValue(getRankId('action_learn_botany')),
                         B: 0.995,
                         type: 0,
                     }
@@ -3387,7 +3421,7 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 effects: {
                     'learn_languages_efficiency': {
-                        A: 0.1*gameEffects.getEffectValue(getRankId('action_learn_languages')),
+                        A: 0.1*gameEffects.getEffectValue(getRankId('action_linguistic_practices')),
                         B: -0.1,
                         type: 0,
                     },
@@ -4877,12 +4911,12 @@ export const registerActionsStage1 = () => {
             get_income: () => ({
                 effects: {
                     'attribute_willpower': {
-                        A: 4*gameEffects.getEffectValue(getRankId('action_mental_endurance')),
+                        A: 4*gameEffects.getEffectValue(getRankId('action_enhance_mind')),
                         B: -4,
                         type: 0,
                     },
                     'attribute_memory': {
-                        A: 1*gameEffects.getEffectValue(getRankId('action_mental_endurance')),
+                        A: 1*gameEffects.getEffectValue(getRankId('action_enhance_mind')),
                         B: -1,
                         type: 0,
                     }
@@ -5104,7 +5138,7 @@ export const registerActionsStage1 = () => {
             get_multiplier: () => ({
                 effects: {
                     'expedition_xp_rate': {
-                        A: 0.01*gameEffects.getEffectValue(getRankId('action_alchemy_training')),
+                        A: 0.01*gameEffects.getEffectValue(getRankId('action_archeology_intuition_training')),
                         B: 0.99,
                         type: 0,
                     }

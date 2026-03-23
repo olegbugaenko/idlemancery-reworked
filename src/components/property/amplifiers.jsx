@@ -30,6 +30,9 @@ const ACTIONS_SEARCH_SCOPES = [{
 },{
     id: 'effects',
     label: 'effects'
+},{
+    id: 'cost',
+    label: 'cost'
 }]
 
 export const AmplifiersUpgrades = ({ setItemDetails, purchaseItem, newUnlocks, isMobile }) => {

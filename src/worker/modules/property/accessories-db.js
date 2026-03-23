@@ -1,12 +1,17 @@
 import {gameEntity, gameCore, gameEffects, gameResources} from "game-framework"
 
 
-const getResourceModifierDataSearchable = (rs) => {
+const getResourceModifierDataSearchable = (rs, cost) => {
 
     const searchables = {
         'effects': [],
-        'resources': []
+        'resources': [],
+        'cost': []
     };
+
+    if(cost) {
+        searchables.cost.push(...Object.keys(cost).map(one => gameResources.getResource(one)?.name?.toLowerCase() ?? one.toLowerCase()));
+    }
 
     if(!rs) return searchables;
 
@@ -30,7 +35,7 @@ const getResourceModifierDataSearchable = (rs) => {
 
 export const registerAccessory = (id, options) => {
 
-    options.searchableMeta = getResourceModifierDataSearchable(options.resourceModifier);
+    options.searchableMeta = getResourceModifierDataSearchable(options.resourceModifier, options.get_cost ? options.get_cost() : options.cost);
 
     gameEntity.registerGameEntity(id, options);
 }
@@ -417,7 +422,7 @@ export const registerAccessoriesStage1 = () => {
 
     // Scientific Papers series (unlocked by PhD expertise upgrades)
     registerAccessory('accessory_scientific_papers_social', {
-        tags: ["accessory", "upgrade", "purchaseable", "effect", "paper", "scroll", "scientific"],
+        tags: ["accessory", "upgrade", "purchaseable", "effect", "paper", "scientific"],
         name: 'Scientific Papers: Social Sciences',
         description: 'A curated collection of peer-reviewed works in social sciences. Reduces XP requirements for social actions.',
         level: 0,
@@ -452,7 +457,7 @@ export const registerAccessoriesStage1 = () => {
     })
 
     registerAccessory('accessory_scientific_papers_anatomy', {
-        tags: ["accessory", "upgrade", "purchaseable", "effect", "paper", "scroll", "scientific"],
+        tags: ["accessory", "upgrade", "purchaseable", "effect", "paper", "scientific"],
         name: 'Scientific Papers: Anatomy',
         description: 'Comprehensive anatomical studies compiled into an accessible format. Reduces XP requirements for physical actions.',
         level: 0,
@@ -487,7 +492,7 @@ export const registerAccessoriesStage1 = () => {
     })
 
     registerAccessory('accessory_scientific_papers_philosophy', {
-        tags: ["accessory", "upgrade", "purchaseable", "effect", "paper", "scroll", "scientific"],
+        tags: ["accessory", "upgrade", "purchaseable", "effect", "paper", "scientific"],
         name: 'Scientific Papers: Philosophy',
         description: 'A synthesis of philosophical treatises that sharpen reasoning. Reduces XP requirements for mental actions.',
         level: 0,

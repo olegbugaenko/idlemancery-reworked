@@ -6,7 +6,16 @@ export const About = () => {
     return (<div className={'ingame-box about-block'}>
         <PerfectScrollbar>
             <div>
-            <h3>Idle Awakening v0.3.0c</h3>
+                <h3>Idle Awakening v0.3.1</h3>
+                <div className={'features'}>
+                    <p>Added possibility to search in property tab by cost</p>
+                    <p>Added rank progress bar indicator to action card</p>
+                    <p>Fixed a bug where active ritual data could remain after reset</p>
+                    <p>Fixed multiple action rank multiplier mismatches (Learn Botany, Archeology Intuition Training, Linguistic Drills, Enhance Mind)</p>
+                    <p>Rebalanced Public Engagement to be a consistent mental action (tags, category, and discount)</p>
+                    <p>Added strict validation for rankable actions to prevent wrong rank links in future updates</p>
+                </div>
+                <h3>Idle Awakening v0.3.0c</h3>
                 <div className={'features'}>
                     <p>QoL: Added new resource filter mode to map</p>
                     <p>Fixed a bug where social events icon didn't show up properly</p>

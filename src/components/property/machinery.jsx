@@ -18,6 +18,7 @@ const SEARCH_SCOPES = [
     { id: 'description', label: 'description' },
     { id: 'resources', label: 'resources' },
     { id: 'effects', label: 'effects' },
+    { id: 'cost', label: 'cost' },
 ];
 
 export const MachineryUpgrades = ({ setItemDetails, purchaseItem, deleteItem, newUnlocks, isMobile }) => {

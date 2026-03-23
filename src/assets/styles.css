@@ -829,6 +829,12 @@ p.small-hint, span.small-hint {
     transition: width 0.2s linear;
 }
 
+.bar-container.action-rank-progress-inline .bar-outer {
+    margin-top: 2px;
+    height: 3px;
+    border-radius: 2px;
+}
+
 .icon-card.unavailable {
     opacity: 0.5;
     border-color: var(--yellow);
@@ -4117,6 +4123,24 @@ body::after {
     width: 16px;
     height: 16px;
     cursor: pointer;
+}
+
+.press-wrap .press-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: nowrap;
+}
+
+.press-wrap .press-controls .space-item {
+    display: flex;
+    align-items: center;
+}
+
+.press-wrap .press-controls .checkbox-label {
+    white-space: nowrap;
+    font-size: 13px;
+    gap: 6px;
 }
 
 .rebalance-status {

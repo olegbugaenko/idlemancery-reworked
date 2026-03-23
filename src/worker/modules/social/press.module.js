@@ -7,6 +7,7 @@ export class PressModule extends GameModule {
         super()
         this.journals = {}
         this.effortAssign = {}
+        this.keepMaxEffort = true;
 
         this.eventHandler.registerHandler('query-press-state', () => {
             this.eventHandler.sendData('press-state', this.getState())
@@ -16,6 +17,11 @@ export class PressModule extends GameModule {
             // Set effort for a single journal
             this.setJournalEffort(id, effort);
             // Send updated state
+            this.eventHandler.sendData('press-state', this.getState());
+        })
+
+        this.eventHandler.registerHandler('set-press-keep-max-effort', ({ value }) => {
+            this.keepMaxEffort = !!value;
             this.eventHandler.sendData('press-state', this.getState());
         })
 
@@ -135,6 +141,7 @@ export class PressModule extends GameModule {
         return {
             printing_effort: gameResources.getResource('printing_effort').amount,
             assign: this.effortAssign,
+            keepMaxEffort: this.keepMaxEffort,
             journals: this.getJournals().map(jid=>this.getJournalState(jid.id))
         }
     }
@@ -250,23 +257,31 @@ export class PressModule extends GameModule {
             }
         }
 
-        // Calculate multiplier to scale other efforts to fit in remaining space
-        const mult = currentEffortsTotal > 0 ? remainingToRedistribute / currentEffortsTotal : 0;
+        // Keep max effort ON: always rescale others so total is exactly 100%.
+        if (this.keepMaxEffort) {
+            const mult = currentEffortsTotal > 0 ? remainingToRedistribute / currentEffortsTotal : 0;
+            for (const journal of journals) {
+                const id = journal.id;
+                if (id !== skipId) {
+                    const currentEffort = this.effortAssign[id] || 0;
+                    this.effortAssign[id] = currentEffort * mult;
+                }
+            }
+            return;
+        }
         
-        console.log('recalculateRemaining: ', {
-            skipId,
-            remainingToRedistribute, 
-            currentEffortsTotal, 
-            mult
-        });
+        // Keep max effort OFF: only downscale when we overflow >100%.
+        // If there is free effort left (<100%), keep other allocations unchanged.
+        if (currentEffortsTotal <= remainingToRedistribute || currentEffortsTotal <= 0) {
+            return;
+        }
 
-        // Scale all other journals proportionally
+        const mult = remainingToRedistribute / currentEffortsTotal;
         for (const journal of journals) {
             const id = journal.id;
             if (id !== skipId) {
                 const currentEffort = this.effortAssign[id] || 0;
                 this.effortAssign[id] = currentEffort * mult;
-                console.log(`recalculateRemaining: changing ${id} effort from ${currentEffort} to ${currentEffort * mult}`);
             }
         }
     }
@@ -316,6 +331,7 @@ export class PressModule extends GameModule {
         return {
             journals: this.journals,
             effortAssign: this.effortAssign,
+            keepMaxEffort: this.keepMaxEffort,
         }
     }
 
@@ -329,6 +345,7 @@ export class PressModule extends GameModule {
         
         this.journals = saveObject.journals || {};
         this.effortAssign = saveObject.effortAssign || {};
+        this.keepMaxEffort = saveObject.keepMaxEffort ?? true;
         
         // Sync levels from saved data to entities
         for (const journalId in this.journals) {
@@ -347,5 +364,6 @@ export class PressModule extends GameModule {
         }
         this.journals = {};
         this.effortAssign = {};
+        this.keepMaxEffort = true;
     }
 }

@@ -1186,6 +1186,17 @@ export class ActionsModule extends GameModule {
             isHidden: this.actions?.[entity.id]?.isHidden,
             monitored: this.getMonitoredData(entity),
             missingResourceId: this.isRunningAction(entity.id) && gameEntity.getEntityEfficiency(`runningAction_${entity.id}`) < 1 ? gameEntity.getEntity(`runningAction_${entity.id}`)?.modifier?.bottleNeck : null,
+            rankData: gameEntity.getAttribute(entity.id, 'isRankAvailable') ? (() => {
+                const actionLevel = this.actions[entity.id]?.level || 1;
+                const rankData = {
+                    rank: this.getActionRank(entity.id),
+                    nextRankLevel: 100*Math.ceil((actionLevel + 1)/100),
+                    prevRankLevel: 100*Math.floor((actionLevel + 1)/100),
+                };
+                rankData.progress = (actionLevel - rankData.prevRankLevel) / 100;
+                rankData.bonus = this.getRankBonus(rankData.rank);
+                return rankData;
+            })() : null,
             // nextEtas: this.getEtasNext(entity.id)
         }))
 
@@ -1298,13 +1309,14 @@ export class ActionsModule extends GameModule {
         };
 
         if(gameEntity.getAttribute(entity.id, 'isRankAvailable')) {
+            const actionLevel = this.actions[entity.id]?.level || 1;
             const rankData = {
                 rank: this.getActionRank(entity.id),
-                nextRankLevel: 100*Math.ceil((this.actions[entity.id]?.level + 1)/100),
-                prevRankLevel: 100*Math.floor((this.actions[entity.id]?.level + 1)/100),
+                nextRankLevel: 100*Math.ceil((actionLevel + 1)/100),
+                prevRankLevel: 100*Math.floor((actionLevel + 1)/100),
             }
 
-            rankData.progress = (this.actions[entity.id]?.level - rankData.prevRankLevel) / 100;
+            rankData.progress = (actionLevel - rankData.prevRankLevel) / 100;
             rankData.bonus = this.getRankBonus(rankData.rank);
             entityData.rankData = rankData;
         }

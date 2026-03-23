@@ -1124,7 +1124,7 @@ const areDraggablePropsEqual = (prev, next) => {
 
 const DraggableActionCard = React.memo(DraggableActionCardComponent, areDraggablePropsEqual);
 
-export const ActionCard = React.memo(({ id, category, isFavorite, monitored, entityEfficiency, isEditingList, index, isCapped, name, level, max, xp, maxXP, xpRate, isActive, effort, isLeveled, focused, isTraining, actionEffect, currentEffects, potentialEffects, isHidden, onFlash, onSelect, onActivate, onShowDetails, toggleHiddenAction, missingResourceId, isSelected, tags, ...props}) => {
+export const ActionCard = React.memo(({ id, category, isFavorite, monitored, entityEfficiency, isEditingList, index, isCapped, name, level, max, xp, maxXP, xpRate, isActive, effort, isLeveled, focused, isTraining, actionEffect, currentEffects, potentialEffects, isHidden, onFlash, onSelect, onActivate, onShowDetails, toggleHiddenAction, missingResourceId, isSelected, tags, rankData, ...props}) => {
     const elementRef = useRef(null);
 
     useEffect(() => {
@@ -1254,6 +1254,9 @@ export const ActionCard = React.memo(({ id, category, isFavorite, monitored, ent
 
                         <div id={`level_up_indicator_${id}`}>
                             <ProgressBar className={'action-progress'} percentage={xp/maxXP}></ProgressBar>
+                            {rankData ? (
+                                <ProgressBar className={'action-progress rank-progress action-rank-progress-inline'} percentage={rankData.progress}></ProgressBar>
+                            ) : null}
                         </div>
                         <div className={'buttons'}>
                             <div className={'buttons-inner-wrap'}>

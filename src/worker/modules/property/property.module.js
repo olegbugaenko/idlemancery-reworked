@@ -917,6 +917,8 @@ export class PropertyModule extends GameModule {
             && one.searchableMeta?.['resources'].some(tag => tag.includes(search.toLowerCase()))) return true;
         if(selectedScopes.includes('effects') && one.searchableMeta?.['effects']
             && one.searchableMeta?.['effects'].some(tag => tag.includes(search.toLowerCase()))) return true;
+        if(selectedScopes.includes('cost') && one.searchableMeta?.['cost']
+            && one.searchableMeta?.['cost'].some(tag => tag.includes(search.toLowerCase()))) return true;
 
         return false;
     }

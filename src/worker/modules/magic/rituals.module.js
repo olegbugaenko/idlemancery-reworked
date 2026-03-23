@@ -81,6 +81,13 @@ export class RitualModule extends GameModule {
     }
 
     load(saveObj) {
+        // Clean up active ritual entities from the previous state before loading new data.
+        for(const id in this.rituals) {
+            if(this.rituals[id]?.isRunning && gameEntity.entityExists(`active_${id}`)) {
+                gameEntity.unsetEntity(`active_${id}`);
+            }
+        }
+
         this.rituals = saveObj?.rituals || {};
         this.switchCooldown = saveObj?.switchCooldown ?? 0;
         for(const id in this.rituals) {

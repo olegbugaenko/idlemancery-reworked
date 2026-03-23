@@ -15,6 +15,7 @@ export const PressWrap = ({ children }) => {
 
     const [pressData, setPressData] = useState({
         printing_effort: 0,
+        keepMaxEffort: true,
         journals: []
     });
     const [detailOpenedId, setDetailOpenedId] = useState(null);
@@ -75,6 +76,10 @@ export const PressWrap = ({ children }) => {
         sendData('assign-effort', { id, effort });
     }, [sendData]);
 
+    const setKeepMaxEffort = useCallback((value) => {
+        sendData('set-press-keep-max-effort', { value });
+    }, [sendData]);
+
     const handleJournalClick = useCallback((id) => {
         setDetailOpenedId(id);
         setViewedOpenedId(null);
@@ -117,6 +122,21 @@ export const PressWrap = ({ children }) => {
                     </div>
 
                     <div className={'press-controls'}>
+                        <div className={'space-item'}>
+                            <TippyWrapper content={<div className={'hint-popup'}>
+                                <p className={'hint'}>When enabled, total assigned effort is kept at 100% by rescaling other journals. When disabled, journals are only rescaled down if total exceeds 100%.</p>
+                            </div>}>
+                                <label className={'checkbox-label'}>
+                                    <input
+                                        type="checkbox"
+                                        checked={pressData.keepMaxEffort ?? true}
+                                        onChange={(e) => setKeepMaxEffort(e.target.checked)}
+                                    />
+                                    <span>Keep max effort</span>
+                                </label>
+                            </TippyWrapper>
+                        </div>
+
                         <div className={'space-item'}>
                             <TippyWrapper content={<div className={'hint-popup'}>
                                 <p className={'hint'}>When enabled, shows numeric input fields instead of sliders for setting effort values.</p>

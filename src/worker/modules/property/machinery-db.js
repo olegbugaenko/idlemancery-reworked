@@ -2,11 +2,15 @@ import { gameEntity, gameResources, gameEffects } from "game-framework";
 import { charismaMod } from "../items/shop-db";
 
 // Helper: build searchable metadata same way as structures
-const getResourceModifierDataSearchable = (rs) => {
+const getResourceModifierDataSearchable = (rs, cost) => {
     const searchables = {
         'effects': [],
-        'resources': []
+        'resources': [],
+        'cost': []
     };
+    if (cost) {
+        searchables.cost.push(...Object.keys(cost).map(one => gameResources.getResource(one)?.name?.toLowerCase() ?? one.toLowerCase()));
+    }
     if (!rs) return searchables;
 
     ['income', 'consumption', 'multiplier', 'rawCap', 'capMult'].forEach(scope => {
@@ -29,7 +33,7 @@ const getResourceModifierDataSearchable = (rs) => {
 }
 
 const registerMachine = (id, options) => {
-    options.searchableMeta = getResourceModifierDataSearchable(options.resourceModifier);
+    options.searchableMeta = getResourceModifierDataSearchable(options.resourceModifier, options.get_cost ? options.get_cost() : options.cost);
     gameEntity.registerGameEntity(id, options);
 }
 
